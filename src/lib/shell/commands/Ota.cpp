@@ -313,7 +313,7 @@ CHIP_ERROR ConnectProvider(FabricIndex fabricIndex, NodeId nodeId, const Transpo
     DeviceProxyInitParams initParams = { .sessionManager = &Server::GetInstance().GetSecureSessionManager(),
                                          .exchangeMgr    = &Server::GetInstance().GetExchangeManager(),
                                          .idAllocator    = &Server::GetInstance().GetSessionIDAllocator(),
-                                         .fabricInfo     = fabric,
+                                         .fabricTable    = &Server::GetInstance().GetFabricTable(),
                                          .imDelegate     = &sIMDelegate };
 
     auto deviceProxy = Platform::New<OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(nodeId));

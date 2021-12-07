@@ -170,7 +170,7 @@ private:
     /**
      * Setup CASESessionManager used to establish a session with the provider
      */
-    CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
+    CHIP_ERROR SetupCASESessionManager();
 
     /**
      * Create a QueryImage request using values from the Basic cluster attributes
