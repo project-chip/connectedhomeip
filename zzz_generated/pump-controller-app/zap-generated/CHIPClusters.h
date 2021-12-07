@@ -180,8 +180,6 @@ public:
                                           uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeCapacity(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint8_t value);
     CHIP_ERROR SubscribeAttributeOperationMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeOperationMode(Callback::Cancelable * onReportCallback);
