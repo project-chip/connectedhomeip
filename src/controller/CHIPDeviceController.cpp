@@ -962,7 +962,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     FreeRendezvousSession();
 
-    if (mDeviceBeingCommissioned != nullptr && mIsIPRendezvous)
+    if (mDeviceBeingCommissioned != nullptr)
     {
         // Release the commissionee device. For BLE, this is stored,
         // for IP commissioning, we have taken a reference to the
@@ -1020,22 +1020,8 @@ void DeviceCommissioner::OnSessionEstablished()
     // For IP rendezvous, this is sent as part of the state machine.
     if (mRunCommissioningAfterConnection)
     {
-        mRunCommissioningAfterConnection       = false;
-        bool usingLegacyFlowWithImmediateStart = !mIsIPRendezvous;
-        if (usingLegacyFlowWithImmediateStart)
-        {
-            err = SendCertificateChainRequestCommand(mDeviceBeingCommissioned, CertificateType::kPAI);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(Ble, "Failed in sending 'Certificate Chain request' command to the device: err %s", ErrorStr(err));
-                OnSessionEstablishmentError(err);
-                return;
-            }
-        }
-        else
-        {
-            mAutoCommissioner.StartCommissioning(mDeviceBeingCommissioned);
-        }
+        mRunCommissioningAfterConnection = false;
+        mAutoCommissioner.StartCommissioning(mDeviceBeingCommissioned);
     }
     else
     {
@@ -1516,14 +1502,7 @@ CHIP_ERROR DeviceCommissioner::OnOperationalCredentialsProvisioningCompletion(Co
     {
         mPairingDelegate->OnStatusUpdate(DevicePairingDelegate::SecurePairingSuccess);
     }
-    if (mIsIPRendezvous)
-    {
-        CommissioningStageComplete(CHIP_NO_ERROR);
-    }
-    else
-    {
-        RendezvousCleanup(CHIP_NO_ERROR);
-    }
+    CommissioningStageComplete(CHIP_NO_ERROR);
 
     return CHIP_NO_ERROR;
 }
@@ -1652,6 +1631,7 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
     {
+        RendezvousCleanup(CHIP_NO_ERROR);
         // Let's release the device that's being paired, if pairing was successful,
         // and the device is available on the operational network.
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
@@ -1685,30 +1665,22 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));
 
-    if (commissioner->mIsIPRendezvous)
+    if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
     {
-        if (commissioner->mCommissioningStage == CommissioningStage::kFindOperational)
+        if (commissioner->mCommissioningDelegate != nullptr)
         {
-            if (commissioner->mCommissioningDelegate != nullptr)
-            {
-                CommissioningDelegate::CommissioningReport report;
-                report.stageCompleted                            = CommissioningStage::kFindOperational;
-                report.OperationalNodeFoundData.operationalProxy = device;
-                commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
-            }
+            CommissioningDelegate::CommissioningReport report;
+            report.stageCompleted                            = CommissioningStage::kFindOperational;
+            report.OperationalNodeFoundData.operationalProxy = device;
+            commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
         }
-        else
-        {
-            commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
-        }
-        // For IP rendezvous, we don't want to call commissioning complete below because IP commissioning
-        // has more steps currently.
-        return;
     }
-
-    VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
-                   ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
-    commissioner->mPairingDelegate->OnCommissioningComplete(device->GetDeviceId(), CHIP_NO_ERROR);
+    else
+    {
+        VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
+                       ChipLogProgress(Controller, "Device connected callback with null pairing delegate. Ignoring"));
+        commissioner->mPairingDelegate->OnPairingComplete(CHIP_NO_ERROR);
+    }
 }
 
 void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
@@ -1727,10 +1699,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 {
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
-    if (!mIsIPRendezvous)
-    {
-        return;
-    }
     mCommissioningStage    = step;
     mCommissioningDelegate = delegate;
 
@@ -1894,7 +1862,6 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     break;
     case CommissioningStage::kFindOperational: {
         PeerId peerId = PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(proxy->GetDeviceId());
-        RendezvousCleanup(CHIP_NO_ERROR);
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         ChipLogProgress(Controller, "Finding node on operational network");
         mDNSResolver.ResolveNodeId(peerId, Inet::IPAddressType::kAny);

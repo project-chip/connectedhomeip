@@ -182,10 +182,17 @@ class ChipDeviceController(object):
 
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def CloseBLEConnection(self):
         return self._ChipStack.Call(
