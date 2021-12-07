@@ -25,7 +25,6 @@
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/attribute-storage.h>
 
-#include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>

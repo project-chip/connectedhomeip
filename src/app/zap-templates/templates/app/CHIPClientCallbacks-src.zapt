@@ -5,7 +5,6 @@
 
 #include <cinttypes>
 
-#include <app/Command.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af.h>
 #include <app/util/af-enums.h>
