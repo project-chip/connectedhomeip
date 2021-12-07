@@ -172,5 +172,20 @@ limitations under the License.
       <arg name="Duration" type="INT32U"/>
     </command>
 
+    <event side="server" code="0x00" priority="info" name="StateChanged" optional="false">
+      <description>This event SHALL be generated when there is a change in the Status of an ActionID.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStatusEnum" />
+    </event>
+
+    <event side="server" code="0x01" priority="info" name="ActionFailed" optional="false">
+      <description>This event SHALL be generated when there is some error which prevents the action from its normal planned execution.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStatusEnum" />
+      <field id="3" name="Error"    type="ActionErrorEnum" />
+    </event>
+
   </cluster>
 </configurator>
