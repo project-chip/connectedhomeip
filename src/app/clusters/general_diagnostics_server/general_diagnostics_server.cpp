@@ -178,7 +178,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
                 MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, static_cast<AttributeId>(context));
                 return Loop::Continue;
             },
-            attribute);
+            static_cast<intptr_t>(attribute));
     }
 
     // Gets called when any network interface on the Node is updated.
