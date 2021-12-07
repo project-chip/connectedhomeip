@@ -26,5 +26,5 @@ class AudioOutputManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetListOfAudioOutputInfo(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

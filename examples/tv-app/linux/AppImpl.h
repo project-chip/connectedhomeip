@@ -164,16 +164,18 @@ protected:
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
 {
+#define APP_LIBRARY_SIZE 3
 public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
     ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
+    ContentApp * LoadContentAppByAppId(ApplicationLauncherApp application);
 
 protected:
-    ContentAppImpl mContentApps[3] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
-                                       ContentAppImpl("Vendor2", 2, "App2", 22, "Version2"),
-                                       ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3") };
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
+                                                      ContentAppImpl("Vendor2", 2, "App2", 22, "Version2"),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3") };
 };
 
 } // namespace AppPlatform

@@ -236,6 +236,16 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
     return NULL;
 }
 
+ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApp application)
+{
+    ChipLogProgress(DeviceLayer, "GetLoadContentAppByAppId()");
+    if (mContentAppFactory != NULL)
+    {
+        return mContentAppFactory->LoadContentAppByAppId(application);
+    }
+    return NULL;
+}
+
 ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
 {
     uint8_t index = 0;

@@ -27,5 +27,5 @@ class TargetNavigatorManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetTargetInfoList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

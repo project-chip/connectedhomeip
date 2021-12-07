@@ -36,7 +36,7 @@
 using namespace chip;
 
 namespace {
-template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(app::AttributeValueEncoder &)>
+template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(uint16_t, app::AttributeValueEncoder &)>
 class TvAttrAccess : public app::AttributeAccessInterface
 {
 public:
@@ -46,7 +46,7 @@ public:
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {
-            return (Manager().*Getter)(aEncoder);
+            return (Manager().*Getter)(aPath.mEndpointId, aEncoder);
         }
 
         return CHIP_NO_ERROR;

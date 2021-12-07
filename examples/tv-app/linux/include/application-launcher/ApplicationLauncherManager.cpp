@@ -36,9 +36,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::EndpointId mEndpointId,
+                                                               chip::app::AttributeValueEncoder & aEncoder)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncherManager::proxyGetApplicationList");
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::proxyGetApplicationList endpoint=%d", mEndpointId);
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         ReturnErrorOnFailure(encoder.Encode(123u));
         ReturnErrorOnFailure(encoder.Encode(456u));
@@ -49,19 +50,29 @@ CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::Attrib
 ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
                                                                 std::string data)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterLaunchApp endpoint=%d", emberAfCurrentEndpoint());
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
     if (app != NULL)
     {
         return app->GetApplicationLauncher()->LaunchApp(application, data);
     }
+
+    app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByAppId(application);
+    if (app != NULL)
+    {
+        return app->GetApplicationLauncher()->LaunchApp(application, data);
+    }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterLaunchApp app not found");
 
     // TODO: Insert your code
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
     // TODO: Update once storing a structure attribute is supported
     // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
     //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);

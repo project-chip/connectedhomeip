@@ -37,7 +37,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here

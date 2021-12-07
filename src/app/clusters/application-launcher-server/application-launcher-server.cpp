@@ -66,9 +66,8 @@ exit:
 ::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, CharSpan applicationId)
 {
     ::ApplicationLauncherApp application = {};
-    // TODO: Need to figure out what types we're using here.
-    // application.applicationId            = applicationId;
-    application.catalogVendorId = catalogVendorId;
+    application.applicationId            = applicationId;
+    application.catalogVendorId          = catalogVendorId;
     return application;
 }
 
