@@ -968,9 +968,23 @@ public:
         return SaveToFlash();
     }
 
-    CHIP_ERROR GetMaxEntries(int & value) const override
+    CHIP_ERROR GetMaxEntryCount(size_t & value) const override
     {
         value = ArraySize(EntryStorage::acl);
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR GetEntryCount(size_t & value) const override
+    {
+        value = 0;
+        for (const auto & storage : EntryStorage::acl)
+        {
+            if (!storage.InUse())
+            {
+                break;
+            }
+            value++;
+        }
         return CHIP_NO_ERROR;
     }
 

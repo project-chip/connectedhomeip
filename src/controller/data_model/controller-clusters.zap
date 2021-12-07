@@ -1458,7 +1458,7 @@
               "bounded": 0,
               "defaultValue": "",
               "reportable": 1,
-              "minInterval": 1,
+              "minInterval": 0,
               "maxInterval": 65534,
               "reportableChange": 0
             },
@@ -1468,12 +1468,12 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "External",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
               "reportable": 1,
-              "minInterval": 1,
+              "minInterval": 0,
               "maxInterval": 65534,
               "reportableChange": 0
             },

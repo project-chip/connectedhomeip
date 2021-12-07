@@ -73,7 +73,7 @@ limitations under the License.
         <access op="write" privilege="administer"/>        
         <access modifier="fabric-scoped"/>
     </attribute>
-    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" writable="true">
+    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" length="4" entryType="ExtensionEntry" writable="true">
         <description>Extension</description>
         <access op="read" privilege="administer"/>
         <access op="write" privilege="administer"/>        
