@@ -1634,6 +1634,10 @@ namespace TestListInt8UArgumentRequest {
 static constexpr CommandId Id = 0x0000000A;
 } // namespace TestListInt8UArgumentRequest
 
+namespace TestEmitTestEventResponse {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace TestEmitTestEventResponse
+
 namespace TestNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace TestNestedStructListArgumentRequest
@@ -1669,6 +1673,10 @@ static constexpr CommandId Id = 0x00000012;
 namespace TestSimpleOptionalArgumentRequest {
 static constexpr CommandId Id = 0x00000013;
 } // namespace TestSimpleOptionalArgumentRequest
+
+namespace TestEmitTestEventRequest {
+static constexpr CommandId Id = 0x00000014;
+} // namespace TestEmitTestEventRequest
 
 } // namespace Commands
 } // namespace TestCluster

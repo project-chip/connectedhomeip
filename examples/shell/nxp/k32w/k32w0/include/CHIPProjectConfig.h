@@ -133,11 +133,11 @@
 #define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
 
 /**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
+ * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
  *
- * A size, in bytes, of the individual debug event logging buffer.
+ * @brief Enable Interaction model Event support in server
  */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
+#define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 0
 
 /**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT

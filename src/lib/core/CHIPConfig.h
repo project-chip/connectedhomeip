@@ -2733,5 +2733,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+ *
+ * @brief Enable Interaction model Event support in server
+ */
+#ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+#define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
+#endif
+/**
  * @}
  */
