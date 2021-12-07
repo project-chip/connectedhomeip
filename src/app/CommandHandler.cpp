@@ -28,6 +28,7 @@
 
 #include <access/AccessControl.h>
 #include <app/util/MatterCallbacks.h>
+#include <credentials/GroupDataProvider.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
 
@@ -127,7 +128,15 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
         VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
-        ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
+
+        if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
+        {
+            ReturnErrorOnFailure(ProcessGroupCommandDataIB(commandData));
+        }
+        else
+        {
+            ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
+        }
     }
 
     // if we have exhausted this container
@@ -236,19 +245,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetCommandId(&concretePath.mCommandId);
     SuccessOrExit(err);
 
-    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
-    {
-        // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
-        // Issue 11075
-
-        // Using endpoint 1 for test purposes
-        concretePath.mEndpointId = 1;
-        err                      = CHIP_NO_ERROR;
-    }
-    else
-    {
-        err = commandPath.GetEndpointId(&concretePath.mEndpointId);
-    }
+    err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     SuccessOrExit(err);
 
     VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
@@ -309,6 +306,90 @@ exit:
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
     // other commands in the invoke request.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CommandPathIB::Parser commandPath;
+    TLV::TLVReader commandDataReader;
+    ClusterId clusterId;
+    CommandId commandId;
+    GroupId groupId;
+    FabricIndex fabric;
+
+    Credentials::GroupDataProvider::GroupEndpoint mapping;
+    Credentials::GroupDataProvider * groupDataProvider = Credentials::GetGroupDataProvider();
+    Credentials::GroupDataProvider::EndpointIterator * iterator;
+
+    err = aCommandElement.GetPath(&commandPath);
+    SuccessOrExit(err);
+
+    err = commandPath.GetClusterId(&clusterId);
+    SuccessOrExit(err);
+
+    err = commandPath.GetCommandId(&commandId);
+    SuccessOrExit(err);
+
+    groupId = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetGroupId();
+    fabric  = GetAccessingFabricIndex();
+
+    ChipLogDetail(DataManagement,
+                  "Received group command for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI, groupId,
+                  ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+
+    err = aCommandElement.GetData(&commandDataReader);
+    if (CHIP_END_OF_TLV == err)
+    {
+        ChipLogDetail(DataManagement,
+                      "Received command without data for Group=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                      groupId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+        err = CHIP_NO_ERROR;
+    }
+    SuccessOrExit(err);
+
+    iterator = groupDataProvider->IterateEndpoints(fabric);
+    VerifyOrExit(iterator != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    while (iterator->Next(mapping))
+    {
+        if (groupId != mapping.group_id)
+        {
+            continue;
+        }
+
+        ChipLogDetail(DataManagement,
+                      "Processing group command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
+                      mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+
+        const ConcreteCommandPath concretePath(mapping.endpoint_id, clusterId, commandId);
+
+        if (!mpCallback->CommandExists(concretePath))
+        {
+            ChipLogError(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(clusterId),
+                         mapping.endpoint_id);
+
+            continue;
+        }
+
+        if ((err = MatterPreCommandReceivedCallback(concretePath)) == CHIP_NO_ERROR)
+        {
+            TLV::TLVReader dataReader(commandDataReader);
+            mpCallback->DispatchCommand(*this, concretePath, dataReader);
+            MatterPostCommandReceivedCallback(concretePath);
+        }
+        else
+        {
+            ChipLogError(DataManagement,
+                         "Error when calling MatterPreCommandReceivedCallback for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
+                         " Command=" ChipLogFormatMEI " : %s",
+                         mapping.endpoint_id, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId), err.AsString());
+            continue;
+        }
+    }
+
+exit:
     return CHIP_NO_ERROR;
 }
 
