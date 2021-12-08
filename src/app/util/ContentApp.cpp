@@ -212,7 +212,7 @@ EmberAfStatus MediaPlayback::HandleWriteAttribute(chip::AttributeId attributeId,
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-TargetNavigator::TargetNavigator(std::list<string> targets, uint8_t currentTarget)
+TargetNavigator::TargetNavigator(std::list<std::string> targets, uint8_t currentTarget)
 {
     mTargets       = targets;
     mCurrentTarget = currentTarget;
@@ -224,7 +224,7 @@ CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder &
 
     return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
         int i = 0;
-        for (string entry : mTargets)
+        for (std::string entry : mTargets)
         {
             // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
 

@@ -35,8 +35,6 @@
 #include <stdint.h>
 #include <string>
 
-using namespace std;
-
 namespace chip {
 namespace AppPlatform {
 
@@ -123,7 +121,7 @@ public:
 class DLL_EXPORT TargetNavigator : public ContentAppCluster
 {
 public:
-    TargetNavigator(std::list<string> targets, uint8_t currentTarget);
+    TargetNavigator(std::list<std::string> targets, uint8_t currentTarget);
     virtual ~TargetNavigator() = default;
 
     TargetNavigatorResponse NavigateTarget(uint8_t target, std::string data);
@@ -133,7 +131,7 @@ public:
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
 
 protected:
-    std::list<string> mTargets;
+    std::list<std::string> mTargets;
     uint8_t mCurrentTarget;
 };
 
