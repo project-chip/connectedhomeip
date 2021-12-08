@@ -69,17 +69,11 @@ public:
 
     CASEClientPoolDelegate * GetCASEClientPool() { return mCASEClientPool; }
 
-    void SetCASEClientPool(CASEClientPoolDelegate * clientPool)
-    {
-        mCASEClientPool = clientPool;
-    }
+    void SetCASEClientPool(CASEClientPoolDelegate * clientPool) { mCASEClientPool = clientPool; }
 
     OperationalDeviceProxyPoolDelegate * GetDevicePool() { return mDevicePool; }
 
-    void SetDevicePool(OperationalDeviceProxyPoolDelegate * devicePool)
-    {
-        mDevicePool = devicePool;
-    }
+    void SetDevicePool(OperationalDeviceProxyPoolDelegate * devicePool) { mDevicePool = devicePool; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -147,7 +141,7 @@ private:
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
-    CASEClientPoolDelegate * mCASEClientPool = nullptr;
+    CASEClientPoolDelegate * mCASEClientPool         = nullptr;
     OperationalDeviceProxyPoolDelegate * mDevicePool = nullptr;
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
