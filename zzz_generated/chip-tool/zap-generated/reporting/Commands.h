@@ -3065,17 +3065,17 @@ private:
             new chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)>(
                 ReadThermostatClusterRevision::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
+        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
             new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)>(
                 ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(
-        &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
+    chip::Callback::Callback<
+        decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
@@ -3154,8 +3154,8 @@ private:
             new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)>(
                 ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)> *
-        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<decltype(
-            &ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
+        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<
+            decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
             ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)> *
         onReportThreadNetworkDiagnosticsParentChangeCountCallback =
