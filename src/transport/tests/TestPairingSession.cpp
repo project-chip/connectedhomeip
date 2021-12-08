@@ -91,7 +91,7 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, writer.Put(TLV::ContextTag(1), 0x1234) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(0x1234)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);
 
