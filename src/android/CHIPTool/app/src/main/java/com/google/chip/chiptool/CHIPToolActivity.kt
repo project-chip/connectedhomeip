@@ -75,7 +75,7 @@ class CHIPToolActivity :
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
       onNfcIntent(intent)
 
-    if(Intent.ACTION_VIEW == intent?.action) {
+    if (Intent.ACTION_VIEW == intent?.action) {
       onReturnIntent(intent)
     }
   }
