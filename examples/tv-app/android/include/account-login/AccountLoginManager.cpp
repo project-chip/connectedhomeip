@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace std;

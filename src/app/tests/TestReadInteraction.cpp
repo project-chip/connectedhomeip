@@ -535,7 +535,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();

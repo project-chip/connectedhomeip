@@ -135,7 +135,7 @@ void ParseClusterPathIB(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
 void BuildDataVersionFilterIB(nlTestSuite * apSuite, DataVersionFilterIB::Builder & aDataVersionFilterIBBuilder)
 {
-    ClusterPathIB::Builder clusterPathBuilder = aDataVersionFilterIBBuilder.CreatePath();
+    ClusterPathIB::Builder & clusterPathBuilder = aDataVersionFilterIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, clusterPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildClusterPathIB(apSuite, clusterPathBuilder);
     aDataVersionFilterIBBuilder.DataVersion(2).EndOfDataVersionFilterIB();

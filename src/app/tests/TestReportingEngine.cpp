@@ -87,20 +87,12 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     AttributePathIB::Builder & attributePathBuilder1 = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder1 = attributePathBuilder1.Node(1)
-                                .Endpoint(kTestEndpointId)
-                                .Cluster(kTestClusterId)
-                                .Attribute(kTestFieldId1)
-                                .EndOfAttributePathIB();
+    attributePathBuilder1.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId1).EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, attributePathBuilder1.GetError() == CHIP_NO_ERROR);
 
     AttributePathIB::Builder & attributePathBuilder2 = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder2 = attributePathBuilder2.Node(1)
-                                .Endpoint(kTestEndpointId)
-                                .Cluster(kTestClusterId)
-                                .Attribute(kTestFieldId2)
-                                .EndOfAttributePathIB();
+    attributePathBuilder2.Node(1).Endpoint(kTestEndpointId).Cluster(kTestClusterId).Attribute(kTestFieldId2).EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, attributePathBuilder2.GetError() == CHIP_NO_ERROR);
     attributePathListBuilder.EndOfAttributePathIBs();
 
