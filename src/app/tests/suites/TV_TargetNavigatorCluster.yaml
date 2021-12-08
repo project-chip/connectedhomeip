@@ -29,8 +29,12 @@ tests:
       response:
           value:
               [
-                  { identifier: 1, name: "exampleName" },
-                  { identifier: 2, name: "exampleName" },
+                  { identifier: 0, name: "home" },
+                  { identifier: 1, name: "search" },
+                  { identifier: 2, name: "info" },
+                  { identifier: 3, name: "guide" },
+                  { identifier: 4, name: "menu" },
+                  { identifier: 5, name: "apps" },
               ]
 
     - label: "Navigate Target Command"
