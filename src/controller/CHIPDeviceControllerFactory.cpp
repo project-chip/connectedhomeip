@@ -260,8 +260,8 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr->Shutdown();
     }
 
-    mSystemLayer          = nullptr;
-    mUDPEndPointManager   = nullptr;
+    mSystemLayer        = nullptr;
+    mUDPEndPointManager = nullptr;
 
     if (mMessageCounterManager != nullptr)
     {

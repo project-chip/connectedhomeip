@@ -84,8 +84,7 @@ class DeviceControllerSystemState
 public:
     ~DeviceControllerSystemState(){};
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
-        mSystemLayer(params.systemLayer),
-        mTCPEndPointManager(params.tcpEndPointManager),
+        mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
         mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
         mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
         mIMDelegate(params.imDelegate)
