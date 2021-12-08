@@ -276,6 +276,7 @@ def NrfTargets():
         if '-nrf52840' in rpc.name:
             yield target.Extend('pigweed', app=NrfApp.PIGWEED)
 
+
 def AndroidTargets():
     target = Target('android', AndroidBuilder)
 
