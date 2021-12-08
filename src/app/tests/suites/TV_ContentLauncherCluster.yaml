@@ -58,9 +58,9 @@ tests:
       response:
           values:
               - name: "data"
-               value: "exampleData"
+                value: "exampleData"
               - name: "contentLaunchStatus"
-               value: 0
+                value: 0
 
     - label: "Launch URL Command"
       command: "LaunchURL"
@@ -123,6 +123,6 @@ tests:
       response:
           values:
               - name: "data"
-               value: "exampleData"
+                value: "exampleData"
               - name: "contentLaunchStatus"
-               value: 0
+                value: 0
