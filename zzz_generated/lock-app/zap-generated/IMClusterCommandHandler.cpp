@@ -144,6 +144,54 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace DiagnosticLogs
 
+namespace DoorLock {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
+    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
+    // Any error value TLVUnpackError means we have received an illegal value.
+    // The following variables are used for all commands to save code size.
+    CHIP_ERROR TLVError = CHIP_NO_ERROR;
+    bool wasHandled     = false;
+    {
+        switch (aCommandPath.mCommandId)
+        {
+        case Commands::LockDoor::Id: {
+            Commands::LockDoor::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterLockDoorCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::UnlockDoor::Id: {
+            Commands::UnlockDoor::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfDoorLockClusterUnlockDoorCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            ReportCommandUnsupported(apCommandObj, aCommandPath);
+            return;
+        }
+        }
+    }
+
+    if (CHIP_NO_ERROR != TLVError || !wasHandled)
+    {
+        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
+    }
+}
+
+} // namespace DoorLock
+
 namespace GeneralCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -481,6 +529,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::DiagnosticLogs::Id:
         Clusters::DiagnosticLogs::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
+    case Clusters::DoorLock::Id:
+        Clusters::DoorLock::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::GeneralCommissioning::Id:
         Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

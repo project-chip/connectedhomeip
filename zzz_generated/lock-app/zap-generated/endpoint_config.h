@@ -830,6 +830,12 @@
             { 0x0013, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_EMPTY_DEFAULT() },          /* BatteryReplacementDescription */            \
             { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(639) },     /* FeatureMap */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },              /* ClusterRevision */                          \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Door Lock (server) */                                                                         \
+            { 0x0000, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() }, /* LockState */                     \
+            { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                            /* LockType */                      \
+            { 0x0002, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },                          /* ActuatorEnabled */               \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                         /* ClusterRevision */               \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -842,6 +848,9 @@
     };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayOnOffServer[] = {                                                             \
         (EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback,                                                     \
+    };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
+        (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
@@ -909,6 +918,12 @@
             {                                                                                                                      \
                 0x002F, ZAP_ATTRIBUTE_INDEX(173), 9, 133, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Power Source (server) */                                                                   \
+            { 0x0101,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(170),                                                                                            \
+              4,                                                                                                                   \
+              5,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
+              chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -947,7 +962,7 @@
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        22, 10                                                                                                                     \
+        0, 0                                                                                                                       \
     }
 
 // Array of device versions
