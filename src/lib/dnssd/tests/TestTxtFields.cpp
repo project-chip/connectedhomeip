@@ -135,7 +135,7 @@ void TestGetVendor(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
 
     // overflow a uint16
-    strcpy(vp, "%" PRIu32 "+456", static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
+    sprintf(vp, "%" PRIu32 "+456", static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 0);
 }
 
@@ -146,7 +146,7 @@ void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 1234);
 
     // overflow a uint16
-    strcpy(ld, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
+    sprintf(ld, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     printf("ld = %s\n", ld);
     NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 0);
 }
@@ -175,7 +175,7 @@ void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 1234);
 
     // overflow a uint16
-    strcpy(dt, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
+    sprintf(dt, "%" PRIu32, static_cast<uint32_t>(std::numeric_limits<uint16_t>::max()) + 1);
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 0);
 }
 
@@ -602,7 +602,7 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "CRA");
-    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count());
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
