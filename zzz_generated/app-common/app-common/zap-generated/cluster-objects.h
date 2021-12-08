@@ -7009,57 +7009,14 @@ namespace Basic {
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace StartUp {
-struct Type;
-struct DecodableType;
-} // namespace StartUp
-
 namespace MfgSpecificPing {
 struct Type;
 struct DecodableType;
 } // namespace MfgSpecificPing
 
-namespace ShutDown {
-struct Type;
-struct DecodableType;
-} // namespace ShutDown
-
-namespace Leave {
-struct Type;
-struct DecodableType;
-} // namespace Leave
-
 } // namespace Commands
 
 namespace Commands {
-namespace StartUp {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::StartUp::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace StartUp
 namespace MfgSpecificPing {
 enum class Fields
 {
@@ -7088,62 +7045,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace MfgSpecificPing
-namespace ShutDown {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ShutDown::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ShutDown
-namespace Leave {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Leave::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Leave
 } // namespace Commands
 
 namespace Attributes {

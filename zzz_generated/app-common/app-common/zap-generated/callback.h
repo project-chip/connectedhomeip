@@ -13846,23 +13846,11 @@ bool emberAfBridgedActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Basic Cluster StartUp Command callback (from server)
- */
-bool emberAfBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
  * @brief Basic Cluster MfgSpecificPing Command callback (from client)
  */
 bool emberAfBasicClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
-/**
- * @brief Basic Cluster ShutDown Command callback (from server)
- */
-bool emberAfBasicClusterShutDownCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Basic Cluster Leave Command callback (from server)
- */
-bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */

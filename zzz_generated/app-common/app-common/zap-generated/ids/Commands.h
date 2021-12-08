@@ -500,21 +500,9 @@ static constexpr CommandId Id = 0x0000000B;
 namespace Basic {
 namespace Commands {
 
-namespace StartUp {
-static constexpr CommandId Id = 0x00000000;
-} // namespace StartUp
-
 namespace MfgSpecificPing {
 static constexpr CommandId Id = 0x10020000;
 } // namespace MfgSpecificPing
-
-namespace ShutDown {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ShutDown
-
-namespace Leave {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Leave
 
 } // namespace Commands
 } // namespace Basic

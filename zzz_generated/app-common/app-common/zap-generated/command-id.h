@@ -156,10 +156,7 @@
 #define ZCL_DISABLE_ACTION_WITH_DURATION_COMMAND_ID (0x0B)
 
 // Commands for cluster: Basic
-#define ZCL_START_UP_COMMAND_ID (0x00)
 #define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
-#define ZCL_SHUT_DOWN_COMMAND_ID (0x01)
-#define ZCL_LEAVE_COMMAND_ID (0x02)
 
 // Commands for cluster: OTA Software Update Provider
 #define ZCL_QUERY_IMAGE_COMMAND_ID (0x00)
