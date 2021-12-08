@@ -96,10 +96,7 @@ struct OnOffEffect
         uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
     ~OnOffEffect();
 
-    bool hasNext()
-    {
-        return this->nextEffect != nullptr;
-    }
+    bool hasNext() { return this->nextEffect != nullptr; }
 
     OnOffEffect * next() { return this->nextEffect; }
 
