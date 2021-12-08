@@ -39,6 +39,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPApplicationLauncherClusterHideAppResponseCallback
+    : public Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterHideAppResponseCallback(jobject javaCallback);
+
+    ~CHIPApplicationLauncherClusterHideAppResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPApplicationLauncherClusterLaunchAppResponseCallback
     : public Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
@@ -49,6 +64,21 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPApplicationLauncherClusterStopAppResponseCallback
+    : public Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterStopAppResponseCallback(jobject javaCallback);
+
+    ~CHIPApplicationLauncherClusterStopAppResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

@@ -32,7 +32,6 @@ tests:
 
     # TODO: Support chars validation
     - label: "Read attribute vendor name"
-      disabled: true
       command: "readAttribute"
       attribute: "vendor name"
       response:
@@ -45,8 +44,7 @@ tests:
           value: 1
 
     # TODO: Support chars validation
-    - label: "Read attribute name"
-      disabled: true
+    - label: "Read attribute application name"
       command: "readAttribute"
       attribute: "application name"
       response:
@@ -58,11 +56,34 @@ tests:
       response:
           value: 1
 
-    # TODO: Support chars validation
-    - label: "Read attribute id"
-      disabled: true
+    - label: "Read attribute application status"
       command: "readAttribute"
-      attribute: "application id"
+      attribute: "application status"
       response:
-          value: "appId"
+          value: 0
+    # TODO: Enable once attribute struct is supported
+    # - label: "Read attribute application status"
+    #   command: "readAttribute"
+    #   attribute: "application app"
+    #   response:
+    #       values:
+    #           - name: "arg1"
+    #             value:
+    #                 {
+    #                     catalogVendorId: 123,
+    #                     applicationId: "applicationId"
+    #                 }
+
+    # TODO: Support chars validation
+    - label: "Read attribute application version"
+      command: "readAttribute"
+      attribute: "application version"
+      response:
+          value: "exampleVersion"
+
+    # - label: "Read attribute application allowed vendor list"
+    #   command: "readAttribute"
+    #   attribute: "allowed vendor list"
+    #   response:
+    #       value: [123, 456]
 
