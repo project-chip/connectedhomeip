@@ -23,6 +23,7 @@ class AmebaBoard(Enum):
     AMEBAD = auto()
     LIGHT = auto()
 
+
 class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
 
