@@ -322,6 +322,23 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    AccountLogin::Commands::Logout::Type request;
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -870,6 +887,27 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterHideAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    ApplicationLauncher::Commands::HideApp::Type request;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
+
+    new CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
           completionHandler:(void (^)(CHIPApplicationLauncherClusterLaunchAppResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler
@@ -883,6 +921,27 @@ using namespace chip::app::Clusters;
     new CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterStopAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    ApplicationLauncher::Commands::StopApp::Type request;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
+
+    new CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });

@@ -50,6 +50,7 @@ public:
                            chip::CharSpan tempAccountIdentifier);
     CHIP_ERROR Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                      chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
+    CHIP_ERROR Logout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -125,8 +126,12 @@ public:
     ~ApplicationLauncherCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR HideApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                       chip::CharSpan applicationId);
     CHIP_ERROR LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::CharSpan data,
                          uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR StopApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                       chip::CharSpan applicationId);
 
     // Cluster Attributes
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
