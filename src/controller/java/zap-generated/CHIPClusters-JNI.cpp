@@ -147,6 +147,41 @@ JNI_METHOD(void, AccountLoginCluster, login)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, AccountLoginCluster, logout)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    AccountLoginCluster * cppCluster;
+
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type request;
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<AccountLoginCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, AccountLoginCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -826,6 +861,47 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, ApplicationLauncherCluster, hideApp)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ApplicationLauncherCluster * cppCluster;
+
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type request;
+
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+
+    std::unique_ptr<CHIPApplicationLauncherClusterHideAppResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterHideAppResponseCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherClusterHideAppResponseCallback>(callback),
+                  Platform::Delete<CHIPApplicationLauncherClusterHideAppResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<ApplicationLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject catalogVendorId, jstring applicationId)
 {
@@ -858,6 +934,47 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
 
     auto successFn =
         chip::Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ApplicationLauncherCluster, stopApp)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ApplicationLauncherCluster * cppCluster;
+
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type request;
+
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+
+    std::unique_ptr<CHIPApplicationLauncherClusterStopAppResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterStopAppResponseCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherClusterStopAppResponseCallback>(callback),
+                  Platform::Delete<CHIPApplicationLauncherClusterStopAppResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<ApplicationLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
