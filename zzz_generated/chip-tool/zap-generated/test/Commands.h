@@ -47785,6 +47785,10 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Restore initial location value\n");
             err = TestRestoreInitialLocationValue_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read AttributeList value\n");
+            err = TestReadAttributeListValue_5();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -47796,7 +47800,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 6;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -47831,6 +47835,16 @@ private:
     }
 
     static void OnSuccessCallback_4(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    {
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_5(attributeList);
+    }
 
     //
     // Tests methods
@@ -47915,6 +47929,68 @@ private:
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeListValue_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(this, OnSuccessCallback_5,
+                                                                                                      OnFailureCallback_5);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    {
+        auto iter = attributeList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 0));
+        VerifyOrReturn(CheckValue("attributeList[0]", iter.GetValue(), 0UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 1));
+        VerifyOrReturn(CheckValue("attributeList[1]", iter.GetValue(), 1UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 2));
+        VerifyOrReturn(CheckValue("attributeList[2]", iter.GetValue(), 2UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 3));
+        VerifyOrReturn(CheckValue("attributeList[3]", iter.GetValue(), 3UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 4));
+        VerifyOrReturn(CheckValue("attributeList[4]", iter.GetValue(), 4UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 5));
+        VerifyOrReturn(CheckValue("attributeList[5]", iter.GetValue(), 5UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 6));
+        VerifyOrReturn(CheckValue("attributeList[6]", iter.GetValue(), 6UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 7));
+        VerifyOrReturn(CheckValue("attributeList[7]", iter.GetValue(), 7UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 8));
+        VerifyOrReturn(CheckValue("attributeList[8]", iter.GetValue(), 8UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 9));
+        VerifyOrReturn(CheckValue("attributeList[9]", iter.GetValue(), 9UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 10));
+        VerifyOrReturn(CheckValue("attributeList[10]", iter.GetValue(), 10UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 11));
+        VerifyOrReturn(CheckValue("attributeList[11]", iter.GetValue(), 11UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 12));
+        VerifyOrReturn(CheckValue("attributeList[12]", iter.GetValue(), 12UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 13));
+        VerifyOrReturn(CheckValue("attributeList[13]", iter.GetValue(), 13UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 14));
+        VerifyOrReturn(CheckValue("attributeList[14]", iter.GetValue(), 14UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 15));
+        VerifyOrReturn(CheckValue("attributeList[15]", iter.GetValue(), 15UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 16));
+        VerifyOrReturn(CheckValue("attributeList[16]", iter.GetValue(), 16UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 17));
+        VerifyOrReturn(CheckValue("attributeList[17]", iter.GetValue(), 17UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 18));
+        VerifyOrReturn(CheckValue("attributeList[18]", iter.GetValue(), 18UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 19));
+        VerifyOrReturn(CheckValue("attributeList[19]", iter.GetValue(), 65531UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 20));
+        VerifyOrReturn(CheckValue("attributeList[20]", iter.GetValue(), 65533UL));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(attributeList)>("attributeList", iter, 21));
+
+        NextTest();
+    }
 };
 
 class TestIdentifyCluster : public TestCommand
