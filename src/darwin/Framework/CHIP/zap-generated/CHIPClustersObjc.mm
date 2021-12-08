@@ -6491,6 +6491,83 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeLockStateWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableDoorLockClusterDlLockStateAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::LockState::TypeInfo;
+            auto successFn = Callback<NullableDoorLockClusterDlLockStateAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeLockState(success, failure, minInterval, maxInterval);
+        });
+}
+
+- (void)reportAttributeLockStateWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
+{
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            responseHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLockState(success);
+        },
+        true);
+}
+
+- (void)readAttributeLockTypeWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPDoorLockClusterDlLockTypeAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::LockType::TypeInfo;
+            auto successFn = Callback<DoorLockClusterDlLockTypeAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeLockTypeWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeLockType(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeLockTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            responseHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeLockType(success);
+        },
+        true);
+}
+
 - (void)readAttributeActuatorEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
@@ -19167,6 +19244,62 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeEnumAttrWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::EnumAttr::TypeInfo;
+            auto successFn = Callback<TestClusterClusterSimpleEnumAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeEnumAttrWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TestCluster::Attributes::EnumAttr::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeEnumAttrWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+        return self.cppCluster.SubscribeAttributeEnumAttr(success, failure, minInterval, maxInterval);
+    });
+}
+
+- (void)reportAttributeEnumAttrWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            responseHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeEnumAttr(success);
+        },
+        true);
+}
+
 - (void)readAttributeRangeRestrictedInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler
 {
@@ -21202,6 +21335,69 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             return self.cppCluster.ReportAttributeNullableCharString(success);
+        },
+        true);
+}
+
+- (void)readAttributeNullableEnumAttrWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::NullableEnumAttr::TypeInfo;
+            auto successFn = Callback<NullableTestClusterClusterSimpleEnumAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeNullableEnumAttrWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TestCluster::Attributes::NullableEnumAttr::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeNullableEnumAttrWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                          responseHandler:(ResponseHandler)responseHandler
+{
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeNullableEnumAttr(success, failure, minInterval, maxInterval);
+        });
+}
+
+- (void)reportAttributeNullableEnumAttrWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))responseHandler
+{
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            responseHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.ReportAttributeNullableEnumAttr(success);
         },
         true);
 }

@@ -4413,6 +4413,40 @@ exit:
 }
 
 // DoorLock Cluster Attributes
+CHIP_ERROR DoorLockCluster::SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                        uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::LockState::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::LockState::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeLockType(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                       uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::LockType::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeLockType(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::LockType::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
 CHIP_ERROR DoorLockCluster::SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                               uint16_t maxInterval)
@@ -12101,6 +12135,23 @@ CHIP_ERROR TestClusterCluster::ReportAttributeVendorId(Callback::Cancelable * on
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+CHIP_ERROR TestClusterCluster::SubscribeAttributeEnumAttr(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                          uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::EnumAttr::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeEnumAttr(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::EnumAttr::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
 CHIP_ERROR TestClusterCluster::SubscribeAttributeRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,
                                                                       Callback::Cancelable * onFailureCallback,
                                                                       uint16_t minInterval, uint16_t maxInterval)
@@ -12643,6 +12694,23 @@ CHIP_ERROR TestClusterCluster::ReportAttributeNullableCharString(Callback::Cance
 {
     return RequestAttributeReporting(TestCluster::Attributes::NullableCharString::Id, onReportCallback,
                                      BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableEnumAttr(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::NullableEnumAttr::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeNullableEnumAttr(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::NullableEnumAttr::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,

@@ -15382,6 +15382,171 @@ private:
 };
 
 /*
+ * Attribute LockState
+ */
+class ReadDoorLockLockState : public ModelCommand
+{
+public:
+    ReadDoorLockLockState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lock-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockLockState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.LockState response", value);
+    }
+};
+
+class ReportDoorLockLockState : public ModelCommand
+{
+public:
+    ReportDoorLockLockState() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "lock-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockLockState()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeLockState(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLockState(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute LockType
+ */
+class ReadDoorLockLockType : public ModelCommand
+{
+public:
+    ReadDoorLockLockType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lock-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockLockType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::LockType::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::DoorLock::DlLockType value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.LockType response", value);
+    }
+};
+
+class ReportDoorLockLockType : public ModelCommand
+{
+public:
+    ReportDoorLockLockType() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "lock-type");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockLockType()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeLockType(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLockType(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute ActuatorEnabled
  */
 class ReadDoorLockActuatorEnabled : public ModelCommand
@@ -38521,6 +38686,114 @@ public:
 };
 
 /*
+ * Attribute EnumAttr
+ */
+class ReadTestClusterEnumAttr : public ModelCommand
+{
+public:
+    ReadTestClusterEnumAttr() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "enum-attr");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterEnumAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.EnumAttr response", value);
+    }
+};
+
+class WriteTestClusterEnumAttr : public ModelCommand
+{
+public:
+    WriteTestClusterEnumAttr() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "enum-attr");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterEnumAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::SimpleEnum mValue;
+};
+
+class ReportTestClusterEnumAttr : public ModelCommand
+{
+public:
+    ReportTestClusterEnumAttr() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "enum-attr");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterEnumAttr()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeEnumAttr(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeEnumAttr(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute RangeRestrictedInt8u
  */
 class ReadTestClusterRangeRestrictedInt8u : public ModelCommand
@@ -42065,6 +42338,115 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableEnumAttr
+ */
+class ReadTestClusterNullableEnumAttr : public ModelCommand
+{
+public:
+    ReadTestClusterNullableEnumAttr() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-enum-attr");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableEnumAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnumAttr response", value);
+    }
+};
+
+class WriteTestClusterNullableEnumAttr : public ModelCommand
+{
+public:
+    WriteTestClusterNullableEnumAttr() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-enum-attr");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableEnumAttr() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> mValue;
+};
+
+class ReportTestClusterNullableEnumAttr : public ModelCommand
+{
+public:
+    ReportTestClusterNullableEnumAttr() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-enum-attr");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableEnumAttr()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableEnumAttr(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableEnumAttr(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -54093,6 +54475,10 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<DoorLockSetCredential>(),         //
         make_unique<DoorLockSetUser>(),               //
         make_unique<DoorLockUnlockDoor>(),            //
+        make_unique<ReadDoorLockLockState>(),         //
+        make_unique<ReportDoorLockLockState>(),       //
+        make_unique<ReadDoorLockLockType>(),          //
+        make_unique<ReportDoorLockLockType>(),        //
         make_unique<ReadDoorLockActuatorEnabled>(),   //
         make_unique<ReportDoorLockActuatorEnabled>(), //
         make_unique<ReadDoorLockAttributeList>(),     //
@@ -55029,6 +55415,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterVendorId>(),                           //
         make_unique<ReportTestClusterVendorId>(),                          //
         make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<ReadTestClusterEnumAttr>(),                            //
+        make_unique<WriteTestClusterEnumAttr>(),                           //
+        make_unique<ReportTestClusterEnumAttr>(),                          //
         make_unique<ReadTestClusterRangeRestrictedInt8u>(),                //
         make_unique<WriteTestClusterRangeRestrictedInt8u>(),               //
         make_unique<ReportTestClusterRangeRestrictedInt8u>(),              //
@@ -55128,6 +55517,9 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableCharString>(),                  //
         make_unique<WriteTestClusterNullableCharString>(),                 //
         make_unique<ReportTestClusterNullableCharString>(),                //
+        make_unique<ReadTestClusterNullableEnumAttr>(),                    //
+        make_unique<WriteTestClusterNullableEnumAttr>(),                   //
+        make_unique<ReportTestClusterNullableEnumAttr>(),                  //
         make_unique<ReadTestClusterNullableRangeRestrictedInt8u>(),        //
         make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(),       //
         make_unique<ReportTestClusterNullableRangeRestrictedInt8u>(),      //

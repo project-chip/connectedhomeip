@@ -1302,6 +1302,22 @@ public class ClusterWriteMapping {
             writeTestClusterVendorIdCommandParams);
     writeTestClusterInteractionInfo.put(
         "writeVendorIdAttribute", writeTestClusterVendorIdAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterEnumAttrCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClusterenumAttrCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTestClusterEnumAttrCommandParams.put("value", testClusterenumAttrCommandParameterInfo);
+    InteractionInfo writeTestClusterEnumAttrAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeEnumAttrAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterEnumAttrCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeEnumAttrAttribute", writeTestClusterEnumAttrAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeTestClusterRangeRestrictedInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterrangeRestrictedInt8uCommandParameterInfo =
@@ -1872,6 +1888,23 @@ public class ClusterWriteMapping {
     writeTestClusterInteractionInfo.put(
         "writeNullableCharStringAttribute",
         writeTestClusterNullableCharStringAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterNullableEnumAttrCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClusternullableEnumAttrCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeTestClusterNullableEnumAttrCommandParams.put(
+        "value", testClusternullableEnumAttrCommandParameterInfo);
+    InteractionInfo writeTestClusterNullableEnumAttrAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeNullableEnumAttrAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterNullableEnumAttrCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeNullableEnumAttrAttribute", writeTestClusterNullableEnumAttrAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeTestClusterNullableRangeRestrictedInt8uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusternullableRangeRestrictedInt8uCommandParameterInfo =
