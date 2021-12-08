@@ -52,6 +52,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
+using namespace chip::Access;
 
 namespace chip {
 namespace app {
@@ -353,13 +354,15 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+
+    ChipLogDetail(DataManagement, "############################## R fi=%u", aSubjectDescriptor.fabricIndex);
 
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
@@ -370,7 +373,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         {
             AttributeListReader reader(cluster);
             bool ignored; // Our reader always tries to encode
-            return ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, &reader, &ignored);
+            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
+                                          &ignored);
         }
 
         // else to save codesize just fall through and do the metadata search
@@ -417,8 +421,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         bool triedEncode;
-        ReturnErrorOnFailure(
-            ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, attrOverride, &triedEncode));
+        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                    attrOverride, &triedEncode));
 
         if (triedEncode)
         {
@@ -820,8 +824,10 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
+    ChipLogDetail(DataManagement, "############################## W fi=%u", aSubjectDescriptor.fabricIndex);
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
     ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
