@@ -66,6 +66,10 @@
 #include "Rpc.h"
 #endif
 
+//#if defined(ENABLE_CHIP_SHELL)
+#include "matter_shell.h"
+//#endif
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -176,6 +180,10 @@ int main(void)
         EFR32_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
+
+//#if defined(ENABLE_CHIP_SHELL)
+    chip::startShellTask();
+//#endif
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();

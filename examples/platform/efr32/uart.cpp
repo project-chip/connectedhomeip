@@ -27,6 +27,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "matter_shell.h"
+
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #endif
@@ -176,7 +178,7 @@ static uint8_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToR
  */
 void uartConsoleInit(void)
 {
-    sl_board_enable_vcom();
+    //sl_board_enable_vcom();
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
@@ -192,6 +194,9 @@ void uartConsoleInit(void)
 
 void USART_IRQHandler(void)
 {
+#ifdef ENABLE_CHIP_SHELL
+    chip::NotifyShellProcessFromISR();
+#endif
 #ifndef PW_RPC_ENABLED
     otSysEventSignalPending();
 #endif
@@ -212,6 +217,10 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     }
 
     UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, data, transferCount, UART_rx_callback);
+
+#ifdef ENABLE_CHIP_SHELL
+    chip::NotifyShellProcessFromISR();
+#endif
 #ifndef PW_RPC_ENABLED
     otSysEventSignalPending();
 #endif
