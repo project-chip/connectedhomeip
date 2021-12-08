@@ -43,7 +43,8 @@ CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::Attrib
     });
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
+                                                                std::string data)
 {
     // TODO: Insert your code
     ApplicationLauncherResponse response;
