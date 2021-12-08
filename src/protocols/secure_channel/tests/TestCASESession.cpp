@@ -484,8 +484,9 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
         bool resumptionRequested;                                                                                                  \
         ByteSpan resumptionId;                                                                                                     \
         ByteSpan initiatorResumeMIC;                                                                                               \
-        err = CASESession::ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,             \
-                                       resumptionRequested, resumptionId, initiatorResumeMIC);                                     \
+        CASESession session;                                                                                                       \
+        err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,                  \
+                                  resumptionRequested, resumptionId, initiatorResumeMIC);                                          \
         NL_TEST_ASSERT(inSuite, (err == CHIP_NO_ERROR) == params::expectSuccess);                                                  \
         if (params::expectSuccess)                                                                                                 \
         {                                                                                                                          \

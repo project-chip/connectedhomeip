@@ -28,10 +28,12 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
@@ -352,6 +354,8 @@ protected:
     CASESessionManager * mCASESessionManager = nullptr;
 
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
+    CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
@@ -492,9 +496,14 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] rendezvousParams      The Rendezvous connection parameters
-     * @param[in] commssioningParams    The commissioning parameters (uses defualt if not supplied)
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    /**
+     * @overload
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commissioningParams    The commissioning parameters (uses default if not supplied)
+     */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                           CommissioningParameters & commissioningParams);
 
@@ -514,7 +523,7 @@ public:
      *   OnPairingComplete will be called with an error.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] params                The Rendezvous connection parameters
      */
     CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
 
@@ -810,6 +819,8 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
+
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace Controller

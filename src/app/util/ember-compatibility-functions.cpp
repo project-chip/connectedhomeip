@@ -250,6 +250,84 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     return aAttributeReport.EndOfAttributeReportIB().GetError();
 }
 
+// This reader should never actually be registered; we do manual dispatch to it
+// for the one attribute it handles.
+class MandatoryGlobalAttributeReader : public AttributeAccessInterface
+{
+public:
+    MandatoryGlobalAttributeReader(const EmberAfCluster * aCluster) :
+        AttributeAccessInterface(MakeOptional(kInvalidEndpointId), kInvalidClusterId), mCluster(aCluster)
+    {}
+
+protected:
+    const EmberAfCluster * mCluster;
+};
+
+class AttributeListReader : public MandatoryGlobalAttributeReader
+{
+public:
+    AttributeListReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+};
+
+CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    // The id of AttributeList is not in the attribute metadata.
+    // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
+    // put it in the metadata, or fix wildcard expansion to add it.
+    return aEncoder.EncodeList([this](const auto & encoder) {
+        constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
+        const size_t count          = mCluster->attributeCount;
+        bool addedOurId             = false;
+        for (size_t i = 0; i < count; ++i)
+        {
+            AttributeId id = mCluster->attributes[i].attributeId;
+            if (!addedOurId && id > ourId)
+            {
+                ReturnErrorOnFailure(encoder.Encode(ourId));
+                addedOurId = true;
+            }
+            ReturnErrorOnFailure(encoder.Encode(id));
+        }
+        if (!addedOurId)
+        {
+            ReturnErrorOnFailure(encoder.Encode(ourId));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+// Helper function for trying to read an attribute value via an
+// AttributeAccessInterface.  On failure, the read has failed.  On success, the
+// aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
+CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+                                  AttributeReportIBs::Builder & aAttributeReports,
+                                  AttributeValueEncoder::AttributeEncodeState * aEncoderState,
+                                  AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
+{
+    // TODO: We should probably clone the writer and convert failures here
+    // into status responses, unless our caller already does that.
+    AttributeValueEncoder::AttributeEncodeState state =
+        (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, state);
+    CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
+        // The state is used by list chunking feature for now.
+        if (aEncoderState != nullptr)
+        {
+            *aEncoderState = valueEncoder.GetState();
+        }
+        return err;
+    }
+
+    *aTriedEncode = valueEncoder.TriedEncode();
+    return CHIP_NO_ERROR;
+}
+
 } // anonymous namespace
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
@@ -259,6 +337,22 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+
+    if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
+    {
+        // This is not in our attribute metadata, so we just check for this
+        // endpoint+cluster existing.
+        EmberAfCluster * cluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+        if (cluster)
+        {
+            AttributeListReader reader(cluster);
+            bool ignored; // Our reader always tries to encode
+            return ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, &reader, &ignored);
+        }
+
+        // else to save codesize just fall through and do the metadata search
+        // (which we know will fail and error out);
+    }
 
     EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
@@ -277,27 +371,11 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
     if (attrOverride != nullptr)
     {
-        // TODO: We should probably clone the writer and convert failures here
-        // into status responses, unless our caller already does that.
-        AttributeValueEncoder::AttributeEncodeState state =
-            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex,
-                                           ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                                           kTemporaryDataVersion, state);
-        CHIP_ERROR err = attrOverride->Read(aPath, valueEncoder);
+        bool triedEncode;
+        ReturnErrorOnFailure(
+            ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, attrOverride, &triedEncode));
 
-        if (err != CHIP_NO_ERROR)
-        {
-            // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
-            // The state is used by list chunking feature for now.
-            if (apEncoderState != nullptr)
-            {
-                *apEncoderState = valueEncoder.GetState();
-            }
-            return err;
-        }
-
-        if (valueEncoder.TriedEncode())
+        if (triedEncode)
         {
             return CHIP_NO_ERROR;
         }
@@ -533,14 +611,9 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         case ZCL_ARRAY_ATTRIBUTE_TYPE: {
             // We only get here for attributes of list type that have no override
             // registered.  There should not be any nonempty lists like that.
-            uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
-            if (size != 2)
+            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
+            if (length != 0)
             {
-                // The value returned by emberAfAttributeValueSize for a list
-                // includes the space needed to store the list length (2 bytes) plus
-                // the space needed to store the actual list items.  We expect it to
-                // return 2 here, indicating a zero-length list.  If it doesn't,
-                // something has gone wrong.
                 return CHIP_ERROR_INCORRECT_STATE;
             }
 

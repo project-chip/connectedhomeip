@@ -54,7 +54,6 @@ target_sources(${APP_TARGET} PRIVATE
 
                ${MBED_COMMON}/util/LEDWidget.cpp
 
-               ${GEN_DIR}/all-clusters-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
                ${GEN_DIR}/all-clusters-app/zap-generated/CHIPClusters.cpp
@@ -77,7 +76,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/attribute-storage.cpp
                ${APP_UTIL}/attribute-table.cpp
                ${APP_UTIL}/attribute-size-util.cpp
-               ${APP_UTIL}/attribute-list-byte-span.cpp
                ${APP_UTIL}/binding-table.cpp
                ${APP_UTIL}/chip-message-send.cpp
                ${APP_UTIL}/client-api.cpp

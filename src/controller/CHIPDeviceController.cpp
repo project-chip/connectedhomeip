@@ -151,12 +151,14 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .exchangeMgr    = params.systemState->ExchangeMgr(),
         .idAllocator    = &mIDAllocator,
         .fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
+        .clientPool     = &mCASEClientPool,
         .imDelegate     = params.systemState->IMDelegate(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
+        .devicePool        = &mDevicePool,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -859,7 +861,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
     // TODO - Remove use of SetActive/IsActive from CommissioneeDeviceProxy
     device->SetActive(true);
 
-    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID, exchangeCtxt, this);
+    err = device->GetPairing().Pair(params.GetPeerAddress(), params.GetSetupPINCode(), keyID,
+                                    Optional<ReliableMessageProtocolConfig>::Value(mMRPConfig), exchangeCtxt, this);
     SuccessOrExit(err);
 
     // Immediately persist the updated mNextKeyID value

@@ -107,7 +107,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              SessionEstablishmentDelegate * delegate);
+                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -123,7 +123,8 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
-                              uint16_t mySessionId, SessionEstablishmentDelegate * delegate);
+                              uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                              SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -141,7 +142,8 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -169,10 +171,6 @@ public:
      * @return CHIP_ERROR The result of session derivation
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
-
-    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
-
-    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -304,6 +302,8 @@ private:
 
     SessionEstablishmentExchangeDispatch mMessageDispatch;
 
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
+
     struct Spake2pErrorMsg
     {
         Spake2pErrorType error;
@@ -368,10 +368,6 @@ public:
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;
     }
-
-    const char * GetI2RSessionInfo() const override { return "i2r"; }
-
-    const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;
