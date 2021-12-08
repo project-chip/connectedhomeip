@@ -21,6 +21,8 @@
  * This file implements Inet::UDPEndPoint using sockets.
  */
 
+// Required to properly support underlying RFC3542-related fields to IPV6_PKTINFO 
+// on Darwin.
 #define __APPLE_USE_RFC_3542
 #include <inet/UDPEndPointImplSockets.h>
 
