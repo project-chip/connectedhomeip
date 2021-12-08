@@ -82,7 +82,7 @@ struct OnOffEffect
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
     uint8_t mEffectIdentifier;
     uint8_t mEffectVariant;
-    OnOffEffect * next_effect = nullptr;
+    OnOffEffect * nextEffect = nullptr;
 
     OnOffEffect(
         chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
@@ -98,18 +98,12 @@ struct OnOffEffect
 
     bool hasNext()
     {
-        bool hasNext = false;
-        if (this->next_effect != nullptr)
-        {
-            hasNext = true;
-        }
-
-        return hasNext;
+        return this->nextEffect != nullptr;
     }
 
-    OnOffEffect * next() { return this->next_effect; }
+    OnOffEffect * next() { return this->nextEffect; }
 
-    void setNext(OnOffEffect * inst) { this->next_effect = inst; }
+    void setNext(OnOffEffect * inst) { this->nextEffect = inst; }
 };
 
 /**********************************************************
