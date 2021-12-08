@@ -64,13 +64,13 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
 
-static Identify * first_identify = nullptr;
+static Identify * firstIdentify = nullptr;
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState);
 
 static Identify * inst(EndpointId endpoint)
 {
-    Identify * current = first_identify;
+    Identify * current = firstIdentify;
     while (current != nullptr && current->mEndpoint != endpoint)
     {
         current = current->next();
@@ -81,20 +81,20 @@ static Identify * inst(EndpointId endpoint)
 
 static inline void reg(Identify * inst)
 {
-    inst->setNext(first_identify);
-    first_identify = inst;
+    inst->setNext(firstIdentify);
+    firstIdentify = inst;
 }
 
 static inline void unreg(Identify * inst)
 {
-    if (first_identify == inst)
+    if (firstIdentify == inst)
     {
-        first_identify = first_identify->next();
+        firstIdentify = firstIdentify->next();
     }
     else
     {
-        Identify * previous = first_identify;
-        Identify * current  = first_identify->next();
+        Identify * previous = firstIdentify;
+        Identify * current  = firstIdentify->next();
 
         while (current != nullptr && current != inst)
         {

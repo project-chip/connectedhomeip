@@ -68,7 +68,7 @@ using namespace chip::app::Clusters::OnOff;
  * Attributes Definition
  *********************************************************/
 
-static OnOffEffect * first_effect = nullptr;
+static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
 
 /**********************************************************
@@ -539,7 +539,7 @@ EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 
 static OnOffEffect * inst(EndpointId endpoint)
 {
-    OnOffEffect * current = first_effect;
+    OnOffEffect * current = firstEffect;
     while (current != nullptr && current->mEndpoint != endpoint)
     {
         current = current->next();
@@ -550,20 +550,20 @@ static OnOffEffect * inst(EndpointId endpoint)
 
 static inline void reg(OnOffEffect * inst)
 {
-    inst->setNext(first_effect);
-    first_effect = inst;
+    inst->setNext(firstEffect);
+    firstEffect = inst;
 }
 
 static inline void unreg(OnOffEffect * inst)
 {
-    if (first_effect == inst)
+    if (firstEffect == inst)
     {
-        first_effect = first_effect->next();
+        firstEffect = firstEffect->next();
     }
     else
     {
-        OnOffEffect * previous = first_effect;
-        OnOffEffect * current  = first_effect->next();
+        OnOffEffect * previous = firstEffect;
+        OnOffEffect * current  = firstEffect->next();
 
         while (current != nullptr && current != inst)
         {
