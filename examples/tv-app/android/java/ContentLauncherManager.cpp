@@ -92,7 +92,8 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
     }
 }
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
+                                                          std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                           const chip::CharSpan & data)
 {
     return ContentLauncherMgr().LaunchContent(parameterList, autoplay, data);
