@@ -64,6 +64,7 @@ private:
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
+    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList);
 
     // ===== Members for internal use by the following friends.
 

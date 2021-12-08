@@ -32,7 +32,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'DOOR_LOCK_CLUSTER': ['door-lock-server'],
     'ELECTRICAL_MEASUREMENT_CLUSTER': [],
     'ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER': ['ethernet-network-diagnostics-server'],
-    'FIXED_LABEL_CLUSTER': [],
+    'FIXED_LABEL_CLUSTER': ['fixed-label-server'],
     'FLOW_MEASUREMENT_CLUSTER': [],
     'GENERAL_COMMISSIONING_CLUSTER': ['general-commissioning-server'],
     'GENERAL_DIAGNOSTICS_CLUSTER': ['general-diagnostics-server'],
