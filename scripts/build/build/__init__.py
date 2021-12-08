@@ -27,13 +27,13 @@ class Context:
         self.output_prefix = output_prefix
         self.completed_steps = set()
 
-    def SetupBuilders(self, targets: Sequence[Target], enable_flashbundle: bool):
+    def SetupBuilders(self, targets: Sequence[Target], enable_flashbundle: bool, custom_build_arg: Sequence[str]):
         """Configures internal builders for the given platform/board/app combination. """
 
         self.builders = []
         for target in targets:
             self.builders.append(target.Create(
-                self.runner, self.repository_path, self.output_prefix, enable_flashbundle))
+                self.runner, self.repository_path, self.output_prefix, enable_flashbundle, custom_build_arg))
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)

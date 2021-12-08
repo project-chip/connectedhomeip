@@ -27,6 +27,7 @@ class NrfApp(Enum):
     SHELL = auto()
     PUMP = auto()
     PUMP_CONTROLLER = auto()
+    PIGWEED = auto()
 
     def ExampleName(self):
         if self == NrfApp.LIGHT:
@@ -39,6 +40,8 @@ class NrfApp(Enum):
             return 'pump-app'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'pump-controller-app'
+        elif self == NrfApp.PIGWEED:
+            return 'pigweed-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -53,6 +56,8 @@ class NrfApp(Enum):
             return 'chip-nrf-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrf-pump-controller-example'
+        elif self == NrfApp.PIGWEED:
+            return 'chip-nrf-pigweed-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -67,6 +72,8 @@ class NrfApp(Enum):
             return 'chip-nrfconnect-pump-example'
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
+        elif self == NrfApp.PIGWEED:
+            return 'chip-nrfconnect-pigweed-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -128,16 +135,23 @@ class NrfConnectBuilder(Builder):
 
                     raise Exception('ZEPHYR_BASE validation failed')
 
+            extra_args = list(self.custom_build_arg)
+
+            if self.enable_rpcs:
+                if '--' not in extra_args:
+                    extra_args.append('--')
+                extra_args.append('-DOVERLAY_CONFIG=rpc.overlay')
+
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
+west build --cmake-only -d {outdir} -b {board} {sourcedir} {extraargs}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
                     self.root, 'examples', self.app.ExampleName(), 'nrfconnect')),
-                rpcs=" -- -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
+                extraargs=shlex.join(extra_args)
             ).strip()
 
             self._Execute(['bash', '-c', cmd],

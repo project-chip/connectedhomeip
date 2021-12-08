@@ -116,9 +116,14 @@ def ValidateRepoPath(context, parameter, value):
     default=False,
     is_flag=True,
     help='Skip timestaps in log output')
+@click.option(
+    '--custom-build-arg',
+    multiple=True,
+    default=[],
+    help='Target-specific build argument')
 @click.pass_context
 def main(context, log_level, target, target_glob, skip_target_glob, repo, out_prefix, clean,
-         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps):
+         dry_run, dry_run_output, enable_flashbundle, no_log_timestamps, custom_build_arg):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -169,7 +174,7 @@ before running this script.
     context.obj = build.Context(
         repository_path=repo, output_prefix=out_prefix, runner=runner)
     context.obj.SetupBuilders(
-        targets=targets, enable_flashbundle=enable_flashbundle)
+        targets=targets, enable_flashbundle=enable_flashbundle, custom_build_arg=custom_build_arg)
 
     if clean:
         context.obj.CleanOutputDirectories()

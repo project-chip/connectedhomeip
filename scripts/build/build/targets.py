@@ -14,7 +14,7 @@
 
 import os
 
-from typing import Any, List
+from typing import Any, List, Sequence
 from itertools import combinations
 
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
@@ -66,7 +66,7 @@ class Target:
         clone.create_kw_args.update(kargs)
         return clone
 
-    def Create(self, runner, repository_path: str, output_prefix: str, enable_flashbundle: bool):
+    def Create(self, runner, repository_path: str, output_prefix: str, enable_flashbundle: bool, custom_build_arg: Sequence[str]):
         builder = self.builder_class(
             repository_path, runner=runner, **self.create_kw_args)
 
@@ -74,6 +74,7 @@ class Target:
         builder.identifier = self.name
         builder.output_dir = os.path.join(output_prefix, self.name)
         builder.enable_flashbundle(enable_flashbundle)
+        builder.custom_build_arg = custom_build_arg
 
         return builder
 
@@ -272,6 +273,8 @@ def NrfTargets():
 
         yield rpc
 
+        if '-nrf52840' in rpc.name:
+            yield target.Extend('pigweed', app=NrfApp.PIGWEED)
 
 def AndroidTargets():
     target = Target('android', AndroidBuilder)

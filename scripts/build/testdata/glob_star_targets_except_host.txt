@@ -38,6 +38,7 @@ mbed-CY8CPROTO_062_4343W-shell-release
 nrf-nrf52840-light
 nrf-nrf52840-light-rpc
 nrf-nrf52840-lock
+nrf-nrf52840-pigweed
 nrf-nrf52840-pump
 nrf-nrf52840-pump-controller
 nrf-nrf52840-shell

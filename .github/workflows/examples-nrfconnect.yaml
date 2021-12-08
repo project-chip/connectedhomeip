@@ -67,82 +67,74 @@ jobs:
             - name: Build example nRF Connect SDK Lock App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lock-app nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-lock build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 lock-app \
-                    examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-lock/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-light build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 lighting-app \
-                    examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-light/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dk_nrf52840 -DOVERLAY_CONFIG=rpc.overlay
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-light-rpc build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840+rpc lighting-app \
-                    examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-light-rpc/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Shell on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh shell nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-shell build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 shell \
-                    examples/shell/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-shell/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pigweed on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-pigweed build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 pigweed-app \
-                    examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-pigweed/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lock App on nRF5340 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lock-app nrf5340dk_nrf5340_cpuapp
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf5340-lock build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf5340dk_nrf5340_cpuapp lock-app \
-                    examples/lock-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp/zephyr/zephyr.elf \
+                    out/nrf-nrf5340-lock/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF5340 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf5340dk_nrf5340_cpuapp
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf5340-light build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf5340dk_nrf5340_cpuapp lighting-app \
-                    examples/lighting-app/nrfconnect/build/nrf5340dk_nrf5340_cpuapp/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-            - name: Build example nRF Connect SDK Shell on nRF5340 DK
-              timeout-minutes: 10
-              run: |
-                  scripts/examples/nrfconnect_example.sh shell nrf5340dk_nrf5340_cpuapp
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    nrfconnect nrf5340dk_nrf5340_cpuapp shell \
-                    examples/shell/nrfconnect/build/nrf5340dk_nrf5340_cpuapp/zephyr/zephyr.elf \
+                    out/nrf-nrf5340-light/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh pump-app nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-pump build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 pump-app \
-                    examples/pump-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-pump/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Pump Controller App on nRF52840 DK
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh pump-controller-app nrf52840dk_nrf52840
+                  scripts/run_in_build_env.sh "scripts/build/build_examples.py --no-log-timestamps --target nrf-nrf52840-pump-controller build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 pump-controller-app \
-                    examples/pump-controller-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    out/nrf-nrf52840-pump-controller/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Run unit tests for Zephyr native_posix_64 platform
               timeout-minutes: 10

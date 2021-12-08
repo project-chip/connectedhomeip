@@ -521,6 +521,11 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
 
+# Generating nrf-nrf52840-pigweed
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf52840-pigweed -b nrf52840dk_nrf52840 {root}/examples/pigweed-app/nrfconnect'
+
 # Generating nrf-nrf52840-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
@@ -1073,6 +1078,9 @@ ninja -C {out}/nrf-nrf52840-light-rpc
 
 # Building nrf-nrf52840-lock
 ninja -C {out}/nrf-nrf52840-lock
+
+# Building nrf-nrf52840-pigweed
+ninja -C {out}/nrf-nrf52840-pigweed
 
 # Building nrf-nrf52840-pump
 ninja -C {out}/nrf-nrf52840-pump

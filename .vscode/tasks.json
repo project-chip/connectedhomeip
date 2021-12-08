@@ -122,19 +122,6 @@
             "problemMatcher": []
         },
         {
-            "label": "Build nRF Connect Pigweed Example (nRF52840)",
-            "type": "shell",
-            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app nrf52840dk_nrf52840",
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build/nrf52840dk_nrf52840"
-                ]
-            }
-        },
-        {
             "label": "Run Mbed Application",
             "type": "shell",
             "command": "scripts/examples/mbed_example.sh",
@@ -325,6 +312,7 @@
                 "nrf-nrf52840-light",
                 "nrf-nrf52840-light-rpc",
                 "nrf-nrf52840-lock",
+                "nrf-nrf52840-pigweed",
                 "nrf-nrf52840-pump",
                 "nrf-nrf52840-pump-controller",
                 "nrf-nrf52840-shell",
