@@ -54,23 +54,25 @@ private:
  * `ClusterID` and `EventId`.
  *
  * @param[in] apDelegate The EventLoggingDelegate to serialize the event data
- *
- * @param[in] aEventOptions    The options for the event metadata.
- *
+ * @param[in] aEndpoint    The current cluster's Endpoint Id
+ * @param[in] aUrgent    The EventOption Type, kUrgent or kNotUrgent
  * @param[out] aEventNumber The event Number if the event was written to the
  *                         log, 0 otherwise. The Event number is expected to monotonically increase.
  *
  * @return CHIP_ERROR  CHIP Error Code
  */
 template <typename T>
-CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventOptions aEventOptions, EventNumber & aEventNumber)
+CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventNumber & aEventNumber,
+                    EventOptions::Type aUrgent = EventOptions::Type::kNotUrgent)
 {
     EventLogger<T> eventData(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    aEventOptions.mPath       = path;
-    aEventOptions.mPriority   = aEventData.GetPriorityLevel();
-    return logMgmt.LogEvent(&eventData, aEventOptions, aEventNumber);
+    EventOptions eventOptions;
+    eventOptions.mUrgent   = aUrgent;
+    eventOptions.mPath     = path;
+    eventOptions.mPriority = aEventData.GetPriorityLevel();
+    return logMgmt.LogEvent(&eventData, eventOptions, aEventNumber);
 }
 
 } // namespace app
