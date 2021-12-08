@@ -155,7 +155,8 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Access Control (client) */                                                                    \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */              \
+            { 0xFFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(CLIENT) | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                      \
+              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Actions (client) */                                                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */              \
@@ -338,7 +339,7 @@
             }, /* Endpoint: 1, Cluster: Descriptor (client) */                                                                     \
             { 0x001E, ZAP_ATTRIBUTE_INDEX(8), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Binding (client) */ \
             {                                                                                                                      \
-                0x001F, ZAP_ATTRIBUTE_INDEX(9), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
+                0x001F, ZAP_ATTRIBUTE_INDEX(9), 1, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                               \
             }, /* Endpoint: 1, Cluster: Access Control (client) */                                                                 \
             {                                                                                                                      \
                 0x0025, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
@@ -490,7 +491,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 59, 140 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 59, 138 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers
@@ -500,7 +501,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (4)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (140)
+#define ATTRIBUTE_MAX_SIZE (138)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)
