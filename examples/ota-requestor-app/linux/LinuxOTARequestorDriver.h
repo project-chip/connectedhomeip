@@ -21,6 +21,8 @@
  */
 #include "app/clusters/ota-requestor/OTARequestorDriver.h"
 
+namespace chip {
+
 class LinuxOTARequestorDriver : public OTARequestorDriver
 {
 
@@ -36,3 +38,5 @@ class LinuxOTARequestorDriver : public OTARequestorDriver
 
     // Virtual functions from OTARequestorDriver -- end
 };
+
+} // namespace chip

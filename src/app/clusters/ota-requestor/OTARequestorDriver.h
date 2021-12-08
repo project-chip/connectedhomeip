@@ -24,11 +24,29 @@
 
 #pragma once
 
+#include <protocols/bdx/BdxMessages.h>
+
+namespace chip {
+// The set of parameters needed for starting a BDX download.
+struct BdxDownloadParameters {
+    uint32_t delayedActionTime;
+    chip::CharSpan imageURI;
+    uint32_t softwareVersion;
+    chip::CharSpan softwareVersionString;
+    chip::ByteSpan updateToken;
+    bool userConsentNeeded;
+    chip::ByteSpan metadataForRequestor;
+};
+
+
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
 {
 public:
+
+    // Mandatory methods, applications are required to implement these
+
     // A call into the application logic to give it a chance to allow or stop the Requestor
     // from proceeding with actual image download. Returning TRUE will allow the download
     // to proceed, returning FALSE will abort the download process.
@@ -37,6 +55,20 @@ public:
     // Notify the application that the download is complete and the image can be applied
     virtual void ImageDownloadComplete() = 0;
 
+    // Optional methods, applications may choose to implement these
+
+    // This method informs the application of the BDX download parameters. This info can be used 
+    // later on for diecting the Requestor to resume an interrupted download
+    virtual void PostBdxDownloadParameters(const BdxDownloadParameters &bdxParameters) {};
+
+    // Return maximum supported download block size
+    virtual uint16_t GetMaxDownloadBlockSize() { return 1024;}
+
+    // Get Version of the last downloaded image, return CHIP_ERROR_NOT_FOUND if none exists
+    virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE;}
+
     // Destructor
     virtual ~OTARequestorDriver() = default;
 };
+
+} // namespace chip

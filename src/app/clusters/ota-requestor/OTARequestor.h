@@ -28,15 +28,21 @@
 #include <app/CASESessionManager.h>
 #include <protocols/bdx/BdxMessages.h>
 
+namespace chip {
+
 // This class implements all of the core logic of the OTA Requestor
 class OTARequestor : public OTARequestorInterface
 {
 public:
     // Application interface declarations -- start
+    enum OTATriggerResult {
+                                kTriggerSuccessful       = 0,
+                                kNoProviderKnown         = 1
+    };
 
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
-    void TriggerImmediateQuery();
+    OTATriggerResult TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -50,15 +56,22 @@ public:
     // the image update
     void AbortImageUpdate();
 
+    // Application directs the Requestor to download the image using the suppiled parameter and without
+    // issuing QueryImage
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters &bdxParameters) {/* NOT IMPLEMENTED YET */ 
+        return kTriggerSuccessful;} 
+
     // Application interface declarations -- end
 
-    // Virtual functions from OTARequestorInterface start
+    // Virtual functions from OTARequestorInterface -- start
+
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
     // Virtual functions from OTARequestorInterface -- end
+
     void ConnectToProvider();
 
     void mOnConnected(void * context, chip::DeviceProxy * deviceProxy);
@@ -67,9 +80,9 @@ public:
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
 
     // When the Requestor is used as a test tool (Tesm Mode) the Provider parameters may be supplied explicitly
-    void TestModeSetProviderParameters(chip::NodeId NodeId, chip::FabricIndex FabIndex)
+    void TestModeSetProviderParameters(chip::NodeId id, chip::FabricIndex FabIndex)
     {
-        mProviderNodeId      = NodeId;
+        mProviderNodeId      = id;
         mProviderFabricIndex = FabIndex;
     }
 
@@ -155,7 +168,7 @@ private:
     // Variables
     // TODO: align on variable naming standard
     OTARequestorDriver * mOtaRequestorDriver;
-    chip::NodeId mProviderNodeId;
+    chip::NodeId mProviderNodeId                   = kUndefinedNodeId;
     chip::FabricIndex mProviderFabricIndex;
     uint32_t mOtaStartDelayMs                      = 0;
     chip::CASESessionManager * mCASESessionManager = nullptr;
@@ -170,3 +183,5 @@ private:
     // Functions
     CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
 };
+
+} // namespace chip

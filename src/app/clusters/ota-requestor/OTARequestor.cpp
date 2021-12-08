@@ -36,6 +36,7 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
+
 using chip::ByteSpan;
 using chip::CASESessionManager;
 using chip::CASESessionManagerConfig;
@@ -51,10 +52,11 @@ using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
 using chip::bdx::TransferSession;
-using chip::Callback::Callback;
+//using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
-// using namespace chip::ArgParser;
+
+using namespace chip;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using chip::Inet::IPAddress;
@@ -66,10 +68,10 @@ constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this valu
 
 // Callbacks for connection management
 void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
-Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
+chip::Callback::Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
-Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
+chip::Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
 void OnQueryImageFailure(void * context, EmberAfStatus status);
@@ -405,8 +407,14 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
     }
 }
 
-void OTARequestor::TriggerImmediateQuery()
+OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
-    // Perhaps we don't need a separate function ConnectToProvider, revisit this
-    ConnectToProvider();
+ 
+    if(mProviderNodeId != kUndefinedNodeId) {
+        ConnectToProvider();
+        return kTriggerSuccessful;
+    } else {
+        ChipLogError(SoftwareUpdate, "No OTA Providers available");
+        return kNoProviderKnown;
+    }
 }
