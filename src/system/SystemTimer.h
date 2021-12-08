@@ -160,7 +160,7 @@ public:
     /**
      * Test whether there are any timers.
      */
-    bool Empty() const { return mEarliestTimer != nullptr; }
+    bool Empty() const { return mEarliestTimer == nullptr; }
 
     /**
      * Remove and return all timers that expire before the given time @a t.
