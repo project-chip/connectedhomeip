@@ -44,13 +44,59 @@ tests:
                       affiliateCallSign: "exampleASign",
                   },
               ]
-    # TODO: Enable the test once struct response is supported
-    # - label: "Change Channel Command"
-    #   command: "ChangeChannel"
-    #   arguments:
+    # TODO: Enable once attribute struct is supported
+    # - label: "Read attribute channel lineup"
+    #   command: "readAttribute"
+    #   attribute: "channel lineup"
+    #   response:
     #       values:
-    #           - name: "match"
-    #             value: "CNN"
+    #           - name: "operatorName"
+    #             value: "exampleName"
+    #           - name: "lineupName"
+    #             value: "exampleName"
+    #           - name: "postalCode"
+    #             value: "exampleName"
+    #           - name: "lineupInfoTyp"
+    #             value: 0
+
+    # TODO: Enable once attribute struct is supported
+    # - label: "Read attribute current channel"
+    #   command: "readAttribute"
+    #   attribute: "current channel"
+    #   response:
+    #       values:
+    #           - name: "majorNumber"
+    #             value: 1
+    #           - name: "minorNumber"
+    #             value: 0
+    #           - name: "name"
+    #             value: "exampleName"
+    #           - name: "callSign"
+    #             value: "callSign"
+    #           - name: "affiliateCallSign"
+    #             value: "sign"
+
+    
+    - label: "Change Channel Command"
+      command: "ChangeChannel"
+      arguments:
+          values:
+              - name: "match"
+                value: "CNN"
+      response:
+          values:
+              - name: "errorType"
+                value: 0
+              - name: "channelMatch"
+                value:
+                    {
+                        majorNumber: 1,
+                        minorNumber: 0,
+                        name: "name",
+                        callSign: "callSign",
+                        affiliateCallSign: "affiliateCallSign"
+                    }
+               
 
     - label: "Change Channel By Number Command"
       command: "ChangeChannelByNumber"
