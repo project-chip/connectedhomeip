@@ -20,7 +20,6 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
@@ -277,7 +276,7 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
 // Singleton instance of the callbacks manager
 static app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus status)
+bool IMDefaultResponseCallback(const app::CommandSender * commandObj, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
     ChipLogProgress(Zcl, "  Transaction: %p", commandObj);

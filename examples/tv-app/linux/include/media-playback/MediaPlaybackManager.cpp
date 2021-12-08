@@ -16,7 +16,7 @@
  */
 
 #include "MediaPlaybackManager.h"
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <iostream>
 

@@ -185,7 +185,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder Priority(const uint8_t aPriority);
+    EventDataIB::Builder & Priority(const uint8_t aPriority);
 
     /**
      *  @brief Inject Number into the TLV stream to indicate the number associated with
@@ -196,7 +196,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder EventNumber(const EventNumber aEventNumber);
+    EventDataIB::Builder & EventNumber(const EventNumber aEventNumber);
 
     /**
      *  @brief Inject EpochTimestamp into the TLV stream.
@@ -206,7 +206,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder EpochTimestamp(const uint64_t aEpochTimestamp);
+    EventDataIB::Builder & EpochTimestamp(const uint64_t aEpochTimestamp);
 
     /**
      *  @brief Inject SystemTimestamp into the TLV stream. If Epoch time is not available, time since boot
@@ -216,7 +216,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder SystemTimestamp(const uint64_t aSystemTimestamp);
+    EventDataIB::Builder & SystemTimestamp(const uint64_t aSystemTimestamp);
 
     /**
      *  @brief Inject DeltaEpochTimestamp into the TLV stream.
@@ -227,7 +227,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder DeltaEpochTimestamp(const uint64_t aDeltaEpochTimestamp);
+    EventDataIB::Builder & DeltaEpochTimestamp(const uint64_t aDeltaEpochTimestamp);
 
     /**
      *  @brief Inject DeltaSystemTimestamp into the TLV stream.
@@ -238,7 +238,7 @@ public:
      *
      *  @return A reference to *this
      */
-    EventDataIB::Builder DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp);
+    EventDataIB::Builder & DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp);
 
     /**
      *  @brief Mark the end of this EventDataIB

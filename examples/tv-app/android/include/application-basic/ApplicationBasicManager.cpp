@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/support/TypeTraits.h>
