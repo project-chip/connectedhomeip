@@ -222,7 +222,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        AttributePathIB::Builder path = aAttributePathIBsBuilder.CreatePath();
+        AttributePathIB::Builder & path = aAttributePathIBsBuilder.CreatePath();
         ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
         ReturnErrorOnFailure(path.Encode(apAttributePathParamsList[index]));
     }

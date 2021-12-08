@@ -65,8 +65,10 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
     if (responseDirective == kSendDataResponse)
     {
-        auto attributeReport                   = aAttributeReports.CreateAttributeReport();
-        AttributeDataIB::Builder attributeData = attributeReport.CreateAttributeData();
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
+        AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+        ReturnErrorOnFailure(attributeReport.GetError());
         TestCluster::Attributes::ListStructOctetString::TypeInfo::Type value;
         TestCluster::Structs::TestListStructOctet::Type valueBuf[4];
 
@@ -80,7 +82,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         }
 
         attributeData.DataVersion(0);
-        AttributePathIB::Builder attributePath = attributeData.CreatePath();
+        AttributePathIB::Builder & attributePath = attributeData.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
@@ -91,13 +93,15 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
     else
     {
-        auto attributeReport                       = aAttributeReports.CreateAttributeReport();
-        AttributeStatusIB::Builder attributeStatus = attributeReport.CreateAttributeStatus();
-        AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
+        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+        AttributePathIB::Builder & attributePath     = attributeStatus.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
-        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+        ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Busy));
         attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());

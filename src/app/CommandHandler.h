@@ -273,7 +273,6 @@ private:
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
 
-    uint8_t mCommandIndex = 0;
     State mState          = State::Idle;
     chip::System::PacketBufferTLVWriter mCommandMessageWriter;
     bool mBufferAllocated = false;

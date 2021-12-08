@@ -87,6 +87,8 @@ public:
 
     void EndOfContainer();
 
+    Builder(Builder &) = delete;
+
 protected:
     CHIP_ERROR mError;
     chip::TLV::TLVWriter * mpWriter;
