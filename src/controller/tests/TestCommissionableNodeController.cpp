@@ -198,12 +198,8 @@ int TestCommissionableNodeController_Teardown(void * inContext)
 
 int TestCommissionableNodeController()
 {
-    nlTestSuite theSuite = {
-        "CommissionableNodeController",
-        &sTests[0],
-        TestCommissionableNodeController_Setup,
-        TestCommissionableNodeController_Teardown
-    };
+    nlTestSuite theSuite = { "CommissionableNodeController", &sTests[0], TestCommissionableNodeController_Setup,
+                             TestCommissionableNodeController_Teardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
