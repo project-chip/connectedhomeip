@@ -19,9 +19,16 @@
 #include <controller/AutoCommissioner.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <lib/support/SafeInt.h>
 
 namespace chip {
 namespace Controller {
+
+AutoCommissioner::~AutoCommissioner()
+{
+    ReleaseDAC();
+    ReleasePAI();
+}
 
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
@@ -61,8 +68,12 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kArmFailsafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
-        return CommissioningStage::kDeviceAttestation;
-    case CommissioningStage::kDeviceAttestation:
+        return CommissioningStage::kSendPAICertificateRequest;
+    case CommissioningStage::kSendPAICertificateRequest:
+        return CommissioningStage::kSendDACCertificateRequest;
+    case CommissioningStage::kSendDACCertificateRequest:
+        return CommissioningStage::kCheckCertificates;
+    case CommissioningStage::kCheckCertificates:
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -119,7 +130,6 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
 
     // Currently unimplemented.
     case CommissioningStage::kConfigACL:
-    case CommissioningStage::kCheckCertificates:
         return CommissioningStage::kError;
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
@@ -138,13 +148,31 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 
 void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
-
-    if (report.stageCompleted == CommissioningStage::kFindOperational)
+    switch (report.stageCompleted)
     {
+    case CommissioningStage::kSendPAICertificateRequest:
+        SetPAI(report.requestedCertificate.certificate);
+        break;
+    case CommissioningStage::kSendDACCertificateRequest:
+        SetDAC(report.requestedCertificate.certificate);
+        break;
+    case CommissioningStage::kFindOperational:
         mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
+        break;
+    case CommissioningStage::kCleanup:
+        ReleasePAI();
+        ReleaseDAC();
+        mCommissioneeDeviceProxy = nullptr;
+        mOperationalDeviceProxy  = nullptr;
+        mParams                  = CommissioningParameters();
+        return;
+    default:
+        break;
     }
+
     CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted);
-    DeviceProxy * proxy          = mCommissioneeDeviceProxy;
+
+    DeviceProxy * proxy = mCommissioneeDeviceProxy;
     if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kCleanup)
     {
         proxy = mOperationalDeviceProxy;
@@ -156,6 +184,78 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
         return;
     }
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
+}
+
+void AutoCommissioner::ReleaseDAC()
+{
+    if (mDAC != nullptr)
+    {
+        Platform::MemoryFree(mDAC);
+    }
+    mDACLen = 0;
+    mDAC    = nullptr;
+}
+
+CHIP_ERROR AutoCommissioner::SetDAC(const ByteSpan & dac)
+{
+    if (dac.size() == 0)
+    {
+        ReleaseDAC();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(dac.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDACLen != 0)
+    {
+        ReleaseDAC();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(dac.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mDAC == nullptr)
+    {
+        mDAC = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(dac.size()));
+    }
+    VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
+    mDACLen = static_cast<uint16_t>(dac.size());
+    memcpy(mDAC, dac.data(), mDACLen);
+
+    return CHIP_NO_ERROR;
+}
+
+void AutoCommissioner::ReleasePAI()
+{
+    if (mPAI != nullptr)
+    {
+        chip::Platform::MemoryFree(mPAI);
+    }
+    mPAILen = 0;
+    mPAI    = nullptr;
+}
+
+CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
+{
+    if (pai.size() == 0)
+    {
+        ReleasePAI();
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(pai.size() <= Credentials::kMaxDERCertLength, CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAILen != 0)
+    {
+        ReleasePAI();
+    }
+
+    VerifyOrReturnError(CanCastTo<uint16_t>(pai.size()), CHIP_ERROR_INVALID_ARGUMENT);
+    if (mPAI == nullptr)
+    {
+        mPAI = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(pai.size()));
+    }
+    VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
+    mPAILen = static_cast<uint16_t>(pai.size());
+    memcpy(mPAI, pai.data(), mPAILen);
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

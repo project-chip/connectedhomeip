@@ -650,8 +650,6 @@ private:
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
 
-    Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
-
     /* TODO: BLE rendezvous and IP rendezvous should share the same procedure, so this is just a
        workaround-like flag and should be removed in the future.
        When using IP rendezvous, we need to disable network provisioning. In the future, network
@@ -689,7 +687,7 @@ private:
     /* This function sends a Device Attestation Certificate chain request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendCertificateChainRequestCommand(CommissioneeDeviceProxy * device, Credentials::CertificateType certificateType);
+    CHIP_ERROR SendCertificateChainRequestCommand(DeviceProxy * device, Credentials::CertificateType certificateType);
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */

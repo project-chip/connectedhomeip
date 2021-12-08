@@ -29,13 +29,22 @@ class AutoCommissioner : public CommissioningDelegate
 {
 public:
     AutoCommissioner(DeviceCommissioner * commissioner) : mCommissioner(commissioner) {}
+    ~AutoCommissioner();
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params);
     void StartCommissioning(CommissioneeDeviceProxy * proxy);
 
     void CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage);
+    void ReleaseDAC();
+    void ReleasePAI();
+
+    CHIP_ERROR SetDAC(const ByteSpan & dac);
+    CHIP_ERROR SetPAI(const ByteSpan & pai);
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;
@@ -45,6 +54,11 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+
+    uint8_t * mDAC   = nullptr;
+    uint16_t mDACLen = 0;
+    uint8_t * mPAI   = nullptr;
+    uint16_t mPAILen = 0;
 };
 
 } // namespace Controller

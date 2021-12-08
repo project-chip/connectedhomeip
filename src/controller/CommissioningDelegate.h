@@ -32,7 +32,8 @@ enum CommissioningStage : uint8_t
     // kConfigTimeZone,  // NOT YET IMPLEMENTED
     // kConfigDST,  // NOT YET IMPLEMENTED
     kConfigRegulatory,
-    kDeviceAttestation,
+    kSendPAICertificateRequest,
+    kSendDACCertificateRequest,
     kCheckCertificates,
     kConfigACL,
     kWifiNetworkSetup,
@@ -105,10 +106,15 @@ public:
     virtual ~CommissioningDelegate(){};
     struct CommissioningReport
     {
+        CommissioningReport(CommissioningStage stage) : stageCompleted(stage) {}
         CommissioningStage stageCompleted;
         // TODO: Add other things the delegate needs to know.
         union
         {
+            struct
+            {
+                ByteSpan certificate;
+            } requestedCertificate;
             struct
             {
                 OperationalDeviceProxy * operationalProxy;

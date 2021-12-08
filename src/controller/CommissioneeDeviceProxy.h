@@ -241,14 +241,6 @@ public:
 
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
 
-    bool AreCredentialsAvailable() const { return (mDAC != nullptr && mDACLen != 0); }
-
-    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
-
-    CHIP_ERROR SetDAC(const ByteSpan & dac);
-    CHIP_ERROR SetPAI(const ByteSpan & pai);
-
     MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
     CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
@@ -322,19 +314,11 @@ private:
      */
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
-    void ReleaseDAC();
-    void ReleasePAI();
-
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
-
-    uint8_t * mDAC   = nullptr;
-    uint16_t mDACLen = 0;
-    uint8_t * mPAI   = nullptr;
-    uint16_t mPAILen = 0;
 
     uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mNOCCertBufferSize = 0;
