@@ -1227,6 +1227,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     int mbedResult;
     uint32_t flags;
 
+    result = CertificateChainValidationResult::kInternalFrameworkError;
+
     VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
                         (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
@@ -1282,6 +1284,7 @@ exit:
     (void) caCertificateLen;
     (void) leafCertificate;
     (void) leafCertificateLen;
+    (void) result;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 

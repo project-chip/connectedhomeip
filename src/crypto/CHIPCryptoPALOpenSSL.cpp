@@ -1661,6 +1661,8 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     X509 * x509CACertificate   = nullptr;
     X509 * x509LeafCertificate = nullptr;
 
+    result = CertificateChainValidationResult::kInternalFrameworkError;
+
     VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
                         (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
     VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
