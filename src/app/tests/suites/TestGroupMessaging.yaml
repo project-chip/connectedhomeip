@@ -63,11 +63,28 @@ tests:
               - name: "groupId"
                 value: 0x1234
 
+    - label: "Add Group 2 - endpoint 0"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 0
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+
     # Test Pair 1 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"
       attribute: "location"
-      groupId: "1234"
+      groupId: "1"
       arguments:
           value: "us"
 
@@ -82,7 +99,7 @@ tests:
     - label: "Restore initial location value"
       command: "writeAttribute"
       attribute: "location"
-      groupId: "1234"
+      groupId: "1"
       arguments:
           value: ""
 
