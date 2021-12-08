@@ -41,12 +41,12 @@ struct EventPathParams
     bool IsValidEventPath() const { return !(HasWildcardClusterId() && !HasWildcardEventId()); }
 
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
-    inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
-    inline bool HasWildcardEventId() const { return mEventId == ClusterInfo::kInvalidEventId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
+    inline bool HasWildcardEventId() const { return mEventId == kInvalidEventId; }
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    ClusterId mClusterId   = ClusterInfo::kInvalidClusterId;
-    EventId mEventId       = ClusterInfo::kInvalidEventId;
+    ClusterId mClusterId   = kInvalidClusterId;
+    EventId mEventId       = kInvalidEventId;
 };
 } // namespace app
 } // namespace chip

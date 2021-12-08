@@ -151,12 +151,14 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .exchangeMgr    = params.systemState->ExchangeMgr(),
         .idAllocator    = &mIDAllocator,
         .fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
+        .clientPool     = &mCASEClientPool,
         .imDelegate     = params.systemState->IMDelegate(),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
+        .devicePool        = &mDevicePool,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);

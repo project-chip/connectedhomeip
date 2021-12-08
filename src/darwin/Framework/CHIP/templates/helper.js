@@ -34,6 +34,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
+  case 'DiagnosticLogs':
   case 'GeneralCommissioning':
   case 'GeneralDiagnostics':
   case 'SoftwareDiagnostics':
