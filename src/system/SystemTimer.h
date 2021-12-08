@@ -44,6 +44,7 @@ namespace chip {
 namespace System {
 
 class Layer;
+class TestTimer;
 
 /**
  * Basic Timer information: time and callback.
@@ -57,7 +58,7 @@ public:
         Callback(Layer & systemLayer, TimerCompleteCallback onComplete, void * appState) :
             mSystemLayer(&systemLayer), mOnComplete(onComplete), mAppState(appState)
         {}
-        void Invoke() { mOnComplete(mSystemLayer, mAppState); }
+        void Invoke() const { mOnComplete(mSystemLayer, mAppState); }
         const TimerCompleteCallback & GetOnComplete() const { return mOnComplete; }
         void * GetAppState() const { return mAppState; }
         Layer * GetSystemLayer() const { return mSystemLayer; }
@@ -68,8 +69,8 @@ public:
         void * mAppState;
     };
 
-    TimerData(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) :
-        mAwakenTime(SystemClock().GetMonotonicTimestamp() + delay), mCallback(systemLayer, onComplete, appState)
+    TimerData(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState) :
+        mAwakenTime(awakenTime), mCallback(systemLayer, onComplete, appState)
     {}
     ~TimerData() = default;
 
@@ -106,8 +107,8 @@ public:
     class Node : public TimerData
     {
     public:
-        Node(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) :
-            TimerData(systemLayer, delay, onComplete, appState), mNextTimer(nullptr)
+        Node(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState) :
+            TimerData(systemLayer, awakenTime, onComplete, appState), mNextTimer(nullptr)
         {}
         Node * mNextTimer;
     };
@@ -160,7 +161,7 @@ public:
     /**
      * Test whether there are any timers.
      */
-    bool Empty() const { return mEarliestTimer != nullptr; }
+    bool Empty() const { return mEarliestTimer == nullptr; }
 
     /**
      * Remove and return all timers that expire before the given time @a t.
@@ -188,9 +189,9 @@ public:
     /**
      * Create a new timer from the pool.
      */
-    Timer * Create(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+    Timer * Create(Layer & systemLayer, System::Clock::Timestamp awakenTime, TimerCompleteCallback onComplete, void * appState)
     {
-        Timer * timer = mTimerPool.CreateObject(systemLayer, delay, onComplete, appState);
+        Timer * timer = mTimerPool.CreateObject(systemLayer, awakenTime, onComplete, appState);
         SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
         return timer;
     }
@@ -224,6 +225,7 @@ public:
     }
 
 private:
+    friend class TestTimer;
     ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> mTimerPool;
 };
 
