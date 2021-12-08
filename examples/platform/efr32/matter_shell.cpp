@@ -82,10 +82,6 @@ void startShellTask()
 #endif
 
     shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack, &shellTaskStruct);
-    // if (!shellTaskHandle)
-    // {
-    //     EFR32_LOG("Shell task creation error");
-    // }
 }
 
 } // namespace chip

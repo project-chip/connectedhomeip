@@ -14,5 +14,5 @@
 
 declare_args() {
   # Enable libshell support.
-  chip_build_libshell = true
+  chip_build_libshell = false
 }

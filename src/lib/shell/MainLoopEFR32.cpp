@@ -32,7 +32,7 @@ using chip::Shell::streamer_get;
 
 namespace {
 
-constexpr const char kShellPrompt[] = "matterCli >";
+constexpr const char kShellPrompt[] = "matterCli > ";
 
 void ReadLine(char * buffer, size_t max)
 {

@@ -66,9 +66,9 @@
 #include "Rpc.h"
 #endif
 
-//#if defined(ENABLE_CHIP_SHELL)
+#ifdef ENABLE_CHIP_SHELL
 #include "matter_shell.h"
-//#endif
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -181,9 +181,9 @@ int main(void)
         appError(ret);
     }
 
-//#if defined(ENABLE_CHIP_SHELL)
+#ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
-//#endif
+#endif
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();

@@ -65,6 +65,7 @@ efr32_executable("shell_app") {
 
   deps = [
     ":sdk",
+    "${examples_plat_dir}:efr-matter-shell",
     "${chip_root}/examples/shell/shell_common:shell_common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",

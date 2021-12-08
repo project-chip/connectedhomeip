@@ -15,8 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "uart.h"
 #include "AppConfig.h"
+#include "matter_shell.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#include "uart.h"
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
@@ -26,8 +31,6 @@
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
-
-#include "matter_shell.h"
 
 #if !defined(MIN)
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
@@ -178,7 +181,7 @@ static uint8_t RetrieveFromFifo(Fifo_t * fifo, uint8_t * pData, uint16_t SizeToR
  */
 void uartConsoleInit(void)
 {
-    //sl_board_enable_vcom();
+    sl_board_enable_vcom();
     // Init a fifo for the data received on the uart
     InitFifo(&sReceiveFifo, sRxFifoBuffer, MAX_BUFFER_SIZE);
 
@@ -276,3 +279,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
 }
+
+#ifdef __cplusplus
+}
+#endif

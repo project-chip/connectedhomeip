@@ -80,6 +80,7 @@ efr32_executable("window_app") {
 
   deps = [
     ":sdk",
+    "${examples_plat_dir}:efr-matter-shell",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/window-app/common:window-common",
     "${chip_root}/src/lib",

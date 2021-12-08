@@ -90,6 +90,7 @@ efr32_executable("lock_app") {
 
   deps = [
     ":sdk",
+    "${examples_plat_dir}:efr-matter-shell",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",

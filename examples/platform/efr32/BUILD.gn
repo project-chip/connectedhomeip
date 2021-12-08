@@ -56,7 +56,7 @@ source_set("efr-matter-shell") {
     defines = ["ENABLE_CHIP_SHELL"]
 
     sources = ["matter_shell.cpp"]
-    include_dirs = [ "${chip_root}/examples/platform/efr32" ]
+    include_dirs = [ "." ]
 
     public_deps = [
       "${chip_root}/src/lib/shell:shell",
