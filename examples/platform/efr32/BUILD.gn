@@ -61,7 +61,7 @@ source_set("efr-matter-shell") {
     public_deps = [
       "${chip_root}/src/lib/shell:shell",
       "${chip_root}/src/lib/shell:shell_core",
-      #"${chip_root}/examples/shell/shell_common:shell_common",
+      "${chip_root}/examples/shell/shell_common:shell_common",
     ]
   }
 }

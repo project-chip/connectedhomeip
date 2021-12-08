@@ -18,7 +18,7 @@
 #include "matter_shell.h"
 #include <FreeRTOS.h>
 #include <task.h>
-//#include <ChipShellCollection.h>
+#include <ChipShellCollection.h>
 #include <lib/shell/Engine.h>
 #include <lib/core/CHIPCore.h>
 
@@ -74,12 +74,12 @@ void startShellTask()
     int status = chip::Shell::streamer_init(chip::Shell::streamer_get());
     assert(status == 0);
 
-#ifdef SHELL_APP
+    // For now also register commands from shell_common (shell app).
+    // TODO move at least OTCLI to default commands in lib/shell/commands
     cmd_misc_init();
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
-#endif
 
     shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack, &shellTaskStruct);
 }
