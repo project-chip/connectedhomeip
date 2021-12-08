@@ -21,7 +21,7 @@ from .builder import Builder
 
 class AmebaBoard(Enum):
     AMEBAD = auto()
-
+    LIGHT = auto()
 
 class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
@@ -30,13 +30,17 @@ class AmebaApp(Enum):
     def ExampleName(self):
         if self == AmebaApp.ALL_CLUSTERS:
             return 'all-clusters-app'
+        elif self == AmebaApp.LIGHT:
+            return 'lighting-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
     @property
     def AppNamePrefix(self):
         if self == AmebaApp.ALL_CLUSTERS:
-            return 'chip-all-clusters-app'
+            return 'chip-ameba-all-clusters-app'
+        elif self == AmebaApp.LIGHT:
+            return 'chip-ameba-lighting-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -53,8 +57,8 @@ class AmebaBuilder(Builder):
         self.app = app
 
     def generate(self):
-        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh %s ninja %s' % (
-            self.root, self.output_dir)
+        cmd = '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh %s ninja %s %s' % (
+            self.root, self.output_dir, self.app.ExampleName)
         self._Execute(['bash', '-c', cmd],
                       title='Generating ' + self.identifier)
 

@@ -319,6 +319,11 @@ def InfineonTargets():
     yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
     yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
 
+def AmebaTargets():
+    ameba_target = Target('ameba', AmebaBuilder)
+
+    yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
+    yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
 
 ALL = []
 
@@ -329,8 +334,8 @@ target_generators = [
     NrfTargets(),
     AndroidTargets(),
     MbedTargets(),
-    InfineonTargets()
-
+    InfineonTargets(),
+    AmebaTargets()
 ]
 
 for generator in target_generators:
@@ -343,8 +348,6 @@ ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
-ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
-                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)
