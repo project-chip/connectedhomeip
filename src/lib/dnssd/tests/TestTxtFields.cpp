@@ -19,6 +19,7 @@
 #include <lib/dnssd/TxtFields.h>
 
 #include <limits>
+#include <stdio.h>
 #include <string.h>
 
 #include <lib/dnssd/Resolver.h>
