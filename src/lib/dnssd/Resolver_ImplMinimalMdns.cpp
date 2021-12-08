@@ -599,21 +599,28 @@ Resolver & chip::Dnssd::Resolver::Instance()
     return gResolver;
 }
 
+// Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
+// updating the delegate that ends up beeing used by the server by calling 'SetResolverDelegate'.
+// This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
+// it won't work well if requests are issued in parallel.
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
-    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
 {
-    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
-    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
     return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 

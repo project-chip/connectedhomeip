@@ -17,52 +17,81 @@
 
 #pragma once
 
+#include <lib/core/ReferenceCounted.h>
 #include <lib/dnssd/Resolver.h>
-#include <lib/dnssd/platform/Dnssd.h>
 
 namespace chip {
 namespace Dnssd {
 
-class ResolverProxy : public Resolver, public ResolverDelegate
+class ResolverDelegateProxy : public ReferenceCounted<ResolverDelegateProxy>, public ResolverDelegate
+{
+public:
+    void SetDelegate(ResolverDelegate * delegate) { mDelegate = delegate; }
+
+    /// ResolverDelegate interface
+    void OnNodeIdResolved(const ResolvedNodeData & nodeData) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnNodeIdResolved(nodeData);
+        }
+    }
+
+    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnNodeIdResolutionFailed(peerId, error);
+        }
+    }
+
+    void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) override
+    {
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnNodeDiscoveryComplete(nodeData);
+        }
+    }
+
+private:
+    ResolverDelegate * mDelegate = nullptr;
+};
+
+class ResolverProxy : public Resolver
 {
 public:
     ResolverProxy() {}
-    ResolverProxy(ResolverDelegate * delegate) : mResolverDelegate(delegate) {}
 
     // Resolver interface.
-    CHIP_ERROR Init(Inet::InetLayer * = nullptr) override { return CHIP_NO_ERROR; }
-    void Shutdown() override { mResolverDelegate = nullptr; };
-    void SetResolverDelegate(ResolverDelegate * delegate) override { mResolverDelegate = delegate; }
+    CHIP_ERROR Init(Inet::InetLayer * inetLayer = nullptr) override
+    {
+        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(inetLayer));
+        VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        mDelegate = chip::Platform::New<ResolverDelegateProxy>();
+        return CHIP_NO_ERROR;
+    }
+
+    void SetResolverDelegate(ResolverDelegate * delegate) override
+    {
+        VerifyOrReturn(mDelegate != nullptr);
+        mDelegate->SetDelegate(delegate);
+    }
+
+    void Shutdown() override
+    {
+        VerifyOrReturn(mDelegate != nullptr);
+        mDelegate->SetDelegate(nullptr);
+        mDelegate->Release();
+        mDelegate = nullptr;
+    }
+
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
                              Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
-    /// ResolverDelegate interface
-    void OnNodeIdResolved(const ResolvedNodeData & nodeData) override
-    {
-        if (mResolverDelegate != nullptr)
-        {
-            mResolverDelegate->OnNodeIdResolved(nodeData);
-        }
-    }
-    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override
-    {
-        if (mResolverDelegate != nullptr)
-        {
-            mResolverDelegate->OnNodeIdResolutionFailed(peerId, error);
-        }
-    }
-    void OnNodeDiscoveryComplete(const DiscoveredNodeData & nodeData) override
-    {
-        if (mResolverDelegate != nullptr)
-        {
-            mResolverDelegate->OnNodeDiscoveryComplete(nodeData);
-        }
-    }
-
 private:
-    ResolverDelegate * mResolverDelegate = nullptr;
+    ResolverDelegateProxy * mDelegate = nullptr;
 };
 
 } // namespace Dnssd
