@@ -50,7 +50,7 @@ protected:
     const Dnssd::DiscoveredNodeData * GetDiscoveredNode(int idx);
     virtual DiscoveredNodeList GetDiscoveredNodes()    = 0;
     DeviceDiscoveryDelegate * mDeviceDiscoveryDelegate = nullptr;
-    Dnssd::ResolverProxy mDNSResolver{ this };
+    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace Controller

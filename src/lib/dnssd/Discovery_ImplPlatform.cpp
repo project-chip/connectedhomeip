@@ -44,7 +44,13 @@ static DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sDnssdCache;
 
 static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR error)
 {
-    VerifyOrReturn(CHIP_NO_ERROR == error);
+    ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        proxy->Release();
+        return;
+    }
 
     DiscoveredNodeData nodeData;
     Platform::CopyString(nodeData.hostName, result->mHostName);
@@ -66,13 +72,12 @@ static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR 
         FillNodeDataFromTxt(key, val, nodeData);
     }
 
-    ResolverProxy * proxy = static_cast<ResolverProxy *>(context);
     proxy->OnNodeDiscoveryComplete(nodeData);
 }
 
 static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error)
 {
-    ResolverProxy * proxy = static_cast<ResolverProxy *>(context);
+    ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
     VerifyOrReturn(CHIP_NO_ERROR == error, proxy->OnNodeIdResolutionFailed(PeerId(), error));
     VerifyOrReturn(result != nullptr, proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID));
 
@@ -108,8 +113,12 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
 {
+    ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
+    proxy->Release();
+
     for (size_t i = 0; i < servicesSize; ++i)
     {
+        proxy->Retain();
         // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
         if (!services[i].mAddress.HasValue())
         {
@@ -576,7 +585,8 @@ Resolver & chip::Dnssd::Resolver::Instance()
 
 CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
-    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mDelegate->Retain();
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (dnssdCacheBypass == Resolver::CacheBypass::Off)
@@ -585,7 +595,7 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
         ResolvedNodeData nodeData;
         if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
         {
-            mResolverDelegate->OnNodeIdResolved(nodeData);
+            mDelegate->OnNodeIdResolved(nodeData);
             return CHIP_NO_ERROR;
         }
     }
@@ -597,29 +607,31 @@ CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressTy
     strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
     service.mProtocol    = DnssdServiceProtocol::kDnssdProtocolTcp;
     service.mAddressType = type;
-    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, this);
+    return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, mDelegate);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
 {
-    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mDelegate->Retain();
 
     char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                           Inet::InterfaceId::Null(), HandleNodeBrowse, this);
+                           Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate);
 }
 
 CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
-    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mDelegate->Retain();
 
     char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
-                           Inet::InterfaceId::Null(), HandleNodeBrowse, this);
+                           Inet::InterfaceId::Null(), HandleNodeBrowse, mDelegate);
 }
 
 } // namespace Dnssd
