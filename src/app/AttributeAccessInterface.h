@@ -23,11 +23,13 @@
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <app/data-model/List.h> // So we can encode lists
 #include <app/data-model/TagBoundEncoder.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/Optional.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 /**
  * Callback class that clusters can implement in order to interpose custom
@@ -97,10 +99,18 @@ public:
     public:
         ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(encoder) {}
 
-        template <typename... Ts>
-        CHIP_ERROR Encode(Ts &&... aArgs) const
+        template <typename T, std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
+        CHIP_ERROR Encode(T && aArg) const
         {
-            return mAttributeValueEncoder.EncodeListItem(std::forward<Ts>(aArgs)...);
+            // If the fabric index does not match that present in the request, skip encoding this list item.
+            VerifyOrReturnError(aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex), CHIP_NO_ERROR);
+            return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
+        }
+
+        template <typename T, std::enable_if_t<!DataModel::IsFabricScoped<T>::value, bool> = true>
+        CHIP_ERROR Encode(T && aArg) const
+        {
+            return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }
 
     private:
