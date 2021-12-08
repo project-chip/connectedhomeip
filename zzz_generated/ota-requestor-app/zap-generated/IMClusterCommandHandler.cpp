@@ -41,6 +41,15 @@ namespace app {
 
 namespace Clusters {
 
+namespace Basic {
+
+void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
+{
+    ReportCommandUnsupported(apCommandObj, aCommandPath);
+}
+
+} // namespace Basic
+
 namespace GeneralCommissioning {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -561,6 +570,9 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
 
     switch (aCommandPath.mClusterId)
     {
+    case Clusters::Basic::Id:
+        Clusters::Basic::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
+        break;
     case Clusters::GeneralCommissioning::Id:
         Clusters::GeneralCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;

@@ -29,6 +29,7 @@
 
 #include "BDXDownloader.h"
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
@@ -36,29 +37,13 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
-using chip::ByteSpan;
-using chip::CASESessionManager;
-using chip::CASESessionManagerConfig;
-using chip::CharSpan;
-using chip::DeviceProxy;
-using chip::EndpointId;
-using chip::FabricIndex;
-using chip::FabricInfo;
-using chip::NodeId;
-using chip::OnDeviceConnected;
-using chip::OnDeviceConnectionFailure;
-using chip::PeerId;
-using chip::Server;
-using chip::VendorId;
-using chip::bdx::TransferSession;
-using chip::Callback::Callback;
-using chip::System::Layer;
-using chip::Transport::PeerAddress;
-// using namespace chip::ArgParser;
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::bdx;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
-using chip::Inet::IPAddress;
 
+namespace {
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
 
@@ -66,23 +51,13 @@ constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this valu
 
 // Callbacks for connection management
 void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
-Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
+Callback::Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
-Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
+Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnConnectionFailure, nullptr);
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
 void OnQueryImageFailure(void * context, EmberAfStatus status);
-
-void SetRequestorInstance(OTARequestorInterface * instance)
-{
-    globalOTARequestorInstance = instance;
-}
-
-OTARequestorInterface * GetRequestorInstance()
-{
-    return globalOTARequestorInstance;
-}
 
 void StartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState)
 {
@@ -95,6 +70,17 @@ void OnQueryImageFailure(void * context, EmberAfStatus status)
     ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
 }
 
+// Called whenever FindOrEstablishSession is successful. Finds the Requestor instance
+// and calls the corresponding OTARequestor member function
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
+{
+    OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
+
+    VerifyOrDie(requestorCore != nullptr);
+
+    requestorCore->mOnConnected(context, deviceProxy);
+}
+
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ChipLogError(SoftwareUpdate, "failed to connect to 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
@@ -104,10 +90,27 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
 
-    assert(requestorCore != nullptr);
+    VerifyOrDie(requestorCore != nullptr);
 
     requestorCore->mOnQueryImageResponse(context, response);
 }
+} // namespace
+
+void SetRequestorInstance(OTARequestorInterface * instance)
+{
+    globalOTARequestorInstance = instance;
+}
+
+OTARequestorInterface * GetRequestorInstance()
+{
+    return globalOTARequestorInstance;
+}
+
+struct OTARequestor::QueryImageRequest
+{
+    char location[2];
+    QueryImage::Type args;
+};
 
 void OTARequestor::mOnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
@@ -297,7 +300,7 @@ void OTARequestor::ConnectToProvider()
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
     // and fabric index
-    PeerAddress addr = PeerAddress::UDP(mIpAddress, CHIP_PORT);
+    Transport::PeerAddress addr = Transport::PeerAddress::UDP(mIpAddress, CHIP_PORT);
     operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
 
     CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
@@ -307,58 +310,25 @@ void OTARequestor::ConnectToProvider()
     }
 }
 
-// Called whenever FindOrEstablishSession is successful. Finds the Requestor instance
-// and calls the corresponding OTARequestor member function
-void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
-{
-    OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
-
-    assert(requestorCore != nullptr);
-
-    requestorCore->mOnConnected(context, deviceProxy);
-}
-
 // Member function called whenever FindOrEstablishSession is successful
 void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
 {
     switch (onConnectedState)
     {
     case kQueryImage: {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         constexpr EndpointId kOtaProviderEndpoint = 0;
 
-        // These QueryImage params have been chosen arbitrarily
-        constexpr VendorId kExampleVendorId                               = VendorId::Common;
-        constexpr uint16_t kExampleProductId                              = 77;
-        constexpr uint16_t kExampleHWVersion                              = 3;
-        constexpr uint16_t kExampleSoftwareVersion                        = 0;
-        constexpr EmberAfOTADownloadProtocol kExampleProtocolsSupported[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
-        const char locationBuf[]                                          = { 'U', 'S' };
-        CharSpan exampleLocation(locationBuf);
-        constexpr bool kExampleClientCanConsent = false;
-        ByteSpan metadata;
+        QueryImageRequest request;
+        CHIP_ERROR err = BuildQueryImageRequest(request);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(SoftwareUpdate, "Failed to build QueryImage command: %" CHIP_ERROR_FORMAT, err.Format()));
 
-        err = cluster.Associate(deviceProxy, kOtaProviderEndpoint);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
-            return;
-        }
-        QueryImage::Type args;
-        args.vendorId           = kExampleVendorId;
-        args.productId          = kExampleProductId;
-        args.softwareVersion    = kExampleSoftwareVersion;
-        args.protocolsSupported = kExampleProtocolsSupported;
-        args.hardwareVersion.Emplace(kExampleHWVersion);
-        args.location.Emplace(exampleLocation);
-        args.requestorCanConsent.Emplace(kExampleClientCanConsent);
-        args.metadataForProvider.Emplace(metadata);
-        err = cluster.InvokeCommand(args, /* context = */ nullptr, OnQueryImageResponse, OnQueryImageFailure);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "QueryImage() failed: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        Controller::OtaSoftwareUpdateProviderCluster cluster;
+        cluster.Associate(deviceProxy, kOtaProviderEndpoint);
+
+        err = cluster.InvokeCommand(request.args, /* context = */ nullptr, OnQueryImageResponse, OnQueryImageFailure);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(SoftwareUpdate, "Failed to send QueryImage command: %" CHIP_ERROR_FORMAT, err.Format()));
 
         break;
     }
@@ -409,4 +379,38 @@ void OTARequestor::TriggerImmediateQuery()
 {
     // Perhaps we don't need a separate function ConnectToProvider, revisit this
     ConnectToProvider();
+}
+
+CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)
+{
+    constexpr EmberAfOTADownloadProtocol kProtocolsSupported[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
+    constexpr bool kRequestorCanConsent                        = false;
+    QueryImage::Type & args                                    = request.args;
+
+    uint16_t vendorId;
+    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &vendorId) == EMBER_ZCL_STATUS_SUCCESS,
+                        CHIP_ERROR_READ_FAILED);
+    args.vendorId = static_cast<VendorId>(vendorId);
+
+    VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
+                        CHIP_ERROR_READ_FAILED);
+
+    VerifyOrReturnError(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &args.softwareVersion) == EMBER_ZCL_STATUS_SUCCESS,
+                        CHIP_ERROR_READ_FAILED);
+
+    args.protocolsSupported = kProtocolsSupported;
+    args.requestorCanConsent.SetValue(kRequestorCanConsent);
+
+    uint16_t hardwareVersion;
+    if (Basic::Attributes::HardwareVersion::Get(kRootEndpointId, &hardwareVersion) == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        args.hardwareVersion.SetValue(hardwareVersion);
+    }
+
+    if (Basic::Attributes::Location::Get(kRootEndpointId, MutableCharSpan(request.location)) == EMBER_ZCL_STATUS_SUCCESS)
+    {
+        args.location.SetValue(CharSpan(request.location));
+    }
+
+    return CHIP_NO_ERROR;
 }
