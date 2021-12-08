@@ -57,6 +57,8 @@ struct DeviceProxyInitParams
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
+
     CHIP_ERROR Validate()
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);

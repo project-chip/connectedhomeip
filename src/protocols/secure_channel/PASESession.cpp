@@ -442,7 +442,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
 
-    SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+    SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
@@ -562,7 +562,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     if (mHavePBKDFParameters)
     {
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
 
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
         err = SetupSpake2p(mIterationCount, ByteSpan(mSalt, mSaltLength));
@@ -585,7 +585,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
         SuccessOrExit(err = tlvReader.ExitContainer(containerType));
 
-        SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
 
         err = SetupSpake2p(iterCount, ByteSpan(salt, saltLength));
         SuccessOrExit(err);

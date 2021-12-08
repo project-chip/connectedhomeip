@@ -172,7 +172,7 @@ protected:
      * If the parameters are present, but TLV reader fails to correctly parse it, the function will
      * return the corresponding error.
      */
-    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::ContiguousBufferTLVReader & tlvReader);
+    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()

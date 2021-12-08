@@ -43,9 +43,9 @@ class TestPairingSession : public PairingSession
 public:
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader)
+    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, System::PacketBufferTLVReader & tlvReader)
     {
-        return PairingSession::DecodeMRPParametersIfPresent(tlvReader);
+        return PairingSession::DecodeMRPParametersIfPresent(expectedTag, tlvReader);
     }
 };
 
@@ -75,7 +75,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
 
-    err = session.DecodeMRPParametersIfPresent(reader);
+    err = session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == config.mIdleRetransTimeout);
@@ -101,7 +101,7 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     reader.Init(std::move(buf));
     NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(reader) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == gDefaultMRPConfig.mIdleRetransTimeout);
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == gDefaultMRPConfig.mActiveRetransTimeout);

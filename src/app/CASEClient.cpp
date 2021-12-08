@@ -43,8 +43,8 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
 
-    ReturnErrorOnFailure(
-        mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), keyID, exchange, this));
+    ReturnErrorOnFailure(mCASESession.EstablishSession(peerAddress, mInitParams.fabricInfo, peer.GetNodeId(), keyID, exchange, this,
+                                                       mInitParams.mrpLocalConfig));
     mConnectionSuccessCallback = onConnection;
     mConnectionFailureCallback = onFailure;
     mConectionContext          = context;
