@@ -81,28 +81,13 @@ void InteractionModelEngine::Shutdown()
     // Increase magic number to invalidate all Handle-s.
     mMagic++;
 
-    mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> Loop {
-        // Modifying the pool during iteration is generally frowned upon.
-        // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
-        // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
-        //
-        // Deallocate an CommandHandler will call its destructor (and abort the exchange context it holds) without calling
-        // Shutdown().
-        //
-        // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
-
-        mCommandHandlerObjs.Deallocate(obj);
-        return Loop::Continue;
-    });
+    mCommandHandlerObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
-        // This calls back into us and deallocates |obj|.  As above, this is not
-        // really guaranteed, and we should do something better here (like
-        // ignoring the calls to OnTimedInteractionFailed and then doing a
-        // DeallocateAll.
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
         return Loop::Continue;
     });
+    mTimedHandlers.ReleaseAll();
 
     for (auto & readClient : mReadClients)
     {
@@ -702,7 +687,7 @@ CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId 
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
 {
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 }
 
 void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
@@ -713,7 +698,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     // Reset the ourselves as the exchange delegate for now, to match what we'd
     // do with an initial unsolicited invoke.
     apExchangeContext->SetDelegate(this);
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
@@ -734,7 +719,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     // Reset the ourselves as the exchange delegate for now, to match what we'd
     // do with an initial unsolicited write.
     apExchangeContext->SetDelegate(this);
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::WriteRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
