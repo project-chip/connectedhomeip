@@ -52,35 +52,22 @@ using namespace chip::app::Clusters::TvChannel;
 bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
 bool tvChannelClusterSkipChannel(uint16_t count);
 
-void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
-{
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), TvChannel::Id, Commands::ChangeChannelResponse::Id };
-    TLV::TLVWriter * writer       = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(path));
-    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // TODO: Enable this once struct as param is supported
-    // SuccessOrExit(err = writer->Put(TLV::ContextTag(0), channelInfo));
-    // EmberAfTvChannelErrorType. errorType
-    // SuccessOrExit(err = writer->Put(TLV::ContextTag(1), errorType));
-    SuccessOrExit(err = command->FinishCommand());
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to send ChangeChannel. Error:%s", ErrorStr(err));
-    }
-}
-
 bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                   const Commands::ChangeChannel::DecodableType & commandData)
 {
-    auto & match = commandData.match;
+    Commands::ChangeChannelResponse::Type response;
+    response.channelMatch.majorNumber = 1;
+    response.channelMatch.minorNumber = 0;
+    response.channelMatch.name = chip::CharSpan("name", strlen("name"));
+    response.channelMatch.callSign = chip::CharSpan("callSign", strlen("callSign"));
+    response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
+    response.errorType = (TvChannelErrorType) 0;
 
-    std::string matchString(match.data(), match.size());
-    // TODO: Enable this once struct as param is supported
-    // TvChannelInfo channelInfo = tvChannelClusterChangeChannel(matchString);
-    // sendResponse(command, channelInfo);
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    CHIP_ERROR err = command->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
     return true;
 }
 

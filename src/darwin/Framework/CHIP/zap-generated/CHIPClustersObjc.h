@@ -61,6 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
             completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -187,9 +188,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPApplicationLauncher : CHIPCluster
 
+- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterHideAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
 - (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
           completionHandler:(void (^)(CHIPApplicationLauncherClusterLaunchAppResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler;
+- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterStopAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeApplicationLauncherListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
