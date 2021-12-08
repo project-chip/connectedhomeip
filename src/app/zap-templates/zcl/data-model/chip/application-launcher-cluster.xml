@@ -36,13 +36,11 @@ limitations under the License.
 
     <command source="client" code="0x01" name="StopApp" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.</description>
-      <arg name="data" type="CHAR_STRING"/>
       <arg name="application" type="ApplicationLauncherApp"/>
     </command>
 
     <command source="client" code="0x02" name="HideApp" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.</description>
-      <arg name="data" type="CHAR_STRING"/>
       <arg name="application" type="ApplicationLauncherApp"/>
     </command>
 
@@ -53,13 +51,15 @@ limitations under the License.
     </command>
 
     <command source="server" code="0x01" name="StopAppResponse" optional="false">
-      <description>This command SHALL be generated in response to LaunchApp commands.</description>
+      <description>This command SHALL be generated in response to StopApp commands.</description>
       <arg name="status" type="ApplicationLauncherStatus"/>
+      <arg name="data" type="CHAR_STRING"/>
     </command>
 
     <command source="server" code="0x02" name="HideAppResponse" optional="false">
       <description>This command SHALL be generated in response to HideApp commands.</description>
       <arg name="status" type="ApplicationLauncherStatus"/>
+      <arg name="data" type="CHAR_STRING"/>
     </command>
 
   </cluster>

@@ -33,8 +33,12 @@ typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataM
 
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterHideAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterStopAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
@@ -4102,6 +4106,19 @@ public:
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
+class CHIPApplicationLauncherClusterHideAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+};
+
 class CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
@@ -4113,6 +4130,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+};
+
+class CHIPApplicationLauncherClusterStopAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
 };
 
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge

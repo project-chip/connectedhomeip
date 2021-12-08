@@ -28003,7 +28003,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
-    DataModel::List<const Structs::TvChannelInfo::Type> channelMatch;
+    Structs::TvChannelInfo::Type channelMatch;
     TvChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -28019,7 +28019,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
 
-    DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> channelMatch;
+    Structs::TvChannelInfo::DecodableType channelMatch;
     TvChannelErrorType errorType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30654,8 +30654,7 @@ public:
 namespace StopApp {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
 };
 
 struct Type
@@ -30665,7 +30664,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
     Structs::ApplicationLauncherApp::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30681,7 +30679,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
     Structs::ApplicationLauncherApp::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30690,6 +30687,7 @@ namespace StopAppResponse {
 enum class Fields
 {
     kStatus = 0,
+    kData   = 1,
 };
 
 struct Type
@@ -30700,6 +30698,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30715,14 +30714,14 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppResponse
 namespace HideApp {
 enum class Fields
 {
-    kData        = 0,
-    kApplication = 1,
+    kApplication = 0,
 };
 
 struct Type
@@ -30732,7 +30731,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
     Structs::ApplicationLauncherApp::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30748,7 +30746,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
     Structs::ApplicationLauncherApp::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30757,6 +30754,7 @@ namespace HideAppResponse {
 enum class Fields
 {
     kStatus = 0,
+    kData   = 1,
 };
 
 struct Type
@@ -30767,6 +30765,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30782,6 +30781,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     ApplicationLauncherStatus status;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppResponse

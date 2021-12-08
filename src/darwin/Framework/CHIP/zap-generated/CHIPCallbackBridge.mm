@@ -4994,6 +4994,23 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPApplicationLauncherClusterHideAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterHideAppResponseParams new];
+    {
+        NSNumber * value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+        response.status = value;
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
@@ -5003,6 +5020,23 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
     }
     {
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPApplicationLauncherClusterStopAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterStopAppResponseParams new];
+    {
+        NSNumber * value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+        response.status = value;
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -5943,6 +5977,7 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTvChannelClusterChangeChannelResponseParams new];
     {
+<<<<<<< HEAD
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.channelMatch.begin();
         while (iter_0.Next()) {
@@ -5970,6 +6005,22 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
             }
         }
         response.channelMatch = array_0;
+=======
+        CHIPTvChannelClusterTvChannelInfo * value;
+        value = [CHIPTvChannelClusterTvChannelInfo new];
+        value.majorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.majorNumber];
+        value.minorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.minorNumber];
+        value.name = [[NSString alloc] initWithBytes:data.channelMatch.name.data()
+                                              length:data.channelMatch.name.size()
+                                            encoding:NSUTF8StringEncoding];
+        value.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.data()
+                                                  length:data.channelMatch.callSign.size()
+                                                encoding:NSUTF8StringEncoding];
+        value.affiliateCallSign = [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.data()
+                                                           length:data.channelMatch.affiliateCallSign.size()
+                                                         encoding:NSUTF8StringEncoding];
+        response.channelMatch = value;
+>>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
     }
     {
         response.errorType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];

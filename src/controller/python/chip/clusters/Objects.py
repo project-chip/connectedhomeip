@@ -27286,11 +27286,11 @@ class TvChannel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
+                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=TvChannel.Structs.TvChannelInfo),
                             ClusterObjectFieldDescriptor(Label="errorType", Tag=1, Type=TvChannel.Enums.TvChannelErrorType),
                     ])
 
-            channelMatch: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(default_factory=lambda: [])
+            channelMatch: 'TvChannel.Structs.TvChannelInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelInfo())
             errorType: 'TvChannel.Enums.TvChannelErrorType' = 0
 
         @dataclass
@@ -27534,9 +27534,9 @@ class TargetNavigator(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'typing.Optional[uint]' = None
+            value: 'uint' = 0
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -29169,11 +29169,9 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
                     ])
 
-            data: 'str' = ""
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
@@ -29187,9 +29185,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
             status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
+            data: 'str' = ""
 
         @dataclass
         class HideApp(ClusterCommand):
@@ -29201,11 +29201,9 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
                     ])
 
-            data: 'str' = ""
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
@@ -29219,9 +29217,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
             status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
+            data: 'str' = ""
 
 
     class Attributes:
