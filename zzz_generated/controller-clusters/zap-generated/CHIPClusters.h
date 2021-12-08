@@ -726,6 +726,12 @@ public:
                                  uint16_t timeout, chip::ByteSpan pinCode);
 
     // Cluster Attributes
+    CHIP_ERROR SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeLockState(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeLockType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeLockType(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeActuatorEnabled(Callback::Cancelable * onReportCallback);
@@ -1946,6 +1952,9 @@ public:
     CHIP_ERROR SubscribeAttributeVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeVendorId(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeEnumAttr(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeEnumAttr(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                       uint16_t maxInterval);
@@ -2053,6 +2062,10 @@ public:
                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                     uint16_t maxInterval);
     CHIP_ERROR ReportAttributeNullableCharString(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeNullableEnumAttr(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                  uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeNullableEnumAttr(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeNullableRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                               uint16_t maxInterval);

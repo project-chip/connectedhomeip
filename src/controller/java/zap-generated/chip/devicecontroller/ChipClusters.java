@@ -4456,10 +4456,42 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
+    public interface LockStateAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
       void onError(Exception ex);
+    }
+
+    public void readLockStateAttribute(LockStateAttributeCallback callback) {
+      readLockStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLockStateAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeLockStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportLockStateAttribute(IntegerAttributeCallback callback) {
+      reportLockStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLockTypeAttribute(IntegerAttributeCallback callback) {
+      readLockTypeAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeLockTypeAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeLockTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportLockTypeAttribute(IntegerAttributeCallback callback) {
+      reportLockTypeAttribute(chipClusterPtr, callback);
     }
 
     public void readActuatorEnabledAttribute(BooleanAttributeCallback callback) {
@@ -4491,6 +4523,24 @@ public class ChipClusters {
     public void reportClusterRevisionAttribute(IntegerAttributeCallback callback) {
       reportClusterRevisionAttribute(chipClusterPtr, callback);
     }
+
+    private native void readLockStateAttribute(
+        long chipClusterPtr, LockStateAttributeCallback callback);
+
+    private native void subscribeLockStateAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportLockStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLockTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeLockTypeAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportLockTypeAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readActuatorEnabledAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
@@ -6152,6 +6202,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface LightSensorTypeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -6210,7 +6266,7 @@ public class ChipClusters {
       reportToleranceAttribute(chipClusterPtr, callback);
     }
 
-    public void readLightSensorTypeAttribute(IntegerAttributeCallback callback) {
+    public void readLightSensorTypeAttribute(LightSensorTypeAttributeCallback callback) {
       readLightSensorTypeAttribute(chipClusterPtr, callback);
     }
 
@@ -6277,7 +6333,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readLightSensorTypeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, LightSensorTypeAttributeCallback callback);
 
     private native void subscribeLightSensorTypeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -6474,6 +6530,12 @@ public class ChipClusters {
 
     private native void stopWithOnOff(long chipClusterPtr, DefaultClusterCallback Callback);
 
+    public interface OnLevelAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface OnTransitionTimeAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -6481,6 +6543,12 @@ public class ChipClusters {
     }
 
     public interface OffTransitionTimeAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface DefaultMoveRateAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
@@ -6617,7 +6685,7 @@ public class ChipClusters {
       reportOnOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
-    public void readOnLevelAttribute(IntegerAttributeCallback callback) {
+    public void readOnLevelAttribute(OnLevelAttributeCallback callback) {
       readOnLevelAttribute(chipClusterPtr, callback);
     }
 
@@ -6670,7 +6738,7 @@ public class ChipClusters {
       reportOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
-    public void readDefaultMoveRateAttribute(IntegerAttributeCallback callback) {
+    public void readDefaultMoveRateAttribute(DefaultMoveRateAttributeCallback callback) {
       readDefaultMoveRateAttribute(chipClusterPtr, callback);
     }
 
@@ -6810,7 +6878,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readOnLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, OnLevelAttributeCallback callback);
 
     private native void writeOnLevelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -6846,7 +6914,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readDefaultMoveRateAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, DefaultMoveRateAttributeCallback callback);
 
     private native void writeDefaultMoveRateAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -11454,6 +11522,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface NullableBitmap8AttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface NullableBitmap16AttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -11468,6 +11542,12 @@ public class ChipClusters {
 
     public interface NullableBitmap64AttributeCallback {
       void onSuccess(@Nullable Long value);
+
+      void onError(Exception ex);
+    }
+
+    public interface NullableInt8uAttributeCallback {
+      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
     }
@@ -11562,6 +11642,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface NullableEnum8AttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface NullableEnum16AttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -11588,6 +11674,18 @@ public class ChipClusters {
 
     public interface NullableCharStringAttributeCallback {
       void onSuccess(@Nullable String value);
+
+      void onError(Exception ex);
+    }
+
+    public interface NullableEnumAttrAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface NullableRangeRestrictedInt8uAttributeCallback {
+      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
     }
@@ -12178,6 +12276,23 @@ public class ChipClusters {
       readListNullablesAndOptionalsStructAttribute(chipClusterPtr, callback);
     }
 
+    public void readEnumAttrAttribute(IntegerAttributeCallback callback) {
+      readEnumAttrAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeEnumAttrAttribute(DefaultClusterCallback callback, Integer value) {
+      writeEnumAttrAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeEnumAttrAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeEnumAttrAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportEnumAttrAttribute(IntegerAttributeCallback callback) {
+      reportEnumAttrAttribute(chipClusterPtr, callback);
+    }
+
     public void readRangeRestrictedInt8uAttribute(IntegerAttributeCallback callback) {
       readRangeRestrictedInt8uAttribute(chipClusterPtr, callback);
     }
@@ -12295,7 +12410,7 @@ public class ChipClusters {
       reportNullableBooleanAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableBitmap8Attribute(IntegerAttributeCallback callback) {
+    public void readNullableBitmap8Attribute(NullableBitmap8AttributeCallback callback) {
       readNullableBitmap8Attribute(chipClusterPtr, callback);
     }
 
@@ -12367,7 +12482,7 @@ public class ChipClusters {
       reportNullableBitmap64Attribute(chipClusterPtr, callback);
     }
 
-    public void readNullableInt8uAttribute(IntegerAttributeCallback callback) {
+    public void readNullableInt8uAttribute(NullableInt8uAttributeCallback callback) {
       readNullableInt8uAttribute(chipClusterPtr, callback);
     }
 
@@ -12655,7 +12770,7 @@ public class ChipClusters {
       reportNullableInt64sAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableEnum8Attribute(IntegerAttributeCallback callback) {
+    public void readNullableEnum8Attribute(NullableEnum8AttributeCallback callback) {
       readNullableEnum8Attribute(chipClusterPtr, callback);
     }
 
@@ -12763,7 +12878,26 @@ public class ChipClusters {
       reportNullableCharStringAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableRangeRestrictedInt8uAttribute(IntegerAttributeCallback callback) {
+    public void readNullableEnumAttrAttribute(NullableEnumAttrAttributeCallback callback) {
+      readNullableEnumAttrAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableEnumAttrAttribute(
+        DefaultClusterCallback callback, @Nullable Integer value) {
+      writeNullableEnumAttrAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeNullableEnumAttrAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeNullableEnumAttrAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportNullableEnumAttrAttribute(IntegerAttributeCallback callback) {
+      reportNullableEnumAttrAttribute(chipClusterPtr, callback);
+    }
+
+    public void readNullableRangeRestrictedInt8uAttribute(
+        NullableRangeRestrictedInt8uAttributeCallback callback) {
       readNullableRangeRestrictedInt8uAttribute(chipClusterPtr, callback);
     }
 
@@ -13219,6 +13353,18 @@ public class ChipClusters {
     private native void readListNullablesAndOptionalsStructAttribute(
         long chipClusterPtr, ListNullablesAndOptionalsStructAttributeCallback callback);
 
+    private native void readEnumAttrAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeEnumAttrAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Integer value);
+
+    private native void subscribeEnumAttrAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportEnumAttrAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
     private native void readRangeRestrictedInt8uAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
 
@@ -13301,7 +13447,7 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void readNullableBitmap8Attribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, NullableBitmap8AttributeCallback callback);
 
     private native void writeNullableBitmap8Attribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13349,7 +13495,7 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readNullableInt8uAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, NullableInt8uAttributeCallback callback);
 
     private native void writeNullableInt8uAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13541,7 +13687,7 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readNullableEnum8Attribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, NullableEnum8AttributeCallback callback);
 
     private native void writeNullableEnum8Attribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13612,8 +13758,20 @@ public class ChipClusters {
     private native void reportNullableCharStringAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void readNullableRangeRestrictedInt8uAttribute(
+    private native void readNullableEnumAttrAttribute(
+        long chipClusterPtr, NullableEnumAttrAttributeCallback callback);
+
+    private native void writeNullableEnumAttrAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
+
+    private native void subscribeNullableEnumAttrAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportNullableEnumAttrAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readNullableRangeRestrictedInt8uAttribute(
+        long chipClusterPtr, NullableRangeRestrictedInt8uAttributeCallback callback);
 
     private native void writeNullableRangeRestrictedInt8uAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
