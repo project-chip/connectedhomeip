@@ -682,7 +682,10 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
-    SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+    }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
@@ -854,7 +857,10 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SetPeerCATs(peerCATs);
 
     // Retrieve responderMRPParams if present
-    SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1377,8 +1383,12 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     VerifyOrReturnError(initiatorEphPubKey.size() == kP256_PublicKey_Length, CHIP_ERROR_INVALID_CASE_PARAMETER);
 
     // Optional members start here.
-    ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
     CHIP_ERROR err = tlvReader.Next();
+    if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
+    {
+        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
+        err = tlvReader.Next();
+    }
 
     bool resumptionIDTagFound = false;
     bool resume1MICTagFound   = false;

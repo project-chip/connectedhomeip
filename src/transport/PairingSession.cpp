@@ -39,13 +39,6 @@ CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessa
 CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader)
 {
     // The MRP parameters are optional.
-    CHIP_ERROR err = tlvReader.Next();
-    if (err == CHIP_END_OF_TLV)
-    {
-        return CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
-
     if (tlvReader.GetTag() != expectedTag)
     {
         return CHIP_NO_ERROR;
@@ -68,7 +61,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
         mMRPConfig.mIdleRetransTimeout = System::Clock::Milliseconds32(tlvElementValue);
 
         // The next element is optional. If it's not present, return CHIP_NO_ERROR.
-        err = tlvReader.Next();
+        CHIP_ERROR err = tlvReader.Next();
         if (err == CHIP_END_OF_TLV)
         {
             return tlvReader.ExitContainer(containerType);

@@ -163,7 +163,7 @@ protected:
     }
 
     /**
-     * Try to decode the next element (pointed by the TLV reader) as MRP parameters.
+     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
      * If the MRP parameters are found, mMRPConfig is updated with the devoded values.
      *
      * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,

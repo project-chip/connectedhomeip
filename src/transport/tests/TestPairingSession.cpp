@@ -62,8 +62,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
 
-    CHIP_ERROR err = PairingSession::EncodeMRPParameters(TLV::ContextTag(1), config, writer);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, PairingSession::EncodeMRPParameters(TLV::ContextTag(1), config, writer) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);
@@ -75,8 +74,8 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
 
-    err = session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == config.mIdleRetransTimeout);
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == config.mActiveRetransTimeout);
@@ -92,6 +91,7 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, writer.Put(TLV::ContextTag(1), 0x1234) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);
 
@@ -101,7 +101,8 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     reader.Init(std::move(buf));
     NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(1), reader) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mIdleRetransTimeout == gDefaultMRPConfig.mIdleRetransTimeout);
     NL_TEST_ASSERT(inSuite, session.GetMRPConfig().mActiveRetransTimeout == gDefaultMRPConfig.mActiveRetransTimeout);
