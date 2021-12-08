@@ -67,29 +67,30 @@ TimerList::Node * TimerList::Add(TimerList::Node * add)
 
 TimerList::Node * TimerList::Remove(TimerList::Node * remove)
 {
-    VerifyOrDie(mEarliestTimer != nullptr);
-
-    if (remove == mEarliestTimer)
+    if (mEarliestTimer != nullptr && remove != nullptr)
     {
-        mEarliestTimer = remove->mNextTimer;
-    }
-    else
-    {
-        TimerList::Node * lTimer = mEarliestTimer;
-
-        while (lTimer->mNextTimer)
+        if (remove == mEarliestTimer)
         {
-            if (remove == lTimer->mNextTimer)
-            {
-                lTimer->mNextTimer = remove->mNextTimer;
-                break;
-            }
-
-            lTimer = lTimer->mNextTimer;
+            mEarliestTimer = remove->mNextTimer;
         }
-    }
+        else
+        {
+            TimerList::Node * lTimer = mEarliestTimer;
 
-    remove->mNextTimer = nullptr;
+            while (lTimer->mNextTimer)
+            {
+                if (remove == lTimer->mNextTimer)
+                {
+                    lTimer->mNextTimer = remove->mNextTimer;
+                    break;
+                }
+
+                lTimer = lTimer->mNextTimer;
+            }
+        }
+
+        remove->mNextTimer = nullptr;
+    }
     return mEarliestTimer;
 }
 

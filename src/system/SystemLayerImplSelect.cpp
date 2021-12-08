@@ -124,7 +124,7 @@ CHIP_ERROR LayerImplSelect::StartTimer(Clock::Timeout delay, TimerCompleteCallba
 
     CancelTimer(onComplete, appState);
 
-    TimerList::Node * timer = mTimerPool.Create(*this, delay, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp() + delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
@@ -186,7 +186,7 @@ CHIP_ERROR LayerImplSelect::ScheduleWork(TimerCompleteCallback onComplete, void 
 
     CancelTimer(onComplete, appState);
 
-    TimerList::Node * timer = mTimerPool.Create(*this, Clock::kZero, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
