@@ -129,13 +129,13 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     serviceInfo.setServiceName(serviceName);
     serviceInfo.setServiceType(type);
     serviceInfo.setPort(port);
-      Log.i(TAG, "publish serviceName=" + serviceName + " type=" + type + " port=" + port);
-      int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
-      for (int i = 0; i < cnt; i ++ ) {
-          String value = new String(textEntriesDatas[i]);
-          serviceInfo.setAttribute(textEntriesKeys[i], value);
-          Log.i(TAG, "     " + textEntriesKeys[i] + "=" + value);
-      }
+    Log.i(TAG, "publish serviceName=" + serviceName + " type=" + type + " port=" + port);
+    int cnt = Math.min(textEntriesDatas.length, textEntriesKeys.length);
+    for (int i = 0; i < cnt; i++) {
+      String value = new String(textEntriesDatas[i]);
+      serviceInfo.setAttribute(textEntriesKeys[i], value);
+      Log.i(TAG, "     " + textEntriesKeys[i] + "=" + value);
+    }
 
     NsdManager.RegistrationListener registrationListener =
         new NsdManager.RegistrationListener() {
