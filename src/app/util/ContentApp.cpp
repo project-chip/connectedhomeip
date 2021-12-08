@@ -212,11 +212,65 @@ EmberAfStatus MediaPlayback::HandleWriteAttribute(chip::AttributeId attributeId,
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
+TargetNavigator::TargetNavigator(std::list<string> targets, uint8_t currentTarget)
+{
+    mTargets       = targets;
+    mCurrentTarget = currentTarget;
+}
+
+CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder)
+{
+    ChipLogProgress(DeviceLayer, "TargetNavigator: GetTargetInfoList ");
+
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        int i = 0;
+        for (string entry : mTargets)
+        {
+            // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
+
+            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
+            targetInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
+            targetInfo.identifier = static_cast<uint8_t>(i++);
+            ReturnErrorOnFailure(encoder.Encode(targetInfo));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+TargetNavigatorResponse TargetNavigator::NavigateTarget(uint8_t target, std::string data)
+{
+    ChipLogProgress(DeviceLayer, "TargetNavigator: NavigateTarget target=%d data=\"%s\"", target, data.c_str());
+
+    TargetNavigatorResponse response;
+    const char * testData = "data response";
+    response.data         = (uint8_t *) testData;
+    if (target >= mTargets.size())
+    {
+        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
+    }
+    else
+    {
+        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+        mCurrentTarget  = target;
+    }
+    return response;
+}
+
 EmberAfStatus TargetNavigator::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer, "TargetNavigator::HandleReadAttribute: attrId=%d, maxReadLength=%d",
                     static_cast<uint16_t>(attributeId), maxReadLength);
-    return EMBER_ZCL_STATUS_FAILURE;
+
+    if ((attributeId == ZCL_TARGET_NAVIGATOR_CURRENT_TARGET_ATTRIBUTE_ID) && (maxReadLength == 1))
+    {
+        *(uint8_t *) buffer = mCurrentTarget;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus TargetNavigator::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)

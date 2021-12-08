@@ -18,6 +18,7 @@
 #include "TargetNavigatorManager.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -27,6 +28,10 @@
 #include <string>
 
 using namespace std;
+using namespace chip::AppPlatform;
+
+std::list<std::string> gTargets = { "home", "search", "info", "guide", "menu", "apps" };
+uint8_t gCurrentTarget          = 0;
 
 CHIP_ERROR TargetNavigatorManager::Init()
 {
@@ -37,30 +42,54 @@ exit:
     return err;
 }
 
-CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::EndpointId endpointId, chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        int maximumVectorSize = 2;
-        char name[]           = "exampleName";
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
+    if (app != NULL)
+    {
+        return app->GetTargetNavigator()->GetTargetInfoList(aEncoder);
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
-        for (int i = 0; i < maximumVectorSize; ++i)
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        int i = 0;
+        for (string entry : gTargets)
         {
+            // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
+
             chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
-            targetInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
-            targetInfo.identifier = static_cast<uint8_t>(1 + i);
+            targetInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
+            targetInfo.identifier = static_cast<uint8_t>(i++);
             ReturnErrorOnFailure(encoder.Encode(targetInfo));
         }
         return CHIP_NO_ERROR;
     });
 }
 
-TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data)
+TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId endpointId, uint8_t target, std::string data)
 {
-    // TODO: Insert code here
+    ChipLogProgress(Zcl, "targetNavigatorClusterNavigateTarget endpoint=%d", endpointId);
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
+    if (app != NULL)
+    {
+        return app->GetTargetNavigator()->NavigateTarget(target, data);
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
     TargetNavigatorResponse response;
     const char * testData = "data response";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    if (target >= gTargets.size())
+    {
+        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
+    }
+    else
+    {
+        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+        gCurrentTarget  = target;
+    }
     return response;
 }

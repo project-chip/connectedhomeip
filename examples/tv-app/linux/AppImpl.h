@@ -108,6 +108,8 @@ class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
 public:
     virtual ~ContentLauncherImpl() {}
 
+    ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, std::string data) override;
+
 protected:
 };
 
@@ -122,6 +124,7 @@ protected:
 class DLL_EXPORT TargetNavigatorImpl : public TargetNavigator
 {
 public:
+    TargetNavigatorImpl() : TargetNavigator{ { "home", "search", "info", "guide", "menu" }, 0 } {};
     virtual ~TargetNavigatorImpl() {}
 
 protected:

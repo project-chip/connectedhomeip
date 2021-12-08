@@ -32,7 +32,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TargetNavigator;
 
-TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data);
+TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId endpointId, uint8_t target, std::string data);
 
 void sendResponse(app::CommandHandler * command, TargetNavigatorResponse response)
 {
@@ -61,7 +61,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * c
 
     // TODO: char is not null terminated, verify this code once #7963 gets merged.
     std::string dataString(data.data(), data.size());
-    TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(target, dataString);
+    TargetNavigatorResponse response = targetNavigatorClusterNavigateTarget(emberAfCurrentEndpoint(), target, dataString);
     sendResponse(command, response);
     return true;
 }
