@@ -30,11 +30,12 @@
     {{! Maybe we should add a check for properties in the expected object (other
         than "global") that are not present in the struct ? }}
   {{else}}
-    VerifyOrReturn(CheckValue
-      {{~#if (isOctetString type)}}AsString("{{label}}", {{actual}}, chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}}))
-      {{else if (isCharString type)}}AsString("{{label}}", {{actual}}, chip::CharSpan("{{expected}}", {{utf8StringLength expected}}))
-      {{else}}("{{label}}", {{actual}}, {{asTypedLiteral expected type}})
+    VerifyOrReturn(CheckValue{{#if (isString type)}}AsString{{/if}}("{{label}}", {{actual}}, 
+      {{~#if (isOctetString type)}}chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}})
+      {{else if (isCharString type)}}chip::CharSpan("{{expected}}", {{utf8StringLength expected}})
+      {{else if (chip_tests_config_has expected)}}m{{asUpperCamelCase expected}}.HasValue() ? m{{asUpperCamelCase expected}}.Value() : {{asTypedLiteral (chip_tests_config_get_default_value expected) (chip_tests_config_get_type expected)}}
+      {{else}}{{asTypedLiteral expected type}}
       {{/if}}
-    );
+    ));
   {{/if_is_struct}}
 {{/if}}
