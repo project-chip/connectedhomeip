@@ -30,7 +30,7 @@ public class ClusterReadMapping {
             );
           },
           {{#if isList}}
-            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase name}}AttributeCallback(),
+            () -> new ClusterInfoMapping.Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback(),
           {{else}}
             () -> new ClusterInfoMapping.Delegated{{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback(),
           {{/if}}

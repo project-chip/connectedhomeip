@@ -30,6 +30,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
 const kGlobalAttributes = [
+  0xfffb, // AttributeList
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
 ];

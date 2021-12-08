@@ -43,6 +43,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 
@@ -58,6 +61,9 @@ NS_ASSUME_NONNULL_BEGIN
             completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
 - (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -89,6 +95,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeAdminVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                             NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -164,6 +173,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeApplicationStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -203,6 +215,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeApplicationIdWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -234,6 +249,9 @@ NS_ASSUME_NONNULL_BEGIN
                                             responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentAudioOutputWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -286,6 +304,9 @@ NS_ASSUME_NONNULL_BEGIN
                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeBarrierPositionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -453,6 +474,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeUniqueIDWithCompletionHandler:(void (^)(
                                                        NSString * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -495,6 +519,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeStatusFlagsWithResponseHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -513,6 +540,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)bindWithParams:(CHIPBindingClusterBindParams *)params completionHandler:(StatusCompletion)completionHandler;
 - (void)unbindWithParams:(CHIPBindingClusterUnbindParams *)params completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -537,6 +567,9 @@ NS_ASSUME_NONNULL_BEGIN
                                     responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeStateValueWithResponseHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -592,6 +625,9 @@ NS_ASSUME_NONNULL_BEGIN
                                   responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSetupUrlWithResponseHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -607,6 +643,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  */
 @interface CHIPBridgedDeviceBasic : CHIPCluster
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1089,6 +1128,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeStartUpColorTemperatureMiredsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1118,6 +1160,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeSupportedStreamingTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1146,6 +1191,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributePartsListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1165,6 +1213,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)retrieveLogsRequestWithParams:(CHIPDiagnosticLogsClusterRetrieveLogsRequestParams *)params
                     completionHandler:(void (^)(CHIPDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable data,
                                           NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 @end
 
@@ -1230,6 +1281,9 @@ NS_ASSUME_NONNULL_BEGIN
                                          responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeActuatorEnabledWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1335,6 +1389,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeActivePowerMaxWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1424,6 +1481,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeTimeSinceResetWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
@@ -1445,6 +1505,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1494,6 +1557,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeToleranceWithResponseHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1537,6 +1603,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1596,6 +1665,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveNetworkFaultsWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1616,6 +1688,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeGroupKeysWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1657,6 +1732,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNameSupportWithResponseHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1695,6 +1773,9 @@ NS_ASSUME_NONNULL_BEGIN
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeIdentifyTypeWithResponseHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1752,6 +1833,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeLightSensorTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1771,6 +1855,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendKeyWithParams:(CHIPKeypadInputClusterSendKeyParams *)params
         completionHandler:
             (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1916,6 +2003,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeStartUpCurrentLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                   NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -1933,6 +2023,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPLowPower : CHIPCluster
 
 - (void)sleepWithCompletionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1967,6 +2060,9 @@ NS_ASSUME_NONNULL_BEGIN
                                            responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentMediaInputWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2072,6 +2168,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeSeekRangeStartWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -2125,6 +2224,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeDescriptionWithResponseHandler:(void (^)(
                                                           NSString * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -2166,6 +2268,9 @@ NS_ASSUME_NONNULL_BEGIN
                   completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams * _Nullable data,
                                         NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -2198,6 +2303,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)queryImageWithParams:(CHIPOtaSoftwareUpdateProviderClusterQueryImageParams *)params
            completionHandler:(void (^)(CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams * _Nullable data,
                                  NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2234,6 +2342,9 @@ NS_ASSUME_NONNULL_BEGIN
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeUpdatePossibleWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2274,6 +2385,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOccupancySensorTypeBitmapWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                         NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2338,6 +2452,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeStartUpOnOffWithResponseHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -2378,6 +2495,9 @@ NS_ASSUME_NONNULL_BEGIN
                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSwitchActionsWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2451,6 +2571,9 @@ NS_ASSUME_NONNULL_BEGIN
                                             responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeCurrentFabricIndexWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2531,6 +2654,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeBatteryChargeStateWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -2556,6 +2682,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPPowerSourceConfiguration : CHIPCluster
 
 - (void)readAttributeSourcesWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2591,6 +2720,9 @@ NS_ASSUME_NONNULL_BEGIN
                                           responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeMaxMeasuredValueWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2799,6 +2931,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeAlarmMaskWithResponseHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -2854,6 +2989,9 @@ NS_ASSUME_NONNULL_BEGIN
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeToleranceWithResponseHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -2931,6 +3069,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNameSupportWithResponseHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -2976,6 +3117,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeCurrentHeapHighWatermarkWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
@@ -3018,6 +3162,9 @@ NS_ASSUME_NONNULL_BEGIN
                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeMultiPressMaxWithResponseHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3069,6 +3216,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeCurrentTvChannelWithResponseHandler:(void (^)(
                                                                NSData * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -3091,6 +3241,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeTargetNavigatorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -3139,6 +3292,9 @@ NS_ASSUME_NONNULL_BEGIN
                                    responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeToleranceWithResponseHandler:(void (^)(
                                                         NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -3800,6 +3956,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNullableRangeRestrictedInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -3977,6 +4136,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNumberOfDailyTransitionsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                        NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeFeatureMapWithMinInterval:(uint16_t)minInterval
@@ -4029,6 +4191,9 @@ NS_ASSUME_NONNULL_BEGIN
                                                        responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeScheduleProgrammingVisibilityWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                             NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -4522,6 +4687,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
@@ -4548,6 +4716,9 @@ NS_ASSUME_NONNULL_BEGIN
                                              responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeWakeOnLanMacAddressWithResponseHandler:(void (^)(NSString * _Nullable value,
                                                                   NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -4666,6 +4837,9 @@ NS_ASSUME_NONNULL_BEGIN
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeOverrunCountWithResponseHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -4838,6 +5012,9 @@ NS_ASSUME_NONNULL_BEGIN
                                       responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeSafetyStatusWithResponseHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
