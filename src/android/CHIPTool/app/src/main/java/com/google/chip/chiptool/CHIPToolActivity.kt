@@ -22,6 +22,7 @@ import android.net.Uri
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -44,6 +45,7 @@ import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
 import com.google.chip.chiptool.setuppayloadscanner.CHIPLedgerDetailsFragment
+import org.json.JSONObject
 
 class CHIPToolActivity :
     AppCompatActivity(),
@@ -72,6 +74,10 @@ class CHIPToolActivity :
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
       onNfcIntent(intent)
+
+    if(Intent.ACTION_VIEW == intent?.action) {
+      onReturnIntent(intent)
+    }
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -220,6 +226,54 @@ class CHIPToolActivity :
         }
         .create()
         .show()
+  }
+
+  private fun onReturnIntent(intent: Intent) {
+    val appLinkData = intent.data
+    // Require URI schema "mt:"
+    if (!appLinkData?.scheme.equals("mt")) return
+    // Require URI host "modelinfo"
+    if (!appLinkData?.host.equals("modelinfo")) return
+
+    // parse payload
+    try {
+      val payloadBase64String = appLinkData?.getQueryParameter("payload")
+      val decodeBytes = Base64.decode(payloadBase64String, Base64.DEFAULT)
+      val payloadString = String(decodeBytes)
+      val payload = JSONObject(payloadString)
+
+      // parse payload from JSON
+      val setupPayload = SetupPayload()
+      // set defaults
+      setupPayload.discoveryCapabilities = setOf()
+      setupPayload.optionalQRCodeInfo = mapOf()
+
+      // read from payload
+      setupPayload.version = payload.getInt("version")
+      setupPayload.vendorId = payload.getInt("vendorId")
+      setupPayload.productId = payload.getInt("productId")
+      setupPayload.commissioningFlow = payload.getInt("commissioningFlow")
+      setupPayload.discriminator = payload.getInt("discriminator")
+      setupPayload.setupPinCode = payload.getLong("setupPinCode")
+
+      val deviceInfo = CHIPDeviceInfo.fromSetupPayload(setupPayload)
+      val buttons = arrayOf(
+        getString(R.string.nfc_tag_action_show)
+      )
+
+      AlertDialog.Builder(this)
+        .setTitle(R.string.provision_custom_flow_alert_title)
+        .setItems(buttons) { _, _ ->
+          onCHIPDeviceInfoReceived(deviceInfo)
+        }
+        .create()
+        .show()
+
+    } catch (ex: UnrecognizedQrCodeException) {
+      Log.e(TAG, "Unrecognized Payload", ex)
+      Toast.makeText(this, "Unrecognized Setup Payload", Toast.LENGTH_SHORT).show()
+      return
+    }
   }
 
   companion object {
