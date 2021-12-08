@@ -35,8 +35,8 @@
 
 #include <CHIPVersion.h>
 
-#include <inet/InetError.h>
 #include <inet/IPPrefix.h>
+#include <inet/InetError.h>
 
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
