@@ -21,13 +21,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "uart.h"
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
 #include "sl_board_control.h"
 #include "sl_uartdrv_instances.h"
 #include "sl_uartdrv_usart_vcom_config.h"
+#include "uart.h"
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>

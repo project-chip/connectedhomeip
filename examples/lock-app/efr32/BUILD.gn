@@ -90,7 +90,6 @@ efr32_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${examples_plat_dir}:efr-matter-shell",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
@@ -99,6 +98,7 @@ efr32_executable("lock_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   include_dirs = [ "include" ]

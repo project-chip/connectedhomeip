@@ -16,11 +16,11 @@
  */
 
 #include "matter_shell.h"
-#include <FreeRTOS.h>
-#include <task.h>
 #include <ChipShellCollection.h>
-#include <lib/shell/Engine.h>
+#include <FreeRTOS.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/shell/Engine.h>
+#include <task.h>
 
 using namespace ::chip;
 using chip::Shell::Engine;
@@ -81,7 +81,8 @@ void startShellTask()
     cmd_ping_init();
     cmd_send_init();
 
-    shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack, &shellTaskStruct);
+    shellTaskHandle = xTaskCreateStatic(MatterShellTask, "matter_cli", ArraySize(shellStack), NULL, SHELL_TASK_PRIORITY, shellStack,
+                                        &shellTaskStruct);
 }
 
 } // namespace chip

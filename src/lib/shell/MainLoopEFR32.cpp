@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
+#include "matter_shell.h"
 #include "streamer.h"
 #include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
-#include "matter_shell.h"
 
 #include <ctype.h>
 #include <string.h>

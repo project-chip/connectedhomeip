@@ -80,7 +80,6 @@ efr32_executable("window_app") {
 
   deps = [
     ":sdk",
-    "${examples_plat_dir}:efr-matter-shell",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/window-app/common:window-common",
     "${chip_root}/src/lib",
@@ -89,6 +88,7 @@ efr32_executable("window_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   include_dirs = [

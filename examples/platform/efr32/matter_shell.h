@@ -17,8 +17,6 @@
 
 #pragma once
 
-//#define CHIP_SHELL_PROMPT "matter >"
-
 namespace chip {
 
 void NotifyShellProcess();

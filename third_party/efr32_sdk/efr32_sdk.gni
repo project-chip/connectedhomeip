@@ -17,8 +17,8 @@ import("//build_overrides/efr32_sdk.gni")
 import("//build_overrides/jlink.gni")
 import("//build_overrides/mbedtls.gni")
 
-import("efr32_board.gni")
 import("${chip_root}/src/lib/lib.gni")
+import("efr32_board.gni")
 
 declare_args() {
   # Location of the efr32 SDK.
@@ -146,11 +146,10 @@ template("efr32_sdk") {
 
     defines += board_defines
 
-    if (chip_build_libshell)
-    { 
+    if (chip_build_libshell) {
       defines += [
-       "ENABLE_CHIP_SHELL",
-       "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
+        "ENABLE_CHIP_SHELL",
+        "OPENTHREAD_CONFIG_CLI_TRANSPORT=OT_CLI_TRANSPORT_CONSOLE",
       ]
     }
 

@@ -36,11 +36,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
+#include "matter_shell.h"
 #include <AppConfig.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
 #include <sl_system_kernel.h>
-#include "matter_shell.h"
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
