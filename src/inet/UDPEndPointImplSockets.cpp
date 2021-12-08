@@ -21,6 +21,7 @@
  * This file implements Inet::UDPEndPoint using sockets.
  */
 
+#define __APPLE_USE_RFC_3542
 #include <inet/UDPEndPointImplSockets.h>
 
 #include <lib/support/CodeUtils.h>
