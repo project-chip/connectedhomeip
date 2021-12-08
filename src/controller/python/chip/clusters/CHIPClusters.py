@@ -80,6 +80,12 @@ class ChipClusters:
                         "setupPIN": "str",
                     },
                 },
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "Logout",
+                    "args": {
+                    },
+                },
             },
             "attributes": {
                 0x0000FFFB: {
@@ -232,11 +238,27 @@ class ChipClusters:
             "clusterName": "ApplicationLauncher",
             "clusterId": 0x0000050C,
             "commands": {
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "HideApp",
+                    "args": {
+                        "catalogVendorId": "int",
+                        "applicationId": "str",
+                    },
+                },
             0x00000000: {
                     "commandId": 0x00000000,
                     "commandName": "LaunchApp",
                     "args": {
                         "data": "str",
+                        "catalogVendorId": "int",
+                        "applicationId": "str",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "StopApp",
+                    "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
                     },

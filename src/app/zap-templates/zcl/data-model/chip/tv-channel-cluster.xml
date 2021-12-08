@@ -47,7 +47,7 @@ limitations under the License.
 
     <command source="server" code="0x00" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
-      <arg name="channelMatch" type="TvChannelInfo" array="true"/>
+      <arg name="channelMatch" type="TvChannelInfo"/>
       <arg name="errorType" type="TvChannelErrorType"/>
     </command>
 

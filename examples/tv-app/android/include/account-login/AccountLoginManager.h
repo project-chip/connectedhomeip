@@ -27,6 +27,7 @@ class AccountLoginManager
 {
 public:
     bool isUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
+    bool proxyLogout();
     std::string proxySetupPinRequest(std::string requestTempAccountIdentifier, chip::EndpointId endpoint);
     void setTempAccountIdentifierForPin(std::string requestTempAccountIdentifier, std::string requestSetupPin);
 

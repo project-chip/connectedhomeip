@@ -2403,10 +2403,46 @@ static void OnAccountLoginGetSetupPINResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnApplicationLauncherHideAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received HideAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void OnApplicationLauncherLaunchAppResponseSuccess(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
     ChipLogProgress(Zcl, "Received LaunchAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnApplicationLauncherStopAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received StopAppResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
@@ -3811,6 +3847,7 @@ public:
 | Commands:                                                           |        |
 | * GetSetupPIN                                                       |   0x00 |
 | * Login                                                             |   0x01 |
+| * Logout                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AttributeList                                                     | 0xFFFB |
@@ -3864,6 +3901,26 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Login::Type mRequest;
+};
+
+/*
+ * Command Logout
+ */
+class AccountLoginLogout : public ModelCommand
+{
+public:
+    AccountLoginLogout() : ModelCommand("logout") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
 };
 
 /*
@@ -4953,7 +5010,9 @@ private:
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * HideApp                                                           |   0x02 |
 | * LaunchApp                                                         |   0x00 |
+| * StopApp                                                           |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
@@ -4961,6 +5020,30 @@ private:
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideApp
+ */
+class ApplicationLauncherHideApp : public ModelCommand
+{
+public:
+    ApplicationLauncherHideApp() : ModelCommand("hide-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherHideAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
+};
 
 /*
  * Command LaunchApp
@@ -4985,6 +5068,30 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
+};
+
+/*
+ * Command StopApp
+ */
+class ApplicationLauncherStopApp : public ModelCommand
+{
+public:
+    ApplicationLauncherStopApp() : ModelCommand("stop-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherStopAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
 };
 
 /*
@@ -54085,6 +54192,7 @@ void registerClusterAccountLogin(Commands & commands)
     commands_list clusterCommands = {
         make_unique<AccountLoginGetSetupPIN>(),           //
         make_unique<AccountLoginLogin>(),                 //
+        make_unique<AccountLoginLogout>(),                //
         make_unique<ReadAccountLoginAttributeList>(),     //
         make_unique<ReadAccountLoginClusterRevision>(),   //
         make_unique<ReportAccountLoginClusterRevision>(), //
@@ -54141,7 +54249,9 @@ void registerClusterApplicationLauncher(Commands & commands)
     const char * clusterName = "ApplicationLauncher";
 
     commands_list clusterCommands = {
+        make_unique<ApplicationLauncherHideApp>(),                     //
         make_unique<ApplicationLauncherLaunchApp>(),                   //
+        make_unique<ApplicationLauncherStopApp>(),                     //
         make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
         make_unique<ReadApplicationLauncherAttributeList>(),           //
         make_unique<ReadApplicationLauncherClusterRevision>(),         //
