@@ -52,8 +52,6 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 
         mInvokeResponseBuilder.CreateInvokeResponses();
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
-
-        mCommandIndex    = 0;
         mBufferAllocated = true;
     }
 

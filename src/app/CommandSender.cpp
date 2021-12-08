@@ -54,7 +54,6 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         mInvokeRequestBuilder.CreateInvokeRequests();
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
 
-        mCommandIndex    = 0;
         mBufferAllocated = true;
     }
 
