@@ -43,6 +43,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <pw_trace/trace.h>
 #include <setup_payload/SetupPayload.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/SessionManager.h>
@@ -329,6 +330,7 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
                              Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
                              SessionEstablishmentDelegate * delegate)
 {
+    PW_TRACE_INSTANT("PASESession::Pair", "Commissioning");
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(mySessionId, peerSetUpPINCode, delegate);
     SuccessOrExit(err);
@@ -927,27 +929,39 @@ CHIP_ERROR PASESession::OnMessageReceived(ExchangeContext * exchange, const Payl
     switch (static_cast<MsgType>(payloadHeader.GetMessageType()))
     {
     case MsgType::PBKDFParamRequest:
+        PW_TRACE_START("PASESession::HandlePBKDFParamRequest", "Commissioning");
         err = HandlePBKDFParamRequest(std::move(msg));
+        PW_TRACE_END("PASESession::HandlePBKDFParamRequest", "Commissioning");
         break;
 
     case MsgType::PBKDFParamResponse:
+        PW_TRACE_START("PASESession::HandlePBKDFParamResponse", "Commissioning");
         err = HandlePBKDFParamResponse(std::move(msg));
+        PW_TRACE_END("PASESession::HandlePBKDFParamResponse", "Commissioning");
         break;
 
     case MsgType::PASE_Pake1:
+        PW_TRACE_START("PASESession::HandleMsg1_and_SendMsg2", "Commissioning");
         err = HandleMsg1_and_SendMsg2(std::move(msg));
+        PW_TRACE_END("PASESession::HandleMsg1_and_SendMsg2", "Commissioning");
         break;
 
     case MsgType::PASE_Pake2:
+        PW_TRACE_START("PASESession::HandleMsg2_and_SendMsg3", "Commissioning");
         err = HandleMsg2_and_SendMsg3(std::move(msg));
+        PW_TRACE_END("PASESession::HandleMsg2_and_SendMsg3", "Commissioning");
         break;
 
     case MsgType::PASE_Pake3:
+        PW_TRACE_START("PASESession::HandleMsg3", "Commissioning");
         err = HandleMsg3(std::move(msg));
+        PW_TRACE_END("PASESession::HandleMsg3", "Commissioning");
         break;
 
     case MsgType::StatusReport:
+        PW_TRACE_START("PASESession::HandleStatusReport", "Commissioning");
         err = HandleStatusReport(std::move(msg), mNextExpectedMsg == MsgType::StatusReport);
+        PW_TRACE_END("PASESession::HandleStatusReport", "Commissioning");
         break;
 
     default:

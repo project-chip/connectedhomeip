@@ -167,6 +167,7 @@ void RegisterServices(pw::rpc::Server & server)
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
     server.RegisterService(trace_service);
+    PW_TRACE_SET_ENABLED(true);
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 }
 

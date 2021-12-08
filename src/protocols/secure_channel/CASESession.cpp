@@ -37,6 +37,7 @@
 #include <lib/support/TypeTraits.h>
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <pw_trace/trace.h>
 #include <system/TLVPacketBufferBackingStore.h>
 #include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
@@ -225,6 +226,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
                                          uint16_t localSessionId, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
+    PW_TRACE_INSTANT("CASESession::EstablishSession", "Commissioning");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
@@ -248,7 +250,9 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     SetPeerAddress(peerAddress);
     SetPeerNodeId(peerNodeId);
 
+    PW_TRACE_START("CASESession::SendSigma1", "Commissioning");
     err = SendSigma1();
+    PW_TRACE_END("CASESession::SendSigma1", "Commissioning");
     SuccessOrExit(err);
 
 exit:
@@ -385,7 +389,11 @@ CHIP_ERROR CASESession::SendSigma1()
 
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
-    ReturnErrorOnFailure(HandleSigma1(std::move(msg)));
+
+    PW_TRACE_START("CASESession::HandleSigma1", "Commissioning");
+    CHIP_ERROR err = HandleSigma1(std::move(msg));
+    PW_TRACE_END("CASESession::HandleSigma1", "Commissioning");
+    ReturnErrorOnFailure(err);
 
     return CHIP_NO_ERROR;
 }
@@ -425,7 +433,10 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
                                    ByteSpan(kResume1MIC_Nonce)) == CHIP_NO_ERROR)
         {
             // Send Sigma2Resume message to the initiator
-            SuccessOrExit(err = SendSigma2Resume(initiatorRandom));
+            PW_TRACE_START("CASESession::SendSigma2Resume", "Commissioning");
+            err = SendSigma2Resume(initiatorRandom);
+            PW_TRACE_START("CASESession::SendSigma2Resume", "Commissioning");
+            SuccessOrExit(err);
 
             mDelegate->OnSessionEstablishmentStarted();
 
@@ -448,7 +459,10 @@ CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
     // mRemotePubKey.Length() == initiatorPubKey.size() == kP256_PublicKey_Length.
     memcpy(mRemotePubKey.Bytes(), initiatorPubKey.data(), mRemotePubKey.Length());
 
-    SuccessOrExit(err = SendSigma2());
+    PW_TRACE_START("CASESession::SendSigma2", "Commissioning");
+    err = SendSigma2();
+    PW_TRACE_END("CASESession::SendSigma2", "Commissioning");
+    SuccessOrExit(err);
 
     mDelegate->OnSessionEstablishmentStarted();
 
@@ -715,8 +729,14 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
-    ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
-    ReturnErrorOnFailure(SendSigma3());
+    PW_TRACE_START("CASESession::HandleSigma2", "Commissioning");
+    CHIP_ERROR err = HandleSigma2(std::move(msg));
+    PW_TRACE_END("CASESession::HandleSigma2", "Commissioning");
+    ReturnErrorOnFailure(err);
+    PW_TRACE_START("CASESession::SendSigma3", "Commissioning");
+    err = SendSigma3();
+    PW_TRACE_END("CASESession::SendSigma3", "Commissioning");
+    ReturnErrorOnFailure(err);
 
     return CHIP_NO_ERROR;
 }
@@ -1481,22 +1501,30 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case kInitialized:
         if (msgType == Protocols::SecureChannel::MsgType::CASE_Sigma1)
         {
+            PW_TRACE_START("CASESession::HandleSigma1_and_SendSigma2", "Commissioning");
             err = HandleSigma1_and_SendSigma2(std::move(msg));
+            PW_TRACE_END("CASESession::HandleSigma1_and_SendSigma2", "Commissioning");
         }
         break;
     case kSentSigma1:
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma2:
+            PW_TRACE_START("CASESession::HandleSigma2_and_SendSigma3", "Commissioning");
             err = HandleSigma2_and_SendSigma3(std::move(msg));
+            PW_TRACE_END("CASESession::HandleSigma2_and_SendSigma3", "Commissioning");
             break;
 
         case Protocols::SecureChannel::MsgType::CASE_Sigma2Resume:
+            PW_TRACE_START("CASESession::HandleSigma2Resume", "Commissioning");
             err = HandleSigma2Resume(std::move(msg));
+            PW_TRACE_END("CASESession::HandleSigma2Resume", "Commissioning");
             break;
 
         case MsgType::StatusReport:
+            PW_TRACE_START("CASESession::HandleStatusReport", "Commissioning");
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            PW_TRACE_END("CASESession::HandleStatusReport", "Commissioning");
             break;
 
         default:
@@ -1508,11 +1536,15 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
         switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
         {
         case Protocols::SecureChannel::MsgType::CASE_Sigma3:
+            PW_TRACE_START("CASESession::HandleSigma3", "Commissioning");
             err = HandleSigma3(std::move(msg));
+            PW_TRACE_END("CASESession::HandleSigma3", "Commissioning");
             break;
 
         case MsgType::StatusReport:
+            PW_TRACE_START("CASESession::HandleStatusReport", "Commissioning");
             err = HandleStatusReport(std::move(msg), /* successExpected*/ false);
+            PW_TRACE_END("CASESession::HandleStatusReport", "Commissioning");
             break;
 
         default:
@@ -1524,7 +1556,9 @@ CHIP_ERROR CASESession::OnMessageReceived(ExchangeContext * ec, const PayloadHea
     case kSentSigma2Resume:
         if (msgType == Protocols::SecureChannel::MsgType::StatusReport)
         {
+            PW_TRACE_START("CASESession::HandleStatusReport", "Commissioning");
             err = HandleStatusReport(std::move(msg), /* successExpected*/ true);
+            PW_TRACE_END("CASESession::HandleStatusReport", "Commissioning");
         }
         break;
     default:

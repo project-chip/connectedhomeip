@@ -140,6 +140,7 @@ endif
 	  echo "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"" >> $(OUTPUT_DIR)/args.gn     ;\
 	  echo "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"" >> $(OUTPUT_DIR)/args.gn      ;\
+	  echo "pw_trace_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"" >> $(OUTPUT_DIR)/args.gn ;\
 	  echo "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"" >>$(OUTPUT_DIR)/args.gn         ;\
 	fi
 	if [[ "$(CONFIG_ENABLE_CHIP_SHELL)" = "y" ]]; then \
