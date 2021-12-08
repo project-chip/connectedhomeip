@@ -156,6 +156,11 @@ const Label * GetStrings();
 // Additional macros for testing.
 #define SYSTEM_STATS_TEST_IN_USE(entry, expected) (chip::System::Stats::GetResourcesInUse()[entry] == (expected))
 #define SYSTEM_STATS_TEST_HIGH_WATER_MARK(entry, expected) (chip::System::Stats::GetHighWatermarks()[entry] == (expected))
+#define SYSTEM_STATS_RESET_HIGH_WATER_MARK_FOR_TESTING(entry)                                                                      \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        chip::System::Stats::GetHighWatermarks()[entry] = 0;                                                                       \
+    } while (0)
 
 #else // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
 
@@ -171,5 +176,6 @@ const Label * GetStrings();
 
 #define SYSTEM_STATS_TEST_IN_USE(entry, expected) (true)
 #define SYSTEM_STATS_TEST_HIGH_WATER_MARK(entry, expected) (true)
+#define SYSTEM_STATS_RESET_HIGH_WATER_MARK_FOR_TESTING(entry)
 
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
