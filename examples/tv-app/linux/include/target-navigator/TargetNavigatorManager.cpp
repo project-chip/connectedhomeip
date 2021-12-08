@@ -30,8 +30,9 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
-std::list<std::string> gTargets = { "home", "search", "info", "guide", "menu", "apps" };
-uint8_t gCurrentTarget          = 0;
+// index starts at 1 for
+std::list<std::string> gTargets = { "exampleName", "exampleName" };
+uint8_t gCurrentTarget          = 1;
 
 CHIP_ERROR TargetNavigatorManager::Init()
 {
@@ -53,7 +54,7 @@ CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::EndpointId endpo
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        int i = 0;
+        int i = 1; // make sure TV_TargetNavigatorCluster.yaml test suite passes - assumes index starts at 1
         for (string entry : gTargets)
         {
             // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
@@ -82,7 +83,8 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId en
     TargetNavigatorResponse response;
     const char * testData = "data response";
     response.data         = (uint8_t *) testData;
-    if (target >= gTargets.size())
+    // make sure TV_TargetNavigatorCluster.yaml test suite passes - assumes index starts at 1
+    if (target == 0 || target > gTargets.size())
     {
         response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
     }
