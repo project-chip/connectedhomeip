@@ -3505,6 +3505,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | Attributes:                                                         |        |
 | * Acl                                                               | 0x0000 |
 | * Extension                                                         | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3575,6 +3576,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadAccessControlAttributeList : public ModelCommand
+{
+public:
+    ReadAccessControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "AccessControl.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadAccessControlClusterRevision : public ModelCommand
@@ -3612,6 +3643,7 @@ public:
 | * Login                                                             |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3662,6 +3694,36 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Login::Type mRequest;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadAccountLoginAttributeList : public ModelCommand
+{
+public:
+    ReadAccountLoginAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccountLoginAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AccountLogin::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "AccountLogin.AttributeList response", value);
+    }
 };
 
 /*
@@ -3758,6 +3820,7 @@ private:
 | * WindowStatus                                                      | 0x0000 |
 | * AdminFabricIndex                                                  | 0x0001 |
 | * AdminVendorId                                                     | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3925,6 +3988,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadAdministratorCommissioningAttributeList : public ModelCommand
+{
+public:
+    ReadAdministratorCommissioningAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAdministratorCommissioningAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadAdministratorCommissioningClusterRevision : public ModelCommand
@@ -4020,6 +4113,7 @@ private:
 | * ApplicationId                                                     | 0x0005 |
 | * CatalogVendorId                                                   | 0x0006 |
 | * ApplicationStatus                                                 | 0x0007 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -4624,6 +4718,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadApplicationBasicAttributeList : public ModelCommand
+{
+public:
+    ReadApplicationBasicAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadApplicationBasicClusterRevision : public ModelCommand
@@ -4715,6 +4839,7 @@ private:
 | * ApplicationLauncherList                                           | 0x0000 |
 | * CatalogVendorId                                                   | 0x0001 |
 | * ApplicationId                                                     | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -4939,6 +5064,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadApplicationLauncherAttributeList : public ModelCommand
+{
+public:
+    ReadApplicationLauncherAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationLauncherAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadApplicationLauncherClusterRevision : public ModelCommand
@@ -5030,6 +5185,7 @@ private:
 | Attributes:                                                         |        |
 | * AudioOutputList                                                   | 0x0000 |
 | * CurrentAudioOutput                                                | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5199,6 +5355,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadAudioOutputAttributeList : public ModelCommand
+{
+public:
+    ReadAudioOutputAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAudioOutputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "AudioOutput.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadAudioOutputClusterRevision : public ModelCommand
@@ -5292,6 +5478,7 @@ private:
 | * BarrierSafetyStatus                                               | 0x0002 |
 | * BarrierCapabilities                                               | 0x0003 |
 | * BarrierPosition                                                   | 0x000A |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -5671,6 +5858,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadBarrierControlAttributeList : public ModelCommand
+{
+public:
+    ReadBarrierControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBarrierControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0103) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BarrierControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadBarrierControlClusterRevision : public ModelCommand
@@ -5778,6 +5995,7 @@ private:
 | * LocalConfigDisabled                                               | 0x0010 |
 | * Reachable                                                         | 0x0011 |
 | * UniqueID                                                          | 0x0012 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -7391,6 +7609,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadBasicAttributeList : public ModelCommand
+{
+public:
+    ReadBasicAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadBasicClusterRevision : public ModelCommand
@@ -7481,6 +7729,7 @@ private:
 | * OutOfService                                                      | 0x0051 |
 | * PresentValue                                                      | 0x0055 |
 | * StatusFlags                                                       | 0x006F |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -7783,6 +8032,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadBinaryInputBasicAttributeList : public ModelCommand
+{
+public:
+    ReadBinaryInputBasicAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBinaryInputBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x000F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BinaryInputBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadBinaryInputBasicClusterRevision : public ModelCommand
@@ -7872,6 +8151,7 @@ private:
 | * Unbind                                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -7927,6 +8207,36 @@ public:
 
 private:
     chip::app::Clusters::Binding::Commands::Unbind::Type mRequest;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadBindingAttributeList : public ModelCommand
+{
+public:
+    ReadBindingAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBindingAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BindingCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Binding.AttributeList response", value);
+    }
 };
 
 /*
@@ -8018,6 +8328,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * StateValue                                                        | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -8101,6 +8412,36 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadBooleanStateAttributeList : public ModelCommand
+{
+public:
+    ReadBooleanStateAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBooleanStateAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BooleanState.AttributeList response", value);
+    }
 };
 
 /*
@@ -8206,6 +8547,7 @@ private:
 | * ActionList                                                        | 0x0000 |
 | * EndpointList                                                      | 0x0001 |
 | * SetupUrl                                                          | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -8663,6 +9005,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadBridgedActionsAttributeList : public ModelCommand
+{
+public:
+    ReadBridgedActionsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedActionsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedActions.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadBridgedActionsClusterRevision : public ModelCommand
@@ -8750,8 +9122,39 @@ private:
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute AttributeList
+ */
+class ReadBridgedDeviceBasicAttributeList : public ModelCommand
+{
+public:
+    ReadBridgedDeviceBasicAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBridgedDeviceBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0039) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedDeviceBasic.AttributeList response", value);
+    }
+};
 
 /*
  * Attribute ClusterRevision
@@ -8912,6 +9315,7 @@ private:
 | * ColorTempPhysicalMax                                              | 0x400C |
 | * CoupleColorTempToLevelMinMireds                                   | 0x400D |
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14083,6 +14487,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadColorControlAttributeList : public ModelCommand
+{
+public:
+    ReadColorControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadColorControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ColorControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadColorControlClusterRevision : public ModelCommand
@@ -14174,6 +14608,7 @@ private:
 | Attributes:                                                         |        |
 | * AcceptsHeaderList                                                 | 0x0000 |
 | * SupportedStreamingTypes                                           | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14290,6 +14725,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadContentLauncherAttributeList : public ModelCommand
+{
+public:
+    ReadContentLauncherAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadContentLauncherAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ContentLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ContentLauncher.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadContentLauncherClusterRevision : public ModelCommand
@@ -14381,6 +14846,7 @@ private:
 | * ServerList                                                        | 0x0001 |
 | * ClientList                                                        | 0x0002 |
 | * PartsList                                                         | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14507,6 +14973,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadDescriptorAttributeList : public ModelCommand
+{
+public:
+    ReadDescriptorAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDescriptorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadDescriptorClusterRevision : public ModelCommand
@@ -14595,6 +15091,7 @@ private:
 | * RetrieveLogsRequest                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -14625,6 +15122,36 @@ private:
     chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type mRequest;
 };
 
+/*
+ * Attribute AttributeList
+ */
+class ReadDiagnosticLogsAttributeList : public ModelCommand
+{
+public:
+    ReadDiagnosticLogsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDiagnosticLogsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0032) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DiagnosticLogsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "DiagnosticLogs.AttributeList response", value);
+    }
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
@@ -14642,6 +15169,7 @@ private:
 | * LockState                                                         | 0x0000 |
 | * LockType                                                          | 0x0001 |
 | * ActuatorEnabled                                                   | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -14936,6 +15464,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadDoorLockAttributeList : public ModelCommand
+{
+public:
+    ReadDoorLockAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadDoorLockClusterRevision : public ModelCommand
@@ -15034,6 +15592,7 @@ private:
 | * ActivePower                                                       | 0x050B |
 | * ActivePowerMin                                                    | 0x050C |
 | * ActivePowerMax                                                    | 0x050D |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -15940,6 +16499,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadElectricalMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadElectricalMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadElectricalMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0B04) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ElectricalMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadElectricalMeasurementClusterRevision : public ModelCommand
@@ -16037,6 +16626,7 @@ private:
 | * OverrunCount                                                      | 0x0006 |
 | * CarrierDetect                                                     | 0x0007 |
 | * TimeSinceReset                                                    | 0x0008 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -16800,6 +17390,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadEthernetNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReadEthernetNetworkDiagnosticsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadEthernetNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadEthernetNetworkDiagnosticsFeatureMap : public ModelCommand
@@ -16918,6 +17538,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LabelList                                                         | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -16950,6 +17571,36 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "FixedLabel.LabelList response", value);
+    }
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadFixedLabelAttributeList : public ModelCommand
+{
+public:
+    ReadFixedLabelAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFixedLabelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0040) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FixedLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FixedLabel::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "FixedLabel.AttributeList response", value);
     }
 };
 
@@ -17045,6 +17696,7 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -17377,6 +18029,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadFlowMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadFlowMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFlowMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadFlowMeasurementClusterRevision : public ModelCommand
@@ -17471,6 +18153,7 @@ private:
 | * BasicCommissioningInfoList                                        | 0x0001 |
 | * RegulatoryConfig                                                  | 0x0002 |
 | * LocationCapability                                                | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -17750,6 +18433,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadGeneralCommissioningAttributeList : public ModelCommand
+{
+public:
+    ReadGeneralCommissioningAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralCommissioningAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadGeneralCommissioningClusterRevision : public ModelCommand
@@ -17845,6 +18558,7 @@ private:
 | * ActiveHardwareFaults                                              | 0x0005 |
 | * ActiveRadioFaults                                                 | 0x0006 |
 | * ActiveNetworkFaults                                               | 0x0007 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -18301,6 +19015,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadGeneralDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReadGeneralDiagnosticsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0033) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadGeneralDiagnosticsClusterRevision : public ModelCommand
@@ -18390,6 +19134,7 @@ private:
 | Attributes:                                                         |        |
 | * Groups                                                            | 0x0000 |
 | * GroupKeys                                                         | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -18456,6 +19201,36 @@ public:
             value)
     {
         OnGeneralAttributeResponse(context, "GroupKeyManagement.GroupKeys response", value);
+    }
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadGroupKeyManagementAttributeList : public ModelCommand
+{
+public:
+    ReadGroupKeyManagementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGroupKeyManagementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.AttributeList response", value);
     }
 };
 
@@ -18554,6 +19329,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -18782,6 +19558,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadGroupsAttributeList : public ModelCommand
+{
+public:
+    ReadGroupsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGroupsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0004) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Groups::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Groups.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadGroupsClusterRevision : public ModelCommand
@@ -18874,6 +19680,7 @@ private:
 | Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
 | * IdentifyType                                                      | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19139,6 +19946,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadIdentifyAttributeList : public ModelCommand
+{
+public:
+    ReadIdentifyAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadIdentifyAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0003) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Identify.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadIdentifyClusterRevision : public ModelCommand
@@ -19231,6 +20068,7 @@ private:
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
 | * LightSensorType                                                   | 0x0004 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19645,6 +20483,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadIlluminanceMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadIlluminanceMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadIlluminanceMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0400) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IlluminanceMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadIlluminanceMeasurementClusterRevision : public ModelCommand
@@ -19733,6 +20601,7 @@ private:
 | * SendKey                                                           |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -19759,6 +20628,36 @@ public:
 
 private:
     chip::app::Clusters::KeypadInput::Commands::SendKey::Type mRequest;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadKeypadInputAttributeList : public ModelCommand
+{
+public:
+    ReadKeypadInputAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadKeypadInputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0509) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::KeypadInputCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "KeypadInput.AttributeList response", value);
+    }
 };
 
 /*
@@ -19871,6 +20770,7 @@ private:
 | * OffTransitionTime                                                 | 0x0013 |
 | * DefaultMoveRate                                                   | 0x0014 |
 | * StartUpCurrentLevel                                               | 0x4000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -21415,6 +22315,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadLevelControlAttributeList : public ModelCommand
+{
+public:
+    ReadLevelControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLevelControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LevelControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadLevelControlClusterRevision : public ModelCommand
@@ -21503,6 +22433,7 @@ private:
 | * Sleep                                                             |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -21524,6 +22455,36 @@ public:
 
 private:
     chip::app::Clusters::LowPower::Commands::Sleep::Type mRequest;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadLowPowerAttributeList : public ModelCommand
+{
+public:
+    ReadLowPowerAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLowPowerAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0508) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LowPowerCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "LowPower.AttributeList response", value);
+    }
 };
 
 /*
@@ -21620,6 +22581,7 @@ private:
 | Attributes:                                                         |        |
 | * MediaInputList                                                    | 0x0000 |
 | * CurrentMediaInput                                                 | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -21828,6 +22790,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadMediaInputAttributeList : public ModelCommand
+{
+public:
+    ReadMediaInputAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaInputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0507) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "MediaInput.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadMediaInputClusterRevision : public ModelCommand
@@ -21934,6 +22926,7 @@ private:
 | * PlaybackSpeed                                                     | 0x0005 |
 | * SeekRangeEnd                                                      | 0x0006 |
 | * SeekRangeStart                                                    | 0x0007 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -22827,6 +23820,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadMediaPlaybackAttributeList : public ModelCommand
+{
+public:
+    ReadMediaPlaybackAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadMediaPlaybackAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadMediaPlaybackClusterRevision : public ModelCommand
@@ -22920,6 +23943,7 @@ private:
 | * OnMode                                                            | 0x0002 |
 | * StartUpMode                                                       | 0x0003 |
 | * Description                                                       | 0x0004 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -23335,6 +24359,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadModeSelectAttributeList : public ModelCommand
+{
+public:
+    ReadModeSelectAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadModeSelectAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadModeSelectClusterRevision : public ModelCommand
@@ -23430,6 +24484,7 @@ private:
 | * UpdateWiFiNetwork                                                 |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -23645,6 +24700,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadNetworkCommissioningAttributeList : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadNetworkCommissioningFeatureMap : public ModelCommand
@@ -23817,6 +24902,7 @@ private:
 | * QueryImage                                                        |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -23899,6 +24985,36 @@ public:
 
 private:
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type mRequest;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadOtaSoftwareUpdateProviderAttributeList : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateProviderAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateProviderAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0029) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateProvider.AttributeList response", value);
+    }
 };
 
 /*
@@ -23992,6 +25108,7 @@ private:
 | Attributes:                                                         |        |
 | * DefaultOtaProvider                                                | 0x0001 |
 | * UpdatePossible                                                    | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -24216,6 +25333,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadOtaSoftwareUpdateRequestorAttributeList : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
@@ -24306,6 +25453,7 @@ private:
 | * Occupancy                                                         | 0x0000 |
 | * OccupancySensorType                                               | 0x0001 |
 | * OccupancySensorTypeBitmap                                         | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -24558,6 +25706,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadOccupancySensingAttributeList : public ModelCommand
+{
+public:
+    ReadOccupancySensingAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOccupancySensingAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OccupancySensingCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OccupancySensing.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadOccupancySensingClusterRevision : public ModelCommand
@@ -24656,6 +25834,7 @@ private:
 | * OnTime                                                            | 0x4001 |
 | * OffWaitTime                                                       | 0x4002 |
 | * StartUpOnOff                                                      | 0x4003 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -25284,6 +26463,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadOnOffAttributeList : public ModelCommand
+{
+public:
+    ReadOnOffAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOnOffAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadOnOffFeatureMap : public ModelCommand
@@ -25455,6 +26664,7 @@ private:
 | Attributes:                                                         |        |
 | * SwitchType                                                        | 0x0000 |
 | * SwitchActions                                                     | 0x0010 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -25649,6 +26859,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadOnOffSwitchConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReadOnOffSwitchConfigurationAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOnOffSwitchConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadOnOffSwitchConfigurationClusterRevision : public ModelCommand
@@ -25750,6 +26990,7 @@ private:
 | * CommissionedFabrics                                               | 0x0003 |
 | * TrustedRootCertificates                                           | 0x0004 |
 | * CurrentFabricIndex                                                | 0x0005 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -26286,6 +27527,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadOperationalCredentialsAttributeList : public ModelCommand
+{
+public:
+    ReadOperationalCredentialsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOperationalCredentialsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadOperationalCredentialsClusterRevision : public ModelCommand
@@ -26382,6 +27653,7 @@ private:
 | * BatteryChargeLevel                                                | 0x000E |
 | * ActiveBatteryFaults                                               | 0x0012 |
 | * BatteryChargeState                                                | 0x001A |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -27077,6 +28349,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadPowerSourceAttributeList : public ModelCommand
+{
+public:
+    ReadPowerSourceAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadPowerSourceFeatureMap : public ModelCommand
@@ -27247,6 +28549,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Sources                                                           | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -27277,6 +28580,36 @@ public:
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
         OnGeneralAttributeResponse(context, "PowerSourceConfiguration.Sources response", value);
+    }
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadPowerSourceConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReadPowerSourceConfigurationAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPowerSourceConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.AttributeList response", value);
     }
 };
 
@@ -27319,6 +28652,7 @@ public:
 | * MeasuredValue                                                     | 0x0000 |
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -27569,6 +28903,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadPressureMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadPressureMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPressureMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "PressureMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadPressureMeasurementClusterRevision : public ModelCommand
@@ -27680,6 +29044,7 @@ private:
 | * OperationMode                                                     | 0x0020 |
 | * ControlMode                                                       | 0x0021 |
 | * AlarmMask                                                         | 0x0022 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -29764,6 +31129,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadPumpConfigurationAndControlAttributeList : public ModelCommand
+{
+public:
+    ReadPumpConfigurationAndControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadPumpConfigurationAndControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadPumpConfigurationAndControlFeatureMap : public ModelCommand
@@ -29937,6 +31332,7 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -30269,6 +31665,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadRelativeHumidityMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadRelativeHumidityMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadRelativeHumidityMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0405) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::RelativeHumidityMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadRelativeHumidityMeasurementClusterRevision : public ModelCommand
@@ -30368,6 +31794,7 @@ private:
 | * CurrentGroup                                                      | 0x0002 |
 | * SceneValid                                                        | 0x0003 |
 | * NameSupport                                                       | 0x0004 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -30959,6 +32386,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadScenesAttributeList : public ModelCommand
+{
+public:
+    ReadScenesAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadScenesAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0005) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadScenesClusterRevision : public ModelCommand
@@ -31051,6 +32508,7 @@ private:
 | * CurrentHeapFree                                                   | 0x0001 |
 | * CurrentHeapUsed                                                   | 0x0002 |
 | * CurrentHeapHighWatermark                                          | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -31356,6 +32814,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadSoftwareDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReadSoftwareDiagnosticsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSoftwareDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadSoftwareDiagnosticsFeatureMap : public ModelCommand
@@ -31476,6 +32964,7 @@ private:
 | * NumberOfPositions                                                 | 0x0000 |
 | * CurrentPosition                                                   | 0x0001 |
 | * MultiPressMax                                                     | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -31728,6 +33217,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadSwitchAttributeList : public ModelCommand
+{
+public:
+    ReadSwitchAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadSwitchAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadSwitchFeatureMap : public ModelCommand
@@ -31903,6 +33422,7 @@ private:
 | * TvChannelList                                                     | 0x0000 |
 | * TvChannelLineup                                                   | 0x0001 |
 | * CurrentTvChannel                                                  | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -32176,6 +33696,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadTvChannelAttributeList : public ModelCommand
+{
+public:
+    ReadTvChannelAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTvChannelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TvChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "TvChannel.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadTvChannelClusterRevision : public ModelCommand
@@ -32265,6 +33815,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TargetNavigatorList                                               | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -32323,6 +33874,36 @@ public:
                             chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "TargetNavigator.TargetNavigatorList response", value);
+    }
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadTargetNavigatorAttributeList : public ModelCommand
+{
+public:
+    ReadTargetNavigatorAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTargetNavigatorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0505) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "TargetNavigator.AttributeList response", value);
     }
 };
 
@@ -32418,6 +33999,7 @@ private:
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 | * Tolerance                                                         | 0x0003 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -32750,6 +34332,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadTemperatureMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReadTemperatureMeasurementAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTemperatureMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0402) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TemperatureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadTemperatureMeasurementClusterRevision : public ModelCommand
@@ -32932,6 +34544,7 @@ private:
 | * NullableRangeRestrictedInt8s                                      | 0x8027 |
 | * NullableRangeRestrictedInt16u                                     | 0x8028 |
 | * NullableRangeRestrictedInt16s                                     | 0x8029 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -40894,6 +42507,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadTestClusterAttributeList : public ModelCommand
+{
+public:
+    ReadTestClusterAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadTestClusterClusterRevision : public ModelCommand
@@ -41003,6 +42646,7 @@ private:
 | * StartOfWeek                                                       | 0x0020 |
 | * NumberOfWeeklyTransitions                                         | 0x0021 |
 | * NumberOfDailyTransitions                                          | 0x0022 |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -42774,6 +44418,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadThermostatAttributeList : public ModelCommand
+{
+public:
+    ReadThermostatAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadThermostatFeatureMap : public ModelCommand
@@ -42946,6 +44620,7 @@ private:
 | * TemperatureDisplayMode                                            | 0x0000 |
 | * KeypadLockout                                                     | 0x0001 |
 | * ScheduleProgrammingVisibility                                     | 0x0002 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -43282,6 +44957,37 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadThermostatUserInterfaceConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReadThermostatUserInterfaceConfigurationAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThermostatUserInterfaceConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadThermostatUserInterfaceConfigurationClusterRevision : public ModelCommand
@@ -43434,6 +45140,7 @@ private:
 | * ChannelMask                                                       | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -48402,6 +50109,36 @@ public:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadThreadNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReadThreadNetworkDiagnosticsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThreadNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0035) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadThreadNetworkDiagnosticsFeatureMap : public ModelCommand
@@ -48520,6 +50257,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * WakeOnLanMacAddress                                               | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -48604,6 +50342,36 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadWakeOnLanAttributeList : public ModelCommand
+{
+public:
+    ReadWakeOnLanAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWakeOnLanAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0503) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WakeOnLanCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "WakeOnLan.AttributeList response", value);
+    }
 };
 
 /*
@@ -48708,6 +50476,7 @@ private:
 | * PacketUnicastTxCount                                              | 0x000A |
 | * CurrentMaxRate                                                    | 0x000B |
 | * OverrunCount                                                      | 0x000C |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -49803,6 +51572,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadWiFiNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReadWiFiNetworkDiagnosticsAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWiFiNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadWiFiNetworkDiagnosticsFeatureMap : public ModelCommand
@@ -49945,6 +51744,7 @@ private:
 | * InstalledClosedLimitTilt                                          | 0x0013 |
 | * Mode                                                              | 0x0017 |
 | * SafetyStatus                                                      | 0x001A |
+| * AttributeList                                                     | 0xFFFB |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -51623,6 +53423,36 @@ private:
 };
 
 /*
+ * Attribute AttributeList
+ */
+class ReadWindowCoveringAttributeList : public ModelCommand
+{
+public:
+    ReadWindowCoveringAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadWindowCoveringAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.AttributeList response", value);
+    }
+};
+
+/*
  * Attribute FeatureMap
  */
 class ReadWindowCoveringFeatureMap : public ModelCommand
@@ -51796,6 +53626,7 @@ void registerClusterAccessControl(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadAccessControlAcl>(),             //
         make_unique<ReadAccessControlExtension>(),       //
+        make_unique<ReadAccessControlAttributeList>(),   //
         make_unique<ReadAccessControlClusterRevision>(), //
     };
 
@@ -51808,6 +53639,7 @@ void registerClusterAccountLogin(Commands & commands)
     commands_list clusterCommands = {
         make_unique<AccountLoginGetSetupPIN>(),           //
         make_unique<AccountLoginLogin>(),                 //
+        make_unique<ReadAccountLoginAttributeList>(),     //
         make_unique<ReadAccountLoginClusterRevision>(),   //
         make_unique<ReportAccountLoginClusterRevision>(), //
     };
@@ -51825,6 +53657,7 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<ReadAdministratorCommissioningWindowStatus>(),             //
         make_unique<ReadAdministratorCommissioningAdminFabricIndex>(),         //
         make_unique<ReadAdministratorCommissioningAdminVendorId>(),            //
+        make_unique<ReadAdministratorCommissioningAttributeList>(),            //
         make_unique<ReadAdministratorCommissioningClusterRevision>(),          //
         make_unique<ReportAdministratorCommissioningClusterRevision>(),        //
     };
@@ -51851,6 +53684,7 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReportApplicationBasicCatalogVendorId>(),   //
         make_unique<ReadApplicationBasicApplicationStatus>(),   //
         make_unique<ReportApplicationBasicApplicationStatus>(), //
+        make_unique<ReadApplicationBasicAttributeList>(),       //
         make_unique<ReadApplicationBasicClusterRevision>(),     //
         make_unique<ReportApplicationBasicClusterRevision>(),   //
     };
@@ -51868,6 +53702,7 @@ void registerClusterApplicationLauncher(Commands & commands)
         make_unique<ReportApplicationLauncherCatalogVendorId>(),       //
         make_unique<ReadApplicationLauncherApplicationId>(),           //
         make_unique<ReportApplicationLauncherApplicationId>(),         //
+        make_unique<ReadApplicationLauncherAttributeList>(),           //
         make_unique<ReadApplicationLauncherClusterRevision>(),         //
         make_unique<ReportApplicationLauncherClusterRevision>(),       //
     };
@@ -51884,6 +53719,7 @@ void registerClusterAudioOutput(Commands & commands)
         make_unique<ReadAudioOutputAudioOutputList>(),      //
         make_unique<ReadAudioOutputCurrentAudioOutput>(),   //
         make_unique<ReportAudioOutputCurrentAudioOutput>(), //
+        make_unique<ReadAudioOutputAttributeList>(),        //
         make_unique<ReadAudioOutputClusterRevision>(),      //
         make_unique<ReportAudioOutputClusterRevision>(),    //
     };
@@ -51905,6 +53741,7 @@ void registerClusterBarrierControl(Commands & commands)
         make_unique<ReportBarrierControlBarrierCapabilities>(), //
         make_unique<ReadBarrierControlBarrierPosition>(),       //
         make_unique<ReportBarrierControlBarrierPosition>(),     //
+        make_unique<ReadBarrierControlAttributeList>(),         //
         make_unique<ReadBarrierControlClusterRevision>(),       //
         make_unique<ReportBarrierControlClusterRevision>(),     //
     };
@@ -51957,6 +53794,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadBasicReachable>(),                 //
         make_unique<ReportBasicReachable>(),               //
         make_unique<ReadBasicUniqueID>(),                  //
+        make_unique<ReadBasicAttributeList>(),             //
         make_unique<ReadBasicClusterRevision>(),           //
         make_unique<ReportBasicClusterRevision>(),         //
     };
@@ -51976,6 +53814,7 @@ void registerClusterBinaryInputBasic(Commands & commands)
         make_unique<ReportBinaryInputBasicPresentValue>(),    //
         make_unique<ReadBinaryInputBasicStatusFlags>(),       //
         make_unique<ReportBinaryInputBasicStatusFlags>(),     //
+        make_unique<ReadBinaryInputBasicAttributeList>(),     //
         make_unique<ReadBinaryInputBasicClusterRevision>(),   //
         make_unique<ReportBinaryInputBasicClusterRevision>(), //
     };
@@ -51989,6 +53828,7 @@ void registerClusterBinding(Commands & commands)
     commands_list clusterCommands = {
         make_unique<BindingBind>(),                  //
         make_unique<BindingUnbind>(),                //
+        make_unique<ReadBindingAttributeList>(),     //
         make_unique<ReadBindingClusterRevision>(),   //
         make_unique<ReportBindingClusterRevision>(), //
     };
@@ -52002,6 +53842,7 @@ void registerClusterBooleanState(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadBooleanStateStateValue>(),        //
         make_unique<ReportBooleanStateStateValue>(),      //
+        make_unique<ReadBooleanStateAttributeList>(),     //
         make_unique<ReadBooleanStateClusterRevision>(),   //
         make_unique<ReportBooleanStateClusterRevision>(), //
     };
@@ -52029,6 +53870,7 @@ void registerClusterBridgedActions(Commands & commands)
         make_unique<ReadBridgedActionsEndpointList>(),            //
         make_unique<ReadBridgedActionsSetupUrl>(),                //
         make_unique<ReportBridgedActionsSetupUrl>(),              //
+        make_unique<ReadBridgedActionsAttributeList>(),           //
         make_unique<ReadBridgedActionsClusterRevision>(),         //
         make_unique<ReportBridgedActionsClusterRevision>(),       //
     };
@@ -52040,6 +53882,7 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
     const char * clusterName = "BridgedDeviceBasic";
 
     commands_list clusterCommands = {
+        make_unique<ReadBridgedDeviceBasicAttributeList>(),     //
         make_unique<ReadBridgedDeviceBasicClusterRevision>(),   //
         make_unique<ReportBridgedDeviceBasicClusterRevision>(), //
     };
@@ -52187,6 +54030,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlStartUpColorTemperatureMireds>(),     //
         make_unique<WriteColorControlStartUpColorTemperatureMireds>(),    //
         make_unique<ReportColorControlStartUpColorTemperatureMireds>(),   //
+        make_unique<ReadColorControlAttributeList>(),                     //
         make_unique<ReadColorControlClusterRevision>(),                   //
         make_unique<ReportColorControlClusterRevision>(),                 //
     };
@@ -52202,6 +54046,7 @@ void registerClusterContentLauncher(Commands & commands)
         make_unique<ContentLauncherLaunchURL>(),                   //
         make_unique<ReadContentLauncherAcceptsHeaderList>(),       //
         make_unique<ReadContentLauncherSupportedStreamingTypes>(), //
+        make_unique<ReadContentLauncherAttributeList>(),           //
         make_unique<ReadContentLauncherClusterRevision>(),         //
         make_unique<ReportContentLauncherClusterRevision>(),       //
     };
@@ -52217,6 +54062,7 @@ void registerClusterDescriptor(Commands & commands)
         make_unique<ReadDescriptorServerList>(),        //
         make_unique<ReadDescriptorClientList>(),        //
         make_unique<ReadDescriptorPartsList>(),         //
+        make_unique<ReadDescriptorAttributeList>(),     //
         make_unique<ReadDescriptorClusterRevision>(),   //
         make_unique<ReportDescriptorClusterRevision>(), //
     };
@@ -52229,6 +54075,7 @@ void registerClusterDiagnosticLogs(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<DiagnosticLogsRetrieveLogsRequest>(), //
+        make_unique<ReadDiagnosticLogsAttributeList>(),   //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -52248,6 +54095,7 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<DoorLockUnlockDoor>(),            //
         make_unique<ReadDoorLockActuatorEnabled>(),   //
         make_unique<ReportDoorLockActuatorEnabled>(), //
+        make_unique<ReadDoorLockAttributeList>(),     //
         make_unique<ReadDoorLockClusterRevision>(),   //
         make_unique<ReportDoorLockClusterRevision>(), //
     };
@@ -52281,6 +54129,7 @@ void registerClusterElectricalMeasurement(Commands & commands)
         make_unique<ReportElectricalMeasurementActivePowerMin>(),   //
         make_unique<ReadElectricalMeasurementActivePowerMax>(),     //
         make_unique<ReportElectricalMeasurementActivePowerMax>(),   //
+        make_unique<ReadElectricalMeasurementAttributeList>(),      //
         make_unique<ReadElectricalMeasurementClusterRevision>(),    //
         make_unique<ReportElectricalMeasurementClusterRevision>(),  //
     };
@@ -52311,6 +54160,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReportEthernetNetworkDiagnosticsCarrierDetect>(),   //
         make_unique<ReadEthernetNetworkDiagnosticsTimeSinceReset>(),    //
         make_unique<ReportEthernetNetworkDiagnosticsTimeSinceReset>(),  //
+        make_unique<ReadEthernetNetworkDiagnosticsAttributeList>(),     //
         make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(),        //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),   //
         make_unique<ReportEthernetNetworkDiagnosticsClusterRevision>(), //
@@ -52324,6 +54174,7 @@ void registerClusterFixedLabel(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadFixedLabelLabelList>(),         //
+        make_unique<ReadFixedLabelAttributeList>(),     //
         make_unique<ReadFixedLabelClusterRevision>(),   //
         make_unique<ReportFixedLabelClusterRevision>(), //
     };
@@ -52343,6 +54194,7 @@ void registerClusterFlowMeasurement(Commands & commands)
         make_unique<ReportFlowMeasurementMaxMeasuredValue>(), //
         make_unique<ReadFlowMeasurementTolerance>(),          //
         make_unique<ReportFlowMeasurementTolerance>(),        //
+        make_unique<ReadFlowMeasurementAttributeList>(),      //
         make_unique<ReadFlowMeasurementClusterRevision>(),    //
         make_unique<ReportFlowMeasurementClusterRevision>(),  //
     };
@@ -52363,6 +54215,7 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(), //
         make_unique<ReadGeneralCommissioningRegulatoryConfig>(),           //
         make_unique<ReadGeneralCommissioningLocationCapability>(),         //
+        make_unique<ReadGeneralCommissioningAttributeList>(),              //
         make_unique<ReadGeneralCommissioningClusterRevision>(),            //
         make_unique<ReportGeneralCommissioningClusterRevision>(),          //
     };
@@ -52386,6 +54239,7 @@ void registerClusterGeneralDiagnostics(Commands & commands)
         make_unique<ReadGeneralDiagnosticsActiveHardwareFaults>(),    //
         make_unique<ReadGeneralDiagnosticsActiveRadioFaults>(),       //
         make_unique<ReadGeneralDiagnosticsActiveNetworkFaults>(),     //
+        make_unique<ReadGeneralDiagnosticsAttributeList>(),           //
         make_unique<ReadGeneralDiagnosticsClusterRevision>(),         //
         make_unique<ReportGeneralDiagnosticsClusterRevision>(),       //
     };
@@ -52399,6 +54253,7 @@ void registerClusterGroupKeyManagement(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadGroupKeyManagementGroups>(),            //
         make_unique<ReadGroupKeyManagementGroupKeys>(),         //
+        make_unique<ReadGroupKeyManagementAttributeList>(),     //
         make_unique<ReadGroupKeyManagementClusterRevision>(),   //
         make_unique<ReportGroupKeyManagementClusterRevision>(), //
     };
@@ -52418,6 +54273,7 @@ void registerClusterGroups(Commands & commands)
         make_unique<GroupsViewGroup>(),             //
         make_unique<ReadGroupsNameSupport>(),       //
         make_unique<ReportGroupsNameSupport>(),     //
+        make_unique<ReadGroupsAttributeList>(),     //
         make_unique<ReadGroupsClusterRevision>(),   //
         make_unique<ReportGroupsClusterRevision>(), //
     };
@@ -52437,6 +54293,7 @@ void registerClusterIdentify(Commands & commands)
         make_unique<ReportIdentifyIdentifyTime>(),    //
         make_unique<ReadIdentifyIdentifyType>(),      //
         make_unique<ReportIdentifyIdentifyType>(),    //
+        make_unique<ReadIdentifyAttributeList>(),     //
         make_unique<ReadIdentifyClusterRevision>(),   //
         make_unique<ReportIdentifyClusterRevision>(), //
     };
@@ -52458,6 +54315,7 @@ void registerClusterIlluminanceMeasurement(Commands & commands)
         make_unique<ReportIlluminanceMeasurementTolerance>(),        //
         make_unique<ReadIlluminanceMeasurementLightSensorType>(),    //
         make_unique<ReportIlluminanceMeasurementLightSensorType>(),  //
+        make_unique<ReadIlluminanceMeasurementAttributeList>(),      //
         make_unique<ReadIlluminanceMeasurementClusterRevision>(),    //
         make_unique<ReportIlluminanceMeasurementClusterRevision>(),  //
     };
@@ -52470,6 +54328,7 @@ void registerClusterKeypadInput(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<KeypadInputSendKey>(),               //
+        make_unique<ReadKeypadInputAttributeList>(),     //
         make_unique<ReadKeypadInputClusterRevision>(),   //
         make_unique<ReportKeypadInputClusterRevision>(), //
     };
@@ -52524,6 +54383,7 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<ReadLevelControlStartUpCurrentLevel>(),   //
         make_unique<WriteLevelControlStartUpCurrentLevel>(),  //
         make_unique<ReportLevelControlStartUpCurrentLevel>(), //
+        make_unique<ReadLevelControlAttributeList>(),         //
         make_unique<ReadLevelControlClusterRevision>(),       //
         make_unique<ReportLevelControlClusterRevision>(),     //
     };
@@ -52536,6 +54396,7 @@ void registerClusterLowPower(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<LowPowerSleep>(),                 //
+        make_unique<ReadLowPowerAttributeList>(),     //
         make_unique<ReadLowPowerClusterRevision>(),   //
         make_unique<ReportLowPowerClusterRevision>(), //
     };
@@ -52554,6 +54415,7 @@ void registerClusterMediaInput(Commands & commands)
         make_unique<ReadMediaInputMediaInputList>(),      //
         make_unique<ReadMediaInputCurrentMediaInput>(),   //
         make_unique<ReportMediaInputCurrentMediaInput>(), //
+        make_unique<ReadMediaInputAttributeList>(),       //
         make_unique<ReadMediaInputClusterRevision>(),     //
         make_unique<ReportMediaInputClusterRevision>(),   //
     };
@@ -52592,6 +54454,7 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<ReportMediaPlaybackSeekRangeEnd>(),      //
         make_unique<ReadMediaPlaybackSeekRangeStart>(),      //
         make_unique<ReportMediaPlaybackSeekRangeStart>(),    //
+        make_unique<ReadMediaPlaybackAttributeList>(),       //
         make_unique<ReadMediaPlaybackClusterRevision>(),     //
         make_unique<ReportMediaPlaybackClusterRevision>(),   //
     };
@@ -52614,6 +54477,7 @@ void registerClusterModeSelect(Commands & commands)
         make_unique<ReportModeSelectStartUpMode>(),     //
         make_unique<ReadModeSelectDescription>(),       //
         make_unique<ReportModeSelectDescription>(),     //
+        make_unique<ReadModeSelectAttributeList>(),     //
         make_unique<ReadModeSelectClusterRevision>(),   //
         make_unique<ReportModeSelectClusterRevision>(), //
     };
@@ -52633,6 +54497,7 @@ void registerClusterNetworkCommissioning(Commands & commands)
         make_unique<NetworkCommissioningScanNetworks>(),          //
         make_unique<NetworkCommissioningUpdateThreadNetwork>(),   //
         make_unique<NetworkCommissioningUpdateWiFiNetwork>(),     //
+        make_unique<ReadNetworkCommissioningAttributeList>(),     //
         make_unique<ReadNetworkCommissioningFeatureMap>(),        //
         make_unique<ReportNetworkCommissioningFeatureMap>(),      //
         make_unique<ReadNetworkCommissioningClusterRevision>(),   //
@@ -52649,6 +54514,7 @@ void registerClusterOtaSoftwareUpdateProvider(Commands & commands)
         make_unique<OtaSoftwareUpdateProviderApplyUpdateRequest>(),    //
         make_unique<OtaSoftwareUpdateProviderNotifyUpdateApplied>(),   //
         make_unique<OtaSoftwareUpdateProviderQueryImage>(),            //
+        make_unique<ReadOtaSoftwareUpdateProviderAttributeList>(),     //
         make_unique<ReadOtaSoftwareUpdateProviderClusterRevision>(),   //
         make_unique<ReportOtaSoftwareUpdateProviderClusterRevision>(), //
     };
@@ -52666,6 +54532,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
         make_unique<ReportOtaSoftwareUpdateRequestorDefaultOtaProvider>(), //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),       //
         make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),     //
+        make_unique<ReadOtaSoftwareUpdateRequestorAttributeList>(),        //
         make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),      //
         make_unique<ReportOtaSoftwareUpdateRequestorClusterRevision>(),    //
     };
@@ -52683,6 +54550,7 @@ void registerClusterOccupancySensing(Commands & commands)
         make_unique<ReportOccupancySensingOccupancySensorType>(),       //
         make_unique<ReadOccupancySensingOccupancySensorTypeBitmap>(),   //
         make_unique<ReportOccupancySensingOccupancySensorTypeBitmap>(), //
+        make_unique<ReadOccupancySensingAttributeList>(),               //
         make_unique<ReadOccupancySensingClusterRevision>(),             //
         make_unique<ReportOccupancySensingClusterRevision>(),           //
     };
@@ -52713,6 +54581,7 @@ void registerClusterOnOff(Commands & commands)
         make_unique<ReadOnOffStartUpOnOff>(),         //
         make_unique<WriteOnOffStartUpOnOff>(),        //
         make_unique<ReportOnOffStartUpOnOff>(),       //
+        make_unique<ReadOnOffAttributeList>(),        //
         make_unique<ReadOnOffFeatureMap>(),           //
         make_unique<ReportOnOffFeatureMap>(),         //
         make_unique<ReadOnOffClusterRevision>(),      //
@@ -52731,6 +54600,7 @@ void registerClusterOnOffSwitchConfiguration(Commands & commands)
         make_unique<ReadOnOffSwitchConfigurationSwitchActions>(),     //
         make_unique<WriteOnOffSwitchConfigurationSwitchActions>(),    //
         make_unique<ReportOnOffSwitchConfigurationSwitchActions>(),   //
+        make_unique<ReadOnOffSwitchConfigurationAttributeList>(),     //
         make_unique<ReadOnOffSwitchConfigurationClusterRevision>(),   //
         make_unique<ReportOnOffSwitchConfigurationClusterRevision>(), //
     };
@@ -52759,6 +54629,7 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadOperationalCredentialsTrustedRootCertificates>(),  //
         make_unique<ReadOperationalCredentialsCurrentFabricIndex>(),       //
         make_unique<ReportOperationalCredentialsCurrentFabricIndex>(),     //
+        make_unique<ReadOperationalCredentialsAttributeList>(),            //
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
         make_unique<ReportOperationalCredentialsClusterRevision>(),        //
     };
@@ -52787,6 +54658,7 @@ void registerClusterPowerSource(Commands & commands)
         make_unique<ReadPowerSourceActiveBatteryFaults>(),       //
         make_unique<ReadPowerSourceBatteryChargeState>(),        //
         make_unique<ReportPowerSourceBatteryChargeState>(),      //
+        make_unique<ReadPowerSourceAttributeList>(),             //
         make_unique<ReadPowerSourceFeatureMap>(),                //
         make_unique<ReportPowerSourceFeatureMap>(),              //
         make_unique<ReadPowerSourceClusterRevision>(),           //
@@ -52801,6 +54673,7 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadPowerSourceConfigurationSources>(),         //
+        make_unique<ReadPowerSourceConfigurationAttributeList>(),   //
         make_unique<ReadPowerSourceConfigurationClusterRevision>(), //
     };
 
@@ -52817,6 +54690,7 @@ void registerClusterPressureMeasurement(Commands & commands)
         make_unique<ReportPressureMeasurementMinMeasuredValue>(), //
         make_unique<ReadPressureMeasurementMaxMeasuredValue>(),   //
         make_unique<ReportPressureMeasurementMaxMeasuredValue>(), //
+        make_unique<ReadPressureMeasurementAttributeList>(),      //
         make_unique<ReadPressureMeasurementClusterRevision>(),    //
         make_unique<ReportPressureMeasurementClusterRevision>(),  //
     };
@@ -52880,6 +54754,7 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<ReportPumpConfigurationAndControlControlMode>(),            //
         make_unique<ReadPumpConfigurationAndControlAlarmMask>(),                //
         make_unique<ReportPumpConfigurationAndControlAlarmMask>(),              //
+        make_unique<ReadPumpConfigurationAndControlAttributeList>(),            //
         make_unique<ReadPumpConfigurationAndControlFeatureMap>(),               //
         make_unique<ReportPumpConfigurationAndControlFeatureMap>(),             //
         make_unique<ReadPumpConfigurationAndControlClusterRevision>(),          //
@@ -52901,6 +54776,7 @@ void registerClusterRelativeHumidityMeasurement(Commands & commands)
         make_unique<ReportRelativeHumidityMeasurementMaxMeasuredValue>(), //
         make_unique<ReadRelativeHumidityMeasurementTolerance>(),          //
         make_unique<ReportRelativeHumidityMeasurementTolerance>(),        //
+        make_unique<ReadRelativeHumidityMeasurementAttributeList>(),      //
         make_unique<ReadRelativeHumidityMeasurementClusterRevision>(),    //
         make_unique<ReportRelativeHumidityMeasurementClusterRevision>(),  //
     };
@@ -52929,6 +54805,7 @@ void registerClusterScenes(Commands & commands)
         make_unique<ReportScenesSceneValid>(),      //
         make_unique<ReadScenesNameSupport>(),       //
         make_unique<ReportScenesNameSupport>(),     //
+        make_unique<ReadScenesAttributeList>(),     //
         make_unique<ReadScenesClusterRevision>(),   //
         make_unique<ReportScenesClusterRevision>(), //
     };
@@ -52948,6 +54825,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReportSoftwareDiagnosticsCurrentHeapUsed>(),          //
         make_unique<ReadSoftwareDiagnosticsCurrentHeapHighWatermark>(),   //
         make_unique<ReportSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
+        make_unique<ReadSoftwareDiagnosticsAttributeList>(),              //
         make_unique<ReadSoftwareDiagnosticsFeatureMap>(),                 //
         make_unique<ReadSoftwareDiagnosticsClusterRevision>(),            //
         make_unique<ReportSoftwareDiagnosticsClusterRevision>(),          //
@@ -52966,6 +54844,7 @@ void registerClusterSwitch(Commands & commands)
         make_unique<ReportSwitchCurrentPosition>(),   //
         make_unique<ReadSwitchMultiPressMax>(),       //
         make_unique<ReportSwitchMultiPressMax>(),     //
+        make_unique<ReadSwitchAttributeList>(),       //
         make_unique<ReadSwitchFeatureMap>(),          //
         make_unique<ReportSwitchFeatureMap>(),        //
         make_unique<ReadSwitchClusterRevision>(),     //
@@ -52987,6 +54866,7 @@ void registerClusterTvChannel(Commands & commands)
         make_unique<ReportTvChannelTvChannelLineup>(),  //
         make_unique<ReadTvChannelCurrentTvChannel>(),   //
         make_unique<ReportTvChannelCurrentTvChannel>(), //
+        make_unique<ReadTvChannelAttributeList>(),      //
         make_unique<ReadTvChannelClusterRevision>(),    //
         make_unique<ReportTvChannelClusterRevision>(),  //
     };
@@ -53000,6 +54880,7 @@ void registerClusterTargetNavigator(Commands & commands)
     commands_list clusterCommands = {
         make_unique<TargetNavigatorNavigateTarget>(),          //
         make_unique<ReadTargetNavigatorTargetNavigatorList>(), //
+        make_unique<ReadTargetNavigatorAttributeList>(),       //
         make_unique<ReadTargetNavigatorClusterRevision>(),     //
         make_unique<ReportTargetNavigatorClusterRevision>(),   //
     };
@@ -53019,6 +54900,7 @@ void registerClusterTemperatureMeasurement(Commands & commands)
         make_unique<ReportTemperatureMeasurementMaxMeasuredValue>(), //
         make_unique<ReadTemperatureMeasurementTolerance>(),          //
         make_unique<ReportTemperatureMeasurementTolerance>(),        //
+        make_unique<ReadTemperatureMeasurementAttributeList>(),      //
         make_unique<ReadTemperatureMeasurementClusterRevision>(),    //
         make_unique<ReportTemperatureMeasurementClusterRevision>(),  //
     };
@@ -53258,6 +55140,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableRangeRestrictedInt16s>(),       //
         make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(),      //
         make_unique<ReportTestClusterNullableRangeRestrictedInt16s>(),     //
+        make_unique<ReadTestClusterAttributeList>(),                       //
         make_unique<ReadTestClusterClusterRevision>(),                     //
         make_unique<ReportTestClusterClusterRevision>(),                   //
     };
@@ -53317,6 +55200,7 @@ void registerClusterThermostat(Commands & commands)
         make_unique<ReportThermostatNumberOfWeeklyTransitions>(),  //
         make_unique<ReadThermostatNumberOfDailyTransitions>(),     //
         make_unique<ReportThermostatNumberOfDailyTransitions>(),   //
+        make_unique<ReadThermostatAttributeList>(),                //
         make_unique<ReadThermostatFeatureMap>(),                   //
         make_unique<ReportThermostatFeatureMap>(),                 //
         make_unique<ReadThermostatClusterRevision>(),              //
@@ -53339,6 +55223,7 @@ void registerClusterThermostatUserInterfaceConfiguration(Commands & commands)
         make_unique<ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(),   //
         make_unique<WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(),  //
         make_unique<ReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibility>(), //
+        make_unique<ReadThermostatUserInterfaceConfigurationAttributeList>(),                   //
         make_unique<ReadThermostatUserInterfaceConfigurationClusterRevision>(),                 //
         make_unique<ReportThermostatUserInterfaceConfigurationClusterRevision>(),               //
     };
@@ -53472,6 +55357,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReportThreadNetworkDiagnosticsChannelMask>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),        //
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),             //
+        make_unique<ReadThreadNetworkDiagnosticsAttributeList>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(),                          //
         make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                     //
         make_unique<ReportThreadNetworkDiagnosticsClusterRevision>(),                   //
@@ -53486,6 +55372,7 @@ void registerClusterWakeOnLan(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadWakeOnLanWakeOnLanMacAddress>(),   //
         make_unique<ReportWakeOnLanWakeOnLanMacAddress>(), //
+        make_unique<ReadWakeOnLanAttributeList>(),         //
         make_unique<ReadWakeOnLanClusterRevision>(),       //
         make_unique<ReportWakeOnLanClusterRevision>(),     //
     };
@@ -53524,6 +55411,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<ReportWiFiNetworkDiagnosticsCurrentMaxRate>(),         //
         make_unique<ReadWiFiNetworkDiagnosticsOverrunCount>(),             //
         make_unique<ReportWiFiNetworkDiagnosticsOverrunCount>(),           //
+        make_unique<ReadWiFiNetworkDiagnosticsAttributeList>(),            //
         make_unique<ReadWiFiNetworkDiagnosticsFeatureMap>(),               //
         make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),          //
         make_unique<ReportWiFiNetworkDiagnosticsClusterRevision>(),        //
@@ -53580,6 +55468,7 @@ void registerClusterWindowCovering(Commands & commands)
         make_unique<ReportWindowCoveringMode>(),                             //
         make_unique<ReadWindowCoveringSafetyStatus>(),                       //
         make_unique<ReportWindowCoveringSafetyStatus>(),                     //
+        make_unique<ReadWindowCoveringAttributeList>(),                      //
         make_unique<ReadWindowCoveringFeatureMap>(),                         //
         make_unique<ReportWindowCoveringFeatureMap>(),                       //
         make_unique<ReadWindowCoveringClusterRevision>(),                    //

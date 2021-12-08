@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -131,10 +132,24 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        ForAllEndpointsWithServerCluster(SoftwareDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
-            // TODO: Log SoftwareFault event and walk them all.
-            return Loop::Break;
-        });
+        ForAllEndpointsWithServerCluster(
+            SoftwareDiagnostics::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                // If Software Diagnostics cluster is implemented on this endpoint
+                SoftwareDiagnostics::Structs::SoftwareFault::Type * pSoftwareFault =
+                    reinterpret_cast<SoftwareDiagnostics::Structs::SoftwareFault::Type *>(context);
+
+                EventNumber eventNumber;
+                Events::SoftwareFault::Type event{ *pSoftwareFault };
+
+                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+                {
+                    ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+                }
+
+                return Loop::Continue;
+            },
+            reinterpret_cast<intptr_t>(&softwareFault));
     }
 };
 
