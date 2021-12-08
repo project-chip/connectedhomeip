@@ -231,13 +231,24 @@ class CHIPToolActivity :
   private fun onReturnIntent(intent: Intent) {
     val appLinkData = intent.data
     // Require URI schema "mt:"
-    if (!appLinkData?.scheme.equals("mt")) return
+    if (!appLinkData?.scheme.equals("mt", true)) {
+      Log.d(TAG, "Unrecognized URI schema : ${appLinkData?.scheme}")
+      return
+    }
     // Require URI host "modelinfo"
-    if (!appLinkData?.host.equals("modelinfo")) return
+    if (!appLinkData?.host.equals("modelinfo", true)) {
+      Log.d(TAG, "Unrecognized URI host : ${appLinkData?.host}")
+      return
+    }
 
     // parse payload
     try {
       val payloadBase64String = appLinkData?.getQueryParameter("payload")
+      if (payloadBase64String.isNullOrEmpty()) {
+        Log.d(TAG, "Unrecognized payload")
+        return
+      }
+
       val decodeBytes = Base64.decode(payloadBase64String, Base64.DEFAULT)
       val payloadString = String(decodeBytes)
       val payload = JSONObject(payloadString)
