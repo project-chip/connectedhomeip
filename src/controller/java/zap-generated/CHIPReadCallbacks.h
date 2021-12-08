@@ -1045,6 +1045,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPDoorLockLockStateAttributeCallback : public chip::Callback::Callback<CHIPDoorLockClusterLockStateAttributeCallbackType>
+{
+public:
+    CHIPDoorLockLockStateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPDoorLockLockStateAttributeCallback();
+
+    static void maybeDestroy(CHIPDoorLockLockStateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPDoorLockLockStateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPDoorLockAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPDoorLockClusterAttributeListAttributeCallbackType>
 {
@@ -1562,6 +1586,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback
+    : public chip::Callback::Callback<CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackType>
+{
+public:
+    CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback();
+
+    static void maybeDestroy(CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPIlluminanceMeasurementLightSensorTypeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPIlluminanceMeasurementAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPIlluminanceMeasurementClusterAttributeListAttributeCallbackType>
 {
@@ -1610,6 +1658,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPLevelControlOnLevelAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterOnLevelAttributeCallbackType>
+{
+public:
+    CHIPLevelControlOnLevelAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlOnLevelAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlOnLevelAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlOnLevelAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPLevelControlOnTransitionTimeAttributeCallback
     : public chip::Callback::Callback<CHIPLevelControlClusterOnTransitionTimeAttributeCallbackType>
 {
@@ -1652,6 +1724,30 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPLevelControlDefaultMoveRateAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterDefaultMoveRateAttributeCallbackType>
+{
+public:
+    CHIPLevelControlDefaultMoveRateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlDefaultMoveRateAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlDefaultMoveRateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlDefaultMoveRateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 
 private:
     jobject javaCallbackRef;
@@ -2684,6 +2780,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPTestClusterNullableBitmap8AttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap8AttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableBitmap8AttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableBitmap8AttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableBitmap8AttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableBitmap8AttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPTestClusterNullableBitmap16AttributeCallback
     : public chip::Callback::Callback<CHIPTestClusterClusterNullableBitmap16AttributeCallbackType>
 {
@@ -2750,6 +2870,30 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterNullableInt8uAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableInt8uAttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableInt8uAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableInt8uAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableInt8uAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableInt8uAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 
 private:
     jobject javaCallbackRef;
@@ -3116,6 +3260,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPTestClusterNullableEnum8AttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableEnum8AttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableEnum8AttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableEnum8AttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableEnum8AttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableEnum8AttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPTestClusterNullableEnum16AttributeCallback
     : public chip::Callback::Callback<CHIPTestClusterClusterNullableEnum16AttributeCallbackType>
 {
@@ -3230,6 +3398,55 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterNullableEnumAttrAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableEnumAttrAttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableEnumAttrAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableEnumAttrAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableEnumAttrAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableEnumAttrAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableRangeRestrictedInt8uAttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableRangeRestrictedInt8uAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 
 private:
     jobject javaCallbackRef;

@@ -52,7 +52,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
 
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label)}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=parent.parent.name}}
     {{/chip_cluster_command_arguments}}
 
     {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name false}}Cluster{{asUpperCamelCase responseName false}}{{else}}DefaultSuccess{{/if}}{{/inline}}
@@ -93,7 +93,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     TypeInfo::Type cppValue;
 
-    {{>encode_value target="cppValue" source="value"}}
+    {{>encode_value target="cppValue" source="value" cluster=parent.name}}
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
