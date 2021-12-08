@@ -388,6 +388,8 @@ protected:
 
     uint16_t mVendorId;
 
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
 
@@ -819,8 +821,6 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
-
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace Controller

@@ -153,6 +153,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
         .clientPool     = &mCASEClientPool,
         .imDelegate     = params.systemState->IMDelegate(),
+        .mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Value(mMRPConfig),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {

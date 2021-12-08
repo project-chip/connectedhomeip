@@ -35,6 +35,8 @@ struct CASEClientInitParams
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
     FabricInfo * fabricInfo                  = nullptr;
+
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 };
 
 class DLL_EXPORT CASEClient : public SessionEstablishmentDelegate
