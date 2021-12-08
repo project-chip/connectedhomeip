@@ -155,7 +155,7 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
 }
 
 bool applicationBasicClusterChangeApplicationStatus(chip::EndpointId endpoint,
-                                                    app::Clusters::ApplicationBasic::ApplicationBasicStatus status, )
+                                                    app::Clusters::ApplicationBasic::ApplicationBasicStatus status)
 {
     // TODO: Insert code here
     ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", to_underlying(status), endpoint);
