@@ -252,12 +252,12 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
-            auto status = (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
-                                                            : Protocols::InteractionModel::Status::Failure;
-            AddStatus(concretePath, status);
-            return CHIP_NO_ERROR;
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }
     }
 
