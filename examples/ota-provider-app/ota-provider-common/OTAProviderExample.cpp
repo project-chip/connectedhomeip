@@ -33,6 +33,7 @@ using chip::ByteSpan;
 using chip::CharSpan;
 using chip::FabricIndex;
 using chip::FabricInfo;
+using chip::MutableCharSpan;
 using chip::NodeId;
 using chip::Optional;
 using chip::Server;
@@ -62,18 +63,18 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
     }
 }
 
-bool GenerateBdxUri(NodeId nodeId, const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
+bool GenerateBdxUri(NodeId nodeId, CharSpan fileDesignator, MutableCharSpan outUri)
 {
     static constexpr char bdxPrefix[] = "bdx://";
     size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
     size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + 1 + fileDesignator.size();
 
-    if (expectedLength >= availableSize)
+    if (expectedLength >= outUri.size())
     {
         return false;
     }
 
-    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "/%s", bdxPrefix,
+    size_t written = static_cast<size_t>(snprintf(outUri.data(), outUri.size(), "%s" ChipLogFormatX64 "/%s", bdxPrefix,
                                                   ChipLogValueX64(nodeId), fileDesignator.data()));
 
     return expectedLength == written;
@@ -126,8 +127,9 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
 
         // Only doing BDX transport for now
-        GenerateBdxUri(nodeId, Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, kUriMaxLen), kUriMaxLen);
-        ChipLogDetail(SoftwareUpdate, "generated URI: %.*s", static_cast<int>(strlen(uriBuf)), uriBuf);
+        MutableCharSpan uri(uriBuf, kUriMaxLen);
+        GenerateBdxUri(nodeId, CharSpan(mOTAFilePath, strlen(mOTAFilePath)), uri);
+        ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
     }
 
     // Set Status for the Query Image Response

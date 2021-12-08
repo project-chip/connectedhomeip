@@ -16,6 +16,8 @@
  *    limitations under the License.
  */
 
+#include <app/CASEClientPool.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/Server.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -29,6 +31,7 @@
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
+using chip::CASEClientPool;
 using chip::CharSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
@@ -37,6 +40,7 @@ using chip::LinuxOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
+using chip::OperationalDeviceProxyPool;
 using chip::OTADownloader;
 using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
@@ -50,10 +54,15 @@ using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
-OTARequestor requestorCore;
-LinuxOTARequestorDriver requestorUser;
-BDXDownloader downloader;
-LinuxOTAImageProcessor imageProcessor;
+constexpr size_t kMaxActiveCaseClients = 2;
+constexpr size_t kMaxActiveDevices     = 8;
+
+OTARequestor gRequestorCore;
+LinuxOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+LinuxOTAImageProcessor gImageProcessor;
+CASEClientPool<kMaxActiveCaseClients> gCASEClientPool;
+OperationalDeviceProxyPool<kMaxActiveDevices> gDevicePool;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
@@ -191,10 +200,16 @@ int main(int argc, char * argv[])
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&requestorCore);
+    SetRequestorInstance(&gRequestorCore);
+
+    // Set server instance used for session establishment
+    chip::Server * server = &(chip::Server::GetInstance());
+    server->SetCASEClientPool(&gCASEClientPool);
+    server->SetDevicePool(&gDevicePool);
+    gRequestorCore.SetServerInstance(server);
 
     // Connect the Requestor and Requestor Driver objects
-    requestorCore.SetOtaRequestorDriver(&requestorUser);
+    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
@@ -202,20 +217,20 @@ int main(int argc, char * argv[])
     // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan("test.txt");
-    imageProcessor.SetOTAImageProcessorParams(ipParams);
-    imageProcessor.SetOTADownloader(&downloader);
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
 
     // Connect the Downloader and Image Processor objects
-    downloader.SetImageProcessorDelegate(&imageProcessor);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 
-    requestorCore.SetBDXDownloader(&downloader);
+    gRequestorCore.SetBDXDownloader(&gDownloader);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     // Test Mode operation: If a delay is provided, QueryImage after the timer expires
     if (delayQueryTimeInSec > 0)
     {
         // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        requestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
+        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
 
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);

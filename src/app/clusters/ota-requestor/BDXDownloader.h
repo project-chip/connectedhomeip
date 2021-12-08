@@ -33,6 +33,13 @@
 
 namespace chip {
 
+// Constants for BDX URI parsing
+constexpr uint8_t bdxPrefix[]         = { 'b', 'd', 'x', ':', '/', '/' };
+constexpr uint8_t bdxSeparator[]      = { '/' };
+constexpr uint8_t kValidBdxUriMinLen  = 24;
+constexpr uint8_t kNodeIdHexStringLen = 16;
+constexpr size_t kUriMaxLen           = 256;
+
 class BDXDownloader : public chip::OTADownloader
 {
 public:
@@ -64,6 +71,11 @@ public:
     void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) override;
     CHIP_ERROR FetchNextData() override;
     // TODO: override SkipData
+
+    /**
+     * Validate the URI and parse the BDX URI for various fields
+     */
+    CHIP_ERROR ParseBdxUri(CharSpan uri, NodeId & nodeId, MutableCharSpan fileDesignator);
 
 private:
     void PollTransferSession();

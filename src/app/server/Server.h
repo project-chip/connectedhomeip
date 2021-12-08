@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
@@ -64,6 +66,20 @@ public:
     CHIP_ERROR AddTestCommissioning();
 
     FabricTable & GetFabricTable() { return mFabrics; }
+
+    CASEClientPoolDelegate * GetCASEClientPool() { return mCASEClientPool; }
+
+    void SetCASEClientPool(CASEClientPoolDelegate * clientPool)
+    {
+        mCASEClientPool = clientPool;
+    }
+
+    OperationalDeviceProxyPoolDelegate * GetDevicePool() { return mDevicePool; }
+
+    void SetDevicePool(OperationalDeviceProxyPoolDelegate * devicePool)
+    {
+        mDevicePool = devicePool;
+    }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -131,6 +147,8 @@ private:
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
+    CASEClientPoolDelegate * mCASEClientPool = nullptr;
+    OperationalDeviceProxyPoolDelegate * mDevicePool = nullptr;
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;

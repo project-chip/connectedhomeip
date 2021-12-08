@@ -23,6 +23,7 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
+#include <app/server/Server.h>
 #include <protocols/bdx/BdxMessages.h>
 
 #include "BDXDownloader.h"
@@ -30,8 +31,6 @@
 #include "OTARequestorInterface.h"
 
 namespace chip {
-
-using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 // This class implements all of the core logic of the OTA Requestor
 class OTARequestor : public OTARequestorInterface
@@ -75,7 +74,14 @@ public:
     // Virtual functions from OTARequestorInterface -- end
 
     /**
-     * Called to establish a session to mProviderNodeId on mProviderFabricIndex
+     * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
+     * BDX transfers
+     */
+    void SetServerInstance(Server * server) { mServer = server; }
+
+    /**
+     * Called to establish a session to mProviderNodeId on mProviderFabricIndex. This must be called from the same externally
+     * synchronized context as any other Matter stack method.
      *
      * @param onConnectedAction  The action to take once session to provider has been established
      */
@@ -165,11 +171,6 @@ private:
     CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
 
     /**
-     * Validate the URI and parse the BDX URI for various fields
-     */
-    CHIP_ERROR ParseBdxUri(CharSpan uri, NodeId & nodeId, CharSpan & fileDesignator);
-
-    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -180,7 +181,9 @@ private:
     /**
      * QueryImage callbacks
      */
-    static void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
+    static void
+    OnQueryImageResponse(void * context,
+                         const app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
     static void OnQueryImageFailure(void * context, EmberAfStatus status);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
@@ -192,6 +195,7 @@ private:
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    Server * mServer = nullptr;
 };
 
 } // namespace chip
