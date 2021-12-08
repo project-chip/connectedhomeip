@@ -388,6 +388,7 @@ CHIP_ERROR CommandHandler::ProcessGroupCommandDataIB(CommandDataIB::Parser & aCo
             continue;
         }
     }
+    iterator->Release();
 
 exit:
     return CHIP_NO_ERROR;
