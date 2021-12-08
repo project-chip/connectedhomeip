@@ -261,8 +261,7 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
 
     err = writeClientHandle.SendWriteRequest(groupSession);
 
-    // Write will fail until issue #11078 is completed
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     // The internal WriteClient should be shutdown once we SendWriteRequest for group.
     NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
 }

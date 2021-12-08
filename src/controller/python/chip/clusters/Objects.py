@@ -4761,7 +4761,7 @@ class BridgedActions(Cluster):
             kUnknown = 0x00
             kInterrupted = 0x01
 
-        class ActionStatusEnum(IntEnum):
+        class ActionStateEnum(IntEnum):
             kInactive = 0x00
             kActive = 0x01
             kPaused = 0x02
@@ -4794,7 +4794,7 @@ class BridgedActions(Cluster):
                             ClusterObjectFieldDescriptor(Label="type", Tag=3, Type=BridgedActions.Enums.ActionTypeEnum),
                             ClusterObjectFieldDescriptor(Label="endpointListID", Tag=4, Type=uint),
                             ClusterObjectFieldDescriptor(Label="supportedCommands", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="status", Tag=6, Type=BridgedActions.Enums.ActionStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=6, Type=BridgedActions.Enums.ActionStateEnum),
                     ])
 
             actionID: 'uint' = 0
@@ -4802,7 +4802,7 @@ class BridgedActions(Cluster):
             type: 'BridgedActions.Enums.ActionTypeEnum' = 0
             endpointListID: 'uint' = 0
             supportedCommands: 'uint' = 0
-            status: 'BridgedActions.Enums.ActionStatusEnum' = 0
+            status: 'BridgedActions.Enums.ActionStateEnum' = 0
 
         @dataclass
         class EndpointListStruct(ClusterObject):
@@ -5121,6 +5121,55 @@ class BridgedActions(Cluster):
             value: 'uint' = 0
 
 
+    class Events:
+        @dataclass
+        class StateChanged(ClusterEventDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0025
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
+                    ])
+
+            actionID: 'uint' = 0
+            invokeID: 'uint' = 0
+            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
+
+        @dataclass
+        class ActionFailed(ClusterEventDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0025
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
+                            ClusterObjectFieldDescriptor(Label="error", Tag=3, Type=BridgedActions.Enums.ActionErrorEnum),
+                    ])
+
+            actionID: 'uint' = 0
+            invokeID: 'uint' = 0
+            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
+            error: 'BridgedActions.Enums.ActionErrorEnum' = 0
+
 
 @dataclass
 class Basic(Cluster):
@@ -5130,49 +5179,10 @@ class Basic(Cluster):
 
     class Commands:
         @dataclass
-        class StartUp(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
-
-        @dataclass
         class MfgSpecificPing(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0028
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
-
-        @dataclass
-        class ShutDown(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                    ])
-
-
-        @dataclass
-        class Leave(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            command_id: typing.ClassVar[int] = 0x0002
-            is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5523,8 +5533,13 @@ class Basic(Cluster):
     class Events:
         @dataclass
         class StartUp(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0028
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5537,8 +5552,13 @@ class Basic(Cluster):
 
         @dataclass
         class ShutDown(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0028
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5549,8 +5569,13 @@ class Basic(Cluster):
 
         @dataclass
         class Leave(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0028
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5561,8 +5586,13 @@ class Basic(Cluster):
 
         @dataclass
         class ReachableChanged(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0028
-            event_id: typing.ClassVar[int] = 0x00000003
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0028
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5865,8 +5895,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
     class Events:
         @dataclass
         class StateTransition(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x002A
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002A
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5885,8 +5920,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
         @dataclass
         class VersionApplied(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x002A
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002A
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -5901,8 +5941,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
         @dataclass
         class DownloadError(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x002A
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002A
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7612,8 +7657,13 @@ class GeneralDiagnostics(Cluster):
     class Events:
         @dataclass
         class HardwareFaultChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0033
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0033
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7628,8 +7678,13 @@ class GeneralDiagnostics(Cluster):
 
         @dataclass
         class RadioFaultChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0033
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0033
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7644,8 +7699,13 @@ class GeneralDiagnostics(Cluster):
 
         @dataclass
         class NetworkFaultChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0033
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0033
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7660,8 +7720,13 @@ class GeneralDiagnostics(Cluster):
 
         @dataclass
         class BootReason(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0033
-            event_id: typing.ClassVar[int] = 0x00000003
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0033
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -7831,8 +7896,13 @@ class SoftwareDiagnostics(Cluster):
     class Events:
         @dataclass
         class SoftwareFault(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0034
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0034
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9044,8 +9114,13 @@ class ThreadNetworkDiagnostics(Cluster):
     class Events:
         @dataclass
         class ConnectionStatus(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0035
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0035
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9350,8 +9425,13 @@ class WiFiNetworkDiagnostics(Cluster):
     class Events:
         @dataclass
         class Disconnection(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0036
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0036
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9364,8 +9444,13 @@ class WiFiNetworkDiagnostics(Cluster):
 
         @dataclass
         class AssociationFailure(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0036
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0036
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -9380,8 +9465,13 @@ class WiFiNetworkDiagnostics(Cluster):
 
         @dataclass
         class ConnectionStatus(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0036
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0036
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10075,8 +10165,13 @@ class Switch(Cluster):
     class Events:
         @dataclass
         class SwitchLatched(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10089,8 +10184,13 @@ class Switch(Cluster):
 
         @dataclass
         class InitialPress(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10103,8 +10203,13 @@ class Switch(Cluster):
 
         @dataclass
         class LongPress(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10117,8 +10222,13 @@ class Switch(Cluster):
 
         @dataclass
         class ShortRelease(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000003
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10131,8 +10241,13 @@ class Switch(Cluster):
 
         @dataclass
         class LongRelease(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000004
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10145,8 +10260,13 @@ class Switch(Cluster):
 
         @dataclass
         class MultiPressOngoing(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000005
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000005
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10161,8 +10281,13 @@ class Switch(Cluster):
 
         @dataclass
         class MultiPressComplete(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x003B
-            event_id: typing.ClassVar[int] = 0x00000006
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003B
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000006
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -10181,6 +10306,11 @@ class AdministratorCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x003C
 
     class Enums:
+        class CommissioningWindowStatus(IntEnum):
+            kWindowNotOpen = 0x00
+            kEnhancedWindowOpen = 0x01
+            kBasicWindowOpen = 0x02
+
         class StatusCode(IntEnum):
             kBusy = 0x01
             kPAKEParameterError = 0x02
@@ -10244,6 +10374,54 @@ class AdministratorCommissioning(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class WindowStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class AdminFabricIndex(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class AdminVendorId(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -11110,8 +11288,13 @@ class BooleanState(Cluster):
     class Events:
         @dataclass
         class StateChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0045
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0045
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13200,8 +13383,13 @@ class DoorLock(Cluster):
     class Events:
         @dataclass
         class DoorLockAlarm(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0101
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0101
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13214,8 +13402,13 @@ class DoorLock(Cluster):
 
         @dataclass
         class DoorStateChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0101
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0101
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13228,8 +13421,13 @@ class DoorLock(Cluster):
 
         @dataclass
         class LockOperation(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0101
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0101
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13252,8 +13450,13 @@ class DoorLock(Cluster):
 
         @dataclass
         class LockOperationError(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0101
-            event_id: typing.ClassVar[int] = 0x00000003
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0101
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13278,8 +13481,13 @@ class DoorLock(Cluster):
 
         @dataclass
         class LockUserChange(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0101
-            event_id: typing.ClassVar[int] = 0x00000004
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0101
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14555,8 +14763,13 @@ class PumpConfigurationAndControl(Cluster):
     class Events:
         @dataclass
         class SupplyVoltageLow(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000000
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14567,8 +14780,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class SupplyVoltageHigh(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14579,8 +14797,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class PowerMissingPhase(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000002
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000002
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14591,8 +14814,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class SystemPressureLow(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000003
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000003
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14603,8 +14831,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class SystemPressureHigh(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000004
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000004
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14615,8 +14848,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class DryRunning(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000005
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000005
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14627,8 +14865,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class MotorTemperatureHigh(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000006
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000006
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14639,8 +14882,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class PumpMotorFatalFailure(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000007
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000007
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14651,8 +14899,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class ElectronicTemperatureHigh(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000008
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000008
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14663,8 +14916,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class PumpBlocked(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000009
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000009
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14675,8 +14933,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class SensorFailure(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000A
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000A
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14687,8 +14950,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class ElectronicNonFatalFailure(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000B
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000B
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14699,8 +14967,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class ElectronicFatalFailure(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000C
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000C
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14711,8 +14984,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class GeneralFault(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000D
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000D
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14723,8 +15001,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class Leakage(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000E
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000E
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14735,8 +15018,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class AirDetection(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x0000000F
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x0000000F
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -14747,8 +15035,13 @@ class PumpConfigurationAndControl(Cluster):
 
         @dataclass
         class TurbineOperation(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x0200
-            event_id: typing.ClassVar[int] = 0x00000010
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0200
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000010
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -25124,6 +25417,21 @@ class TestCluster(Cluster):
             arg1: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
+        class TestEmitTestEventResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x000A
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="value", Tag=0, Type=uint),
+                    ])
+
+            value: 'uint' = 0
+
+        @dataclass
         class TestNestedStructListArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x000B
@@ -25279,6 +25587,25 @@ class TestCluster(Cluster):
                     ])
 
             arg1: 'typing.Optional[bool]' = None
+
+        @dataclass
+        class TestEmitTestEventRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0014
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="arg1", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
+                            ClusterObjectFieldDescriptor(Label="arg3", Tag=2, Type=bool),
+                    ])
+
+            arg1: 'uint' = 0
+            arg2: 'TestCluster.Enums.SimpleEnum' = 0
+            arg3: 'bool' = False
 
 
     class Attributes:
@@ -26566,8 +26893,13 @@ class TestCluster(Cluster):
     class Events:
         @dataclass
         class TestEvent(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = 0x050F
-            event_id: typing.ClassVar[int] = 0x00000001
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:

@@ -157,6 +157,7 @@ def HostTargets():
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
         HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
+        HostBuildVariant(name="test-group", test_group=True),
         HostBuildVariant(name="same-event-loop",
                          validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
     ]
@@ -285,7 +286,7 @@ def AndroidTargets():
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
 
 
 def MbedTargets():

@@ -17,12 +17,9 @@
  */
 
 /**
- *    @file
- *      This file defines the chip::System::Timer class and its
- *      related types used for representing an in-progress one-shot
- *      timer.
- *
- *      Some platforms use this to implement System::Layer timer events.
+ *  This file defines the chip::System::Timer class and related types that can be used for representing
+ *  an in-progress one-shot timer. Implementations of System::Layer may (but are not required to) use
+ *  these for their versions of timer events.
  */
 
 #pragma once
@@ -36,166 +33,45 @@
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
-#include <system/SystemMutex.h>
+#include <system/SystemLayer.h>
 #include <system/SystemStats.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
 #include <dispatch/dispatch.h>
 #endif
 
-#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-#include <mutex>
-#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-
 namespace chip {
 namespace System {
 
 class Layer;
 
-using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
-
-#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-
 /**
- * This is an Object-pool based class that System::Layer implementations can use to assist in providing timer functions.
+ * Basic Timer information: time and callback.
  */
-class DLL_EXPORT Timer
+class DLL_EXPORT TimerData
 {
 public:
-    /**
-     * List of timers ordered by completion time.
-     *
-     * @note
-     *  This is an intrusive linked list, using the Timer field `mNextTimer`.
-     */
-    class List
+    class Callback
     {
     public:
-        List() : mHead(nullptr) {}
-        List(Timer * head) : mHead(head) {}
-
-        /**
-         * Add a timer to the list
-         *
-         * @return  The new earliest timer in the list. If this is the newly added timer, that implies it is earlier
-         *          than any existing timer.
-         */
-        Timer * Add(Timer * add);
-
-        /**
-         * Remove the given timer from the list, if present. It is not an error for the timer not to be present.
-         *
-         * @return  The new earliest timer in the list, or nullptr if the list is empty.
-         */
-        Timer * Remove(Timer * remove);
-
-        /**
-         * Remove the first timer with the given properties, if present. It is not an error for no such timer to be present.
-         *
-         * @return  The removed timer, or nullptr if the list contains no matching timer.
-         */
-        Timer * Remove(TimerCompleteCallback onComplete, void * appState);
-
-        /**
-         * Remove and return the earliest timer in the list.
-         *
-         * @return  The earliest timer, or nullptr if the list is empty.
-         */
-        Timer * PopEarliest();
-
-        /**
-         * Remove and return the earliest timer in the list, provided it expires earlier than the given time @a t.
-         *
-         * @return  The earliest timer expiring before @a t, or nullptr if there is no such timer.
-         */
-        Timer * PopIfEarlier(Clock::Timestamp t);
-
-        /**
-         * Remove and return all timers that expire before the given time @a t.
-         *
-         * @return  An ordered linked list (by `mNextTimer`) of all timers that expire before @a t, or nullptr if there are none.
-         */
-        Timer * ExtractEarlier(Clock::Timestamp t);
-
-        /**
-         * Get the earliest timer in the list.
-         */
-        Timer * Earliest() const { return mHead; }
-
-    protected:
-        Timer * mHead;
-        List(const List &) = delete;
-        List & operator=(const List &) = delete;
-    };
-    /**
-     * List of timers ordered by completion time.
-     *
-     * This extends Timer::List to lock all access to the list.
-     */
-    class MutexedList : private List
-    {
-    public:
-        MutexedList() = default;
-        CHIP_ERROR Init();
-        bool Empty() const
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return mHead == nullptr;
-        }
-        Timer * Add(Timer * add)
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::Add(add);
-        }
-        Timer * Remove(Timer * remove)
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::Remove(remove);
-        }
-        Timer * Remove(TimerCompleteCallback onComplete, void * appState)
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::Remove(onComplete, appState);
-        }
-        Timer * PopEarliest()
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::PopEarliest();
-        }
-        Timer * PopIfEarlier(Clock::Timestamp t)
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::PopIfEarlier(t);
-        }
-        Timer * ExtractEarlier(Clock::Timestamp t)
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return List::ExtractEarlier(t);
-        }
-        Timer * Earliest() const
-        {
-            std::lock_guard<Mutex> lock(mMutex);
-            return mHead;
-        }
+        Callback(Layer & systemLayer, TimerCompleteCallback onComplete, void * appState) :
+            mSystemLayer(&systemLayer), mOnComplete(onComplete), mAppState(appState)
+        {}
+        void Invoke() { mOnComplete(mSystemLayer, mAppState); }
+        const TimerCompleteCallback & GetOnComplete() const { return mOnComplete; }
+        void * GetAppState() const { return mAppState; }
+        Layer * GetSystemLayer() const { return mSystemLayer; }
 
     private:
-        mutable Mutex mMutex;
-        MutexedList(const MutexedList &) = delete;
-        MutexedList & operator=(const MutexedList &) = delete;
+        Layer * mSystemLayer;
+        TimerCompleteCallback mOnComplete;
+        void * mAppState;
     };
 
-    Timer() = default;
-
-    /**
-     * Obtain a new timer from the object pool.
-     */
-    static Timer * New(System::Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete,
-                       void * appState);
-
-    /**
-     * Return a timer to the object pool.
-     */
-    void Release();
+    TimerData(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) :
+        mAwakenTime(SystemClock().GetMonotonicTimestamp() + delay), mCallback(systemLayer, onComplete, appState)
+    {}
+    ~TimerData() = default;
 
     /**
      * Return the expiration time.
@@ -203,43 +79,13 @@ public:
     Clock::Timestamp AwakenTime() const { return mAwakenTime; }
 
     /**
-     * Fire the timer.
-     *
-     * This method is called by the underlying timer mechanism provided by the platform when the timer fires.
-     * It invalidates this timer object, calls Object::Release() on it, and invokes the callback.
+     * Return callback information.
      */
-    void HandleComplete();
-
-    /**
-     * Invalidate the timer fields. This is intended for timer cancellation, and typically this will be followed by
-     * an object Release().
-     *
-     * @note
-     *  The Timer owner is responsible for ensuring this timer is not in use, e.g. in a List or by a platform timer implementation.
-     */
-    void Clear();
-
-    /**
-     * Read timer pool statistics.
-     */
-    static void GetStatistics(Stats::count_t & aNumInUse, Stats::count_t & aHighWatermark)
-    {
-        aNumInUse      = mNumInUse;
-        aHighWatermark = mHighWatermark;
-    }
+    const Callback & GetCallback() const { return mCallback; }
 
 private:
-    friend class LayerImplLwIP;
-    static chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
-    static Stats::count_t mNumInUse;
-    static Stats::count_t mHighWatermark;
-
-    TimerCompleteCallback mOnComplete;
     Clock::Timestamp mAwakenTime;
-    Timer * mNextTimer;
-
-    Layer * mSystemLayer;
-    void * mAppState;
+    Callback mCallback;
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
     friend class LayerImplSelect;
@@ -247,11 +93,139 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 
     // Not defined
-    Timer(const Timer &) = delete;
-    Timer & operator=(const Timer &) = delete;
+    TimerData(const TimerData &) = delete;
+    TimerData & operator=(const TimerData &) = delete;
 };
 
-#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
+/**
+ * List of `Timer`s ordered by expiration time.
+ */
+class TimerList
+{
+public:
+    class Node : public TimerData
+    {
+    public:
+        Node(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState) :
+            TimerData(systemLayer, delay, onComplete, appState), mNextTimer(nullptr)
+        {}
+        Node * mNextTimer;
+    };
+
+    TimerList() : mEarliestTimer(nullptr) {}
+
+    /**
+     * Add a timer to the list
+     *
+     * @return  The new earliest timer in the list. If this is the newly added timer, that implies it is earlier
+     *          than any existing timer.
+     */
+    Node * Add(Node * timer);
+
+    /**
+     * Remove the given timer from the list, if present. It is not an error for the timer not to be present.
+     *
+     * @return  The new earliest timer in the list, or nullptr if the list is empty.
+     */
+    Node * Remove(Node * remove);
+
+    /**
+     * Remove the first timer with the given properties, if present. It is not an error for no such timer to be present.
+     *
+     * @return  The removed timer, or nullptr if the list contains no matching timer.
+     */
+    Node * Remove(TimerCompleteCallback onComplete, void * appState);
+
+    /**
+     * Remove and return the earliest timer in the list.
+     *
+     * @return  The earliest timer, or nullptr if the list is empty.
+     */
+    Node * PopEarliest();
+
+    /**
+     * Remove and return the earliest timer in the list, provided it expires earlier than the given time @a t.
+     *
+     * @return  The earliest timer expiring before @a t, or nullptr if there is no such timer.
+     */
+    Node * PopIfEarlier(Clock::Timestamp t);
+
+    /**
+     * Get the earliest timer in the list.
+     *
+     * @return  The earliest timer, or nullptr if there are no timers.
+     */
+    Node * Earliest() const { return mEarliestTimer; }
+
+    /**
+     * Test whether there are any timers.
+     */
+    bool Empty() const { return mEarliestTimer != nullptr; }
+
+    /**
+     * Remove and return all timers that expire before the given time @a t.
+     */
+    TimerList ExtractEarlier(Clock::Timestamp t);
+
+    /**
+     * Remove all timers.
+     */
+    void Clear() { mEarliestTimer = nullptr; }
+
+private:
+    Node * mEarliestTimer;
+};
+
+/**
+ * ObjectPool wrapper that keeps System Timer statistics.
+ */
+template <typename T = TimerList::Node>
+class TimerPool
+{
+public:
+    using Timer = T;
+
+    /**
+     * Create a new timer from the pool.
+     */
+    Timer * Create(Layer & systemLayer, System::Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+    {
+        Timer * timer = mTimerPool.CreateObject(systemLayer, delay, onComplete, appState);
+        SYSTEM_STATS_INCREMENT(Stats::kSystemLayer_NumTimers);
+        return timer;
+    }
+
+    /**
+     * Release a timer to the pool.
+     */
+    void Release(Timer * timer)
+    {
+        SYSTEM_STATS_DECREMENT(Stats::kSystemLayer_NumTimers);
+        mTimerPool.ReleaseObject(timer);
+    }
+
+    /**
+     * Release all timers.
+     */
+    void ReleaseAll()
+    {
+        SYSTEM_STATS_RESET(Stats::kSystemLayer_NumTimers);
+        mTimerPool.ReleaseAll();
+    }
+
+    /**
+     * Release a timer to the pool and invoke its callback.
+     */
+    void Invoke(Timer * timer)
+    {
+        typename Timer::Callback callback = timer->GetCallback();
+        Release(timer);
+        callback.Invoke();
+    }
+
+private:
+    ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> mTimerPool;
+};
 
 } // namespace System
 } // namespace chip

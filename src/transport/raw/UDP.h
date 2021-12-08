@@ -115,6 +115,13 @@ public:
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
 
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override;
+
+    bool CanListenMulticast() override
+    {
+        return (mState == State::kInitialized) && (mUDPEndpointType == Inet::IPAddressType::kIPv6);
+    }
+
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
         return (mState == State::kInitialized) && (address.GetTransportType() == Type::kUdp) &&

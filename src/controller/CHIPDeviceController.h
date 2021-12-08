@@ -492,9 +492,14 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] rendezvousParams      The Rendezvous connection parameters
-     * @param[in] commssioningParams    The commissioning parameters (uses defualt if not supplied)
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    /**
+     * @overload
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commissioningParams    The commissioning parameters (uses default if not supplied)
+     */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                           CommissioningParameters & commissioningParams);
 
@@ -514,7 +519,7 @@ public:
      *   OnPairingComplete will be called with an error.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] params                The Rendezvous connection parameters
      */
     CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
 
@@ -810,6 +815,8 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
+
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace Controller

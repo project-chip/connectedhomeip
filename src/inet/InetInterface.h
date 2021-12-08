@@ -59,6 +59,18 @@ class IPAddress;
 class IPPrefix;
 
 /**
+ * Data type describing interface type.
+ */
+enum class InterfaceType
+{
+    Unknown  = 0,
+    WiFi     = 1,
+    Ethernet = 2,
+    Cellular = 3,
+    Thread   = 4,
+};
+
+/**
  * Indicator for system network interfaces.
  */
 class InterfaceId
@@ -298,6 +310,22 @@ public:
      *          if not, or if the iterator is positioned beyond the end of the list.
      */
     bool HasBroadcastAddress();
+
+    /**
+     * Get the interface type of the current network interface.
+     *
+     * @param[out]   type       Object to save the interface type.
+     */
+    CHIP_ERROR GetInterfaceType(InterfaceType & type);
+
+    /**
+     * Get the hardware address of the current network interface
+     *
+     * @param[out]   addressBuffer       Region of memory to write the hardware address.
+     * @param[out]   addressSize         Size of the address saved to a buffer.
+     * @param[in]    addressBufferSize   Maximum size of a buffer to save data.
+     */
+    CHIP_ERROR GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize);
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

@@ -29,7 +29,6 @@ aef
 AES
 algs
 alloc
-ameba
 Ameba
 amebad
 amebaiot
@@ -88,7 +87,6 @@ BeagleBone
 befc
 bitbake
 bld
-ble
 BLE
 BleApplicationDelegate
 BleLayer
@@ -160,7 +158,6 @@ CHIPTest
 CHIPTool
 chmod
 chrpath
-cipd
 CIPD
 CircleCI
 cJTAG
@@ -331,7 +328,6 @@ ee
 EEE
 eef
 ef
-efr
 EFR
 eg
 EjQ
@@ -347,6 +343,7 @@ eno
 entrypoint
 enum
 env
+eq
 esd
 ESPPORT
 Espressif
@@ -390,7 +387,6 @@ flashdebug
 focusable
 forkpty
 formatOnSave
-fota
 FOTA
 FreeRTOS
 FreeRTOSConfig
@@ -421,7 +417,6 @@ gn
 GND
 gni
 GNinja
-gnuarmemb
 GNUARMEMB
 gnueabihf
 googleapis
@@ -463,7 +458,6 @@ ifdef
 ifdefs
 IGMP
 ihex
-im
 IM
 imager
 imagetool
@@ -501,7 +495,6 @@ itemName
 iterable
 JDK
 jinja
-jlink
 JLink
 JLinkExe
 JLinkRTTClient
@@ -654,6 +647,7 @@ navpad
 ncs
 nding
 NDK
+netcmp
 netif
 netplan
 NetworkCommissioning
@@ -856,12 +850,11 @@ ScriptBinding
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
-segger
 SEGGER
 semver
 sendto
@@ -932,7 +925,6 @@ sysconfdir
 SysConfig
 sysctl
 sysdeps
-sysroot
 SYSROOT
 systemctl
 systemd
@@ -992,7 +984,6 @@ ttyUSB
 TvChannel
 TXD
 txt
-uart
 UART
 udhcpc
 UDP
@@ -1001,7 +992,6 @@ udpPort
 ug
 ui
 uint
-unblur
 UNBLUR
 uncommissioned
 unfocus

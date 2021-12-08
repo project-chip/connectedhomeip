@@ -51,9 +51,6 @@ public:
 
     virtual bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const { return false; }
 
-    virtual CHIP_ERROR SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
-                                                Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter);
-
     virtual CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
                                                      uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback);

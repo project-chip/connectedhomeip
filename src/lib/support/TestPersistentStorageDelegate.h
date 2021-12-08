@@ -23,6 +23,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DLLUtil.h>
 #include <map>
+#include <string>
 #include <vector>
 
 namespace chip {

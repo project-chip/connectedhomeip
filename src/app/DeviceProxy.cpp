@@ -74,34 +74,6 @@ void DeviceProxy::AddReportHandler(EndpointId endpoint, ClusterId cluster, Attri
     mCallbacksMgr.AddReportCallback(GetDeviceId(), endpoint, cluster, attribute, onReportCallback, tlvDataFilter);
 }
 
-CHIP_ERROR DeviceProxy::SendReadAttributeRequest(app::AttributePathParams aPath, Callback::Cancelable * onSuccessCallback,
-                                                 Callback::Cancelable * onFailureCallback, app::TLVDataFilter aTlvDataFilter)
-{
-    VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
-
-    app::ReadClient * readClient = nullptr;
-    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewReadClient(
-        &readClient, app::ReadClient::InteractionType::Read, &GetInteractionModelDelegate()->GetBufferedCallback()));
-
-    if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
-    {
-        AddIMResponseHandler(readClient, onSuccessCallback, onFailureCallback, aTlvDataFilter);
-    }
-    // The application context is used to identify different requests from client application the type of it is intptr_t, here we
-    // use the seqNum.
-    chip::app::ReadPrepareParams readPrepareParams(GetSecureSession().Value());
-    readPrepareParams.mpAttributePathParamsList    = &aPath;
-    readPrepareParams.mAttributePathParamsListSize = 1;
-
-    CHIP_ERROR err = readClient->SendReadRequest(readPrepareParams);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        CancelIMResponseHandler(readClient);
-    }
-    return err;
-}
-
 CHIP_ERROR DeviceProxy::SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
                                                       uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback)

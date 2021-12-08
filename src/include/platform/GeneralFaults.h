@@ -55,6 +55,7 @@ public:
 
     CHIP_ERROR add(const uint8_t value);
 
+    uint8_t * data() { return mData; }
     int size() const;
     uint8_t operator[](int index) const;
 

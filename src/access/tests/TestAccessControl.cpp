@@ -110,7 +110,7 @@ struct EntryData
     NodeId subjects[kMaxSubjects] = { 0 };
     Target targets[kMaxTargets]   = { { 0 } };
 
-    void Clear() { memset(this, 0, sizeof(*this)); }
+    void Clear() { *this = EntryData(); }
 
     bool IsEmpty() const { return authMode == AuthMode::kNone; }
 

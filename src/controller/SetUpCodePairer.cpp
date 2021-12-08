@@ -62,16 +62,6 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
         VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
     }
 
-    if (searchOverAll || rendezvousInformation == RendezvousInformationFlag::kOnNetwork)
-    {
-        if (CHIP_NO_ERROR ==
-            (err = StartDiscoverOverIP(isShort ? static_cast<uint16_t>((discriminator >> 8) & 0x0F) : discriminator, isShort)))
-        {
-            isRunning = true;
-        }
-        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
-    }
-
     if (searchOverAll || rendezvousInformation == RendezvousInformationFlag::kSoftAP)
     {
         if (CHIP_NO_ERROR == (err = StartDiscoverOverSoftAP(discriminator, isShort)))
@@ -80,6 +70,15 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
         }
         VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
     }
+
+    // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
+    // QR code flag.
+    if (CHIP_NO_ERROR ==
+        (err = StartDiscoverOverIP(isShort ? static_cast<uint16_t>((discriminator >> 8) & 0x0F) : discriminator, isShort)))
+    {
+        isRunning = true;
+    }
+    VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
 
     return isRunning ? CHIP_NO_ERROR : CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

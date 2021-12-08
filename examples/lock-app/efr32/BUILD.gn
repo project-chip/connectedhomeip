@@ -67,7 +67,10 @@ efr32_sdk("sdk") {
   ]
 
   if (chip_enable_pw_rpc) {
-    defines += [ "HAL_VCOM_ENABLE=1" ]
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
   }
 }
 

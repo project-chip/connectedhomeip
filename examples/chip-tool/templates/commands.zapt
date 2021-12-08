@@ -74,7 +74,15 @@ CHIP_ERROR LogValue(const char * label, size_t indent, chip::CharSpan value)
 
 CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
 {
-    ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    if (CHIP_NO_ERROR == chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
+    {
+        ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, buffer);
+    }
+    else
+    {
+      ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -197,25 +205,9 @@ static void OnBooleanAttributeReport(void * context, bool value)
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
 }
 
-static void OnBooleanAttributeResponse(void * context, bool value)
-{
-    OnBooleanAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt8uAttributeReport(void * context, uint8_t value)
 {
     ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
-}
-
-static void OnInt8uAttributeResponse(void * context, uint8_t value)
-{
-    OnInt8uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16uAttributeReport(void * context, uint16_t value)
@@ -223,25 +215,9 @@ static void OnInt16uAttributeReport(void * context, uint16_t value)
     ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 }
 
-static void OnInt16uAttributeResponse(void * context, uint16_t value)
-{
-    OnInt16uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt32uAttributeReport(void * context, uint32_t value)
 {
     ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
-}
-
-static void OnInt32uAttributeResponse(void * context, uint32_t value)
-{
-    OnInt32uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64uAttributeReport(void * context, uint64_t value)
@@ -249,25 +225,9 @@ static void OnInt64uAttributeReport(void * context, uint64_t value)
     ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 }
 
-static void OnInt64uAttributeResponse(void * context, uint64_t value)
-{
-    OnInt64uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt8sAttributeReport(void * context, int8_t value)
 {
     ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
-}
-
-static void OnInt8sAttributeResponse(void * context, int8_t value)
-{
-    OnInt8sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16sAttributeReport(void * context, int16_t value)
@@ -275,25 +235,9 @@ static void OnInt16sAttributeReport(void * context, int16_t value)
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 }
 
-static void OnInt16sAttributeResponse(void * context, int16_t value)
-{
-    OnInt16sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt32sAttributeReport(void * context, int32_t value)
 {
     ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
-}
-
-static void OnInt32sAttributeResponse(void * context, int32_t value)
-{
-    OnInt32sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64sAttributeReport(void * context, int64_t value)
@@ -301,38 +245,14 @@ static void OnInt64sAttributeReport(void * context, int64_t value)
     ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 }
 
-static void OnInt64sAttributeResponse(void * context, int64_t value)
-{
-    OnInt64sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnFloatAttributeReport(void * context, float value)
 {
     ChipLogProgress(chipTool, "Float attribute Response: %f", value);
 }
 
-static void OnFloatAttributeResponse(void * context, float value)
-{
-    OnFloatAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnDoubleAttributeReport(void * context, double value)
 {
     ChipLogProgress(chipTool, "Double attribute Response: %f", value);
-}
-
-static void OnDoubleAttributeResponse(void * context, double value)
-{
-    OnDoubleAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
@@ -345,41 +265,19 @@ static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan va
     }
 }
 
-static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
-{
-    OnOctetStringAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnCharStringAttributeReport(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+template <typename T>
+static void OnGeneralAttributeResponse(void * context, const char * label, T value)
 {
-    OnCharStringAttributeReport(context, value);
+    CHIP_ERROR err = LogValue(label, 0, value);
 
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
-{{#chip_client_clusters}}
-{{#chip_server_cluster_attributes}}
-{{#if isList}}
-static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
-{
-    CHIP_ERROR err = LogValue("On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
+    auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
 }
-
-{{/if}}
-{{/chip_server_cluster_attributes}}
-{{/chip_client_clusters}}
 
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
@@ -471,8 +369,6 @@ public:
 
     ~Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
     {
-      delete onSuccessCallback;
-      delete onFailureCallback;
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
@@ -481,16 +377,15 @@ public:
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute{{asUpperCamelCase name}}(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo>(this,
+          OnAttributeResponse,
+          OnDefaultFailure);
     }
 
-private:
-{{#if isList}}
-    chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse, this);
-{{else}}
-    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onSuccessCallback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
-{{/if}}
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback = new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
+    {
+        OnGeneralAttributeResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
+    }
 };
 
 {{#if isWritableAttribute}}

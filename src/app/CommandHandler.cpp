@@ -216,18 +216,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
+    ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
-    ClusterId clusterId;
-    CommandId commandId;
-    EndpointId endpointId;
+
+    // NOTE: errors may occur before the concrete command path is even fully decoded.
 
     err = aCommandElement.GetPath(&commandPath);
     SuccessOrExit(err);
 
-    err = commandPath.GetClusterId(&clusterId);
+    err = commandPath.GetClusterId(&concretePath.mClusterId);
     SuccessOrExit(err);
 
-    err = commandPath.GetCommandId(&commandId);
+    err = commandPath.GetCommandId(&concretePath.mCommandId);
     SuccessOrExit(err);
 
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
@@ -236,26 +236,24 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         // Issue 11075
 
         // Using endpoint 1 for test purposes
-        endpointId = 1;
-        err        = CHIP_NO_ERROR;
+        concretePath.mEndpointId = 1;
+        err                      = CHIP_NO_ERROR;
     }
     else
     {
-        err = commandPath.GetEndpointId(&endpointId);
+        err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     }
     SuccessOrExit(err);
 
-    VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
-                 err = CHIP_ERROR_INVALID_PROFILE_ID);
+    VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
 
     {
         Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
-        Access::RequestPath requestPath{ .cluster = clusterId, .endpoint = endpointId };
+        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
         if (err != CHIP_NO_ERROR)
         {
-            const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
             auto status = (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
                                                             : Protocols::InteractionModel::Status::Failure;
             AddStatus(concretePath, status);
@@ -269,37 +267,34 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
                       " Command=" ChipLogFormatMEI,
-                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         err = CHIP_NO_ERROR;
     }
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(DataManagement,
                       "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
-        const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
-        mpCallback->DispatchCommand(*this, ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader);
+        mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        const ConcreteCommandPath path(endpointId, clusterId, commandId);
-
         // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
         // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
         // TODO: The error code should be updated after #7072 added error codes required by IM.
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
-            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(clusterId),
-                          endpointId);
+            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(concretePath.mClusterId), concretePath.mEndpointId);
         }
 
         // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
-        AddStatus(path, Protocols::InteractionModel::Status::InvalidCommand);
+        AddStatus(concretePath, Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process

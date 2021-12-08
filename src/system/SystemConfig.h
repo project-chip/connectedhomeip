@@ -440,20 +440,6 @@ struct LwIPEvent;
 #endif /* CHIP_SYSTEM_CONFIG_NUM_TIMERS */
 
 /**
- *  @def CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
- *
- *  @brief
- *      This defines whether (1) or not (0) the implementation uses the System::Timer pool.
- */
-#ifndef CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-#if CHIP_SYSTEM_CONFIG_NUM_TIMERS > 0
-#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 1
-#else
-#define CHIP_SYSTEM_CONFIG_USE_TIMER_POOL 0
-#endif
-#endif /* CHIP_SYSTEM_CONFIG_USE_TIMER_POOL */
-
-/**
  *  @def CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
  *
  *  @brief

@@ -106,8 +106,8 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True
-                 ):
+                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
+                 test_group=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -130,6 +130,10 @@ class HostBuilder(GnBuilder):
 
         if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
+
+        if test_group:
+            self.extra_gn_options.append(
+                'chip_enable_group_messaging_tests=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

@@ -178,6 +178,10 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
+    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    {
+        return;
+    }
     mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
     mNodeData.mInterfaceId                  = mInterfaceId;
     mHasIP                                  = true;
