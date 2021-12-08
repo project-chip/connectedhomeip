@@ -151,7 +151,8 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
     {
         status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
-        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
+                       ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
     }
 
     bool reachable;

@@ -281,7 +281,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetReachable(bool & disabled)
     return ReadConfigValue(AndroidConfig::kConfigKey_Reachable, disabled);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize) 
+CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
 {
     size_t dateLen;
     return ReadConfigValueStr(AndroidConfig::kConfigKey_UniqueId, buf, bufSize, dateLen);
