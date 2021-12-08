@@ -19,6 +19,7 @@
 #include "basic.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <cstddef>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
 
@@ -31,6 +32,21 @@ using namespace chip::DeviceLayer;
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
     EmberAfStatus status;
+
+    char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
+    if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
+    {
+        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan(nodeLabel, strlen(nodeLabel)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
+    }
+
+    char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
+    size_t codeLen = 0;
+    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
+    {
+        status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
+    }
 
     char vendorName[DeviceLayer::ConfigurationManager::kMaxVendorNameLength + 1];
     if (ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName)) == CHIP_NO_ERROR)
@@ -108,6 +124,48 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
         VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status,
                        ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
+    }
+
+    char partNumber[DeviceLayer::ConfigurationManager::kMaxPartNumberLength + 1];
+    if (ConfigurationMgr().GetPartNumber(partNumber, sizeof(partNumber)) == CHIP_NO_ERROR)
+    {
+        status = Attributes::PartNumber::Set(endpoint, CharSpan(partNumber, strlen(partNumber)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Part Number: 0x%02x", status));
+    }
+
+    char productURL[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
+    if (ConfigurationMgr().GetProductURL(productURL, sizeof(productURL)) == CHIP_NO_ERROR)
+    {
+        status = Attributes::ProductURL::Set(endpoint, CharSpan(productURL, strlen(productURL)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product URL: 0x%02x", status));
+    }
+
+    char productLabel[DeviceLayer::ConfigurationManager::kMaxProductURLLength + 1];
+    if (ConfigurationMgr().GetProductLabel(productLabel, sizeof(productLabel)) == CHIP_NO_ERROR)
+    {
+        status = Attributes::ProductLabel::Set(endpoint, CharSpan(productLabel, strlen(productLabel)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Label: 0x%02x", status));
+    }
+
+    bool localConfigDisabled;
+    if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
+    {
+        status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
+    }
+
+    bool reachable;
+    if (ConfigurationMgr().GetReachable(reachable) == CHIP_NO_ERROR)
+    {
+        status = Attributes::Reachable::Set(endpoint, reachable);
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Reachable: 0x%02x", status));
+    }
+
+    char uniqueId[DeviceLayer::ConfigurationManager::kMaxUniqueIDLength + 1];
+    if (ConfigurationMgr().GetUniqueId(uniqueId, sizeof(uniqueId)) == CHIP_NO_ERROR)
+    {
+        status = Attributes::UniqueID::Set(endpoint, CharSpan(uniqueId, strlen(uniqueId)));
+        VerifyOrReturn(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Unique Id: 0x%02x", status));
     }
 }
 

@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 
 /** Java interface for ConfigurationManager */
 public class PreferencesConfigurationManager implements ConfigurationManager {
@@ -32,6 +33,15 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
 
   public PreferencesConfigurationManager(Context context) {
     preferences = context.getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+
+    try {
+      String keyUniqueId = getKey(kConfigNamespace_ChipFactory,kConfigKey_UniqueId);
+      if (!preferences.contains(keyUniqueId)) {
+        preferences.edit().putString(keyUniqueId, UUID.randomUUID().toString().replaceAll("-","")).apply();
+      }
+    } catch (AndroidChipPlatformException e) {
+      e.printStackTrace();
+    }
   }
 
   @Override
@@ -136,6 +146,25 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
          */
       case kConfigNamespace_ChipFactory + ":" + kConfigKey_SerialNum:
         return "TEST_ANDROID_SN";
+
+      /**
+       * The PartNumber attribute SHALL specify a human-readable (displayable) vendor assigned part number for the Node whose meaning and numbering scheme is vendor defined.
+       * Multiple products (and hence PartNumbers) can share a ProductID. For instance, there may be different packaging (with different PartNumbers) for different regions; also different colors of a product might share the ProductID but may have a different PartNumber.
+       */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_PartNumber:
+        return "TEST_ANDROID_PRODUCT_BLUE";
+
+      /**
+       * The ProductURL attribute SHALL specify a link to a product specific web page. The syntax of the ProductURL attribute SHALL follow the syntax as specified in RFC 3986. The specified URL SHOULD resolve to a maintained web page available for the lifetime of the product. The maximum length of the ProductUrl attribute is 256 ASCII characters.
+       */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductURL:
+        return "https://buildwithmatter.com/";
+
+      /**
+       * The ProductLabel attribute SHALL specify a vendor specific human readable (displayable) product label. The ProductLabel attribute MAY be used to provide a more user-friendly value than that represented by the ProductName attribute. The ProductLabel attribute SHOULD NOT include the name of the vendor as defined within the VendorName attribute.
+       */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductLabel:
+        return "X10";
     }
 
     if (preferences.contains(key)) {
