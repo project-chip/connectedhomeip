@@ -32,11 +32,16 @@
 #define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif
 
+using namespace chip::app::DataModel;
+using namespace chip::app::Clusters;
+
+/**
+ * @brief Door Lock Server Plugin class.
+ */
 class DoorLockServer
 {
 public:
     static DoorLockServer & Instance();
-    static DoorLockServer instance;
 
     void InitServer(chip::EndpointId endpointId);
 
@@ -50,6 +55,32 @@ public:
 
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
+
+    bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
+                 const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                 const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
+                 const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+
+    bool ModifyUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex modifierFabricIndex,
+                    const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                    const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
+                    const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+
+    EmberAfStatus ClearUser(chip::EndpointId endpointId, uint16_t userIndex);
+
+private:
+    static DoorLockServer instance;
+};
+
+struct EmberAfPluginDoorLockUserInfo
+{
+    char userName[10];
+    uint32_t userUniqueId;
+    DoorLock::DlUserStatus userStatus;
+    DoorLock::DlUserType userType;
+    DoorLock::DlCredentialRule credentialRule;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex lastModifiedBy;
 };
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
@@ -162,3 +193,12 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId,
                                                                                           EmberAfAttributeType attrType,
                                                                                           uint16_t attrSize, uint8_t * attrValue);
+
+bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
+bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
+                                  chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
+                                  DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
+                                  DoorLock::DlCredentialRule credentialRule);
+bool emberAfPluginDoorLockModifyUser(uint16_t, chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
+                                     DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
+                                     DoorLock::DlCredentialRule credentialRule);
