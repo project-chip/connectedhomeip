@@ -14817,9 +14817,9 @@ bool emberAfTvChannelClusterChangeChannelCallback(
 /**
  * @brief TV Channel Cluster ChangeChannelResponse Command callback (from server)
  */
-bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          /* TYPE WARNING: array array defaults to */ uint8_t * channelMatch,
-                                                          uint8_t errorType);
+bool emberAfTvChannelClusterChangeChannelResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType);
 /**
  * @brief TV Channel Cluster ChangeChannelByNumber Command callback (from client)
  */
@@ -15059,7 +15059,7 @@ bool emberAfApplicationLauncherClusterStopAppCallback(
  * @brief Application Launcher Cluster StopAppResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterStopAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t status);
+                                                              uint8_t status, chip::CharSpan data);
 /**
  * @brief Application Launcher Cluster HideApp Command callback (from client)
  */
@@ -15070,7 +15070,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(
  * @brief Application Launcher Cluster HideAppResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterHideAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                              uint8_t status);
+                                                              uint8_t status, chip::CharSpan data);
 /**
  * @brief Application Basic Cluster ChangeStatus Command callback (from client)
  */
