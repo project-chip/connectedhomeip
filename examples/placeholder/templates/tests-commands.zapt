@@ -4,6 +4,9 @@
 
 #include "TestCommand.h"
 
+{{#chip_client_clusters}}
+{{/chip_client_clusters}}
+
 {{#if (getTests)}}
 {{>test_cluster tests=(getTests)}}
 {{/if}}
