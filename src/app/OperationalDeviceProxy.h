@@ -52,7 +52,7 @@ struct DeviceProxyInitParams
     SessionManager * sessionManager          = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    FabricTable * fabricTable                = nullptr;
     CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
@@ -64,7 +64,7 @@ struct DeviceProxyInitParams
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -87,6 +87,7 @@ public:
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mInitParams  = params;
         mPeerId      = peerId;
+        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
 
         mState = State::NeedsAddress;
     }
@@ -198,6 +199,7 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
+    FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
     CASEClient * mCASEClient = nullptr;
