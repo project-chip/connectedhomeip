@@ -1420,7 +1420,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NetworkDisabled",
+              "name": "InterfaceEnabled",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -1484,7 +1484,7 @@
               "code": 65531,
               "mfgCode": null,
               "side": "server",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
