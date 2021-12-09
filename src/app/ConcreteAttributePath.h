@@ -40,11 +40,12 @@ struct ConcreteAttributePath
 
     bool operator==(const ConcreteAttributePath & other) const
     {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
+        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId &&
+            mExpanded == other.mExpanded;
     }
 
     EndpointId mEndpointId   = 0;
-    bool mExpanded           = false;
+    bool mExpanded           = false; // NOTE: in between larger members
     ClusterId mClusterId     = 0;
     AttributeId mAttributeId = 0;
 };
@@ -58,9 +59,7 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
 {
     ConcreteReadAttributePath() {}
 
-    ConcreteReadAttributePath(const ConcreteAttributePath & path) :
-        ConcreteReadAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId)
-    {}
+    ConcreteReadAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
 
     ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
@@ -93,6 +92,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     };
 
     ConcreteDataAttributePath() {}
+
+    ConcreteDataAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
 
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
