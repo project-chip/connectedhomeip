@@ -457,30 +457,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPApplicationBasicAllowedVendorListAttributeCallback
-    : public chip::Callback::Callback<CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType>
-{
-public:
-    CHIPApplicationBasicAllowedVendorListAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPApplicationBasicAllowedVendorListAttributeCallback();
-
-    static void maybeDestroy(CHIPApplicationBasicAllowedVendorListAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPApplicationBasicAllowedVendorListAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPApplicationBasicAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>
 {

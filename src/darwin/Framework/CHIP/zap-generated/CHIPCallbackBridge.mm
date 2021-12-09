@@ -949,6 +949,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnS
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
@@ -986,6 +987,8 @@ void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccess
 };
 >>>>>>> 359911f36 (Run zap tool successfully)
 
+=======
+>>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {

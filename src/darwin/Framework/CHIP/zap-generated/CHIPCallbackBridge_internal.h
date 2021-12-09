@@ -1394,6 +1394,7 @@ public:
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 class CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge
     : public CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
 {
@@ -1423,6 +1424,8 @@ public:
 >>>>>>> 359911f36 (Run zap tool successfully)
 };
 
+=======
+>>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 class CHIPApplicationBasicAttributeListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
 {

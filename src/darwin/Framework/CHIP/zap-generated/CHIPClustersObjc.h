@@ -192,9 +192,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeApplicationVersionWithResponseHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler;
 
-- (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler;
-
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 

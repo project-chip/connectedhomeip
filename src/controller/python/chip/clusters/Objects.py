@@ -29493,22 +29493,6 @@ class ApplicationBasic(Cluster):
             value: 'str' = ""
 
         @dataclass
-        class AllowedVendorList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x050D
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000007
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
