@@ -3412,23 +3412,116 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute", readModeSelectClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("modeSelect", readModeSelectInteractionInfo);
     Map<String, InteractionInfo> readNetworkCommissioningInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readNetworkCommissioningAttributeListCommandParams =
+    Map<String, CommandParameterInfo> readNetworkCommissioningMaxNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readNetworkCommissioningAttributeListAttributeInteractionInfo =
+    InteractionInfo readNetworkCommissioningMaxNetworksAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .readAttributeListAttribute(
-                      (ChipClusters.NetworkCommissioningCluster.AttributeListAttributeCallback)
+                  .readMaxNetworksAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readNetworkCommissioningMaxNetworksCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readMaxNetworksAttribute", readNetworkCommissioningMaxNetworksAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningNetworksCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningNetworksAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readNetworksAttribute(
+                      (ChipClusters.NetworkCommissioningCluster.NetworksAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedNetworkCommissioningClusterAttributeListAttributeCallback(),
-            readNetworkCommissioningAttributeListCommandParams);
+                    .DelegatedNetworkCommissioningClusterNetworksAttributeCallback(),
+            readNetworkCommissioningNetworksCommandParams);
     readNetworkCommissioningInteractionInfo.put(
-        "readAttributeListAttribute",
-        readNetworkCommissioningAttributeListAttributeInteractionInfo);
+        "readNetworksAttribute", readNetworkCommissioningNetworksAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningScanMaxTimeSecondsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningScanMaxTimeSecondsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readScanMaxTimeSecondsAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readNetworkCommissioningScanMaxTimeSecondsCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readScanMaxTimeSecondsAttribute",
+        readNetworkCommissioningScanMaxTimeSecondsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningConnectMaxTimeSecondsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningConnectMaxTimeSecondsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readConnectMaxTimeSecondsAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readNetworkCommissioningConnectMaxTimeSecondsCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readConnectMaxTimeSecondsAttribute",
+        readNetworkCommissioningConnectMaxTimeSecondsAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningInterfaceEnabledCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningInterfaceEnabledAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readInterfaceEnabledAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readNetworkCommissioningInterfaceEnabledCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readInterfaceEnabledAttribute",
+        readNetworkCommissioningInterfaceEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningLastNetworkingStatusCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningLastNetworkingStatusAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readLastNetworkingStatusAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readNetworkCommissioningLastNetworkingStatusCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readLastNetworkingStatusAttribute",
+        readNetworkCommissioningLastNetworkingStatusAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningLastNetworkIDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningLastNetworkIDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readLastNetworkIDAttribute((ChipClusters.OctetStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
+            readNetworkCommissioningLastNetworkIDCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readLastNetworkIDAttribute",
+        readNetworkCommissioningLastNetworkIDAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readNetworkCommissioningLastConnectErrorValueCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .readLastConnectErrorValueAttribute(
+                      (ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readNetworkCommissioningLastConnectErrorValueCommandParams);
+    readNetworkCommissioningInteractionInfo.put(
+        "readLastConnectErrorValueAttribute",
+        readNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readNetworkCommissioningFeatureMapCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readNetworkCommissioningFeatureMapAttributeInteractionInfo =

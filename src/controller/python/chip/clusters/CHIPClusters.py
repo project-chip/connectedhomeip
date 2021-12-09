@@ -2710,50 +2710,46 @@ class ChipClusters:
             "clusterName": "NetworkCommissioning",
             "clusterId": 0x00000031,
             "commands": {
-            0x00000006: {
-                    "commandId": 0x00000006,
-                    "commandName": "AddThreadNetwork",
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "AddOrUpdateThreadNetwork",
                     "args": {
                         "operationalDataset": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "AddWiFiNetwork",
+                    "commandName": "AddOrUpdateWiFiNetwork",
                     "args": {
                         "ssid": "bytes",
                         "credentials": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000E: {
-                    "commandId": 0x0000000E,
-                    "commandName": "DisableNetwork",
+            0x00000006: {
+                    "commandId": 0x00000006,
+                    "commandName": "ConnectNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "EnableNetwork",
-                    "args": {
-                        "networkID": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x0000000A: {
-                    "commandId": 0x0000000A,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "RemoveNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
+                    },
+                },
+            0x00000008: {
+                    "commandId": 0x00000008,
+                    "commandName": "ReorderNetwork",
+                    "args": {
+                        "networkID": "bytes",
+                        "networkIndex": "int",
+                        "breadcrumb": "int",
                     },
                 },
             0x00000000: {
@@ -2762,34 +2758,53 @@ class ChipClusters:
                     "args": {
                         "ssid": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000008: {
-                    "commandId": 0x00000008,
-                    "commandName": "UpdateThreadNetwork",
-                    "args": {
-                        "operationalDataset": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "UpdateWiFiNetwork",
-                    "args": {
-                        "ssid": "bytes",
-                        "credentials": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
             "attributes": {
-                0x0000FFFB: {
-                    "attributeName": "AttributeList",
-                    "attributeId": 0x0000FFFB,
+                0x00000000: {
+                    "attributeName": "MaxNetworks",
+                    "attributeId": 0x00000000,
                     "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "Networks",
+                    "attributeId": 0x00000001,
+                    "type": "",
+                },
+                0x00000002: {
+                    "attributeName": "ScanMaxTimeSeconds",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "ConnectMaxTimeSeconds",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "InterfaceEnabled",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
+                    "writable": True,
+                },
+                0x00000005: {
+                    "attributeName": "LastNetworkingStatus",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000006: {
+                    "attributeName": "LastNetworkID",
+                    "attributeId": 0x00000006,
+                    "type": "bytes",
+                    "writable": True,
+                },
+                0x00000007: {
+                    "attributeName": "LastConnectErrorValue",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                    "writable": True,
                 },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",

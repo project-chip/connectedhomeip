@@ -95,22 +95,12 @@ typedef void (*CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType)(
     void *, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType &);
 typedef void (*CHIPMediaPlaybackClusterMediaStopResponseCallbackType)(
     void *, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
 typedef void (*CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType)(
     void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
@@ -243,10 +233,10 @@ typedef void (*GeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbac
     void *, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType);
 typedef void (*NullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> &);
-typedef void (*NetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback)(
-    void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError);
-typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError> &);
+typedef void (*NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
+    void *, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus);
+typedef void (*NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> &);
 typedef void (*DiagnosticLogsClusterLogsIntentAttributeCallback)(void *, chip::app::Clusters::DiagnosticLogs::LogsIntent);
 typedef void (*NullableDiagnosticLogsClusterLogsIntentAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> &);
@@ -2858,26 +2848,28 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>
+class CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>
 {
 public:
-    CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+    CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningNetworksListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            value);
 };
 
-class CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge
+class CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningNetworksListAttributeCallbackBridge
 {
 public:
-    CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4473,72 +4465,31 @@ public:
                             const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data);
 };
 
-class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                                keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
                                                                                               keepAlive){};
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data);
+                const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
 };
 
-class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(queue, handler, action, OnSuccessFn,
                                                                                              keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data);
+                            const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
@@ -4552,34 +4503,6 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>(queue, handler, action,
-                                                                                                   OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data);
-};
-
-class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>(queue, handler, action,
-                                                                                                 OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
@@ -6336,27 +6259,28 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback>
+class CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
 {
 public:
-    CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                    CHIPActionBlock action,
-                                                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback>(queue, handler, action,
-                                                                                                  OnSuccessFn, keepAlive){};
+    CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                     ResponseHandler handler,
+                                                                                     CHIPActionBlock action,
+                                                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value);
 };
 
-class CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge
+class CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
+    : public CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
 {
 public:
-    CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge(
+    CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -6366,30 +6290,30 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback>
+class CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>
 {
 public:
-    CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                            ResponseHandler handler,
-                                                                                            CHIPActionBlock action,
-                                                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallback>(queue, handler, action,
-                                                                                                          OnSuccessFn, keepAlive){};
+    CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(dispatch_queue_t queue,
+                                                                                             ResponseHandler handler,
+                                                                                             CHIPActionBlock action,
+                                                                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>(
+            queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value);
 };
 
-class CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge
-    : public CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge
+class CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge
+    : public CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge
 {
 public:
-    CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge(
+    CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

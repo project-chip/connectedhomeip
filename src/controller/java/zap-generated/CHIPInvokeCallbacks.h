@@ -494,77 +494,31 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterConnectNetworkResponseCallback
+    : public Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback(jobject javaCallback);
+    CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(jobject javaCallback);
 
-    ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback();
+    ~CHIPNetworkCommissioningClusterConnectNetworkResponseCallback();
 
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data);
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterNetworkConfigResponseCallback
+    : public Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback(jobject javaCallback);
+    CHIPNetworkCommissioningClusterNetworkConfigResponseCallback(jobject javaCallback);
 
-    ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterDisableNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterDisableNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallback();
+    ~CHIPNetworkCommissioningClusterNetworkConfigResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterEnableNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterEnableNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data);
+                           const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -580,38 +534,6 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback();
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback();
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

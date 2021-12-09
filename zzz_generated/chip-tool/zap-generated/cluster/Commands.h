@@ -62,6 +62,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value);
@@ -647,15 +649,94 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("NetworkID", indent + 1, value.networkID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NetworkID'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Connected", indent + 1, value.connected);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Connected'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
-        CHIP_ERROR err = LogValue("DiscoveryResponse", indent + 1, value.discoveryResponse);
+        CHIP_ERROR err = LogValue("PanId", indent + 1, value.panId);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'DiscoveryResponse'",
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'PanId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ExtendedPanId", indent + 1, value.extendedPanId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtendedPanId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NetworkName", indent + 1, value.networkName);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NetworkName'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Channel", indent + 1, value.channel);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Channel'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Version", indent + 1, value.version);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Version'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ExtendedAddress", indent + 1, value.extendedAddress);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExtendedAddress'",
                             IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Rssi", indent + 1, value.rssi);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rssi'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Lqi", indent + 1, value.lqi);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Lqi'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -699,10 +780,18 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("FrequencyBand", indent + 1, value.frequencyBand);
+        CHIP_ERROR err = LogValue("WiFiBand", indent + 1, value.wiFiBand);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FrequencyBand'", IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'WiFiBand'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Rssi", indent + 1, value.rssi);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Rssi'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -2886,86 +2975,36 @@ OnMediaPlaybackMediaStopResponseSuccess(void * context,
     command->SetCommandExitStatus(err);
 };
 
-static void OnNetworkCommissioningAddThreadNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data)
+static void OnNetworkCommissioningConnectNetworkResponseSuccess(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received AddThreadNetworkResponse:");
+    ChipLogProgress(Zcl, "Received ConnectNetworkResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
         err = LogValue("debugText", 1, data.debugText);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("errorValue", 1, data.errorValue);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
 };
 
-static void OnNetworkCommissioningAddWiFiNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data)
+static void OnNetworkCommissioningNetworkConfigResponseSuccess(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received AddWiFiNetworkResponse:");
+    ChipLogProgress(Zcl, "Received NetworkConfigResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("debugText", 1, data.debugText);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnNetworkCommissioningDisableNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received DisableNetworkResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorCode", 1, data.errorCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("debugText", 1, data.debugText);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnNetworkCommissioningEnableNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received EnableNetworkResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorCode", 1, data.errorCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("debugText", 1, data.debugText);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnNetworkCommissioningRemoveNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received RemoveNetworkResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2983,7 +3022,7 @@ static void OnNetworkCommissioningScanNetworksResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorCode", 1, data.errorCode);
+        err = LogValue("networkingStatus", 1, data.networkingStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2991,47 +3030,11 @@ static void OnNetworkCommissioningScanNetworksResponseSuccess(
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("wifiScanResults", 1, data.wifiScanResults);
+        err = LogValue("wiFiScanResults", 1, data.wiFiScanResults);
     }
     if (err == CHIP_NO_ERROR)
     {
         err = LogValue("threadScanResults", 1, data.threadScanResults);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnNetworkCommissioningUpdateThreadNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received UpdateThreadNetworkResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorCode", 1, data.errorCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("debugText", 1, data.debugText);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received UpdateWiFiNetworkResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorCode", 1, data.errorCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("debugText", 1, data.debugText);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -23625,59 +23628,62 @@ private:
 | Cluster NetworkCommissioning                                        | 0x0031 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * AddThreadNetwork                                                  |   0x06 |
-| * AddWiFiNetwork                                                    |   0x02 |
-| * DisableNetwork                                                    |   0x0E |
-| * EnableNetwork                                                     |   0x0C |
-| * RemoveNetwork                                                     |   0x0A |
+| * AddOrUpdateThreadNetwork                                          |   0x03 |
+| * AddOrUpdateWiFiNetwork                                            |   0x02 |
+| * ConnectNetwork                                                    |   0x06 |
+| * RemoveNetwork                                                     |   0x04 |
+| * ReorderNetwork                                                    |   0x08 |
 | * ScanNetworks                                                      |   0x00 |
-| * UpdateThreadNetwork                                               |   0x08 |
-| * UpdateWiFiNetwork                                                 |   0x04 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * AttributeList                                                     | 0xFFFB |
+| * MaxNetworks                                                       | 0x0000 |
+| * Networks                                                          | 0x0001 |
+| * ScanMaxTimeSeconds                                                | 0x0002 |
+| * ConnectMaxTimeSeconds                                             | 0x0003 |
+| * InterfaceEnabled                                                  | 0x0004 |
+| * LastNetworkingStatus                                              | 0x0005 |
+| * LastNetworkID                                                     | 0x0006 |
+| * LastConnectErrorValue                                             | 0x0007 |
 | * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command AddThreadNetwork
+ * Command AddOrUpdateThreadNetwork
  */
-class NetworkCommissioningAddThreadNetwork : public ModelCommand
+class NetworkCommissioningAddOrUpdateThreadNetwork : public ModelCommand
 {
 public:
-    NetworkCommissioningAddThreadNetwork() : ModelCommand("add-thread-network")
+    NetworkCommissioningAddOrUpdateThreadNetwork() : ModelCommand("add-or-update-thread-network")
     {
         AddArgument("OperationalDataset", &mRequest.operationalDataset);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddThreadNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type mRequest;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type mRequest;
 };
 
 /*
- * Command AddWiFiNetwork
+ * Command AddOrUpdateWiFiNetwork
  */
-class NetworkCommissioningAddWiFiNetwork : public ModelCommand
+class NetworkCommissioningAddOrUpdateWiFiNetwork : public ModelCommand
 {
 public:
-    NetworkCommissioningAddWiFiNetwork() : ModelCommand("add-wi-fi-network")
+    NetworkCommissioningAddOrUpdateWiFiNetwork() : ModelCommand("add-or-update-wi-fi-network")
     {
         AddArgument("Ssid", &mRequest.ssid);
         AddArgument("Credentials", &mRequest.credentials);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ModelCommand::AddArguments();
     }
 
@@ -23685,64 +23691,37 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddWiFiNetworkResponseSuccess, OnDefaultFailure,
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type mRequest;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type mRequest;
 };
 
 /*
- * Command DisableNetwork
+ * Command ConnectNetwork
  */
-class NetworkCommissioningDisableNetwork : public ModelCommand
+class NetworkCommissioningConnectNetwork : public ModelCommand
 {
 public:
-    NetworkCommissioningDisableNetwork() : ModelCommand("disable-network")
+    NetworkCommissioningConnectNetwork() : ModelCommand("connect-network")
     {
         AddArgument("NetworkID", &mRequest.networkID);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000E) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningDisableNetworkResponseSuccess, OnDefaultFailure,
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningConnectNetworkResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type mRequest;
-};
-
-/*
- * Command EnableNetwork
- */
-class NetworkCommissioningEnableNetwork : public ModelCommand
-{
-public:
-    NetworkCommissioningEnableNetwork() : ModelCommand("enable-network")
-    {
-        AddArgument("NetworkID", &mRequest.networkID);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000C) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningEnableNetworkResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type mRequest;
+    chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Type mRequest;
 };
 
 /*
@@ -23755,20 +23734,45 @@ public:
     {
         AddArgument("NetworkID", &mRequest.networkID);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000A) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningRemoveNetworkResponseSuccess, OnDefaultFailure,
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
     chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type mRequest;
+};
+
+/*
+ * Command ReorderNetwork
+ */
+class NetworkCommissioningReorderNetwork : public ModelCommand
+{
+public:
+    NetworkCommissioningReorderNetwork() : ModelCommand("reorder-network")
+    {
+        AddArgument("NetworkID", &mRequest.networkID);
+        AddArgument("NetworkIndex", 0, UINT8_MAX, &mRequest.networkIndex);
+        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningNetworkConfigResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Type mRequest;
 };
 
 /*
@@ -23781,7 +23785,6 @@ public:
     {
         AddArgument("Ssid", &mRequest.ssid);
         AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
         ModelCommand::AddArguments();
     }
 
@@ -23798,71 +23801,18 @@ private:
 };
 
 /*
- * Command UpdateThreadNetwork
+ * Attribute MaxNetworks
  */
-class NetworkCommissioningUpdateThreadNetwork : public ModelCommand
+class ReadNetworkCommissioningMaxNetworks : public ModelCommand
 {
 public:
-    NetworkCommissioningUpdateThreadNetwork() : ModelCommand("update-thread-network")
+    ReadNetworkCommissioningMaxNetworks() : ModelCommand("read")
     {
-        AddArgument("OperationalDataset", &mRequest.operationalDataset);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
+        AddArgument("attr-name", "max-networks");
         ModelCommand::AddArguments();
     }
 
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateThreadNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type mRequest;
-};
-
-/*
- * Command UpdateWiFiNetwork
- */
-class NetworkCommissioningUpdateWiFiNetwork : public ModelCommand
-{
-public:
-    NetworkCommissioningUpdateWiFiNetwork() : ModelCommand("update-wi-fi-network")
-    {
-        AddArgument("Ssid", &mRequest.ssid);
-        AddArgument("Credentials", &mRequest.credentials);
-        AddArgument("Breadcrumb", 0, UINT64_MAX, &mRequest.breadcrumb);
-        AddArgument("TimeoutMs", 0, UINT32_MAX, &mRequest.timeoutMs);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type mRequest;
-};
-
-/*
- * Attribute AttributeList
- */
-class ReadNetworkCommissioningAttributeList : public ModelCommand
-{
-public:
-    ReadNetworkCommissioningAttributeList() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "attribute-list");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadNetworkCommissioningAttributeList() {}
+    ~ReadNetworkCommissioningMaxNetworks() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23870,14 +23820,331 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::AttributeList::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeResponse(context, "NetworkCommissioning.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.MaxNetworks response", value);
     }
+};
+
+/*
+ * Attribute Networks
+ */
+class ReadNetworkCommissioningNetworks : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningNetworks() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "networks");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningNetworks() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.Networks response", value);
+    }
+};
+
+/*
+ * Attribute ScanMaxTimeSeconds
+ */
+class ReadNetworkCommissioningScanMaxTimeSeconds : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningScanMaxTimeSeconds() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "scan-max-time-seconds");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningScanMaxTimeSeconds() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ScanMaxTimeSeconds response", value);
+    }
+};
+
+/*
+ * Attribute ConnectMaxTimeSeconds
+ */
+class ReadNetworkCommissioningConnectMaxTimeSeconds : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningConnectMaxTimeSeconds() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "connect-max-time-seconds");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningConnectMaxTimeSeconds() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ConnectMaxTimeSeconds response", value);
+    }
+};
+
+/*
+ * Attribute InterfaceEnabled
+ */
+class ReadNetworkCommissioningInterfaceEnabled : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningInterfaceEnabled() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "interface-enabled");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningInterfaceEnabled() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.InterfaceEnabled response", value);
+    }
+};
+
+class WriteNetworkCommissioningInterfaceEnabled : public ModelCommand
+{
+public:
+    WriteNetworkCommissioningInterfaceEnabled() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "interface-enabled");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteNetworkCommissioningInterfaceEnabled() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+/*
+ * Attribute LastNetworkingStatus
+ */
+class ReadNetworkCommissioningLastNetworkingStatus : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningLastNetworkingStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "last-networking-status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningLastNetworkingStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastNetworkingStatus response", value);
+    }
+};
+
+class WriteNetworkCommissioningLastNetworkingStatus : public ModelCommand
+{
+public:
+    WriteNetworkCommissioningLastNetworkingStatus() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "last-networking-status");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteNetworkCommissioningLastNetworkingStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus mValue;
+};
+
+/*
+ * Attribute LastNetworkID
+ */
+class ReadNetworkCommissioningLastNetworkID : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningLastNetworkID() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "last-network-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningLastNetworkID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkID::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastNetworkID response", value);
+    }
+};
+
+class WriteNetworkCommissioningLastNetworkID : public ModelCommand
+{
+public:
+    WriteNetworkCommissioningLastNetworkID() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "last-network-id");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteNetworkCommissioningLastNetworkID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkID::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::ByteSpan mValue;
+};
+
+/*
+ * Attribute LastConnectErrorValue
+ */
+class ReadNetworkCommissioningLastConnectErrorValue : public ModelCommand
+{
+public:
+    ReadNetworkCommissioningLastConnectErrorValue() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "last-connect-error-value");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadNetworkCommissioningLastConnectErrorValue() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastConnectErrorValue response", value);
+    }
+};
+
+class WriteNetworkCommissioningLastConnectErrorValue : public ModelCommand
+{
+public:
+    WriteNetworkCommissioningLastConnectErrorValue() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "last-connect-error-value");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteNetworkCommissioningLastConnectErrorValue() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
 };
 
 /*
@@ -51250,19 +51517,28 @@ void registerClusterNetworkCommissioning(Commands & commands)
     const char * clusterName = "NetworkCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<NetworkCommissioningAddThreadNetwork>(),      //
-        make_unique<NetworkCommissioningAddWiFiNetwork>(),        //
-        make_unique<NetworkCommissioningDisableNetwork>(),        //
-        make_unique<NetworkCommissioningEnableNetwork>(),         //
-        make_unique<NetworkCommissioningRemoveNetwork>(),         //
-        make_unique<NetworkCommissioningScanNetworks>(),          //
-        make_unique<NetworkCommissioningUpdateThreadNetwork>(),   //
-        make_unique<NetworkCommissioningUpdateWiFiNetwork>(),     //
-        make_unique<ReadNetworkCommissioningAttributeList>(),     //
-        make_unique<ReadNetworkCommissioningFeatureMap>(),        //
-        make_unique<ReportNetworkCommissioningFeatureMap>(),      //
-        make_unique<ReadNetworkCommissioningClusterRevision>(),   //
-        make_unique<ReportNetworkCommissioningClusterRevision>(), //
+        make_unique<NetworkCommissioningAddOrUpdateThreadNetwork>(),   //
+        make_unique<NetworkCommissioningAddOrUpdateWiFiNetwork>(),     //
+        make_unique<NetworkCommissioningConnectNetwork>(),             //
+        make_unique<NetworkCommissioningRemoveNetwork>(),              //
+        make_unique<NetworkCommissioningReorderNetwork>(),             //
+        make_unique<NetworkCommissioningScanNetworks>(),               //
+        make_unique<ReadNetworkCommissioningMaxNetworks>(),            //
+        make_unique<ReadNetworkCommissioningNetworks>(),               //
+        make_unique<ReadNetworkCommissioningScanMaxTimeSeconds>(),     //
+        make_unique<ReadNetworkCommissioningConnectMaxTimeSeconds>(),  //
+        make_unique<ReadNetworkCommissioningInterfaceEnabled>(),       //
+        make_unique<WriteNetworkCommissioningInterfaceEnabled>(),      //
+        make_unique<ReadNetworkCommissioningLastNetworkingStatus>(),   //
+        make_unique<WriteNetworkCommissioningLastNetworkingStatus>(),  //
+        make_unique<ReadNetworkCommissioningLastNetworkID>(),          //
+        make_unique<WriteNetworkCommissioningLastNetworkID>(),         //
+        make_unique<ReadNetworkCommissioningLastConnectErrorValue>(),  //
+        make_unique<WriteNetworkCommissioningLastConnectErrorValue>(), //
+        make_unique<ReadNetworkCommissioningFeatureMap>(),             //
+        make_unique<ReportNetworkCommissioningFeatureMap>(),           //
+        make_unique<ReadNetworkCommissioningClusterRevision>(),        //
+        make_unique<ReportNetworkCommissioningClusterRevision>(),      //
     };
 
     commands.Register(clusterName, clusterCommands);

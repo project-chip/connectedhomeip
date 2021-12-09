@@ -7718,182 +7718,172 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void addThreadNetwork(
-        AddThreadNetworkResponseCallback callback,
-        byte[] operationalDataset,
-        Long breadcrumb,
-        Long timeoutMs) {
-      addThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb, timeoutMs);
+    public void addOrUpdateThreadNetwork(
+        NetworkConfigResponseCallback callback, byte[] operationalDataset, Long breadcrumb) {
+      addOrUpdateThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb);
     }
 
-    public void addWiFiNetwork(
-        AddWiFiNetworkResponseCallback callback,
-        byte[] ssid,
-        byte[] credentials,
-        Long breadcrumb,
-        Long timeoutMs) {
-      addWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb, timeoutMs);
+    public void addOrUpdateWiFiNetwork(
+        NetworkConfigResponseCallback callback, byte[] ssid, byte[] credentials, Long breadcrumb) {
+      addOrUpdateWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb);
     }
 
-    public void disableNetwork(
-        DisableNetworkResponseCallback callback,
-        byte[] networkID,
-        Long breadcrumb,
-        Long timeoutMs) {
-      disableNetwork(chipClusterPtr, callback, networkID, breadcrumb, timeoutMs);
-    }
-
-    public void enableNetwork(
-        EnableNetworkResponseCallback callback, byte[] networkID, Long breadcrumb, Long timeoutMs) {
-      enableNetwork(chipClusterPtr, callback, networkID, breadcrumb, timeoutMs);
+    public void connectNetwork(
+        ConnectNetworkResponseCallback callback, byte[] networkID, Long breadcrumb) {
+      connectNetwork(chipClusterPtr, callback, networkID, breadcrumb);
     }
 
     public void removeNetwork(
-        RemoveNetworkResponseCallback callback, byte[] networkID, Long breadcrumb, Long timeoutMs) {
-      removeNetwork(chipClusterPtr, callback, networkID, breadcrumb, timeoutMs);
+        NetworkConfigResponseCallback callback, byte[] networkID, Long breadcrumb) {
+      removeNetwork(chipClusterPtr, callback, networkID, breadcrumb);
     }
 
-    public void scanNetworks(
-        ScanNetworksResponseCallback callback, byte[] ssid, Long breadcrumb, Long timeoutMs) {
-      scanNetworks(chipClusterPtr, callback, ssid, breadcrumb, timeoutMs);
+    public void reorderNetwork(
+        NetworkConfigResponseCallback callback,
+        byte[] networkID,
+        Integer networkIndex,
+        Long breadcrumb) {
+      reorderNetwork(chipClusterPtr, callback, networkID, networkIndex, breadcrumb);
     }
 
-    public void updateThreadNetwork(
-        UpdateThreadNetworkResponseCallback callback,
+    public void scanNetworks(ScanNetworksResponseCallback callback, byte[] ssid, Long breadcrumb) {
+      scanNetworks(chipClusterPtr, callback, ssid, breadcrumb);
+    }
+
+    private native void addOrUpdateThreadNetwork(
+        long chipClusterPtr,
+        NetworkConfigResponseCallback Callback,
         byte[] operationalDataset,
-        Long breadcrumb,
-        Long timeoutMs) {
-      updateThreadNetwork(chipClusterPtr, callback, operationalDataset, breadcrumb, timeoutMs);
-    }
+        Long breadcrumb);
 
-    public void updateWiFiNetwork(
-        UpdateWiFiNetworkResponseCallback callback,
+    private native void addOrUpdateWiFiNetwork(
+        long chipClusterPtr,
+        NetworkConfigResponseCallback Callback,
         byte[] ssid,
         byte[] credentials,
-        Long breadcrumb,
-        Long timeoutMs) {
-      updateWiFiNetwork(chipClusterPtr, callback, ssid, credentials, breadcrumb, timeoutMs);
-    }
+        Long breadcrumb);
 
-    private native void addThreadNetwork(
+    private native void connectNetwork(
         long chipClusterPtr,
-        AddThreadNetworkResponseCallback Callback,
-        byte[] operationalDataset,
-        Long breadcrumb,
-        Long timeoutMs);
-
-    private native void addWiFiNetwork(
-        long chipClusterPtr,
-        AddWiFiNetworkResponseCallback Callback,
-        byte[] ssid,
-        byte[] credentials,
-        Long breadcrumb,
-        Long timeoutMs);
-
-    private native void disableNetwork(
-        long chipClusterPtr,
-        DisableNetworkResponseCallback Callback,
+        ConnectNetworkResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
-        Long timeoutMs);
-
-    private native void enableNetwork(
-        long chipClusterPtr,
-        EnableNetworkResponseCallback Callback,
-        byte[] networkID,
-        Long breadcrumb,
-        Long timeoutMs);
+        Long breadcrumb);
 
     private native void removeNetwork(
         long chipClusterPtr,
-        RemoveNetworkResponseCallback Callback,
+        NetworkConfigResponseCallback Callback,
         byte[] networkID,
-        Long breadcrumb,
-        Long timeoutMs);
+        Long breadcrumb);
+
+    private native void reorderNetwork(
+        long chipClusterPtr,
+        NetworkConfigResponseCallback Callback,
+        byte[] networkID,
+        Integer networkIndex,
+        Long breadcrumb);
 
     private native void scanNetworks(
-        long chipClusterPtr,
-        ScanNetworksResponseCallback Callback,
-        byte[] ssid,
-        Long breadcrumb,
-        Long timeoutMs);
+        long chipClusterPtr, ScanNetworksResponseCallback Callback, byte[] ssid, Long breadcrumb);
 
-    private native void updateThreadNetwork(
-        long chipClusterPtr,
-        UpdateThreadNetworkResponseCallback Callback,
-        byte[] operationalDataset,
-        Long breadcrumb,
-        Long timeoutMs);
-
-    private native void updateWiFiNetwork(
-        long chipClusterPtr,
-        UpdateWiFiNetworkResponseCallback Callback,
-        byte[] ssid,
-        byte[] credentials,
-        Long breadcrumb,
-        Long timeoutMs);
-
-    public interface AddThreadNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
+    public interface ConnectNetworkResponseCallback {
+      void onSuccess(Integer NetworkingStatus, String DebugText, Long ErrorValue);
 
       void onError(Exception error);
     }
 
-    public interface AddWiFiNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
-
-      void onError(Exception error);
-    }
-
-    public interface DisableNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
-
-      void onError(Exception error);
-    }
-
-    public interface EnableNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
-
-      void onError(Exception error);
-    }
-
-    public interface RemoveNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
+    public interface NetworkConfigResponseCallback {
+      void onSuccess(Integer NetworkingStatus, String DebugText);
 
       void onError(Exception error);
     }
 
     public interface ScanNetworksResponseCallback {
-      void onSuccess(Integer errorCode, String debugText
-          // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+      void onSuccess(Integer NetworkingStatus, String DebugText
+          // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
-          // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
 
       void onError(Exception error);
     }
 
-    public interface UpdateThreadNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
+    public static class NetworksAttribute {
+      public byte[] networkID;
+      public Boolean connected;
 
-      void onError(Exception error);
+      public NetworksAttribute(byte[] networkID, Boolean connected) {
+        this.networkID = networkID;
+        this.connected = connected;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("byte[] ");
+        output.append(Arrays.toString(networkID));
+        output.append("\n");
+
+        output.append("boolean connected: ");
+        output.append(this.connected);
+        output.append("\n");
+
+        return output.toString();
+      }
     }
 
-    public interface UpdateWiFiNetworkResponseCallback {
-      void onSuccess(Integer errorCode, String debugText);
-
-      void onError(Exception error);
-    }
-
-    public interface AttributeListAttributeCallback {
-      void onSuccess(List<Object> valueList);
+    public interface NetworksAttributeCallback {
+      void onSuccess(List<NetworksAttribute> valueList);
 
       void onError(Exception ex);
     }
 
-    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
-      readAttributeListAttribute(chipClusterPtr, callback);
+    public void readMaxNetworksAttribute(IntegerAttributeCallback callback) {
+      readMaxNetworksAttribute(chipClusterPtr, callback);
+    }
+
+    public void readNetworksAttribute(NetworksAttributeCallback callback) {
+      readNetworksAttribute(chipClusterPtr, callback);
+    }
+
+    public void readScanMaxTimeSecondsAttribute(IntegerAttributeCallback callback) {
+      readScanMaxTimeSecondsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readConnectMaxTimeSecondsAttribute(IntegerAttributeCallback callback) {
+      readConnectMaxTimeSecondsAttribute(chipClusterPtr, callback);
+    }
+
+    public void readInterfaceEnabledAttribute(BooleanAttributeCallback callback) {
+      readInterfaceEnabledAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeInterfaceEnabledAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeInterfaceEnabledAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readLastNetworkingStatusAttribute(IntegerAttributeCallback callback) {
+      readLastNetworkingStatusAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeLastNetworkingStatusAttribute(DefaultClusterCallback callback, Integer value) {
+      writeLastNetworkingStatusAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readLastNetworkIDAttribute(OctetStringAttributeCallback callback) {
+      readLastNetworkIDAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeLastNetworkIDAttribute(DefaultClusterCallback callback, byte[] value) {
+      writeLastNetworkIDAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readLastConnectErrorValueAttribute(LongAttributeCallback callback) {
+      readLastConnectErrorValueAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeLastConnectErrorValueAttribute(DefaultClusterCallback callback, Long value) {
+      writeLastConnectErrorValueAttribute(chipClusterPtr, callback, value);
     }
 
     public void readFeatureMapAttribute(LongAttributeCallback callback) {
@@ -7922,8 +7912,41 @@ public class ChipClusters {
       reportClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
-    private native void readAttributeListAttribute(
-        long chipClusterPtr, AttributeListAttributeCallback callback);
+    private native void readMaxNetworksAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readNetworksAttribute(
+        long chipClusterPtr, NetworksAttributeCallback callback);
+
+    private native void readScanMaxTimeSecondsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readConnectMaxTimeSecondsAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readInterfaceEnabledAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeInterfaceEnabledAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Boolean value);
+
+    private native void readLastNetworkingStatusAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void writeLastNetworkingStatusAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Integer value);
+
+    private native void readLastNetworkIDAttribute(
+        long chipClusterPtr, OctetStringAttributeCallback callback);
+
+    private native void writeLastNetworkIDAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, byte[] value);
+
+    private native void readLastConnectErrorValueAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
+
+    private native void writeLastConnectErrorValueAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Long value);
 
     private native void readFeatureMapAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

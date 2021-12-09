@@ -196,12 +196,39 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPNetworkCommissioningClusterNetworkInfo
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _networkID = [NSData data];
+
+        _connected = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPNetworkCommissioningClusterThreadInterfaceScanResult
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _discoveryResponse = [NSData data];
+        _panId = @(0);
+
+        _extendedPanId = @(0);
+
+        _networkName = @"";
+
+        _channel = @(0);
+
+        _version = @(0);
+
+        _extendedAddress = @(0);
+
+        _rssi = @(0);
+
+        _lqi = @(0);
     }
     return self;
 }
@@ -220,7 +247,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _channel = @(0);
 
-        _frequencyBand = @(0);
+        _wiFiBand = @(0);
+
+        _rssi = @(0);
     }
     return self;
 }

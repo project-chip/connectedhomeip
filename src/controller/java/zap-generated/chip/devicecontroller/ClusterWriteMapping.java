@@ -581,6 +581,78 @@ public class ClusterWriteMapping {
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeNetworkCommissioningInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeNetworkCommissioningInterfaceEnabledCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioninginterfaceEnabledCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeNetworkCommissioningInterfaceEnabledCommandParams.put(
+        "value", networkCommissioninginterfaceEnabledCommandParameterInfo);
+    InteractionInfo writeNetworkCommissioningInterfaceEnabledAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .writeInterfaceEnabledAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeNetworkCommissioningInterfaceEnabledCommandParams);
+    writeNetworkCommissioningInteractionInfo.put(
+        "writeInterfaceEnabledAttribute",
+        writeNetworkCommissioningInterfaceEnabledAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeNetworkCommissioningLastNetworkingStatusCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioninglastNetworkingStatusCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeNetworkCommissioningLastNetworkingStatusCommandParams.put(
+        "value", networkCommissioninglastNetworkingStatusCommandParameterInfo);
+    InteractionInfo writeNetworkCommissioningLastNetworkingStatusAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .writeLastNetworkingStatusAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeNetworkCommissioningLastNetworkingStatusCommandParams);
+    writeNetworkCommissioningInteractionInfo.put(
+        "writeLastNetworkingStatusAttribute",
+        writeNetworkCommissioningLastNetworkingStatusAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeNetworkCommissioningLastNetworkIDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioninglastNetworkIDCommandParameterInfo =
+        new CommandParameterInfo("value", byte[].class);
+    writeNetworkCommissioningLastNetworkIDCommandParams.put(
+        "value", networkCommissioninglastNetworkIDCommandParameterInfo);
+    InteractionInfo writeNetworkCommissioningLastNetworkIDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .writeLastNetworkIDAttribute(
+                      (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeNetworkCommissioningLastNetworkIDCommandParams);
+    writeNetworkCommissioningInteractionInfo.put(
+        "writeLastNetworkIDAttribute",
+        writeNetworkCommissioningLastNetworkIDAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeNetworkCommissioningLastConnectErrorValueCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioninglastConnectErrorValueCommandParameterInfo =
+        new CommandParameterInfo("value", long.class);
+    writeNetworkCommissioningLastConnectErrorValueCommandParams.put(
+        "value", networkCommissioninglastConnectErrorValueCommandParameterInfo);
+    InteractionInfo writeNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .writeLastConnectErrorValueAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeNetworkCommissioningLastConnectErrorValueCommandParams);
+    writeNetworkCommissioningInteractionInfo.put(
+        "writeLastConnectErrorValueAttribute",
+        writeNetworkCommissioningLastConnectErrorValueAttributeInteractionInfo);
     writeAttributeMap.put("networkCommissioning", writeNetworkCommissioningInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateProviderInteractionInfo =
         new LinkedHashMap<>();
