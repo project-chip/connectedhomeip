@@ -112,8 +112,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-ember.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
