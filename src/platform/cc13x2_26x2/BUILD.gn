@@ -73,10 +73,14 @@ static_library("cc13x2_26x2") {
       "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
     ]
 
-    if (ti_simplelink_device_family == "cc13x2_26x2") {
-      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
-    } else if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
-      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    if (chip_openthread_ftd) {
+      public_deps += [
+        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+      ]
+    } else {
+      public_deps += [
+        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+      ]
     }
 
     sources += [

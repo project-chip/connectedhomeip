@@ -109,13 +109,6 @@
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
-
-/**
  * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
  *
  * Enable Thread CLI interface at initialisation.
