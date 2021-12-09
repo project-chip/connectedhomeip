@@ -335,8 +335,8 @@ function parse(filename)
   const defaultConfig = yaml.config || [];
   yaml.tests.forEach(test => {
     test.isNotSimulated = !filename.includes("Simulated");
-    test.filename = filename;
-    test.testName = yaml.name;
+    test.filename       = filename;
+    test.testName       = yaml.name;
     setDefaults(test, defaultConfig);
   });
 
