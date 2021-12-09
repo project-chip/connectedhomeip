@@ -650,7 +650,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     writer.Init(std::move(msgBuf));
