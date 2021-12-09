@@ -106,13 +106,13 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 /*
  * @brief
  *
- * This specific variant decodes to TLV a cluster object that contains all attributes encapsulated within a single, monolithic
+ * This specific variant decodes from TLV a cluster object that contains all attributes encapsulated within a single, monolithic
  * cluster object.
  *
  * Each attribute in the cluster is decoded based on the provided ConcreteAttributePath. The TLVReader is to be positioned right on
  * the data value for the specified attribute.
  *
- * This API depends on the presence of a Decode method on the object to present. The signature of that method
+ * This API depends on the presence of a Decode method on the object. The signature of that method
  * is as follows:
  *
  * CHIP_ERROR <Object>::Decode(TLVReader &reader, ConcreteAttributePath &path);

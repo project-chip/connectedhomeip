@@ -85,7 +85,7 @@ public:
 
     /*
      * When registering as a callback to the ReadClient, please do not pass the AttributeCache
-     * directly. Instead, utilize this method below to correctly setup the callback chain such that
+     * directly. Instead, utilize this method below to correctly set up the callback chain such that
      * the buffered reader is the first callback in the chain before calling into cache subsequently.
      */
     ReadClient::Callback & GetBufferedCallback() { return mBufferedReader; }
@@ -154,7 +154,7 @@ public:
      */
     struct AttributeStatus
     {
-        AttributeStatus(ConcreteAttributePath & path, StatusIB & status) : mPath(path), mStatus(status) {}
+        AttributeStatus(const ConcreteAttributePath & path, StatusIB & status) : mPath(path), mStatus(status) {}
         ConcreteAttributePath mPath;
         StatusIB mStatus;
     };
@@ -169,7 +169,7 @@ public:
      * object that can be decoded using the DataModel::Decode machinery will work.
      *
      * Notable return values:
-     *      - If neither data or status for the specified path don't exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
+     *      - If neither data or status for the specified path exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
      *        shall be returned.
      *
      */
@@ -210,7 +210,7 @@ public:
      * right at the attribute value.
      *
      * Notable return values:
-     *      - If neither data nor status for the specified path don't exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
+     *      - If neither data nor status for the specified path exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
      *        shall be returned.
      *
      *      - If a StatusIB is present in the cache instead of data, a CHIP_ERROR_IM_STATUS_CODE_RECEIVED error
@@ -286,7 +286,7 @@ public:
 
     /*
      * Execute an iterator function that is called for every cluster
-     * in a given endpoint is passed in a ClusterId for every cluster that
+     * in a given endpoint and passed a ClusterId for every cluster that
      * matches.
      *
      * The iterator is expected to have this signature:
