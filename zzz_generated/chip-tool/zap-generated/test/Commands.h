@@ -4965,7 +4965,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t driftCompensationArgument;
-        driftCompensationArgument = static_cast<uint8_t>(0);
+        driftCompensationArgument = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
             driftCompensationArgument, this, OnSuccessCallback_71, OnFailureCallback_71));
@@ -18256,7 +18256,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t occupancySensorTypeArgument;
-        occupancySensorTypeArgument = static_cast<uint8_t>(0);
+        occupancySensorTypeArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
@@ -19185,7 +19185,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t startUpOnOffArgument;
-        startUpOnOffArgument = static_cast<uint8_t>(0);
+        startUpOnOffArgument = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
             startUpOnOffArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
@@ -22242,7 +22242,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
-        operationModeArgument = static_cast<uint8_t>(1);
+        operationModeArgument = 1;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
@@ -22261,7 +22261,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
-        operationModeArgument = static_cast<uint8_t>(2);
+        operationModeArgument = 2;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
@@ -22280,7 +22280,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
-        operationModeArgument = static_cast<uint8_t>(3);
+        operationModeArgument = 3;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
@@ -22382,7 +22382,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
-        operationModeArgument = static_cast<uint8_t>(0);
+        operationModeArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
@@ -25101,7 +25101,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t controlSequenceOfOperationArgument;
-        controlSequenceOfOperationArgument = static_cast<uint8_t>(4);
+        controlSequenceOfOperationArgument = 4;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
@@ -25178,7 +25178,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t systemModeArgument;
-        systemModeArgument = static_cast<uint8_t>(1);
+        systemModeArgument = 1;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
             systemModeArgument, this, OnSuccessCallback_48, OnFailureCallback_48));
@@ -25311,7 +25311,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t startOfWeekArgument;
-        startOfWeekArgument = static_cast<uint8_t>(0);
+        startOfWeekArgument = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
             startOfWeekArgument, this, OnSuccessCallback_55, OnFailureCallback_55));
@@ -26937,7 +26937,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t controlSequenceOfOperationArgument;
-        controlSequenceOfOperationArgument = static_cast<uint8_t>(2);
+        controlSequenceOfOperationArgument = 2;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
@@ -27546,7 +27546,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
-        temperatureDisplayModeArgument = static_cast<uint8_t>(0);
+        temperatureDisplayModeArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -27646,7 +27646,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(0);
+        keypadLockoutArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -27745,7 +27745,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
-        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
+        scheduleProgrammingVisibilityArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -27981,7 +27981,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
-        temperatureDisplayModeArgument = static_cast<uint8_t>(0);
+        temperatureDisplayModeArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -28001,7 +28001,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
-        temperatureDisplayModeArgument = static_cast<uint8_t>(1);
+        temperatureDisplayModeArgument = 1;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -28021,7 +28021,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(0);
+        keypadLockoutArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28040,7 +28040,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(1);
+        keypadLockoutArgument = 1;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28059,7 +28059,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(2);
+        keypadLockoutArgument = 2;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28078,7 +28078,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(3);
+        keypadLockoutArgument = 3;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28097,7 +28097,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(4);
+        keypadLockoutArgument = 4;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28116,7 +28116,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
-        keypadLockoutArgument = static_cast<uint8_t>(5);
+        keypadLockoutArgument = 5;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -28135,7 +28135,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
-        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
+        scheduleProgrammingVisibilityArgument = 0;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -28155,7 +28155,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
-        scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
+        scheduleProgrammingVisibilityArgument = 1;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<
@@ -29443,7 +29443,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t typeArgument;
-        typeArgument = static_cast<uint8_t>(250);
+        typeArgument = 250;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
             typeArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -29629,7 +29629,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t endProductTypeArgument;
-        endProductTypeArgument = static_cast<uint8_t>(250);
+        endProductTypeArgument = 250;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
             endProductTypeArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
@@ -38628,7 +38628,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
-        enum8Argument = static_cast<uint8_t>(255);
+        enum8Argument = 255;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
             enum8Argument, this, OnSuccessCallback_98, OnFailureCallback_98));
@@ -38665,7 +38665,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
-        enum8Argument = static_cast<uint8_t>(0);
+        enum8Argument = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
             enum8Argument, this, OnSuccessCallback_100, OnFailureCallback_100));
@@ -38721,7 +38721,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
-        enum16Argument = static_cast<uint16_t>(65535);
+        enum16Argument = 65535U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
             enum16Argument, this, OnSuccessCallback_103, OnFailureCallback_103));
@@ -38758,7 +38758,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
-        enum16Argument = static_cast<uint16_t>(0);
+        enum16Argument = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
             enum16Argument, this, OnSuccessCallback_105, OnFailureCallback_105));
@@ -42593,7 +42593,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
-        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(254);
+        nullableEnum8Argument.SetNonNull() = 254;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             nullableEnum8Argument, this, OnSuccessCallback_268, OnFailureCallback_268));
@@ -42631,7 +42631,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
-        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(255);
+        nullableEnum8Argument.SetNonNull() = 255;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             nullableEnum8Argument, this, OnSuccessCallback_270, OnFailureCallback_270));
@@ -42710,7 +42710,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
-        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65534);
+        nullableEnum16Argument.SetNonNull() = 65534U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             nullableEnum16Argument, this, OnSuccessCallback_274, OnFailureCallback_274));
@@ -42748,7 +42748,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
-        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65535);
+        nullableEnum16Argument.SetNonNull() = 65535U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             nullableEnum16Argument, this, OnSuccessCallback_276, OnFailureCallback_276));
@@ -47045,7 +47045,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
-        enum8Argument = static_cast<uint8_t>(1);
+        enum8Argument = 1;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
             enum8Argument, this, OnSuccessCallback_70, OnFailureCallback_70));
@@ -47082,7 +47082,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
-        enum8Argument = static_cast<uint8_t>(readAttributeEnum8DefaultValue);
+        enum8Argument = readAttributeEnum8DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
             enum8Argument, this, OnSuccessCallback_72, OnFailureCallback_72));
@@ -47139,7 +47139,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
-        enum16Argument = static_cast<uint16_t>(1);
+        enum16Argument = 1U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
             enum16Argument, this, OnSuccessCallback_75, OnFailureCallback_75));
@@ -47176,7 +47176,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
-        enum16Argument = static_cast<uint16_t>(readAttributeEnum16DefaultValue);
+        enum16Argument = readAttributeEnum16DefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
             enum16Argument, this, OnSuccessCallback_77, OnFailureCallback_77));
