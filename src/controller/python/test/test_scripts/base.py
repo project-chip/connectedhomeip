@@ -29,6 +29,7 @@ import logging
 import time
 import ctypes
 import chip.clusters as Clusters
+import chip.clusters.Attribute as Attribute
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -249,7 +250,7 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "NodeLabel": "Test",
+            "NodeLabel": "",
             "Location": "",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
@@ -321,12 +322,14 @@ class BaseTestHelper:
         updateLock = threading.Lock()
         updateCv = threading.Condition(updateLock)
 
-        def OnValueChange(path: Clusters.Attribute.AttributePath, data: typing.Any) -> None:
+        def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
             nonlocal desiredPath, updateCv, updateLock, receivedUpdate
-            if path != desiredPath:
+            if path.Path != desiredPath:
                 return
+
+            data = transaction.GetAttribute(path)
             logger.info(
-                f"Received report from server: path: {path}, value: {data}")
+                f"Received report from server: path: {path.Path}, value: {data}")
             with updateLock:
                 receivedUpdate += 1
                 updateCv.notify_all()
