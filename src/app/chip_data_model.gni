@@ -132,11 +132,10 @@ template("chip_data_model") {
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
         sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
-      } else if (cluster == "network-commissioning") {
+      } else if (cluster == "network-commissioning-old") {
         sources += [
-          "${_app_root}/clusters/${cluster}-old/${cluster}-ember.cpp",
-          "${_app_root}/clusters/${cluster}-old/${cluster}.cpp",
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/network-commissioning-ember.cpp",
+          "${_app_root}/clusters/${cluster}/network-commissioning-old.cpp",
         ]
       } else if (cluster == "mode-select-server") {
         sources += [

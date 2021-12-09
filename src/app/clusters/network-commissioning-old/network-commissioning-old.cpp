@@ -108,8 +108,9 @@ namespace {
 NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
-void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                               ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnAddOrUpdateThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler,
+                                                       const app::ConcreteCommandPath & commandPath, ByteSpan operationalDataset,
+                                                       uint64_t breadcrumb, uint32_t timeoutMs)
 {
     Commands::NetworkConfigResponse::Type response;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -148,18 +149,19 @@ void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHa
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, to_underlying(err));
+    ChipLogDetail(Zcl, "AddOrUpdateThreadNetwork: %" PRIu8, to_underlying(err));
     response.networkingStatus = err;
 #else
-    // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
-    // return "Command not found" error.
+    // The target does not supports ThreadNetwork. We should not add AddOrUpdateThreadNetwork command in that case then the upper
+    // layer will return "Command not found" error.
     response.networkingStatus = NetworkCommissioningStatus::kUnknownError;
 #endif
     apCommandHandler->AddResponseData(commandPath, response);
 }
 
-void OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                             ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnAddOrUpdateWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler,
+                                                     const app::ConcreteCommandPath & commandPath, ByteSpan ssid,
+                                                     ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     Commands::NetworkConfigResponse::Type response;
 #if defined(CHIP_DEVICE_LAYER_TARGET)
@@ -205,7 +207,7 @@ void OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHand
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, to_underlying(err));
+    ChipLogDetail(Zcl, "AddOrUpdateWiFiNetwork: %" PRIu8, to_underlying(err));
     response.networkingStatus = err;
 #else
     // The target does not supports WiFiNetwork.
@@ -216,7 +218,7 @@ exit:
 }
 
 namespace {
-CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
+CHIP_ERROR DoConnectNetwork(NetworkInfo * network)
 {
     switch (network->mNetworkType)
     {
@@ -257,8 +259,8 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
 }
 } // namespace
 
-void OnEnableNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                            ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnConnectNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
+                                             ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     Commands::ConnectNetworkResponse::Type response;
     size_t networkSeq;
@@ -272,7 +274,8 @@ void OnEnableNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandl
         {
             // TODO: Currently, we cannot figure out the detailed error from network provisioning on DeviceLayer, we should
             // implement this in device layer.
-            VerifyOrExit(DoEnableNetwork(&sNetworks[networkSeq]) == CHIP_NO_ERROR, err = NetworkCommissioningStatus::kUnknownError);
+            VerifyOrExit(DoConnectNetwork(&sNetworks[networkSeq]) == CHIP_NO_ERROR,
+                         err = NetworkCommissioningStatus::kUnknownError);
             ExitNow(err = NetworkCommissioningStatus::kSuccess);
         }
     }
