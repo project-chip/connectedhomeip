@@ -26,7 +26,6 @@
 // ==================== Platform Adaptations ====================
 
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 1
 
