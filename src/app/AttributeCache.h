@@ -59,7 +59,7 @@ namespace app {
  * **NOTE** This already includes the BufferedReadCallback, so there is no need to add that to the ReadClient callback chain.
  *
  */
-class AttributeCache : public ReadClient::Callback
+class AttributeCache : protected ReadClient::Callback
 {
 public:
     class Callback : public ReadClient::Callback
@@ -84,7 +84,7 @@ public:
     AttributeCache(Callback & callback) : mCallback(callback), mBufferedReader(*this) {}
 
     /*
-     * When registering as a callback to the ReadClient, please do not pass the AttributeCache
+     * When registering as a callback to the ReadClient, the AttributeCache cannot not be passed as a callback
      * directly. Instead, utilize this method below to correctly set up the callback chain such that
      * the buffered reader is the first callback in the chain before calling into cache subsequently.
      */
@@ -93,6 +93,11 @@ public:
     /*
      * Retrieve the value of an attribute from the cache (if present) given a concrete path and decode
      * is using DataModel::Decode into the in-out argument 'value'.
+     *
+     * For some types of attributes, the value for the attribute is directly backed by the underlying TLV buffer
+     * and has pointers into that buffer. (e.g octet strings, char strings and lists).  This buffer only remains
+     * valid until the cached value for that path is updated, so it must not be held
+     * across any async call boundaries.
      *
      * The template parameter AttributeObjectTypeT is generally expected to be a
      * ClusterName::Attributes::AttributeName::DecodableType, but any
@@ -133,21 +138,7 @@ public:
      *      - If data exists in the cache instead of status, CHIP_ERROR_INVALID_ARGUMENT shall be returned.
      *
      */
-    CHIP_ERROR GetStatus(const ConcreteAttributePath & path, StatusIB & status)
-    {
-        CHIP_ERROR err;
-
-        auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
-        ReturnErrorOnFailure(err);
-
-        if (!attributeState->Is<StatusIB>())
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
-        status = attributeState->Get<StatusIB>();
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR GetStatus(const ConcreteAttributePath & path, StatusIB & status);
 
     /*
      * Encapsulates a StatusIB and a ConcreteAttributePath pair.
@@ -163,6 +154,11 @@ public:
      * Retrieve the value of an entire cluster instance from the cache (if present) given a path
      * and decode it using DataModel::Decode into the in-out argument 'value'. If any StatusIBs
      * are present in the cache instead of data, they will be provided in the statusList argument.
+     *
+     * For some types of attributes, the value for the attribute is directly backed by the underlying TLV buffer
+     * and has pointers into that buffer. (e.g octet strings, char strings and lists).  This buffer only remains
+     * valid until the cached value for that path is updated, so it must not be held
+     * across any async call boundaries.
      *
      * The template parameter ClusterObjectT is generally expected to be a
      * ClusterName::Attributes::DecodableType, but any
@@ -209,6 +205,9 @@ public:
      * Retrieve the value of an attribute by updating a in-out TLVReader to be positioned
      * right at the attribute value.
      *
+     * The underlying TLV buffer only remains valid until the cached value for that path is updated, so it must
+     * not be held across any async call boundaries.
+     *
      * Notable return values:
      *      - If neither data nor status for the specified path exist in the cache, CHIP_ERROR_KEY_NOT_FOUND
      *        shall be returned.
@@ -254,8 +253,8 @@ public:
 
     /*
      * Execute an iterator function that is called for every attribute
-     * for a given cluster in the cache and is passed a concrete attribute path
-     * to every attribute that matches in the cache.
+     * for a given cluster across all endpoints in the cache. The function is passed a
+     * concrete attribute path to every attribute that matches in the cache.
      *
      * The iterator is expected to have this signature:
      *      CHIP_ERROR IteratorFunc(const ConcreteAttributePath &path);

@@ -197,5 +197,21 @@ AttributeCache::AttributeState * AttributeCache::GetAttributeState(EndpointId en
     return &attributeState->second;
 }
 
+CHIP_ERROR AttributeCache::GetStatus(const ConcreteAttributePath & path, StatusIB & status)
+{
+    CHIP_ERROR err;
+
+    auto attributeState = GetAttributeState(path.mEndpointId, path.mClusterId, path.mAttributeId, err);
+    ReturnErrorOnFailure(err);
+
+    if (!attributeState->Is<StatusIB>())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    status = attributeState->Get<StatusIB>();
+    return CHIP_NO_ERROR;
+}
+
 } // namespace app
 } // namespace chip
