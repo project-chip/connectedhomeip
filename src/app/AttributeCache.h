@@ -181,11 +181,9 @@ public:
             err = Get(path, reader);
             if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
             {
-                ConcreteAttributePath pathCopy(path);
                 StatusIB status;
-
                 ReturnErrorOnFailure(GetStatus(path, status));
-                statusList.push_back(AttributeStatus(pathCopy, status));
+                statusList.push_back(AttributeStatus(path, status));
                 err = CHIP_NO_ERROR;
             }
             else if (err == CHIP_NO_ERROR)
