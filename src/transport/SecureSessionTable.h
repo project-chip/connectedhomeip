@@ -37,7 +37,7 @@ constexpr const uint16_t kAnyKeyId = 0xffff;
  *   - handle session active time and expiration
  *   - allocate and free space for sessions.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class SecureSessionTable
 {
 public:
@@ -64,8 +64,7 @@ public:
                                            CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                                            const ReliableMessageProtocolConfig & config)
     {
-        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config,
-                                     mTimeSource.GetMonotonicTimestamp());
+        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config);
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
@@ -98,9 +97,6 @@ public:
         return result;
     }
 
-    /// Convenience method to mark a session as active
-    void MarkSessionActive(SecureSession * state) { state->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp()); }
-
     /**
      * Iterates through all active sessions and expires any sessions with an idle time
      * larger than the given amount.
@@ -110,9 +106,8 @@ public:
     template <typename Callback>
     void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
     {
-        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
         mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLastActivityTime() + maxIdleTime < currentTime)
+            if (session->GetLastActivityTime() + maxIdleTime < System::SystemClock().GetMonotonicTimestamp())
             {
                 callback(*session);
                 ReleaseSession(session);
@@ -121,11 +116,7 @@ public:
         });
     }
 
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
-
 private:
-    Time::TimeSource<kTimeSource> mTimeSource;
     BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
 };
 

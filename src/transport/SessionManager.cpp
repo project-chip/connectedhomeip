@@ -226,7 +226,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
             }
 
             // This marks any connection where we send data to as 'active'
-            mSecureSessions.MarkSessionActive(session);
+            session->MarkActive();
 
             destination = &session->GetPeerAddress();
 
@@ -241,7 +241,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     else
     {
         auto unauthenticated = sessionHandle.GetUnauthenticatedSession();
-        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
+        unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
 
         ChipLogProgress(Inet,
@@ -439,7 +439,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
 
-    mUnauthenticatedSessions.MarkSessionActive(session);
+    session->MarkActive();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -502,7 +502,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    mSecureSessions.MarkSessionActive(session);
+    session->MarkActive();
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
@@ -628,7 +628,8 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
     mgr->mSecureSessions.ExpireInactiveSessions(
-        CHIP_PEER_CONNECTION_TIMEOUT_MS, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        System::SystemClock().GetMonotonicTimestamp(), System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS),
+        [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }

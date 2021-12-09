@@ -65,13 +65,11 @@ public:
     };
 
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
-                  FabricIndex fabric, const ReliableMessageProtocolConfig & config, System::Clock::Timestamp currentTime) :
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mFabric(fabric), mMRPConfig(config)
-    {
-        SetLastActivityTime(currentTime);
-    }
+        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {}
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
@@ -95,7 +93,7 @@ public:
     FabricIndex GetFabricIndex() const { return mFabric; }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
-    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
