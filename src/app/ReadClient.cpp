@@ -114,6 +114,21 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
+CHIP_ERROR ReadClient::SendRequest(ReadPrepareParams & aReadPrepareParams)
+{
+    if (mInteractionType == InteractionType::Read)
+    {
+        return SendReadRequest(aReadPrepareParams);
+    }
+
+    if (mInteractionType == InteractionType::Subscribe)
+    {
+        return SendSubscribeRequest(aReadPrepareParams);
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
