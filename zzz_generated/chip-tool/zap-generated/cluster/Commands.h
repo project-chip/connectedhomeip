@@ -4328,7 +4328,6 @@ private:
 | * ApplicationApp                                                    | 0x0004 |
 | * ApplicationStatus                                                 | 0x0005 |
 | * ApplicationVersion                                                | 0x0006 |
-| * AllowedVendorList                                                 | 0x0007 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4808,6 +4807,7 @@ private:
 };
 
 /*
+<<<<<<< HEAD
  * Attribute AllowedVendorList
  */
 class ReadApplicationBasicAllowedVendorList : public ModelCommand
@@ -4953,6 +4953,8 @@ private:
 };
 
 /*
+=======
+>>>>>>> f7646cf02 (Disabled application basic cluster - allowed vendor list)
  * Attribute AttributeList
  */
 class ReadApplicationBasicAttributeList : public ModelCommand
@@ -50815,7 +50817,6 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReportApplicationBasicApplicationStatus>(),  //
         make_unique<ReadApplicationBasicApplicationVersion>(),   //
         make_unique<ReportApplicationBasicApplicationVersion>(), //
-        make_unique<ReadApplicationBasicAllowedVendorList>(),    //
         make_unique<ReadApplicationBasicAttributeList>(),        //
         make_unique<ReadApplicationBasicClusterRevision>(),      //
         make_unique<ReportApplicationBasicClusterRevision>(),    //
