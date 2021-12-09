@@ -31,7 +31,7 @@ limitations under the License.
     <attribute side="server" code="0x0004" define="APPLICATION_APP" type="ApplicationBasicApp" writable="true" optional="false">application app</attribute>
     <attribute side="server" code="0x0005" define="APPLICATION_STATUS" type="ENUM8" min="0x00" max="0xFF" default="0x01" writable="false" optional="false">application status</attribute>
     <attribute side="server" code="0x0006" define="APPLICATION_VERSION" type="CHAR_STRING" length="32" writable="false" optional="false">application version</attribute>
-    <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="ARRAY" entryType="INT16U" length="32" writable="false" optional="false">allowed vendor list</attribute>
+    <!-- <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="ARRAY" entryType="INT16U" length="32" writable="false" optional="false">allowed vendor list</attribute> -->
 
     <command source="client" code="0x00" name="ChangeStatus" optional="false">
       <description>Upon receipt, this SHALL change the running status of the application.</description>

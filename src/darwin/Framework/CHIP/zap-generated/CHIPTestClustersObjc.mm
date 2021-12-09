@@ -416,6 +416,7 @@ using namespace chip::app::Clusters;
         });
 }
 
+<<<<<<< HEAD
 - (void)writeAttributeAllowedVendorListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -459,6 +460,8 @@ using namespace chip::app::Clusters;
         });
 }
 
+=======
+>>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(

@@ -792,6 +792,7 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
+<<<<<<< HEAD
 - (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {
@@ -837,6 +838,8 @@ using namespace chip::app::Clusters;
 }
 
 >>>>>>> 359911f36 (Run zap tool successfully)
+=======
+>>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
