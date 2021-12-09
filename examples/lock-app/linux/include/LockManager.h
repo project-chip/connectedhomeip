@@ -43,7 +43,8 @@ public:
     void Init();
     //bool InitiateAction(Action_t aAction);
 
-    bool CheckPin(const char* pin);
+    bool Lock(const char* pin);
+    bool Unlock(const char* pin);
 
     //using LockCallback_fn = std::function<void(Action_t)>;
 

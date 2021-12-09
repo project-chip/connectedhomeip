@@ -29,17 +29,14 @@ void LockManager::Init()
     mLocked = false;
 }
 
-bool LockManager::CheckPin(const char* pin)
+bool LockManager::Lock(const char* pin)
 {
-    // TODO: Remove pin hardcode
-    if(pin != NULL && std::strncmp(pin, "1234", 4) == 0)
-    {
-        mLocked = true;
+    mLocked = true;
+    return true;
+}
 
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+bool LockManager::Unlock(const char* pin)
+{
+    mLocked = false;
+    return true;
 }

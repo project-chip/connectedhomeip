@@ -61,6 +61,10 @@ DoorLockServer & DoorLockServer::Instance()
 void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
     emberAfDoorLockClusterPrintln("Door Lock cluster initialized at %d", endpointId);
+    // TODO: Remove hardcode
+    strcpy(mPin, "1234");
+    SetLockState(endpointId, DlLockState::kLocked);;
+    SetActuatorEnabled(endpointId, true);
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
@@ -78,16 +82,16 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     return status;
 }
 
-bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActuatorState)
+bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState)
 {
     auto actuatorState = static_cast<uint8_t>(newActuatorState);
 
-    emberAfDoorLockClusterPrintln("Setting Actuator State to '%hhu'", actuatorState);
+    emberAfDoorLockClusterPrintln("Setting Actuator Enabled State to '%hhu'", actuatorState);
 
-    bool status = Attributes::LockState::Set(endpointId, actuatorState);
+    bool status = Attributes::ActuatorEnabled::Set(endpointId, actuatorState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(Zcl, "Unable to set the Actuator State to %hhu: internal error", actuatorState);
+        ChipLogError(Zcl, "Unable to set the Actuator Enabled State to %hhu: internal error", actuatorState);
     }
 
     return false;
@@ -139,23 +143,49 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
                                             const chip::app::ConcreteCommandPath & commandPath,
                                             const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Lock Door command (implementing currently!)");
+    emberAfDoorLockClusterPrintln("Received Lock Door command");
     bool success = false;
 
-    // TODO: Get actual endpoint id
-    chip::EndpointId endpoint = 1;
+    chip::EndpointId endpoint = commandPath.mEndpointId;
 
-    if(commandData.pinCode.HasValue())
+    bool require_pin = false;
+    Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
+
+    if(require_pin)
     {
-        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, 
-                reinterpret_cast<const char*>(commandData.pinCode.Value().data()));
+        if(!commandData.pinCode.HasValue())
+        {
+            success = false; // Just to be explicit. success == false at this point anywyay
+        }
+        else
+        {
+            const char *cmd_pin = reinterpret_cast<const char*>(commandData.pinCode.Value().data());
+            char *mPin = DoorLockServer::Instance().mPin;
+            if(strncmp(mPin, cmd_pin, 4) == 0)
+            {
+                success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, cmd_pin);
+            }
+            else
+            {
+                success = false;
+            }
+        }
     }
     else
     {
-        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, NULL);
+        const char *cmd_pin = commandData.pinCode.HasValue() ?
+            reinterpret_cast<const char*>(commandData.pinCode.Value().data()) :
+            NULL;
+        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, cmd_pin);
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+
+    // Should be called after reponse sent (indicating command complete) since
+    // the attribute Set call in SetLockState will error out if the command is
+    // still pending
+    if(success)
+        return DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked) == EMBER_ZCL_STATUS_SUCCESS;
     return success;
 }
 
@@ -163,23 +193,49 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Unlock Door command (implementing currently!)");
+    emberAfDoorLockClusterPrintln("Received Unlock Door command");
     bool success = false;
 
-    // TODO: Get actual endpoint id
-    chip::EndpointId endpoint = 1;
+    chip::EndpointId endpoint = commandPath.mEndpointId;
 
-    if(commandData.pinCode.HasValue())
+    bool require_pin = false;
+    Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
+
+    if(require_pin)
     {
-        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint,
-                reinterpret_cast<const char*>(commandData.pinCode.Value().data()));
+        if(!commandData.pinCode.HasValue())
+        {
+            success = false; // Just to be explicit. success == false at this point anywyay
+        }
+        else
+        {
+            const char *cmd_pin = reinterpret_cast<const char*>(commandData.pinCode.Value().data());
+            char *mPin = DoorLockServer::Instance().mPin;
+            if(strncmp(mPin, cmd_pin, 4) == 0)
+            {
+                success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, cmd_pin);
+            }
+            else
+            {
+                success = false;
+            }
+        }
     }
     else
     {
-        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, NULL);
+        const char *cmd_pin = commandData.pinCode.HasValue() ?
+            reinterpret_cast<const char*>(commandData.pinCode.Value().data()) :
+            NULL;
+        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, cmd_pin);
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+
+    // Should be called after reponse sent (indicating command complete) since
+    // the attribute Set call in SetLockState will error out if the command is
+    // still pending
+    if(success)
+        return DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked) == EMBER_ZCL_STATUS_SUCCESS;
     return success;
 }
 
@@ -188,6 +244,14 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Set User command (not implemented)");
+    // SetUser command fields are:
+        //DlDataOperationType operationType;
+        //uint16_t userIndex;
+        //DataModel::Nullable<chip::CharSpan> userName;
+        //DataModel::Nullable<uint32_t> userUniqueId;
+        //DlUserStatus userStatus;
+        //DlUserType userType;
+        //DlCredentialRule credentialRule;
 
     // TODO: Implement setting the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -199,6 +263,8 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Get User command (not implemented)");
+    // GetUser command fields are:
+        // uint16_t userIndex;
 
     // TODO: Implement getting the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -210,6 +276,8 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
                                              const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Clear User command (not implemented)");
+    // ClearUser command fields are:
+        // uint16_t userIndex;
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -221,6 +289,12 @@ bool emberAfDoorLockClusterSetCredentialCallback(
     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Set Credential command (not implemented)");
+    // SetCredential command fields are:
+        //DlDataOperationType operationType;
+        //Structs::DlCredential::Type credential;
+        //chip::ByteSpan credentialData;
+        //uint16_t userIndex;
+        //DlUserStatus userStatus;
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -232,6 +306,8 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
     const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Get Credential Status command (not implemented)");
+    // GetCredentialStatus command fields are:
+        // Structs::DlCredential::Type credential;
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -243,6 +319,8 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("Received Clear Credential command (not implemented)");
+    // ClearCredential command fields are:
+        // Structs::DlCredential::Type credential;
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

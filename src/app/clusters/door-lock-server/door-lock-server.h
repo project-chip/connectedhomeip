@@ -43,7 +43,7 @@ public:
     };
 
     // Where should this actually live?
-    char *pin;
+    char mPin[5];
 
     static DoorLockServer & Instance();
     static DoorLockServer instance;
@@ -51,7 +51,7 @@ public:
     void InitServer(chip::EndpointId endpointId);
 
     bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
-    bool SetActuatorState(chip::EndpointId endpointId, bool newActuatorState);
+    bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
     bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newDoorState);
 
     bool SetLanguage(chip::EndpointId endpointId, const char * newLanguage);

@@ -62,24 +62,18 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::DoorLock;
 
+// App handles physical aspects of locking but not locking logic. That is it
+// should wait for door to be locked on lock command and return success) but
+// door lock server should check pin before even calling the lock-door
+// callback.
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCode)
 {
-    if(LockMgr().CheckPin(PINCode))
-    {
-        return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
-    }
-
-    return false;
+    return LockMgr().Lock(PINCode);
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode)
 {
-    if(LockMgr().CheckPin(PINCode))
-    {
-        return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked);
-    }
-
-    return false;
+    return LockMgr().Unlock(PINCode);
 }
 
 /*
@@ -141,7 +135,7 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
 
 void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
-    // TODO: Implement if needed
+    DoorLockServer::Instance().InitServer(endpoint);
 }
 
 
