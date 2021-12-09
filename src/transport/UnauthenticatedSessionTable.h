@@ -48,8 +48,8 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
-        mPeerAddress(address), mMRPConfig(config)
+    UnauthenticatedSession(const PeerAddress & address, System::Clock::Timestamp now, const ReliableMessageProtocolConfig & config) :
+        mPeerAddress(address), mLastActivityTime(now), mMRPConfig(config)
     {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
@@ -69,9 +69,8 @@ public:
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
-
     const PeerAddress mPeerAddress;
+    System::Clock::Timestamp mLastActivityTime;
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
@@ -84,7 +83,7 @@ private:
  *   hold by using UnauthenticatedSessionHandle, which increase the reference
  *   count by 1. If the reference count is not 0, the entry won't be pruned.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class UnauthenticatedSessionTable
 {
 public:
@@ -94,14 +93,14 @@ public:
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address,
+    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address, System::Clock::Timestamp now,
                                                                const ReliableMessageProtocolConfig & config)
     {
         UnauthenticatedSession * result = FindEntry(address);
         if (result != nullptr)
             return MakeOptional<UnauthenticatedSessionHandle>(*result);
 
-        CHIP_ERROR err = AllocEntry(address, config, result);
+        CHIP_ERROR err = AllocEntry(address, now, config, result);
         if (err == CHIP_NO_ERROR)
         {
             return MakeOptional<UnauthenticatedSessionHandle>(*result);
@@ -113,13 +112,10 @@ public:
     }
 
     /// Mark a session as active
-    void MarkSessionActive(UnauthenticatedSessionHandle session)
+    void MarkSessionActive(System::Clock::Timestamp now, UnauthenticatedSessionHandle session)
     {
-        session->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp());
+        session->SetLastActivityTime(now);
     }
-
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
     /**
@@ -129,10 +125,10 @@ private:
      * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR AllocEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config,
+    CHIP_ERROR AllocEntry(const PeerAddress & address, System::Clock::Timestamp now, const ReliableMessageProtocolConfig & config,
                           UnauthenticatedSession *& entry)
     {
-        entry = mEntries.CreateObject(address, config);
+        entry = mEntries.CreateObject(address, now, config);
         if (entry != nullptr)
             return CHIP_NO_ERROR;
 
@@ -142,7 +138,7 @@ private:
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        mEntries.ResetObject(entry, address, config);
+        mEntries.ResetObject(entry, address, now, config);
         return CHIP_NO_ERROR;
     }
 
@@ -222,7 +218,6 @@ private:
         return false;
     }
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
     BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
 };
 

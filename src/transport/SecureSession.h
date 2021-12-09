@@ -66,13 +66,11 @@ public:
 
     SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, Credentials::CATValues peerCATs,
                   uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config,
-                  System::Clock::Timestamp currentTime) :
+                  System::Clock::Timestamp now) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mFabric(fabric), mMRPConfig(config)
-    {
-        SetLastActivityTime(currentTime);
-    }
+        mFabric(fabric), mLastActivityTime(now), mMRPConfig(config)
+    {}
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;

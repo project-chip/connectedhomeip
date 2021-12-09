@@ -253,11 +253,11 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
-    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
+    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress, System::Clock::Timestamp now,
                                                          const ReliableMessageProtocolConfig & config)
     {
         Optional<Transport::UnauthenticatedSessionHandle> session =
-            mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
+            mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, now, config);
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 

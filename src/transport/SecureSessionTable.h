@@ -37,7 +37,7 @@ constexpr const uint16_t kAnyKeyId = 0xffff;
  *   - handle session active time and expiration
  *   - allocate and free space for sessions.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class SecureSessionTable
 {
 public:
@@ -60,10 +60,9 @@ public:
     CHECK_RETURN_VALUE
     SecureSession * CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
                                            Credentials::CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
-                                           const ReliableMessageProtocolConfig & config)
+                                           const ReliableMessageProtocolConfig & config, System::Clock::Timestamp now)
     {
-        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config,
-                                     mTimeSource.GetMonotonicTimestamp());
+        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config, now);
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
@@ -97,7 +96,7 @@ public:
     }
 
     /// Convenience method to mark a session as active
-    void MarkSessionActive(SecureSession * state) { state->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp()); }
+    void MarkSessionActive(System::Clock::Timestamp now, SecureSession * state) { state->SetLastActivityTime(now); }
 
     /**
      * Iterates through all active sessions and expires any sessions with an idle time
@@ -106,11 +105,10 @@ public:
      * Expiring a session involves callback execution and then clearing the internal state.
      */
     template <typename Callback>
-    void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
+    void ExpireInactiveSessions(System::Clock::Timestamp now, Callback callback)
     {
-        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
         mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLastActivityTime() + maxIdleTime < currentTime)
+            if (session->GetLastActivityTime() + System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS) < now)
             {
                 callback(*session);
                 ReleaseSession(session);
@@ -119,11 +117,7 @@ public:
         });
     }
 
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
-
 private:
-    Time::TimeSource<kTimeSource> mTimeSource;
     BitMapObjectPool<SecureSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
 };
 
