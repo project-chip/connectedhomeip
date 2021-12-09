@@ -43,7 +43,7 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -56,6 +56,8 @@ struct DeviceProxyInitParams
     CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
 
     CHIP_ERROR Validate()
     {
@@ -107,9 +109,11 @@ public:
      * session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately.
+     * If the resolver is null and the device state is State::NeedsAddress, CHIP_ERROR_INVALID_ARGUMENT will be
+     * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 

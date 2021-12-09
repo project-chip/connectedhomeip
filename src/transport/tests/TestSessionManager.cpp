@@ -120,7 +120,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -147,7 +147,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -236,7 +236,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -311,7 +311,7 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -416,7 +416,7 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = sessionManager.Init(ctx.GetInetLayer().SystemLayer(), &transportMgr, &gMessageCounterManager);
+    err = sessionManager.Init(&ctx.GetSystemLayer(), &transportMgr, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     TestSessMgrCallback callback;

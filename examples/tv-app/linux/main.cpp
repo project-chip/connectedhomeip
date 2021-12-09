@@ -22,7 +22,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 
@@ -46,7 +46,7 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;

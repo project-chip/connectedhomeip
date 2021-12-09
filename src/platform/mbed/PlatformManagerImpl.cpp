@@ -2,7 +2,6 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
-#include <inet/InetLayer.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 #include <platform/ScopedLock.h>

@@ -23,8 +23,6 @@
  */
 
 #include "CommandHandler.h"
-#include "Command.h"
-#include "CommandSender.h"
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
@@ -55,8 +53,6 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 
         mInvokeResponseBuilder.CreateInvokeResponses();
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
-
-        mCommandIndex    = 0;
         mBufferAllocated = true;
     }
 
@@ -67,7 +63,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     System::PacketBufferHandle response;
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
@@ -145,7 +141,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
 void CommandHandler::Close()
 {
     mSuppressResponse = false;
-    MoveToState(CommandState::AwaitingDestruction);
+    MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
     // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
@@ -153,7 +149,24 @@ void CommandHandler::Close()
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
                        mPendingWork);
 
-    Command::Close();
+    //
+    // Shortly after this call to close and when handling an inbound message, it's entirely possible
+    // for this object (courtesy of its derived class) to be destroyed
+    // *before* the call unwinds all the way back to ExchangeContext::HandleMessage.
+    //
+    // As part of tearing down the exchange, there is logic there to invoke the delegate to notify
+    // it of impending closure - which is this object, which just got destroyed!
+    //
+    // So prevent a use-after-free, set delegate to null.
+    //
+    // For more details, see #10344.
+    //
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+    }
+
+    mpExchangeCtx = nullptr;
 
     if (mpCallback)
     {
@@ -198,7 +211,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     System::PacketBufferHandle commandPacket;
 
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(commandPacket));
@@ -207,7 +220,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
     // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
 
-    MoveToState(CommandState::CommandSent);
+    MoveToState(State::CommandSent);
 
     return CHIP_NO_ERROR;
 }
@@ -350,7 +363,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -365,14 +378,14 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
         ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
                                                                      TLV::kTLVType_Structure, mDataElementContainerType));
     }
-    MoveToState(CommandState::AddingCommand);
+    MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 {
-    VerifyOrReturnError(mState == CommandState::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
-    CommandDataIB::Builder commandData = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand();
+    VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    CommandDataIB::Builder & commandData = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand();
     if (aStartDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
@@ -381,7 +394,7 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
-    MoveToState(CommandState::AddedCommand);
+    MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
 
@@ -391,7 +404,7 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -400,25 +413,25 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     CommandPathIB::Builder & path = commandStatus.CreatePath();
     ReturnErrorOnFailure(commandStatus.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPath));
-    MoveToState(CommandState::AddingCommand);
+    MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::FinishStatus()
 {
-    VerifyOrReturnError(mState == CommandState::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(
         mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
-    MoveToState(CommandState::AddedCommand);
+    MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
 
 TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 {
-    if (mState != CommandState::AddingCommand)
+    if (mState != State::AddingCommand)
     {
         return nullptr;
     }
@@ -461,6 +474,66 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
+CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    return mCommandMessageWriter.Finalize(&commandPacket);
+}
+
+const char * CommandHandler::GetStateStr() const
+{
+#if CHIP_DETAIL_LOGGING
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::AddingCommand:
+        return "AddingCommand";
+
+    case State::AddedCommand:
+        return "AddedCommand";
+
+    case State::AwaitingTimedStatus:
+        return "AwaitingTimedStatus";
+
+    case State::CommandSent:
+        return "CommandSent";
+
+    case State::AwaitingDestruction:
+        return "AwaitingDestruction";
+    }
+#endif // CHIP_DETAIL_LOGGING
+    return "N/A";
+}
+
+void CommandHandler::MoveToState(const State aTargetState)
+{
+    mState = aTargetState;
+    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+}
+
+void CommandHandler::Abort()
+{
+    //
+    // If the exchange context hasn't already been gracefully closed
+    // (signaled by setting it to null), then we need to forcibly
+    // tear it down.
+    //
+    if (mpExchangeCtx != nullptr)
+    {
+        // We (or more precisely our subclass) might be a delegate for this
+        // exchange, and we don't want the OnExchangeClosing notification in
+        // that case.  Null out the delegate to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx->Abort();
+        mpExchangeCtx = nullptr;
+    }
+}
 } // namespace app
 } // namespace chip
 

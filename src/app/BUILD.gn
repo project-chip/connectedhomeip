@@ -45,8 +45,6 @@ static_library("app") {
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",
-    "Command.cpp",
-    "Command.h",
     "CommandHandler.cpp",
     "CommandSender.cpp",
     "DeviceProxy.cpp",

@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/CASEClientPool.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
@@ -66,6 +67,14 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
+    CASEClientPoolDelegate * GetCASEClientPool() { return mCASEClientPool; }
+
+    void SetCASEClientPool(CASEClientPoolDelegate * clientPool) { mCASEClientPool = clientPool; }
+
+    OperationalDeviceProxyPoolDelegate * GetDevicePool() { return mDevicePool; }
+
+    void SetDevicePool(OperationalDeviceProxyPoolDelegate * devicePool) { mDevicePool = devicePool; }
+
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
@@ -73,13 +82,6 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
-
-    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
-
-    void SetOperationalDeviceProxy(chip::OperationalDeviceProxy * operationalDeviceProxy)
-    {
-        mOperationalDeviceProxy = operationalDeviceProxy;
-    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
@@ -139,6 +141,8 @@ private:
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
+    CASEClientPoolDelegate * mCASEClientPool         = nullptr;
+    OperationalDeviceProxyPoolDelegate * mDevicePool = nullptr;
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
@@ -156,8 +160,6 @@ private:
     // (https://github.com/project-chip/connectedhomeip/issues/12174)
     TestPersistentStorageDelegate mGroupsStorage;
     Credentials::GroupDataProviderImpl mGroupsProvider;
-
-    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

@@ -27,7 +27,7 @@
 #include <lib/support/Pool.h>
 #include <transport/SessionDelegate.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -36,6 +36,7 @@ struct CASESessionManagerConfig
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
     OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
+    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
 };
 
 /**
@@ -56,6 +57,9 @@ public:
         VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
         mConfig = params;
+
+        // TODO: Revisit who should be set as the resolver delegate
+        Dnssd::Resolver::Instance().SetResolverDelegate(this);
     }
 
     virtual ~CASESessionManager() {}

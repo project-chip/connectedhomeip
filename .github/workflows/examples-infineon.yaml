@@ -61,7 +61,12 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/run_in_build_env.sh \
-                  "scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-lock' build"
+                  "scripts/build/build_examples.py \
+                      --enable-flashbundle --no-log-timestamps \
+                      --target infineon-p6-lock \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     p6 default lock-app \
                     out/infineon-p6-lock/chip-p6-lock-example.out
@@ -69,7 +74,12 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/run_in_build_env.sh \
-                  "scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-all-clusters' build"
+                  "scripts/build/build_examples.py \
+                      --enable-flashbundle --no-log-timestamps \
+                      --target infineon-p6-all-clusters \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     p6 default all-clusters-app \
                     out/infineon-p6-all-clusters/chip-p6-clusters-example.out
@@ -77,7 +87,12 @@ jobs:
               timeout-minutes: 10
               run: |
                 scripts/run_in_build_env.sh \
-                  "scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-light' build"
+                  "scripts/build/build_examples.py \
+                      --enable-flashbundle --no-log-timestamps \
+                      --target infineon-p6-light \
+                      build \
+                      --copy-artifacts-to out/artifacts \
+                  "
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     p6 default light-app \
                     out/infineon-p6-light/chip-p6-lighting-example.out

@@ -57,7 +57,7 @@ efr32_executable("pigweed_app") {
     "${examples_plat_dir}/PigweedLogger.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
 

@@ -27,18 +27,13 @@
 namespace chip {
 namespace DeviceLayer {
 
-chip::Inet::InetLayer & InetLayer()
-{
-    static chip::Inet::InetLayer gInetLayer;
-    return gInetLayer;
-}
-
 chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
 {
     static chip::Inet::UDPEndPointManagerImpl gUDPEndPointManager;
     return &gUDPEndPointManager;
 }
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
 chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
 {
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -48,6 +43,7 @@ chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
     return nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 chip::System::LayerImpl * gMockedSystemLayer = nullptr;
 

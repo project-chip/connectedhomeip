@@ -82,7 +82,7 @@ struct OnOffEffect
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
     uint8_t mEffectIdentifier;
     uint8_t mEffectVariant;
-    bool mActive = false;
+    OnOffEffect * nextEffect = nullptr;
 
     OnOffEffect(
         chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
@@ -95,6 +95,12 @@ struct OnOffEffect
          */
         uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
     ~OnOffEffect();
+
+    bool hasNext() { return this->nextEffect != nullptr; }
+
+    OnOffEffect * next() { return this->nextEffect; }
+
+    void setNext(OnOffEffect * inst) { this->nextEffect = inst; }
 };
 
 /**********************************************************

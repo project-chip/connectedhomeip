@@ -161,13 +161,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * E-Lock Demo Application is a Thread SED (Sleepy End Device)
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
-
-/**
  *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
  *
  *  @brief

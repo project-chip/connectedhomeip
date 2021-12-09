@@ -15,21 +15,13 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP ExchangeManager tests.
- *
- */
+#pragma once
 
-#include <nlunit-test.h>
+namespace chip {
 
-int TestChannel();
+void NotifyShellProcess();
+void NotifyShellProcessFromISR();
+void WaitForShellActivity();
+void startShellTask();
 
-int main()
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestChannel());
-}
+} // namespace chip

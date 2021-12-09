@@ -49,7 +49,7 @@ class InfineonApp(Enum):
         elif self == InfineonApp.ALL_CLUSTERS:
             return 'clusters_app.flashbundle.txt'
         elif self == InfineonApp.LIGHT:
-            return 'light_app.flashbundle.txt'
+            return 'lighting_app.flashbundle.txt'
         else:
             raise Exception('Unknown app type: %r' % self)
 
