@@ -199,12 +199,12 @@ private:
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 
     // The event number of the last processed event for each priority level
-    EventNumber mSelfProcessedEvents[kNumPriorityLevel];
+    EventNumber mSelfProcessedEvents[kNumPriorityLevel] = { 0 };
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    EventNumber mLastScheduledEventNumber[kNumPriorityLevel] = { 0 };
+    Messaging::ExchangeManager * mpExchangeMgr               = nullptr;
+    InteractionModelDelegate * mpDelegate                    = nullptr;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions

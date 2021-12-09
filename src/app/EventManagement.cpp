@@ -671,7 +671,6 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
 {
     EventLoadOutContext * const loadOutContext = static_cast<EventLoadOutContext *>(apContext);
     CHIP_ERROR err                             = EventIterator(aReader, aDepth, loadOutContext);
-    loadOutContext->mCurrentEventNumber++;
     if (err == CHIP_EVENT_ID_FOUND)
     {
         // checkpoint the writer
@@ -693,7 +692,7 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         loadOutContext->mFirst               = false;
         loadOutContext->mEventCount++;
     }
-
+    loadOutContext->mCurrentEventNumber++;
     return err;
 }
 
