@@ -39,6 +39,13 @@ public interface ConfigurationManager {
   String kConfigKey_ProductName = "product-name";
   String kConfigKey_SoftwareVersion = "software-version";
   String kConfigKey_SoftwareVersionString = "software-version-str";
+  String kConfigKey_NodeLabel = "node-label";
+  String kConfigKey_PartNumber = "part-number";
+  String kConfigKey_ProductURL = "product-url";
+  String kConfigKey_ProductLabel = "product-label";
+  String kConfigKey_LocalConfigDisabled = "local-config-disabled";
+  String kConfigKey_Reachable = "reachable";
+  String kConfigKey_UniqueId = "uniqueId";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";

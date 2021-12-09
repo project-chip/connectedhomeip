@@ -45,11 +45,14 @@ public:
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadAttributeCallback * callback)>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
-                               OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
+                               OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
         mClusterId(aClusterId),
-        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mBufferedReadAdapter(*this)
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone),
+        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mBufferedReadAdapter(*this)
     {}
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -99,11 +102,20 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
+    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    {
+        if (mOnSubscriptionEstablished)
+        {
+            mOnSubscriptionEstablished();
+        }
+    }
+
     ClusterId mClusterId;
     AttributeId mAttributeId;
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
     app::BufferedReadCallback mBufferedReadAdapter;
 };
 

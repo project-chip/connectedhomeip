@@ -99,6 +99,10 @@ if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
 endif()
 
+if (CONFIG_OPENTHREAD_FTD)
+    chip_gn_arg_append("chip_openthread_ftd"                    "true")
+endif()
+
 if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()

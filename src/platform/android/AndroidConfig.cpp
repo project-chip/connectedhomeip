@@ -71,6 +71,13 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_ProductId             = { kCo
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductName           = { kConfigNamespace_ChipFactory, "product-name" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersion       = { kConfigNamespace_ChipFactory, "software-version" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersionString = { kConfigNamespace_ChipFactory, "software-version-str" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_NodeLabel             = { kConfigNamespace_ChipFactory, "node-label" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_PartNumber            = { kConfigNamespace_ChipFactory, "part-number" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductURL            = { kConfigNamespace_ChipFactory, "product-url" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ProductLabel          = { kConfigNamespace_ChipFactory, "product-label" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_LocalConfigDisabled = { kConfigNamespace_ChipFactory, "local-config-disabled" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_Reachable           = { kConfigNamespace_ChipFactory, "reachable" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_UniqueId            = { kConfigNamespace_ChipFactory, "uniqueId" };
 
 // Keys stored in the Chip-config namespace
 const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
