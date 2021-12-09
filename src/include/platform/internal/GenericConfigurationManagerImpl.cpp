@@ -417,7 +417,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLocalConfigDisabled(
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & disabled)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & reachable)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
