@@ -193,6 +193,7 @@ chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
+chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)

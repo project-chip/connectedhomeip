@@ -146,9 +146,9 @@ void CommissioneeDeviceProxy::Reset()
 {
     SetActive(false);
 
-    mState          = ConnectionState::NotConnected;
-    mSessionManager = nullptr;
-    mInetLayer      = nullptr;
+    mState              = ConnectionState::NotConnected;
+    mSessionManager     = nullptr;
+    mUDPEndPointManager = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = nullptr;
 #endif

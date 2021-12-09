@@ -23,7 +23,6 @@
 #include <app/util/chip-message-send.h>
 
 #include <assert.h>
-#include <inet/InetLayer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>

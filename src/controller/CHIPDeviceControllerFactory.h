@@ -67,10 +67,11 @@ struct SetupParams
 // We're blocked because of the need to support !CHIP_DEVICE_LAYER
 struct FactoryInitParams
 {
-    FabricStorage * fabricStorage                         = nullptr;
-    System::Layer * systemLayer                           = nullptr;
-    Inet::InetLayer * inetLayer                           = nullptr;
-    DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
+    FabricStorage * fabricStorage                                 = nullptr;
+    System::Layer * systemLayer                                   = nullptr;
+    Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    DeviceControllerInteractionModelDelegate * imDelegate         = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
