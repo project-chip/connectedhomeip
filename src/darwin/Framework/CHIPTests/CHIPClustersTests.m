@@ -29950,7 +29950,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@""]);
+            XCTAssertTrue([actualValue isEqualToString:@"XX"]);
         }
 
         [expectation fulfill];

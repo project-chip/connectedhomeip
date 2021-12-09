@@ -100,7 +100,19 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     size_t codeLen = 0;
     if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
     {
-        status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+        if (codeLen == 0)
+        {
+            status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
+        }
+        else
+        {
+            status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
+        }
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
+    }
+    else
+    {
+        status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
     }
 

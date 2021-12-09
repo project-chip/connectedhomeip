@@ -49137,7 +49137,7 @@ private:
 
     void OnSuccessResponse_1(chip::CharSpan location)
     {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
 
         NextTest();
     }
