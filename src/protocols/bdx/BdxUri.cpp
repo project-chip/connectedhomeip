@@ -19,6 +19,7 @@
 #include "BdxUri.h"
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
@@ -66,7 +67,7 @@ CHIP_ERROR MakeURI(NodeId nodeId, CharSpan fileDesignator, MutableCharSpan & uri
     char nodeIdHex[sizeof(NodeId) * 2];
     ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(nodeIdBytes, sizeof(nodeIdBytes), nodeIdHex, sizeof(nodeIdHex)));
 
-    Encoding::BufferWriter writer(reinterpret_cast<uint8_t *>(uri.data()), uri.size());
+    Encoding::BufferWriter writer(Uint8::from_char(uri.data()), uri.size());
     writer.Put(kScheme, kSchemeLen);
     writer.Put(nodeIdHex, sizeof(nodeIdHex));
     writer.Put("/");

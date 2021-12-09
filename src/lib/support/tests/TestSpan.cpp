@@ -259,7 +259,7 @@ static void TestSubSpan(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, subspan.data() == &array[1]);
     NL_TEST_ASSERT(inSuite, subspan.size() == 14);
 
-    subspan = span.SubSpan(1, 1);
+    subspan = span.SubSpan(1, 0);
     NL_TEST_ASSERT(inSuite, subspan.size() == 0);
 
     subspan = span.SubSpan(10);
