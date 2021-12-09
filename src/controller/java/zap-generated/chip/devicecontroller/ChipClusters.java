@@ -425,12 +425,6 @@ public class ChipClusters {
     private native void changeStatus(
         long chipClusterPtr, DefaultClusterCallback Callback, Integer status);
 
-    public interface AllowedVendorListAttributeCallback {
-      void onSuccess(List<Object> valueList);
-
-      void onError(Exception ex);
-    }
-
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -515,10 +509,6 @@ public class ChipClusters {
       reportApplicationVersionAttribute(chipClusterPtr, callback);
     }
 
-    public void readAllowedVendorListAttribute(AllowedVendorListAttributeCallback callback) {
-      readAllowedVendorListAttribute(chipClusterPtr, callback);
-    }
-
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
       readAttributeListAttribute(chipClusterPtr, callback);
     }
@@ -589,9 +579,6 @@ public class ChipClusters {
 
     private native void reportApplicationVersionAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
-
-    private native void readAllowedVendorListAttribute(
-        long chipClusterPtr, AllowedVendorListAttributeCallback callback);
 
     private native void readAttributeListAttribute(
         long chipClusterPtr, AttributeListAttributeCallback callback);
