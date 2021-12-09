@@ -3022,16 +3022,19 @@ void CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubsc
     }
 }
 
-void CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void CHIPNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        CHIPNetworkCommissioningClusterNetworkInfo * newElement_0;
+        newElement_0 = [CHIPNetworkCommissioningClusterNetworkInfo new];
+        newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+        newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -3045,9 +3048,9 @@ void CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge::OnSuccess
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNetworkCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -5393,72 +5396,30 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data)
+void CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
-    auto * response = [CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams new];
+    auto * response = [CHIPNetworkCommissioningClusterConnectNetworkResponseParams new];
     {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
                                                       length:data.debugText.size()
                                                     encoding:NSUTF8StringEncoding];
     }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams new];
     {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
+        response.errorValue = [NSNumber numberWithInt:data.errorValue];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data)
+void CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
-    auto * response = [CHIPNetworkCommissioningClusterDisableNetworkResponseParams new];
+    auto * response = [CHIPNetworkCommissioningClusterNetworkConfigResponseParams new];
     {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterEnableNetworkResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterRemoveNetworkResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
@@ -5473,7 +5434,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
 {
     auto * response = [CHIPNetworkCommissioningClusterScanNetworksResponseParams new];
     {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
@@ -5482,7 +5443,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
     }
     {
         auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.wifiScanResults.begin();
+        auto iter_0 = data.wiFiScanResults.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_0;
@@ -5491,7 +5452,8 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             newElement_0.ssid = [NSData dataWithBytes:entry_0.ssid.data() length:entry_0.ssid.size()];
             newElement_0.bssid = [NSData dataWithBytes:entry_0.bssid.data() length:entry_0.bssid.size()];
             newElement_0.channel = [NSNumber numberWithUnsignedChar:entry_0.channel];
-            newElement_0.frequencyBand = [NSNumber numberWithUnsignedInt:entry_0.frequencyBand];
+            newElement_0.wiFiBand = [NSNumber numberWithUnsignedInt:entry_0.wiFiBand];
+            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
             [array_0 addObject:newElement_0];
         }
         { // Scope for the error so we will know what it's named
@@ -5501,7 +5463,7 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
                 return;
             }
         }
-        response.wifiScanResults = array_0;
+        response.wiFiScanResults = array_0;
     }
     {
         auto * array_0 = [NSMutableArray new];
@@ -5510,8 +5472,16 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             auto & entry_0 = iter_0.GetValue();
             CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_0;
             newElement_0 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
-            newElement_0.discoveryResponse = [NSData dataWithBytes:entry_0.discoveryResponse.data()
-                                                            length:entry_0.discoveryResponse.size()];
+            newElement_0.panId = [NSNumber numberWithUnsignedLongLong:entry_0.panId];
+            newElement_0.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanId];
+            newElement_0.networkName = [[NSString alloc] initWithBytes:entry_0.networkName.data()
+                                                                length:entry_0.networkName.size()
+                                                              encoding:NSUTF8StringEncoding];
+            newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
+            newElement_0.version = [NSNumber numberWithUnsignedChar:entry_0.version];
+            newElement_0.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extendedAddress];
+            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
+            newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
             [array_0 addObject:newElement_0];
         }
         { // Scope for the error so we will know what it's named
@@ -5522,36 +5492,6 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             }
         }
         response.threadScanResults = array_0;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams new];
-    {
-        response.errorCode = [NSNumber numberWithUnsignedChar:data.errorCode];
-    }
-    {
-        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
-                                                      length:data.debugText.size()
-                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -7331,19 +7271,19 @@ void CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallb
     }
 }
 
-void CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError value)
+void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7357,8 +7297,8 @@ void CHIPNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSu
     }
 }
 
-void CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningError> & value)
+void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7369,11 +7309,11 @@ void CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCa
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
 {
     auto * self
-        = static_cast<CHIPNullableNetworkCommissioningClusterNetworkCommissioningErrorAttributeCallbackSubscriptionBridge *>(
+        = static_cast<CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
             context);
     if (!self->mQueue) {
         return;
