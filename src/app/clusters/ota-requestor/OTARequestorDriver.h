@@ -91,7 +91,7 @@ public:
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
     // Get Version of the last downloaded image, return CHIP_ERROR_NOT_FOUND if none exists
-    virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE; }
+    virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_NOT_FOUND; }
 
     // Notify application of a change in the UpdateState attribute
     virtual void NotifyUpdateStateChange(chip::UpdateStateEnum state){};

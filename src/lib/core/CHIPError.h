@@ -2332,6 +2332,15 @@ using CHIP_ERROR = ::chip::ChipError;
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
+
+/**
+ * @def CHIP_ERROR_NOT_FOUND
+ *
+ * @brief
+ *   The item referenced in the function call was not found
+ */
+#define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
+
 /**
  *  @}
  */
