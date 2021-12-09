@@ -7309,6 +7309,212 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace NetworkCommissioning {
 namespace Attributes {
 
+namespace MaxNetworks {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace MaxNetworks
+
+namespace ScanMaxTimeSeconds {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ScanMaxTimeSeconds
+
+namespace ConnectMaxTimeSeconds {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ConnectMaxTimeSeconds
+
+namespace InterfaceEnabled {
+
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
+{
+    NumericAttributeTraits<bool>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<bool>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<bool>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<bool>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, bool value)
+{
+    if (!NumericAttributeTraits<bool>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<bool>::StorageType storageValue;
+    NumericAttributeTraits<bool>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<bool>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+}
+
+} // namespace InterfaceEnabled
+
+namespace LastNetworkingStatus {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastNetworkingStatus
+
+namespace LastNetworkID {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value)
+{
+    uint8_t zclString[32 + 1];
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+
+    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 32);
+    value.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value)
+{
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[32 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, zclString,
+                                       ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastNetworkID
+
+namespace LastConnectErrorValue {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+    NumericAttributeTraits<uint32_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint32_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint32_t>::StorageType storageValue;
+    NumericAttributeTraits<uint32_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::NetworkCommissioning::Id, Id, writable, ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+} // namespace LastConnectErrorValue
+
 namespace FeatureMap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)

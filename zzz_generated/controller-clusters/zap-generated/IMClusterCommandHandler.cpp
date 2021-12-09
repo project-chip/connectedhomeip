@@ -2324,11 +2324,12 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::AddThreadNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
+        case Commands::ConnectNetworkResponse::Id: {
+            expectArgumentCount = 3;
+            uint8_t NetworkingStatus;
+            chip::CharSpan DebugText;
+            int32_t ErrorValue;
+            bool argExists[3];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -2341,7 +2342,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
+                if (currentDecodeTagId < 3)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -2358,10 +2359,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
+                    TLVUnpackError = aDataTlv.Get(NetworkingStatus);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
+                    TLVUnpackError = aDataTlv.Get(DebugText);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(ErrorValue);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -2380,17 +2384,17 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(aCommandPath.mEndpointId,
-                                                                                                apCommandObj, errorCode, debugText);
+                wasHandled = emberAfNetworkCommissioningClusterConnectNetworkResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, NetworkingStatus, DebugText, ErrorValue);
             }
             break;
         }
-        case Commands::AddWiFiNetworkResponse::Id: {
+        case Commands::NetworkConfigResponse::Id: {
             expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
+            uint8_t NetworkingStatus;
+            chip::CharSpan DebugText;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -2421,10 +2425,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
+                    TLVUnpackError = aDataTlv.Get(NetworkingStatus);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
+                    TLVUnpackError = aDataTlv.Get(DebugText);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -2445,206 +2449,17 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(aCommandPath.mEndpointId,
-                                                                                              apCommandObj, errorCode, debugText);
-            }
-            break;
-        }
-        case Commands::DisableNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(aCommandPath.mEndpointId,
-                                                                                              apCommandObj, errorCode, debugText);
-            }
-            break;
-        }
-        case Commands::EnableNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                             errorCode, debugText);
-            }
-            break;
-        }
-        case Commands::RemoveNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                             errorCode, debugText);
+                wasHandled = emberAfNetworkCommissioningClusterNetworkConfigResponseCallback(aCommandPath.mEndpointId, apCommandObj,
+                                                                                             NetworkingStatus, DebugText);
             }
             break;
         }
         case Commands::ScanNetworksResponse::Id: {
             expectArgumentCount = 4;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults;
-            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults;
+            uint8_t NetworkingStatus;
+            chip::CharSpan DebugText;
+            /* TYPE WARNING: array array defaults to */ uint8_t * WiFiScanResults;
+            /* TYPE WARNING: array array defaults to */ uint8_t * ThreadScanResults;
             bool argExists[4];
 
             memset(argExists, 0, sizeof argExists);
@@ -2675,18 +2490,18 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
+                    TLVUnpackError = aDataTlv.Get(NetworkingStatus);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
+                    TLVUnpackError = aDataTlv.Get(DebugText);
                     break;
                 case 2:
                     // Just for compatibility, we will add array type support in IM later.
-                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(wifiScanResults));
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(WiFiScanResults));
                     break;
                 case 3:
                     // Just for compatibility, we will add array type support in IM later.
-                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(threadScanResults));
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(ThreadScanResults));
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -2708,133 +2523,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
             {
                 wasHandled = emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, errorCode, debugText, wifiScanResults, threadScanResults);
-            }
-            break;
-        }
-        case Commands::UpdateThreadNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, errorCode, debugText);
-            }
-            break;
-        }
-        case Commands::UpdateWiFiNetworkResponse::Id: {
-            expectArgumentCount = 2;
-            uint8_t errorCode;
-            chip::CharSpan debugText;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(errorCode);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(debugText);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, errorCode, debugText);
+                    aCommandPath.mEndpointId, apCommandObj, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
             }
             break;
         }

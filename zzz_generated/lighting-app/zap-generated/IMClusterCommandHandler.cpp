@@ -625,39 +625,32 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::AddThreadNetwork::Id: {
-            Commands::AddThreadNetwork::DecodableType commandData;
+        case Commands::AddOrUpdateThreadNetwork::Id: {
+            Commands::AddOrUpdateThreadNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled =
+                    emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::AddWiFiNetwork::Id: {
-            Commands::AddWiFiNetwork::DecodableType commandData;
+        case Commands::AddOrUpdateWiFiNetwork::Id: {
+            Commands::AddOrUpdateWiFiNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled =
+                    emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::DisableNetwork::Id: {
-            Commands::DisableNetwork::DecodableType commandData;
+        case Commands::ConnectNetwork::Id: {
+            Commands::ConnectNetwork::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfNetworkCommissioningClusterDisableNetworkCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::EnableNetwork::Id: {
-            Commands::EnableNetwork::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterEnableNetworkCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfNetworkCommissioningClusterConnectNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -670,30 +663,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::ReorderNetwork::Id: {
+            Commands::ReorderNetwork::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfNetworkCommissioningClusterReorderNetworkCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::ScanNetworks::Id: {
             Commands::ScanNetworks::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfNetworkCommissioningClusterScanNetworksCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::UpdateThreadNetwork::Id: {
-            Commands::UpdateThreadNetwork::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::UpdateWiFiNetwork::Id: {
-            Commands::UpdateWiFiNetwork::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
