@@ -83,7 +83,7 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
 bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::Logout::DecodableType & commandData)
 {
-    bool isLoggedOut      = accountLoginClusterLogout();
+    bool isLoggedOut     = accountLoginClusterLogout();
     EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     if (!isLoggedOut)
     {
