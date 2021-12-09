@@ -405,6 +405,25 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return paired;
 }
 
+- (CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error
+{
+    CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    if (![self isRunning]) {
+        [self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return nil;
+    }
+
+    chip::CommissioneeDeviceProxy * deviceProxy;
+    errorCode = self->_cppCommissioner->GetDeviceBeingCommissioned(deviceId, &deviceProxy);
+    if (errorCode != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:errorCode];
+        }
+        return nil;
+    }
+    return [[CHIPDevice alloc] initWithDevice:deviceProxy];
+}
+
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
                      queue:(dispatch_queue_t)queue
          completionHandler:(CHIPDeviceConnectionCallback)completionHandler
