@@ -1,5 +1,6 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
+#include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>
 
 #include <cinttypes>
@@ -27,7 +28,7 @@ namespace Platform {
 /**
  * CHIP log output functions.
  */
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     struct timeval tv;
 
