@@ -365,7 +365,6 @@ void OTARequestor::OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERR
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
 }
 
-
 CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)
 {
     constexpr EmberAfOTADownloadProtocol kProtocolsSupported[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
