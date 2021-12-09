@@ -187,36 +187,66 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return (EMBER_ZCL_STATUS_SUCCESS == status);
 }
 
-bool DoorLockServer::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
-                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                             const Nullable<DoorLock::DlCredentialRule> & credentialRule)
+bool DoorLockServer::CreateUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
+                                const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                                const Nullable<DoorLock::DlUserStatus> & userStatus,
+                                const Nullable<DoorLock::DlUserType> & userType,
+                                const Nullable<DoorLock::DlCredentialRule> & credentialRule)
 {
-    char newUserName[10] = { 0 };
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        ChipLogError(Zcl, "[CreateUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+
+    // appclusters, 5.2.4.34: to modify user its status should be set to Available. If it is we should return INVALID_COMMAND.
+    if (DlUserStatus::kAvailable != user.userStatus)
+    {
+        emberAfDoorLockClusterPrintln("[CreateUser] Unable to overwrite existing user [endpointId=%d,userIndex=%d]", endpointId,
+                                      userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return true;
+    }
+
+    char newUserName[DOOR_LOCK_USER_NAME_BUFFER_SIZE] = { 0 };
     if (!userName.IsNull())
     {
         memcpy(newUserName, userName.Value().data(), userName.Value().size());
-        newUserName[9] = 0;
+        newUserName[DOOR_LOCK_MAX_USER_NAME_SIZE] = '\0';
     }
     auto newUserUniqueId   = userUniqueId.IsNull() ? 0xFFFFFFFF : userUniqueId.Value();
     auto newUserStatus     = userStatus.IsNull() ? DlUserStatus::kOccupiedEnabled : userStatus.Value();
     auto newUserType       = userType.IsNull() ? DlUserType::kUnrestrictedUser : userType.Value();
     auto newCredentialRule = credentialRule.IsNull() ? DlCredentialRule::kSingle : credentialRule.Value();
 
-    emberAfDoorLockClusterPrintln(
-        "Setting the user (from fabric %d) "
-        "[userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%hhu,userType=%hhu,credentialRule=%hhu]",
-        creatorFabricIdx, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType, newCredentialRule);
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId,
+                                      newUserStatus, newUserType, newCredentialRule))
+    {
+        emberAfDoorLockClusterPrintln("[CreateUser] Unable to create user: app error "
+                                      "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus="
+                                      "%hhu,userType=%hhu,credentialRule=%hhu]",
+                                      endpointId, creatorFabricIdx, userIndex, newUserName, newUserUniqueId, newUserStatus,
+                                      newUserType, newCredentialRule);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
 
-    return emberAfPluginDoorLockSetUser(endpointId, userIndex, creatorFabricIdx, creatorFabricIdx, newUserName, newUserUniqueId,
-                                        newUserStatus, newUserType, newCredentialRule);
+    emberAfDoorLockClusterPrintln("[CreateUser] User created "
+                                  "[endpointId=%d,creatorFabricId=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%"
+                                  "hhu,userType=%hhu,credentialRule=%hhu]",
+                                  endpointId, creatorFabricIdx, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
+                                  newCredentialRule);
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
 
 EmberAfStatus DoorLockServer::ClearUser(chip::EndpointId endpointId, uint16_t userIndex)
 {
-    bool setStatus = emberAfPluginDoorLockSetUser(endpointId, userIndex, 0, 0, "", 0, DlUserStatus::kAvailable,
-                                                  DlUserType::kUnrestrictedUser, DlCredentialRule::kSingle);
-    if (!setStatus)
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, 0, 0, "", 0, DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser,
+                                      DlCredentialRule::kSingle))
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
@@ -231,8 +261,7 @@ bool DoorLockServer::ModifyUser(chip::EndpointId endpointId, uint16_t userIndex,
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
-    bool status = emberAfPluginDoorLockGetUser(endpointId, userIndex, user);
-    if (!status)
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
         ChipLogError(Zcl, "[ModifyUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
@@ -268,20 +297,19 @@ bool DoorLockServer::ModifyUser(chip::EndpointId endpointId, uint16_t userIndex,
         return true;
     }
 
-    char newUserName[10] = { 0 };
+    char newUserName[DOOR_LOCK_USER_NAME_BUFFER_SIZE] = { 0 };
     if (!userName.IsNull())
     {
         memcpy(newUserName, userName.Value().data(), userName.Value().size());
-        newUserName[9] = 0;
+        newUserName[DOOR_LOCK_MAX_USER_NAME_SIZE] = 0;
     }
     auto newUserUniqueId   = userUniqueId.IsNull() ? user.userUniqueId : userUniqueId.Value();
     auto newUserStatus     = userStatus.IsNull() ? user.userStatus : userStatus.Value();
     auto newUserType       = userType.IsNull() ? user.userType : userType.Value();
     auto newCredentialRule = credentialRule.IsNull() ? user.credentialRule : credentialRule.Value();
 
-    status = emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIndex, newUserName, newUserUniqueId,
-                                          newUserStatus, newUserType, newCredentialRule);
-    if (!status)
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIndex, newUserName, newUserUniqueId,
+                                      newUserStatus, newUserType, newCredentialRule))
     {
         ChipLogError(Zcl,
                      "[ModifyUser] Unable to modify the user: app error "
@@ -292,7 +320,37 @@ bool DoorLockServer::ModifyUser(chip::EndpointId endpointId, uint16_t userIndex,
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
+    ChipLogError(Zcl,
+                 "[ModifyUser] User modified "
+                 "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%hhu,userType=%"
+                 "hhu,credentialRule=%hhu]",
+                 endpointId, modifierFabricIndex, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
+                 newCredentialRule);
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool DoorLockServer::UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex)
+{
+    uint16_t maxNumberOfUsers;
+    return UserIndexValid(endpointId, userIndex, maxNumberOfUsers);
+}
+
+bool DoorLockServer::UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUsers)
+{
+    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
+        return true;
+    }
+
+    // appclusters, 5.2.4.34-37: user index changes from 1 to maxNumberOfUsers
+    if (0 == userIndex || userIndex > maxNumberOfUsers)
+    {
+        return false;
+    }
     return true;
 }
 
@@ -408,7 +466,9 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
     // TODO: Make sure that USR feature is enabled prior to executing command
-    emberAfDoorLockClusterPrintln("Received Set User command");
+
+    auto & userIndex = commandData.userIndex;
+    emberAfDoorLockClusterPrintln("[SetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     if (nullptr == commandObj || nullptr == commandObj->GetExchangeContext())
     {
@@ -417,32 +477,43 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
         return true;
     }
 
-    auto requestorFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
-    auto & operationType      = commandData.operationType;
-    auto & userIndex          = commandData.userIndex;
+    auto fabricIndex      = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+    auto & operationType  = commandData.operationType;
+    auto & userName       = commandData.userName;
+    auto & userUniqueId   = commandData.userUniqueId;
+    auto & userStatus     = commandData.userStatus;
+    auto & userType       = commandData.userType;
+    auto & credentialRule = commandData.credentialRule;
+
+    if (!DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [userIndex=%d]", userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return true;
+    }
+
+    // appclusters, 5.2.4.34: UserName has maximum DOOR_LOCK_MAX_USER_NAME_SIZE (10) characters excluding NUL terminator in it.
+    if (!userName.IsNull() && userName.Value().size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%zu]",
+            commandPath.mEndpointId, userIndex, userName.Value().size());
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return true;
+    }
 
     switch (operationType)
     {
-    case DlDataOperationType::kAdd: {
-        emberAfDoorLockClusterPrintln("Setting user with index %d", userIndex);
-
+    case DlDataOperationType::kAdd:
         // Nullable wrappers here for future: so far chip-tool doesn't play well with them, so I've been forced to use
         // non-nullable types. But I thought it was a good idea to wrap them into Nullables so in future we will only have to change
         // this line instead of SetUser function.
-        auto status = DoorLockServer::Instance().SetUser(
-            commandPath.mEndpointId, userIndex, requestorFabricIndex, commandData.userName, commandData.userUniqueId,
-            Nullable<DlUserStatus>(commandData.userStatus), Nullable<DlUserType>(commandData.userType),
-            Nullable<DlCredentialRule>(commandData.credentialRule));
-        if (!status)
-        {
-            emberAfSendImmediateDefaultResponse(static_cast<EmberAfStatus>(DlStatus::kOccupied));
-            return true;
-        }
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    }
-        return true;
+        return DoorLockServer::Instance().CreateUser(commandPath.mEndpointId, userIndex, fabricIndex, userName, userUniqueId,
+                                                     Nullable<DlUserStatus>(userStatus), Nullable<DlUserType>(userType),
+                                                     Nullable<DlCredentialRule>(credentialRule));
     case DlDataOperationType::kModify:
-        return DoorLockServer::Instance().ModifyUser(commandPath.mEndpointId, userIndex, requestorFabricIndex, commandData.userName,
+        return DoorLockServer::Instance().ModifyUser(commandPath.mEndpointId, userIndex, fabricIndex, commandData.userName,
                                                      commandData.userUniqueId, Nullable<DlUserStatus>(commandData.userStatus),
                                                      Nullable<DlUserType>(commandData.userType),
                                                      Nullable<DlCredentialRule>(commandData.credentialRule));
@@ -462,18 +533,10 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
 {
     auto & userIndex = commandData.userIndex;
 
-    emberAfDoorLockClusterPrintln("[GetUser] Received a command [userIndex: %d]", userIndex);
+    emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     uint16_t maxNumberOfUsers = 0;
-    EmberAfStatus status      = Attributes::NumberOfTotalUsersSupported::Get(commandPath.mEndpointId, &maxNumberOfUsers);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogError(Zcl, "[GetUser] Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-        return true;
-    }
-
-    if (userIndex > maxNumberOfUsers)
+    if (!DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
     {
         emberAfDoorLockClusterPrintln("[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
                                       maxNumberOfUsers);
@@ -482,9 +545,8 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     EmberAfPluginDoorLockUserInfo user;
-    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), status = EMBER_ZCL_STATUS_FAILURE);
+    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
     {
         app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetUserResponse::Id };
         TLV::TLVWriter * writer       = nullptr;
@@ -540,7 +602,8 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
 exit:
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(Zcl, "[GetUser] Command processing failed [err=%s]", err.AsString());
+        ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
+                     userIndex, err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
     return true;
@@ -551,19 +614,10 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
                                              const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
     auto & userIndex = commandData.userIndex;
-    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [userIndex: %d]", userIndex);
+    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [userIndex=%d]", userIndex);
 
     uint16_t maxNumberOfUsers = 0;
-    EmberAfStatus status      = Attributes::NumberOfTotalUsersSupported::Get(commandPath.mEndpointId, &maxNumberOfUsers);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogError(Zcl, "[ClearUser] Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-        return true;
-    }
-
-    // appclusters, 5.2.4.37.1: value 0xFFFE for userIndex indicates that we should clear the whole storage
-    if (userIndex > maxNumberOfUsers && userIndex != 0xFFFE)
+    if (userIndex != 0xFFFE && !DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
     {
         emberAfDoorLockClusterPrintln("[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]",
                                       userIndex, maxNumberOfUsers);
@@ -573,7 +627,7 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
 
     if (0xFFFE != userIndex)
     {
-        status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, userIndex);
+        auto status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, userIndex);
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
             ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", userIndex,
@@ -586,7 +640,7 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
     emberAfDoorLockClusterPrintln("[ClearUser] Removing all users from storage");
     for (uint16_t i = 0; i < maxNumberOfUsers; ++i)
     {
-        status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, i);
+        auto status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, i);
         if (!status)
         {
             ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", i, status);
@@ -962,10 +1016,4 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
     return true;
 }
 
-bool emberAfPluginDoorLockModifyUser(uint16_t, chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
-                                     DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                     DoorLock::DlCredentialRule credentialRule)
-{
-    return false;
-}
 #endif

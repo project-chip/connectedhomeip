@@ -35,6 +35,9 @@
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
+static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE    = 10;
+static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
+
 /**
  * @brief Door Lock Server Plugin class.
  */
@@ -56,10 +59,13 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
-    bool SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
-                 const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                 const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                 const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+    bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
+    bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
+
+    bool CreateUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
+                    const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                    const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
+                    const Nullable<DoorLock::DlCredentialRule> & credentialRule);
 
     bool ModifyUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex modifierFabricIndex,
                     const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
@@ -72,9 +78,16 @@ private:
     static DoorLockServer instance;
 };
 
+struct EmberAfPluginDoorLockCredentialInfo
+{
+    bool inUse;
+    DoorLock::DlCredentialType credentialType;
+    chip::ByteSpan credentialData;
+};
+
 struct EmberAfPluginDoorLockUserInfo
 {
-    char userName[10];
+    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
     uint32_t userUniqueId;
     DoorLock::DlUserStatus userStatus;
     DoorLock::DlUserType userType;
@@ -199,6 +212,8 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                                   chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
                                   DoorLock::DlCredentialRule credentialRule);
-bool emberAfPluginDoorLockModifyUser(uint16_t, chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
-                                     DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                     DoorLock::DlCredentialRule credentialRule);
+
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+                                        EmberAfPluginDoorLockCredentialInfo & credential);
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+                                        DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData);
