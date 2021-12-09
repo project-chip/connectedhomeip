@@ -30,7 +30,7 @@ In terminal 2:
 In terminal 3:
 
 ```
-./chip-ota-requestor-app -d ${REQUESTOR_LONG_DISCRIMINATOR} -u ${REQUESTOR_UDP_PORT} -i ${PROVIDER_IP_ADDRESS} -n ${PROVIDER_NODE_ID} -q ${DELAY_QUERY_SECONDS}
+./chip-ota-requestor-app -d ${REQUESTOR_LONG_DISCRIMINATOR} -u ${REQUESTOR_UDP_PORT} -n ${PROVIDER_NODE_ID} -f ${PROVIDER_FABRIC_INDEX} -q ${DELAY_QUERY_SECONDS}
 ```
 
 -   `{REQUESTOR_LONG_DISCRIMINATOR}` is the long discriminator specified for the
@@ -39,7 +39,10 @@ In terminal 3:
     for secure connections
 -   `${PROVIDER_IP_ADDRESS}` is the IP address of the ota-provider-app that has
     been resolved manually
--   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app assigned above
+-   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app; this is a Test
+     Mode parameter and should not be used in most scenarios
+-   `${PROVIDER_FABRIC_INDEX}` is the fabric index of the ota-provider-app; this
+    is a Test Mode parameter and should not be used in most scenarios
 -   `${DELAY_QUERY_SECONDS}` is the amount of time in seconds to wait before
     initiating secure session establishment and query for software image
 
