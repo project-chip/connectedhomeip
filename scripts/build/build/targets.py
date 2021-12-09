@@ -99,12 +99,15 @@ class AcceptAnyName:
         return True
 
 
-class AcceptNameWithSubstring:
-    def __init__(self, substr: str):
+class AcceptNameWithSubstrings:
+    def __init__(self, substr: List[str]):
         self.substr = substr
 
     def Accept(self, name: str):
-        return self.substr in name
+        for s in self.substr:
+            if s in name:
+                return True
+        return False
 
 
 class HostBuildVariant:
@@ -155,9 +158,10 @@ def HostTargets():
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
         HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
-        HostBuildVariant(name="test-group", test_group=True),
+        HostBuildVariant(name="test-group",
+                         validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
         HostBuildVariant(name="same-event-loop",
-                         validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
+                         validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
     ]
 
     glob_whitelist = set(['ipv6only'])
