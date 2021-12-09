@@ -562,6 +562,29 @@ inline void chipDie(void)
         }                                                                                                                          \
     } while (false)
 
+/**
+ *  @def VerifyOrdo(expr, ...)
+ *
+ *  @brief
+ *    do something if expression evaluates to false
+ *
+ *  Example usage:
+ *
+ * @code
+ *    VerifyOrdo(param != nullptr, LogError("param is nullptr"));
+ *  @endcode
+ *
+ *  @param[in]  expr        A Boolean expression to be evaluated.
+ */
+#define VerifyOrdo(expr, ...)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+        }                                                                                                                          \
+    } while (false)
+
 #if (__cplusplus >= 201103L)
 
 #ifndef __FINAL
