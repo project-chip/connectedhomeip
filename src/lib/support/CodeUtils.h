@@ -576,7 +576,7 @@ inline void chipDie(void)
  *
  *  @param[in]  expr        A Boolean expression to be evaluated.
  */
-#define VerifyOrdo(expr, ...)                                                                                                  \
+#define VerifyOrdo(expr, ...)                                                                                                      \
     do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
