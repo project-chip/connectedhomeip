@@ -42,6 +42,7 @@ typedef uint8_t FabricIndex;
 typedef uint32_t FieldId;
 typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
+typedef uint16_t KeysetId;
 
 constexpr FabricIndex kUndefinedFabricIndex = 0;
 constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
