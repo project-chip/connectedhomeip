@@ -86,4 +86,3 @@ tests:
     #   attribute: "allowed vendor list"
     #   response:
     #       value: [123, 456]
-

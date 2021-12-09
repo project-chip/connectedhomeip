@@ -76,7 +76,7 @@ tests:
     #           - name: "affiliateCallSign"
     #             value: "sign"
 
-    
+
     - label: "Change Channel Command"
       command: "ChangeChannel"
       arguments:
@@ -96,7 +96,7 @@ tests:
                         callSign: "callSign",
                         affiliateCallSign: "affiliateCallSign"
                     }
-               
+
 
     - label: "Change Channel By Number Command"
       command: "ChangeChannelByNumber"

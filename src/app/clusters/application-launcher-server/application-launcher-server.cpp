@@ -111,7 +111,7 @@ bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * comm
     auto & requestApplicationCatalogVendorId = commandData.application.catalogVendorId;
     auto & requestApplicationId              = commandData.application.applicationId;
 
-    
+
     app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::HideAppResponse::Id };
 
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
