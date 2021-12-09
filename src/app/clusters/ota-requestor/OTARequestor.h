@@ -37,9 +37,10 @@ public:
     // Application interface declarations -- start
 
     // Return value for various trigger-type APIs
-    enum OTATriggerResult {
-                                kTriggerSuccessful       = 0,
-                                kNoProviderKnown         = 1
+    enum OTATriggerResult
+    {
+        kTriggerSuccessful = 0,
+        kNoProviderKnown   = 1
     };
 
     // Application directs the Requestor to start the Image Query process
@@ -68,9 +69,10 @@ public:
 
     // Application directs the Requestor to download the image using the suppiled parameter and without
     // issuing QueryImage
-    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters &bdxParameters) {/* NOT IMPLEMENTED YET */
-        return kTriggerSuccessful;}
-
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters)
+    { /* NOT IMPLEMENTED YET */
+        return kTriggerSuccessful;
+    }
 
     // Application interface declarations -- end
 
@@ -179,7 +181,7 @@ private:
     // Variables
     // TODO: align on variable naming standard
     OTARequestorDriver * mOtaRequestorDriver;
-    chip::NodeId mProviderNodeId                   = kUndefinedNodeId;
+    chip::NodeId mProviderNodeId = kUndefinedNodeId;
     chip::FabricIndex mProviderFabricIndex;
     uint32_t mOtaStartDelayMs                      = 0;
     chip::CASESessionManager * mCASESessionManager = nullptr;

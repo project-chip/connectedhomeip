@@ -36,7 +36,6 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
-
 using chip::ByteSpan;
 using chip::CASESessionManager;
 using chip::CASESessionManagerConfig;
@@ -52,7 +51,7 @@ using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
 using chip::bdx::TransferSession;
-//using chip::Callback::Callback;
+// using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
 
@@ -410,10 +409,13 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
 OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
 
-    if(mProviderNodeId != kUndefinedNodeId) {
+    if (mProviderNodeId != kUndefinedNodeId)
+    {
         ConnectToProvider();
         return kTriggerSuccessful;
-    } else {
+    }
+    else
+    {
         ChipLogError(SoftwareUpdate, "No OTA Providers available");
         return kNoProviderKnown;
     }

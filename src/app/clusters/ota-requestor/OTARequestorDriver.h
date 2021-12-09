@@ -29,7 +29,8 @@
 namespace chip {
 
 // The set of parameters needed for starting a BDX download.
-struct BdxDownloadParameters {
+struct BdxDownloadParameters
+{
     uint32_t delayedActionTime;
     chip::CharSpan imageURI;
     uint32_t softwareVersion;
@@ -40,23 +41,25 @@ struct BdxDownloadParameters {
 };
 
 // Possible values for the UpdateState attribute
-enum UpdateStateEnum {
-                      Unknown = 0,
-                      Idle = 1,
-                      Querying = 2,
-                      DelayedOnQuery = 3,
-                      Downloading = 4,
-                      Applying = 5,
-                      DelayedOnApply = 6,
-                      RollingBack = 7,
-                      DelayedOnUserConsent = 8,
-    };
+enum UpdateStateEnum
+{
+    Unknown              = 0,
+    Idle                 = 1,
+    Querying             = 2,
+    DelayedOnQuery       = 3,
+    Downloading          = 4,
+    Applying             = 5,
+    DelayedOnApply       = 6,
+    RollingBack          = 7,
+    DelayedOnUserConsent = 8,
+};
 
 // Return type for RequestUserConsent()
-enum UserConsentAction {
-                        ImmediateYes = 1,
-                        ImmediateNo  = 2,
-                        Requested    = 3,
+enum UserConsentAction
+{
+    ImmediateYes = 1,
+    ImmediateNo  = 2,
+    Requested    = 3,
 };
 
 // Interface class to abstract the OTA-related business logic. Each application
@@ -64,7 +67,6 @@ enum UserConsentAction {
 class OTARequestorDriver
 {
 public:
-
     // Mandatory methods, applications are required to implement these
 
     // A call into the application logic to give it a chance to allow or stop the Requestor
@@ -83,17 +85,16 @@ public:
 
     // This method informs the application of the BDX download parameters. This info can be used
     // later on for diecting the Requestor to resume an interrupted download
-    virtual void PostBdxDownloadParameters(const BdxDownloadParameters &bdxParameters) {};
+    virtual void PostBdxDownloadParameters(const BdxDownloadParameters & bdxParameters){};
 
     // Return maximum supported download block size
-    virtual uint16_t GetMaxDownloadBlockSize() { return 1024;}
+    virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
     // Get Version of the last downloaded image, return CHIP_ERROR_NOT_FOUND if none exists
-    virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE;}
+    virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE; }
 
     // Notify application of a change in the UpdateState attribute
-    virtual void NotifyUpdateStateChange(chip::UpdateStateEnum state) {};
-
+    virtual void NotifyUpdateStateChange(chip::UpdateStateEnum state){};
 
     // Destructor
     virtual ~OTARequestorDriver() = default;
