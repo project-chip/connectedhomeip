@@ -2629,7 +2629,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 22, 1930 }, { ZAP_CLUSTER_INDEX(22), 44, 6415 }, { ZAP_CLUSTER_INDEX(66), 4, 21 },                 \
+        { ZAP_CLUSTER_INDEX(0), 21, 1930 }, { ZAP_CLUSTER_INDEX(21), 44, 6415 }, { ZAP_CLUSTER_INDEX(65), 4, 21 },                 \
     }
 
 // Largest attribute size is needed for various buffers
