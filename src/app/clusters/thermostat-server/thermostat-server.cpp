@@ -67,9 +67,7 @@ constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the defaul
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
 
-static constexpr EndpointId kThermostatEndpointId = 1;
-
-void emberAfThermostatClusterServerInitCallback()
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
     // TODO
     // Get from the "real thermostat"
@@ -87,8 +85,8 @@ void emberAfThermostatClusterServerInitCallback()
     // Feature map override, for testing only:
     uint32_t featureMap = FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO;
 
-    emberAfWriteServerAttribute(kThermostatEndpointId, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
-                                &featureMap, sizeof(featureMap));
+    emberAfWriteServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
+                                (uint8_t *) &featureMap, sizeof(featureMap));
 }
 
 using imcode = Protocols::InteractionModel::Status;
@@ -122,7 +120,7 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     int16_t UnoccupiedCoolingSetpoint;
     int16_t UnoccupiedHeatingSetpoint;
 
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
+    emberAfReadServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
                                (uint8_t *) &FeatureMap, sizeof(FeatureMap));
 
     if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
@@ -558,7 +556,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     int8_t DeadBand                          = 0;
     uint32_t FeatureMap                      = 0;
 
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
+    emberAfReadServerAttribute(aEndpointId, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
                                (uint8_t *) &FeatureMap, sizeof(FeatureMap));
 
     if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
