@@ -8,6 +8,14 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 {{asBasicType chipType}} {{saveAs}};
 {{/if}}
 {{/chip_tests_item_response_parameters}}
+
+{{~#*inline "subscribeDataCallback"}}
+test_{{parent.filename}}_{{attribute}}_Reported
+{{/inline}}
+{{#if allocateSubscribeDataCallback}}
+ResponseHandler {{> subscribeDataCallback}} = nil;
+{{/if~}}
+
 - (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}
 {
     {{#unless async}}
@@ -43,21 +51,17 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
       {{/if}}
     {{else if isSubscribeAttribute}}
     {{#chip_tests_item_parameters}}
-    {{#if (isString type)}}
-    {{#if (isOctetString type)}}
-    NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
-    {{else}}
-    NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
-    {{/if}}
-    {{else}}
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
-    {{/if}}
     {{/chip_tests_item_parameters}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
                                                                  maxInterval:maxIntervalArgument
-                                                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                                     subscriptionEstablished:^{
+        XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
+        [expectation fulfill];
+      }
+                                                               reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWaitForReport}}
-    [cluster reportAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
+    {{> subscribeDataCallback }} = ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isReadAttribute}}
     [cluster readAttribute{{asUpperCamelCase attribute}}WithCompletionHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWriteAttribute}}
@@ -149,16 +153,21 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 
-        {{else}}
-        XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
-        {{/unless}}
         {{#unless async}}
         [expectation fulfill];
         {{else}}
         testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
+        {{else}}
+          {{! We're a subscription }}
+          if ({{> subscribeDataCallback}} != nil) {
+            ResponseHandler callback = {{> subscribeDataCallback}};
+            {{> subscribeDataCallback}} = nil;
+            callback(value, err);
+          }
+        {{/unless}}
         {{/if}}
-    }];
+    }{{#unless isWaitForReport}}]{{/unless}};
 
 {{/if}}
     {{#unless async}}

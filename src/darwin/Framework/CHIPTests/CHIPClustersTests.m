@@ -31381,6 +31381,7 @@ uint16_t readAttributeVendorIdDefaultValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
+ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 - (void)testSendClusterTestSubscribe_OnOff_000002_WaitForReport
 {
 
@@ -31389,7 +31390,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    test_TestSubscribe_OnOff_OnOff_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Report: Subscribe OnOff Attribute Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -31400,7 +31401,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
         }
 
         testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = true;
-    }];
+    };
 }
 - (void)testSendClusterTestSubscribe_OnOff_000003_SubscribeAttribute
 {
@@ -31414,14 +31415,21 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     uint16_t minIntervalArgument = 2U;
     uint16_t maxIntervalArgument = 10U;
     [cluster subscribeAttributeOnOffWithMinInterval:minIntervalArgument
-                                        maxInterval:maxIntervalArgument
-                                    responseHandler:^(NSError * err, NSDictionary * values) {
-                                        NSLog(@"Subscribe OnOff Attribute Error: %@", err);
+        maxInterval:maxIntervalArgument
+        subscriptionEstablished:^{
+            XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
+            [expectation fulfill];
+        }
+        reportHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Subscribe OnOff Attribute Error: %@", err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-                                        XCTAssertEqual(testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled, true);
-                                        [expectation fulfill];
-                                    }];
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+            if (test_TestSubscribe_OnOff_OnOff_Reported != nil) {
+                ResponseHandler callback = test_TestSubscribe_OnOff_OnOff_Reported;
+                test_TestSubscribe_OnOff_OnOff_Reported = nil;
+                callback(value, err);
+            }
+        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -31453,7 +31461,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    test_TestSubscribe_OnOff_OnOff_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check for attribute report Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -31464,7 +31472,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
         }
 
         [expectation fulfill];
-    }];
+    };
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -31496,7 +31504,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    [cluster reportAttributeOnOffWithResponseHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+    test_TestSubscribe_OnOff_OnOff_Reported = ^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Check for attribute report Error: %@", err);
 
         XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
@@ -31507,7 +31515,7 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
         }
 
         [expectation fulfill];
-    }];
+    };
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
