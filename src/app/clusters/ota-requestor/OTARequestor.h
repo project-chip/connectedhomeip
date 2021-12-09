@@ -78,12 +78,11 @@ public:
     // FALSE otherwise
     void OnUserConsent(bool result);
 
+    /* Commented out until the API is supported
     // Application directs the Requestor to download the image using the suppiled parameter and without
     // issuing QueryImage
-    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters)
-    { /* NOT IMPLEMENTED YET */
-        return kTriggerSuccessful;
-    }
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters){ return kTriggerSuccessful;}
+    */
 
     // Application interface declarations -- end
 

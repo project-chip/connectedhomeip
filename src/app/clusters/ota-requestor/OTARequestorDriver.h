@@ -28,17 +28,19 @@
 
 namespace chip {
 
+/* Commented out until the API is supported
 // The set of parameters needed for starting a BDX download.
 struct BdxDownloadParameters
 {
-    uint32_t delayedActionTime;
+    uint32_t delayedActionTime;           // Might not be needed
     chip::CharSpan imageURI;
     uint32_t softwareVersion;
-    chip::CharSpan softwareVersionString;
+    chip::CharSpan softwareVersionString; // Might not be needed
     chip::ByteSpan updateToken;
-    bool userConsentNeeded;
-    chip::ByteSpan metadataForRequestor;
+    bool userConsentNeeded;               // Might not be needed
+    chip::ByteSpan metadataForRequestor;  // Might not be needed
 };
+*/
 
 // Possible values for the UpdateState attribute
 enum UpdateStateEnum
@@ -83,9 +85,11 @@ public:
 
     // Optional methods, applications may choose to implement these
 
+    /* Commented out until the API is supported
     // This method informs the application of the BDX download parameters. This info can be used
     // later on for diecting the Requestor to resume an interrupted download
     virtual void PostBdxDownloadParameters(const BdxDownloadParameters & bdxParameters){};
+    */
 
     // Return maximum supported download block size
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
