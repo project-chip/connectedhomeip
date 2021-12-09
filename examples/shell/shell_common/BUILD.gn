@@ -49,15 +49,15 @@ static_library("shell_common") {
   if (chip_enable_openthread &&
       (current_os == "freertos" || current_os == "zephyr")) {
     if (chip_device_platform == "k32w0") {
-        public_deps += [
-          "${openthread_root}:libopenthread-cli-mtd",
-          "${openthread_root}:libopenthread-mtd",
-        ]
+      public_deps += [
+        "${openthread_root}:libopenthread-cli-mtd",
+        "${openthread_root}:libopenthread-mtd",
+      ]
     } else {
-        public_deps += [
-          "${openthread_root}:libopenthread-cli-ftd",
-          "${openthread_root}:libopenthread-ftd",
-        ]
+      public_deps += [
+        "${openthread_root}:libopenthread-cli-ftd",
+        "${openthread_root}:libopenthread-ftd",
+      ]
     }
   }
 
