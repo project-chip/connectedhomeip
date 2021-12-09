@@ -63,9 +63,9 @@ public:
     ResolverProxy() {}
 
     // Resolver interface.
-    CHIP_ERROR Init(Inet::InetLayer * inetLayer = nullptr) override
+    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPoint = nullptr) override
     {
-        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(inetLayer));
+        ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(udpEndPoint));
         VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mDelegate = chip::Platform::New<ResolverDelegateProxy>();
         return CHIP_NO_ERROR;

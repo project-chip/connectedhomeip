@@ -41,7 +41,7 @@ namespace Transport {
 class UdpListenParameters
 {
 public:
-    explicit UdpListenParameters(Inet::InetLayer * inetLayer) : mEndPointManager(inetLayer->GetUDPEndPointManager()) {}
+    explicit UdpListenParameters(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) : mEndPointManager(endPointManager) {}
     UdpListenParameters(const UdpListenParameters &) = default;
     UdpListenParameters(UdpListenParameters &&)      = default;
 

@@ -80,7 +80,6 @@ using namespace chip::Inet;
 
 System::LayerImpl gSystemLayer;
 
-Inet::InetLayer gInet;
 Inet::UDPEndPointManagerImpl gUDP;
 Inet::TCPEndPointManagerImpl gTCP;
 
@@ -420,8 +419,8 @@ void InitNetwork()
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    gInet.Init(gSystemLayer, &gUDP);
-    gInet.InitTCP(&gTCP);
+    gTCP.Init(gSystemLayer);
+    gUDP.Init(gSystemLayer);
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)
@@ -504,8 +503,8 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
-    gInet.ShutdownTCP();
-    gInet.Shutdown();
+    gTCP.Shutdown();
+    gUDP.Shutdown();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();
 #endif

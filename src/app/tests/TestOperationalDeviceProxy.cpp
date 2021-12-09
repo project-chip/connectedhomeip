@@ -17,7 +17,6 @@
 
 #include <app/OperationalDeviceProxy.h>
 #include <inet/IPAddress.h>
-#include <inet/InetLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -44,7 +43,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     TestTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;
-    Inet::InetLayer inetLayer;
+    Inet::UDPEndPointManagerImpl udpEndPointManager;
     System::LayerImpl systemLayer;
     // Heap-allocate the fairly large FabricTable so we don't end up with a huge
     // stack.
@@ -54,8 +53,8 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     SessionIDAllocator idAllocator;
 
     systemLayer.Init();
-    inetLayer.Init(systemLayer, nullptr);
-    transportMgr.Init(UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT));
+    udpEndPointManager.Init(systemLayer);
+    transportMgr.Init(UdpListenParameters(udpEndPointManager).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT));
     sessionManager.Init(&systemLayer, &transportMgr, &messageCounterManager);
     exchangeMgr.Init(&sessionManager);
     messageCounterManager.Init(&exchangeMgr);
@@ -81,7 +80,7 @@ void TestOperationalDeviceProxy_EstablishSessionDirectly(nlTestSuite * inSuite, 
     sessionManager.Shutdown();
     Platform::Delete(fabrics);
     transportMgr.Close();
-    inetLayer.Shutdown();
+    udpEndPointManager.Shutdown();
     systemLayer.Shutdown();
     Platform::MemoryShutdown();
 }

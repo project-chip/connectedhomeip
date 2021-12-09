@@ -121,7 +121,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     VerifyOrReturnError(params.systemState->SystemLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(params.systemState->InetLayer() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(params.systemState->UDPEndPointManager() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     mStorageDelegate = params.storageDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
@@ -131,7 +131,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->InetLayer()));
+    ReturnErrorOnFailure(mDNSResolver.Init(params.systemState->UDPEndPointManager()));
     mDNSResolver.SetResolverDelegate(this);
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
@@ -586,14 +586,14 @@ void DeviceController::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHIP_
 ControllerDeviceInitParams DeviceController::GetControllerDeviceInitParams()
 {
     return ControllerDeviceInitParams{
-        .transportMgr    = mSystemState->TransportMgr(),
-        .sessionManager  = mSystemState->SessionMgr(),
-        .exchangeMgr     = mSystemState->ExchangeMgr(),
-        .inetLayer       = mSystemState->InetLayer(),
-        .storageDelegate = mStorageDelegate,
-        .idAllocator     = &mIDAllocator,
-        .fabricsTable    = mSystemState->Fabrics(),
-        .imDelegate      = mSystemState->IMDelegate(),
+        .transportMgr       = mSystemState->TransportMgr(),
+        .sessionManager     = mSystemState->SessionMgr(),
+        .exchangeMgr        = mSystemState->ExchangeMgr(),
+        .udpEndPointManager = mSystemState->UDPEndPointManager(),
+        .storageDelegate    = mStorageDelegate,
+        .idAllocator        = &mIDAllocator,
+        .fabricsTable       = mSystemState->Fabrics(),
+        .imDelegate         = mSystemState->IMDelegate(),
     };
 }
 
@@ -632,12 +632,12 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     mUdcTransportMgr = chip::Platform::New<DeviceIPTransportMgr>();
-    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->InetLayer())
+    ReturnErrorOnFailure(mUdcTransportMgr->Init(Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv6)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #if INET_CONFIG_ENABLE_IPV4
                                                     ,
-                                                Transport::UdpListenParameters(mSystemState->InetLayer())
+                                                Transport::UdpListenParameters(mSystemState->UDPEndPointManager())
                                                     .SetAddressType(Inet::IPAddressType::kIPv4)
                                                     .SetListenPort((uint16_t)(mUdcListenPort))
 #endif // INET_CONFIG_ENABLE_IPV4

@@ -20,7 +20,6 @@
 
 #include <limits>
 
-#include <inet/IPPacketInfo.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ResolverProxy.h>
@@ -348,7 +347,7 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
@@ -405,18 +404,18 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
 }
 
-CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
-    /// the same inetLayer and port for mDNS.
-    mSystemLayer = inetLayer->SystemLayer();
+    /// the same udpEndPointManager and port for mDNS.
+    mSystemLayer = &udpEndPointManager->SystemLayer();
 
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
 
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
+    return GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort);
 }
 
 void MinMdnsResolver::Shutdown()
