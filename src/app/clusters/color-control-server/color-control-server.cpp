@@ -2457,9 +2457,8 @@ void emberAfPluginColorControlServerStopTransition(void)
 bool emberAfColorControlClusterMoveHueCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::MoveHue::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().moveHueCommand(commandPath.mEndpointId, commandData.moveMode,
-                                                         static_cast<uint16_t>(commandData.rate), commandData.optionsMask,
-                                                         commandData.optionsOverride, false);
+    return ColorControlServer::Instance().moveHueCommand(commandPath.mEndpointId, commandData.moveMode, commandData.rate,
+                                                         commandData.optionsMask, commandData.optionsOverride, false);
 }
 
 bool emberAfColorControlClusterMoveSaturationCallback(app::CommandHandler * commandObj,
@@ -2473,9 +2472,9 @@ bool emberAfColorControlClusterMoveSaturationCallback(app::CommandHandler * comm
 bool emberAfColorControlClusterMoveToHueCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::MoveToHue::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().moveToHueCommand(commandPath.mEndpointId, static_cast<uint16_t>(commandData.hue),
-                                                           commandData.direction, commandData.transitionTime,
-                                                           commandData.optionsMask, commandData.optionsOverride, false);
+    return ColorControlServer::Instance().moveToHueCommand(commandPath.mEndpointId, commandData.hue, commandData.direction,
+                                                           commandData.transitionTime, commandData.optionsMask,
+                                                           commandData.optionsOverride, false);
 }
 
 bool emberAfColorControlClusterMoveToSaturationCallback(app::CommandHandler * commandObj,
@@ -2490,16 +2489,16 @@ bool emberAfColorControlClusterMoveToHueAndSaturationCallback(app::CommandHandle
                                                               const Commands::MoveToHueAndSaturation::DecodableType & commandData)
 {
     return ColorControlServer::Instance().moveToHueAndSaturationCommand(
-        commandPath.mEndpointId, static_cast<uint16_t>(commandData.hue), commandData.saturation, commandData.transitionTime,
-        commandData.optionsMask, commandData.optionsOverride, false);
+        commandPath.mEndpointId, commandData.hue, commandData.saturation, commandData.transitionTime, commandData.optionsMask,
+        commandData.optionsOverride, false);
 }
 
 bool emberAfColorControlClusterStepHueCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::StepHue::DecodableType & commandData)
 {
-    return ColorControlServer::Instance().stepHueCommand(
-        commandPath.mEndpointId, commandData.stepMode, static_cast<uint16_t>(commandData.stepSize),
-        static_cast<uint16_t>(commandData.transitionTime), commandData.optionsMask, commandData.optionsOverride, false);
+    return ColorControlServer::Instance().stepHueCommand(commandPath.mEndpointId, commandData.stepMode, commandData.stepSize,
+                                                         commandData.transitionTime, commandData.optionsMask,
+                                                         commandData.optionsOverride, false);
 }
 
 bool emberAfColorControlClusterStepSaturationCallback(app::CommandHandler * commandObj,
