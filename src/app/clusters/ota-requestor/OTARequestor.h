@@ -41,6 +41,7 @@ public:
     {
         kQueryImage = 0,
         kStartBDX,
+        kApplyUpdate,
     };
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
@@ -57,6 +58,9 @@ public:
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
     OTATriggerResult TriggerImmediateQuery();
+
+    // Send ApplyImage
+    void ApplyUpdate();
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -112,14 +116,17 @@ public:
      * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
      * explicitly.
      */
-    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex)
+    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId)
     {
         mProviderNodeId      = nodeId;
         mProviderFabricIndex = fabIndex;
+        mProviderEndpointId  = endpointId;
     }
 
 private:
     struct QueryImageRequest;
+
+    static constexpr size_t kMaxUpdateTokenLen = 32;
 
     // TODO: the application should define this, along with initializing the BDXDownloader
 
@@ -196,7 +203,12 @@ private:
     /**
      * Create a QueryImage request using values from the Basic cluster attributes
      */
-    CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & req);
+    CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & request);
+
+    /**
+     * Create a ApplyUpdate request using values obtained from QueryImageResponse
+     */
+    CHIP_ERROR BuildApplyUpdateRequest(app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type & args);
 
     /**
      * Session connection callbacks
@@ -214,16 +226,28 @@ private:
                          const app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
     static void OnQueryImageFailure(void * context, EmberAfStatus status);
 
+    /**
+     * ApplyUpdate callbacks
+     */
+    static void
+    OnApplyUpdateResponse(void * context,
+                          const app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & response);
+    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     NodeId mProviderNodeId                    = kUndefinedNodeId;
     FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
+    EndpointId mProviderEndpointId            = kRootEndpointId;
     uint32_t mOtaStartDelayMs                 = 0;
     CASESessionManager * mCASESessionManager  = nullptr;
     OnConnectedAction mOnConnectedAction      = kQueryImage;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
-    Server * mServer = nullptr;
+    uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
+    ByteSpan mUpdateToken;
+    uint32_t mUpdateVersion = 0;
+    Server * mServer        = nullptr;
 };
 
 } // namespace chip

@@ -68,6 +68,7 @@ public:
 
     // A setter for the delegate class pointer
     void SetImageProcessorDelegate(OTAImageProcessorInterface * delegate) { mImageProcessor = delegate; }
+    OTAImageProcessorInterface * GetImageProcessorDelegate() const { return mImageProcessor; }
 
     State GetState() const { return mState; }
 
