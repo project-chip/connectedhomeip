@@ -39,22 +39,17 @@ tests:
       command: "LaunchContent"
       arguments:
           values:
-               - name: "autoPlay"
-                 value: true
-               - name: "data"
-                 value: "exampleData"
-               - name: "search"
-                 value:
-                     {
-                         type: 1,
-                         value: "exampleValue",
-                         externalIDList: [
-                                {
-                                    name: "name",
-                                    value: "value"
-                                }
-                            ]
-                     }
+              - name: "autoPlay"
+                value: true
+              - name: "data"
+                value: "exampleData"
+              - name: "search"
+                value:
+                    {
+                        type: 1,
+                        value: "exampleValue",
+                        externalIDList: [{ name: "name", value: "value" }],
+                    }
       response:
           values:
               - name: "data"
@@ -66,60 +61,45 @@ tests:
       command: "LaunchURL"
       arguments:
           values:
-               - name: "contentURL"
-                 value: "exampleUrl"
-               - name: "displayString"
-                 value: "exampleDisplayString"
-               - name: "brandingInformation"
-                 value:
-                     {
-                         providerName: "exampleName",
-                         background: {
-                            imageUrl: "exampleUrl",
-                            color: "exampleColor",
-                            size: {
-                              width: 0,
-                              height: 0,
-                              metric: 0
-                            }
-                         },
-                         logo: {
-                            imageUrl: "exampleUrl",
-                            color: "exampleColor",
-                            size: {
-                              width: 0,
-                              height: 0,
-                              metric: 0
-                            }
-                         },
-                         progressBar: {
-                            imageUrl: "exampleUrl",
-                            color: "exampleColor",
-                            size: {
-                              width: 0,
-                              height: 0,
-                              metric: 0
-                            }
-                         },
-                         splash: {
-                            imageUrl: "exampleUrl",
-                            color: "exampleColor",
-                            size: {
-                              width: 0,
-                              height: 0,
-                              metric: 0
-                            }
-                         },
-                         waterMark: {
-                            imageUrl: "exampleUrl",
-                            color: "exampleColor",
-                            size: {
-                              width: 0,
-                              height: 0,
-                              metric: 0
-                            }
-                         }
-                     }
+              - name: "contentURL"
+                value: "exampleUrl"
+              - name: "displayString"
+                value: "exampleDisplayString"
+              - name: "brandingInformation"
+                value:
+                    {
+                        providerName: "exampleName",
+                        background:
+                            {
+                                imageUrl: "exampleUrl",
+                                color: "exampleColor",
+                                size: { width: 0, height: 0, metric: 0 },
+                            },
+                        logo:
+                            {
+                                imageUrl: "exampleUrl",
+                                color: "exampleColor",
+                                size: { width: 0, height: 0, metric: 0 },
+                            },
+                        progressBar:
+                            {
+                                imageUrl: "exampleUrl",
+                                color: "exampleColor",
+                                size: { width: 0, height: 0, metric: 0 },
+                            },
+                        splash:
+                            {
+                                imageUrl: "exampleUrl",
+                                color: "exampleColor",
+                                size: { width: 0, height: 0, metric: 0 },
+                            },
+                        waterMark:
+                            {
+                                imageUrl: "exampleUrl",
+                                color: "exampleColor",
+                                size: { width: 0, height: 0, metric: 0 },
+                            },
+                    }
       response:
           values:
               - name: "data"

@@ -76,7 +76,6 @@ tests:
     #           - name: "affiliateCallSign"
     #             value: "sign"
 
-
     - label: "Change Channel Command"
       command: "ChangeChannel"
       arguments:
@@ -94,9 +93,8 @@ tests:
                         minorNumber: 0,
                         name: "name",
                         callSign: "callSign",
-                        affiliateCallSign: "affiliateCallSign"
+                        affiliateCallSign: "affiliateCallSign",
                     }
-
 
     - label: "Change Channel By Number Command"
       command: "ChangeChannelByNumber"
