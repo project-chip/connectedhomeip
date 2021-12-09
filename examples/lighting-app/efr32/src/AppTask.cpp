@@ -143,7 +143,7 @@ Identify gIdentify = {
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
     chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant          = effect->mEffectVariant;
+    uint8_t effectVariant                                      = effect->mEffectVariant;
 
     // Uses print outs until we can support the effects
     if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
