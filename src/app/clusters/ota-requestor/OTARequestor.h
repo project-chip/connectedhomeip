@@ -35,6 +35,8 @@ class OTARequestor : public OTARequestorInterface
 {
 public:
     // Application interface declarations -- start
+
+    // Return value for various trigger-type APIs
     enum OTATriggerResult {
                                 kTriggerSuccessful       = 0,
                                 kNoProviderKnown         = 1
@@ -52,14 +54,23 @@ public:
     // The BDXDownloader instance should already have the ImageProcessingDelegate set.
     void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
 
-    // Application directs the Requestor to abort any processing related to
-    // the image update
+    // Application directs the Requestor to abort the download in progress. All the Requestor state (such 
+    // as the QueryImageResponse content) is preserved
     void AbortImageUpdate();
+
+    // Application directs the Requestor to abort the download in progress. All the Requestor state is
+    // cleared, UploadState is reset to Idle
+    void AbortAndResetState();
+
+    // Application notifies the Requestor on the user consent action, TRUE if consent is given, 
+    // FALSE otherwise
+    void OnUserConsent(bool result);
 
     // Application directs the Requestor to download the image using the suppiled parameter and without
     // issuing QueryImage
     OTATriggerResult ResumeImageDownload(const BdxDownloadParameters &bdxParameters) {/* NOT IMPLEMENTED YET */ 
         return kTriggerSuccessful;} 
+
 
     // Application interface declarations -- end
 
@@ -174,6 +185,8 @@ private:
     chip::CASESessionManager * mCASESessionManager = nullptr;
     OnConnectedState onConnectedState              = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
+    UpdateStateEnum mUpdateState                   = UpdateStateEnum::Unknown;
+
     chip::BDXDownloader * mBdxDownloader; // TODO: this should be OTADownloader
     BDXMessenger mBdxMessenger;           // TODO: ideally this is held by the application
 

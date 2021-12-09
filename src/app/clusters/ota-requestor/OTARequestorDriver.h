@@ -27,6 +27,7 @@
 #include <protocols/bdx/BdxMessages.h>
 
 namespace chip {
+
 // The set of parameters needed for starting a BDX download.
 struct BdxDownloadParameters {
     uint32_t delayedActionTime;
@@ -38,6 +39,25 @@ struct BdxDownloadParameters {
     chip::ByteSpan metadataForRequestor;
 };
 
+// Possible values for the UpdateState attribute
+enum UpdateStateEnum {
+                      Unknown = 0,
+                      Idle = 1,
+                      Querying = 2,
+                      DelayedOnQuery = 3,
+                      Downloading = 4,
+                      Applying = 5,
+                      DelayedOnApply = 6,
+                      RollingBack = 7,
+                      DelayedOnUserConsent = 8,
+    };
+
+// Return type for RequestUserConsent()
+enum UserConsentAction {
+                        ImmediateYes = 1,
+                        ImmediateNo  = 2,
+                        Requested    = 3,
+};
 
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
@@ -51,6 +71,10 @@ public:
     // from proceeding with actual image download. Returning TRUE will allow the download
     // to proceed, returning FALSE will abort the download process.
     virtual bool CheckImageDownloadAllowed() = 0;
+
+    // Application is directed to complete user consent: either return ImmediateYes/ImmediateNo 
+    // without blocking or return Requested and call OTARequestor::OnUserConsent() later. 
+    virtual UserConsentAction RequestUserConsent() = 0;
 
     // Notify the application that the download is complete and the image can be applied
     virtual void ImageDownloadComplete() = 0;
@@ -66,6 +90,10 @@ public:
 
     // Get Version of the last downloaded image, return CHIP_ERROR_NOT_FOUND if none exists
     virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE;}
+
+    // Notify application of a change in the UpdateState attribute 
+    virtual void NotifyUpdateStateChange(chip::UpdateStateEnum state) {};
+
 
     // Destructor
     virtual ~OTARequestorDriver() = default;

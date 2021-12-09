@@ -34,3 +34,8 @@ bool LinuxOTARequestorDriver::CheckImageDownloadAllowed()
 
 // Notify the application that the download is complete and the image can be applied
 void LinuxOTARequestorDriver::ImageDownloadComplete() {}
+
+UserConsentAction LinuxOTARequestorDriver::RequestUserConsent()
+{
+    return ImmediateYes;
+}
