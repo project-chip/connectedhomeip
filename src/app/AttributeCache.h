@@ -174,8 +174,7 @@ public:
      *
      */
     template <typename ClusterObjectTypeT>
-    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT & value,
-                   std::list<AttributeStatus> & statusList)
+    CHIP_ERROR Get(EndpointId endpointId, ClusterId clusterId, ClusterObjectTypeT & value, std::list<AttributeStatus> & statusList)
     {
         statusList.clear();
 

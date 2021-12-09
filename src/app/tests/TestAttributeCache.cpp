@@ -92,7 +92,7 @@ struct AttributeInstruction
             return Clusters::TestCluster::Attributes::StructAttr::Id;
             break;
 
-	default:
+        default:
             return Clusters::TestCluster::Attributes::ListStructOctetString::Id;
             break;
         }
