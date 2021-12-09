@@ -1047,32 +1047,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -8482,32 +8457,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -14819,7 +14769,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -15179,7 +15129,7 @@
               "code": 7,
               "mfgCode": null,
               "side": "server",
-              "included": 1,
+              "included": 0,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -15413,16 +15363,16 @@
               "outgoing": 0
             },
             {
-              "name": "TestEmitTestEventRequest",
-              "code": 20,
+              "name": "TestSimpleOptionalArgumentRequest",
+              "code": 19,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
               "outgoing": 0
             },
             {
-              "name": "TestSimpleOptionalArgumentRequest",
-              "code": 19,
+              "name": "TestEmitTestEventRequest",
+              "code": 20,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -17844,32 +17794,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -20132,5 +20057,6 @@
       "endpointVersion": 1,
       "deviceIdentifier": 22
     }
-  ]
+  ],
+  "log": []
 }

@@ -80,8 +80,10 @@ tests:
       attribute: "application version"
       response:
           value: "exampleVersion"
-    # - label: "Read attribute application allowed vendor list"
-    #   command: "readAttribute"
-    #   attribute: "allowed vendor list"
-    #   response:
-    #       value: [123, 456]
+
+    - label: "Read attribute application allowed vendor list"
+      disabled: true
+      command: "readAttribute"
+      attribute: "allowed vendor list"
+      response:
+          value: [123, 456]
