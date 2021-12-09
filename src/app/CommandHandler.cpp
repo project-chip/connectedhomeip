@@ -26,6 +26,7 @@
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
+#include <access/AccessControl.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -258,6 +259,23 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     SuccessOrExit(err);
 
     VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            if (err != CHIP_ERROR_ACCESS_DENIED)
+            {
+                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+            }
+            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)

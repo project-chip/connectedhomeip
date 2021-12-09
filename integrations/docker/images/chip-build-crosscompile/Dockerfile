@@ -1,9 +1,13 @@
-FROM alpine:3.15 as build
+ARG VERSION=latest
+FROM connectedhomeip/chip-build:${VERSION} as build
 
-RUN apk --no-cache add \
-    bash=5.1.8-r0 \
-    git=2.34.1-r0 \
-    wget=1.21.2-r2
+RUN set -x \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
+    git=1:2.25.1-1ubuntu3.2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/ \
+    && : # last line
 
 WORKDIR /opt
 # Unpack the sysroot, while also removing some rather large items in it that
@@ -22,7 +26,7 @@ RUN set -x \
     && rm -rf /opt/ubuntu-21.04-aarch64-sysroot/lib/modules \
     && : # last line
 
-FROM alpine:3.15
+FROM connectedhomeip/chip-build:${VERSION}
 
 COPY --from=build /opt/ubuntu-21.04-aarch64-sysroot/ /opt/ubuntu-21.04-aarch64-sysroot/
 
