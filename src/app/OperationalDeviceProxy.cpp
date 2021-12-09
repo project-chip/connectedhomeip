@@ -43,7 +43,8 @@ using namespace chip::Callback;
 namespace chip {
 
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                           Dnssd::ResolverProxy * resolver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -54,7 +55,8 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        err = Dnssd::Resolver::Instance().ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
+        VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        err = resolver->ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
@@ -150,7 +152,8 @@ bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port)
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
     mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{ mInitParams.sessionManager, mInitParams.exchangeMgr,
-                                                                         mInitParams.idAllocator, mInitParams.fabricInfo });
+                                                                         mInitParams.idAllocator, mInitParams.fabricInfo,
+                                                                         mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
     CHIP_ERROR err =
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);

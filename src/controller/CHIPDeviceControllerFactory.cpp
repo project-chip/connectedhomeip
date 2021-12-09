@@ -24,6 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 
 #if CONFIG_DEVICE_LAYER
@@ -140,8 +141,14 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
+    InitDataModelHandler(stateParams.exchangeMgr);
+
     stateParams.imDelegate = params.imDelegate;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.imDelegate));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.inetLayer));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -219,6 +226,10 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     VerifyOrReturnError(mRefCount == 1, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Dnssd::Resolver::Instance().Shutdown();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();

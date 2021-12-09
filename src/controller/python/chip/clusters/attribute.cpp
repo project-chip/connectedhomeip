@@ -323,13 +323,9 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+        }
 
-            err = readClient->SendSubscribeRequest(params);
-        }
-        else
-        {
-            err = readClient->SendReadRequest(params);
-        }
+        err = readClient->SendRequest(params);
 
         if (err != CHIP_NO_ERROR)
         {
@@ -384,13 +380,9 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
         {
             params.mMinIntervalFloorSeconds   = minInterval;
             params.mMaxIntervalCeilingSeconds = maxInterval;
+        }
 
-            err = readClient->SendSubscribeRequest(params);
-        }
-        else
-        {
-            err = readClient->SendReadRequest(params);
-        }
+        err = readClient->SendRequest(params);
 
         if (err != CHIP_NO_ERROR)
         {

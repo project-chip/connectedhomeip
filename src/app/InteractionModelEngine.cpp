@@ -24,9 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "Command.h"
-#include "CommandHandler.h"
-#include "CommandSender.h"
 #include <cinttypes>
 
 namespace chip {
@@ -462,7 +459,7 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendReadRequest(aReadPrepareParams);
+    err = client->SendRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
@@ -474,7 +471,7 @@ CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aRea
 {
     ReadClient * client = nullptr;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    ReturnErrorOnFailure(client->SendRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
 

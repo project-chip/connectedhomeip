@@ -291,12 +291,12 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
                                                   sizeof(uint16_t),            // initiatorSessionId,
                                                   kSHA256_Hash_Length,         // destinationId
                                                   kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  /* TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                                     sizeof(uint16)_t), // initiatorMRPParams */
+                                                  mrpParamsSize,               // initiatorMRPParams
                                                   kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -461,8 +461,9 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
-    size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                                                                    sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t max_sigma2_resume_data_len =
+        TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -603,8 +604,9 @@ CHIP_ERROR CASESession::SendSigma2()
                                          CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
+                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -623,7 +625,7 @@ CHIP_ERROR CASESession::SendSigma2()
     if (mLocalMRPConfig.HasValue())
     {
         ChipLogDetail(SecureChannel, "Including MRP parameters");
-        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriterMsg2));
     }
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msg_R2));
@@ -680,7 +682,10 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
 
-    SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+    }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
@@ -852,7 +857,10 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SetPeerCATs(peerCATs);
 
     // Retrieve responderMRPParams if present
-    SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1378,7 +1386,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     CHIP_ERROR err = tlvReader.Next();
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
-        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(tlvReader));
+        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
         err = tlvReader.Next();
     }
 

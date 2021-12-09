@@ -22,7 +22,6 @@
  */
 
 #include <app/ClusterInfo.h>
-#include <app/Command.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
@@ -64,7 +63,7 @@ constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_
 EmberAfClusterCommand imCompatibilityEmberAfCluster;
 EmberApsFrame imCompatibilityEmberApsFrame;
 EmberAfInterpanHeader imCompatibilityInterpanHeader;
-Command * currentCommandObject;
+CommandHandler * currentCommandObject;
 
 // BasicType maps the type to basic int(8|16|32|64)(s|u) types.
 EmberAfAttributeType BaseType(EmberAfAttributeType type)
@@ -137,7 +136,30 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandPath)
+void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPath & commandPath)
+{
+    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
+
+    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
+    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
+    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
+    imCompatibilityEmberApsFrame.sequence =
+        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
+
+    if (commandExchangeCtx->IsGroupExchangeContext())
+    {
+        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
+    }
+
+    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
+    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
+    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
+    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
+
+    emAfCurrentCommand = &imCompatibilityEmberAfCluster;
+}
+
+void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
 
@@ -359,7 +381,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
     if (attributeMetadata == nullptr)
     {
-        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
 
         // This path is not actually supported.
@@ -381,7 +403,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         }
     }
 
-    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
 
     ReturnErrorOnFailure(aAttributeReports.GetError());
     TLV::TLVWriter backup;

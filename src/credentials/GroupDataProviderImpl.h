@@ -160,7 +160,7 @@ private:
     BitMapObjectPool<GroupMappingIteratorImpl, kIteratorsMax> mEndpointGroupsIterators;
     BitMapObjectPool<AllStatesIterator, kIteratorsMax> mAllStatesIterators;
     BitMapObjectPool<FabricStatesIterator, kIteratorsMax> mFabricStatesIterators;
-    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mKeySetIterators;
+    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
 };
 
 } // namespace Credentials

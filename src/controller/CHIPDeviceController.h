@@ -72,6 +72,7 @@
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #endif
 
 namespace chip {
@@ -387,6 +388,8 @@ protected:
     SessionIDAllocator mIDAllocator;
 
     uint16_t mVendorId;
+
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
@@ -819,8 +822,6 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
-
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace Controller

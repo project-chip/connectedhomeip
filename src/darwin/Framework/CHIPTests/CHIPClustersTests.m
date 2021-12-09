@@ -29845,27 +29845,28 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 20);
+            XCTAssertEqual([actualValue count], 21);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 3UL);
-            XCTAssertEqual([actualValue[1] unsignedIntValue], 29UL);
-            XCTAssertEqual([actualValue[2] unsignedIntValue], 30UL);
-            XCTAssertEqual([actualValue[3] unsignedIntValue], 31UL);
-            XCTAssertEqual([actualValue[4] unsignedIntValue], 40UL);
-            XCTAssertEqual([actualValue[5] unsignedIntValue], 41UL);
-            XCTAssertEqual([actualValue[6] unsignedIntValue], 42UL);
-            XCTAssertEqual([actualValue[7] unsignedIntValue], 46UL);
-            XCTAssertEqual([actualValue[8] unsignedIntValue], 48UL);
-            XCTAssertEqual([actualValue[9] unsignedIntValue], 49UL);
-            XCTAssertEqual([actualValue[10] unsignedIntValue], 50UL);
-            XCTAssertEqual([actualValue[11] unsignedIntValue], 51UL);
-            XCTAssertEqual([actualValue[12] unsignedIntValue], 52UL);
-            XCTAssertEqual([actualValue[13] unsignedIntValue], 53UL);
-            XCTAssertEqual([actualValue[14] unsignedIntValue], 54UL);
-            XCTAssertEqual([actualValue[15] unsignedIntValue], 55UL);
-            XCTAssertEqual([actualValue[16] unsignedIntValue], 60UL);
-            XCTAssertEqual([actualValue[17] unsignedIntValue], 62UL);
-            XCTAssertEqual([actualValue[18] unsignedIntValue], 63UL);
-            XCTAssertEqual([actualValue[19] unsignedIntValue], 1029UL);
+            XCTAssertEqual([actualValue[1] unsignedIntValue], 4UL);
+            XCTAssertEqual([actualValue[2] unsignedIntValue], 29UL);
+            XCTAssertEqual([actualValue[3] unsignedIntValue], 30UL);
+            XCTAssertEqual([actualValue[4] unsignedIntValue], 31UL);
+            XCTAssertEqual([actualValue[5] unsignedIntValue], 40UL);
+            XCTAssertEqual([actualValue[6] unsignedIntValue], 41UL);
+            XCTAssertEqual([actualValue[7] unsignedIntValue], 42UL);
+            XCTAssertEqual([actualValue[8] unsignedIntValue], 46UL);
+            XCTAssertEqual([actualValue[9] unsignedIntValue], 48UL);
+            XCTAssertEqual([actualValue[10] unsignedIntValue], 49UL);
+            XCTAssertEqual([actualValue[11] unsignedIntValue], 50UL);
+            XCTAssertEqual([actualValue[12] unsignedIntValue], 51UL);
+            XCTAssertEqual([actualValue[13] unsignedIntValue], 52UL);
+            XCTAssertEqual([actualValue[14] unsignedIntValue], 53UL);
+            XCTAssertEqual([actualValue[15] unsignedIntValue], 54UL);
+            XCTAssertEqual([actualValue[16] unsignedIntValue], 55UL);
+            XCTAssertEqual([actualValue[17] unsignedIntValue], 60UL);
+            XCTAssertEqual([actualValue[18] unsignedIntValue], 62UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 63UL);
+            XCTAssertEqual([actualValue[20] unsignedIntValue], 1029UL);
         }
 
         [expectation fulfill];
@@ -34693,6 +34694,54 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeAttributeListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"DiagnosticLogs AttributeList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeLockStateWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockStateWithCompletionHandler"];
+
+    [cluster readAttributeLockStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock LockState Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterDoorLockReadAttributeLockTypeWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockTypeWithCompletionHandler"];
+
+    [cluster readAttributeLockTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"DoorLock LockType Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

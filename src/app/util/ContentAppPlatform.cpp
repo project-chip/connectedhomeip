@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
 #include <app/util/ContentAppPlatform.h>
 #include <cstdio>
 #include <inttypes.h>

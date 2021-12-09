@@ -168,6 +168,158 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     ServiceEvents(lSys);
 }
 
+// Test the implementation helper classes TimerPool, TimerList, and TimerData.
+namespace chip {
+namespace System {
+class TestTimer
+{
+public:
+    static void CheckTimerPool(nlTestSuite * inSuite, void * aContext);
+};
+} // namespace System
+} // namespace chip
+
+void chip::System::TestTimer::CheckTimerPool(nlTestSuite * inSuite, void * aContext)
+{
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    using Timer = TimerList::Node;
+    struct TestState
+    {
+        int count = 0;
+        static void Increment(Layer * layer, void * state) { ++static_cast<TestState *>(state)->count; }
+        static void Reset(Layer * layer, void * state) { static_cast<TestState *>(state)->count = 0; }
+    };
+    TestState testState;
+
+    using namespace Clock::Literals;
+    struct
+    {
+        Clock::Timestamp awakenTime;
+        TimerCompleteCallback onComplete;
+        Timer * timer;
+    } testTimer[] = {
+        { 111_ms, TestState::Increment }, // 0
+        { 100_ms, TestState::Increment }, // 1
+        { 202_ms, TestState::Reset },     // 2
+        { 303_ms, TestState::Increment }, // 3
+    };
+
+    TimerPool<Timer> pool;
+    NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 0);
+    SYSTEM_STATS_RESET(Stats::kSystemLayer_NumTimers);
+
+    // Test TimerPool::Create() and TimerData accessors.
+
+    for (auto & timer : testTimer)
+    {
+        timer.timer = pool.Create(systemLayer, timer.awakenTime, timer.onComplete, &testState);
+    }
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 4);
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+
+    for (auto & timer : testTimer)
+    {
+        NL_TEST_ASSERT(suite, timer.timer != nullptr);
+        NL_TEST_ASSERT(suite, timer.timer->AwakenTime() == timer.awakenTime);
+        NL_TEST_ASSERT(suite, timer.timer->GetCallback().GetOnComplete() == timer.onComplete);
+        NL_TEST_ASSERT(suite, timer.timer->GetCallback().GetAppState() == &testState);
+        NL_TEST_ASSERT(suite, timer.timer->GetCallback().GetSystemLayer() == &systemLayer);
+    }
+
+    // Test TimerList operations.
+
+    TimerList list;
+    NL_TEST_ASSERT(suite, list.Remove(nullptr) == nullptr);
+    NL_TEST_ASSERT(suite, list.Remove(nullptr, nullptr) == nullptr);
+    NL_TEST_ASSERT(suite, list.PopEarliest() == nullptr);
+    NL_TEST_ASSERT(suite, list.PopIfEarlier(500_ms) == nullptr);
+    NL_TEST_ASSERT(suite, list.Earliest() == nullptr);
+    NL_TEST_ASSERT(suite, list.Empty());
+
+    Timer * earliest = list.Add(testTimer[0].timer); // list: () → (0) returns: 0
+    NL_TEST_ASSERT(suite, earliest == testTimer[0].timer);
+    NL_TEST_ASSERT(suite, list.PopIfEarlier(10_ms) == nullptr);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[0].timer);
+    NL_TEST_ASSERT(suite, !list.Empty());
+
+    earliest = list.Add(testTimer[1].timer); // list: (0) → (1 0) returns: 1
+    NL_TEST_ASSERT(suite, earliest == testTimer[1].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[1].timer);
+
+    earliest = list.Add(testTimer[2].timer); // list: (1 0) → (1 0 2) returns: 1
+    NL_TEST_ASSERT(suite, earliest == testTimer[1].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[1].timer);
+
+    earliest = list.Add(testTimer[3].timer); // list: (1 0 2) → (1 0 2 3) returns: 1
+    NL_TEST_ASSERT(suite, earliest == testTimer[1].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[1].timer);
+
+    earliest = list.Remove(earliest); // list: (1 0 2 3) → (0 2 3) returns: 0
+    NL_TEST_ASSERT(suite, earliest == testTimer[0].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[0].timer);
+
+    earliest = list.Remove(TestState::Reset, &testState); // list: (0 2 3) → (0 3) returns: 2
+    NL_TEST_ASSERT(suite, earliest == testTimer[2].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[0].timer);
+
+    earliest = list.PopEarliest(); // list: (0 3) → (3) returns: 0
+    NL_TEST_ASSERT(suite, earliest == testTimer[0].timer);
+    NL_TEST_ASSERT(suite, list.Earliest() == testTimer[3].timer);
+
+    earliest = list.PopIfEarlier(10_ms); // list: (3) → (3) returns: nullptr
+    NL_TEST_ASSERT(suite, earliest == nullptr);
+
+    earliest = list.PopIfEarlier(500_ms); // list: (3) → () returns: 3
+    NL_TEST_ASSERT(suite, earliest == testTimer[3].timer);
+    NL_TEST_ASSERT(suite, list.Empty());
+
+    earliest = list.Add(testTimer[3].timer); // list: () → (3) returns: 3
+    list.Clear();                            // list: (3) → ()
+    NL_TEST_ASSERT(suite, earliest == testTimer[3].timer);
+    NL_TEST_ASSERT(suite, list.Empty());
+
+    for (auto & timer : testTimer)
+    {
+        list.Add(timer.timer);
+    }
+    TimerList early = list.ExtractEarlier(200_ms); // list: (1 0 2 3) → (2 3) returns: (1 0)
+    NL_TEST_ASSERT(suite, list.PopEarliest() == testTimer[2].timer);
+    NL_TEST_ASSERT(suite, list.PopEarliest() == testTimer[3].timer);
+    NL_TEST_ASSERT(suite, list.PopEarliest() == nullptr);
+    NL_TEST_ASSERT(suite, early.PopEarliest() == testTimer[1].timer);
+    NL_TEST_ASSERT(suite, early.PopEarliest() == testTimer[0].timer);
+    NL_TEST_ASSERT(suite, early.PopEarliest() == nullptr);
+
+    // Test TimerPool::Invoke()
+    NL_TEST_ASSERT(suite, testState.count == 0);
+    pool.Invoke(testTimer[0].timer);
+    testTimer[0].timer = nullptr;
+    NL_TEST_ASSERT(suite, testState.count == 1);
+    NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 3);
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 3);
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+
+    // Test TimerPool::Release()
+    pool.Release(testTimer[1].timer);
+    testTimer[1].timer = nullptr;
+    NL_TEST_ASSERT(suite, testState.count == 1);
+    NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 2);
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 2);
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+
+    pool.ReleaseAll();
+    NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 0);
+#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 0);
+#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+}
+
 // Test Suite
 
 /**
@@ -178,6 +330,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
+    NL_TEST_DEF("Timer::TestTimerPool",            chip::System::TestTimer::CheckTimerPool),
     NL_TEST_SENTINEL()
 };
 // clang-format on
