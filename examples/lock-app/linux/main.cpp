@@ -20,6 +20,8 @@
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/util/af.h>
 
+#include "LockManager.h"
+
 #include "AppMain.h"
 
 /* Current proposed DoorLockServer API:
@@ -29,7 +31,7 @@ class DoorLockServer
 
     void InitServer();
 
-    bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
+   bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
     bool SetActuatorState(chip::EndpointId endpointId, bool actuatorState);
     bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState doorState);
 
@@ -57,24 +59,31 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, ...);
 bool emberAfPluginDoorLockClearCredential(chip::EndpointId endpointId, ...);
 */
 
-// Many of these should just be implemented in src/app/clusters/door-lock-server/*. 
+using namespace chip;
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::DoorLock;
+
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCode)
 {
-    // TODO: Set LockState, ActuatorEnabled
-    // call SetLockState
-    // call SetActuatorState
-    return true;
+    if(LockMgr().CheckPin(PINCode))
+    {
+        return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kLocked);
+    }
+
+    return false;
 }
 
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode)
 {
-    // TODO: Set LockState, ActuatorEnabled
-    // call SetLockState
-    // call SetActuatorState
-    return true;
+    if(LockMgr().CheckPin(PINCode))
+    {
+        return DoorLockServer::Instance().SetLockState(endpointId, DlLockState::kUnlocked);
+    }
+
+    return false;
 }
 
-
+/*
 bool emberAfPluginDoorLockGetUsers(chip::EndpointId endpointId, ...)
 {
     // TODO: Get (how to get? send out msg somehow?) 
@@ -111,23 +120,36 @@ bool emberAfPluginDoorLockClearCredential(chip::EndpointId endpointId, ...)
     // TODO: 
     return true;
 }
+*/
 
-
+/* TODO: Don't think we need this
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+*/
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
 {
-    // Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
+    // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
 
+    if (attributePath.mClusterId == DoorLock::Id)
+    {
+        emberAfDoorLockClusterPrintln("Door Lock attribute changed");
+    }
 }
+
+void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
+{
+    // TODO: Implement if needed
+}
+
 
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+    LockMgr().Init();
     ChipLinuxAppMainLoop();
     return 0;
 }

@@ -19,7 +19,27 @@
 #include "LockManager.h"
 
 #include <iostream>
+#include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
 LockManager LockManager::sLock;
 
+void LockManager::Init()
+{
+    mLocked = false;
+}
+
+bool LockManager::CheckPin(const char* pin)
+{
+    // TODO: Remove pin hardcode
+    if(pin != NULL && std::strncmp(pin, "1234", 4) == 0)
+    {
+        mLocked = true;
+
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}

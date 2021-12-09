@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 
 executable("chip-lock-app") {
   sources = [
-    #"include/tv-callbacks.cpp",
+    "src/LockManager.cpp",
     "main.cpp",
   ]
 
@@ -28,7 +28,8 @@ executable("chip-lock-app") {
   ]
 
   include_dirs =
-      [ "${chip_root}/examples/lock-app/lock-common/include" ]
+      [ "${chip_root}/examples/lock-app/lock-common/include",
+        "include" ]
 
   cflags = [ "-Wconversion" ]
 

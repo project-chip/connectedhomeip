@@ -40,19 +40,24 @@ public:
         kState_Unlocked,
     } State;
 
-    int Init();
-    bool InitiateAction(Action_t aAction);
+    void Init();
+    //bool InitiateAction(Action_t aAction);
 
-    using LockCallback_fn = std::function<void(Action_t)>;
+    bool CheckPin(const char* pin);
 
-    void SetCallbacks(LockCallback_fn aActionInitiated_CB, LockCallback_fn aActionCompleted_CB);
+    //using LockCallback_fn = std::function<void(Action_t)>;
+
+    //void SetCallbacks(LockCallback_fn aActionInitiated_CB, LockCallback_fn aActionCompleted_CB);
 
 private:
     friend LockManager & LockMgr(void);
-    State_t mState;
 
-    LockCallback_fn mActionInitiated_CB;
-    LockCallback_fn mActionCompleted_CB;
+    //State_t mState;
+
+    bool mLocked;
+
+    //LockCallback_fn mActionInitiated_CB;
+    //LockCallback_fn mActionCompleted_CB;
 
     static LockManager sLock;
 };

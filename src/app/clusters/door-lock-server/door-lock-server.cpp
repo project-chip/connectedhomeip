@@ -12,8 +12,7 @@
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
+ *    limitations under the License. */
 
 /****************************************************************************
  * @file
@@ -70,8 +69,8 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 
     emberAfDoorLockClusterPrintln("Setting Lock State to '%hhu'", lockState);
 
-    bool status = Attributes::LockState::Set(endpointId, lockState);
-    if (!status)
+    auto status = Attributes::LockState::Set(endpointId, lockState);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Unable to set the Lock State to %hhu: internal error", lockState);
     }
@@ -86,7 +85,7 @@ bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActua
     emberAfDoorLockClusterPrintln("Setting Actuator State to '%hhu'", actuatorState);
 
     bool status = Attributes::LockState::Set(endpointId, actuatorState);
-    if (!status)
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Unable to set the Actuator State to %hhu: internal error", actuatorState);
     }
@@ -101,7 +100,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDo
     emberAfDoorLockClusterPrintln("Setting Door State to '%hhu'", doorState);
     bool status = Attributes::DoorState::Set(endpointId, doorState);
 
-    if (!status)
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Unable to set the Door State to %hhu: internal error", doorState);
     }
@@ -140,23 +139,48 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
                                             const chip::app::ConcreteCommandPath & commandPath,
                                             const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Lock Door command (not implemented)");
+    emberAfDoorLockClusterPrintln("Received Lock Door command (implementing currently!)");
+    bool success = false;
 
-    // TODO: Implement door locking by calling emberAfPluginDoorLockOnDoorLockCommand
+    // TODO: Get actual endpoint id
+    chip::EndpointId endpoint = 1;
 
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    if(commandData.pinCode.HasValue())
+    {
+        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, 
+                reinterpret_cast<const char*>(commandData.pinCode.Value().data()));
+    }
+    else
+    {
+        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, NULL);
+    }
+
+    emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return success;
 }
 
 bool emberAfDoorLockClusterUnlockDoorCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Unlock Door command (not implemented)");
+    emberAfDoorLockClusterPrintln("Received Unlock Door command (implementing currently!)");
+    bool success = false;
 
-    // TODO: Implement door unlocking by calling emberAfPluginDoorLockOnDoorUnlockCommand
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    // TODO: Get actual endpoint id
+    chip::EndpointId endpoint = 1;
+
+    if(commandData.pinCode.HasValue())
+    {
+        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint,
+                reinterpret_cast<const char*>(commandData.pinCode.Value().data()));
+    }
+    else
+    {
+        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, NULL);
+    }
+
+    emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
+    return success;
 }
 
 bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandObj,
