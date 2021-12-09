@@ -141,11 +141,12 @@
     <string name="chip_ledger_info_commissioning_flow_url_text">Loading...</string>
     <string name="chip_ledge_info_redirect_btn_text">Redirect</string>
     <string name="chip_ledger_info_commissioning_flow_url_not_available">Not available</string>
+    <string name="provision_custom_flow_alert_title">Commissioning flow Completed.</string>
 
     <string name="dcl_api_root_url">https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
     <string name="dcl_response_key">result</string>
     <string name="dcl_custom_flow_url_key">custom</string>
-    <string name="custom_flow_return_url"></string>
+    <string name="custom_flow_return_url">mt://modelinfo</string>
     <string name="retrieve_endpoint_list">Retrieve Endpoint List</string>
     <string name="invoke">Invoke</string>
     <string name="select_a_command">Select a command</string>
