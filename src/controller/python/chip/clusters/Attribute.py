@@ -497,6 +497,16 @@ class AsyncReadTransaction:
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet = set()
 
+        #
+        # We cannot post back async work onto the asyncio's event loop for subscriptions,
+        # since at that point, we've returned from the await ... and got a subscription object
+        # back, and the REPL's event loop is not running and capable of posting background work to.
+        #
+        # So instead, we'll directly call the callback on the originating thread and use locks to protect
+        # relevant critical sections.
+        #
+        self._resLock = threading.Lock()
+
     def GetAllEventValues(self):
         return self._events
 
@@ -515,17 +525,15 @@ class AsyncReadTransaction:
                 tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
                 attributeValue = tlvData
 
-            self._cache.UpdateTLV(path, attributeValue)
-            self._changedPathSet.add(path)
+            with self._resLock:
+                self._cache.UpdateTLV(path, attributeValue)
+                self._changedPathSet.add(path)
+
         except Exception as ex:
             logging.exception(ex)
 
     def handleAttributeData(self, path: AttributePath, status: int, data: bytes):
-        if self._subscription_handler is not None:
-            self._handleAttributeData(path, status, data)
-        else:
-            self._event_loop.call_soon_threadsafe(
-                self._handleAttributeData, path, status, data)
+        self._handleAttributeData(path, status, data)
 
     def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
         try:
@@ -551,14 +559,14 @@ class AsyncReadTransaction:
                     if (builtins.enableDebugMode):
                         raise
 
-            self._events.append[EventReadResult(
-                Header=header, Data=eventValue)]
+            with self._resLock:
+                self._events.append[EventReadResult(
+                    Header=header, Data=eventValue)]
         except Exception as ex:
             logging.exception(ex)
 
     def handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
-        self._event_loop.call_soon_threadsafe(
-            self._handleEventData, header, path, data)
+        self._handleEventData(header, path, data)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -604,7 +612,8 @@ class AsyncReadTransaction:
         pass
 
     def handleReportEnd(self):
-        self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        # self._event_loop.call_soon_threadsafe(self._handleReportEnd)
+        self._handleReportEnd()
 
 
 class AsyncWriteTransaction:
