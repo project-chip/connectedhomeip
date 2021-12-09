@@ -40,7 +40,7 @@ In terminal 3:
 -   `${PROVIDER_IP_ADDRESS}` is the IP address of the ota-provider-app that has
     been resolved manually
 -   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app; this is a Test
-     Mode parameter and should not be used in most scenarios
+    Mode parameter and should not be used in most scenarios
 -   `${PROVIDER_FABRIC_INDEX}` is the fabric index of the ota-provider-app; this
     is a Test Mode parameter and should not be used in most scenarios
 -   `${DELAY_QUERY_SECONDS}` is the amount of time in seconds to wait before
