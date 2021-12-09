@@ -16,7 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/Command.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/util/af.h>
 
