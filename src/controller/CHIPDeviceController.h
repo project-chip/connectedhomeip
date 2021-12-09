@@ -239,7 +239,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(mFabricInfo, deviceId, onConnection, onFailure);
     }
 
     /**
@@ -253,7 +253,7 @@ public:
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(deviceId);
+        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
     }
 
     /**
@@ -363,6 +363,7 @@ protected:
 
     PeerId mLocalId    = PeerId();
     FabricId mFabricId = kUndefinedFabricId;
+    FabricInfo * mFabricInfo;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD

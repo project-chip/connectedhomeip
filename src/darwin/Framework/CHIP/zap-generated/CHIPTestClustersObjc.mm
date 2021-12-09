@@ -48,7 +48,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -87,7 +87,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -118,7 +118,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -157,7 +157,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -188,7 +188,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -206,7 +206,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -224,7 +224,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -242,7 +242,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -281,7 +281,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -312,7 +312,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -330,7 +330,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -348,7 +348,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -366,7 +366,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -384,7 +384,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -402,7 +402,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -420,7 +420,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -438,7 +438,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -477,7 +477,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -509,7 +509,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -548,7 +548,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -566,7 +566,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -584,7 +584,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -623,7 +623,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -654,7 +654,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -697,7 +697,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -715,7 +715,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -754,7 +754,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -785,7 +785,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -803,7 +803,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -821,7 +821,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -839,7 +839,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -857,7 +857,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -896,7 +896,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -928,7 +928,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -946,7 +946,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -964,7 +964,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -982,7 +982,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1000,7 +1000,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1018,7 +1018,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1037,7 +1037,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1055,7 +1055,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1074,7 +1074,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1092,7 +1092,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1110,7 +1110,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1128,7 +1128,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1146,7 +1146,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1164,7 +1164,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1182,7 +1182,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1200,7 +1200,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1218,7 +1218,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1257,7 +1257,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1288,7 +1288,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1306,7 +1306,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1345,7 +1345,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1376,7 +1376,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1415,7 +1415,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1446,7 +1446,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1464,7 +1464,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1503,7 +1503,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1534,7 +1534,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1582,7 +1582,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1647,7 +1647,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1665,7 +1665,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1704,7 +1704,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1735,7 +1735,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1774,7 +1774,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1805,7 +1805,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1823,7 +1823,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1841,7 +1841,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1859,7 +1859,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1877,7 +1877,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1895,7 +1895,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1913,7 +1913,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1931,7 +1931,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1949,7 +1949,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1967,7 +1967,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -1985,7 +1985,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2003,7 +2003,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2021,7 +2021,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2039,7 +2039,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2057,7 +2057,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2075,7 +2075,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2093,7 +2093,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2111,7 +2111,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2129,7 +2129,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2147,7 +2147,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2165,7 +2165,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2183,7 +2183,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2201,7 +2201,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2219,7 +2219,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2237,7 +2237,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2255,7 +2255,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2273,7 +2273,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2291,7 +2291,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2309,7 +2309,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2327,7 +2327,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2345,7 +2345,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2363,7 +2363,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2381,7 +2381,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2400,7 +2400,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2419,7 +2419,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2437,7 +2437,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2455,7 +2455,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2473,7 +2473,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2492,7 +2492,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2510,7 +2510,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2549,7 +2549,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2580,7 +2580,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2620,7 +2620,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2660,7 +2660,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2699,7 +2699,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2730,7 +2730,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2770,7 +2770,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2809,7 +2809,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2848,7 +2848,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2887,7 +2887,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2926,7 +2926,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -2957,7 +2957,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3009,7 +3009,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3032,7 +3032,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3050,7 +3050,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3184,7 +3184,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3223,7 +3223,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3254,7 +3254,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3272,7 +3272,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3290,7 +3290,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3308,7 +3308,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3326,7 +3326,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3344,7 +3344,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3362,7 +3362,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3380,7 +3380,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3398,7 +3398,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3416,7 +3416,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3434,7 +3434,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3452,7 +3452,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3491,7 +3491,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3522,7 +3522,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3540,7 +3540,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3558,7 +3558,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3576,7 +3576,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3594,7 +3594,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3612,7 +3612,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3630,7 +3630,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3648,7 +3648,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3666,7 +3666,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3684,7 +3684,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3723,7 +3723,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3741,7 +3741,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3772,7 +3772,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3814,7 +3814,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3853,7 +3853,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3884,7 +3884,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3902,7 +3902,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3920,7 +3920,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3938,7 +3938,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3956,7 +3956,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -3995,7 +3995,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4027,7 +4027,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4066,7 +4066,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4084,7 +4084,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4102,7 +4102,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4141,7 +4141,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4172,7 +4172,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4220,7 +4220,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4238,7 +4238,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4257,7 +4257,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4275,7 +4275,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4293,7 +4293,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4332,7 +4332,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4371,7 +4371,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4410,7 +4410,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4449,7 +4449,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4480,7 +4480,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4521,7 +4521,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4566,7 +4566,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4605,7 +4605,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4636,7 +4636,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4654,7 +4654,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4693,7 +4693,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4724,7 +4724,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4742,7 +4742,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4781,7 +4781,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4812,7 +4812,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4835,7 +4835,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4858,7 +4858,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4881,7 +4881,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4899,7 +4899,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4922,7 +4922,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4961,7 +4961,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -4992,7 +4992,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5031,7 +5031,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5062,7 +5062,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5080,7 +5080,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5098,7 +5098,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5116,7 +5116,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5134,7 +5134,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5152,7 +5152,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5170,7 +5170,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5188,7 +5188,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5227,7 +5227,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5258,7 +5258,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5297,7 +5297,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5328,7 +5328,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5372,7 +5372,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5390,7 +5390,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5429,7 +5429,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5460,7 +5460,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5478,7 +5478,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5496,7 +5496,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5514,7 +5514,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5532,7 +5532,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5550,7 +5550,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5568,7 +5568,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5586,7 +5586,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5604,7 +5604,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5643,7 +5643,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5674,7 +5674,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5692,7 +5692,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5733,7 +5733,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5751,7 +5751,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5769,7 +5769,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5808,7 +5808,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5839,7 +5839,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5878,7 +5878,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5896,7 +5896,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5927,7 +5927,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5966,7 +5966,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5997,7 +5997,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6015,7 +6015,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6054,7 +6054,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6085,7 +6085,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6103,7 +6103,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6122,7 +6122,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6140,7 +6140,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6179,7 +6179,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6210,7 +6210,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6228,7 +6228,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6246,7 +6246,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6285,7 +6285,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6303,7 +6303,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6334,7 +6334,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6352,7 +6352,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6391,7 +6391,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6422,7 +6422,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6466,7 +6466,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6484,7 +6484,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6503,7 +6503,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6542,7 +6542,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6560,7 +6560,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6599,7 +6599,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6630,7 +6630,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6648,7 +6648,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6666,7 +6666,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6684,7 +6684,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6703,7 +6703,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6721,7 +6721,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6739,7 +6739,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6757,7 +6757,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6796,7 +6796,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6814,7 +6814,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6853,7 +6853,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6871,7 +6871,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6902,7 +6902,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6941,7 +6941,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -6980,7 +6980,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7011,7 +7011,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7029,7 +7029,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7047,7 +7047,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7065,7 +7065,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7104,7 +7104,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7135,7 +7135,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7153,7 +7153,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7171,7 +7171,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7189,7 +7189,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7207,7 +7207,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7225,7 +7225,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7243,7 +7243,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7261,7 +7261,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7279,7 +7279,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7297,7 +7297,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7315,7 +7315,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7333,7 +7333,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7351,7 +7351,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7369,7 +7369,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7388,7 +7388,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7406,7 +7406,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7424,7 +7424,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7442,7 +7442,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7460,7 +7460,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7478,7 +7478,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7496,7 +7496,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7535,7 +7535,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7553,7 +7553,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7584,7 +7584,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7602,7 +7602,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7620,7 +7620,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7638,7 +7638,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7656,7 +7656,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7695,7 +7695,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7726,7 +7726,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7744,7 +7744,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7762,7 +7762,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7780,7 +7780,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7798,7 +7798,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7816,7 +7816,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7855,7 +7855,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7886,7 +7886,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7929,7 +7929,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7947,7 +7947,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7966,7 +7966,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -7984,7 +7984,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8023,7 +8023,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8041,7 +8041,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8072,7 +8072,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8090,7 +8090,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8108,7 +8108,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8126,7 +8126,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8165,7 +8165,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8183,7 +8183,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8214,7 +8214,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8257,7 +8257,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8275,7 +8275,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8293,7 +8293,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8332,7 +8332,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8363,7 +8363,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8403,7 +8403,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8442,7 +8442,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8473,7 +8473,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8491,7 +8491,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8509,7 +8509,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8527,7 +8527,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8545,7 +8545,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8584,7 +8584,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8616,7 +8616,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8827,7 +8827,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8866,7 +8866,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8905,7 +8905,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8936,7 +8936,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8955,7 +8955,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8974,7 +8974,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -8993,7 +8993,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9012,7 +9012,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9030,7 +9030,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9049,7 +9049,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9068,7 +9068,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9086,7 +9086,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9125,7 +9125,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9143,7 +9143,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9174,7 +9174,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9213,7 +9213,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9244,7 +9244,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9262,7 +9262,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9280,7 +9280,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9298,7 +9298,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9316,7 +9316,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9334,7 +9334,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9352,7 +9352,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9370,7 +9370,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9422,7 +9422,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9470,7 +9470,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9488,7 +9488,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9506,7 +9506,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9524,7 +9524,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9542,7 +9542,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9560,7 +9560,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9578,7 +9578,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9596,7 +9596,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9614,7 +9614,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9632,7 +9632,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9651,7 +9651,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9670,7 +9670,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9688,7 +9688,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9706,7 +9706,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9724,7 +9724,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9742,7 +9742,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9760,7 +9760,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9778,7 +9778,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9797,7 +9797,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9815,7 +9815,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9833,7 +9833,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9851,7 +9851,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9869,7 +9869,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9887,7 +9887,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9905,7 +9905,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9924,7 +9924,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9943,7 +9943,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9961,7 +9961,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9979,7 +9979,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -9998,7 +9998,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10016,7 +10016,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10034,7 +10034,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10052,7 +10052,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10070,7 +10070,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10088,7 +10088,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10106,7 +10106,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10124,7 +10124,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10142,7 +10142,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10161,7 +10161,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10180,7 +10180,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10198,7 +10198,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10216,7 +10216,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10235,7 +10235,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10254,7 +10254,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10272,7 +10272,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10290,7 +10290,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10308,7 +10308,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10326,7 +10326,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10344,7 +10344,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10362,7 +10362,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10380,7 +10380,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10420,7 +10420,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10439,7 +10439,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10490,7 +10490,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10530,7 +10530,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10569,7 +10569,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10587,7 +10587,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10618,7 +10618,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10636,7 +10636,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10675,7 +10675,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10706,7 +10706,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10724,7 +10724,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10742,7 +10742,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10760,7 +10760,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10778,7 +10778,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10796,7 +10796,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10814,7 +10814,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10833,7 +10833,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10852,7 +10852,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10870,7 +10870,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10888,7 +10888,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10906,7 +10906,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10924,7 +10924,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10942,7 +10942,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10981,7 +10981,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -10999,7 +10999,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11030,7 +11030,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11048,7 +11048,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11066,7 +11066,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11084,7 +11084,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11103,7 +11103,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11122,7 +11122,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11140,7 +11140,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11159,7 +11159,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11178,7 +11178,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11196,7 +11196,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11215,7 +11215,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11234,7 +11234,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11253,7 +11253,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11272,7 +11272,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11291,7 +11291,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11310,7 +11310,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11328,7 +11328,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11346,7 +11346,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11385,7 +11385,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -11403,7 +11403,7 @@ using namespace chip::app::Clusters;
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {

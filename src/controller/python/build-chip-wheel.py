@@ -134,6 +134,7 @@ try:
         'rich',
         'stringcase',
         'pyyaml',
+        'ipdb'
     ]
 
     if platform.system() == "Darwin":

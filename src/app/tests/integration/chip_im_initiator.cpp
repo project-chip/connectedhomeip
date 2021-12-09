@@ -391,7 +391,7 @@ CHIP_ERROR SendSubscribeRequest()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
+    readPrepareParams.mMinIntervalFloorSeconds   = 5;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

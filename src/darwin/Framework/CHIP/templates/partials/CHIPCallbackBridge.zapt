@@ -33,6 +33,23 @@ public:
       {{/if}}
     );
 };
+
+{{#unless partial-type}}
+class CHIP{{> @partial-block}}SubscriptionBridge : public CHIP{{> @partial-block}}Bridge
+{
+public:
+    CHIP{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, SubscriptionEstablishedHandler establishedHandler)
+      : CHIP{{> @partial-block}}Bridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+      {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+{{/unless}}
+
 {{else}}
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if partial-type}}
@@ -74,4 +91,22 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     DispatchSuccess(context, objCValue);
     {{/if}}
 };
+
+{{#unless partial-type}}
+void CHIP{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+     auto * self = static_cast<CHIP{{> @partial-block}}SubscriptionBridge *>(context);
+     if (!self->mQueue) {
+         return;
+     }
+
+     if (self->mEstablishedHandler != nil) {
+         dispatch_async(self->mQueue, self->mEstablishedHandler);
+         // On failure, mEstablishedHandler will be cleaned up by our destructor,
+         // but we can clean it up earlier on successful subscription
+         // establishment.
+         self->mEstablishedHandler = nil;
+     }
+}
+{{/unless}}
 {{/if}}

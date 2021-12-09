@@ -56,9 +56,9 @@ function asExpectedEndpointForCluster(clusterName)
 function asTestValue()
 {
   if (StringHelper.isOctetString(this.type)) {
-    return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
+    return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
   } else if (StringHelper.isCharString(this.type)) {
-    return '@"Test"';
+    return `@"${"Test".substring(0, this.maxLength)}"`;
   } else if (this.isArray) {
     return '[NSArray array]';
   } else {

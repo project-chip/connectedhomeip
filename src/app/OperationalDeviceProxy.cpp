@@ -151,9 +151,8 @@ bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port)
 
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
-    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{ mInitParams.sessionManager, mInitParams.exchangeMgr,
-                                                                         mInitParams.idAllocator, mInitParams.fabricInfo,
-                                                                         mInitParams.mrpLocalConfig });
+    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
+        mInitParams.sessionManager, mInitParams.exchangeMgr, mInitParams.idAllocator, mFabricInfo, mInitParams.mrpLocalConfig });
     ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
     CHIP_ERROR err =
         mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
@@ -301,8 +300,7 @@ void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mInitParams.fabricInfo->GetFabricIndex(),
-                                                                             GetDeviceId());
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy() {}
