@@ -2570,19 +2570,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-        { ZAP_CLUSTER_INDEX(0), 21, 1930 }, { ZAP_CLUSTER_INDEX(21), 44, 6400 }, { ZAP_CLUSTER_INDEX(65), 4, 21 },                 \
-=======
-        { ZAP_CLUSTER_INDEX(0), 22, 1930 }, { ZAP_CLUSTER_INDEX(22), 44, 6092 }, { ZAP_CLUSTER_INDEX(66), 4, 21 },                 \
->>>>>>> a18a0ccc6 (Run zap tool successfully)
-=======
-        { ZAP_CLUSTER_INDEX(0), 22, 1930 }, { ZAP_CLUSTER_INDEX(22), 44, 6060 }, { ZAP_CLUSTER_INDEX(66), 4, 21 },                 \
->>>>>>> 22ee5db01 (Updated allowed vendor list attribute)
-=======
-        { ZAP_CLUSTER_INDEX(0), 22, 1930 }, { ZAP_CLUSTER_INDEX(22), 44, 6061 }, { ZAP_CLUSTER_INDEX(66), 4, 21 },                 \
->>>>>>> 596ceed19 (Enable current navigator attribute in all cluster app.)
+        { ZAP_CLUSTER_INDEX(0), 21, 1930 }, { ZAP_CLUSTER_INDEX(21), 44, 6061 }, { ZAP_CLUSTER_INDEX(65), 4, 21 },                 \
     }
 
 // Largest attribute size is needed for various buffers
