@@ -316,6 +316,11 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
         err = CHIP_NO_ERROR;
     }
 
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        mSelfProcessedEvents[index] = 0;
+    }
+
     MoveToState(HandlerState::GeneratingReports);
 
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();

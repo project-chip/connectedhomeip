@@ -260,7 +260,7 @@ class ClusterObjectTests:
             await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 1)
             await cls.TestReadEventRequests(devCtrl, 1)
             await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 2)
-            await cls.TestReadEventRequests(devCtrl, 1)
+            await cls.TestReadEventRequests(devCtrl, 2)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
