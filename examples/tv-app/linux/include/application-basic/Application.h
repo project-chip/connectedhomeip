@@ -22,7 +22,7 @@
 
 struct Application
 {
-    using ApplicationBasicStatus = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
+    using ApplicationBasicStatus   = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
     char vendorName[32]            = "";
     char name[32]                  = "";
     char id[32]                    = "";
@@ -30,6 +30,6 @@ struct Application
     uint16_t vendorId              = 0;
     uint16_t productId             = 0;
     uint16_t catalogVendorId       = 0;
-    uint16_t allowedVendorList[32] = {123, 456};
-    ApplicationBasicStatus status = ApplicationBasicStatus::kStopped;
+    uint16_t allowedVendorList[32] = { 123, 456 };
+    ApplicationBasicStatus status  = ApplicationBasicStatus::kStopped;
 };
