@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-#include <app/clusters/ota-requestor/OTAImageProcessor.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/OTAImageProcessor.h>
 
 #include <fstream>
 

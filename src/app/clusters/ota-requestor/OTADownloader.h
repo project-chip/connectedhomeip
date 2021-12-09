@@ -25,9 +25,8 @@
 
 #pragma once
 
-#include "OTAImageProcessor.h"
-
 #include <lib/core/CHIPError.h>
+#include <platform/OTAImageProcessor.h>
 
 namespace chip {
 
