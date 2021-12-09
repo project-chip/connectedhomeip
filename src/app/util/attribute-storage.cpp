@@ -643,32 +643,33 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
 }
 
-// Check if a cluster is implemented or not. If yes, the cluster is returned.
-// If the cluster is not manufacturerSpecific [ClusterId < FC00] then
-// manufacturerCode argument is ignored otherwise checked.
-//
-// mask = 0 -> find either client or server
-// mask = CLUSTER_MASK_CLIENT -> find client
-// mask = CLUSTER_MASK_SERVER -> find server
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, ClusterId clusterId,
                                                      EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index)
 {
     uint8_t i;
+    uint8_t scopedIndex = 0;
+
     for (i = 0; i < endpointType->clusterCount; i++)
     {
         EmberAfCluster * cluster = &(endpointType->cluster[i]);
-        if (cluster->clusterId == clusterId &&
-            (mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
+
+        if ((mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
              (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))))
         {
-            if (index)
+            if (cluster->clusterId == clusterId)
             {
-                *index = i;
+                if (index)
+                {
+                    *index = scopedIndex;
+                }
+
+                return cluster;
             }
 
-            return cluster;
+            scopedIndex++;
         }
     }
+
     return NULL;
 }
 
