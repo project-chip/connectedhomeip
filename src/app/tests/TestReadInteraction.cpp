@@ -371,7 +371,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err = readClient.Init(&ctx.GetExchangeManager(), &delegate, chip::app::ReadClient::InteractionType::Read);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequest(readPrepareParams);
+    err = readClient.SendRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
@@ -498,7 +498,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequest(readPrepareParams);
+    err = readClient.SendRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
@@ -695,6 +695,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
+
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -703,6 +704,18 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+    delegate.mGotEventResponse     = false;
+    delegate.mNumAttributeResponse = 0;
+    delegate.mGotReport            = false;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -1029,6 +1042,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
     engine->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
@@ -1124,7 +1138,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
 
-    // Test multiple subscriptipn
+    // Test multiple subscription
+    delegate.mGotEventResponse     = false;
     delegate.mNumAttributeResponse = 0;
     delegate.mGotReport            = false;
     ReadPrepareParams readPrepareParams1(ctx.GetSessionBobToAlice());
@@ -1193,34 +1208,11 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams3.mMinIntervalFloorSeconds                  = 2;
     readPrepareParams3.mMaxIntervalCeilingSeconds                = 5;
 
-    printf("\nSend 4th subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+    printf("\nSend 4th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
 
     ReadClient readClient3;
     readClient3.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
-    err = readClient3.SendSubscribeRequest(readPrepareParams3);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    engine->GetReportingEngine().Run();
-    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-
-    delegate.mNumAttributeResponse = 0;
-    delegate.mGotReport            = false;
-    ReadPrepareParams readPrepareParams4(ctx.GetSessionBobToAlice());
-    chip::app::AttributePathParams attributePathParams4[1];
-    readPrepareParams4.mpAttributePathParamsList                 = attributePathParams4;
-    readPrepareParams4.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
-    readPrepareParams4.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
-    readPrepareParams4.mpAttributePathParamsList[0].mAttributeId = 1;
-    readPrepareParams4.mAttributePathParamsListSize              = 1;
-    readPrepareParams4.mMinIntervalFloorSeconds                  = 2;
-    readPrepareParams4.mMaxIntervalCeilingSeconds                = 5;
-
-    printf("\nSend 5th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
-
-    ReadClient readClient4;
-    readClient4.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
-    err = readClient4.SendSubscribeRequest(readPrepareParams4);
+    err = readClient3.SendRequest(readPrepareParams3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
@@ -1449,7 +1441,7 @@ void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, voi
     readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mSessionHandle             = ctx.GetSessionBobToAlice();
-    readPrepareParams.mMinIntervalFloorSeconds   = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 6;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

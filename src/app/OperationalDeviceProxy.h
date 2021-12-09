@@ -43,7 +43,7 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -52,7 +52,7 @@ struct DeviceProxyInitParams
     SessionManager * sessionManager          = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    FabricTable * fabricTable                = nullptr;
     CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
@@ -64,7 +64,7 @@ struct DeviceProxyInitParams
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -87,6 +87,7 @@ public:
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mInitParams  = params;
         mPeerId      = peerId;
+        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
 
         mState = State::NeedsAddress;
     }
@@ -109,9 +110,11 @@ public:
      * session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately.
+     * If the resolver is null and the device state is State::NeedsAddress, CHIP_ERROR_INVALID_ARGUMENT will be
+     * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
@@ -196,6 +199,7 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
+    FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
     CASEClient * mCASEClient = nullptr;

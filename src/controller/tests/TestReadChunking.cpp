@@ -232,7 +232,7 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
         NL_TEST_ASSERT(apSuite,
                        engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
                                              &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -306,7 +306,7 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
         NL_TEST_ASSERT(apSuite,
                        engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
                                              &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -368,7 +368,7 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     NL_TEST_ASSERT(apSuite,
                    engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &readCallback.mBufferedCallback) ==
                        CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
 
     //
     // Service the IO + Engine till we get a ReportEnd callback on the client.

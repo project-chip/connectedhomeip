@@ -32,7 +32,6 @@ from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 class Target:
     """Represents a build target:
-
         Has a name identifier plus parameters on how to build it (what
         builder class to use and what arguments are required to produce
         the specified build)
@@ -56,7 +55,6 @@ class Target:
 
     def Extend(self, suffix, **kargs):
         """Creates a clone of the current object extending its build parameters.
-
         Arguments:
            suffix: appended with a "-" as separator to the clone name
            **kargs: arguments needed to produce the new build variant
@@ -101,12 +99,15 @@ class AcceptAnyName:
         return True
 
 
-class AcceptNameWithSubstring:
-    def __init__(self, substr: str):
+class AcceptNameWithSubstrings:
+    def __init__(self, substr: List[str]):
         self.substr = substr
 
     def Accept(self, name: str):
-        return self.substr in name
+        for s in self.substr:
+            if s in name:
+                return True
+        return False
 
 
 class HostBuildVariant:
@@ -157,9 +158,10 @@ def HostTargets():
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
         HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
-        HostBuildVariant(name="test-group", test_group=True),
+        HostBuildVariant(name="test-group",
+                         validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
         HostBuildVariant(name="same-event-loop",
-                         validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
+                         validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
     ]
 
     glob_whitelist = set(['ipv6only'])
@@ -320,6 +322,13 @@ def InfineonTargets():
     yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
 
 
+def AmebaTargets():
+    ameba_target = Target('ameba', AmebaBuilder)
+
+    yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
+    yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
+
+
 ALL = []
 
 target_generators = [
@@ -329,8 +338,8 @@ target_generators = [
     NrfTargets(),
     AndroidTargets(),
     MbedTargets(),
-    InfineonTargets()
-
+    InfineonTargets(),
+    AmebaTargets()
 ]
 
 for generator in target_generators:
@@ -343,8 +352,6 @@ ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
-ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
-                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

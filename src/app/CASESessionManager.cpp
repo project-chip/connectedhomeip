@@ -20,12 +20,13 @@
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::Callback<OnDeviceConnected> * onConnection,
+CHIP_ERROR CASESessionManager::FindOrEstablishSession(FabricInfo * fabric, NodeId nodeId,
+                                                      Callback::Callback<OnDeviceConnected> * onConnection,
                                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    PeerId peerId = GetFabricInfo()->GetPeerIdForNode(nodeId);
+    PeerId peerId = fabric->GetPeerIdForNode(nodeId);
 
     bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
@@ -53,7 +54,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure);
+    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
     if (err != CHIP_NO_ERROR)
     {
         ReleaseSession(session);
@@ -67,10 +68,10 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
     ReleaseSession(FindExistingSession(nodeId));
 }
 
-CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
+CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
 {
-    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                                     Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(fabric->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
+                                              Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -94,12 +95,12 @@ void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERRO
     ChipLogError(Controller, "Error resolving node id: %s", ErrorStr(error));
 }
 
-CHIP_ERROR CASESessionManager::GetPeerAddress(NodeId nodeId, Transport::PeerAddress & addr)
+CHIP_ERROR CASESessionManager::GetPeerAddress(FabricInfo * fabric, NodeId nodeId, Transport::PeerAddress & addr)
 {
     if (mConfig.dnsCache != nullptr)
     {
         Dnssd::ResolvedNodeData resolutionData;
-        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(GetFabricInfo()->GetPeerIdForNode(nodeId), resolutionData));
+        ReturnErrorOnFailure(mConfig.dnsCache->Lookup(fabric->GetPeerIdForNode(nodeId), resolutionData));
         addr = OperationalDeviceProxy::ToPeerAddress(resolutionData);
         return CHIP_NO_ERROR;
     }

@@ -131,7 +131,6 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
                                                  ReadClient::Callback * aCallback)
 {
     *apReadClient = nullptr;
-
     for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
@@ -314,6 +313,15 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         }
     }
 
+    // Reserve the last ReadHandler for ReadInteraction
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe &&
+        ((CHIP_IM_MAX_NUM_READ_HANDLER - GetNumActiveReadHandlers()) == 1) && !HasActiveRead())
+    {
+        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+        return CHIP_NO_ERROR;
+    }
+
     for (auto & readHandler : mReadHandlers)
     {
         if (readHandler.IsFree())
@@ -459,7 +467,7 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendReadRequest(aReadPrepareParams);
+    err = client->SendRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
@@ -471,7 +479,7 @@ CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aRea
 {
     ReadClient * client = nullptr;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    ReturnErrorOnFailure(client->SendRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
 
@@ -726,6 +734,19 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     {
         StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
+}
+
+bool InteractionModelEngine::HasActiveRead()
+{
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsReadType())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app

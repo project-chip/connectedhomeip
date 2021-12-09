@@ -26,7 +26,7 @@ namespace {
 class NoneResolver : public Resolver
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer *) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> *) override { return CHIP_NO_ERROR; }
     void Shutdown() override {}
     void SetResolverDelegate(ResolverDelegate *) override {}
 

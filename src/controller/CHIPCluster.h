@@ -45,8 +45,9 @@ using WriteResponseSuccessCallback   = void (*)(void * context);
 using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
 using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
-using ReadResponseSuccessCallback = void (*)(void * context, T responseData);
-using ReadResponseFailureCallback = void (*)(void * context, EmberAfStatus status);
+using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
+using ReadResponseFailureCallback     = void (*)(void * context, EmberAfStatus status);
+using SubscriptionEstablishedCallback = void (*)(void * context);
 
 class DLL_EXPORT ClusterBase
 {
@@ -203,6 +204,56 @@ public:
 
         return Controller::ReadAttribute<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
                                                         mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb);
+    }
+
+    /**
+     * Subscribe to attribute and get a type-safe callback with the attribute
+     * value when it changes.
+     */
+    template <typename AttributeInfo>
+    CHIP_ERROR SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
+                                  ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                                  uint16_t maxIntervalCeilingSeconds,
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb);
+    }
+
+    template <typename DecodableType, typename DecodableArgType>
+    CHIP_ERROR SubscribeAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                                  ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
+                                  uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+            if (reportCb != nullptr)
+            {
+                reportCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+            if (subscriptionEstablishedCb != nullptr)
+            {
+                subscriptionEstablishedCb(context);
+            }
+        };
+
+        return Controller::SubscribeAttribute<DecodableType>(
+            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, onReportCb,
+            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
     }
 
 protected:

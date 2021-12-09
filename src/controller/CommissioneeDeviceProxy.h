@@ -65,12 +65,12 @@ using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr           = nullptr;
-    SessionManager * sessionManager             = nullptr;
-    Messaging::ExchangeManager * exchangeMgr    = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    SessionIDAllocator * idAllocator            = nullptr;
+    DeviceTransportMgr * transportMgr                             = nullptr;
+    SessionManager * sessionManager                               = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                      = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    PersistentStorageDelegate * storageDelegate                   = nullptr;
+    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -119,12 +119,12 @@ public:
      */
     void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
-        mSessionManager = params.sessionManager;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mFabricIndex    = fabric;
-        mIDAllocator    = params.idAllocator;
-        mpIMDelegate    = params.imDelegate;
+        mSessionManager     = params.sessionManager;
+        mExchangeMgr        = params.exchangeMgr;
+        mUDPEndPointManager = params.udpEndPointManager;
+        mFabricIndex        = fabric;
+        mIDAllocator        = params.idAllocator;
+        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -289,7 +289,7 @@ private:
      */
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Inet::InetLayer * mInetLayer = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;

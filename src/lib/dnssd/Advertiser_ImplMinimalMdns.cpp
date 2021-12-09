@@ -116,7 +116,7 @@ public:
     ~AdvertiserMinMdns() {}
 
     // Service advertiser
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
@@ -274,7 +274,7 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
     }
 }
 
-CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer)
+CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
@@ -285,7 +285,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer)
     // GlobalMinimalMdnsServer (used for testing).
     mResponseSender.SetServer(&GlobalMinimalMdnsServer::Server());
 
-    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort));
+    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
 

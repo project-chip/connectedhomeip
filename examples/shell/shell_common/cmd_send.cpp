@@ -211,13 +211,13 @@ void ProcessCommand(streamer_t * stream, char * destination)
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer())
+    err = gTCPManager.Init(Transport::TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer())
+    err = gUDPManager.Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));

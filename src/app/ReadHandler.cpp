@@ -47,7 +47,12 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mIsPrimingReports          = true;
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        mSelfProcessedEvents[index]      = 0;
+        mLastScheduledEventNumber[index] = 0;
+    }
+    mIsPrimingReports = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate          = apDelegate;
     mSubscriptionId     = 0;
@@ -103,14 +108,19 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mIsPrimingReports          = false;
-    mpDelegate                 = nullptr;
-    mHoldReport                = false;
-    mDirty                     = false;
-    mActiveSubscription        = false;
-    mIsChunkedReport           = false;
-    mInitiatorNodeId           = kUndefinedNodeId;
-    mHoldSync                  = false;
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        mSelfProcessedEvents[index]      = 0;
+        mLastScheduledEventNumber[index] = 0;
+    }
+    mIsPrimingReports   = false;
+    mpDelegate          = nullptr;
+    mHoldReport         = false;
+    mDirty              = false;
+    mActiveSubscription = false;
+    mIsChunkedReport    = false;
+    mInitiatorNodeId    = kUndefinedNodeId;
+    mHoldSync           = false;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
@@ -604,7 +614,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-    VerifyOrReturnError(mMinIntervalFloorSeconds < mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
@@ -640,13 +650,14 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->mHoldSync    = false;
-    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after max %d seconds", readHandler->mMaxIntervalCeilingSeconds);
+    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
+                    readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
+    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxIntervalCeilingSeconds);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
