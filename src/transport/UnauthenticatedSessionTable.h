@@ -48,8 +48,10 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address, System::Clock::Timestamp now, const ReliableMessageProtocolConfig & config) :
-        mPeerAddress(address), mLastActivityTime(now), mMRPConfig(config)
+    UnauthenticatedSession(const PeerAddress & address, System::Clock::Timestamp now,
+                           const ReliableMessageProtocolConfig & config) :
+        mPeerAddress(address),
+        mLastActivityTime(now), mMRPConfig(config)
     {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;

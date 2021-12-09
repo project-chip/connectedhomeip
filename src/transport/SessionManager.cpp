@@ -626,7 +626,9 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
 #if CHIP_CONFIG_SESSION_REKEYING
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
-    mgr->mSecureSessions.ExpireInactiveSessions(System::SystemClock().GetMonotonicTimestamp(), [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+    mgr->mSecureSessions.ExpireInactiveSessions(
+        System::SystemClock().GetMonotonicTimestamp(),
+        [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
