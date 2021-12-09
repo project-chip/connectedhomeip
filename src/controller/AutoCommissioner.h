@@ -33,10 +33,7 @@ public:
     CHIP_ERROR SetCommissioningParameters(const CommissioningParameters & params);
     void StartCommissioning(CommissioneeDeviceProxy * proxy);
 
-    void CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
-
-    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+    CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage);
@@ -45,6 +42,10 @@ private:
 
     CHIP_ERROR SetDAC(const ByteSpan & dac);
     CHIP_ERROR SetPAI(const ByteSpan & pai);
+
+    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
+    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;
@@ -55,10 +56,12 @@ private:
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
 
+    // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
     uint16_t mDACLen = 0;
     uint8_t * mPAI   = nullptr;
     uint16_t mPAILen = 0;
+    uint8_t mAttestationNonce[kAttestationNonceLength];
 };
 
 } // namespace Controller

@@ -34,6 +34,7 @@ enum CommissioningStage : uint8_t
     kConfigRegulatory,
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
+    kSendAttestationRequest,
     kCheckCertificates,
     kConfigACL,
     kWifiNetworkSetup,
@@ -117,11 +118,16 @@ public:
             } requestedCertificate;
             struct
             {
+                ByteSpan attestationElements;
+                ByteSpan signature;
+            } attestationResponse;
+            struct
+            {
                 OperationalDeviceProxy * operationalProxy;
             } OperationalNodeFoundData;
         };
     };
-    virtual void CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
+    virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
 };
 
 } // namespace Controller

@@ -561,6 +561,21 @@ public:
     void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
                                   CommissioningDelegate * delegate);
 
+    /**
+     * @brief
+     *   This function validates the Attestation Information sent by the device.
+     *
+     * @param[in] attestationElements Attestation Elements TLV.
+     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
+     * @param[in] attestationNonce    Attestation nonce
+     * @param[in] pai                 PAI certificate
+     * @param[in] dac                 DAC certificates
+     * @param[in] proxy               device proxy that is being attested.
+     */
+    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
+                                       const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
+                                       CommissioneeDeviceProxy * proxy);
+
     void CommissioningStageComplete(CHIP_ERROR err);
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -691,7 +706,7 @@ private:
     /* This function sends an Attestation request to the device.
        The function does not hold a reference to the device object.
      */
-    CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
+    CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
@@ -763,15 +778,6 @@ private:
      *   This function processes the DAC or PAI certificate sent by the device.
      */
     CHIP_ERROR ProcessCertificateChain(const ByteSpan & certificate);
-
-    /**
-     * @brief
-     *   This function validates the Attestation Information sent by the device.
-     *
-     * @param[in] attestationElements Attestation Elements TLV.
-     * @param[in] signature           Attestation signature generated for all the above fields + Attestation Challenge.
-     */
-    CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature);
 
     void HandleAttestationResult(CHIP_ERROR err);
 

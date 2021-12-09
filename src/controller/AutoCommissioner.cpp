@@ -56,6 +56,18 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         mParams.SetWifiCredentials(
             WifiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
+    // If the AttestationNonce is passed in, using that else using a random one..
+    if (params.HasAttestationNonce())
+    {
+        VerifyOrReturnError(params.GetAttestationNonce().Value().size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mAttestationNonce, params.GetAttestationNonce().Value().data(), params.GetAttestationNonce().Value().size());
+    }
+    else
+    {
+        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
+    }
+    mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
+
     return CHIP_NO_ERROR;
 }
 
@@ -72,6 +84,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendPAICertificateRequest:
         return CommissioningStage::kSendDACCertificateRequest;
     case CommissioningStage::kSendDACCertificateRequest:
+        return CommissioningStage::kSendAttestationRequest;
+    case CommissioningStage::kSendAttestationRequest:
         return CommissioningStage::kCheckCertificates;
     case CommissioningStage::kCheckCertificates:
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
@@ -146,7 +160,7 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this);
 }
 
-void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
+CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     switch (report.stageCompleted)
     {
@@ -156,6 +170,12 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
     case CommissioningStage::kSendDACCertificateRequest:
         SetDAC(report.requestedCertificate.certificate);
         break;
+    case CommissioningStage::kSendAttestationRequest:
+        ReturnErrorOnFailure(mCommissioner->ValidateAttestationInfo(
+            report.attestationResponse.attestationElements, report.attestationResponse.signature,
+            mParams.GetAttestationNonce().Value(), GetPAI(), GetDAC(), mCommissioneeDeviceProxy));
+        break;
+
     case CommissioningStage::kFindOperational:
         mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
         break;
@@ -165,7 +185,7 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
         mCommissioneeDeviceProxy = nullptr;
         mOperationalDeviceProxy  = nullptr;
         mParams                  = CommissioningParameters();
-        return;
+        return CHIP_NO_ERROR;
     default:
         break;
     }
@@ -181,9 +201,10 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
     if (proxy == nullptr)
     {
         ChipLogError(Controller, "Invalid device for commissioning");
-        return;
+        return CHIP_ERROR_INCORRECT_STATE;
     }
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
+    return CHIP_NO_ERROR;
 }
 
 void AutoCommissioner::ReleaseDAC()

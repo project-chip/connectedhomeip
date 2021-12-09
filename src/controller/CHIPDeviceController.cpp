@@ -911,19 +911,6 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
         ReturnErrorOnFailure(device->SetCSRNonce(ByteSpan(mCSRNonce)));
     }
-
-    // If the AttestationNonce is passed in, using that else using a random one..
-    if (params.HasAttestationNonce())
-    {
-        ReturnErrorOnFailure(device->SetAttestationNonce(params.GetAttestationNonce().Value()));
-    }
-    else
-    {
-        uint8_t mAttestationNonce[kAttestationNonceLength];
-        Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
-        ReturnErrorOnFailure(device->SetAttestationNonce(ByteSpan(mAttestationNonce)));
-    }
-
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
@@ -1075,7 +1062,7 @@ void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan cer
     commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 }
 
-CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce)
+CHIP_ERROR DeviceCommissioner::SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce)
 {
     ChipLogDetail(Controller, "Sending Attestation request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1108,15 +1095,17 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
     commissioner->mAttestationResponseCallback.Cancel();
     commissioner->mOnAttestationFailureCallback.Cancel();
 
-    commissioner->HandleAttestationResult(commissioner->ValidateAttestationInfo(attestationElements, signature));
+    CommissioningDelegate::CommissioningReport report(CommissioningStage::kSendAttestationRequest);
+    report.attestationResponse.attestationElements = attestationElements;
+    report.attestationResponse.signature           = signature;
+    commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 }
 
-CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature)
+CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
+                                                       const ByteSpan & attestationNonce, const ByteSpan & pai,
+                                                       const ByteSpan & dac, CommissioneeDeviceProxy * proxy)
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
 
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
@@ -1126,9 +1115,8 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 
-    AttestationVerificationResult result =
-        dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature, mAutoCommissioner.GetPAI(),
-                                                   mAutoCommissioner.GetDAC(), device->GetAttestationNonce());
+    AttestationVerificationResult result = dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge,
+                                                                                      signature, pai, dac, attestationNonce);
     if (result != AttestationVerificationResult::kSuccess)
     {
         if (result == AttestationVerificationResult::kNotImplemented)
@@ -1155,31 +1143,6 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
     // TODO: Validate Firmware Information
 
     return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::HandleAttestationResult(CHIP_ERROR err)
-{
-    if (err != CHIP_NO_ERROR)
-    {
-        // Here we assume the Attestation Information validation always succeeds.
-        // Spec mandates that commissioning shall continue despite attestation fails (in some cases).
-        // TODO: Handle failure scenarios where commissioning may progress regardless.
-        ChipLogError(Controller, "Failed to validate the Attestation Information");
-    }
-
-    VerifyOrReturn(mState == State::Initialized);
-    VerifyOrReturn(mDeviceBeingCommissioned != nullptr);
-
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-
-    ChipLogProgress(Controller, "Sending 'CSR request' command to the device.");
-    CHIP_ERROR error = SendOperationalCertificateSigningRequestCommand(device);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in sending 'CSR request' command to the device: err %s", ErrorStr(error));
-        OnSessionEstablishmentError(error);
-        return;
-    }
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device)
@@ -1576,7 +1539,11 @@ void DeviceCommissioner::CommissioningStageComplete(CHIP_ERROR err)
         return;
     }
     CommissioningDelegate::CommissioningReport report(mCommissioningStage);
-    mCommissioningDelegate->CommissioningStepFinished(err, report);
+    CHIP_ERROR status = mCommissioningDelegate->CommissioningStepFinished(err, report);
+    if (status != CHIP_NO_ERROR)
+    {
+        OnSessionEstablishmentError(status);
+    }
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -1729,12 +1696,18 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Sending request for DAC certificate");
         SendCertificateChainRequestCommand(proxy, CertificateType::kDAC);
         break;
-    case CommissioningStage::kCheckCertificates: {
+    case CommissioningStage::kSendAttestationRequest:
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
-        CommissioneeDeviceProxy * tempProxy = reinterpret_cast<CommissioneeDeviceProxy *>(proxy);
-        SendAttestationRequestCommand(tempProxy, tempProxy->GetAttestationNonce());
-    }
-    break;
+        if (!params.HasAttestationNonce())
+        {
+            CommissioningDelegate::CommissioningReport report(step);
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value());
+        break;
+    case CommissioningStage::kCheckCertificates:
+        SendOperationalCertificateSigningRequestCommand(reinterpret_cast<CommissioneeDeviceProxy *>(proxy));
+        break;
     // TODO: Right now, these stages are not implemented as a separate stage because they are no-ops.
     // Once these are implemented through the clusters, these should be moved into their separate stages and the callbacks
     // should advance the commissioning stage.

@@ -232,15 +232,6 @@ public:
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
-    CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
-    {
-        VerifyOrReturnError(attestationNonce.size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mAttestationNonce, attestationNonce.data(), attestationNonce.size());
-        return CHIP_NO_ERROR;
-    }
-
-    ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)); }
-
     MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
     CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
@@ -318,7 +309,6 @@ private:
 
     // TODO: Offload Nonces and DAC/PAI into a new struct
     uint8_t mCSRNonce[kOpCSRNonceLength];
-    uint8_t mAttestationNonce[kAttestationNonceLength];
 
     uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mNOCCertBufferSize = 0;
