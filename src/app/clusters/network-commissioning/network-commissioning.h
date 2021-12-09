@@ -68,11 +68,18 @@ public:
         } mData;
     };
 
+    /**
+     * Register will register the network commissioning instance to the attribute and command dispatching route.
+     */
+    CHIP_ERROR Register();
+
     // CommandHandlerInterface
     void InvokeCommand(HandlerContext & ctx) override;
+
     // AttributeAccessInterface
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
+    // Actual handlers of the commands
     void HandleScanNetworks(HandlerContext & ctx, const Commands::ScanNetworks::DecodableType & req);
     void HandleAddOrUpdateWiFiNetwork(HandlerContext & ctx, const Commands::AddOrUpdateWiFiNetwork::DecodableType & req);
     void HandleAddOrUpdateThreadNetwork(HandlerContext & ctx, const Commands::AddOrUpdateThreadNetwork::DecodableType & req);
@@ -104,6 +111,8 @@ public:
 private:
     void OnConnectResult(app::Clusters::NetworkCommissioning::NetworkCommissioningStatus commissioningError, CharSpan errorText,
                          int32_t networkRelatedAssociationStatus);
+
+    // Some handlers for attribute reads.
     CHIP_ERROR HandleReadNetworks(AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleReadScanMaxTimeSeconds(AttributeValueEncoder & aEncoder);
     CHIP_ERROR HandleReadConnectMaxTimeSeconds(AttributeValueEncoder & aEncoder);

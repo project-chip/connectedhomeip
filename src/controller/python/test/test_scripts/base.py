@@ -150,35 +150,6 @@ class BaseTestHelper:
                 f"Failed to close sessions with device {nodeid}: {ex}")
             return False
 
-    def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
-        self.logger.info("Commissioning network to device {}".format(nodeid))
-        try:
-            (err, resp) = self.devCtrl.ZCLSend("NetworkCommissioning", "AddOrUpdateThreadNetwork", nodeid, endpoint, group, {
-                "operationalDataset": bytes.fromhex(dataset),
-                "breadcrumb": 0}, blocking=True)
-            self.logger.info(f"Received response: {resp}")
-            if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
-                self.logger.exception("Failed to add Thread network.")
-                return False
-        except Exception as ex:
-            self.logger.exception(
-                "Failed to send AddOrUpdateThreadNetwork command")
-            return False
-        self.logger.info(
-            "Send ConnectNetwork command to device {}".format(nodeid))
-        try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "ConnectNetwork", nodeid, endpoint, group, {
-                "networkID": bytes.fromhex(network_id),
-                "breadcrumb": 0}, blocking=True)
-            self.logger.info(f"Received response: {resp}")
-            if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
-                self.logger.exception("Failed to enable Thread network.")
-                return False
-        except Exception as ex:
-            self.logger.exception("Failed to send ConnectNetwork command")
-            return False
-        return True
-
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
         self.logger.info(
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))

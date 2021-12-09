@@ -444,10 +444,10 @@ void ChipLinuxAppMainLoop()
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sThreadNetworkCommissioningInstance);
+    sThreadNetworkCommissioningInstance.Register();
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sWiFiNetworkCommissioningInstance);
+    sWiFiNetworkCommissioningInstance.Register();
 #endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

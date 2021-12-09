@@ -20,6 +20,8 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandlerInterface.h>
+#include <app/InteractionModelEngine.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/internal/DeviceControlServer.h>
@@ -40,6 +42,13 @@ constexpr uint32_t kFeatureMapThread        = 0b0000'0010;
 // TODO: The network commissioning cluster should listen to OnCommissioningComplete event, and start to connect to the network in
 // the background.
 // TODO: The Reorder network / remove network uses lots of copy operation and should be updated.
+
+CHIP_ERROR InstanceBase::Register()
+{
+    ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(this));
+    VerifyOrReturnError(registerAttributeAccessOverride(this), CHIP_ERROR_INCORRECT_STATE);
+    return CHIP_NO_ERROR;
+}
 
 void InstanceBase::InvokeCommand(HandlerContext & ctxt)
 {

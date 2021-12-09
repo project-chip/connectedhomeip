@@ -1123,6 +1123,13 @@ CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiNetworkComm
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
     VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
+    if (wpa_fi_w1_wpa_supplicant1_interface_get_scanning(mWpaSupplicant.iface))
+    {
+        // If we are already scanning, skip it
+        mpNetworkCommissioningCallback = callback;
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR ret  = CHIP_NO_ERROR;
     GError * err    = nullptr;
     GVariant * args = nullptr;
@@ -1338,10 +1345,13 @@ void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, G
             scanResults.push_back(scanResult);
         }
 
-        mpNetworkCommissioningCallback->OnScanFinished(
-            CHIP_NO_ERROR, CharSpan(),
-            Span<app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type>(scanResults.data(),
-                                                                                              scanResults.size()));
+        if (mpNetworkCommissioningCallback != nullptr)
+        {
+            mpNetworkCommissioningCallback->OnScanFinished(
+                CHIP_NO_ERROR, CharSpan(),
+                Span<app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type>(scanResults.data(),
+                                                                                                  scanResults.size()));
+        }
     });
 
     g_strfreev(oldBsss);
