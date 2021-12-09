@@ -16,13 +16,13 @@
  *    limitations under the License.
  */
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
 
 #include "AppMain.h"
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;

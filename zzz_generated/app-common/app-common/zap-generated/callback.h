@@ -25,7 +25,6 @@
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
-#include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/ConcreteAttributePath.h>
@@ -13846,23 +13845,11 @@ bool emberAfBridgedActionsClusterDisableActionWithDurationCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::DecodableType & commandData);
 /**
- * @brief Basic Cluster StartUp Command callback (from server)
- */
-bool emberAfBasicClusterStartUpCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
  * @brief Basic Cluster MfgSpecificPing Command callback (from client)
  */
 bool emberAfBasicClusterMfgSpecificPingCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Basic::Commands::MfgSpecificPing::DecodableType & commandData);
-/**
- * @brief Basic Cluster ShutDown Command callback (from server)
- */
-bool emberAfBasicClusterShutDownCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
-/**
- * @brief Basic Cluster Leave Command callback (from server)
- */
-bool emberAfBasicClusterLeaveCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj);
 /**
  * @brief OTA Software Update Provider Cluster QueryImage Command callback (from client)
  */
@@ -15217,6 +15204,11 @@ bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TestEmitTestEventResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterTestEmitTestEventResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                uint64_t value);
+/**
  * @brief Test Cluster Cluster TestNestedStructListArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestNestedStructListArgumentRequestCallback(
@@ -15270,6 +15262,12 @@ bool emberAfTestClusterClusterTimedInvokeRequestCallback(
 bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster TestEmitTestEventRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
@@ -15545,7 +15543,7 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength, int32_t index = -1);
+                                                   uint8_t * buffer, uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -15589,7 +15587,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer, int32_t index = -1);
+                                                    uint8_t * buffer);
 
 /** @brief Get Current Time
  *

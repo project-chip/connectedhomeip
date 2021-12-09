@@ -176,8 +176,9 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
-                                                            mECMPasscodeID, keyID, this));
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), mECMPasscodeID,
+                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
 
         // reset all advertising, indicating we are in commissioningMode
         app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledEnhanced);
@@ -189,7 +190,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(
             pinCode, kSpake2p_Iteration_Count,
-            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID, this));
+            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
+            Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
 
         // reset all advertising, indicating we are in commissioningMode
         app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);

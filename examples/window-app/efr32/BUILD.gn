@@ -71,7 +71,7 @@ efr32_executable("window_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "${project_dir}/common/src/WindowApp.cpp",
     "${project_dir}/common/src/ZclCallbacks.cpp",
     "src/WindowAppImpl.cpp",
@@ -88,6 +88,7 @@ efr32_executable("window_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   include_dirs = [

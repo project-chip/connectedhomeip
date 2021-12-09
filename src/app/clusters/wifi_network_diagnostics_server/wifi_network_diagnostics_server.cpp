@@ -22,6 +22,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
@@ -149,13 +150,72 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
 class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 {
     // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
-    void OnDisconnectionDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected"); }
+    void OnDisconnectionDetected(uint16_t reasonCode) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
+
+        ForAllEndpointsWithServerCluster(
+            WiFiNetworkDiagnostics::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                // If WiFi Network Diagnostics cluster is implemented on this endpoint
+                Events::Disconnection::Type event{ static_cast<uint16_t>(context) };
+                EventNumber eventNumber;
+
+                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+                {
+                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
+                }
+
+                return Loop::Continue;
+            },
+            static_cast<intptr_t>(reasonCode));
+    }
 
     // Gets called when the Node fails to associate or authenticate an access point.
-    void OnAssociationFailureDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected"); }
+    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
+
+        Events::AssociationFailure::Type event{ static_cast<AssociationFailureCause>(associationFailureCause), status };
+
+        ForAllEndpointsWithServerCluster(
+            WiFiNetworkDiagnostics::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                // If WiFi Network Diagnostics cluster is implemented on this endpoint
+                Events::AssociationFailure::Type * pEvent = reinterpret_cast<Events::AssociationFailure::Type *>(context);
+                EventNumber eventNumber;
+
+                if (CHIP_NO_ERROR != LogEvent(*pEvent, endpoint, eventNumber))
+                {
+                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
+                }
+
+                return Loop::Continue;
+            },
+            reinterpret_cast<intptr_t>(&event));
+    }
 
     // Gets when the Node’s connection status to a Wi-Fi network has changed.
-    void OnConnectionStatusChanged() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged"); }
+    void OnConnectionStatusChanged(uint8_t connectionStatus) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
+
+        ForAllEndpointsWithServerCluster(
+            WiFiNetworkDiagnostics::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                // If WiFi Network Diagnostics cluster is implemented on this endpoint
+                Events::ConnectionStatus::Type event{ static_cast<WiFiConnectionStatus>(context) };
+                EventNumber eventNumber;
+
+                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+                {
+                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
+                }
+
+                return Loop::Continue;
+            },
+            static_cast<intptr_t>(connectionStatus));
+    }
 };
 
 WiFiDiagnosticsDelegate gDiagnosticDelegate;

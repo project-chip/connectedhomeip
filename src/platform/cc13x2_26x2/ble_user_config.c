@@ -17,8 +17,8 @@
  */
 
 /**
- * @file  This file contains user configurable variables for the BLE
- *      Application.
+ * @file
+ *  This file contains user configurable variables for the BLE Application.
  *
  */
 

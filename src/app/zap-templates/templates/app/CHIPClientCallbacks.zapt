@@ -3,7 +3,6 @@
 {{#if (chip_has_client_clusters)}}
 #pragma once
 
-#include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>

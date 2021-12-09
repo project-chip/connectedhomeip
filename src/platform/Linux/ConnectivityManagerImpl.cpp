@@ -22,6 +22,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
+#include <platform/Linux/WirelessDefs.h>
 #include <platform/internal/BLEManager.h>
 
 #include <cstdlib>
@@ -57,6 +58,7 @@ using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
+using namespace ::chip::app::Clusters::WiFiNetworkDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
@@ -123,7 +125,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-
+bool ConnectivityManagerImpl::mAssociattionStarted = false;
 BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
@@ -321,6 +323,89 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
+void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
+                                                      const gchar * const * invalidated_properties, gpointer user_data)
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    if (g_variant_n_children(changed_properties) > 0)
+    {
+        GVariantIter * iter;
+        const gchar * key;
+        GVariant * value;
+
+        WiFiDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetWiFiDiagnosticsDelegate();
+
+        g_variant_get(changed_properties, "a{sv}", &iter);
+
+        while (g_variant_iter_loop(iter, "{&sv}", &key, &value))
+        {
+            gchar * value_str;
+            value_str = g_variant_print(value, TRUE);
+            ChipLogProgress(DeviceLayer, "wpa_supplicant:PropertiesChanged:key:%s -> %s", key, value_str);
+
+            if (g_strcmp0(key, "State") == 0)
+            {
+                if (g_strcmp0(value_str, "\'associating\'") == 0)
+                {
+                    mAssociattionStarted = true;
+                }
+                else if (g_strcmp0(value_str, "\'disconnected\'") == 0)
+                {
+                    gint reason = wpa_fi_w1_wpa_supplicant1_interface_get_disconnect_reason(mWpaSupplicant.iface);
+
+                    if (delegate)
+                    {
+                        delegate->OnDisconnectionDetected(reason);
+                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kConnected));
+                    }
+
+                    if (mAssociattionStarted)
+                    {
+                        uint8_t associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kUnknown);
+                        uint16_t status                 = WLAN_STATUS_UNSPECIFIED_FAILURE;
+
+                        switch (abs(reason))
+                        {
+                        case WLAN_REASON_DISASSOC_DUE_TO_INACTIVITY:
+                        case WLAN_REASON_DISASSOC_AP_BUSY:
+                        case WLAN_REASON_DISASSOC_STA_HAS_LEFT:
+                        case WLAN_REASON_DISASSOC_LOW_ACK:
+                        case WLAN_REASON_BSS_TRANSITION_DISASSOC:
+                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kAssociationFailed);
+                            status = wpa_fi_w1_wpa_supplicant1_interface_get_assoc_status_code(mWpaSupplicant.iface);
+                            break;
+                        case WLAN_REASON_PREV_AUTH_NOT_VALID:
+                        case WLAN_REASON_DEAUTH_LEAVING:
+                        case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
+                            associationFailureCause = static_cast<uint8_t>(AssociationFailureCause::kAuthenticationFailed);
+                            status = wpa_fi_w1_wpa_supplicant1_interface_get_auth_status_code(mWpaSupplicant.iface);
+                            break;
+                        default:
+                            break;
+                        }
+
+                        delegate->OnAssociationFailureDetected(associationFailureCause, status);
+                    }
+
+                    mAssociattionStarted = false;
+                }
+                else if (g_strcmp0(value_str, "\'associated\'") == 0)
+                {
+                    if (delegate)
+                    {
+                        delegate->OnConnectionStatusChanged(static_cast<uint8_t>(WiFiConnectionStatus::kNotConnected));
+                    }
+                }
+            }
+
+            g_free(value_str);
+        }
+
+        g_variant_iter_free(iter);
+    }
+}
+
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
 {
     GError * err = nullptr;
@@ -340,6 +425,8 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         mWpaSupplicant.iface = iface;
         mWpaSupplicant.state = GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED;
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
+
+        g_signal_connect(mWpaSupplicant.iface, "properties-changed", G_CALLBACK(_OnWpaPropertiesChanged), NULL);
     }
     else
     {

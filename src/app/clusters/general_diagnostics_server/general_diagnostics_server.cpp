@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/ConnectivityManager.h>
@@ -211,6 +212,34 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+
+                    // Record HardwareFault event
+                    EventNumber eventNumber;
+                    DataModel::List<const HardwareFaultType> currentList = DataModel::List<const HardwareFaultType>(
+                        reinterpret_cast<const HardwareFaultType *>(current.data()), current.size());
+                    DataModel::List<const HardwareFaultType> previousList = DataModel::List<const HardwareFaultType>(
+                        reinterpret_cast<const HardwareFaultType *>(previous.data()), previous.size());
+                    Events::HardwareFaultChange::Type event{ currentList, previousList };
+
+                    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+                    {
+                        ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record HardwareFault event");
+                    }
+                }
+            }
+        }
     }
 
     // Get called when the Node detects a radio fault has been raised.
@@ -219,6 +248,34 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+
+                    // Record RadioFault event
+                    EventNumber eventNumber;
+                    DataModel::List<const RadioFaultType> currentList = DataModel::List<const RadioFaultType>(
+                        reinterpret_cast<const RadioFaultType *>(current.data()), current.size());
+                    DataModel::List<const RadioFaultType> previousList = DataModel::List<const RadioFaultType>(
+                        reinterpret_cast<const RadioFaultType *>(previous.data()), previous.size());
+                    Events::RadioFaultChange::Type event{ currentList, previousList };
+
+                    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+                    {
+                        ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record RadioFault event");
+                    }
+                }
+            }
+        }
     }
 
     // Get called when the Node detects a network fault has been raised.
@@ -227,6 +284,34 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+
+                    // Record NetworkFault event
+                    EventNumber eventNumber;
+                    DataModel::List<const NetworkFaultType> currentList = DataModel::List<const NetworkFaultType>(
+                        reinterpret_cast<const NetworkFaultType *>(current.data()), current.size());
+                    DataModel::List<const NetworkFaultType> previousList = DataModel::List<const NetworkFaultType>(
+                        reinterpret_cast<const NetworkFaultType *>(previous.data()), previous.size());
+                    Events::NetworkFaultChange::Type event{ currentList, previousList };
+
+                    if (CHIP_NO_ERROR != LogEvent(event, endpointId, eventNumber, EventOptions::Type::kUrgent))
+                    {
+                        ChipLogError(Zcl, "GeneralDiagnosticsDelegate: Failed to record NetworkFault event");
+                    }
+                }
+            }
+        }
     }
 };
 

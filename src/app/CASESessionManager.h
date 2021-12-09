@@ -18,14 +18,16 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
 #include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
 #include <lib/support/Pool.h>
 #include <transport/SessionDelegate.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -33,6 +35,8 @@ struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
+    OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
+    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
 };
 
 /**
@@ -50,9 +54,12 @@ public:
 
     CASESessionManager(CASESessionManagerConfig & params)
     {
-        VerifyOrReturn(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
+        VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
         mConfig = params;
+
+        // TODO: Revisit who should be set as the resolver delegate
+        Dnssd::Resolver::Instance().SetResolverDelegate(this);
     }
 
     virtual ~CASESessionManager() {}
@@ -102,10 +109,6 @@ public:
 private:
     OperationalDeviceProxy * FindSession(SessionHandle session);
     void ReleaseSession(OperationalDeviceProxy * device);
-
-    BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES,
-                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mActiveSessions;
 
     CASESessionManagerConfig mConfig;
 };

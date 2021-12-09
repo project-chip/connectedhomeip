@@ -70,7 +70,10 @@ efr32_sdk("sdk") {
   ]
 
   if (chip_enable_pw_rpc) {
-    defines += [ "HAL_VCOM_ENABLE=1" ]
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
   }
 }
 
@@ -81,7 +84,7 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -98,6 +101,7 @@ efr32_executable("lighting_app") {
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   include_dirs = [ "include" ]

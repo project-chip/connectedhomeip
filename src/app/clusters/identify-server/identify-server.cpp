@@ -64,42 +64,47 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Identify;
 
-static std::array<Identify *, EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT> instances = { 0 };
+static Identify * firstIdentify = nullptr;
 
 static void onIdentifyClusterTick(chip::System::Layer * systemLayer, void * appState);
 
 static Identify * inst(EndpointId endpoint)
 {
-    for (size_t i = 0; i < instances.size(); i++)
+    Identify * current = firstIdentify;
+    while (current != nullptr && current->mEndpoint != endpoint)
     {
-        if (nullptr != instances[i] && endpoint == instances[i]->mEndpoint)
-        {
-            return instances[i];
-        }
+        current = current->next();
     }
 
-    return nullptr;
+    return current;
 }
 
 static inline void reg(Identify * inst)
 {
-    for (size_t i = 0; i < instances.size(); i++)
-    {
-        if (nullptr == instances[i])
-        {
-            instances[i] = inst;
-            break;
-        }
-    }
+    inst->setNext(firstIdentify);
+    firstIdentify = inst;
 }
 
 static inline void unreg(Identify * inst)
 {
-    for (size_t i = 0; i < instances.size(); i++)
+    if (firstIdentify == inst)
     {
-        if (inst == instances[i])
+        firstIdentify = firstIdentify->next();
+    }
+    else
+    {
+        Identify * previous = firstIdentify;
+        Identify * current  = firstIdentify->next();
+
+        while (current != nullptr && current != inst)
         {
-            instances[i] = nullptr;
+            previous = current;
+            current  = current->next();
+        }
+
+        if (current != nullptr)
+        {
+            previous->setNext(current->next());
         }
     }
 }

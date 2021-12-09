@@ -233,7 +233,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",
@@ -979,7 +979,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -994,7 +994,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
@@ -15443,6 +15443,14 @@
               "outgoing": 0
             },
             {
+              "name": "TestEmitTestEventRequest",
+              "code": 20,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "TestSimpleOptionalArgumentRequest",
               "code": 19,
               "mfgCode": null,
@@ -15520,6 +15528,14 @@
             {
               "name": "SimpleStructResponse",
               "code": 9,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestEmitTestEventResponse",
+              "code": 10,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
@@ -17113,7 +17129,7 @@
           "mfgCode": null,
           "define": "GROUPS_CLUSTER",
           "side": "server",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
               "name": "AddGroupResponse",

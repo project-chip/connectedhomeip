@@ -96,6 +96,17 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
+    async def SendCommandWithTestClusterEventTrigger(cls, devCtrl, eventNumber):
+        req = Clusters.TestCluster.Commands.TestEmitTestEventRequest(arg1=1)
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
+        if not isinstance(res, Clusters.TestCluster.Commands.TestEmitTestEventResponse):
+            logger.error(f"Unexpected response of type {type(res)} received.")
+            raise ValueError()
+        logger.info(f"Received response: {res}")
+        if res.value != eventNumber:
+            raise ValueError()
+
+    @classmethod
     async def SendWriteRequest(cls, devCtrl):
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -198,29 +209,43 @@ class ClusterObjectTests:
             raise AssertionError("Unexpected read result")
 
     @classmethod
-    async def TestReadEventRequests(cls, devCtrl):
+    async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
-            (0, Clusters.TestCluster.Events.TestEvent),
+            (1, Clusters.TestCluster.Events.TestEvent),
         ]
-        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
-
+        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
+        if (len(res['Events']) != expectEventsNum):
+            raise AssertionError(
+                f"Got back {len(res['Events'])} event items instead of {expectEventsNum}")
+        _AssumeEventsDecodeSuccess(res)
         logger.info("2: Reading Ex Cx E*")
         req = [
-            (0, Clusters.TestCluster),
+            (1, Clusters.TestCluster),
         ]
-        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
+        if (len(res['Events']) != 0):
+            raise AssertionError(
+                f"Got back {len(res['Events'])} event items instead of 0")
+        _AssumeEventsDecodeSuccess(res)
 
         logger.info("3: Reading Ex C* E*")
         req = [
-            0
+            1
         ]
+        if (len(res['Events']) != 0):
+            raise AssertionError(
+                f"Got back {len(res['Events'])} event items instead of 0")
         _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
 
         logger.info("4: Reading E* C* E*")
         req = [
             '*'
         ]
+        if (len(res['Events']) != 0):
+            raise AssertionError(
+                f"Got back {len(res['Events'])} event items instead of 0")
         _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
 
         # TODO: Add more wildcard test for IM events.
@@ -232,9 +257,12 @@ class ClusterObjectTests:
             await cls.RoundTripTest(devCtrl)
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
+            await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 1)
+            await cls.TestReadEventRequests(devCtrl, 1)
+            await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 2)
+            await cls.TestReadEventRequests(devCtrl, 1)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
-            await cls.TestReadEventRequests(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
         except Exception as ex:
             logger.error(

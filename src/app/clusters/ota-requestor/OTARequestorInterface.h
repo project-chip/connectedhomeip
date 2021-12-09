@@ -28,6 +28,8 @@
 
 #pragma once
 
+namespace chip {
+
 // Interface class to connect the OTA Software Update Requestor cluster command processing
 // with the core OTA Requestor logic. The OTARequestor class implements this interface
 class OTARequestorInterface
@@ -56,3 +58,5 @@ void SetRequestorInstance(OTARequestorInterface * instance);
 
 // Get the object implementing OTARequestorInterface
 OTARequestorInterface * GetRequestorInstance();
+
+} // namespace chip

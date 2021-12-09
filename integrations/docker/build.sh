@@ -59,6 +59,8 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
+mb_space_before=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+
 # go find and build any CHIP images this image is "FROM"
 awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
     dep=${dep%:*}
@@ -71,6 +73,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+docker image prune --force
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
@@ -87,5 +90,10 @@ docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$
         docker push "$ORG"/"$IMAGE":latest
     }
 }
+
+docker images --filter=reference="$ORG/*"
+df -h /var/lib/docker/
+mb_space_after=$(df -m /var/lib/docker/ | awk 'FNR==2{print $3}')
+printf "%'.f MB total used\n" "$((mb_space_before - mb_space_after))"
 
 exit 0

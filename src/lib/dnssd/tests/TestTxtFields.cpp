@@ -19,6 +19,7 @@
 #include <lib/dnssd/TxtFields.h>
 
 #include <limits>
+#include <stdio.h>
 #include <string.h>
 
 #include <lib/dnssd/Resolver.h>
@@ -43,57 +44,57 @@ ByteSpan GetSpan(char * key)
 void TestGetTxtFieldKey(nlTestSuite * inSuite, void * inContext)
 {
     char key[4];
-    sprintf(key, "D");
+    strcpy(key, "D");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
 
-    sprintf(key, "VP");
+    strcpy(key, "VP");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
 
-    sprintf(key, "CM");
+    strcpy(key, "CM");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kCommissioningMode);
 
-    sprintf(key, "DT");
+    strcpy(key, "DT");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kDeviceType);
 
-    sprintf(key, "DN");
+    strcpy(key, "DN");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kDeviceName);
 
-    sprintf(key, "RI");
+    strcpy(key, "RI");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kRotatingDeviceId);
 
-    sprintf(key, "PI");
+    strcpy(key, "PI");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingInstruction);
 
-    sprintf(key, "PH");
+    strcpy(key, "PH");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kPairingHint);
 
-    sprintf(key, "CRI");
+    strcpy(key, "CRI");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalIdle);
 
-    sprintf(key, "CRA");
+    strcpy(key, "CRA");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kMrpRetryIntervalActive);
 
-    sprintf(key, "T");
+    strcpy(key, "T");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kTcpSupport);
 
-    sprintf(key, "XX");
+    strcpy(key, "XX");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
 }
 
 void TestGetTxtFieldKeyCaseInsensitive(nlTestSuite * inSuite, void * inContext)
 {
     char key[3];
-    sprintf(key, "d");
+    strcpy(key, "d");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kLongDiscriminator);
 
-    sprintf(key, "vp");
+    strcpy(key, "vp");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
-    sprintf(key, "Vp");
+    strcpy(key, "Vp");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
-    sprintf(key, "vP");
+    strcpy(key, "vP");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kVendorProduct);
 
-    sprintf(key, "Xx");
+    strcpy(key, "Xx");
     NL_TEST_ASSERT(inSuite, GetTxtFieldKey(GetSpan(key)) == TxtFieldKey::kUnknown);
 }
 
@@ -101,16 +102,16 @@ void TestGetProduct(nlTestSuite * inSuite, void * inContext)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Product is after the +
     char vp[64];
-    sprintf(vp, "123+456");
+    strcpy(vp, "123+456");
     NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 456);
 
-    sprintf(vp, "123+");
+    strcpy(vp, "123+");
     NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 0);
 
-    sprintf(vp, "+456");
+    strcpy(vp, "+456");
     NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 456);
 
-    sprintf(vp, "123");
+    strcpy(vp, "123");
     NL_TEST_ASSERT(inSuite, GetProduct(GetSpan(vp)) == 0);
 
     // overflow a uint16
@@ -121,16 +122,16 @@ void TestGetVendor(nlTestSuite * inSuite, void * inContext)
 {
     // Product and vendor are given as part of the same key, on either side of a + sign. Vendor is first
     char vp[64];
-    sprintf(vp, "123+456");
+    strcpy(vp, "123+456");
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
 
-    sprintf(vp, "123+");
+    strcpy(vp, "123+");
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
 
-    sprintf(vp, "+456");
+    strcpy(vp, "+456");
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 0);
 
-    sprintf(vp, "123");
+    strcpy(vp, "123");
     NL_TEST_ASSERT(inSuite, GetVendor(GetSpan(vp)) == 123);
 
     // overflow a uint16
@@ -141,7 +142,7 @@ void TestGetVendor(nlTestSuite * inSuite, void * inContext)
 void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
 {
     char ld[64];
-    sprintf(ld, "1234");
+    strcpy(ld, "1234");
     NL_TEST_ASSERT(inSuite, GetLongDiscriminator(GetSpan(ld)) == 1234);
 
     // overflow a uint16
@@ -153,13 +154,13 @@ void TestGetLongDiscriminator(nlTestSuite * inSuite, void * inContext)
 void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
 {
     char cm[64];
-    sprintf(cm, "0");
+    strcpy(cm, "0");
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 0);
 
-    sprintf(cm, "1");
+    strcpy(cm, "1");
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 1);
 
-    sprintf(cm, "2");
+    strcpy(cm, "2");
     NL_TEST_ASSERT(inSuite, GetCommissioningMode(GetSpan(cm)) == 2);
 
     // overflow a uint8
@@ -170,7 +171,7 @@ void TestGetCommissioningMode(nlTestSuite * inSuite, void * inContext)
 void TestGetDeviceType(nlTestSuite * inSuite, void * inContext)
 {
     char dt[64];
-    sprintf(dt, "1234");
+    strcpy(dt, "1234");
     NL_TEST_ASSERT(inSuite, GetDeviceType(GetSpan(dt)) == 1234);
 
     // overflow a uint16
@@ -183,7 +184,7 @@ void TestGetDeviceName(nlTestSuite * inSuite, void * inContext)
     char name[kMaxDeviceNameLen + 1] = "";
     char val[kMaxDeviceNameLen + 2];
 
-    sprintf(val, "testname");
+    strcpy(val, "testname");
     GetDeviceName(GetSpan(val), name);
     NL_TEST_ASSERT(inSuite, strcmp(name, "testname") == 0);
 
@@ -204,7 +205,7 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
     uint8_t id[kMaxRotatingIdLen];
     size_t len;
 
-    sprintf(ri, "0A1B");
+    strcpy(ri, "0A1B");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     printf("id[0] = %x\n", id[0]);
     NL_TEST_ASSERT(inSuite, id[0] == 0x0A);
@@ -212,23 +213,23 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, len == 2);
 
     // odd number of characters can't be parsed.
-    sprintf(ri, "0A1BC");
+    strcpy(ri, "0A1BC");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     NL_TEST_ASSERT(inSuite, len == 0);
 
     // non-hex characters can't be parsed
-    sprintf(ri, "0ATT");
+    strcpy(ri, "0ATT");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     NL_TEST_ASSERT(inSuite, len == 0);
 
     // Lower case should work on SDK even though devices shouldn't be sending that.
-    sprintf(ri, "0a1b");
+    strcpy(ri, "0a1b");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     NL_TEST_ASSERT(inSuite, id[0] == 0x0A);
     NL_TEST_ASSERT(inSuite, id[1] == 0x1B);
     NL_TEST_ASSERT(inSuite, len == 2);
 
-    sprintf(ri, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F3031");
+    strcpy(ri, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F3031");
     GetRotatingDeviceId(GetSpan(ri), id, &len);
     NL_TEST_ASSERT(inSuite, len == sizeof(id));
     for (uint8_t i = 0; i < sizeof(id); ++i)
@@ -240,10 +241,10 @@ void TestGetRotatingDeviceId(nlTestSuite * inSuite, void * inContext)
 void TestGetPairingHint(nlTestSuite * inSuite, void * inContext)
 {
     char ph[64];
-    sprintf(ph, "0");
+    strcpy(ph, "0");
     NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 0);
 
-    sprintf(ph, "9");
+    strcpy(ph, "9");
     NL_TEST_ASSERT(inSuite, GetPairingHint(GetSpan(ph)) == 9);
 
     // overflow a uint16
@@ -256,7 +257,7 @@ void TestGetPairingInstruction(nlTestSuite * inSuite, void * inContext)
     char data[kMaxPairingInstructionLen + 2];
     char ret[kMaxPairingInstructionLen + 1] = "";
 
-    sprintf(data, "something");
+    strcpy(data, "something");
     GetPairingInstruction(GetSpan(data), ret);
     NL_TEST_ASSERT(inSuite, strcmp(ret, "something") == 0);
 
@@ -308,16 +309,16 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     DiscoveredNodeData filled;
 
     // Long discriminator
-    sprintf(key, "D");
-    sprintf(val, "840");
+    strcpy(key, "D");
+    strcpy(val, "840");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.longDiscriminator == 840);
     filled.longDiscriminator = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // vendor and product
-    sprintf(key, "VP");
-    sprintf(val, "123+456");
+    strcpy(key, "VP");
+    strcpy(val, "123+456");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.vendorId == 123);
     NL_TEST_ASSERT(inSuite, filled.productId == 456);
@@ -326,32 +327,32 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Commissioning mode
-    sprintf(key, "CM");
-    sprintf(val, "1");
+    strcpy(key, "CM");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.commissioningMode == 1);
     filled.commissioningMode = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device type
-    sprintf(key, "DT");
-    sprintf(val, "1");
+    strcpy(key, "DT");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.deviceType == 1);
     filled.deviceType = 0;
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Device name
-    sprintf(key, "DN");
-    sprintf(val, "abc");
+    strcpy(key, "DN");
+    strcpy(val, "abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, strcmp(filled.deviceName, "abc") == 0);
     memset(filled.deviceName, 0, sizeof(filled.deviceName));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Rotating device id
-    sprintf(key, "RI");
-    sprintf(val, "1A2B");
+    strcpy(key, "RI");
+    strcpy(val, "1A2B");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.rotatingId[0] == 0x1A);
     NL_TEST_ASSERT(inSuite, filled.rotatingId[1] == 0x2B);
@@ -361,16 +362,16 @@ void TestFillDiscoveredNodeDataFromTxt(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Pairing instruction
-    sprintf(key, "PI");
-    sprintf(val, "hint");
+    strcpy(key, "PI");
+    strcpy(val, "hint");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, strcmp(filled.pairingInstruction, "hint") == 0);
     memset(filled.pairingInstruction, 0, sizeof(filled.pairingInstruction));
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(filled));
 
     // Pairing hint
-    sprintf(key, "PH");
-    sprintf(val, "1");
+    strcpy(key, "PH");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), filled);
     NL_TEST_ASSERT(inSuite, filled.pairingHint == 1);
     filled.pairingHint = 0;
@@ -412,15 +413,15 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     NodeData nodeData;
 
     // Minimum
-    sprintf(key, "CRI");
-    sprintf(val, "1");
+    strcpy(key, "CRI");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
-    sprintf(key, "CRI");
-    sprintf(val, "3600000");
+    strcpy(key, "CRI");
+    strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
@@ -430,38 +431,38 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid CRI - negative value
-    sprintf(key, "CRI");
-    sprintf(val, "-1");
+    strcpy(key, "CRI");
+    strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - greater than maximum
-    sprintf(key, "CRI");
-    sprintf(val, "3600001");
+    strcpy(key, "CRI");
+    strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - much greater than maximum
-    sprintf(key, "CRI");
-    sprintf(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    strcpy(key, "CRI");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - hexadecimal value
-    sprintf(key, "CRI");
-    sprintf(val, "0x20");
+    strcpy(key, "CRI");
+    strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - leading zeros
-    sprintf(key, "CRI");
-    sprintf(val, "0700");
+    strcpy(key, "CRI");
+    strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 
     // Invalid CRI - text at the end
-    sprintf(key, "CRI");
-    sprintf(val, "123abc");
+    strcpy(key, "CRI");
+    strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalIdle().HasValue());
 }
@@ -475,15 +476,15 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     NodeData nodeData;
 
     // Minimum
-    sprintf(key, "CRA");
-    sprintf(val, "1");
+    strcpy(key, "CRA");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
-    sprintf(key, "CRA");
-    sprintf(val, "3600000");
+    strcpy(key, "CRA");
+    strcpy(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
@@ -493,38 +494,38 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // Invalid CRA - negative value
-    sprintf(key, "CRA");
-    sprintf(val, "-1");
+    strcpy(key, "CRA");
+    strcpy(val, "-1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - greater than maximum
-    sprintf(key, "CRA");
-    sprintf(val, "3600001");
+    strcpy(key, "CRA");
+    strcpy(val, "3600001");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - much greater than maximum
-    sprintf(key, "CRA");
-    sprintf(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
+    strcpy(key, "CRA");
+    strcpy(val, "1095216660481"); // 0xFF00000001 == 1 (mod 2^32)
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - hexadecimal value
-    sprintf(key, "CRA");
-    sprintf(val, "0x20");
+    strcpy(key, "CRA");
+    strcpy(val, "0x20");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - leading zeros
-    sprintf(key, "CRA");
-    sprintf(val, "0700");
+    strcpy(key, "CRA");
+    strcpy(val, "0700");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 
     // Invalid CRA - text at the end
-    sprintf(key, "CRA");
-    sprintf(val, "123abc");
+    strcpy(key, "CRA");
+    strcpy(val, "123abc");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.GetMrpRetryIntervalActive().HasValue());
 }
@@ -538,8 +539,8 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     NodeData nodeData;
 
     // True
-    sprintf(key, "T");
-    sprintf(val, "1");
+    strcpy(key, "T");
+    strcpy(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp);
 
@@ -548,14 +549,14 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, NodeDataIsEmpty(nodeData));
 
     // False
-    sprintf(key, "T");
-    sprintf(val, "0");
+    strcpy(key, "T");
+    strcpy(val, "0");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
 
     // Invalid value, stil false
-    sprintf(key, "T");
-    sprintf(val, "asdf");
+    strcpy(key, "T");
+    strcpy(val, "asdf");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
 }
@@ -574,14 +575,14 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
-    sprintf(key, "CRI");
-    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count());
+    strcpy(key, "CRI");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "CRI");
-    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1);
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
@@ -601,13 +602,13 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "CRA");
-    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count());
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count()));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
-    sprintf(key, "CRA");
-    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1);
+    strcpy(key, "CRA");
+    sprintf(val, "%d", static_cast<int>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1));
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }

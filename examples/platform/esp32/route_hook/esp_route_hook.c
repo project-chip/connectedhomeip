@@ -94,7 +94,7 @@ static void ra_recv_handler(struct netif * netif, const uint8_t * icmp_payload, 
             uint8_t rio_data_len     = opt_len - sizeof(rio_header_t);
 
             ESP_LOGI(TAG, "Received RIO");
-            for (; rio_data_len >= prefix_len_bytes; rio_data_len -= prefix_len_bytes, rio_data += prefix_len_bytes)
+            if (rio_data_len >= prefix_len_bytes)
             {
                 ip6_addr_t prefix;
                 esp_route_entry_t route;

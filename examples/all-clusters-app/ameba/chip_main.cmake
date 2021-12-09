@@ -13,7 +13,6 @@ include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 list(
     APPEND ${list_chip_main_sources}
 
-    ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/attribute-size.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/IMClusterCommandHandler.cpp
