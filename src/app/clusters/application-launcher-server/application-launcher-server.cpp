@@ -47,8 +47,8 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
 
 void sendResponse(app::CommandHandler * command, app::ConcreteCommandPath path, ApplicationLauncherResponse response)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer          = nullptr;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
     SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
@@ -106,11 +106,11 @@ bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * comm
  * @brief Application Launcher Cluster HideApp Command callback (from client)
  */
 bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::HideApp::DecodableType & commandData) {
+                                                      const Commands::HideApp::DecodableType & commandData)
+{
 
     auto & requestApplicationCatalogVendorId = commandData.application.catalogVendorId;
     auto & requestApplicationId              = commandData.application.applicationId;
-
 
     app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::HideAppResponse::Id };
 
