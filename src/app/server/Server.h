@@ -67,13 +67,9 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
-    CASEClientPoolDelegate * GetCASEClientPool() { return mCASEClientPool; }
+    CASEClientPoolDelegate * GetCASEClientPool() { return &mCASEClientPool; }
 
-    void SetCASEClientPool(CASEClientPoolDelegate * clientPool) { mCASEClientPool = clientPool; }
-
-    OperationalDeviceProxyPoolDelegate * GetDevicePool() { return mDevicePool; }
-
-    void SetDevicePool(OperationalDeviceProxyPoolDelegate * devicePool) { mDevicePool = devicePool; }
+    OperationalDeviceProxyPoolDelegate * GetDevicePool() { return &mDevicePool; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -141,8 +137,13 @@ private:
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
-    CASEClientPoolDelegate * mCASEClientPool         = nullptr;
-    OperationalDeviceProxyPoolDelegate * mDevicePool = nullptr;
+
+    static constexpr size_t kCASEClientPoolSize        = 2;
+    static constexpr size_t kOperationalDevicePoolSize = 4;
+
+    CASEClientPool<kCASEClientPoolSize> mCASEClientPool;
+    OperationalDeviceProxyPool<kOperationalDevicePoolSize> mDevicePool;
+
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
