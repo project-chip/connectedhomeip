@@ -80,8 +80,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     if (ConfigurationMgr().GetHardwareVersionString(hardwareVersionString, sizeof(hardwareVersionString)) == CHIP_NO_ERROR)
     {
         status = Attributes::HardwareVersionString::Set(endpoint, CharSpan(hardwareVersionString, strlen(hardwareVersionString)));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Hardware Version String: 0x%02x", status));
     }
 
     uint16_t hardwareVersion;
@@ -95,8 +94,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     if (ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString)) == CHIP_NO_ERROR)
     {
         status = Attributes::SoftwareVersionString::Set(endpoint, CharSpan(softwareVersionString, strlen(softwareVersionString)));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Software Version String: 0x%02x", status));
     }
 
     uint16_t softwareVersion;
@@ -123,7 +121,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
                  manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
         status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
+                   ChipLogError(Zcl, "Error setting Manufacturing Date String: 0x%02x", status));
     }
 
     char partNumber[DeviceLayer::ConfigurationManager::kMaxPartNumberLength + 1];
@@ -151,8 +149,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
     {
         status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,
-                       ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
+        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
     }
 
     bool reachable;
