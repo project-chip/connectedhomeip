@@ -22,7 +22,7 @@ cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
-SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell ota-requestor-app)
+SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell ota-requestor-app bootloader)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
 
@@ -92,6 +92,47 @@ source "$CHIP_ROOT"/scripts/activate.sh
 
 # Build directory setup
 BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
+
+if [[ "$APP" == "bootloader" ]]; then
+    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
+
+    cd platform/mbed/bootloader
+    BUILD_DIRECTORY=build-"$TARGET_BOARD"/"$PROFILE"/
+
+    # Set Mbed OS path
+    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
+
+    # Set Mbed MCU boot path
+    MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
+
+    # Install mcuboot requirements (silently)
+    pip install -q -r "$MBED_MCU_BOOT_PATH"/scripts/requirements.txt ||
+        fail "Unable to install mcuboot requirements" "Please take a look at "$MBED_MCU_BOOT_PATH"/scripts/requirements.txt"
+
+    # Run mcuboot setup script
+    python "$MBED_MCU_BOOT_PATH"/scripts/setup.py install ||
+        fail "MCUboot setup script failed"
+
+    # Create the signing keys
+    # shellcheck disable=SC2015
+    "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py keygen -k signing-keys.pem -t rsa-2048 &&
+        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py getpub -k signing-keys.pem >signing_keys.c ||
+        fail "Unable to create the signing keys"
+
+    ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed mcuboot
+
+    # Generate config file for selected target, toolchain and hardware
+    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
+
+    # Remove old artifacts to force linking
+    rm -rf "$BUILD_DIRECTORY/chip-"*
+
+    # Build application
+    cmake -S . -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
+    cmake --build "$BUILD_DIRECTORY"
+
+    exit
+fi
 
 if [[ "$COMMAND" == *"build"* ]]; then
     echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"

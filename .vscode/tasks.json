@@ -201,7 +201,8 @@
                 "pigweed-app",
                 "all-clusters-app",
                 "shell",
-                "ota-requestor-app"
+                "ota-requestor-app",
+                "bootloader"
             ],
             "default": "lock-app"
         },
