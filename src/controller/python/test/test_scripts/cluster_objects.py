@@ -101,17 +101,6 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
-    async def SendCommandWithTestClusterEventTrigger(cls, devCtrl, eventNumber):
-        req = Clusters.TestCluster.Commands.TestEmitTestEventRequest(arg1=1)
-        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
-        if not isinstance(res, Clusters.TestCluster.Commands.TestEmitTestEventResponse):
-            logger.error(f"Unexpected response of type {type(res)} received.")
-            raise ValueError()
-        logger.info(f"Received response: {res}")
-        if res.value != eventNumber:
-            raise ValueError()
-
-    @classmethod
     async def SendWriteRequest(cls, devCtrl):
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -222,10 +211,12 @@ class ClusterObjectTests:
             raise AssertionError("Unexpected read result")
 
     async def TriggerAndWaitForEvents(cls, devCtrl, req):
+        # We trigger sending an event a couple of times just to be safe.
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
         res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
 
+        # Events may take some time to flush, so wait for about 10s or so to get some events.
         for i in range(0, 10):
             print("Reading out events..")
             res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
@@ -276,9 +267,6 @@ class ClusterObjectTests:
             await cls.RoundTripTest(devCtrl)
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
-            await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 1)
-            await cls.TestReadEventRequests(devCtrl, 1)
-            await cls.SendCommandWithTestClusterEventTrigger(devCtrl, 2)
             await cls.TestReadEventRequests(devCtrl, 1)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
