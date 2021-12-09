@@ -135,6 +135,8 @@ public:
         delete onReportColorControlClusterRevisionCallback;
         delete onReportContentLauncherClusterRevisionCallback;
         delete onReportDescriptorClusterRevisionCallback;
+        delete onReportDoorLockLockStateCallback;
+        delete onReportDoorLockLockTypeCallback;
         delete onReportDoorLockActuatorEnabledCallback;
         delete onReportDoorLockClusterRevisionCallback;
         delete onReportElectricalMeasurementMeasurementTypeCallback;
@@ -342,6 +344,7 @@ public:
         delete onReportTestClusterEpochUsCallback;
         delete onReportTestClusterEpochSCallback;
         delete onReportTestClusterVendorIdCallback;
+        delete onReportTestClusterEnumAttrCallback;
         delete onReportTestClusterRangeRestrictedInt8uCallback;
         delete onReportTestClusterRangeRestrictedInt8sCallback;
         delete onReportTestClusterRangeRestrictedInt16uCallback;
@@ -374,6 +377,7 @@ public:
         delete onReportTestClusterNullableFloatDoubleCallback;
         delete onReportTestClusterNullableOctetStringCallback;
         delete onReportTestClusterNullableCharStringCallback;
+        delete onReportTestClusterNullableEnumAttrCallback;
         delete onReportTestClusterNullableRangeRestrictedInt8uCallback;
         delete onReportTestClusterNullableRangeRestrictedInt8sCallback;
         delete onReportTestClusterNullableRangeRestrictedInt16uCallback;
@@ -752,6 +756,10 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001D, 0xFFFD, onReportDescriptorClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0001, onReportDoorLockLockTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0002, onReportDoorLockActuatorEnabledCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0xFFFD, onReportDoorLockClusterRevisionCallback->Cancel(),
@@ -1273,6 +1281,8 @@ public:
                                        BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0022, onReportTestClusterVendorIdCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0024, onReportTestClusterEnumAttrCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0026,
                                        onReportTestClusterRangeRestrictedInt8uCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -1345,6 +1355,8 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x801E,
                                        onReportTestClusterNullableCharStringCallback->Cancel(),
                                        BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8024, onReportTestClusterNullableEnumAttrCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8026,
                                        onReportTestClusterNullableRangeRestrictedInt8uCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -2083,6 +2095,12 @@ private:
         onReportDescriptorClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadDescriptorClusterRevision::OnAttributeResponse)>(
                 ReadDescriptorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockLockState::OnAttributeResponse)> * onReportDoorLockLockStateCallback =
+        new chip::Callback::Callback<decltype(&ReadDoorLockLockState::OnAttributeResponse)>(
+            ReadDoorLockLockState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockLockType::OnAttributeResponse)> * onReportDoorLockLockTypeCallback =
+        new chip::Callback::Callback<decltype(&ReadDoorLockLockType::OnAttributeResponse)>(
+            ReadDoorLockLockType::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)> *
         onReportDoorLockActuatorEnabledCallback =
             new chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)>(
@@ -2844,6 +2862,9 @@ private:
     chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)> * onReportTestClusterVendorIdCallback =
         new chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)>(
             ReadTestClusterVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEnumAttr::OnAttributeResponse)> * onReportTestClusterEnumAttrCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEnumAttr::OnAttributeResponse)>(
+            ReadTestClusterEnumAttr::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)> *
         onReportTestClusterRangeRestrictedInt8uCallback =
             new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)>(
@@ -2971,6 +2992,10 @@ private:
         onReportTestClusterNullableCharStringCallback =
             new chip::Callback::Callback<decltype(&ReadTestClusterNullableCharString::OnAttributeResponse)>(
                 ReadTestClusterNullableCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableEnumAttr::OnAttributeResponse)> *
+        onReportTestClusterNullableEnumAttrCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableEnumAttr::OnAttributeResponse)>(
+                ReadTestClusterNullableEnumAttr::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)> *
         onReportTestClusterNullableRangeRestrictedInt8uCallback =
             new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)>(

@@ -149,15 +149,11 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
 
 CHIP_ERROR WriteClient::FinishAttribute()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-    AttributeDataIB.EndOfAttributeDataIB();
-    SuccessOrExit(err = AttributeDataIB.GetError());
+    AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
+    attributeDataIB.EndOfAttributeDataIB();
+    ReturnErrorOnFailure(attributeDataIB.GetError());
     MoveToState(State::AddAttribute);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
@@ -167,22 +163,14 @@ TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeDataIBs::Builder AttributeDataIBsBuilder;
-    VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    AttributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
-    err                     = AttributeDataIBsBuilder.GetError();
-    SuccessOrExit(err);
+    VerifyOrReturnError(mState == State::AddAttribute, CHIP_ERROR_INCORRECT_STATE);
+    AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
+    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
     mWriteRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
-    err = mWriteRequestBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mMessageWriter.Finalize(&aPacket);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&aPacket));
+    return CHIP_NO_ERROR;
 }
 
 const char * WriteClient::GetStateStr() const

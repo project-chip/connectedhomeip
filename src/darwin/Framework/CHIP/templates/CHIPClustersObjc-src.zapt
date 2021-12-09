@@ -92,6 +92,8 @@ using namespace chip::app::Clusters;
     {{~#if isNullable}}Nullable{{/if~}}
     {{~#if (isStrEqual (asUpperCamelCase type) (asUpperCamelCase "vendor_id"))~}}
       VendorId
+    {{~else if isEnum~}}
+      {{asUpperCamelCase ../name}}Cluster{{asUpperCamelCase type}}
     {{~else~}}
       {{chipCallback.name}}
     {{~/if~}}

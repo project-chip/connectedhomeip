@@ -39,8 +39,8 @@ import builtins
 
 @unique
 class EventTimestampType(Enum):
-    SYSTEM = 1
-    EPOCH = 2
+    SYSTEM = 0
+    EPOCH = 1
 
 
 @unique
@@ -162,7 +162,7 @@ class EventPath:
         self.EventId = EventId
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.EventId}/{self.EventId}"
+        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}"
 
     def __hash__(self):
         return str(self).__hash__()
@@ -245,6 +245,7 @@ class ValueDecodeFailure:
     Reason: Exception = None
 
 
+@dataclass
 class EventReadResult(EventStatus):
     Data: Any = None
 
@@ -472,7 +473,7 @@ def _BuildEventIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
         if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Events') in str(subclass)):
+                if inspect.isclass(subclass) and (('Events' == objName)):
                     for eventName, event in inspect.getmembers(subclass):
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)

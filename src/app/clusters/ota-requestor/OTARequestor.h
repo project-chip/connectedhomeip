@@ -85,6 +85,8 @@ private:
         kStartBDX,
     };
 
+    struct QueryImageRequest;
+
     // TODO: the application should define this, along with initializing the BDXDownloader
 
     // This class is purely for delivering messages and sending outgoing messages to/from the BDXDownloader.
@@ -169,4 +171,5 @@ private:
 
     // Functions
     CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
+    CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & req);
 };

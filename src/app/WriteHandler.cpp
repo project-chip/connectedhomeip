@@ -79,22 +79,13 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatusIBs::Builder attributeStatuses;
-    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
-    err               = attributeStatuses.GetError();
-    SuccessOrExit(err);
-
+    VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
+    AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
+    ReturnErrorOnFailure(attributeStatusIBs.GetError());
     mWriteResponseBuilder.EndOfWriteResponseMessage();
-    err = mWriteResponseBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mMessageWriter.Finalize(&packet);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteHandler::SendWriteResponse()

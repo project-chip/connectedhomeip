@@ -92,7 +92,7 @@ using namespace chip::Credentials;
 // For some applications those does not implement IMDelegate, the DeviceControllerInteractionModelDelegate will dispatch the
 // response to IMDefaultResponseCallback CHIPClientCallbacks, for the applications those implemented IMDelegate, this function will
 // not be used.
-bool __attribute__((weak)) IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status)
+bool __attribute__((weak)) IMDefaultResponseCallback(const chip::app::CommandSender * commandObj, EmberAfStatus status)
 {
     return false;
 }
@@ -151,12 +151,15 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
         .exchangeMgr    = params.systemState->ExchangeMgr(),
         .idAllocator    = &mIDAllocator,
         .fabricInfo     = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex),
+        .clientPool     = &mCASEClientPool,
         .imDelegate     = params.systemState->IMDelegate(),
+        .mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Value(mMRPConfig),
     };
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
         .dnsCache          = &mDNSCache,
+        .devicePool        = &mDevicePool,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);

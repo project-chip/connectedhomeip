@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 
 /**
