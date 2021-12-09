@@ -59,6 +59,11 @@ public:
     virtual CHIP_ERROR Finalize() = 0;
 
     /**
+     * Called when the OTA image should be applied.
+     */
+    virtual CHIP_ERROR Apply() = 0;
+
+    /**
      * Called when the OTA image download process is incomplete or cannot continue. This may include but not limited to erasing
      * everything that has been written and releasing buffers. This must not be a blocking call.
      */
