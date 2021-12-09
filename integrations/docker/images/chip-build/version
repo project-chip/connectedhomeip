@@ -1,1 +1,1 @@
-0.5.36 Version bump reason: ESP32 update to newest 4.4 commit: e104dd7f27d2e73ab0e9b614dd7b9295099069bf
+0.5.37 Version bump reason: Linux ARM Cross compile requires toolset provided by base image
