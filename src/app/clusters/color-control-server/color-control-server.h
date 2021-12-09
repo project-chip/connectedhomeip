@@ -175,9 +175,8 @@ public:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
-    bool
-    moveColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
-                         const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
+    bool moveColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
+                              const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::DecodableType & commandData);
     bool
     moveToColorTempCommand(const chip::app::ConcreteCommandPath & commandPath,
                            const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::DecodableType & commandData);
