@@ -40,7 +40,7 @@ tests:
     #                 {
     #                     application: {
     #                          catalogVendorId: 123,
-    #                          applicationId: "applicationId"   
+    #                          applicationId: "applicationId"
     #                     },
     #                     endpoint: "endpoint"
     #                 }
@@ -49,14 +49,10 @@ tests:
       command: "LaunchApp"
       arguments:
           values:
-               - name: "data"
-                 value: "data"
-               - name: "application"
-                 value:
-                     {
-                         catalogVendorId: 123,
-                         applicationId: "applicationId"
-                     }
+              - name: "data"
+                value: "data"
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
       response:
           values:
               - name: "data"
@@ -68,12 +64,8 @@ tests:
       command: "StopApp"
       arguments:
           values:
-               - name: "application"
-                 value:
-                     {
-                         catalogVendorId: 123,
-                         applicationId: "applicationId"
-                     }
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
       response:
           values:
               - name: "data"
@@ -85,12 +77,8 @@ tests:
       command: "HideApp"
       arguments:
           values:
-               - name: "application"
-                 value:
-                     {
-                         catalogVendorId: 123,
-                         applicationId: "applicationId"
-                     }
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
       response:
           values:
               - name: "data"
