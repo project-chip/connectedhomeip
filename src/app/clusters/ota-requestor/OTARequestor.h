@@ -54,7 +54,7 @@ public:
     // The BDXDownloader instance should already have the ImageProcessingDelegate set.
     void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
 
-    // Application directs the Requestor to abort the download in progress. All the Requestor state (such 
+    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
     // as the QueryImageResponse content) is preserved
     void AbortImageUpdate();
 
@@ -62,14 +62,14 @@ public:
     // cleared, UploadState is reset to Idle
     void AbortAndResetState();
 
-    // Application notifies the Requestor on the user consent action, TRUE if consent is given, 
+    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
     // FALSE otherwise
     void OnUserConsent(bool result);
 
     // Application directs the Requestor to download the image using the suppiled parameter and without
     // issuing QueryImage
-    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters &bdxParameters) {/* NOT IMPLEMENTED YET */ 
-        return kTriggerSuccessful;} 
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters &bdxParameters) {/* NOT IMPLEMENTED YET */
+        return kTriggerSuccessful;}
 
 
     // Application interface declarations -- end

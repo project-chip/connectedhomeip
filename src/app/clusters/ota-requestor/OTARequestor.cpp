@@ -409,7 +409,7 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
 
 OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
- 
+
     if(mProviderNodeId != kUndefinedNodeId) {
         ConnectToProvider();
         return kTriggerSuccessful;

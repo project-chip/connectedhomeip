@@ -72,8 +72,8 @@ public:
     // to proceed, returning FALSE will abort the download process.
     virtual bool CheckImageDownloadAllowed() = 0;
 
-    // Application is directed to complete user consent: either return ImmediateYes/ImmediateNo 
-    // without blocking or return Requested and call OTARequestor::OnUserConsent() later. 
+    // Application is directed to complete user consent: either return ImmediateYes/ImmediateNo
+    // without blocking or return Requested and call OTARequestor::OnUserConsent() later.
     virtual UserConsentAction RequestUserConsent() = 0;
 
     // Notify the application that the download is complete and the image can be applied
@@ -81,7 +81,7 @@ public:
 
     // Optional methods, applications may choose to implement these
 
-    // This method informs the application of the BDX download parameters. This info can be used 
+    // This method informs the application of the BDX download parameters. This info can be used
     // later on for diecting the Requestor to resume an interrupted download
     virtual void PostBdxDownloadParameters(const BdxDownloadParameters &bdxParameters) {};
 
@@ -91,7 +91,7 @@ public:
     // Get Version of the last downloaded image, return CHIP_ERROR_NOT_FOUND if none exists
     virtual CHIP_ERROR GetLastDownloadedImageVersion(uint32_t & out_version) { return CHIP_ERROR_INCORRECT_STATE;}
 
-    // Notify application of a change in the UpdateState attribute 
+    // Notify application of a change in the UpdateState attribute
     virtual void NotifyUpdateStateChange(chip::UpdateStateEnum state) {};
 
 
