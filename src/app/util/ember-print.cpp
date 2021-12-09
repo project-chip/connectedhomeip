@@ -74,10 +74,13 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
             const uint16_t segmentLength  = chip::min(bytesPerBuffer, remainingBytes);
             const uint16_t segmentEnd     = static_cast<uint16_t>(index + segmentLength);
             const uint32_t outStringEnd   = segmentLength * perByteCharCount;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
             for (uint32_t dst_idx = 0; dst_idx < outStringEnd && index < segmentEnd; dst_idx += perByteCharCount, index++)
             {
                 snprintf(result + dst_idx, outStringEnd - dst_idx + 1, perByteFormatStr, buffer[index]);
             }
+#pragma clang diagnostic pop
             result[outStringEnd] = 0;
             emberAfPrint(category, "%s", result);
         }
