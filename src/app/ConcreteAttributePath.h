@@ -26,6 +26,9 @@ namespace app {
 
 /**
  * A representation of a concrete attribute path. This does not convey any list index specifiers.
+ *
+ * The expanded flag can be set to indicate that a concrete path was expanded from a wildcard
+ * or group path.
  */
 struct ConcreteAttributePath
 {
@@ -41,6 +44,7 @@ struct ConcreteAttributePath
     }
 
     EndpointId mEndpointId   = 0;
+    bool mExpanded           = false;
     ClusterId mClusterId     = 0;
     AttributeId mAttributeId = 0;
 };
