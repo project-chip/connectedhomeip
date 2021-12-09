@@ -40,8 +40,7 @@ struct ConcreteAttributePath
 
     bool operator==(const ConcreteAttributePath & other) const
     {
-        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId &&
-            mExpanded == other.mExpanded;
+        return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mAttributeId == other.mAttributeId;
     }
 
     EndpointId mEndpointId   = 0;
