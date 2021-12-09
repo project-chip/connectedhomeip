@@ -275,6 +275,8 @@ private:
                          TLV::TLVReader & apPayload) override;
     bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
+    bool HasActiveRead();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 

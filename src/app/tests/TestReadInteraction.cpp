@@ -1193,34 +1193,11 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams3.mMinIntervalFloorSeconds                  = 2;
     readPrepareParams3.mMaxIntervalCeilingSeconds                = 5;
 
-    printf("\nSend 4th subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+    printf("\nSend 4th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
 
     ReadClient readClient3;
     readClient3.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
     err = readClient3.SendRequest(readPrepareParams3);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    engine->GetReportingEngine().Run();
-    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-
-    delegate.mNumAttributeResponse = 0;
-    delegate.mGotReport            = false;
-    ReadPrepareParams readPrepareParams4(ctx.GetSessionBobToAlice());
-    chip::app::AttributePathParams attributePathParams4[1];
-    readPrepareParams4.mpAttributePathParamsList                 = attributePathParams4;
-    readPrepareParams4.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
-    readPrepareParams4.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
-    readPrepareParams4.mpAttributePathParamsList[0].mAttributeId = 1;
-    readPrepareParams4.mAttributePathParamsListSize              = 1;
-    readPrepareParams4.mMinIntervalFloorSeconds                  = 2;
-    readPrepareParams4.mMaxIntervalCeilingSeconds                = 5;
-
-    printf("\nSend 5th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
-
-    ReadClient readClient4;
-    readClient4.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
-    err = readClient4.SendRequest(readPrepareParams4);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, !delegate.mGotReport);

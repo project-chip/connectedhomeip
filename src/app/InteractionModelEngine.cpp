@@ -131,7 +131,6 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
                                                  ReadClient::Callback * aCallback)
 {
     *apReadClient = nullptr;
-
     for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
@@ -312,6 +311,15 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
                 readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
             }
         }
+    }
+
+    // Reserve the last ReadHandler for ReadInteraction
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe &&
+        ((CHIP_IM_MAX_NUM_READ_HANDLER - GetNumActiveReadHandlers()) == 1) && !HasActiveRead())
+    {
+        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+        return CHIP_NO_ERROR;
     }
 
     for (auto & readHandler : mReadHandlers)
@@ -726,6 +734,19 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     {
         StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
+}
+
+bool InteractionModelEngine::HasActiveRead()
+{
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsReadType())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app
