@@ -215,12 +215,6 @@ class ChipClusters:
                     "type": "str",
                     "reportable": True,
                 },
-                0x00000007: {
-                    "attributeName": "AllowedVendorList",
-                    "attributeId": 0x00000007,
-                    "type": "int",
-                    "reportable": True,
-                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,

@@ -31013,18 +31013,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationVersion
-namespace AllowedVendorList {
-struct TypeInfo
-{
-    using Type             = DataModel::List<const uint16_t>;
-    using DecodableType    = DataModel::DecodableList<uint16_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint16_t> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AllowedVendorList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AllowedVendorList
 namespace AttributeList {
 struct TypeInfo
 {
