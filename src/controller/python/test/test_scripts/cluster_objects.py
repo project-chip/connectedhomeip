@@ -21,6 +21,7 @@ import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction
 import chip.interaction_model
 import asyncio
+import time
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -220,45 +221,51 @@ class ClusterObjectTests:
         if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
+    async def TriggerAndWaitForEvents(cls, devCtrl, req):
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=Clusters.TestCluster.Commands.TestEmitTestEventRequest())
+
+        for i in range(0, 10):
+            print("Reading out events..")
+            res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
+            if (len(res) != 0):
+                break
+
+            time.sleep(1)
+
+        if (len(res) == 0):
+            raise AssertionError("Got no events back")
+
     @classmethod
     async def TestReadEventRequests(cls, devCtrl, expectEventsNum):
         logger.info("1: Reading Ex Cx Ex")
         req = [
             (1, Clusters.TestCluster.Events.TestEvent),
         ]
-        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
-        if (len(res['Events']) != expectEventsNum):
-            raise AssertionError(
-                f"Got back {len(res['Events'])} event items instead of {expectEventsNum}")
-        _AssumeEventsDecodeSuccess(res)
+
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
+
         logger.info("2: Reading Ex Cx E*")
         req = [
             (1, Clusters.TestCluster),
         ]
 
-        res = await devCtrl.ReadEvent(nodeid=NODE_ID, events=req)
-        if (len(res['Events']) != 0):
-            raise AssertionError(
-                f"Got back {len(res['Events'])} event items instead of 0")
-        _AssumeEventsDecodeSuccess(res)
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
 
         logger.info("3: Reading Ex C* E*")
         req = [
             1
         ]
-        if (len(res['Events']) != 0):
-            raise AssertionError(
-                f"Got back {len(res['Events'])} event items instead of 0")
-        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
 
         logger.info("4: Reading E* C* E*")
         req = [
             '*'
         ]
-        if (len(res['Events']) != 0):
-            raise AssertionError(
-                f"Got back {len(res['Events'])} event items instead of 0")
-        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        await cls.TriggerAndWaitForEvents(cls, devCtrl, req)
 
         # TODO: Add more wildcard test for IM events.
 

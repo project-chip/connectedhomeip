@@ -25,7 +25,7 @@ from typing import Tuple, Type, Union, List, Any, Callable, Dict, Set
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint64, c_uint32,  c_uint16, c_uint8, py_object, c_uint64
 from rich.pretty import pprint
 
-from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEventDescriptor
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEvent
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
@@ -176,7 +176,7 @@ class AttributePathWithListIndex(AttributePath):
 @dataclass
 class EventHeader:
     EndpointId: int = None
-    Event: ClusterEventDescriptor = None
+    Event: ClusterEvent = None
     EventNumber: int = None
     Priority: EventPriority = None
     Timestamp: int = None
@@ -218,7 +218,7 @@ class AttributeDescriptorWithEndpoint:
 @dataclass
 class EventDescriptorWithEndpoint:
     EndpointId: int
-    Event: ClusterEventDescriptor
+    Event: ClusterEvent
 
 
 @dataclass
@@ -413,6 +413,7 @@ class AttributeCache:
 class SubscriptionTransaction:
     def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
         self._onAttributeChangeCb = DefaultAttributeChangeCallback
+        self._onEventChangeCb = DefaultEventChangeCallback
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
@@ -433,7 +434,7 @@ class SubscriptionTransaction:
             return data[path.Path.EndpointId][path.ClusterType][path.AttributeType]
 
     def GetEvents(self):
-        return self._read_transaction.GetAllEventValues()
+        return self._readTransaction.GetAllEventValues()
 
     def SetAttributeUpdateCallback(self, callback: Callable[[TypedAttributePath, SubscriptionTransaction], None]):
         '''
@@ -442,9 +443,17 @@ class SubscriptionTransaction:
         if callback is not None:
             self._onAttributeChangeCb = callback
 
+    def SetEventUpdateCallback(self, callback: Callable[[EventReadResult, SubscriptionTransaction], None]):
+        if callback is not None:
+            self._onEventChangeCb = callback
+
     @property
     def OnAttributeChangeCb(self) -> Callable[[TypedAttributePath, SubscriptionTransaction], None]:
         return self._onAttributeChangeCb
+
+    @property
+    def OnEventChangeCb(self) -> Callable[[EventReadResult, SubscriptionTransaction], None]:
+        return self._onEventChangeCb
 
     def Shutdown(self):
         self._devCtrl.ZCLShutdownSubscription(self._subscriptionId)
@@ -465,6 +474,11 @@ def DefaultAttributeChangeCallback(path: TypedAttributePath, transaction: Subscr
     pprint(value, expand_all=True)
 
 
+def DefaultEventChangeCallback(data: EventReadResult, transaction: SubscriptionTransaction):
+    print("Received Event:")
+    pprint(data, expand_all=True)
+
+
 def _BuildEventIndex():
     ''' Build internal event index for locating the corresponding cluster object by path in the future.
     We do this because this operation will take a long time when there are lots of events, it takes about 300ms for a single query.
@@ -480,7 +494,7 @@ def _BuildEventIndex():
 
                             # Only match on classes that extend the ClusterEventescriptor class
                             matched = [
-                                value for value in base_classes if 'ClusterEventDescriptor' in str(value)]
+                                value for value in base_classes if 'ClusterEvent' in str(value)]
                             if (matched == []):
                                 continue
 
@@ -488,25 +502,21 @@ def _BuildEventIndex():
                                 'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
 
 
+class TransactionType(Enum):
+    READ_EVENTS = 1
+    READ_ATTRIBUTES = 2
+
+
 class AsyncReadTransaction:
-    def __init__(self, future: Future, eventLoop, devCtrl, returnClusterObject: bool):
+    def __init__(self, future: Future, eventLoop, devCtrl, transactionType: TransactionType, returnClusterObject: bool):
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
         self._events = []
         self._devCtrl = devCtrl
+        self._transactionType = transactionType
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet = set()
-
-        #
-        # We cannot post back async work onto the asyncio's event loop for subscriptions,
-        # since at that point, we've returned from the await ... and got a subscription object
-        # back, and the REPL's event loop is not running and capable of posting background work to.
-        #
-        # So instead, we'll directly call the callback on the originating thread and use locks to protect
-        # relevant critical sections.
-        #
-        self._resLock = threading.Lock()
 
     def GetAllEventValues(self):
         return self._events
@@ -526,9 +536,8 @@ class AsyncReadTransaction:
                 tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
                 attributeValue = tlvData
 
-            with self._resLock:
-                self._cache.UpdateTLV(path, attributeValue)
-                self._changedPathSet.add(path)
+            self._cache.UpdateTLV(path, attributeValue)
+            self._changedPathSet.add(path)
 
         except Exception as ex:
             logging.exception(ex)
@@ -546,7 +555,7 @@ class AsyncReadTransaction:
                     tlvData, LookupError("event schema not found"))
             else:
                 try:
-                    eventValue = eventType(eventType.FromTLV(data))
+                    eventValue = eventType.FromTLV(data)
                 except Exception as ex:
                     logging.error(
                         f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
@@ -560,9 +569,14 @@ class AsyncReadTransaction:
                     if (builtins.enableDebugMode):
                         raise
 
-            with self._resLock:
-                self._events.append[EventReadResult(
-                    Header=header, Data=eventValue)]
+            eventResult = EventReadResult(
+                Header=header, Data=eventValue, Status=chip.interaction_model.Status.Success)
+            self._events.append(eventResult)
+
+            if (self._subscription_handler is not None):
+                self._subscription_handler.OnEventChangeCb(
+                    eventResult, self._subscription_handler)
+
         except Exception as ex:
             logging.exception(ex)
 
@@ -604,7 +618,10 @@ class AsyncReadTransaction:
 
     def _handleDone(self):
         if not self._future.done():
-            self._future.set_result(self._cache.attributeCache)
+            if (self._transactionType == TransactionType.READ_EVENTS):
+                self._future.set_result(self._events)
+            else:
+                self._future.set_result(self._cache.attributeCache)
 
     def handleDone(self):
         self._event_loop.call_soon_threadsafe(self._handleDone)
@@ -760,7 +777,7 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
 def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], returnClusterObject: bool = True, subscriptionParameters: SubscriptionParameters = None) -> int:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(
-        future, eventLoop, devCtrl, returnClusterObject)
+        future, eventLoop, devCtrl, TransactionType.READ_ATTRIBUTES, returnClusterObject)
 
     readargs = []
     for attr in attributes:
@@ -793,7 +810,8 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
 
 def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], subscriptionParameters: SubscriptionParameters = None) -> int:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncReadTransaction(future, eventLoop, devCtrl, False)
+    transaction = AsyncReadTransaction(
+        future, eventLoop, devCtrl, TransactionType.READ_EVENTS, False)
 
     readargs = []
     for attr in events:

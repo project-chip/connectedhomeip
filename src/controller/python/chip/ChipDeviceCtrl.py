@@ -514,11 +514,11 @@ class ChipDeviceController(object):
         # Wildcard endpoint, Cluster id present
         typing.Tuple[typing.Type[ClusterObjects.Cluster]],
         # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEventDescriptor]],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent]],
         # Wildcard event id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEventDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent]]
     ]], reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of events from a target node
@@ -561,7 +561,7 @@ class ChipDeviceController(object):
                     endpoint = v
                 elif issubclass(v, ClusterObjects.Cluster):
                     cluster = v
-                elif issubclass(v, ClusterObjects.ClusterEventDescriptor):
+                elif issubclass(v, ClusterObjects.ClusterEvent):
                     event = v
                 else:
                     raise ValueError("Unsupported Event Path")
@@ -570,7 +570,7 @@ class ChipDeviceController(object):
                 endpoint = v[0]
                 if issubclass(v[1], ClusterObjects.Cluster):
                     cluster = v[1]
-                elif issubclass(v[1], ClusterAttribute.ClusterEventDescriptor):
+                elif issubclass(v[1], ClusterAttribute.ClusterEvent):
                     event = v[1]
                 else:
                     raise ValueError("Unsupported Attribute Path")
