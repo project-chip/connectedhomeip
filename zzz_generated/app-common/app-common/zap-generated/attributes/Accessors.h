@@ -5153,17 +5153,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace TvChannel {
 namespace Attributes {
 
-<<<<<<< HEAD
-namespace TvChannelLineup {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace TvChannelLineup
-
-namespace CurrentTvChannel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace CurrentTvChannel
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -5174,8 +5163,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
-=======
->>>>>>> a18a0ccc6 (Run zap tool successfully)
 } // namespace Attributes
 } // namespace TvChannel
 
@@ -5302,7 +5289,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ContentLauncher {
 namespace Attributes {
 
-<<<<<<< HEAD
+namespace SupportedStreamingProtocols {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace SupportedStreamingProtocols
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -5312,12 +5303,6 @@ namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
-=======
-namespace SupportedStreamingProtocols {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace SupportedStreamingProtocols
->>>>>>> a18a0ccc6 (Run zap tool successfully)
 
 } // namespace Attributes
 } // namespace ContentLauncher
@@ -5346,17 +5331,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace ApplicationLauncher {
 namespace Attributes {
 
-<<<<<<< HEAD
-namespace CatalogVendorId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CatalogVendorId
-
-namespace ApplicationId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace ApplicationId
-
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -5367,8 +5341,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
-=======
->>>>>>> a18a0ccc6 (Run zap tool successfully)
 } // namespace Attributes
 } // namespace ApplicationLauncher
 
@@ -5400,7 +5372,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace ApplicationStatus
 
-<<<<<<< HEAD
+namespace ApplicationVersion {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace ApplicationVersion
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -5410,12 +5386,6 @@ namespace ClusterRevision {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
-=======
-namespace ApplicationVersion {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace ApplicationVersion
->>>>>>> a18a0ccc6 (Run zap tool successfully)
 
 } // namespace Attributes
 } // namespace ApplicationBasic
