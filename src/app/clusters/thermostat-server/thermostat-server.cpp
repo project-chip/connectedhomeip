@@ -85,8 +85,9 @@ void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
     // Feature map override, for testing only:
     uint32_t featureMap = FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO;
 
-    emberAfWriteServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
-                                (uint8_t *) &featureMap, sizeof(featureMap));
+    emberAfWriteServerAttribute(endpoint, chip::app::Clusters::Thermostat::Id,
+                                chip::app::Clusters::Globals::Attributes::FeatureMap::Id, (uint8_t *) &featureMap,
+                                sizeof(featureMap));
 }
 
 using imcode = Protocols::InteractionModel::Status;
@@ -120,8 +121,9 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     int16_t UnoccupiedCoolingSetpoint;
     int16_t UnoccupiedHeatingSetpoint;
 
-    emberAfReadServerAttribute(endpoint, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+    emberAfReadServerAttribute(endpoint, chip::app::Clusters::Thermostat::Id,
+                               chip::app::Clusters::Globals::Attributes::FeatureMap::Id, (uint8_t *) &FeatureMap,
+                               sizeof(FeatureMap));
 
     if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
     {
@@ -556,8 +558,9 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     int8_t DeadBand                          = 0;
     uint32_t FeatureMap                      = 0;
 
-    emberAfReadServerAttribute(aEndpointId, ZCL_THERMOSTAT_CLUSTER_ID, chip::app::Clusters::Globals::Attributes::FeatureMap::Id,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+    emberAfReadServerAttribute(aEndpointId, chip::app::Clusters::Thermostat::Id,
+                               chip::app::Clusters::Globals::Attributes::FeatureMap::Id, (uint8_t *) &FeatureMap,
+                               sizeof(FeatureMap));
 
     if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
     {
