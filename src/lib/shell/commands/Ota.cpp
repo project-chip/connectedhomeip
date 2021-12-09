@@ -15,12 +15,6 @@
  *    limitations under the License.
  */
 
-#include <app/CASEClientPool.h>
-#include <app/OperationalDeviceProxyPool.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
-#include <app/server/Server.h>
-#include <lib/dnssd/Resolver.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
@@ -28,12 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 #include <platform/OTARequestorDriver.h>
-
-#if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
-#include <platform/nrfconnect/OTAImageProcessorImpl.h>
-#elif CHIP_DEVICE_LAYER_TARGET_ESP32
-#include <platform/esp32/OTAImageProcessorImpl.h>
-#endif
+#include <platform/OTARequestorInterface.h>
 
 using namespace chip::DeviceLayer;
 
@@ -41,56 +30,33 @@ namespace chip {
 namespace Shell {
 namespace {
 
-class DummyOTARequestorDriver : public OTARequestorDriver
-{
-    bool CheckImageDownloadAllowed() override { return true; }
-    void ImageDownloadComplete() override {}
-} sOTARequestorDriver;
-
-constexpr size_t kActiveSessions = 1;
-DeviceLayer::OTAImageProcessorImpl sOTAImageProcessor;
-BDXDownloader sBDXDownloader;
-CASEClientPool<kActiveSessions> sCASEClientPool;
-OperationalDeviceProxyPool<kActiveSessions> sDevicePool;
-OTARequestor sOTARequestor;
 Shell::Engine sSubShell;
-
-void InitRequestor()
-{
-    Server::GetInstance().SetCASEClientPool(&sCASEClientPool);
-    Server::GetInstance().SetDevicePool(&sDevicePool);
-    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
-    sOTARequestor.SetOtaRequestorDriver(&sOTARequestorDriver);
-    sOTARequestor.SetBDXDownloader(&sBDXDownloader);
-    sOTARequestor.SetServerInstance(&Server::GetInstance());
-    SetRequestorInstance(&sOTARequestor);
-}
 
 CHIP_ERROR QueryImageHandler(int argc, char ** argv)
 {
+    VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
     const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
     const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
     const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
 
-    InitRequestor();
-    sOTARequestor.TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
-    PlatformMgr().ScheduleWork([](intptr_t) { sOTARequestor.TriggerImmediateQuery(); });
+    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->TriggerImmediateQuery(); });
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ApplyImageHandler(int argc, char ** argv)
 {
+    VerifyOrReturnError(GetRequestorInstance() != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(argc == 3, CHIP_ERROR_INVALID_ARGUMENT);
 
     const FabricIndex fabricIndex       = static_cast<FabricIndex>(strtoul(argv[0], nullptr, 10));
     const NodeId providerNodeId         = static_cast<NodeId>(strtoull(argv[1], nullptr, 10));
     const EndpointId providerEndpointId = static_cast<EndpointId>(strtoul(argv[2], nullptr, 10));
 
-    InitRequestor();
-    sOTARequestor.TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
-    PlatformMgr().ScheduleWork([](intptr_t) { sOTARequestor.ApplyUpdate(); });
+    GetRequestorInstance()->TestModeSetProviderParameters(providerNodeId, fabricIndex, providerEndpointId);
+    PlatformMgr().ScheduleWork([](intptr_t) { GetRequestorInstance()->ApplyUpdate(); });
     return CHIP_NO_ERROR;
 }
 
