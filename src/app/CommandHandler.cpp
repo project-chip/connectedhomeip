@@ -255,7 +255,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
-            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            if (err != CHIP_ERROR_ACCESS_DENIED)
+            {
+                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+            }
             // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
             return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
         }

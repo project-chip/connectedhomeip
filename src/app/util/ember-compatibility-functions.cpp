@@ -367,6 +367,29 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
+        bool pathWasExpanded               = false;                    // TODO: get actual expanded flag
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            if (pathWasExpanded)
+            {
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+                ReturnErrorOnFailure(aAttributeReports.GetError());
+                return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+            }
+        }
+    }
+
     // Value encoder will encode the whole AttributeReport, including the path, value and the version.
     // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
@@ -381,14 +404,11 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         }
     }
 
-    TLV::TLVWriter backupBeforeReport;
-    aAttributeReports.Checkpoint(backupBeforeReport);
-
     AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
 
-    TLV::TLVWriter backupStartOfReport;
-    attributeReport.Checkpoint(backupStartOfReport);
+    TLV::TLVWriter backup;
+    attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
@@ -417,29 +437,6 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
     if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
     {
-        {
-            Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
-            Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
-            Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
-            bool pathWasExpanded               = false;                    // TODO: get actual expanded flag
-            CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
-            err                                = CHIP_NO_ERROR; // TODO: remove override
-            if (err != CHIP_NO_ERROR)
-            {
-                ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
-                if (pathWasExpanded)
-                {
-                    aAttributeReports.Rollback(backupBeforeReport);
-                    return CHIP_NO_ERROR;
-                }
-                else
-                {
-                    return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess,
-                                             &backupStartOfReport);
-                }
-            }
-        }
-
         EmberAfAttributeType attributeType = attributeMetadata->attributeType;
         bool isNullable                    = attributeMetadata->IsNullable();
         TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
@@ -660,7 +657,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         return SendSuccessStatus(attributeReport, attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, attributeReport, imStatus, &backupStartOfReport);
+    return SendFailureStatus(aPath, attributeReport, imStatus, &backup);
 }
 
 namespace {
