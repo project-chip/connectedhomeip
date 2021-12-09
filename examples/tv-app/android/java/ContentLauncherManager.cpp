@@ -59,7 +59,7 @@ public:
         {
             return ContentLauncherMgr().GetAcceptsHeader(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
+        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id)
         {
             return ContentLauncherMgr().GetSupportedStreamingTypes(aEncoder);
         }
