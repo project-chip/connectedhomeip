@@ -27,7 +27,7 @@ const path              = require('path');
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
-const { asBlocks }                                                   = require('./ClustersHelper.js');
+const { asBlocks, initClusters }                                     = require('./ClustersHelper.js');
 
 const kIdentityName           = 'identity';
 const kClusterName            = 'cluster';
@@ -433,6 +433,7 @@ function chip_tests_pics(options)
 
 async function chip_tests(list, options)
 {
+  initClusters.call(this);
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
   let tests   = names.map(item => parse(item));

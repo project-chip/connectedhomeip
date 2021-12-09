@@ -477,6 +477,11 @@ function asPromise(promise)
   const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
   return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
 }
+function initClusters()
+{
+  const fn = pkgId => Clusters.init(this, pkgId);
+  templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
+}
 
 //
 // Helpers: Get all clusters/commands/responses/attributes.
@@ -601,6 +606,7 @@ Clusters.getServerAttributes = function(name)
 //
 // Module exports
 //
-exports.Clusters  = Clusters;
-exports.asBlocks  = asBlocks;
-exports.asPromise = asPromise;
+exports.Clusters     = Clusters;
+exports.asBlocks     = asBlocks;
+exports.asPromise    = asPromise;
+exports.initClusters = initClusters
