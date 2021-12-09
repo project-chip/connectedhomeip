@@ -948,8 +948,6 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
@@ -965,30 +963,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
         self->mEstablishedHandler = nil;
     }
 }
-=======
-void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
-{
-    NSArray * _Nonnull objCValue;
-    auto * array_0 = [NSMutableArray new];
-    auto iter_0 = value.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
-        [array_0 addObject:newElement_0];
-    }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
-    }
-    objCValue = array_0;
-    DispatchSuccess(context, objCValue);
-};
->>>>>>> 359911f36 (Run zap tool successfully)
 
-=======
->>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -1580,7 +1555,6 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge *>(context);
@@ -1597,44 +1571,6 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
-{
-    NSArray * _Nonnull objCValue;
-    auto * array_0 = [NSMutableArray new];
-    auto iter_0 = value.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-        [array_0 addObject:newElement_0];
-    }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
-    }
-    objCValue = array_0;
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 void CHIPContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3628,7 +3564,6 @@ void CHIPSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
 void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge *>(context);
@@ -3645,10 +3580,7 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-=======
 void CHIPTvChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
->>>>>>> 359911f36 (Run zap tool successfully)
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -3679,9 +3611,9 @@ void CHIPTvChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * con
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11271,7 +11203,6 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-<<<<<<< HEAD
 void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
@@ -11289,63 +11220,6 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubsc
     }
 }
 
-void CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AudioOutput::AudioOutputType value)
 {
