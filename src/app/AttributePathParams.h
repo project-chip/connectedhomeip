@@ -33,7 +33,7 @@ struct AttributePathParams
     //
     // TODO: (#11420) This class is overlapped with ClusterInfo class, need to do a clean up.
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
-        AttributePathParams(aEndpointId, aClusterId, ClusterInfo::kInvalidAttributeId, kInvalidListIndex)
+        AttributePathParams(aEndpointId, aClusterId, kInvalidAttributeId, kInvalidListIndex)
     {}
 
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
@@ -61,13 +61,13 @@ struct AttributePathParams
     bool IsValidAttributePath() const { return HasWildcardListIndex() || !HasWildcardAttributeId(); }
 
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
-    inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
-    inline bool HasWildcardAttributeId() const { return mAttributeId == ClusterInfo::kInvalidAttributeId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == kInvalidClusterId; }
+    inline bool HasWildcardAttributeId() const { return mAttributeId == kInvalidAttributeId; }
     inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
 
     EndpointId mEndpointId   = kInvalidEndpointId;
-    ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
-    AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
+    ClusterId mClusterId     = kInvalidClusterId;
+    AttributeId mAttributeId = kInvalidAttributeId;
     ListIndex mListIndex     = kInvalidListIndex;
 };
 } // namespace app

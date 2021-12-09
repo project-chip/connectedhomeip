@@ -36,6 +36,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/KeyValueStoreManager.h>
 
+#include "matter_shell.h"
 #include <AppConfig.h>
 #include <app/server/Server.h>
 #include <init_efrPlatform.h>
@@ -63,13 +64,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using chip::Shell::Engine;
 
-#define SHELL_TASK_STACK_SIZE 8192
-#define SHELL_TASK_PRIORITY 3
-static TaskHandle_t sShellTaskHandle;
-#define APP_TASK_STACK_SIZE (1536)
-static StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
-static StaticTask_t appTaskStruct;
-
 // ================================================================================
 // Supporting functions
 // ================================================================================
@@ -87,24 +81,12 @@ void appError(CHIP_ERROR error)
     appError(static_cast<int>(error.AsInteger()));
 }
 
-extern "C" unsigned int sleep(unsigned int seconds)
-{
-    const TickType_t xDelay = 1000 * seconds / portTICK_PERIOD_MS;
-    vTaskDelay(xDelay);
-    return 0;
-}
-
 extern "C" void vApplicationIdleHook(void)
 {
     // FreeRTOS Idle callback
 
     // Check CHIP Config nvm3 and repack flash if necessary.
     Internal::EFR32Config::RepackNvm3Flash();
-}
-
-static void shell_task(void * args)
-{
-    Engine::Root().RunMainLoop();
 }
 
 // ================================================================================
@@ -174,19 +156,6 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-    int status = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    assert(status == 0);
-
-    cmd_misc_init();
-    cmd_otcli_init();
-    cmd_ping_init();
-    cmd_send_init();
-
-    sShellTaskHandle = xTaskCreateStatic(shell_task, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
-    if (!sShellTaskHandle)
-    {
-        EFR32_LOG("MEMORY ERROR!!!");
-    }
-
+    chip::startShellTask();
     sl_system_kernel_start();
 }

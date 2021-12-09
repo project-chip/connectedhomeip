@@ -19,6 +19,8 @@
 #include "BDXDownloader.h"
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h> /* TODO:(#12520) remove */
@@ -210,6 +212,65 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     default:
         ChipLogError(BDX, "Unexpected BDX event: %u", static_cast<uint16_t>(outEvent.EventType));
         break;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+// TODO: Add unit tests for parsing BDX URI
+CHIP_ERROR BDXDownloader::ParseBdxUri(CharSpan uri, NodeId & nodeId, MutableCharSpan fileDesignator)
+{
+    // Check against minimum length of a valid BDX URI
+    if (uri.size() < kValidBdxUriMinLen)
+    {
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    }
+
+    uint8_t readValue[kUriMaxLen];
+    Encoding::LittleEndian::Reader uriReader(reinterpret_cast<const uint8_t *>(uri.data()), uri.size());
+
+    // Check the scheme field matches the BDX prefix
+    memset(readValue, 0, sizeof(readValue));
+    ReturnErrorOnFailure(uriReader.ReadBytes(readValue, sizeof(bdxPrefix)).StatusCode());
+    ByteSpan expectedScheme(bdxPrefix, sizeof(bdxPrefix));
+    ByteSpan actualScheme(readValue, sizeof(bdxPrefix));
+    if (!expectedScheme.data_equal(actualScheme))
+    {
+        return CHIP_ERROR_INVALID_SCHEME_PREFIX;
+    }
+
+    // Extract the node ID from the authority field
+    memset(readValue, 0, sizeof(readValue));
+    ReturnErrorOnFailure(uriReader.ReadBytes(readValue, kNodeIdHexStringLen).StatusCode());
+    uint8_t buffer[kNodeIdHexStringLen];
+    if (Encoding::HexToBytes(reinterpret_cast<const char *>(readValue), kNodeIdHexStringLen, buffer, kNodeIdHexStringLen) == 0)
+    {
+        return CHIP_ERROR_INVALID_DESTINATION_NODE_ID;
+    }
+    nodeId = Encoding::BigEndian::Get64(buffer);
+    if (!IsOperationalNodeId(nodeId))
+    {
+        return CHIP_ERROR_INVALID_DESTINATION_NODE_ID;
+    }
+
+    // Verify the separator between authority and path fields
+    memset(readValue, 0, sizeof(readValue));
+    ReturnErrorOnFailure(uriReader.ReadBytes(readValue, sizeof(bdxSeparator)).StatusCode());
+    ByteSpan expectedSeparator(bdxSeparator, sizeof(bdxSeparator));
+    ByteSpan actualSeparator(readValue, sizeof(bdxSeparator));
+    if (!expectedSeparator.data_equal(actualSeparator))
+    {
+        return CHIP_ERROR_MISSING_URI_SEPARATOR;
+    }
+
+    // Extract file designator from the path field
+    size_t fileDesignatorLength = uriReader.Remaining();
+    memset(readValue, 0, sizeof(readValue));
+    ReturnErrorOnFailure(uriReader.ReadBytes(readValue, fileDesignatorLength).StatusCode());
+    size_t written = static_cast<size_t>(snprintf(fileDesignator.data(), fileDesignator.size(), "%s", readValue));
+    if (written != fileDesignatorLength)
+    {
+        return CHIP_ERROR_INTERNAL;
     }
 
     return CHIP_NO_ERROR;

@@ -102,7 +102,7 @@ CHIP_ERROR DeviceProxy::SendSubscribeAttributeRequest(app::AttributePathParams a
     params.mMaxIntervalCeilingSeconds   = mMaxIntervalCeilingSeconds;
     params.mKeepSubscriptions           = false;
 
-    CHIP_ERROR err = readClient->SendSubscribeRequest(params);
+    CHIP_ERROR err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR)
     {
         GetInteractionModelDelegate()->FreeAttributePathParam(reinterpret_cast<uint64_t>(readClient));

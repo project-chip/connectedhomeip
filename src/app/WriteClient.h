@@ -98,7 +98,7 @@ public:
          * This function will:
          *      - Always be called exactly *once* for a given WriteClient instance.
          *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendWriteRequest as been made.
+         *      - Only be called after a successful call to SendWriteRequest has been made.
          *
          * @param[in] apWriteClient The write client object of the terminated write transaction.
          */

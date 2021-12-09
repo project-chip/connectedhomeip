@@ -116,6 +116,14 @@ public:
     virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
     virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
     virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
+    virtual CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize)                        = 0;
+    virtual CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize)                = 0;
+    virtual CHIP_ERROR GetPartNumber(char * buf, size_t bufSize)                       = 0;
+    virtual CHIP_ERROR GetProductURL(char * buf, size_t bufSize)                       = 0;
+    virtual CHIP_ERROR GetProductLabel(char * buf, size_t bufSize)                     = 0;
+    virtual CHIP_ERROR GetLocalConfigDisabled(bool & disabled)                         = 0;
+    virtual CHIP_ERROR GetReachable(bool & reachable)                                  = 0;
+    virtual CHIP_ERROR GetUniqueId(char * buf, size_t bufSize)                         = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

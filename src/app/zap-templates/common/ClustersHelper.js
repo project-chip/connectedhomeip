@@ -164,12 +164,6 @@ function asChipCallback(item)
     return { name : 'List', type : null };
   }
 
-  if (item.isEnum) {
-    // Unsupported or now, until we figure out what to do for callbacks for
-    // strongly typed enums.
-    return { name : 'Unsupported', type : null };
-  }
-
   const basicType = ChipTypesHelper.asBasicType(item.chipType);
   switch (basicType) {
   case 'int8_t':

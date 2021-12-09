@@ -127,6 +127,17 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
 bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord);
 
+// Check if a cluster is implemented or not. If yes, the cluster is returned.
+// If the cluster is not manufacturerSpecific [ClusterId < FC00] then
+// manufacturerCode argument is ignored otherwise checked.
+//
+// mask = 0 -> find either client or server
+// mask = CLUSTER_MASK_CLIENT -> find client
+// mask = CLUSTER_MASK_SERVER -> find server
+//
+// If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
+// within the set of clusters that match the mask criteria.
+//
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, chip::ClusterId clusterId,
                                                      EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index = nullptr);
 

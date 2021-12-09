@@ -15,14 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "uart.h"
 #include "AppConfig.h"
+#include "matter_shell.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "assert.h"
 #include "em_core.h"
 #include "em_usart.h"
 #include "sl_board_control.h"
 #include "sl_uartdrv_instances.h"
 #include "sl_uartdrv_usart_vcom_config.h"
+#include "uart.h"
 #include "uartdrv.h"
 #include <stddef.h>
 #include <string.h>
@@ -192,6 +197,9 @@ void uartConsoleInit(void)
 
 void USART_IRQHandler(void)
 {
+#ifdef ENABLE_CHIP_SHELL
+    chip::NotifyShellProcessFromISR();
+#endif
 #ifndef PW_RPC_ENABLED
     otSysEventSignalPending();
 #endif
@@ -212,6 +220,10 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
     }
 
     UARTDRV_Receive(sl_uartdrv_usart_vcom_handle, data, transferCount, UART_rx_callback);
+
+#ifdef ENABLE_CHIP_SHELL
+    chip::NotifyShellProcessFromISR();
+#endif
 #ifndef PW_RPC_ENABLED
     otSysEventSignalPending();
 #endif
@@ -267,3 +279,7 @@ int16_t uartConsoleRead(char * Buf, uint16_t NbBytesToRead)
 
     return (int16_t) RetrieveFromFifo(&sReceiveFifo, (uint8_t *) Buf, NbBytesToRead);
 }
+
+#ifdef __cplusplus
+}
+#endif

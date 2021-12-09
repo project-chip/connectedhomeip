@@ -28,7 +28,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
     EmberAfStatus status;
-    OTARequestorInterface * requestor = GetRequestorInstance();
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
 
     if (requestor != nullptr)
     {

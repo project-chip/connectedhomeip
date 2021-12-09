@@ -35,11 +35,11 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
         // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
         if (nodeIDWasResolved)
         {
-            session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId, resolutionData);
+            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, resolutionData);
         }
         else
         {
-            session = mActiveSessions.CreateObject(mConfig.sessionInitParams, peerId);
+            session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
         }
 
         if (session == nullptr)
@@ -53,7 +53,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure);
+    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
     if (err != CHIP_NO_ERROR)
     {
         ReleaseSession(session);
@@ -69,8 +69,8 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
 {
-    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                                     Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
+                                              Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -120,39 +120,19 @@ void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
 
 OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)
 {
-    OperationalDeviceProxy * foundSession = nullptr;
-    mActiveSessions.ForEachActiveObject([&](auto * activeSession) {
-        if (activeSession->MatchesSession(session))
-        {
-            foundSession = activeSession;
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-
-    return foundSession;
+    return mConfig.devicePool->FindDevice(session);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindExistingSession(NodeId id)
 {
-    OperationalDeviceProxy * foundSession = nullptr;
-    mActiveSessions.ForEachActiveObject([&](auto * activeSession) {
-        if (activeSession->GetDeviceId() == id)
-        {
-            foundSession = activeSession;
-            return Loop::Break;
-        }
-        return Loop::Continue;
-    });
-
-    return foundSession;
+    return mConfig.devicePool->FindDevice(id);
 }
 
 void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
 {
     if (session != nullptr)
     {
-        mActiveSessions.ReleaseObject(session);
+        mConfig.devicePool->Release(session);
     }
 }
 
