@@ -4464,6 +4464,142 @@ CHIP_ERROR DoorLockCluster::ReportAttributeActuatorEnabled(Callback::Cancelable 
                                      BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
+CHIP_ERROR DoorLockCluster::SubscribeAttributeDoorState(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                        uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::DoorState::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeDoorState(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::DoorState::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeLanguage(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                       uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::Language::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeLanguage(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::Language::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeAutoRelockTime(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::AutoRelockTime::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeAutoRelockTime(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::AutoRelockTime::Id, onReportCallback,
+                                     BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeSoundVolume(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                          uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::SoundVolume::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeSoundVolume(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::SoundVolume::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeOperatingMode(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                            uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::OperatingMode::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeOperatingMode(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::OperatingMode::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeEnableOneTouchLocking(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                    uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::EnableOneTouchLocking::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeEnableOneTouchLocking(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::EnableOneTouchLocking::Id, onReportCallback,
+                                     BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeEnablePrivacyModeButton(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback,
+                                                                      uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::EnablePrivacyModeButton::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeEnablePrivacyModeButton(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::EnablePrivacyModeButton::Id, onReportCallback,
+                                     BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR DoorLockCluster::SubscribeAttributeWrongCodeEntryLimit(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = DoorLock::Attributes::WrongCodeEntryLimit::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR DoorLockCluster::ReportAttributeWrongCodeEntryLimit(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(DoorLock::Attributes::WrongCodeEntryLimit::Id, onReportCallback,
+                                     BasicAttributeFilter<Int8uAttributeCallback>);
+}
+
 CHIP_ERROR DoorLockCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                               uint16_t maxInterval)

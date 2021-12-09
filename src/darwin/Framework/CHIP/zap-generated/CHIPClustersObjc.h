@@ -1266,6 +1266,93 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeActuatorEnabledWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeDoorStateWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeDoorStateWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                                   responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeDoorStateWithResponseHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNumberOfTotalUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeNumberOfPINUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeMinPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLanguageWithCompletionHandler:(void (^)(
+                                                       NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeLanguageWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                                  responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeLanguageWithResponseHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeAutoRelockTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeAutoRelockTimeWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeAutoRelockTimeWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeSoundVolumeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeSoundVolumeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeSoundVolumeWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeOperatingModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeOperatingModeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeOperatingModeWithResponseHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeSupportedOperatingModesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeEnableOneTouchLockingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnableOneTouchLockingWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeEnablePrivacyModeButtonWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+- (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                                 responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeEnablePrivacyModeButtonWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeWrongCodeEntryLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeWrongCodeEntryLimitWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 

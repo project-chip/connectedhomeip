@@ -15169,6 +15169,19 @@ public:
 | * LockState                                                         | 0x0000 |
 | * LockType                                                          | 0x0001 |
 | * ActuatorEnabled                                                   | 0x0002 |
+| * DoorState                                                         | 0x0003 |
+| * NumberOfTotalUsersSupported                                       | 0x0011 |
+| * NumberOfPINUsersSupported                                         | 0x0012 |
+| * MaxPINCodeLength                                                  | 0x0017 |
+| * MinPINCodeLength                                                  | 0x0018 |
+| * Language                                                          | 0x0021 |
+| * AutoRelockTime                                                    | 0x0023 |
+| * SoundVolume                                                       | 0x0024 |
+| * OperatingMode                                                     | 0x0025 |
+| * SupportedOperatingModes                                           | 0x0026 |
+| * EnableOneTouchLocking                                             | 0x0029 |
+| * EnablePrivacyModeButton                                           | 0x002B |
+| * WrongCodeEntryLimit                                               | 0x0030 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -15623,6 +15636,998 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute DoorState
+ */
+class ReadDoorLockDoorState : public ModelCommand
+{
+public:
+    ReadDoorLockDoorState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "door-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockDoorState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::DoorState::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.DoorState response", value);
+    }
+};
+
+class ReportDoorLockDoorState : public ModelCommand
+{
+public:
+    ReportDoorLockDoorState() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "door-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockDoorState()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeDoorState(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeDoorState(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NumberOfTotalUsersSupported
+ */
+class ReadDoorLockNumberOfTotalUsersSupported : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfTotalUsersSupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-total-users-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfTotalUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfTotalUsersSupported response", value);
+    }
+};
+
+/*
+ * Attribute NumberOfPINUsersSupported
+ */
+class ReadDoorLockNumberOfPINUsersSupported : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfPINUsersSupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-pinusers-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfPINUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfPINUsersSupported response", value);
+    }
+};
+
+/*
+ * Attribute MaxPINCodeLength
+ */
+class ReadDoorLockMaxPINCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMaxPINCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-pincode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMaxPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.MaxPINCodeLength response", value);
+    }
+};
+
+/*
+ * Attribute MinPINCodeLength
+ */
+class ReadDoorLockMinPINCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMinPINCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-pincode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMinPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.MinPINCodeLength response", value);
+    }
+};
+
+/*
+ * Attribute Language
+ */
+class ReadDoorLockLanguage : public ModelCommand
+{
+public:
+    ReadDoorLockLanguage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "language");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockLanguage() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.Language response", value);
+    }
+};
+
+class WriteDoorLockLanguage : public ModelCommand
+{
+public:
+    WriteDoorLockLanguage() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "language");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockLanguage() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+class ReportDoorLockLanguage : public ModelCommand
+{
+public:
+    ReportDoorLockLanguage() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "language");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockLanguage()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeLanguage(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeLanguage(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AutoRelockTime
+ */
+class ReadDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    ReadDoorLockAutoRelockTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockAutoRelockTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.AutoRelockTime response", value);
+    }
+};
+
+class WriteDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    WriteDoorLockAutoRelockTime() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockAutoRelockTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class ReportDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    ReportDoorLockAutoRelockTime() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockAutoRelockTime()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeAutoRelockTime(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeAutoRelockTime(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SoundVolume
+ */
+class ReadDoorLockSoundVolume : public ModelCommand
+{
+public:
+    ReadDoorLockSoundVolume() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "sound-volume");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockSoundVolume() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.SoundVolume response", value);
+    }
+};
+
+class WriteDoorLockSoundVolume : public ModelCommand
+{
+public:
+    WriteDoorLockSoundVolume() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "sound-volume");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockSoundVolume() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class ReportDoorLockSoundVolume : public ModelCommand
+{
+public:
+    ReportDoorLockSoundVolume() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "sound-volume");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockSoundVolume()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeSoundVolume(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeSoundVolume(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute OperatingMode
+ */
+class ReadDoorLockOperatingMode : public ModelCommand
+{
+public:
+    ReadDoorLockOperatingMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "operating-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockOperatingMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.OperatingMode response", value);
+    }
+};
+
+class WriteDoorLockOperatingMode : public ModelCommand
+{
+public:
+    WriteDoorLockOperatingMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "operating-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockOperatingMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::DlOperatingMode mValue;
+};
+
+class ReportDoorLockOperatingMode : public ModelCommand
+{
+public:
+    ReportDoorLockOperatingMode() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "operating-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockOperatingMode()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeOperatingMode(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeOperatingMode(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportedOperatingModes
+ */
+class ReadDoorLockSupportedOperatingModes : public ModelCommand
+{
+public:
+    ReadDoorLockSupportedOperatingModes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-operating-modes");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockSupportedOperatingModes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::SupportedOperatingModes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.SupportedOperatingModes response", value);
+    }
+};
+
+/*
+ * Attribute EnableOneTouchLocking
+ */
+class ReadDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    ReadDoorLockEnableOneTouchLocking() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockEnableOneTouchLocking() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.EnableOneTouchLocking response", value);
+    }
+};
+
+class WriteDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    WriteDoorLockEnableOneTouchLocking() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockEnableOneTouchLocking() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    ReportDoorLockEnableOneTouchLocking() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockEnableOneTouchLocking()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeEnableOneTouchLocking(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeEnableOneTouchLocking(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                               mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute EnablePrivacyModeButton
+ */
+class ReadDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    ReadDoorLockEnablePrivacyModeButton() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockEnablePrivacyModeButton() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.EnablePrivacyModeButton response", value);
+    }
+};
+
+class WriteDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    WriteDoorLockEnablePrivacyModeButton() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockEnablePrivacyModeButton() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    ReportDoorLockEnablePrivacyModeButton() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockEnablePrivacyModeButton()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeEnablePrivacyModeButton(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeEnablePrivacyModeButton(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                 mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WrongCodeEntryLimit
+ */
+class ReadDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    ReadDoorLockWrongCodeEntryLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockWrongCodeEntryLimit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.WrongCodeEntryLimit response", value);
+    }
+};
+
+class WriteDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    WriteDoorLockWrongCodeEntryLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockWrongCodeEntryLimit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class ReportDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    ReportDoorLockWrongCodeEntryLimit() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockWrongCodeEntryLimit()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeWrongCodeEntryLimit(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeWrongCodeEntryLimit(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                             mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -54467,23 +55472,51 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearCredential>(),       //
-        make_unique<DoorLockClearUser>(),             //
-        make_unique<DoorLockGetCredentialStatus>(),   //
-        make_unique<DoorLockGetUser>(),               //
-        make_unique<DoorLockLockDoor>(),              //
-        make_unique<DoorLockSetCredential>(),         //
-        make_unique<DoorLockSetUser>(),               //
-        make_unique<DoorLockUnlockDoor>(),            //
-        make_unique<ReadDoorLockLockState>(),         //
-        make_unique<ReportDoorLockLockState>(),       //
-        make_unique<ReadDoorLockLockType>(),          //
-        make_unique<ReportDoorLockLockType>(),        //
-        make_unique<ReadDoorLockActuatorEnabled>(),   //
-        make_unique<ReportDoorLockActuatorEnabled>(), //
-        make_unique<ReadDoorLockAttributeList>(),     //
-        make_unique<ReadDoorLockClusterRevision>(),   //
-        make_unique<ReportDoorLockClusterRevision>(), //
+        make_unique<DoorLockClearCredential>(),                 //
+        make_unique<DoorLockClearUser>(),                       //
+        make_unique<DoorLockGetCredentialStatus>(),             //
+        make_unique<DoorLockGetUser>(),                         //
+        make_unique<DoorLockLockDoor>(),                        //
+        make_unique<DoorLockSetCredential>(),                   //
+        make_unique<DoorLockSetUser>(),                         //
+        make_unique<DoorLockUnlockDoor>(),                      //
+        make_unique<ReadDoorLockLockState>(),                   //
+        make_unique<ReportDoorLockLockState>(),                 //
+        make_unique<ReadDoorLockLockType>(),                    //
+        make_unique<ReportDoorLockLockType>(),                  //
+        make_unique<ReadDoorLockActuatorEnabled>(),             //
+        make_unique<ReportDoorLockActuatorEnabled>(),           //
+        make_unique<ReadDoorLockDoorState>(),                   //
+        make_unique<ReportDoorLockDoorState>(),                 //
+        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(), //
+        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),   //
+        make_unique<ReadDoorLockMaxPINCodeLength>(),            //
+        make_unique<ReadDoorLockMinPINCodeLength>(),            //
+        make_unique<ReadDoorLockLanguage>(),                    //
+        make_unique<WriteDoorLockLanguage>(),                   //
+        make_unique<ReportDoorLockLanguage>(),                  //
+        make_unique<ReadDoorLockAutoRelockTime>(),              //
+        make_unique<WriteDoorLockAutoRelockTime>(),             //
+        make_unique<ReportDoorLockAutoRelockTime>(),            //
+        make_unique<ReadDoorLockSoundVolume>(),                 //
+        make_unique<WriteDoorLockSoundVolume>(),                //
+        make_unique<ReportDoorLockSoundVolume>(),               //
+        make_unique<ReadDoorLockOperatingMode>(),               //
+        make_unique<WriteDoorLockOperatingMode>(),              //
+        make_unique<ReportDoorLockOperatingMode>(),             //
+        make_unique<ReadDoorLockSupportedOperatingModes>(),     //
+        make_unique<ReadDoorLockEnableOneTouchLocking>(),       //
+        make_unique<WriteDoorLockEnableOneTouchLocking>(),      //
+        make_unique<ReportDoorLockEnableOneTouchLocking>(),     //
+        make_unique<ReadDoorLockEnablePrivacyModeButton>(),     //
+        make_unique<WriteDoorLockEnablePrivacyModeButton>(),    //
+        make_unique<ReportDoorLockEnablePrivacyModeButton>(),   //
+        make_unique<ReadDoorLockWrongCodeEntryLimit>(),         //
+        make_unique<WriteDoorLockWrongCodeEntryLimit>(),        //
+        make_unique<ReportDoorLockWrongCodeEntryLimit>(),       //
+        make_unique<ReadDoorLockAttributeList>(),               //
+        make_unique<ReadDoorLockClusterRevision>(),             //
+        make_unique<ReportDoorLockClusterRevision>(),           //
     };
 
     commands.Register(clusterName, clusterCommands);

@@ -375,6 +375,125 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeDiagnosticLogsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("diagnosticLogs", writeDiagnosticLogsInteractionInfo);
     Map<String, InteractionInfo> writeDoorLockInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeDoorLockLanguageCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocklanguageCommandParameterInfo =
+        new CommandParameterInfo("value", String.class);
+    writeDoorLockLanguageCommandParams.put("value", doorLocklanguageCommandParameterInfo);
+    InteractionInfo writeDoorLockLanguageAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeLanguageAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockLanguageCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeLanguageAttribute", writeDoorLockLanguageAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockAutoRelockTimeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockautoRelockTimeCommandParameterInfo =
+        new CommandParameterInfo("value", long.class);
+    writeDoorLockAutoRelockTimeCommandParams.put(
+        "value", doorLockautoRelockTimeCommandParameterInfo);
+    InteractionInfo writeDoorLockAutoRelockTimeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeAutoRelockTimeAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockAutoRelockTimeCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeAutoRelockTimeAttribute", writeDoorLockAutoRelockTimeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockSoundVolumeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLocksoundVolumeCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeDoorLockSoundVolumeCommandParams.put("value", doorLocksoundVolumeCommandParameterInfo);
+    InteractionInfo writeDoorLockSoundVolumeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeSoundVolumeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockSoundVolumeCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeSoundVolumeAttribute", writeDoorLockSoundVolumeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockOperatingModeCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockoperatingModeCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeDoorLockOperatingModeCommandParams.put("value", doorLockoperatingModeCommandParameterInfo);
+    InteractionInfo writeDoorLockOperatingModeAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeOperatingModeAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockOperatingModeCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeOperatingModeAttribute", writeDoorLockOperatingModeAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockEnableOneTouchLockingCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockenableOneTouchLockingCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeDoorLockEnableOneTouchLockingCommandParams.put(
+        "value", doorLockenableOneTouchLockingCommandParameterInfo);
+    InteractionInfo writeDoorLockEnableOneTouchLockingAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeEnableOneTouchLockingAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockEnableOneTouchLockingCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeEnableOneTouchLockingAttribute",
+        writeDoorLockEnableOneTouchLockingAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockEnablePrivacyModeButtonCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockenablePrivacyModeButtonCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeDoorLockEnablePrivacyModeButtonCommandParams.put(
+        "value", doorLockenablePrivacyModeButtonCommandParameterInfo);
+    InteractionInfo writeDoorLockEnablePrivacyModeButtonAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeEnablePrivacyModeButtonAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockEnablePrivacyModeButtonCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeEnablePrivacyModeButtonAttribute",
+        writeDoorLockEnablePrivacyModeButtonAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeDoorLockWrongCodeEntryLimitCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo doorLockwrongCodeEntryLimitCommandParameterInfo =
+        new CommandParameterInfo("value", int.class);
+    writeDoorLockWrongCodeEntryLimitCommandParams.put(
+        "value", doorLockwrongCodeEntryLimitCommandParameterInfo);
+    InteractionInfo writeDoorLockWrongCodeEntryLimitAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.DoorLockCluster) cluster)
+                  .writeWrongCodeEntryLimitAttribute(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeDoorLockWrongCodeEntryLimitCommandParams);
+    writeDoorLockInteractionInfo.put(
+        "writeWrongCodeEntryLimitAttribute",
+        writeDoorLockWrongCodeEntryLimitAttributeInteractionInfo);
     writeAttributeMap.put("doorLock", writeDoorLockInteractionInfo);
     Map<String, InteractionInfo> writeElectricalMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("electricalMeasurement", writeElectricalMeasurementInteractionInfo);

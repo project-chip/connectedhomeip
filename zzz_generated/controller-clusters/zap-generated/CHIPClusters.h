@@ -710,6 +710,33 @@ public:
     CHIP_ERROR SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeActuatorEnabled(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeDoorState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeDoorState(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeLanguage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeLanguage(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeAutoRelockTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeAutoRelockTime(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeSoundVolume(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeSoundVolume(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeOperatingMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOperatingMode(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeEnableOneTouchLocking(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                       uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeEnableOneTouchLocking(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeEnablePrivacyModeButton(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                         uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeEnablePrivacyModeButton(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeWrongCodeEntryLimit(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeWrongCodeEntryLimit(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);

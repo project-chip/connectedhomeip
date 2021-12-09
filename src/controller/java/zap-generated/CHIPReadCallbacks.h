@@ -1069,6 +1069,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPDoorLockDoorStateAttributeCallback : public chip::Callback::Callback<CHIPDoorLockClusterDoorStateAttributeCallbackType>
+{
+public:
+    CHIPDoorLockDoorStateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPDoorLockDoorStateAttributeCallback();
+
+    static void maybeDestroy(CHIPDoorLockDoorStateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPDoorLockDoorStateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPDoorLockAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPDoorLockClusterAttributeListAttributeCallbackType>
 {
