@@ -812,22 +812,6 @@ using namespace chip::app::Clusters;
         true);
 }
 
-- (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler
-{
-    new CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::AllowedVendorList::TypeInfo;
-            auto successFn = Callback<ApplicationBasicAllowedVendorListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
