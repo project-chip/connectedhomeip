@@ -56,12 +56,12 @@ bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command,
                                                   const Commands::ChangeChannel::DecodableType & commandData)
 {
     Commands::ChangeChannelResponse::Type response;
-    response.channelMatch.majorNumber = 1;
-    response.channelMatch.minorNumber = 0;
-    response.channelMatch.name = chip::CharSpan("name", strlen("name"));
-    response.channelMatch.callSign = chip::CharSpan("callSign", strlen("callSign"));
+    response.channelMatch.majorNumber       = 1;
+    response.channelMatch.minorNumber       = 0;
+    response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
+    response.channelMatch.callSign          = chip::CharSpan("callSign", strlen("callSign"));
     response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
-    response.errorType = (TvChannelErrorType) 0;
+    response.errorType                      = (TvChannelErrorType) 0;
 
     CHIP_ERROR err = command->AddResponseData(commandPath, response);
     if (err != CHIP_NO_ERROR)
