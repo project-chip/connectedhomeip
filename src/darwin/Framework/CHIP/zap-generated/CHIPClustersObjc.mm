@@ -329,7 +329,7 @@ using namespace chip::app::Clusters;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
+        ^(id _Nullable value, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -667,136 +667,6 @@ using namespace chip::app::Clusters;
 - (void)readAttributeApplicationStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {
-<<<<<<< HEAD
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationBasic::Attributes::ApplicationId::TypeInfo;
-        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPCharStringAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::ApplicationId::TypeInfo;
-            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-    new CHIPInt8uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeApplicationStatusWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                           responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeApplicationStatus(success, failure, minInterval, maxInterval);
-    });
-}
-
-- (void)reportAttributeApplicationStatusWithResponseHandler:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))responseHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            responseHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReportAttributeApplicationStatus(success);
->>>>>>> 359911f36 (Run zap tool successfully)
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
-                                                                 NSError * _Nullable error))completionHandler
-{
-<<<<<<< HEAD
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationBasic::Attributes::CatalogVendorId::TypeInfo;
-        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt16uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::CatalogVendorId::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-=======
-    new CHIPCharStringAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
-            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeApplicationVersionWithMinInterval:(uint16_t)minInterval
-                                                maxInterval:(uint16_t)maxInterval
-                                            responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeApplicationVersion(success, failure, minInterval, maxInterval);
-    });
-}
-
-- (void)reportAttributeApplicationVersionWithResponseHandler:(void (^)(NSString * _Nullable value,
-                                                                 NSError * _Nullable error))responseHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            responseHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReportAttributeApplicationVersion(success);
->>>>>>> 359911f36 (Run zap tool successfully)
-        },
-        subscriptionEstablishedHandler);
-}
-
-<<<<<<< HEAD
-- (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler
-{
-<<<<<<< HEAD
     new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
         using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
         auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
@@ -823,23 +693,35 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-=======
-    new CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::AllowedVendorList::TypeInfo;
-            auto successFn = Callback<ApplicationBasicAllowedVendorListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+- (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
->>>>>>> 359911f36 (Run zap tool successfully)
-=======
->>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
+- (void)subscribeAttributeApplicationVersionWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:
+                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -900,11 +782,7 @@ using namespace chip::app::Clusters;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -939,11 +817,7 @@ using namespace chip::app::Clusters;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -962,7 +836,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)subscribeAttributeApplicationLauncherListWithMinInterval:(uint16_t)minInterval
                                                      maxInterval:(uint16_t)maxInterval
                                          subscriptionEstablished:
@@ -983,66 +856,6 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributeCatalogVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeApplicationIdWithCompletionHandler:(void (^)(
-                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationLauncher::Attributes::ApplicationId::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationLauncher::Attributes::ApplicationId::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -5262,7 +5075,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)subscribeAttributeAcceptsHeaderListWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
@@ -5282,45 +5094,23 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributeSupportedStreamingTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
-{
-    new CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo;
-            auto successFn = Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(success);
-=======
 - (void)readAttributeSupportedStreamingProtocolsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                           NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
-            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
->>>>>>> 359911f36 (Run zap tool successfully)
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeSupportedStreamingTypesWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:
-                                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-=======
 - (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSNumber * _Nonnull)value
                                          completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
+        ^(id _Nullable ignored, NSError * _Nullable error) {
             completionHandler(error);
         },
         ^(Cancelable * success, Cancelable * failure) {
@@ -5336,40 +5126,19 @@ using namespace chip::app::Clusters;
 
 - (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(uint16_t)minInterval
                                                          maxInterval:(uint16_t)maxInterval
-                                                     responseHandler:(ResponseHandler)responseHandler
+                                             subscriptionEstablished:
+                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))reportHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeSupportedStreamingProtocols(success, failure, minInterval, maxInterval);
-    });
-}
-
-- (void)reportAttributeSupportedStreamingProtocolsWithResponseHandler:(void (^)(NSNumber * _Nullable value,
-                                                                          NSError * _Nullable error))responseHandler
-{
-    new CHIPInt32uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            responseHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReportAttributeSupportedStreamingProtocols(success);
-        },
-        true);
-}
-
-- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler
->>>>>>> 359911f36 (Run zap tool successfully)
-{
-    new CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge(
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo;
-            auto successFn = Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -9664,111 +9433,17 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-<<<<<<< HEAD
-- (void)readAttributePositionUpdatedAtWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler
-{
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributePositionUpdatedAtWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributePositionWithCompletionHandler:(void (^)(
-                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributePositionWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
-                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIPFloatAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
         using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+        auto successFn = Callback<FloatAttributeCallback>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-- (void)subscribeAttributePlaybackSpeedWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-=======
-- (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(
-                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPFloatAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
-            auto successFn = Callback<FloatAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
->>>>>>> 359911f36 (Run zap tool successfully)
 - (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -13919,113 +13594,36 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
-- (void)readAttributeTvChannelListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPTvChannelTvChannelListListAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelList::TypeInfo;
-            auto successFn = Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeTvChannelListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelList::TypeInfo;
-            auto successFn = Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeTvChannelLineupWithCompletionHandler:(void (^)(
-                                                              NSData * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPOctetStringAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelLineup::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeTvChannelLineupWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelLineup::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeCurrentTvChannelWithCompletionHandler:(void (^)(NSData * _Nullable value,
-                                                               NSError * _Nullable error))completionHandler
-{
-    new CHIPOctetStringAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::CurrentTvChannel::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-=======
 - (void)readAttributeChannelListWithCompletionHandler:(void (^)(
                                                           NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPTvChannelChannelListListAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = TvChannel::Attributes::ChannelList::TypeInfo;
             auto successFn = Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(success);
->>>>>>> 359911f36 (Run zap tool successfully)
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-<<<<<<< HEAD
-- (void)subscribeAttributeCurrentTvChannelWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
-                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                            reportHandler:
-                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeChannelListWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
+    new CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::CurrentTvChannel::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            using TypeInfo = TvChannel::Attributes::ChannelList::TypeInfo;
+            auto successFn = Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval,
+                CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
 
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -14105,7 +13703,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-<<<<<<< HEAD
 - (void)subscribeAttributeTargetNavigatorListWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                      subscriptionEstablished:
@@ -14124,22 +13721,17 @@ using namespace chip::app::Clusters;
                 CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
-=======
+}
+
 - (void)readAttributeCurrentNavigatorTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
->>>>>>> 359911f36 (Run zap tool successfully)
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(

@@ -1393,8 +1393,6 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 class CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge
     : public CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge
 {
@@ -1410,22 +1408,8 @@ public:
 
 private:
     SubscriptionEstablishedHandler mEstablishedHandler;
-=======
-class CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>
-{
-public:
-    CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
->>>>>>> 359911f36 (Run zap tool successfully)
 };
 
-=======
->>>>>>> bfc8ba065 (Disabled application basic cluster - allowed vendor list)
 class CHIPApplicationBasicAttributeListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
 {
@@ -1863,7 +1847,6 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
-<<<<<<< HEAD
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge
     : public CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge
 {
@@ -1881,39 +1864,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 class CHIPContentLauncherAttributeListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ContentLauncherAttributeListListAttributeCallback>
 {
@@ -3430,7 +3380,6 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-<<<<<<< HEAD
 class CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge : public CHIPSwitchAttributeListListAttributeCallbackBridge
 {
 public:
@@ -3447,10 +3396,7 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
-=======
 class CHIPTvChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>
->>>>>>> 359911f36 (Run zap tool successfully)
 {
 public:
     CHIPTvChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
@@ -3462,14 +3408,13 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelTvChannelListListAttributeCallbackBridge
+class CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPTvChannelChannelListListAttributeCallbackBridge
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelTvChannelListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTvChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10728,7 +10673,6 @@ public:
                 const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> & value);
 };
 
-<<<<<<< HEAD
 class CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge
     : public CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge
 {
@@ -10746,70 +10690,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value);
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-=======
->>>>>>> 359911f36 (Run zap tool successfully)
 class CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge
     : public CHIPCallbackBridge<AudioOutputClusterAudioOutputTypeAttributeCallback>
 {
