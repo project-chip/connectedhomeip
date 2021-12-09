@@ -34944,7 +34944,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
 
     XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockWriteAttributeLanguageWithValue"];
 
-    NSString * _Nonnull value = @"Test";
+    NSString * _Nonnull value = @"Tes";
     [cluster writeAttributeLanguageWithValue:value
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"DoorLock Language Error: %@", err);
