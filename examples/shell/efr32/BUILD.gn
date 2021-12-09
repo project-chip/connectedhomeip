@@ -73,18 +73,6 @@ efr32_executable("shell_app") {
     "${examples_plat_dir}:efr-matter-shell",
   ]
 
-  if (chip_openthread_ftd) {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-    ]
-  } else {
-    deps += [
-      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-    ]
-  }
-
   include_dirs = [ "include" ]
 
   defines = []
