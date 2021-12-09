@@ -362,8 +362,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    ChipLogDetail(DataManagement, "############################## R fi=%u", aSubjectDescriptor.fabricIndex);
-
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
         // This is not in our attribute metadata, so we just check for this
@@ -827,7 +825,6 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
                                   TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    ChipLogDetail(DataManagement, "############################## W fi=%u", aSubjectDescriptor.fabricIndex);
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
     ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
