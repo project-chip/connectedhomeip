@@ -14729,13 +14729,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockDoorState()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockDoorState() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14744,10 +14738,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeDoorState(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeDoorState(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::DoorState::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -14755,15 +14748,13 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context,
+                              const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    {
+        LogValue("DoorLock.DoorState report", 0, value);
+    }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -14957,13 +14948,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockLanguage()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockLanguage() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14972,10 +14957,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeLanguage(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeLanguage(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -14983,15 +14967,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("DoorLock.Language report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15065,13 +15043,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockAutoRelockTime()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockAutoRelockTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15080,10 +15052,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeAutoRelockTime(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeAutoRelockTime(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15091,15 +15062,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, uint32_t value) { LogValue("DoorLock.AutoRelockTime report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15173,13 +15138,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockSoundVolume()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockSoundVolume() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15188,10 +15147,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeSoundVolume(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeSoundVolume(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15199,15 +15157,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.SoundVolume report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15281,13 +15233,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockOperatingMode()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockOperatingMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15296,10 +15242,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeOperatingMode(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeOperatingMode(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15307,15 +15252,12 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+    {
+        LogValue("DoorLock.OperatingMode report", 0, value);
+    }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15419,13 +15361,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockEnableOneTouchLocking()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockEnableOneTouchLocking() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15434,11 +15370,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeEnableOneTouchLocking(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeEnableOneTouchLocking(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                               mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15446,15 +15380,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnableOneTouchLocking report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15528,13 +15456,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockEnablePrivacyModeButton()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockEnablePrivacyModeButton() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15543,11 +15465,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeEnablePrivacyModeButton(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeEnablePrivacyModeButton(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                                 mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15555,15 +15475,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnablePrivacyModeButton report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -15637,13 +15551,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportDoorLockWrongCodeEntryLimit()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportDoorLockWrongCodeEntryLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15652,11 +15560,9 @@ public:
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeWrongCodeEntryLimit(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeWrongCodeEntryLimit(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                             mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -15664,15 +15570,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.WrongCodeEntryLimit report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
