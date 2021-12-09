@@ -42,7 +42,7 @@ public:
 
         if (CHIP_NO_ERROR != err) {
             dispatch_async(queue, ^{
-                    handler(nil, [CHIPError errorForCHIPErrorCode:err]);
+                handler(nil, [CHIPError errorForCHIPErrorCode:err]);
             });
 
             NSString * errorStr = [NSString stringWithFormat:@"%s: %s", typeid(T).name(), chip::ErrorStr(err)];
