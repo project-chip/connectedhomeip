@@ -663,6 +663,7 @@
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LIBRARY_SEARCH_PATHS = "$(TEMP_DIR)/out/lib";
+                OTHER_CFLAGS = "-Wformat-nonliteral"
 				OTHER_LDFLAGS = "";
 				"OTHER_LDFLAGS[sdk=*]" = (
 					"-framework",
