@@ -76,8 +76,8 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
 
     MakeZclCharString(zclString, application->version);
     EmberAfStatus versionStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID, zclString.data(),
-                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID,
+                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
     if (versionStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store version attribute.");
