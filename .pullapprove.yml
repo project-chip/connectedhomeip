@@ -164,7 +164,7 @@ groups:
             requests.
         type: required
         requirements:
-            - len(groups.approved.include('shared-reviewers-*')) >= 3
+            - len(groups.approved.include('shared-reviewers-*')) >= 2
         reviews:
             required: 0
         labels:
