@@ -660,7 +660,7 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     {
         apEventLoadOutContext->mCurrentTime.mValue += event.mDeltaTime.mValue;
         // If the retrieved event has the same priority as the one set by FetchEventSince, we need to use mSamePriorityEvent to increase
-        // event number after encoding current even number, then this updated event number would be used by FetchEventSince for next
+        // the event number after encoding the current event number.  Then this updated event number will be used by FetchEventSince for next
         // use
         apEventLoadOutContext->mSamePriorityEvent = true;
         if (IsInterestedEventPaths(apEventLoadOutContext, event))
