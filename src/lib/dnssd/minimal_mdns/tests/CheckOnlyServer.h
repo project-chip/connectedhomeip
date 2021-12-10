@@ -71,8 +71,7 @@ void MakePrintableName(char (&location)[N], FullQName name)
 
 } // namespace
 
-class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, chip::OnObjectPoolDestruction::Die,
-                                               ServerBase::EndpointInfoPoolType::Interface>,
+class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, ServerBase::EndpointInfoPoolType::Interface>,
                         public ServerBase,
                         public ParserDelegate,
                         public TxtRecordDelegate

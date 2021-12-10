@@ -272,12 +272,10 @@ private:
     // TODO: This is a temporary solution to release sessions, in the near future, SessionReleaseDelegate will be
     //       directly associated with the every SessionHolder. Then the callback function is called on over the handle
     //       delegate directly, in order to prevent dangling handles.
-    BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES,
-                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
+    BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES>
         mSessionReleaseDelegates;
 
-    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES,
-                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
+    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
         mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
