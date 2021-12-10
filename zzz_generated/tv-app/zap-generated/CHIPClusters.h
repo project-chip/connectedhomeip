@@ -61,6 +61,10 @@ public:
     ~NetworkCommissioningCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                               chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
