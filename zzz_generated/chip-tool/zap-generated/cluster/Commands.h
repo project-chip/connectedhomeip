@@ -4767,7 +4767,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
-| * ApplicationLauncherApp                                            | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -22590,7 +22589,6 @@ private:
 | * PlaybackState                                                     | 0x0000 |
 | * StartTime                                                         | 0x0001 |
 | * Duration                                                          | 0x0002 |
-| * Position                                                          | 0x0003 |
 | * PlaybackSpeed                                                     | 0x0004 |
 | * SeekRangeEnd                                                      | 0x0005 |
 | * SeekRangeStart                                                    | 0x0006 |
@@ -31958,8 +31956,6 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ChannelList                                                       | 0x0000 |
-| * ChannelLineup                                                     | 0x0001 |
-| * CurrentChannel                                                    | 0x0002 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/

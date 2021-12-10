@@ -265,12 +265,6 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000001: {
-                    "attributeName": "ApplicationLauncherApp",
-                    "attributeId": 0x00000001,
-                    "type": "",
-                    "writable": True,
-                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,
@@ -2598,12 +2592,6 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000003: {
-                    "attributeName": "Position",
-                    "attributeId": 0x00000003,
-                    "type": "",
-                    "writable": True,
-                },
                 0x00000004: {
                     "attributeName": "PlaybackSpeed",
                     "attributeId": 0x00000004,
@@ -3760,20 +3748,6 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
-                },
-                0x00000001: {
-                    "attributeName": "ChannelLineup",
-                    "attributeId": 0x00000001,
-                    "type": "",
-                    "reportable": True,
-                    "writable": True,
-                },
-                0x00000002: {
-                    "attributeName": "CurrentChannel",
-                    "attributeId": 0x00000002,
-                    "type": "",
-                    "reportable": True,
-                    "writable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",

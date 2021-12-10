@@ -45,33 +45,33 @@ tests:
                   },
               ]
     # TODO: Enable once attribute struct is supported
-    - label: "Read attribute channel lineup"
-      disabled: true
-      command: "readAttribute"
-      attribute: "channel lineup"
-      response:
-          value:
-              {
-                  operatorName: "operatorName",
-                  lineupName: "lineupName",
-                  postalCode: "postalCode",
-                  lineupInfoType: 0,
-              }
+    # - label: "Read attribute channel lineup"
+    #   disabled: true
+    #   command: "readAttribute"
+    #   attribute: "channel lineup"
+    #   response:
+    #       value:
+    #           {
+    #               operatorName: "operatorName",
+    #               lineupName: "lineupName",
+    #               postalCode: "postalCode",
+    #               lineupInfoType: 0,
+    #           }
 
     # TODO: Enable once attribute struct is supported
-    - label: "Read attribute current channel"
-      disabled: true
-      command: "readAttribute"
-      attribute: "current channel"
-      response:
-          value:
-              {
-                  majorNumber: 1,
-                  minorNumber: 0,
-                  name: "name",
-                  callSign: "callSign",
-                  affiliateCallSign: "affiliateCallSign",
-              }
+    # - label: "Read attribute current channel"
+    #   disabled: true
+    #   command: "readAttribute"
+    #   attribute: "current channel"
+    #   response:
+    #       value:
+    #           {
+    #               majorNumber: 1,
+    #               minorNumber: 0,
+    #               name: "name",
+    #               callSign: "callSign",
+    #               affiliateCallSign: "affiliateCallSign",
+    #           }
 
     - label: "Change Channel Command"
       command: "ChangeChannel"

@@ -42,12 +42,12 @@ tests:
           value: 0
 
     # TODO: Enable once attribute struct is supported
-    - label: "Read attribute position"
-      disabled: true
-      command: "readAttribute"
-      attribute: "position"
-      response:
-          value: { updatedAt: 0, position: 0 }
+    # - label: "Read attribute position"
+    #   disabled: true
+    #   command: "readAttribute"
+    #   attribute: "position"
+    #   response:
+    #       value: { updatedAt: 0, position: 0 }
 
     - label: "Read attribute playback speed"
       command: "readAttribute"
