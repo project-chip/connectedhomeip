@@ -82,6 +82,13 @@ limitations under the License.
 
   </cluster>
 
+  <bitmap name="PowerSourceFeature" type="BITMAP32">
+    <field name="Wired" mask="0x1"/>
+    <field name="Battery" mask="0x2"/>
+    <field name="Rechargeable" mask="0x4"/>
+    <field name="Replaceable" mask="0x8"/>
+  </bitmap>
+
   <enum name="WiredFaultType" type="ENUM8">
     <item name="Unspecfied" value="0x00"/>
     <item name="OverVoltage" value="0x01"/>
