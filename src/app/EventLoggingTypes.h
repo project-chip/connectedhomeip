@@ -149,7 +149,8 @@ public:
 struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
-        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true)
+        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true),
+        mSamePriorityEvent(false)
     {}
 
     TLV::TLVWriter & mWriter;
@@ -161,6 +162,7 @@ struct EventLoadOutContext
     size_t mEventCount                   = 0;
     ClusterInfo * mpInterestedEventPaths = nullptr;
     bool mFirst                          = true;
+    bool mSamePriorityEvent              = false;
 };
 } // namespace app
 } // namespace chip
