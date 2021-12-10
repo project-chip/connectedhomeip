@@ -714,12 +714,11 @@ private:
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
-                                          const ByteSpan & icaCertBuf);
+    CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
+    CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
@@ -768,10 +767,11 @@ private:
      *   This function processes the CSR sent by the device.
      *   (Reference: Specifications section 11.22.5.8. OpCSR Elements)
      *
+     * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
      */
-    CHIP_ERROR ProcessOpCSR(const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
+    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
 
     /**
      * @brief

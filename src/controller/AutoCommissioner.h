@@ -46,6 +46,8 @@ private:
     ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
     ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
 
+    CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac);
+
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;
@@ -63,7 +65,8 @@ private:
     uint16_t mPAILen = 0;
     uint8_t mAttestationNonce[kAttestationNonceLength];
     uint8_t mCSRNonce[kOpCSRNonceLength];
-    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
+    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
+    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
 };
 
 } // namespace Controller

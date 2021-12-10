@@ -37,8 +37,8 @@ enum CommissioningStage : uint8_t
     kSendAttestationRequest,
     kSendOpCertSigningRequest,
     kGenerateNOCChain,
-    kCheckCertificates,
-    kConfigACL,
+    kSendTrustedRootCert,
+    kSendNOC,
     kWifiNetworkSetup,
     kThreadNetworkSetup,
     kWifiNetworkEnable,
@@ -46,6 +46,7 @@ enum CommissioningStage : uint8_t
     kFindOperational,
     kSendComplete,
     kCleanup,
+    kConfigACL,
 };
 
 struct WifiCredentials
@@ -54,6 +55,17 @@ struct WifiCredentials
     // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
     WifiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+};
+
+struct NOCChainGenerationParameters
+{
+    ByteSpan nocsrElements;
+    ByteSpan signature;
+};
+struct NOCerts
+{
+    ByteSpan noc;
+    ByteSpan icac;
 };
 class CommissioningParameters
 {
@@ -65,10 +77,16 @@ public:
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
     bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
+    bool HasNOCChainGenerationaParameters() const { return mNOCChainGenerationParameters.HasValue(); }
+    bool HasRootCert() const { return mRootCert.HasValue(); }
+    bool HasNOCerts() const { return mNOCerts.HasValue(); }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+    const Optional<NOCChainGenerationParameters> GetNOCChainGenerationParameters() const { return mNOCChainGenerationParameters; }
+    const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
+    const Optional<NOCerts> GetNOCerts() const { return mNOCerts; }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
     CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
@@ -95,12 +113,34 @@ public:
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
         return *this;
     }
+    // This parameter should be set with the information returned from kSendOpCertSigningRequest. It must be set before calling
+    // kGenerateNOCChain.
+    CommissioningParameters & SetNOCChainGenerationParameters(const NOCChainGenerationParameters & params)
+    {
+        mNOCChainGenerationParameters.SetValue(params);
+        return *this;
+    }
+    // Root certs can be generated from the kGenerateNOCChain step. This must be set before calling kSendTrustedRootCert.
+    CommissioningParameters & SetRootCert(const ByteSpan & rcac)
+    {
+        mRootCert.SetValue(rcac);
+        return *this;
+    }
+    // NOC and intermediate cert can be generated from the kGenerateNOCChain step. This must be set before calling kSendNOC
+    CommissioningParameters & SetNOCerts(const NOCerts & certs)
+    {
+        mNOCerts.SetValue(certs);
+        return *this;
+    }
 
 private:
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WifiCredentials> mWifiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
+    Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
+    Optional<ByteSpan> mRootCert;
+    Optional<NOCerts> mNOCerts;
 };
 
 class CommissioningDelegate
@@ -123,6 +163,12 @@ public:
                 ByteSpan attestationElements;
                 ByteSpan signature;
             } attestationResponse;
+            struct
+            {
+                ByteSpan noc;
+                ByteSpan icac;
+                ByteSpan rcac;
+            } nocChain;
             struct
             {
                 OperationalDeviceProxy * operationalProxy;

@@ -223,18 +223,6 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
-
-    CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
-
-    ByteSpan GetNOCCert() const { return ByteSpan(mNOCCertBuffer, mNOCCertBufferSize); }
-
-    MutableByteSpan GetMutableICACert() { return MutableByteSpan(mICACertBuffer, sizeof(mICACertBuffer)); }
-
-    CHIP_ERROR SetICACertBufferSize(size_t new_size);
-
-    ByteSpan GetICACert() const { return ByteSpan(mICACertBuffer, mICACertBufferSize); }
-
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mpIMDelegate; };
 
 private:
@@ -297,12 +285,6 @@ private:
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
-    size_t mNOCCertBufferSize = 0;
-
-    uint8_t mICACertBuffer[Credentials::kMaxCHIPCertLength];
-    size_t mICACertBufferSize = 0;
 
     SessionIDAllocator * mIDAllocator = nullptr;
 };

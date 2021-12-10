@@ -187,19 +187,4 @@ bool CommissioneeDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port
 }
 
 CommissioneeDeviceProxy::~CommissioneeDeviceProxy() {}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetNOCCertBufferSize(size_t new_size)
-{
-    ReturnErrorCodeIf(new_size > sizeof(mNOCCertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mNOCCertBufferSize = new_size;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CommissioneeDeviceProxy::SetICACertBufferSize(size_t new_size)
-{
-    ReturnErrorCodeIf(new_size > sizeof(mICACertBuffer), CHIP_ERROR_INVALID_ARGUMENT);
-    mICACertBufferSize = new_size;
-    return CHIP_NO_ERROR;
-}
-
 } // namespace chip

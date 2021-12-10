@@ -19,6 +19,7 @@
 #include <controller/AutoCommissioner.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <credentials/CHIPCert.h>
 #include <lib/support/SafeInt.h>
 
 namespace chip {
@@ -101,8 +102,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kGenerateNOCChain;
     case CommissioningStage::kGenerateNOCChain:
-        return CommissioningStage::kCheckCertificates;
-    case CommissioningStage::kCheckCertificates:
+        return CommissioningStage::kSendTrustedRootCert;
+    case CommissioningStage::kSendTrustedRootCert:
+        return CommissioningStage::kSendNOC;
+    case CommissioningStage::kSendNOC:
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
@@ -175,6 +178,32 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
     mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this);
 }
 
+CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac)
+{
+    {
+        // Reuse NOC Cert buffer for temporary store Root Cert.
+        MutableByteSpan rootCert = MutableByteSpan(mNOCCertBuffer);
+        ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(rcac, rootCert));
+        mParams.SetRootCert(rootCert);
+        mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kSendTrustedRootCert, mParams, this);
+    }
+
+    NOCerts certs;
+    if (!icac.empty())
+    {
+        MutableByteSpan icaCert = MutableByteSpan(mICACertBuffer);
+        ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(icac, icaCert));
+        certs.icac = icaCert;
+    }
+    {
+        MutableByteSpan nocCert = MutableByteSpan(mNOCCertBuffer);
+        ReturnErrorOnFailure(Credentials::ConvertX509CertToChipCert(noc, nocCert));
+        certs.noc = nocCert;
+    }
+    mParams.SetNOCerts(certs);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
     switch (report.stageCompleted)
@@ -190,7 +219,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             report.attestationResponse.attestationElements, report.attestationResponse.signature,
             mParams.GetAttestationNonce().Value(), GetPAI(), GetDAC(), mCommissioneeDeviceProxy));
         break;
-
+    case CommissioningStage::kSendOpCertSigningRequest: {
+        NOCChainGenerationParameters nocParams;
+        nocParams.nocsrElements = report.attestationResponse.attestationElements;
+        nocParams.signature     = report.attestationResponse.signature;
+        mParams.SetNOCChainGenerationParameters(nocParams);
+    }
+    break;
+    case CommissioningStage::kGenerateNOCChain:
+        // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
+        // storing the returned certs, so just return here without triggering the next stage.
+        return NOCChainGenerated(report.nocChain.noc, report.nocChain.icac, report.nocChain.rcac);
     case CommissioningStage::kFindOperational:
         mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
         break;
