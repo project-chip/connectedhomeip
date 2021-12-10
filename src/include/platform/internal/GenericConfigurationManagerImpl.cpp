@@ -309,15 +309,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint32_t & location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
-    return ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+    return GetLocationCapability(location);
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation(uint32_t location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation(uint8_t location)
 {
-    return WriteConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+    uint32_t value = location;
+    return WriteConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, value);
 }
 
 template <class ConfigClass>
