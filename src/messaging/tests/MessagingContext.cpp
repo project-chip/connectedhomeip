@@ -35,11 +35,14 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    ReturnErrorOnFailure(mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
-                                                    &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator, mSrcFabricIndex));
+    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetBobKeyId(), GetFriendsGroupId(), GetFabricIndex()).Value());
 
-    return mSessionManager.NewPairing(Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
-                                      CryptoContext::SessionRole::kResponder, mDestFabricIndex);
+    ReturnErrorOnFailure(mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress),
+                                                    GetAliceNodeId(), &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator,
+                                                    mSrcFabricIndex));
+
+    return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(),
+                                      &mPairingAliceToBob, CryptoContext::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations
@@ -55,19 +58,17 @@ CHIP_ERROR MessagingContext::Shutdown()
 
 SessionHandle MessagingContext::GetSessionBobToAlice()
 {
-    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetAliceNodeId(), GetBobKeyId(), GetAliceKeyId(), GetFabricIndex());
+    return mSessionBobToAlice.Get();
 }
 
 SessionHandle MessagingContext::GetSessionAliceToBob()
 {
-    // TODO: temporarily create a SessionHandle from node id, will be fixed in PR 3602
-    return SessionHandle(GetBobNodeId(), GetAliceKeyId(), GetBobKeyId(), mDestFabricIndex);
+    return mSessionAliceToBob.Get();
 }
 
 SessionHandle MessagingContext::GetSessionBobToFriends()
 {
-    return SessionHandle(GetBobKeyId(), GetFriendsGroupId(), GetFabricIndex());
+    return mSessionBobToFriends.Get();
 }
 
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)

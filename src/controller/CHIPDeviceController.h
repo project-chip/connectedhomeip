@@ -441,7 +441,6 @@ private:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
-                                      public SessionCreationDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
                                       public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
@@ -698,8 +697,6 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// SessionCreationDelegate Implementation ///////////////
-    void OnNewSession(SessionHandle session) override;
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
 

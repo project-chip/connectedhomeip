@@ -619,7 +619,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(params));
 
-    params.systemState->SessionMgr()->RegisterCreationDelegate(*this);
     params.systemState->SessionMgr()->RegisterReleaseDelegate(*this);
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
@@ -682,17 +681,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnNewSession(SessionHandle session)
-{
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnNewConnection was called in incorrect state"));
-
-    CommissioneeDeviceProxy * device =
-        FindCommissioneeDevice(mSystemState->SessionMgr()->GetSecureSession(session)->GetPeerNodeId());
-    VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnNewConnection was called for unknown device, ignoring it."));
-
-    device->OnNewConnection(session);
 }
 
 void DeviceCommissioner::OnSessionReleased(SessionHandle session)
@@ -1013,9 +1001,9 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: the session should know which peer we are trying to connect to when started
     pairing->SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
 
-    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
-                                                            pairing->GetPeerNodeId(), pairing,
-                                                            CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(
+        mDeviceBeingCommissioned->GetSecureSessionHolder(), Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
+        pairing->GetPeerNodeId(), pairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
@@ -1186,12 +1174,9 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
 
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
-    PASESession * pairing = &mDeviceBeingCommissioned->GetPairing();
-
     // Retrieve attestation challenge
     ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession({ pairing->GetPeerNodeId(), pairing->GetLocalSessionId(),
-                                                             pairing->GetPeerSessionId(), mFabricIndex })
+                                        ->GetSecureSession(mDeviceBeingCommissioned->GetSecureSession().Value())
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 

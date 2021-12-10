@@ -33,6 +33,7 @@
 chip::Messaging::ExchangeManager gExchangeManager;
 chip::SessionManager gSessionManager;
 chip::secure_channel::MessageCounterManager gMessageCounterManager;
+chip::SessionHolder gSession;
 
 void InitializeChip(void)
 {
