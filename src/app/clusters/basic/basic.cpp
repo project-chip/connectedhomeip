@@ -108,7 +108,7 @@ public:
                 aEncoder.Encode(span);
             }
         }
-        else if(aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
+        else if (aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
         {
             bool localConfigDisabled;
             if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
@@ -120,14 +120,15 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override 
+    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override
     {
         CHIP_ERROR err;
         if (aPath.mAttributeId == app::Clusters::Basic::Attributes::NodeLabel::Id)
         {
             CharSpan span;
             err = aDecoder.Decode(span);
-            if (err == CHIP_NO_ERROR) {
+            if (err == CHIP_NO_ERROR)
+            {
                 ConfigurationMgr().StoreNodeLabel(span.data(), span.size());
             }
         }
@@ -135,15 +136,17 @@ public:
         {
             CharSpan span;
             err = aDecoder.Decode(span);
-            if (err == CHIP_NO_ERROR) {
+            if (err == CHIP_NO_ERROR)
+            {
                 ConfigurationMgr().StoreCountryCode(span.data(), span.size());
             }
         }
-        else if(aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
+        else if (aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
         {
             bool localConfigDisabled;
             err = aDecoder.Decode(localConfigDisabled);
-            if (err == CHIP_NO_ERROR) {
+            if (err == CHIP_NO_ERROR)
+            {
                 ConfigurationMgr().StoreLocalConfigDisabled(localConfigDisabled);
             }
         }
