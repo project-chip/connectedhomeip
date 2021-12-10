@@ -31928,7 +31928,7 @@ private:
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+        (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint8_t currentNavigatorTarget)
@@ -31981,11 +31981,13 @@ private:
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(uint8_t currentNavigatorTarget)
     {
@@ -32015,17 +32017,13 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::NavigateTargetStatus status, chip::CharSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data response", 13)));
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
         NextTest();
     }
@@ -32109,7 +32107,7 @@ private:
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+        (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint8_t currentAudioOutput)
@@ -32168,11 +32166,12 @@ private:
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(uint8_t currentAudioOutput)
     {
@@ -32201,11 +32200,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_3() { NextTest(); }
 
@@ -32230,11 +32225,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4() { NextTest(); }
 };
@@ -32312,29 +32303,6 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(applicationLauncherList);
     }
 
-<<<<<<< HEAD
-    static void OnFailureCallback_3(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_3(status);
-    }
-
-    static void OnSuccessCallback_3(void * context, uint8_t catalogVendorId)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(catalogVendorId);
-    }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_4(status);
-    }
-
-    static void OnSuccessCallback_4(void * context, uint8_t applicationId)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_4(applicationId);
-    }
-
-=======
->>>>>>> c350a1134 (Run zap tool successfully)
     //
     // Tests methods
     //
@@ -32370,10 +32338,6 @@ private:
 
         NextTest();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
     CHIP_ERROR TestLaunchAppCommand_2()
     {
@@ -32381,16 +32345,10 @@ private:
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
 
         RequestType request;
-<<<<<<< HEAD
-        request.data            = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
-        request.catalogVendorId = 1U;
-        request.applicationId   = chip::Span<const char>("appIdgarbage: not in length on purpose", 5);
-=======
         request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
 
         request.application.catalogVendorId = 123U;
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
@@ -32404,42 +32362,17 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
-    {
-=======
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
         NextTest();
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR TestReadAttributeCatalogVendorId_3()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_3(uint8_t catalogVendorId)
-    {
-        VerifyOrReturn(CheckValue("catalogVendorId", catalogVendorId, 0));
-=======
     CHIP_ERROR TestStopAppCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
@@ -32462,41 +32395,17 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
         NextTest();
     }
 
-<<<<<<< HEAD
-    CHIP_ERROR TestReadAttributeApplicationId_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(uint8_t applicationId)
-    {
-        VerifyOrReturn(CheckValue("applicationId", applicationId, 0));
-
-        NextTest();
-    }
-=======
->>>>>>> c350a1134 (Run zap tool successfully)
-=======
     CHIP_ERROR TestHideAppCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
@@ -32519,7 +32428,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
     {
@@ -32529,7 +32438,6 @@ private:
 
         NextTest();
     }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 };
 
 class TV_KeypadInputCluster : public TestCommand
@@ -32760,7 +32668,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_3() { NextTest(); }
 };
@@ -32954,7 +32862,7 @@ private:
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(status);
     }
 
     static void OnSuccessCallback_4(void * context, chip::CharSpan applicationName)
@@ -32964,7 +32872,7 @@ private:
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_5(status);
     }
 
     static void OnSuccessCallback_5(void * context, uint16_t productId)
@@ -32974,7 +32882,7 @@ private:
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_6(status);
     }
 
     static void OnSuccessCallback_6(void * context, uint8_t applicationStatus)
@@ -32984,7 +32892,7 @@ private:
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_7(chip::to_underlying(status));
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_7(status);
     }
 
     static void OnSuccessCallback_7(void * context, chip::CharSpan applicationVersion)
@@ -32992,19 +32900,6 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_7(applicationVersion);
     }
 
-<<<<<<< HEAD
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(status);
-    }
-
-    static void OnSuccessCallback_4(void * context, uint16_t catalogVendorId)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(catalogVendorId);
-    }
-
-=======
->>>>>>> c350a1134 (Run zap tool successfully)
     //
     // Tests methods
     //
@@ -33045,14 +32940,9 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-<<<<<<< HEAD
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
-=======
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
     }
 
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
@@ -33070,14 +32960,9 @@ private:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-<<<<<<< HEAD
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
-=======
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
     }
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
@@ -33088,38 +32973,6 @@ private:
 
         NextTest();
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    CHIP_ERROR TestReadAttributeCatalogVendorId_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(uint16_t catalogVendorId)
-    {
-        VerifyOrReturn(CheckValue("catalogVendorId", catalogVendorId, 1U));
-
-        NextTest();
-    }
-=======
->>>>>>> c350a1134 (Run zap tool successfully)
-};
-
-class TV_MediaPlaybackCluster : public TestCommand
-{
-public:
-    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0) {}
-=======
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
     CHIP_ERROR TestReadAttributeApplicationName_4()
     {
@@ -33127,11 +32980,12 @@ public:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4(chip::CharSpan applicationName)
     {
@@ -33146,11 +33000,12 @@ public:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_5(uint16_t productId)
     {
@@ -33165,11 +33020,12 @@ public:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_6(uint8_t applicationStatus)
     {
@@ -33184,11 +33040,12 @@ public:
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_7(chip::CharSpan applicationVersion)
     {
@@ -33315,7 +33172,7 @@ private:
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
     }
 
     static void OnSuccessCallback_1(void * context, uint8_t playbackState)
@@ -33325,7 +33182,7 @@ private:
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint64_t startTime)
@@ -33335,7 +33192,7 @@ private:
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(status);
     }
 
     static void OnSuccessCallback_3(void * context, uint64_t duration)
@@ -33345,7 +33202,7 @@ private:
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(status);
     }
 
     static void OnSuccessCallback_4(void * context, float playbackSpeed)
@@ -33355,7 +33212,7 @@ private:
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(status);
     }
 
     static void OnSuccessCallback_5(void * context, uint64_t seekRangeEnd)
@@ -33365,7 +33222,7 @@ private:
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+        (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(status);
     }
 
     static void OnSuccessCallback_6(void * context, uint64_t seekRangeStart)
@@ -33389,11 +33246,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(uint8_t playbackState)
     {
@@ -33408,11 +33266,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>(this, OnSuccessCallback_2,
-                                                                                                          OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(uint64_t startTime)
     {
@@ -33427,11 +33286,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>(this, OnSuccessCallback_3,
-                                                                                                         OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_3(uint64_t duration)
     {
@@ -33446,11 +33306,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4(float playbackSpeed)
     {
@@ -33465,11 +33326,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_5(uint64_t seekRangeEnd)
     {
@@ -33484,11 +33346,12 @@ private:
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_6(uint64_t seekRangeStart)
     {
@@ -33516,11 +33379,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33548,11 +33407,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33580,11 +33435,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33612,11 +33463,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33644,11 +33491,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33676,11 +33519,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33708,11 +33547,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33740,11 +33575,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33773,11 +33604,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33806,11 +33633,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33839,11 +33662,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+    void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_17(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
     {
@@ -33945,14 +33764,9 @@ private:
         chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-<<<<<<< HEAD
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
-=======
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnSuccessCallback_1,
-                                                                                                        OnFailureCallback_1);
->>>>>>> c350a1134 (Run zap tool successfully)
     }
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
@@ -34063,7 +33877,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4() { NextTest(); }
 };
@@ -34239,11 +34053,7 @@ private:
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-<<<<<<< HEAD
-        (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_3(status);
-=======
-        (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_2(chip::to_underlying(status));
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
+        (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint8_t currentMediaInput)
@@ -34302,11 +34112,12 @@ private:
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(uint8_t currentMediaInput)
     {
@@ -34335,26 +34146,7 @@ private:
         return CHIP_NO_ERROR;
     }
 
-<<<<<<< HEAD
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2() { NextTest(); }
-
-    CHIP_ERROR TestReadCurrentInputList_3()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
-=======
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
->>>>>>> 33a14fb16 (Fixed tests, recompiled code, all green)
 
     void OnSuccessResponse_3() { NextTest(); }
 
