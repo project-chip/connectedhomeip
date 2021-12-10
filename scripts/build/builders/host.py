@@ -81,6 +81,9 @@ class HostBoard(Enum):
     # cross-compile support
     ARM64 = auto()
 
+    # for test support
+    FAKE = auto()
+
     def BoardName(self):
         if self == HostBoard.NATIVE:
             uname_result = uname()
@@ -97,12 +100,16 @@ class HostBoard(Enum):
             return arch
         elif self == HostBoard.ARM64:
             return 'arm64'
+        elif self == HostBoard.FAKE:
+            return 'fake'
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
             return uname().system.lower()
+        elif self == HostBoard.FAKE:
+            return 'fake'
         else:
             # Cross compilation assumes linux currently
             return 'linux'
@@ -158,11 +165,21 @@ class HostBuilder(GnBuilder):
             )
 
             return self.extra_gn_options
+        elif self.board == HostBoard.FAKE:
+            self.extra_gn_options.extend(
+                [
+                    'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
+                    'chip_link_tests=true',
+                ]
+            )
+            return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
         if self.board == HostBoard.NATIVE:
+            return None
+        elif self.board == HostBoard.FAKE:
             return None
         elif self.board == HostBoard.ARM64:
             return {
