@@ -127,15 +127,15 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
                ${APP_CLUSTERS}/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${APP_CLUSTERS}/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${APP_CLUSTERS}/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
-               ${APP_CLUSTERS}/software_diagnostics_server/software_diagnostics_server.cpp
-               ${APP_CLUSTERS}/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
-               ${APP_CLUSTERS}/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
+               ${APP_CLUSTERS}/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
+               ${APP_CLUSTERS}/software-diagnostics-server/software-diagnostics-server.cpp
+               ${APP_CLUSTERS}/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
+               ${APP_CLUSTERS}/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${APP_CLUSTERS}/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
                ${APP_CLUSTERS}/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${APP_CLUSTERS}/identify-server/identify-server.cpp
                ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
-               ${APP_CLUSTERS}/general_diagnostics_server/general_diagnostics_server.cpp
+               ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
 )
 
