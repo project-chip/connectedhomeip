@@ -16,4 +16,4 @@
 # options are used from examples/.
 chip_build_tests = false
 
-pw_build_PIP_CONSTRAINTS = ["//scripts/constraints.txt"]
+pw_build_PIP_CONSTRAINTS = ["${chip_root}/scripts/constraints.txt"]
