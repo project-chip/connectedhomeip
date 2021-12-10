@@ -55,7 +55,7 @@ class ClusterInteractionHistoryFragment : Fragment() {
     override fun onItemClick(position: Int) {
       showFragment(
         ClusterDetailFragment.newInstance(
-          clusterInteractionHistoryList[position].deviceptr,
+          clusterInteractionHistoryList[position].deviceId,
           clusterInteractionHistoryList[position].endpointId,
           clusterInteractionHistoryList[position]
         )

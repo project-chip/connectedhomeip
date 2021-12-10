@@ -14,7 +14,7 @@ data class HistoryCommand(
   var responseValue: Map<CommandResponseInfo, Any>?,
   var status: String?,
   var endpointId: Int,
-  var deviceptr: Long,
+  var deviceId: Long,
 ) : Serializable
 
 data class HistoryParameterInfo(

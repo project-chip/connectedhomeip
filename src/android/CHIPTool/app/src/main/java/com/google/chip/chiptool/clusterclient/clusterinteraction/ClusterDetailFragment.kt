@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.InteractionInfo
@@ -23,6 +24,7 @@ import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
+import com.google.chip.chiptool.ChipClient.getConnectedDevicePointer
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionHistoryFragment.Companion.clusterInteractionHistoryList
@@ -42,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /**
  * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
@@ -51,13 +54,14 @@ class ClusterDetailFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
   private var clusterMap: Map<String, ClusterInfo> = ClusterInfoMapping().clusterMap
   private lateinit var selectedClusterInfo: ClusterInfo
   private lateinit var selectedCluster: ChipClusters.BaseChipCluster
   private lateinit var selectedCommandCallback: DelegatedClusterCallback
   private lateinit var selectedInteractionInfo: InteractionInfo
   private var devicePtr by Delegates.notNull<Long>()
+  private var deviceId by Delegates.notNull<Long>()
   private var endpointId by Delegates.notNull<Int>()
 
 
@@ -73,9 +77,13 @@ class ClusterDetailFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
+    scope = viewLifecycleOwner.lifecycleScope
+    deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
+    scope.launch {
+      devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
+    }
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
-    historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand
+    historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand?
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
       if (historyCommand != null) {
@@ -125,7 +133,7 @@ class ClusterDetailFragment : Fragment() {
           null,
           null,
           endpointId,
-          devicePtr
+          deviceId
         )
       )
       parameterList.forEach {
@@ -335,7 +343,7 @@ class ClusterDetailFragment : Fragment() {
         } else {
           it!!.javaClass.toString().split('$').last()
         }
-        attributeCallbackItem.clusterCallbackDataTv.text = objectString
+        attributeCallbackItem.clusterCallbackDataTv.text = callbackClassName
         attributeCallbackItem.clusterCallbackDataTv.setOnClickListener {
           AlertDialog.Builder(requireContext())
             .setTitle(callbackClassName)
@@ -370,16 +378,16 @@ class ClusterDetailFragment : Fragment() {
     private const val TAG = "ClusterDetailFragment"
     private const val ENDPOINT_ID_KEY = "endpointId"
     private const val HISTORY_COMMAND = "historyCommand"
-    private const val DEVICE_PTR = "devicePtr"
+    private const val DEVICE_ID = "deviceId"
 
     fun newInstance(
-      devicePtr: Long,
+      deviceId: Long,
       endpointId: Int,
       historyCommand: HistoryCommand?
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
-        arguments = Bundle(2).apply {
-          putLong(DEVICE_PTR, devicePtr)
+        arguments = Bundle(4).apply {
+          putLong(DEVICE_ID, deviceId)
           putSerializable(HISTORY_COMMAND, historyCommand)
           putInt(ENDPOINT_ID_KEY, endpointId)
         }

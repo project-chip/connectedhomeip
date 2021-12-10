@@ -104,7 +104,7 @@ class ClusterInteractionFragment : Fragment() {
 
   inner class EndpointListener : EndpointAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
-      showFragment(ClusterDetailFragment.newInstance(devicePtr, position, null))
+      showFragment(ClusterDetailFragment.newInstance(addressUpdateFragment.deviceId, position, null))
     }
   }
 }
