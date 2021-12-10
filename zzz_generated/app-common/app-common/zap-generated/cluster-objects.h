@@ -28106,30 +28106,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ChannelList
-namespace ChannelLineup {
-struct TypeInfo
-{
-    using Type             = Structs::TvChannelLineupInfo::Type;
-    using DecodableType    = Structs::TvChannelLineupInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelLineupInfo::DecodableType &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ChannelLineup
-namespace CurrentChannel {
-struct TypeInfo
-{
-    using Type             = Structs::TvChannelInfo::Type;
-    using DecodableType    = Structs::TvChannelInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelInfo::DecodableType &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CurrentChannel
 namespace AttributeList {
 struct TypeInfo
 {

@@ -4760,14 +4760,6 @@ namespace ChannelList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace ChannelList
 
-namespace ChannelLineup {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace ChannelLineup
-
-namespace CurrentChannel {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentChannel
-
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList

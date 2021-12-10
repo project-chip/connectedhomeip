@@ -3761,20 +3761,6 @@ class ChipClusters:
                     "type": "",
                     "reportable": True,
                 },
-                0x00000001: {
-                    "attributeName": "ChannelLineup",
-                    "attributeId": 0x00000001,
-                    "type": "",
-                    "reportable": True,
-                    "writable": True,
-                },
-                0x00000002: {
-                    "attributeName": "CurrentChannel",
-                    "attributeId": 0x00000002,
-                    "type": "",
-                    "reportable": True,
-                    "writable": True,
-                },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
                     "attributeId": 0x0000FFFB,

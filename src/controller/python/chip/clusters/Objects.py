@@ -27198,16 +27198,12 @@ class TvChannel(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
-                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=TvChannel.Structs.TvChannelLineupInfo),
-                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=TvChannel.Structs.TvChannelInfo),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
     channelList: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
-    channelLineup: 'TvChannel.Structs.TvChannelLineupInfo' = None
-    currentChannel: 'TvChannel.Structs.TvChannelInfo' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -27342,38 +27338,6 @@ class TvChannel(Cluster):
                 return ClusterObjectFieldDescriptor(Type=typing.List[TvChannel.Structs.TvChannelInfo])
 
             value: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class ChannelLineup(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0504
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TvChannel.Structs.TvChannelLineupInfo)
-
-            value: 'TvChannel.Structs.TvChannelLineupInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelLineupInfo())
-
-        @dataclass
-        class CurrentChannel(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x0504
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000002
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TvChannel.Structs.TvChannelInfo)
-
-            value: 'TvChannel.Structs.TvChannelInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelInfo())
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):

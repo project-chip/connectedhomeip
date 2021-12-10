@@ -5917,49 +5917,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = array_0;
             return value;
         }
-        case Attributes::ChannelLineup::Id: {
-            using TypeInfo = Attributes::ChannelLineup::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            CHIPTvChannelClusterTvChannelLineupInfo * _Nonnull value;
-            value = [CHIPTvChannelClusterTvChannelLineupInfo new];
-            value.operatorName = [[NSString alloc] initWithBytes:cppValue.operatorName.data()
-                                                          length:cppValue.operatorName.size()
-                                                        encoding:NSUTF8StringEncoding];
-            value.lineupName = [[NSString alloc] initWithBytes:cppValue.lineupName.data()
-                                                        length:cppValue.lineupName.size()
-                                                      encoding:NSUTF8StringEncoding];
-            value.postalCode = [[NSString alloc] initWithBytes:cppValue.postalCode.data()
-                                                        length:cppValue.postalCode.size()
-                                                      encoding:NSUTF8StringEncoding];
-            value.lineupInfoType = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue.lineupInfoType)];
-            return value;
-        }
-        case Attributes::CurrentChannel::Id: {
-            using TypeInfo = Attributes::CurrentChannel::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            CHIPTvChannelClusterTvChannelInfo * _Nonnull value;
-            value = [CHIPTvChannelClusterTvChannelInfo new];
-            value.majorNumber = [NSNumber numberWithUnsignedShort:cppValue.majorNumber];
-            value.minorNumber = [NSNumber numberWithUnsignedShort:cppValue.minorNumber];
-            value.name = [[NSString alloc] initWithBytes:cppValue.name.data()
-                                                  length:cppValue.name.size()
-                                                encoding:NSUTF8StringEncoding];
-            value.callSign = [[NSString alloc] initWithBytes:cppValue.callSign.data()
-                                                      length:cppValue.callSign.size()
-                                                    encoding:NSUTF8StringEncoding];
-            value.affiliateCallSign = [[NSString alloc] initWithBytes:cppValue.affiliateCallSign.data()
-                                                               length:cppValue.affiliateCallSign.size()
-                                                             encoding:NSUTF8StringEncoding];
-            return value;
-        }
         case Attributes::AttributeList::Id: {
             using TypeInfo = Attributes::AttributeList::TypeInfo;
             TypeInfo::DecodableType cppValue;

@@ -914,10 +914,6 @@ typedef void (*CHIPTvChannelClusterChangeChannelResponseCallbackType)(
 
 typedef void (*CHIPTvChannelClusterChannelListAttributeCallbackType)(
     void *, const chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo::DecodableType &);
-typedef void (*CHIPTvChannelClusterChannelLineupAttributeCallbackType)(
-    void *, chip::app::Clusters::TvChannel::Attributes::ChannelLineup::TypeInfo::DecodableArgType);
-typedef void (*CHIPTvChannelClusterCurrentChannelAttributeCallbackType)(
-    void *, chip::app::Clusters::TvChannel::Attributes::CurrentChannel::TypeInfo::DecodableArgType);
 typedef void (*CHIPTvChannelClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TvChannel::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTvChannelClusterClusterRevisionAttributeCallbackType)(

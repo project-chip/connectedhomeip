@@ -1359,8 +1359,6 @@
 
 // Server attributes
 #define ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
-#define ZCL_TV_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
-#define ZCL_TV_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Target Navigator
 
