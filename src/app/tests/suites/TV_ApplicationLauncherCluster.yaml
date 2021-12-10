@@ -29,23 +29,51 @@ tests:
       response:
           value: [123, 456]
 
-    #- label: "Launch App Command"
-    #  command: "LaunchApp"
-    #  arguments:
-    #      values:
-    #          - name: "data"
-    #            value: "exampleData"
-    #          - name: "catalogVendorId"
-    #            value: 1
-    #          - name: "applicationId"
-    #            value: "appId"
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute application launcher app"
+      disabled: true
+      command: "readAttribute"
+      attribute: "application launcher app"
+      response:
+          value: { catalogVendorId: 123, applicationId: "applicationId" }
 
-      # TODO: Enable this once struct as response type is supported
-      # response:
-      #     values:
-      #         - name: "status"
-      #           value: 0
-      #         - name: "data"
-      #           value: "data"
-    # TODO: Read attribute catalog vendor id and Read attribute catalog vendor id
-    # TODO: shoudl be one test, but currently struct as attribute is not supported
+    - label: "Launch App Command"
+      command: "LaunchApp"
+      arguments:
+          values:
+              - name: "data"
+                value: "data"
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
+      response:
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0
+
+    - label: "Stop App Command"
+      command: "StopApp"
+      arguments:
+          values:
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
+      response:
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0
+
+    - label: "Hide App Command"
+      command: "HideApp"
+      arguments:
+          values:
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
+      response:
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0

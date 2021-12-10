@@ -3310,7 +3310,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _channelMatch = [NSArray array];
+        _channelMatch = [CHIPTvChannelClusterTvChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3679,8 +3679,6 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
-
         _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
     }
     return self;
@@ -3693,6 +3691,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _status = @(0);
+
+        _data = @"";
     }
     return self;
 }
@@ -3702,8 +3702,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init
 {
     if (self = [super init]) {
-
-        _data = @"";
 
         _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
     }
@@ -3717,6 +3715,8 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _status = @(0);
+
+        _data = @"";
     }
     return self;
 }
