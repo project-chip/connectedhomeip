@@ -36,8 +36,10 @@
 #include <app/OperationalDeviceProxyPool.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
@@ -113,26 +115,6 @@ struct ControllerInitParams
 
     FabricIndex fabricIndex = kMinValidFabricIndex;
     FabricId fabricId       = kUndefinedFabricId;
-};
-
-enum CommissioningStage : uint8_t
-{
-    kError,
-    kSecurePairing,
-    kArmFailsafe,
-    // kConfigTime,  // NOT YET IMPLEMENTED
-    // kConfigTimeZone,  // NOT YET IMPLEMENTED
-    // kConfigDST,  // NOT YET IMPLEMENTED
-    kConfigRegulatory,
-    kDeviceAttestation,
-    kCheckCertificates,
-    kConfigACL,
-    kNetworkSetup,
-    kScanNetworks, // optional stage if network setup fails (not yet implemented)
-    kNetworkEnable,
-    kFindOperational,
-    kSendComplete,
-    kCleanup,
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -576,7 +558,10 @@ public:
 
     void RendezvousCleanup(CHIP_ERROR status);
 
-    void AdvanceCommissioningStage(CHIP_ERROR err);
+    void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
+                                  CommissioningDelegate * delegate);
+
+    void CommissioningStageComplete(CHIP_ERROR err);
 
 #if CONFIG_NETWORK_LAYER_BLE
     /**
@@ -664,7 +649,6 @@ private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
-    OperationalDeviceProxy * mDeviceOperational        = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
@@ -801,7 +785,6 @@ private:
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
 
-    CommissioningStage GetNextCommissioningStage();
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
@@ -820,6 +803,8 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
+    AutoCommissioner mAutoCommissioner;
+    CommissioningDelegate * mCommissioningDelegate = nullptr;
 };
 
 } // namespace Controller
