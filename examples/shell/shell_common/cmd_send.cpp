@@ -128,7 +128,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
     // Create a new exchange context.
-    auto * ec = gExchangeManager.NewContext(SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex), &gMockAppDelegate);
+    auto * ec = gExchangeManager.NewContext(gSession.Get(), &gMockAppDelegate);
     VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
@@ -181,7 +181,7 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
+    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
                                      gFabricIndex);
 
 exit:

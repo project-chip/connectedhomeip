@@ -73,9 +73,9 @@ void CASEClient::OnSessionEstablished()
     }
 }
 
-CHIP_ERROR CASEClient::DeriveSecureSessionHandle(Optional<SessionHandle> & handle)
+CHIP_ERROR CASEClient::DeriveSecureSessionHandle(SessionHolder & handle)
 {
-    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
+    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(handle,
         Optional<Transport::PeerAddress>::Value(mPeerAddress), mPeerId.GetNodeId(), &mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
     if (err != CHIP_NO_ERROR)
@@ -83,8 +83,6 @@ CHIP_ERROR CASEClient::DeriveSecureSessionHandle(Optional<SessionHandle> & handl
         ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
         return err;
     }
-    handle.SetValue(SessionHandle(mPeerId.GetNodeId(), mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(),
-                                  mInitParams.fabricInfo->GetFabricIndex()));
 
     return CHIP_NO_ERROR;
 }

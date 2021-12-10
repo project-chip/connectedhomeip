@@ -57,12 +57,6 @@ public:
 
     bool operator==(const SessionHandle & that) const
     {
-        // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
-        return mPeerNodeId == that.mPeerNodeId && mPeerSessionId == that.mPeerSessionId;
-    }
-
-    bool MatchIncomingSession(const SessionHandle & that) const
-    {
         if (IsSecure())
         {
             return that.IsSecure() && mLocalSessionId.Value() == that.mLocalSessionId.Value();

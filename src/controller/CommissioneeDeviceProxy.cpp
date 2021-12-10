@@ -56,9 +56,9 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParametersIfNeeded(bool & d
     }
     else
     {
-        if (mSecureSession.HasValue())
+        if (mSecureSession)
         {
-            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+            Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Get());
             // Check if the connection state has the correct transport information
             if (secureSession->GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
             {
@@ -83,29 +83,23 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mSecureSession.Value());
-}
-
-void CommissioneeDeviceProxy::OnNewConnection(SessionHandle session)
-{
-    mState = ConnectionState::SecureConnected;
-    mSecureSession.SetValue(session);
+    return commandObj->SendCommandRequest(mSecureSession.Get());
 }
 
 void CommissioneeDeviceProxy::OnSessionReleased(SessionHandle session)
 {
-    VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
+    VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = ConnectionState::NotConnected;
-    mSecureSession.ClearValue();
+    mSecureSession.Release();
 }
 
 CHIP_ERROR CommissioneeDeviceProxy::CloseSession()
 {
     ReturnErrorCodeIf(mState != ConnectionState::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
-    if (mSecureSession.HasValue())
+    if (mSecureSession)
     {
-        mSessionManager->ExpirePairing(mSecureSession.Value());
+        mSessionManager->ExpirePairing(mSecureSession.Get());
     }
     mState = ConnectionState::NotConnected;
     mPairing.Clear();
@@ -127,7 +121,7 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(didLoad));
 
-    if (!mSecureSession.HasValue())
+    if (!mSecureSession)
     {
         // Nothing needs to be done here.  It's not an error to not have a
         // secureSession.  For one thing, we could have gotten an different
@@ -136,7 +130,7 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
         return CHIP_NO_ERROR;
     }
 
-    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Value());
+    Transport::SecureSession * secureSession = mSessionManager->GetSecureSession(mSecureSession.Get());
     secureSession->SetPeerAddress(addr);
 
     return CHIP_NO_ERROR;
@@ -172,9 +166,9 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    err = mSessionManager->NewPairing(Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mPairing,
-                                      CryptoContext::SessionRole::kInitiator, mFabricIndex);
-    SuccessOrExit(err);
+    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mPairing,
+                                      CryptoContext::SessionRole::kInitiator, mFabricIndex));
+    mState = ConnectionState::SecureConnected;
 
 exit:
 

@@ -249,8 +249,7 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddr
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -329,7 +328,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, gSession.Get());
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

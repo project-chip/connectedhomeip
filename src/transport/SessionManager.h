@@ -38,6 +38,7 @@
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionDelegate.h>
 #include <transport/SessionHandle.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionMessageDelegate.h>
 #include <transport/TransportMgr.h>
 #include <transport/UnauthenticatedSessionTable.h>
@@ -148,31 +149,6 @@ public:
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
-    /// @brief Set the delegate for handling session creation.
-    void RegisterCreationDelegate(SessionCreationDelegate & cb)
-    {
-#ifndef NDEBUG
-        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
-            VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return Loop::Continue;
-        });
-#endif
-        std::reference_wrapper<SessionCreationDelegate> * slot = mSessionCreationDelegates.CreateObject(cb);
-        VerifyOrDie(slot != nullptr);
-    }
-
-    void UnregisterCreationDelegate(SessionCreationDelegate & cb)
-    {
-        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
-            if (std::addressof(cb) == std::addressof(i->get()))
-            {
-                mSessionCreationDelegates.ReleaseObject(i);
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-    }
-
     /// @brief Set the delegate for handling session release.
     void RegisterReleaseDelegate(SessionReleaseDelegate & cb)
     {
@@ -211,7 +187,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
+    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
                           CryptoContext::SessionRole direction, FabricIndex fabric);
 
     void ExpirePairing(SessionHandle session);
@@ -261,6 +237,12 @@ public:
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
+    // TODO: placeholder function for creating GroupSession. Implements a GroupSession class in the future
+    Optional<SessionHandle> CreateGroupSession(NodeId peerNodeId, GroupId groupId, FabricIndex fabricIndex)
+    {
+        return MakeOptional(SessionHandle(peerNodeId, groupId, fabricIndex));
+    }
+
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
 
@@ -286,12 +268,9 @@ private:
     State mState;                                                                         // < Initialization state of the object
 
     SessionMessageDelegate * mCB = nullptr;
-    BitMapObjectPool<std::reference_wrapper<SessionCreationDelegate>, CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES,
-                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mSessionCreationDelegates;
 
     // TODO: This is a temporary solution to release sessions, in the near future, SessionReleaseDelegate will be
-    //       directly associated with the every SessionHandle. Then the callback function is called on over the handle
+    //       directly associated with the every SessionHolder. Then the callback function is called on over the handle
     //       delegate directly, in order to prevent dangling handles.
     BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES,
                      OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>

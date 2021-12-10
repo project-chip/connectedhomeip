@@ -118,7 +118,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     }
     else
     {
-        if (!mSecureSession.HasValue())
+        if (!mSecureSession)
         {
             // Nothing needs to be done here.  It's not an error to not have a
             // secureSession.  For one thing, we could have gotten an different
@@ -127,7 +127,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
             return CHIP_NO_ERROR;
         }
 
-        Transport::SecureSession * secureSession = mInitParams.sessionManager->GetSecureSession(mSecureSession.Value());
+        Transport::SecureSession * secureSession = mInitParams.sessionManager->GetSecureSession(mSecureSession.Get());
         if (secureSession != nullptr)
         {
             secureSession->SetPeerAddress(addr);
@@ -249,9 +249,9 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
 CHIP_ERROR OperationalDeviceProxy::Disconnect()
 {
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
-    if (mSecureSession.HasValue())
+    if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Value());
+        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
     }
     mState = State::Initialized;
     if (mCASEClient)
@@ -292,10 +292,10 @@ void OperationalDeviceProxy::DeferCloseCASESession()
 
 void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
 {
-    VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
+    VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = State::Initialized;
-    mSecureSession.ClearValue();
+    mSecureSession.Release();
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()

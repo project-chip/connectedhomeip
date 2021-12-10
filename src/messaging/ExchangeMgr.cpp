@@ -322,7 +322,7 @@ void ExchangeManager::OnSessionReleased(SessionHandle session)
 void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSession.HasValue() && ec->mSession.Value() == session)
+        if (ec->mSession.Contains(session))
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges

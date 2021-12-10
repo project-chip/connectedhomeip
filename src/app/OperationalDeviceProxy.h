@@ -155,7 +155,7 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
@@ -165,7 +165,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOpional(); }
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
@@ -210,7 +210,7 @@ private:
 
     State mState = State::Uninitialized;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolder mSecureSession;
 
     uint8_t mSequenceNumber = 0;
 
