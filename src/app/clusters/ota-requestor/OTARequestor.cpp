@@ -33,6 +33,7 @@
 namespace chip {
 
 using namespace app::Clusters;
+using namespace app::Clusters::OtaSoftwareUpdateProvider;
 using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
 using bdx::TransferSession;
@@ -45,7 +46,7 @@ constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this valu
 static void LogQueryImageResponse(const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse:");
-    ChipLogDetail(SoftwareUpdate, "  status: %" PRIu8 "", response.status);
+    ChipLogDetail(SoftwareUpdate, "  status: %" PRIu8 "", to_underlying(response.status));
     if (response.delayedActionTime.HasValue())
     {
         ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 " seconds", response.delayedActionTime.Value());
@@ -114,7 +115,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 
     switch (response.status)
     {
-    case EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE: {
+    case OTAQueryStatus::kUpdateAvailable: {
         // Parse out the provider node ID and file designator from the image URI
         NodeId nodeId = kUndefinedNodeId;
         CharSpan fileDesignator;
@@ -135,9 +136,9 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         requestorCore->ConnectToProvider(kStartBDX);
         break;
     }
-    case EMBER_ZCL_OTA_QUERY_STATUS_BUSY:
+    case OTAQueryStatus::kBusy:
         break;
-    case EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE:
+    case OTAQueryStatus::kNotAvailable:
         break;
     // TODO: Add download protocol not supported
     // Issue #9524 should handle all response status appropriately
@@ -437,7 +438,7 @@ CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)
 
 bool OTARequestor::ValidateQueryImageResponse(const QueryImageResponse::DecodableType & response) const
 {
-    if (response.status == EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE)
+    if (response.status == OTAQueryStatus::kUpdateAvailable)
     {
         VerifyOrReturnError(response.imageURI.HasValue(), false);
         VerifyOrReturnError(response.softwareVersion.HasValue() && response.softwareVersionString.HasValue(), false);
