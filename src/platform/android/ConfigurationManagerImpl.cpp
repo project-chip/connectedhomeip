@@ -287,5 +287,10 @@ CHIP_ERROR ConfigurationManagerImpl::GetUniqueId(char * buf, size_t bufSize)
     return ReadConfigValueStr(AndroidConfig::kConfigKey_UniqueId, buf, bufSize, dateLen);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::StoreLocalConfigDisabled(bool disabled)
+{
+    return WriteConfigValue(AndroidConfig::kConfigKey_LocalConfigDisabled, disabled);
+}
+
 } // namespace DeviceLayer
 } // namespace chip

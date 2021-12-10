@@ -83,38 +83,85 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
 
 PlatformMgrDelegate gPlatformMgrDelegate;
 
+class BasicAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    BasicAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::Basic::Id) {}
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    {
+        if (aPath.mAttributeId == app::Clusters::Basic::Attributes::NodeLabel::Id)
+        {
+            char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
+            if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
+            {
+                CharSpan span(nodeLabel, strlen(nodeLabel));
+                aEncoder.Encode(span);
+            }
+        }
+        else if (aPath.mAttributeId == app::Clusters::Basic::Attributes::Location::Id)
+        {
+            char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
+            size_t codeLen = 0;
+            if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR && codeLen > 0)
+            {
+                CharSpan span(location, codeLen);
+                aEncoder.Encode(span);
+            } else {
+                // "XX" is the default value of the location attribute
+                aEncoder.Encode(CharSpan("XX", strlen("XX")));
+            }
+        }
+        else if(aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
+        {
+            bool localConfigDisabled;
+            if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
+            {
+                aEncoder.Encode(localConfigDisabled);
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override 
+    {
+        CHIP_ERROR err;
+        if (aPath.mAttributeId == app::Clusters::Basic::Attributes::NodeLabel::Id)
+        {
+            CharSpan span;
+            err = aDecoder.Decode(span);
+            if (err == CHIP_NO_ERROR) {
+                ConfigurationMgr().StoreNodeLabel(span.data(), span.size());
+            }
+        }
+        else if (aPath.mAttributeId == app::Clusters::Basic::Attributes::Location::Id)
+        {
+            CharSpan span;
+            err = aDecoder.Decode(span);
+            if (err == CHIP_NO_ERROR) {
+                ConfigurationMgr().StoreCountryCode(span.data(), span.size());
+            }
+        }
+        else if(aPath.mAttributeId == app::Clusters::Basic::Attributes::LocalConfigDisabled::Id)
+        {
+            bool localConfigDisabled;
+            err = aDecoder.Decode(localConfigDisabled);
+            if (err == CHIP_NO_ERROR) {
+                ConfigurationMgr().StoreLocalConfigDisabled(localConfigDisabled);
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+static BasicAttrAccess gBasicAttrAttrAccess;
+
 } // anonymous namespace
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
     EmberAfStatus status;
-
-    char nodeLabel[DeviceLayer::ConfigurationManager::kMaxNodeLabelLength + 1];
-    if (ConfigurationMgr().GetNodeLabel(nodeLabel, sizeof(nodeLabel)) == CHIP_NO_ERROR)
-    {
-        status = Attributes::NodeLabel::Set(endpoint, chip::CharSpan(nodeLabel, strlen(nodeLabel)));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Node Label: 0x%02x", status));
-    }
-
-    char location[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
-    size_t codeLen = 0;
-    if (ConfigurationMgr().GetCountryCode(location, sizeof(location), codeLen) == CHIP_NO_ERROR)
-    {
-        if (codeLen == 0)
-        {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
-        }
-        else
-        {
-            status = Attributes::Location::Set(endpoint, chip::CharSpan(location, strlen(location)));
-        }
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
-    }
-    else
-    {
-        status = Attributes::Location::Set(endpoint, chip::CharSpan("XX", strlen("XX")));
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Location: 0x%02x", status));
-    }
 
     char vendorName[DeviceLayer::ConfigurationManager::kMaxVendorNameLength + 1];
     if (ConfigurationMgr().GetVendorName(vendorName, sizeof(vendorName)) == CHIP_NO_ERROR)
@@ -213,13 +260,6 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Product Label: 0x%02x", status));
     }
 
-    bool localConfigDisabled;
-    if (ConfigurationMgr().GetLocalConfigDisabled(localConfigDisabled) == CHIP_NO_ERROR)
-    {
-        status = Attributes::LocalConfigDisabled::Set(endpoint, localConfigDisabled);
-        VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Local Config Disabled: 0x%02x", status));
-    }
-
     bool reachable;
     if (ConfigurationMgr().GetReachable(reachable) == CHIP_NO_ERROR)
     {
@@ -232,6 +272,13 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     {
         status = Attributes::UniqueID::Set(endpoint, CharSpan(uniqueId, strlen(uniqueId)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Unique Id: 0x%02x", status));
+    }
+
+    static bool attrAccessRegistered = false;
+    if (!attrAccessRegistered)
+    {
+        registerAttributeAccessOverride(&gBasicAttrAttrAccess);
+        attrAccessRegistered = true;
     }
 }
 

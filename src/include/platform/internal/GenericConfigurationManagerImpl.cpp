@@ -430,6 +430,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf,
 }
 
 template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreLocalConfigDisabled(bool disabled)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint16_t & lifetimeCounter)
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
