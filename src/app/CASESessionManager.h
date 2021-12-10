@@ -25,6 +25,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
 #include <lib/support/Pool.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <transport/SessionDelegate.h>
 
 #include <lib/dnssd/ResolverProxy.h>
@@ -58,11 +59,18 @@ public:
 
         mConfig = params;
 
-        // TODO: Revisit who should be set as the resolver delegate
-        Dnssd::Resolver::Instance().SetResolverDelegate(this);
+        if (mConfig.dnsResolver == nullptr)
+        {
+            VerifyOrDie(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
+            mDNSResolver.SetResolverDelegate(this);
+            mConfig.dnsResolver = &mDNSResolver;
+        }
     }
 
-    virtual ~CASESessionManager() {}
+    virtual ~CASESessionManager()
+    {
+        mDNSResolver.Shutdown();
+    }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
@@ -109,6 +117,7 @@ private:
     void ReleaseSession(OperationalDeviceProxy * device);
 
     CASESessionManagerConfig mConfig;
+    Dnssd::ResolverProxy mDNSResolver;
 };
 
 } // namespace chip
