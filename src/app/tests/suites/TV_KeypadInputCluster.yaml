@@ -29,3 +29,7 @@ tests:
           values:
               - name: "keyCode"
                 value: 3
+      response:
+          values:
+              - name: "status"
+                value: 0

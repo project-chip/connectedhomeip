@@ -33,8 +33,12 @@ typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataM
 
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterHideAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterStopAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
@@ -494,10 +498,6 @@ typedef void (*ContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, chip::app::Clusters::ContentLauncher::ContentLaunchStatus);
 typedef void (*NullableContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> &);
-typedef void (*ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType);
-typedef void (*NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> &);
 typedef void (*AudioOutputClusterAudioOutputTypeAttributeCallback)(void *, chip::app::Clusters::AudioOutput::AudioOutputType);
 typedef void (*NullableAudioOutputClusterAudioOutputTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::AudioOutputType> &);
@@ -1847,37 +1847,6 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3419,26 +3388,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
+class CHIPTvChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPTvChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelTvChannelListListAttributeCallbackBridge
+class CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPTvChannelChannelListListAttributeCallbackBridge
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelTvChannelListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTvChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4078,6 +4046,19 @@ public:
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
+class CHIPApplicationLauncherClusterHideAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+};
+
 class CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
@@ -4089,6 +4070,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+};
+
+class CHIPApplicationLauncherClusterStopAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
 };
 
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
@@ -10627,68 +10621,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value);
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

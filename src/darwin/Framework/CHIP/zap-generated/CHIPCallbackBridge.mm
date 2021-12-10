@@ -1649,45 +1649,6 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge
     }
 }
 
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
-{
-    NSArray * _Nonnull objCValue;
-    auto * array_0 = [NSMutableArray new];
-    auto iter_0 = value.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
-        [array_0 addObject:newElement_0];
-    }
-    { // Scope for the error so we will know what it's named
-        CHIP_ERROR err = iter_0.GetStatus();
-        if (err != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
-        }
-    }
-    objCValue = array_0;
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void CHIPContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3859,7 +3820,7 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
     }
 }
 
-void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPTvChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -3893,9 +3854,9 @@ void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * c
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -4965,10 +4926,36 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPApplicationLauncherClusterHideAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterHideAppResponseParams new];
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
     auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPApplicationLauncherClusterStopAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterStopAppResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
@@ -4983,10 +4970,10 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
     {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
     }
     {
-        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -4996,10 +4983,10 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
     {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
     }
     {
-        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -5850,33 +5837,18 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTvChannelClusterChangeChannelResponseParams new];
     {
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.channelMatch.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPTvChannelClusterTvChannelInfo * newElement_0;
-            newElement_0 = [CHIPTvChannelClusterTvChannelInfo new];
-            newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
-            newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
-                                                             length:entry_0.callSign.size()
-                                                           encoding:NSUTF8StringEncoding];
-            newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
-                                                                      length:entry_0.affiliateCallSign.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            [array_0 addObject:newElement_0];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return;
-            }
-        }
-        response.channelMatch = array_0;
+        response.channelMatch = [CHIPTvChannelClusterTvChannelInfo new];
+        response.channelMatch.majorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.majorNumber];
+        response.channelMatch.minorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.minorNumber];
+        response.channelMatch.name = [[NSString alloc] initWithBytes:data.channelMatch.name.data()
+                                                              length:data.channelMatch.name.size()
+                                                            encoding:NSUTF8StringEncoding];
+        response.channelMatch.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.data()
+                                                                  length:data.channelMatch.callSign.size()
+                                                                encoding:NSUTF8StringEncoding];
+        response.channelMatch.affiliateCallSign = [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.data()
+                                                                           length:data.channelMatch.affiliateCallSign.size()
+                                                                         encoding:NSUTF8StringEncoding];
     }
     {
         response.errorType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
@@ -11265,61 +11237,6 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubsc
     void * context)
 {
     auto * self = static_cast<CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
