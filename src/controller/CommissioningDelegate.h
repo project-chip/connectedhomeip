@@ -44,6 +44,61 @@ enum CommissioningStage : uint8_t
     kCleanup,
 };
 
+struct WifiCredentials
+{
+    ByteSpan ssid;
+    // TODO(cecille): We should add a PII bytespan concept.
+    ByteSpan credentials;
+    WifiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+};
+class CommissioningParameters
+{
+public:
+    static constexpr size_t kMaxThreadDatasetLen = 254;
+    static constexpr size_t kMaxSsidLen          = 32;
+    static constexpr size_t kMaxCredentialsLen   = 64;
+    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
+    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
+    bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
+    bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
+    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
+    const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
+    const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
+    const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+
+    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
+    CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
+    {
+        mCSRNonce.SetValue(csrNonce);
+        return *this;
+    }
+
+    // The lifetime of the buffer attestationNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
+    CommissioningParameters & SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        mAttestationNonce.SetValue(attestationNonce);
+        return *this;
+    }
+    CommissioningParameters & SetWifiCredentials(WifiCredentials wifiCreds)
+    {
+        mWifiCreds.SetValue(wifiCreds);
+        return *this;
+    }
+
+    CommissioningParameters & SetThreadOperationalDataset(ByteSpan threadOperationalDataset)
+    {
+
+        mThreadOperationalDataset.SetValue(threadOperationalDataset);
+        return *this;
+    }
+
+private:
+    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
+    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
+    Optional<WifiCredentials> mWifiCreds;
+    Optional<ByteSpan> mThreadOperationalDataset;
+};
+
 class CommissioningDelegate
 {
 public:

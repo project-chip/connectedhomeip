@@ -52,6 +52,7 @@
 #include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioningDelegate.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -90,7 +91,7 @@ chip::SimpleFabricStorage sFabricStorage;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
 chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
-chip::CommissioningParameters sCommissioningParameters;
+chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -360,7 +361,7 @@ ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * s
     memcpy(sCredsBuf.Get(), credentials, credsSize);
 
     sCommissioningParameters.SetWifiCredentials(
-        WifiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
+        chip::Controller::WifiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
     char tmp[128];
     chip::Platform::CopyString(tmp, sCommissioningParameters.GetWifiCredentials().Value().ssid);
     return CHIP_NO_ERROR.AsInteger();

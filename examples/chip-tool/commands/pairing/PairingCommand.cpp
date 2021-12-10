@@ -28,6 +28,7 @@
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 
 using namespace ::chip;
+using namespace ::chip::Controller;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -72,7 +73,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     CommissioningParameters commissioningParams;
     if (mNetworkType == PairingNetworkType::WiFi)
     {
-        commissioningParams.SetWifiCredentials(WifiCredentials(mSSID, mPassword));
+        commissioningParams.SetWifiCredentials(Controller::WifiCredentials(mSSID, mPassword));
     }
     else if (mNetworkType == PairingNetworkType::Thread)
     {

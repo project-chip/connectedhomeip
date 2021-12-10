@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <controller/CommissioningDelegate.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -149,7 +150,7 @@ private:
     CHIP_ERROR PairWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR Unpair(NodeId remoteId);
-    chip::CommissioningParameters GetCommissioningParameters();
+    chip::Controller::CommissioningParameters GetCommissioningParameters();
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
