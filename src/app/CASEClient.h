@@ -55,7 +55,7 @@ public:
 
     void OnSessionEstablished() override;
 
-    CHIP_ERROR DeriveSecureSessionHandle(Optional<SessionHandle> & handle);
+    CHIP_ERROR DeriveSecureSessionHandle(SessionHolder & handle);
 
 private:
     CASEClientInitParams mInitParams;
