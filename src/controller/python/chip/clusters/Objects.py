@@ -27197,17 +27197,17 @@ class TvChannel(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="tvChannelList", Tag=0x00000000, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
-                ClusterObjectFieldDescriptor(Label="tvChannelLineup", Tag=0x00000001, Type=bytes),
-                ClusterObjectFieldDescriptor(Label="currentTvChannel", Tag=0x00000002, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
+                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=TvChannel.Structs.TvChannelLineupInfo),
+                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=TvChannel.Structs.TvChannelInfo),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    tvChannelList: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
-    tvChannelLineup: 'bytes' = None
-    currentTvChannel: 'bytes' = None
+    channelList: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
+    channelLineup: 'TvChannel.Structs.TvChannelLineupInfo' = None
+    currentChannel: 'TvChannel.Structs.TvChannelInfo' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -27286,11 +27286,11 @@ class TvChannel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
+                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=TvChannel.Structs.TvChannelInfo),
                             ClusterObjectFieldDescriptor(Label="errorType", Tag=1, Type=TvChannel.Enums.TvChannelErrorType),
                     ])
 
-            channelMatch: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(default_factory=lambda: [])
+            channelMatch: 'TvChannel.Structs.TvChannelInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelInfo())
             errorType: 'TvChannel.Enums.TvChannelErrorType' = 0
 
         @dataclass
@@ -27599,11 +27599,10 @@ class MediaPlayback(Cluster):
                 ClusterObjectFieldDescriptor(Label="playbackState", Tag=0x00000000, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="startTime", Tag=0x00000001, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="duration", Tag=0x00000002, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="positionUpdatedAt", Tag=0x00000003, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="position", Tag=0x00000004, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="playbackSpeed", Tag=0x00000005, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="seekRangeEnd", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="seekRangeStart", Tag=0x00000007, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="position", Tag=0x00000003, Type=MediaPlayback.Structs.MediaPlaybackPosition),
+                ClusterObjectFieldDescriptor(Label="playbackSpeed", Tag=0x00000004, Type=typing.Optional[float]),
+                ClusterObjectFieldDescriptor(Label="seekRangeEnd", Tag=0x00000005, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="seekRangeStart", Tag=0x00000006, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
@@ -27612,9 +27611,8 @@ class MediaPlayback(Cluster):
     playbackState: 'typing.Optional[uint]' = None
     startTime: 'typing.Optional[uint]' = None
     duration: 'typing.Optional[uint]' = None
-    positionUpdatedAt: 'typing.Optional[uint]' = None
-    position: 'typing.Optional[uint]' = None
-    playbackSpeed: 'typing.Optional[uint]' = None
+    position: 'MediaPlayback.Structs.MediaPlaybackPosition' = None
+    playbackSpeed: 'typing.Optional[float]' = None
     seekRangeEnd: 'typing.Optional[uint]' = None
     seekRangeStart: 'typing.Optional[uint]' = None
     attributeList: 'typing.List[uint]' = None
@@ -28622,14 +28620,14 @@ class ContentLauncher(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="acceptsHeaderList", Tag=0x00000000, Type=typing.List[bytes]),
-                ClusterObjectFieldDescriptor(Label="supportedStreamingTypes", Tag=0x00000001, Type=typing.List[ContentLauncher.Enums.ContentLaunchStreamingType]),
+                ClusterObjectFieldDescriptor(Label="supportedStreamingProtocols", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
     acceptsHeaderList: 'typing.List[bytes]' = None
-    supportedStreamingTypes: 'typing.List[ContentLauncher.Enums.ContentLaunchStreamingType]' = None
+    supportedStreamingProtocols: 'uint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -29074,16 +29072,14 @@ class ApplicationLauncher(Cluster):
         return ClusterObjectDescriptor(
             Fields = [
                 ClusterObjectFieldDescriptor(Label="applicationLauncherList", Tag=0x00000000, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="catalogVendorId", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="applicationId", Tag=0x00000002, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="applicationLauncherApp", Tag=0x00000001, Type=ApplicationLauncher.Structs.ApplicationLauncherEndpoint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
     applicationLauncherList: 'typing.List[uint]' = None
-    catalogVendorId: 'typing.Optional[uint]' = None
-    applicationId: 'typing.Optional[uint]' = None
+    applicationLauncherApp: 'ApplicationLauncher.Structs.ApplicationLauncherEndpoint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -29169,11 +29165,9 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
                     ])
 
-            data: 'str' = ""
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
@@ -29187,9 +29181,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
             status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
+            data: 'str' = ""
 
         @dataclass
         class HideApp(ClusterCommand):
@@ -29201,11 +29197,9 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApp),
                     ])
 
-            data: 'str' = ""
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
@@ -29219,9 +29213,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
             status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
+            data: 'str' = ""
 
 
     class Attributes:
@@ -29319,9 +29315,9 @@ class ApplicationBasic(Cluster):
                 ClusterObjectFieldDescriptor(Label="vendorId", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="applicationName", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="productId", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="applicationId", Tag=0x00000005, Type=str),
-                ClusterObjectFieldDescriptor(Label="catalogVendorId", Tag=0x00000006, Type=uint),
-                ClusterObjectFieldDescriptor(Label="applicationStatus", Tag=0x00000007, Type=uint),
+                ClusterObjectFieldDescriptor(Label="applicationApp", Tag=0x00000004, Type=ApplicationBasic.Structs.ApplicationBasicApp),
+                ClusterObjectFieldDescriptor(Label="applicationStatus", Tag=0x00000005, Type=uint),
+                ClusterObjectFieldDescriptor(Label="applicationVersion", Tag=0x00000006, Type=str),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
@@ -29331,9 +29327,9 @@ class ApplicationBasic(Cluster):
     vendorId: 'uint' = None
     applicationName: 'str' = None
     productId: 'uint' = None
-    applicationId: 'str' = None
-    catalogVendorId: 'uint' = None
+    applicationApp: 'ApplicationBasic.Structs.ApplicationBasicApp' = None
     applicationStatus: 'uint' = None
+    applicationVersion: 'str' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -29491,22 +29487,6 @@ class ApplicationBasic(Cluster):
                 return ClusterObjectFieldDescriptor(Type=str)
 
             value: 'str' = ""
-
-        @dataclass
-        class AllowedVendorList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x050D
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000007
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):

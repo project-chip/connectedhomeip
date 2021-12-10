@@ -231,6 +231,10 @@ public class ChipClusters {
       login(chipClusterPtr, callback, tempAccountIdentifier, setupPIN);
     }
 
+    public void logout(DefaultClusterCallback callback) {
+      logout(chipClusterPtr, callback);
+    }
+
     private native void getSetupPIN(
         long chipClusterPtr, GetSetupPINResponseCallback Callback, String tempAccountIdentifier);
 
@@ -239,6 +243,8 @@ public class ChipClusters {
         DefaultClusterCallback Callback,
         String tempAccountIdentifier,
         String setupPIN);
+
+    private native void logout(long chipClusterPtr, DefaultClusterCallback Callback);
 
     public interface GetSetupPINResponseCallback {
       void onSuccess(String setupPIN);
@@ -419,12 +425,6 @@ public class ChipClusters {
     private native void changeStatus(
         long chipClusterPtr, DefaultClusterCallback Callback, Integer status);
 
-    public interface AllowedVendorListAttributeCallback {
-      void onSuccess(List<Object> valueList);
-
-      void onError(Exception ex);
-    }
-
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -509,10 +509,6 @@ public class ChipClusters {
       reportApplicationVersionAttribute(chipClusterPtr, callback);
     }
 
-    public void readAllowedVendorListAttribute(AllowedVendorListAttributeCallback callback) {
-      readAllowedVendorListAttribute(chipClusterPtr, callback);
-    }
-
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
       readAttributeListAttribute(chipClusterPtr, callback);
     }
@@ -584,9 +580,6 @@ public class ChipClusters {
     private native void reportApplicationVersionAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);
 
-    private native void readAllowedVendorListAttribute(
-        long chipClusterPtr, AllowedVendorListAttributeCallback callback);
-
     private native void readAttributeListAttribute(
         long chipClusterPtr, AttributeListAttributeCallback callback);
 
@@ -612,6 +605,11 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void hideApp(
+        HideAppResponseCallback callback, Integer catalogVendorId, String applicationId) {
+      hideApp(chipClusterPtr, callback, catalogVendorId, applicationId);
+    }
+
     public void launchApp(
         LaunchAppResponseCallback callback,
         String data,
@@ -620,6 +618,17 @@ public class ChipClusters {
       launchApp(chipClusterPtr, callback, data, catalogVendorId, applicationId);
     }
 
+    public void stopApp(
+        StopAppResponseCallback callback, Integer catalogVendorId, String applicationId) {
+      stopApp(chipClusterPtr, callback, catalogVendorId, applicationId);
+    }
+
+    private native void hideApp(
+        long chipClusterPtr,
+        HideAppResponseCallback Callback,
+        Integer catalogVendorId,
+        String applicationId);
+
     private native void launchApp(
         long chipClusterPtr,
         LaunchAppResponseCallback Callback,
@@ -627,7 +636,25 @@ public class ChipClusters {
         Integer catalogVendorId,
         String applicationId);
 
+    private native void stopApp(
+        long chipClusterPtr,
+        StopAppResponseCallback Callback,
+        Integer catalogVendorId,
+        String applicationId);
+
+    public interface HideAppResponseCallback {
+      void onSuccess(Integer status, String data);
+
+      void onError(Exception error);
+    }
+
     public interface LaunchAppResponseCallback {
+      void onSuccess(Integer status, String data);
+
+      void onError(Exception error);
+    }
+
+    public interface StopAppResponseCallback {
       void onSuccess(Integer status, String data);
 
       void onError(Exception error);
@@ -10805,7 +10832,7 @@ public class ChipClusters {
         long chipClusterPtr, DefaultClusterCallback Callback, Integer count);
 
     public interface ChangeChannelResponseCallback {
-      void onSuccess( // channelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
+      void onSuccess( // channelMatch: Struct TvChannelInfo
           // Conversion from this type to Java is not properly implemented yet
           Integer errorType);
 

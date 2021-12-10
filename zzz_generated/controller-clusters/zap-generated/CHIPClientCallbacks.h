@@ -36,7 +36,9 @@
 
 // Cluster Specific Response Callbacks
 typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, chip::CharSpan setupPIN);
+typedef void (*ApplicationLauncherClusterHideAppResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*ApplicationLauncherClusterLaunchAppResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*ApplicationLauncherClusterStopAppResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * context, uint8_t contentLaunchStatus,
                                                                     chip::CharSpan data);
 typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, uint8_t contentLaunchStatus, chip::CharSpan data);
@@ -115,9 +117,7 @@ typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint8_t 
 typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
                                                        uint16_t transitionTime, chip::CharSpan sceneName,
                                                        /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
-typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
-                                                              /* TYPE WARNING: array array defaults to */ uint8_t * channelMatch,
-                                                              uint8_t errorType);
+typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context, TvChannelInfo channelMatch, uint8_t errorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*TestClusterClusterBooleanResponseCallback)(void * context, bool value);
 typedef void (*TestClusterClusterSimpleStructResponseCallback)(void * context, SimpleStruct arg1);
@@ -156,11 +156,6 @@ void AdministratorCommissioningClusterAttributeListListAttributeFilter(chip::TLV
                                                                        chip::Callback::Cancelable * onFailureCallback);
 typedef void (*AdministratorCommissioningAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void ApplicationBasicClusterAllowedVendorListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                 chip::Callback::Cancelable * onSuccessCallback,
-                                                                 chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ApplicationBasicAllowedVendorListListAttributeCallback)(void * context,
-                                                                       const chip::app::DataModel::DecodableList<uint16_t> & data);
 void ApplicationBasicClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                              chip::Callback::Cancelable * onSuccessCallback,
                                                              chip::Callback::Cancelable * onFailureCallback);
