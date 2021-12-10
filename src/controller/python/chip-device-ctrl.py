@@ -904,7 +904,8 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-wifi-credential")
                 return
-            self.devCtrl.SetWifiCredentials(args[0].encode("utf-8"), args[1].encode("utf-8"))
+            self.devCtrl.SetWifiCredentials(
+                args[0].encode("utf-8"), args[1].encode("utf-8"))
         except Exception as ex:
             print(str(ex))
             return
