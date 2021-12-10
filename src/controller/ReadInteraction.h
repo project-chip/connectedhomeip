@@ -28,9 +28,9 @@ namespace Controller {
 namespace detail {
 
 template <typename DecodableAttributeType>
-struct ReportParams : public app::ReadPrepareParams
+struct ReportAttributeParams : public app::ReadPrepareParams
 {
-    ReportParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportAttributeParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
@@ -40,7 +40,7 @@ struct ReportParams : public app::ReadPrepareParams
 
 template <typename DecodableAttributeType>
 CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId endpointId, ClusterId clusterId,
-                           AttributeId attributeId, ReportParams<DecodableAttributeType> && readParams)
+                           AttributeId attributeId, ReportAttributeParams<DecodableAttributeType> && readParams)
 {
     app::AttributePathParams attributePath(endpointId, clusterId, attributeId);
     app::ReadClient * readClient         = nullptr;
@@ -89,7 +89,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const Session
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb)
 {
-    detail::ReportParams<DecodableAttributeType> params(sessionHandle);
+    detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb = onSuccessCb;
     params.mOnErrorCb  = onErrorCb;
     return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params));
@@ -125,7 +125,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
                                   onSubscriptionEstablishedCb = nullptr)
 {
-    detail::ReportParams<DecodableAttributeType> params(sessionHandle);
+    detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
     params.mOnErrorCb                   = onErrorCb;
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
@@ -154,24 +154,26 @@ CHIP_ERROR SubscribeAttribute(
         onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
 }
 
-/*
- * A typed read event function that takes as input a template parameter that encapsulates the type information
- * for a given attribute as well as callbacks for success and failure and either returns a decoded cluster-object representation
- * of the requested attribute through the provided success callback or calls the provided failure callback.
- *
- * The DecodableEventType is generally expected to be a ClusterName::Events::EventName::DecodableEventType struct, but any
- * object that contains type information exposed through a 'DecodableType' type declaration as well as GetClusterId() and
- * GetEventId() methods is expected to work.
- */
+namespace detail {
+
 template <typename DecodableEventType>
-CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb)
+struct ReportEventParams : public app::ReadPrepareParams
+{
+    ReportEventParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType mOnReportCb;
+    typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
+    typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
+        nullptr;
+    app::ReadClient::InteractionType mReportType = app::ReadClient::InteractionType::Read;
+};
+
+template <typename DecodableEventType>
+CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId endpointId,
+                       ReportEventParams<DecodableEventType> && readParams)
 {
     ClusterId clusterId = DecodableEventType::GetClusterId();
     EventId eventId     = DecodableEventType::GetEventId();
     app::EventPathParams eventPath(endpointId, clusterId, eventId);
-    app::ReadPrepareParams readParams(sessionHandle);
     app::ReadClient * readClient         = nullptr;
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
@@ -183,11 +185,12 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHa
         chip::Platform::Delete(callback);
     };
 
-    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(onSuccessCb, onErrorCb, onDone);
+    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(
+        readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, callback.get()));
+    ReturnErrorOnFailure(engine->NewReadClient(&readClient, readParams.mReportType, callback.get()));
 
     err = readClient->SendRequest(readParams);
     if (err != CHIP_NO_ERROR)
@@ -203,6 +206,50 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHa
     //
     callback.release();
     return err;
+}
+
+} // namespace detail
+
+/*
+ * A typed read event function that takes as input a template parameter that encapsulates the type information
+ * for a given attribute as well as callbacks for success and failure and either returns a decoded cluster-object representation
+ * of the requested attribute through the provided success callback or calls the provided failure callback.
+ *
+ * The DecodableEventType is generally expected to be a ClusterName::Events::EventName::DecodableEventType struct, but any
+ * object that contains type information exposed through a 'DecodableType' type declaration as well as GetClusterId() and
+ * GetEventId() methods is expected to work.
+ */
+template <typename DecodableEventType>
+CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+                     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb)
+{
+    detail::ReportEventParams<DecodableEventType> params(sessionHandle);
+    params.mOnReportCb = onSuccessCb;
+    params.mOnErrorCb  = onErrorCb;
+    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
+}
+
+/**
+ * A functon that allows subscribing to one particular event.  This works
+ * similarly to ReadEvent but keeps reporting events as they are emitted.
+ */
+template <typename DecodableEventType>
+CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+                          typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onReportCb,
+                          typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
+                          uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
+                          typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
+                              onSubscriptionEstablishedCb = nullptr)
+{
+    detail::ReportEventParams<DecodableEventType> params(sessionHandle);
+    params.mOnReportCb                  = onReportCb;
+    params.mOnErrorCb                   = onErrorCb;
+    params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
+    params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
+    params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
+    params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
+    return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
 }
 
 } // namespace Controller

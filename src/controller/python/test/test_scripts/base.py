@@ -250,7 +250,7 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "NodeLabel": "",
+            "NodeLabel": "Test",
             "Location": "",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",

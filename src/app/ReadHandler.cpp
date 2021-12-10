@@ -47,7 +47,12 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mIsPrimingReports          = true;
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        mSelfProcessedEvents[index]      = 0;
+        mLastScheduledEventNumber[index] = 0;
+    }
+    mIsPrimingReports = true;
     MoveToState(HandlerState::Initialized);
     mpDelegate          = apDelegate;
     mSubscriptionId     = 0;
@@ -57,7 +62,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mIsChunkedReport    = false;
     mInteractionType    = aInteractionType;
     mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
+    mSubjectDescriptor  = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
     mHoldSync           = false;
     if (apExchangeContext != nullptr)
     {
@@ -103,14 +108,19 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
-    mIsPrimingReports          = false;
-    mpDelegate                 = nullptr;
-    mHoldReport                = false;
-    mDirty                     = false;
-    mActiveSubscription        = false;
-    mIsChunkedReport           = false;
-    mInitiatorNodeId           = kUndefinedNodeId;
-    mHoldSync                  = false;
+    for (size_t index = 0; index < kNumPriorityLevel; index++)
+    {
+        mSelfProcessedEvents[index]      = 0;
+        mLastScheduledEventNumber[index] = 0;
+    }
+    mIsPrimingReports   = false;
+    mpDelegate          = nullptr;
+    mHoldReport         = false;
+    mDirty              = false;
+    mActiveSubscription = false;
+    mIsChunkedReport    = false;
+    mInitiatorNodeId    = kUndefinedNodeId;
+    mHoldSync           = false;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)

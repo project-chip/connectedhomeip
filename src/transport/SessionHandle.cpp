@@ -23,6 +23,15 @@ namespace chip {
 
 using namespace Transport;
 
+using SubjectDescriptor = Access::SubjectDescriptor;
+
+SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
+{
+    SubjectDescriptor subjectDescriptor = { .fabricIndex = mFabric };
+    // TODO: fill subject descriptor with proper fields
+    return subjectDescriptor;
+}
+
 const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
 {
     if (IsSecure())

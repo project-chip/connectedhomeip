@@ -376,13 +376,21 @@ function chip_available_cluster_commands(options)
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
-function if_chip_enum(type, options)
+async function if_chip_enum(type, options)
 {
   if (type.toLowerCase() == 'vendor_id') {
     return options.fn(this);
   }
 
-  return zclHelper.if_is_enum.call(this, type, options);
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isEnum(this.global.db, type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
 }
 
 //

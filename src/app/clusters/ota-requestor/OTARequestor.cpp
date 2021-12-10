@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/bdx/BdxUri.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
@@ -114,10 +115,9 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         VerifyOrReturn(response.imageURI.HasValue(), ChipLogError(SoftwareUpdate, "Update is available but no image URI present"));
 
         // Parse out the provider node ID and file designator from the image URI
-        NodeId nodeId                         = kUndefinedNodeId;
-        char fileDesignatorBuffer[kUriMaxLen] = { 0 };
-        MutableCharSpan fileDesignator(fileDesignatorBuffer, kUriMaxLen);
-        CHIP_ERROR err = requestorCore->mBdxDownloader->ParseBdxUri(response.imageURI.Value(), nodeId, fileDesignator);
+        NodeId nodeId = kUndefinedNodeId;
+        CharSpan fileDesignator;
+        CHIP_ERROR err = bdx::ParseURI(response.imageURI.Value(), nodeId, fileDesignator);
         VerifyOrReturn(err == CHIP_NO_ERROR,
                        ChipLogError(SoftwareUpdate, "Parse BDX image URI (%.*s) returned err=%" CHIP_ERROR_FORMAT,
                                     static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data(),
@@ -330,15 +330,25 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     }
 }
 
+OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
+{
+
+    if (mProviderNodeId != kUndefinedNodeId)
+    {
+        ConnectToProvider(kQueryImage);
+        return kTriggerSuccessful;
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "No OTA Providers available");
+        return kNoProviderKnown;
+    }
+}
+
 // Called whenever FindOrEstablishSession fails
 void OTARequestor::OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
-}
-
-void OTARequestor::TriggerImmediateQuery()
-{
-    ConnectToProvider(kQueryImage);
 }
 
 CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)

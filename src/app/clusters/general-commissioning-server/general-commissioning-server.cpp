@@ -67,7 +67,7 @@ CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath 
     switch (aPath.mAttributeId)
     {
     case RegulatoryConfig::Id: {
-        return ReadIfSupported(&ConfigurationManager::GetRegulatoryConfig, aEncoder);
+        return ReadIfSupported(&ConfigurationManager::GetRegulatoryLocation, aEncoder);
     }
     case LocationCapability::Id: {
         return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);

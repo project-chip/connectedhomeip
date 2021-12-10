@@ -626,7 +626,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
@@ -646,7 +646,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler *)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {
