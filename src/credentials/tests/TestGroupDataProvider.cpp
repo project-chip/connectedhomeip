@@ -95,6 +95,37 @@ static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
 static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
 static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
 
+class TestListener : public GroupDataProvider::Listener
+{
+public:
+    chip::FabricIndex fabric_index = kUndefinedFabricIndex;
+    GroupInfo latest;
+    size_t added_count   = 0;
+    size_t removed_count = 0;
+
+    void Reset()
+    {
+        fabric_index  = kUndefinedFabricIndex;
+        latest        = GroupInfo();
+        added_count   = 0;
+        removed_count = 0;
+    }
+
+    void OnGroupAdded(chip::FabricIndex fabric, const GroupInfo & new_group) override
+    {
+        fabric_index = fabric;
+        latest       = new_group;
+        added_count++;
+    }
+    void OnGroupRemoved(chip::FabricIndex fabric, const GroupInfo & old_group) override
+    {
+        fabric_index = fabric;
+        latest       = old_group;
+        removed_count++;
+    }
+};
+static TestListener sListener;
+
 void TestStorageDelegate(nlTestSuite * apSuite, void * apContext)
 {
     chip::TestPersistentStorageDelegate delegate;
@@ -139,6 +170,8 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     // Set Group Info
 
+    sListener.Reset();
+
     // Out-of-order
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_ARGUMENT == provider->SetGroupInfoAt(kFabric1, 2, kGroupInfo1_1));
 
@@ -158,6 +191,10 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kUndefinedFabricIndex, 0, group));
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 999, group));
 
+    NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo2_3);
+    NL_TEST_ASSERT(apSuite, 6 == sListener.added_count);
+    NL_TEST_ASSERT(apSuite, 0 == sListener.removed_count);
+
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 2, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo2_3);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
@@ -175,6 +212,9 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupInfo(kFabric1, kGroup3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupInfoAt(kFabric2, 0));
+    NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo2_1);
+    NL_TEST_ASSERT(apSuite, 6 == sListener.added_count);
+    NL_TEST_ASSERT(apSuite, 2 == sListener.removed_count);
 
     // Remaining entries shift up
 
@@ -199,6 +239,9 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 0, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo3_4);
+    NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo3_4);
+    NL_TEST_ASSERT(apSuite, 8 == sListener.added_count);
+    NL_TEST_ASSERT(apSuite, 2 == sListener.removed_count);
 
     // Overwrite existing group, index must match
 
@@ -213,18 +256,24 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo1_3);
+    NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo3_4);
+    NL_TEST_ASSERT(apSuite, 8 == sListener.added_count);
+    NL_TEST_ASSERT(apSuite, 2 == sListener.removed_count);
 
     // By group_id
 
-    // New
+    // Override existing
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupInfo(kFabric1, kGroupInfo3_5));
-    // Override
+    // New group
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupInfo(kFabric2, kGroupInfo3_2));
     // Not found
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfo(kFabric2, kGroup5, group));
     // Existing
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfo(kFabric2, kGroup2, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo3_2);
+    NL_TEST_ASSERT(apSuite, sListener.latest == kGroupInfo3_2);
+    NL_TEST_ASSERT(apSuite, 9 == sListener.added_count);
+    NL_TEST_ASSERT(apSuite, 2 == sListener.removed_count);
 }
 
 void TestGroupInfoIterator(nlTestSuite * apSuite, void * apContext)
@@ -456,7 +505,7 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
     }
 }
 
-void TestGroupKey(nlTestSuite * apSuite, void * apContext)
+void TestGroupKeys(nlTestSuite * apSuite, void * apContext)
 {
     GroupDataProvider * provider = GetGroupDataProvider();
     NL_TEST_ASSERT(apSuite, provider);
@@ -577,7 +626,7 @@ void TestGroupKeyIterator(nlTestSuite * apSuite, void * apContext)
                                kGroup1Keyset0, kGroup1Keyset1, kGroup1Keyset2, kGroup1Keyset3 };
     size_t expected_f1_count = sizeof(expected_f1) / sizeof(GroupKey);
 
-    auto it      = provider->IterateGroupKey(kFabric1);
+    auto it      = provider->IterateGroupKeys(kFabric1);
     size_t count = 0;
     NL_TEST_ASSERT(apSuite, it);
     if (it)
@@ -596,7 +645,7 @@ void TestGroupKeyIterator(nlTestSuite * apSuite, void * apContext)
     GroupKey expected_f2[]   = { kGroup2Keyset0, kGroup2Keyset1, kGroup2Keyset2, kGroup2Keyset3 };
     size_t expected_f2_count = sizeof(expected_f2) / sizeof(GroupKey);
 
-    it = provider->IterateGroupKey(kFabric2);
+    it = provider->IterateGroupKeys(kFabric2);
     NL_TEST_ASSERT(apSuite, it);
     if (it)
     {
@@ -956,6 +1005,9 @@ int Test_Setup(void * inContext)
     VerifyOrReturnError(CHIP_NO_ERROR == chip::Platform::MemoryInit(), FAILURE);
     VerifyOrReturnError(CHIP_NO_ERROR == sProvider.Init(), FAILURE);
 
+    // Event listener
+    sProvider.SetListener(&chip::app::TestGroups::sListener);
+
     memcpy(chip::app::TestGroups::kKeySet0.epoch_keys, kEpochKeys0, sizeof(kEpochKeys0));
     memcpy(chip::app::TestGroups::kKeySet1.epoch_keys, kEpochKeys1, sizeof(kEpochKeys1));
     memcpy(chip::app::TestGroups::kKeySet2.epoch_keys, kEpochKeys2, sizeof(kEpochKeys2));
@@ -982,7 +1034,7 @@ const nlTest sTests[] = { NL_TEST_DEF("TestStorageDelegate", chip::app::TestGrou
                           NL_TEST_DEF("TestGroupInfoIterator", chip::app::TestGroups::TestGroupInfoIterator),
                           NL_TEST_DEF("TestEndpoints", chip::app::TestGroups::TestEndpoints),
                           NL_TEST_DEF("TestEndpointIterator", chip::app::TestGroups::TestEndpointIterator),
-                          NL_TEST_DEF("TestGroupKey", chip::app::TestGroups::TestGroupKey),
+                          NL_TEST_DEF("TestGroupKeys", chip::app::TestGroups::TestGroupKeys),
                           NL_TEST_DEF("TestGroupKeyIterator", chip::app::TestGroups::TestGroupKeyIterator),
                           NL_TEST_DEF("TestKeySets", chip::app::TestGroups::TestKeySets),
                           NL_TEST_DEF("TestKeySetIterator", chip::app::TestGroups::TestKeySetIterator),

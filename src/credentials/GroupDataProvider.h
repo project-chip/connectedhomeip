@@ -142,6 +142,27 @@ public:
     };
 
     /**
+     *  Interface to listen for changes in the Group info.
+     */
+    class Listener
+    {
+    public:
+        virtual ~Listener() = default;
+        /**
+         *  Callback invoked when a new group is added.
+         *
+         *  @param[in] new_group  GroupInfo structure of the new group.
+         */
+        virtual void OnGroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group) = 0;
+        /**
+         *  Callback invoked when an existing group is removed.
+         *
+         *  @param[in] removed_state  GroupInfo structure of the removed group.
+         */
+        virtual void OnGroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+    };
+
+    /**
      * Template used to iterate the stored group data
      */
     template <typename T>
@@ -233,6 +254,7 @@ public:
     virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
     virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
     virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
+
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
      *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
@@ -240,7 +262,7 @@ public:
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) = 0;
+    virtual GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
@@ -263,6 +285,28 @@ public:
 
     // General
     virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+
+    // Listener
+    void SetListener(Listener * listener) { mListener = listener; };
+    void RemoveListener() { mListener = nullptr; };
+
+protected:
+    void GroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupAdded(fabric_index, new_group);
+        }
+    }
+    void GroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupRemoved(fabric_index, old_group);
+        }
+    }
+
+    Listener * mListener = nullptr;
 };
 
 /**
