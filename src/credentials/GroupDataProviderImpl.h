@@ -149,13 +149,10 @@ private:
 
     chip::PersistentStorageDelegate & mStorage;
     bool mInitialized = false;
-    BitMapObjectPool<GroupInfoIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mGroupInfoIterators;
-    BitMapObjectPool<GroupKeyIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mGroupKeyIterators;
-    BitMapObjectPool<EndpointIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mEndpointIterators;
-    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mKeySetIterators;
+    BitMapObjectPool<GroupInfoIteratorImpl, kIteratorsMax> mGroupInfoIterators;
+    BitMapObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
+    BitMapObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
+    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
 };
 
 } // namespace Credentials

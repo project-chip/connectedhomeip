@@ -655,6 +655,10 @@ CHIP_ERROR GroupDataProviderImpl::Init()
 void GroupDataProviderImpl::Finish()
 {
     mInitialized = false;
+    mGroupInfoIterators.ReleaseAll();
+    mGroupKeyIterators.ReleaseAll();
+    mEndpointIterators.ReleaseAll();
+    mKeySetIterators.ReleaseAll();
 }
 
 //
