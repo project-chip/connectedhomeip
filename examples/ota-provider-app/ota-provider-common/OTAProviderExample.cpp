@@ -90,7 +90,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 {
     // TODO: add confiuration for returning BUSY status
 
-    OTAQueryStatus queryStatus = OTAQueryStatus::kNotAvailable;
+    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
     uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                                    // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
