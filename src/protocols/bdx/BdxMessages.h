@@ -138,10 +138,6 @@ struct BdxMessage
  */
 struct TransferInit : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const TransferInit &) const;
 
     // Proposed Transfer Control (required)
@@ -183,10 +179,6 @@ using ReceiveInit = TransferInit;
  */
 struct SendAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const SendAccept &) const;
 
     // Transfer Control (required, only one should be set)
@@ -217,10 +209,6 @@ struct SendAccept : public BdxMessage
  */
 struct ReceiveAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const ReceiveAccept &) const;
 
     // Transfer Control (required, only one should be set)
@@ -258,10 +246,6 @@ struct ReceiveAccept : public BdxMessage
  */
 struct CounterMessage : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const CounterMessage &) const;
 
     uint32_t BlockCounter = 0;
@@ -283,10 +267,6 @@ using BlockAckEOF = CounterMessage;
  */
 struct DataBlock : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const DataBlock &) const;
 
     uint32_t BlockCounter = 0;
@@ -310,15 +290,8 @@ struct DataBlock : public BdxMessage
 using Block    = DataBlock;
 using BlockEOF = DataBlock;
 
-/**
- * A struct for representing BlockQueryWithSkip messages
- */
 struct BlockQueryWithSkip : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const BlockQueryWithSkip &) const;
 
     uint32_t BlockCounter = 0;
