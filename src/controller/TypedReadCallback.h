@@ -127,9 +127,11 @@ public:
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * client, TypedReadEventCallback * callback)>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+    TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
     {}
 
 private:
@@ -162,9 +164,18 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
+    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    {
+        if (mOnSubscriptionEstablished)
+        {
+            mOnSubscriptionEstablished();
+        }
+    }
+
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
 };
 
 } // namespace Controller
