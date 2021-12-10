@@ -190,6 +190,7 @@ int main(int argc, char * argv[])
 
     // Init Data Model and CHIP App Server with user specified UDP port
     Server::GetInstance().Init(nullptr, requestorSecurePort);
+    chip::Dnssd::Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
     ChipLogProgress(SoftwareUpdate, "Initializing the Application Server. Listening on UDP port %d", requestorSecurePort);
 
     // Initialize device attestation config

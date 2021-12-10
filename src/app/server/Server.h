@@ -18,12 +18,14 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -67,9 +69,7 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
-    CASEClientPoolDelegate * GetCASEClientPool() { return &mCASEClientPool; }
-
-    OperationalDeviceProxyPoolDelegate * GetDevicePool() { return &mDevicePool; }
+    CASESessionManager * GetCASESessionManager() { return mCASESessionManager; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -130,6 +130,8 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
+    CHIP_ERROR InitCASESessionManager();
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -138,11 +140,14 @@ private:
     SessionManager mSessions;
     CASEServer mCASEServer;
 
-    static constexpr size_t kCASEClientPoolSize        = 2;
-    static constexpr size_t kOperationalDevicePoolSize = 4;
+    static constexpr size_t kCASEClientPoolSize        = CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS;
+    static constexpr size_t kOperationalDevicePoolSize = CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES;
 
+    std::aligned_storage_t<sizeof(CASESessionManager), sizeof(void *)> mCASESessionManagerStorage;
+    CASESessionManager * mCASESessionManager;
     CASEClientPool<kCASEClientPoolSize> mCASEClientPool;
     OperationalDeviceProxyPool<kOperationalDevicePoolSize> mDevicePool;
+    Dnssd::ResolverProxy mDNSResolver;
 
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;

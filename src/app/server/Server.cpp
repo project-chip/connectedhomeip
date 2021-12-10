@@ -17,6 +17,8 @@
 
 #include <app/server/Server.h>
 
+#include <new>
+
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -215,6 +217,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
+    err = InitCASESessionManager();
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -227,10 +231,33 @@ exit:
     return err;
 }
 
+CHIP_ERROR Server::InitCASESessionManager()
+{
+    ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
+    DeviceProxyInitParams initParams = {
+        .sessionManager = &mSessions,
+        .exchangeMgr    = &mExchangeMgr,
+        .idAllocator    = &mSessionIDAllocator,
+        .fabricTable    = &mFabrics,
+        .clientPool     = &mCASEClientPool,
+        .imDelegate     = nullptr,
+    };
+    CASESessionManagerConfig sessionManagerConfig = {
+        .sessionInitParams = initParams,
+        .dnsCache          = nullptr,
+        .devicePool        = &mDevicePool,
+        .dnsResolver       = &mDNSResolver,
+    };
+    mCASESessionManager = new (&mCASESessionManagerStorage) CASESessionManager(sessionManagerConfig);
+
+    return mCASESessionManager == nullptr ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
+}
+
 void Server::Shutdown()
 {
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    mCASESessionManager->~CASESessionManager();
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
