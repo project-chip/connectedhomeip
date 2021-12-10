@@ -175,8 +175,6 @@ jobs:
 
             - name: Fun fake linux tests
               timeout-minutes: 15
-              # NOTE: only vscode image contains the cross compile arm64 sysroot
-              #       so the build command below only compiles x64
               run: |
                 ./scripts/run_in_build_env.sh \
                   "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
