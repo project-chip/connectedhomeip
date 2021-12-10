@@ -2324,10 +2324,46 @@ static void OnAccountLoginGetSetupPINResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnApplicationLauncherHideAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received HideAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void OnApplicationLauncherLaunchAppResponseSuccess(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
     ChipLogProgress(Zcl, "Received LaunchAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnApplicationLauncherStopAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received StopAppResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
@@ -3703,6 +3739,7 @@ public:
 | Commands:                                                           |        |
 | * GetSetupPIN                                                       |   0x00 |
 | * Login                                                             |   0x01 |
+| * Logout                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AttributeList                                                     | 0xFFFB |
@@ -3756,6 +3793,26 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Login::Type mRequest;
+};
+
+/*
+ * Command Logout
+ */
+class AccountLoginLogout : public ModelCommand
+{
+public:
+    AccountLoginLogout() : ModelCommand("logout") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
 };
 
 /*
@@ -4152,7 +4209,6 @@ private:
 | * ApplicationApp                                                    | 0x0004 |
 | * ApplicationStatus                                                 | 0x0005 |
 | * ApplicationVersion                                                | 0x0006 |
-| * AllowedVendorList                                                 | 0x0007 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4503,13 +4559,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportApplicationBasicApplicationStatus()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
+    ~ReportApplicationBasicApplicationStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4518,11 +4568,9 @@ public:
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
 
-        ReturnErrorOnFailure(cluster.ReportAttributeApplicationStatus(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeApplicationStatus(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                           mMaxInterval);
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -4530,15 +4578,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
+    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationBasic.ApplicationStatus report", 0, value); }
+
 private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -4586,95 +4628,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-<<<<<<< HEAD
-    ~ReportApplicationBasicApplicationId() {}
-=======
-    ~ReportApplicationBasicApplicationVersion()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
->>>>>>> 2bbe133c0 (Run zap tool successfully)
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-<<<<<<< HEAD
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-=======
-        ReturnErrorOnFailure(cluster.ReportAttributeApplicationVersion(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeApplicationVersion(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                            mMaxInterval);
->>>>>>> 2bbe133c0 (Run zap tool successfully)
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ApplicationBasic.ApplicationId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute AllowedVendorList
- */
-class ReadApplicationBasicAllowedVendorList : public ModelCommand
-{
-public:
-    ReadApplicationBasicAllowedVendorList() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "allowed-vendor-list");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicAllowedVendorList() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-<<<<<<< HEAD
-    static void OnAttributeResponse(void * context, uint16_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationBasicCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationBasicCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicCatalogVendorId() {}
+    ~ReportApplicationBasicApplicationVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4684,7 +4638,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -4693,87 +4647,15 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.CatalogVendorId report", 0, value); }
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("ApplicationBasic.ApplicationVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
-};
-
-/*
- * Attribute ApplicationStatus
- */
-class ReadApplicationBasicApplicationStatus : public ModelCommand
-{
-public:
-    ReadApplicationBasicApplicationStatus() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-status");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicApplicationStatus() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationStatus response", value);
-    }
-};
-
-class ReportApplicationBasicApplicationStatus : public ModelCommand
-{
-public:
-    ReportApplicationBasicApplicationStatus() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-status");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicApplicationStatus() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-=======
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
->>>>>>> 2bbe133c0 (Run zap tool successfully)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.AllowedVendorList response", value);
-    }
-<<<<<<< HEAD
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationBasic.ApplicationStatus report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-=======
->>>>>>> 2bbe133c0 (Run zap tool successfully)
 };
 
 /*
@@ -4879,7 +4761,9 @@ private:
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * HideApp                                                           |   0x02 |
 | * LaunchApp                                                         |   0x00 |
+| * StopApp                                                           |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
@@ -4887,6 +4771,30 @@ private:
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideApp
+ */
+class ApplicationLauncherHideApp : public ModelCommand
+{
+public:
+    ApplicationLauncherHideApp() : ModelCommand("hide-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherHideAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
+};
 
 /*
  * Command LaunchApp
@@ -4911,6 +4819,30 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
+};
+
+/*
+ * Command StopApp
+ */
+class ApplicationLauncherStopApp : public ModelCommand
+{
+public:
+    ApplicationLauncherStopApp() : ModelCommand("stop-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherStopAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
 };
 
 /*
@@ -4986,147 +4918,6 @@ private:
 };
 
 /*
-<<<<<<< HEAD
- * Attribute CatalogVendorId
- */
-class ReadApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherCatalogVendorId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationLauncher.CatalogVendorId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute ApplicationId
- */
-class ReadApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherApplicationId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationId response", value);
-    }
-};
-
-class ReportApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherApplicationId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationLauncher.ApplicationId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
-=======
->>>>>>> 2bbe133c0 (Run zap tool successfully)
  * Attribute AttributeList
  */
 class ReadApplicationLauncherAttributeList : public ModelCommand
@@ -13812,60 +13603,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReportContentLauncherSupportedStreamingProtocols()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ContentLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeSupportedStreamingProtocols(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeSupportedStreamingProtocols(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                                     mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-class ReportContentLauncherSupportedStreamingTypes : public ModelCommand
-{
-public:
-    ReportContentLauncherSupportedStreamingTypes() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "supported-streaming-types");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportContentLauncherSupportedStreamingTypes() {}
+    ~ReportContentLauncherSupportedStreamingProtocols() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13875,7 +13613,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -13884,11 +13622,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ContentLauncher.SupportedStreamingTypes report", 0, value);
+        LogValue("ContentLauncher.SupportedStreamingProtocols report", 0, value);
     }
 
 private:
@@ -23302,147 +23038,6 @@ private:
 };
 
 /*
-<<<<<<< HEAD
- * Attribute PositionUpdatedAt
- */
-class ReadMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPositionUpdatedAt() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPositionUpdatedAt() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.PositionUpdatedAt response", value);
-    }
-};
-
-class ReportMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPositionUpdatedAt() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPositionUpdatedAt() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.PositionUpdatedAt report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute Position
- */
-class ReadMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPosition() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(this, OnAttributeResponse,
-                                                                                                         OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.Position response", value);
-    }
-};
-
-class ReportMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPosition() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.Position report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
-=======
->>>>>>> 2bbe133c0 (Run zap tool successfully)
  * Attribute PlaybackSpeed
  */
 class ReadMediaPlaybackPlaybackSpeed : public ModelCommand
@@ -23472,48 +23067,6 @@ public:
     }
 };
 
-<<<<<<< HEAD
-class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "playback-speed");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPlaybackSpeed() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.PlaybackSpeed report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-=======
->>>>>>> 2bbe133c0 (Run zap tool successfully)
 /*
  * Attribute SeekRangeEnd
  */
@@ -32512,24 +32065,23 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
     {
-<<<<<<< HEAD
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelList response", value);
+        OnGeneralAttributeResponse(context, "TvChannel.ChannelList response", value);
     }
 };
 
-class ReportTvChannelTvChannelList : public ModelCommand
+class ReportTvChannelChannelList : public ModelCommand
 {
 public:
-    ReportTvChannelTvChannelList() : ModelCommand("report")
+    ReportTvChannelChannelList() : ModelCommand("report")
     {
-        AddArgument("attr-name", "tv-channel-list");
+        AddArgument("attr-name", "channel-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~ReportTvChannelTvChannelList() {}
+    ~ReportTvChannelChannelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32539,7 +32091,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -32552,7 +32104,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
     {
-        LogValue("TvChannel.TvChannelList report", 0, value);
+        LogValue("TvChannel.ChannelList report", 0, value);
     }
 
 private:
@@ -32561,150 +32113,6 @@ private:
     bool mWait;
 };
 
-/*
- * Attribute TvChannelLineup
- */
-class ReadTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReadTvChannelTvChannelLineup() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelTvChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelLineup response", value);
-    }
-};
-
-class ReportTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReportTvChannelTvChannelLineup() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelTvChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TvChannel.TvChannelLineup report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CurrentTvChannel
- */
-class ReadTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReadTvChannelCurrentTvChannel() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelCurrentTvChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.CurrentTvChannel response", value);
-    }
-};
-
-class ReportTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReportTvChannelCurrentTvChannel() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelCurrentTvChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TvChannel.CurrentTvChannel report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-=======
-        OnGeneralAttributeResponse(context, "TvChannel.ChannelList response", value);
-    }
-};
-
->>>>>>> 2bbe133c0 (Run zap tool successfully)
 /*
  * Attribute AttributeList
  */
@@ -51068,6 +50476,7 @@ void registerClusterAccountLogin(Commands & commands)
     commands_list clusterCommands = {
         make_unique<AccountLoginGetSetupPIN>(),           //
         make_unique<AccountLoginLogin>(),                 //
+        make_unique<AccountLoginLogout>(),                //
         make_unique<ReadAccountLoginAttributeList>(),     //
         make_unique<ReadAccountLoginClusterRevision>(),   //
         make_unique<ReportAccountLoginClusterRevision>(), //
@@ -51111,7 +50520,6 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReportApplicationBasicApplicationStatus>(),  //
         make_unique<ReadApplicationBasicApplicationVersion>(),   //
         make_unique<ReportApplicationBasicApplicationVersion>(), //
-        make_unique<ReadApplicationBasicAllowedVendorList>(),    //
         make_unique<ReadApplicationBasicAttributeList>(),        //
         make_unique<ReadApplicationBasicClusterRevision>(),      //
         make_unique<ReportApplicationBasicClusterRevision>(),    //
@@ -51124,7 +50532,9 @@ void registerClusterApplicationLauncher(Commands & commands)
     const char * clusterName = "ApplicationLauncher";
 
     commands_list clusterCommands = {
+        make_unique<ApplicationLauncherHideApp>(),                     //
         make_unique<ApplicationLauncherLaunchApp>(),                   //
+        make_unique<ApplicationLauncherStopApp>(),                     //
         make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
         make_unique<ReadApplicationLauncherAttributeList>(),           //
         make_unique<ReadApplicationLauncherClusterRevision>(),         //

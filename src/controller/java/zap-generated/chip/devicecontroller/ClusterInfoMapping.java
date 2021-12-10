@@ -373,32 +373,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedApplicationBasicClusterAllowedVendorListAttributeCallback
-      implements ChipClusters.ApplicationBasicCluster.AllowedVendorListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Object> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<Integer>");
-
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedApplicationBasicClusterAttributeListAttributeCallback
       implements ChipClusters.ApplicationBasicCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -424,8 +398,60 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedHideAppResponseCallback
+      implements ChipClusters.ApplicationLauncherCluster.HideAppResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, String data) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
+      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      responseValues.put(dataResponseValue, data);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedLaunchAppResponseCallback
       implements ChipClusters.ApplicationLauncherCluster.LaunchAppResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Integer status, String data) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
+      responseValues.put(statusResponseValue, status);
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      responseValues.put(dataResponseValue, data);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedStopAppResponseCallback
+      implements ChipClusters.ApplicationLauncherCluster.StopAppResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -3529,11 +3555,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess( // channelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
+    public void onSuccess( // channelMatch: Struct TvChannelInfo
         // Conversion from this type to Java is not properly implemented yet
         Integer errorType) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // channelMatch: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // channelMatch: Struct TvChannelInfo
       // Conversion from this type to Java is not properly implemented yet
       CommandResponseInfo errorTypeResponseValue = new CommandResponseInfo("errorType", "int");
       responseValues.put(errorTypeResponseValue, errorType);
@@ -4794,6 +4820,18 @@ public class ClusterInfoMapping {
             () -> new DelegatedDefaultClusterCallback(),
             accountLoginloginCommandParams);
     accountLoginClusterInteractionInfoMap.put("login", accountLoginloginInteractionInfo);
+    Map<String, CommandParameterInfo> accountLoginlogoutCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // Populate commands
+    InteractionInfo accountLoginlogoutInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccountLoginCluster) cluster)
+                  .logout((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            accountLoginlogoutCommandParams);
+    accountLoginClusterInteractionInfoMap.put("logout", accountLoginlogoutInteractionInfo);
     commandMap.put("accountLogin", accountLoginClusterInteractionInfoMap);
     Map<String, InteractionInfo> administratorCommissioningClusterInteractionInfoMap =
         new LinkedHashMap<>();
@@ -4921,6 +4959,32 @@ public class ClusterInfoMapping {
     commandMap.put("applicationBasic", applicationBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> applicationLauncherClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> applicationLauncherhideAppCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo applicationLauncherhideAppcatalogVendorIdCommandParameterInfo =
+        new CommandParameterInfo("catalogVendorId", int.class);
+    applicationLauncherhideAppCommandParams.put(
+        "catalogVendorId", applicationLauncherhideAppcatalogVendorIdCommandParameterInfo);
+
+    CommandParameterInfo applicationLauncherhideAppapplicationIdCommandParameterInfo =
+        new CommandParameterInfo("applicationId", String.class);
+    applicationLauncherhideAppCommandParams.put(
+        "applicationId", applicationLauncherhideAppapplicationIdCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo applicationLauncherhideAppInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ApplicationLauncherCluster) cluster)
+                  .hideApp(
+                      (ChipClusters.ApplicationLauncherCluster.HideAppResponseCallback) callback,
+                      (Integer) commandArguments.get("catalogVendorId"),
+                      (String) commandArguments.get("applicationId"));
+            },
+            () -> new DelegatedHideAppResponseCallback(),
+            applicationLauncherhideAppCommandParams);
+    applicationLauncherClusterInteractionInfoMap.put(
+        "hideApp", applicationLauncherhideAppInteractionInfo);
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo applicationLauncherlaunchAppdataCommandParameterInfo =
@@ -4953,6 +5017,32 @@ public class ClusterInfoMapping {
             applicationLauncherlaunchAppCommandParams);
     applicationLauncherClusterInteractionInfoMap.put(
         "launchApp", applicationLauncherlaunchAppInteractionInfo);
+    Map<String, CommandParameterInfo> applicationLauncherstopAppCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo applicationLauncherstopAppcatalogVendorIdCommandParameterInfo =
+        new CommandParameterInfo("catalogVendorId", int.class);
+    applicationLauncherstopAppCommandParams.put(
+        "catalogVendorId", applicationLauncherstopAppcatalogVendorIdCommandParameterInfo);
+
+    CommandParameterInfo applicationLauncherstopAppapplicationIdCommandParameterInfo =
+        new CommandParameterInfo("applicationId", String.class);
+    applicationLauncherstopAppCommandParams.put(
+        "applicationId", applicationLauncherstopAppapplicationIdCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo applicationLauncherstopAppInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ApplicationLauncherCluster) cluster)
+                  .stopApp(
+                      (ChipClusters.ApplicationLauncherCluster.StopAppResponseCallback) callback,
+                      (Integer) commandArguments.get("catalogVendorId"),
+                      (String) commandArguments.get("applicationId"));
+            },
+            () -> new DelegatedStopAppResponseCallback(),
+            applicationLauncherstopAppCommandParams);
+    applicationLauncherClusterInteractionInfoMap.put(
+        "stopApp", applicationLauncherstopAppInteractionInfo);
     commandMap.put("applicationLauncher", applicationLauncherClusterInteractionInfoMap);
     Map<String, InteractionInfo> audioOutputClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> audioOutputrenameOutputCommandParams =

@@ -5026,10 +5026,6 @@ namespace ApplicationVersion {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace ApplicationVersion
 
-namespace AllowedVendorList {
-static constexpr AttributeId Id = 0x00000007;
-} // namespace AllowedVendorList
-
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
