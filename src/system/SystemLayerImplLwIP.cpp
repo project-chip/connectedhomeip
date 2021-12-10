@@ -56,7 +56,7 @@ CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback
 
     CancelTimer(onComplete, appState);
 
-    TimerList::Node * timer = mTimerPool.Create(*this, delay, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp() + delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
@@ -87,7 +87,7 @@ CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * 
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    TimerList::Node * timer = mTimerPool.Create(*this, System::Clock::kZero, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });

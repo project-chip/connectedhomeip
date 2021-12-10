@@ -1095,7 +1095,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nullable userUniqueId;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
-@property (strong, nonatomic) NSNumber * _Nullable credentialRule;
+@property (strong, nonatomic) NSNumber * _Nonnull credentialRule;
 - (instancetype)init;
 @end
 
@@ -1149,8 +1149,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull operationType;
 @property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
 @property (strong, nonatomic) NSData * _Nonnull credentialData;
-@property (strong, nonatomic) NSNumber * _Nullable userIndex;
-@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 - (instancetype)init;
 @end
 

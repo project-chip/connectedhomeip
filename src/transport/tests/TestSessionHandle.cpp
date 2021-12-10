@@ -38,10 +38,13 @@ using namespace chip;
 
 void TestMatchSession(nlTestSuite * inSuite, void * inContext)
 {
+    SessionHandle session2(chip::kTestDeviceNodeId, 1, 1, 0);
     SessionHandle session3(chip::kTestDeviceNodeId, 1, 1, 0);
     SessionHandle session4(chip::kTestDeviceNodeId, 1, 2, 0);
-    NL_TEST_ASSERT(inSuite, !(session3 == session4));
-    NL_TEST_ASSERT(inSuite, session3.MatchIncomingSession(session4));
+    SessionHandle session5(chip::kTestDeviceNodeId, 2, 2, 0);
+    NL_TEST_ASSERT(inSuite, session2 == session3);
+    NL_TEST_ASSERT(inSuite, session2 == session4);
+    NL_TEST_ASSERT(inSuite, !(session2 == session5));
 }
 
 // Test Suite

@@ -38,17 +38,6 @@ namespace app {
 // Note: The change will happen after #11171 with a better linked list.
 struct ClusterInfo
 {
-private:
-    // Allow AttributePathParams access these constants.
-    friend struct AttributePathParams;
-    friend struct EventPathParams;
-
-    // The ClusterId, AttributeId and EventId are MEIs,
-    // 0xFFFF is not a valid manufacturer code, thus 0xFFFF'FFFF is not a valid MEI
-    static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
-    static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
-    static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
-
 public:
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
     {

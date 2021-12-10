@@ -340,7 +340,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignature type true}}{{/if}})V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-        {{>decode_value source="value" target="javaValue"}}
+        {{>decode_value source="value" target="javaValue" cluster=parent.name}}
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }

@@ -22,6 +22,7 @@
 #include <app/server/Server.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/Optional.h>
+#include <lib/dnssd/Resolver.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
 #include <lib/shell/commands/Help.h>
@@ -299,7 +300,7 @@ void ConnectDeviceAsync(intptr_t)
     VerifyOrReturn(deviceProxy != nullptr);
 
     deviceProxy->UpdateDeviceData(sOtaContext.providerAddress, deviceProxy->GetMRPConfig());
-    deviceProxy->Connect(&successCallback, &failureCallback);
+    deviceProxy->Connect(&successCallback, &failureCallback, nullptr);
 }
 
 template <OnDeviceConnected OnConnected>
@@ -312,7 +313,7 @@ CHIP_ERROR ConnectProvider(FabricIndex fabricIndex, NodeId nodeId, const Transpo
     DeviceProxyInitParams initParams = { .sessionManager = &Server::GetInstance().GetSecureSessionManager(),
                                          .exchangeMgr    = &Server::GetInstance().GetExchangeManager(),
                                          .idAllocator    = &Server::GetInstance().GetSessionIDAllocator(),
-                                         .fabricInfo     = fabric,
+                                         .fabricTable    = &Server::GetInstance().GetFabricTable(),
                                          .imDelegate     = &sIMDelegate };
 
     auto deviceProxy = Platform::New<OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(nodeId));

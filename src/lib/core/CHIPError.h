@@ -2332,6 +2332,31 @@ using CHIP_ERROR = ::chip::ChipError;
  *   the required elements
  */
 #define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
+
+/**
+ * @def CHIP_ERROR_NOT_FOUND
+ *
+ * @brief
+ *   The item referenced in the function call was not found
+ */
+#define CHIP_ERROR_NOT_FOUND                                       CHIP_CORE_ERROR(0xd8)
+
+/**
+ * @def CHIP_ERROR_INVALID_SCHEME_PREFIX
+ *
+ * @brief
+ *   The scheme field contains an invalid prefix
+ */
+#define CHIP_ERROR_INVALID_SCHEME_PREFIX             CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_MISSING_URI_SEPARATOR
+ *
+ * @brief
+ *   The URI separator is missing
+ */
+#define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
+
 /**
  *  @}
  */

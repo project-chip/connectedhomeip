@@ -20,7 +20,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 #include <controller/CommissioneeDeviceProxy.h>
 #include <inet/IPAddress.h>
-#include <inet/InetLayer.h>
+#include <inetInetLayer.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <nlunit-test.h>
@@ -49,7 +49,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     DeviceTransportMgr transportMgr;
     SessionManager sessionManager;
     ExchangeManager exchangeMgr;
-    Inet::InetLayer inetLayer;
+    Inet::UDPEndPointManagerImpl udpEndPointManager;
     System::LayerImpl systemLayer;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer blelayer;
@@ -61,11 +61,11 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     SessionIDAllocator idAllocator;
 
     systemLayer.Init();
-    inetLayer.Init(systemLayer, nullptr);
-    transportMgr.Init(UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(CHIP_PORT)
+    udpEndPointManager.Init(systemLayer);
+    transportMgr.Init(UdpListenParameters(udpEndPointManager).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
                           ,
-                      UdpListenParameters(&inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT)
+                      UdpListenParameters(udpEndPointManager).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(CHIP_PORT)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
                           ,
@@ -77,13 +77,13 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     messageCounterManager.Init(&exchangeMgr);
 
     ControllerDeviceInitParams params = {
-        .transportMgr    = &transportMgr,
-        .sessionManager  = &sessionManager,
-        .exchangeMgr     = &exchangeMgr,
-        .inetLayer       = &inetLayer,
-        .storageDelegate = nullptr,
-        .idAllocator     = &idAllocator,
-        .fabricsTable    = fabrics,
+        .transportMgr       = &transportMgr,
+        .sessionManager     = &sessionManager,
+        .exchangeMgr        = &exchangeMgr,
+        .udpEndPointManager = &udpEndPointManager,
+        .storageDelegate    = nullptr,
+        .idAllocator        = &idAllocator,
+        .fabricsTable       = fabrics,
     };
     CommissioneeDeviceProxy device;
     NodeId mockNodeId           = 1;
@@ -102,7 +102,7 @@ void TestDevice_EstablishSessionDirectly(nlTestSuite * inSuite, void * inContext
     sessionManager.Shutdown();
     Platform::Delete(fabrics);
     transportMgr.Close();
-    inetLayer.Shutdown();
+    udpEndPointManager.Shutdown();
     systemLayer.Shutdown();
     Platform::MemoryShutdown();
 }

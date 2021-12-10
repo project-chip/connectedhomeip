@@ -2562,6 +2562,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS
+ *
+ * @brief Number of outgoing CASE sessions can be simutaneously negotiated.
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS 16
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -2572,7 +2581,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
 #endif
 
-// TODO: Need to cap number of KeySets
+/**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 1
+#endif
 
 /**
  * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC

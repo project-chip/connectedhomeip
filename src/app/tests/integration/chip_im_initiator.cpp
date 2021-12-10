@@ -247,7 +247,7 @@ CHIP_ERROR SendCommandRequest(std::unique_ptr<chip::app::CommandSender> && comma
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSession.Get(), gMessageTimeout);
     SuccessOrExit(err);
 
     gCommandCount++;
@@ -283,7 +283,7 @@ CHIP_ERROR SendBadCommandRequest(std::unique_ptr<chip::app::CommandSender> && co
     err = commandSender->FinishCommand();
     SuccessOrExit(err);
 
-    err = commandSender->SendCommandRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout);
+    err = commandSender->SendCommandRequest(gSession.Get(), gMessageTimeout);
     SuccessOrExit(err);
     gCommandCount++;
     commandSender.release();
@@ -311,7 +311,7 @@ CHIP_ERROR SendReadRequest()
 
     printf("\nSend read request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(gSession.Get());
     readPrepareParams.mTimeout                     = gMessageTimeout;
     readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 1;
@@ -352,8 +352,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
     SuccessOrExit(err =
                       writer->PutBoolean(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(
-        err = apWriteClient.SendWriteRequest(gSessionManager.FindSecureSessionForNode(chip::kTestDeviceNodeId), gMessageTimeout));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 
     gWriteCount++;
 
@@ -370,7 +369,7 @@ CHIP_ERROR SendSubscribeRequest()
     CHIP_ERROR err   = CHIP_NO_ERROR;
     gLastMessageTime = chip::System::SystemClock().GetMonotonicTimestamp();
 
-    chip::app::ReadPrepareParams readPrepareParams(chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
+    chip::app::ReadPrepareParams readPrepareParams(gSession.Get());
     chip::app::EventPathParams eventPathParams[2];
     chip::app::AttributePathParams attributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
@@ -391,7 +390,7 @@ CHIP_ERROR SendSubscribeRequest()
 
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mMinIntervalFloorSeconds   = 2;
+    readPrepareParams.mMinIntervalFloorSeconds   = 5;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
@@ -416,7 +415,8 @@ CHIP_ERROR EstablishSecureSession()
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
+    err = gSessionManager.NewPairing(gSession,
+                                     chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null())),
                                      chip::kTestDeviceNodeId, testSecurePairingSecret, chip::CryptoContext::SessionRole::kInitiator,
                                      gFabricIndex);
@@ -626,7 +626,7 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     gLastCommandResult = TestCommandResult::kSuccess;
 }
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
@@ -646,7 +646,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler *)
 {
     if (aClusterInfo.mClusterId != kTestClusterId || aClusterInfo.mEndpointId != kTestEndpointId)
     {
@@ -685,7 +686,7 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer())
+    err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
                                      .SetAddressType(chip::Inet::IPAddressType::kIPv6)
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);

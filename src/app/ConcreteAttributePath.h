@@ -26,6 +26,9 @@ namespace app {
 
 /**
  * A representation of a concrete attribute path. This does not convey any list index specifiers.
+ *
+ * The expanded flag can be set to indicate that a concrete path was expanded from a wildcard
+ * or group path.
  */
 struct ConcreteAttributePath
 {
@@ -41,6 +44,7 @@ struct ConcreteAttributePath
     }
 
     EndpointId mEndpointId   = 0;
+    bool mExpanded           = false; // NOTE: in between larger members
     ClusterId mClusterId     = 0;
     AttributeId mAttributeId = 0;
 };
@@ -54,9 +58,7 @@ struct ConcreteReadAttributePath : public ConcreteAttributePath
 {
     ConcreteReadAttributePath() {}
 
-    ConcreteReadAttributePath(const ConcreteAttributePath & path) :
-        ConcreteReadAttributePath(path.mEndpointId, path.mClusterId, path.mAttributeId)
-    {}
+    ConcreteReadAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
 
     ConcreteReadAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)
@@ -89,6 +91,8 @@ struct ConcreteDataAttributePath : public ConcreteAttributePath
     };
 
     ConcreteDataAttributePath() {}
+
+    ConcreteDataAttributePath(const ConcreteAttributePath & path) : ConcreteAttributePath(path) {}
 
     ConcreteDataAttributePath(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
         ConcreteAttributePath(aEndpointId, aClusterId, aAttributeId)

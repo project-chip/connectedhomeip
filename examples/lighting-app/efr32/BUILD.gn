@@ -22,6 +22,8 @@ import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
+
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -70,7 +72,10 @@ efr32_sdk("sdk") {
   ]
 
   if (chip_enable_pw_rpc) {
-    defines += [ "HAL_VCOM_ENABLE=1" ]
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
   }
 }
 
@@ -81,7 +86,7 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -96,9 +101,20 @@ efr32_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   include_dirs = [ "include" ]
 

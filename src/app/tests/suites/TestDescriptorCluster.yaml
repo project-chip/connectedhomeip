@@ -35,6 +35,7 @@ tests:
       response:
           value: [
                   0x0003, # Identify
+                  0x0004, # Groups
                   0x001D, # Descriptor
                   0x001E, # Binding
                   0x001F, # Access Control
@@ -60,9 +61,7 @@ tests:
       command: "readAttribute"
       attribute: "Client List"
       response:
-          value: [
-                  0x0029, # OTA Software Update Provider
-              ]
+          value: []
 
     - label: "Read attribute Parts list"
       command: "readAttribute"

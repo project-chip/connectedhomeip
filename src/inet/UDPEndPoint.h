@@ -28,27 +28,14 @@
 
 #pragma once
 
+#include <inet/InetConfig.h>
+
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 #include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
-#include <lib/support/Pool.h>
 #include <system/SystemPacketBuffer.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <inet/EndPointStateLwIP.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <inet/EndPointStateSockets.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <inet/EndPointStateNetworkFramework.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
 
 namespace chip {
 namespace Inet {
@@ -301,174 +288,6 @@ protected:
     virtual CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg)                     = 0;
     virtual void CloseImpl()                                                                                                  = 0;
 };
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-class UDPEndPointImplLwIP : public UDPEndPoint, public EndPointStateLwIP
-{
-public:
-    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
-
-    // UDPEndPoint overrides.
-    CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
-    InterfaceId GetBoundInterface() const override;
-    uint16_t GetBoundPort() const override;
-    void Free() override;
-
-private:
-    // UDPEndPoint overrides.
-#if INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-#endif // INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-    CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId) override;
-    CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
-    CHIP_ERROR ListenImpl() override;
-    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
-    void CloseImpl() override;
-
-    static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
-    static CHIP_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId);
-
-    void HandleDataReceived(chip::System::PacketBufferHandle && aBuffer);
-
-    /**
-     *  Get LwIP IP layer source and destination addressing information.
-     *
-     *  @param[in]   aBuffer    The packet buffer containing the IP message.
-     *
-     *  @returns  a pointer to the address information on success; otherwise,
-     *            nullptr if there is insufficient space in the packet for
-     *            the address information.
-     *
-     *  When using LwIP information about the packet is 'hidden' in the reserved space before the start of the
-     *  data in the packet buffer. This is necessary because the system layer events only have two arguments,
-     *  which in this case are used to convey the pointer to the end point and the pointer to the buffer.
-     *
-     *  In most cases this trick of storing information before the data works because the first buffer in an
-     *  LwIP IP message contains the space that was used for the Ethernet/IP/UDP headers. However, given the
-     *  current size of the IPPacketInfo structure (40 bytes), it is possible for there to not be enough room
-     *  to store the structure along with the payload in a single packet buffer. In practice, this should only
-     *  happen for extremely large IPv4 packets that arrive without an Ethernet header.
-     */
-    static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
-
-    CHIP_ERROR GetPCB(IPAddressType addrType4);
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port);
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-};
-
-using UDPEndPointImpl = UDPEndPointImplLwIP;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-class UDPEndPointImplSockets : public UDPEndPoint, public EndPointStateSockets
-{
-public:
-    UDPEndPointImplSockets(EndPointManager<UDPEndPoint> & endPointManager) :
-        UDPEndPoint(endPointManager), mBoundIntfId(InterfaceId::Null())
-    {}
-
-    // UDPEndPoint overrides.
-    CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
-    InterfaceId GetBoundInterface() const override;
-    uint16_t GetBoundPort() const override;
-    void Free() override;
-
-private:
-    // UDPEndPoint overrides.
-#if INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-#endif // INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-    CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId) override;
-    CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
-    CHIP_ERROR ListenImpl() override;
-    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
-    void CloseImpl() override;
-
-    CHIP_ERROR GetSocket(IPAddressType addressType);
-    void HandlePendingIO(System::SocketEvents events);
-    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
-
-    InterfaceId mBoundIntfId;
-    uint16_t mBoundPort;
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
-#if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-public:
-    using MulticastGroupHandler = CHIP_ERROR (*)(InterfaceId, const IPAddress &);
-    static void SetJoinMulticastGroupHandler(MulticastGroupHandler handler) { sJoinMulticastGroupHandler = handler; }
-    static void SetLeaveMulticastGroupHandler(MulticastGroupHandler handler) { sLeaveMulticastGroupHandler = handler; }
-
-private:
-    static MulticastGroupHandler sJoinMulticastGroupHandler;
-    static MulticastGroupHandler sLeaveMulticastGroupHandler;
-#endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-};
-
-using UDPEndPointImpl = UDPEndPointImplSockets;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework
-{
-public:
-    UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
-
-    // UDPEndPoint overrides.
-    CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
-    InterfaceId GetBoundInterface() const override;
-    uint16_t GetBoundPort() const override;
-    void Free() override;
-
-private:
-    // UDPEndPoint overrides.
-#if INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-#endif // INET_CONFIG_ENABLE_IPV4
-    CHIP_ERROR IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
-    CHIP_ERROR BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId) override;
-    CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
-    CHIP_ERROR ListenImpl() override;
-    CHIP_ERROR SendMsgImpl(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle && msg) override;
-    void CloseImpl() override;
-
-    nw_listener_t mListener;
-    dispatch_semaphore_t mListenerSemaphore;
-    dispatch_queue_t mListenerQueue;
-    nw_connection_t mConnection;
-    dispatch_semaphore_t mConnectionSemaphore;
-    dispatch_queue_t mDispatchQueue;
-    dispatch_semaphore_t mSendSemaphore;
-
-    CHIP_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    CHIP_ERROR StartListener();
-    CHIP_ERROR GetConnection(const IPPacketInfo * aPktInfo);
-    CHIP_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);
-    CHIP_ERROR StartConnection(nw_connection_t & aConnection);
-    void GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo);
-    void HandleDataReceived(const nw_connection_t & aConnection);
-    CHIP_ERROR ReleaseListener();
-    CHIP_ERROR ReleaseConnection();
-    void ReleaseAll();
-};
-
-using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-using UDPEndPointManagerImpl = EndPointManagerImplPool<UDPEndPointImpl, INET_CONFIG_NUM_UDP_ENDPOINTS>;
 
 template <>
 struct EndPointProperties<UDPEndPoint>

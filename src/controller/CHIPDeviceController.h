@@ -28,10 +28,12 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
 #include <controller/AutoCommissioner.h>
@@ -72,6 +74,7 @@
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #endif
 
 namespace chip {
@@ -218,7 +221,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(mFabricInfo, deviceId, onConnection, onFailure);
     }
 
     /**
@@ -232,7 +235,7 @@ public:
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(deviceId);
+        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
     }
 
     /**
@@ -334,12 +337,15 @@ protected:
     CASESessionManager * mCASESessionManager = nullptr;
 
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
+    CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
     PeerId mLocalId    = PeerId();
     FabricId mFabricId = kUndefinedFabricId;
+    FabricInfo * mFabricInfo;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -365,6 +371,8 @@ protected:
     SessionIDAllocator mIDAllocator;
 
     uint16_t mVendorId;
+
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
@@ -415,7 +423,6 @@ private:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
-                                      public SessionCreationDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
                                       public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
@@ -674,8 +681,6 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// SessionCreationDelegate Implementation ///////////////
-    void OnNewSession(SessionHandle session) override;
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
 
@@ -798,9 +803,6 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
-
-    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
-
     AutoCommissioner mAutoCommissioner;
     CommissioningDelegate * mCommissioningDelegate = nullptr;
 };

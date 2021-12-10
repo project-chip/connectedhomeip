@@ -452,12 +452,11 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
     Structs::SimpleStruct::Type arg4;
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
     DataModel::List<const SimpleEnum> arg6;
-    EventOptions eventOptions;
 
     // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
     Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
 
-    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, eventOptions, responseData.value))
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;

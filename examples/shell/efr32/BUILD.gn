@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/efr32_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
@@ -58,7 +59,7 @@ efr32_executable("shell_app") {
   sources = [
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/main.cpp",
   ]
 
@@ -69,7 +70,7 @@ efr32_executable("shell_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
 
   include_dirs = [ "include" ]

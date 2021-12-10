@@ -106,7 +106,7 @@ public:
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
@@ -172,7 +172,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     TCPImpl tcp;
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }

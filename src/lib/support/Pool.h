@@ -83,10 +83,10 @@ protected:
 
 public:
     StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity, size_t elementSize);
-    void * Allocate();
-    void Deallocate(void * element);
 
 protected:
+    void * Allocate();
+    void Deallocate(void * element);
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 

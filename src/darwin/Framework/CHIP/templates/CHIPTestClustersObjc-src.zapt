@@ -40,7 +40,7 @@ using namespace chip::app::Clusters;
       {{! For now, don't change the bridge API; instead just use an adapter
           to invoke our completion handler. This is not great from a
           type-safety perspective, of course. }}
-      ^(NSError * _Nullable error, id _Nullable ignored) {
+      ^(id _Nullable ignored, NSError * _Nullable error) {
         completionHandler(error);
       },
       ^(Cancelable * success, Cancelable * failure) {

@@ -90,7 +90,9 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(uint16_t mySessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(
+        uint16_t mySessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+        Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * @brief
@@ -105,9 +107,10 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                                uint16_t mySessionId, Messaging::ExchangeContext * exchangeCtxt,
-                                SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR
+    EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId, uint16_t mySessionId,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate,
+                     Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * Parse a sigma1 message.  This function will return success only if the
@@ -127,10 +130,9 @@ public:
      * and the  resumptionID and initiatorResumeMIC outparams will be set to
      * valid values, or the resumptionRequested outparam will be set to false.
      */
-    static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom,
-                                  uint16_t & initiatorSessionId, ByteSpan & destinationId, ByteSpan & initiatorEphPubKey,
-                                  // TODO: MRP param parsing
-                                  bool & resumptionRequested, ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
+    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom, uint16_t & initiatorSessionId,
+                           ByteSpan & destinationId, ByteSpan & initiatorEphPubKey, bool & resumptionRequested,
+                           ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
 
     /**
      * @brief
@@ -260,6 +262,8 @@ private:
 
     uint8_t mLocalFabricIndex       = 0;
     uint64_t mSessionSetupTimeStamp = 0;
+
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
 protected:
     bool mCASESessionEstablished = false;

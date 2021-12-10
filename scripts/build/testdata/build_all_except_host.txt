@@ -2,7 +2,10 @@
 cd "{root}"
 
 # Generating ameba-amebad-all-clusters
-bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters all-clusters-app'
+
+# Generating ameba-amebad-light
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
@@ -581,6 +584,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
+
+# Building ameba-amebad-light
+ninja -C {out}/ameba-amebad-light
 
 # Building APP android-androidstudio-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=armeabi-v7a assembleDebug

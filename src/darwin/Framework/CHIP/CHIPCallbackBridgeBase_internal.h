@@ -42,7 +42,7 @@ public:
 
         if (CHIP_NO_ERROR != err) {
             dispatch_async(queue, ^{
-                handler([CHIPError errorForCHIPErrorCode:err], nil);
+                handler(nil, [CHIPError errorForCHIPErrorCode:err]);
             });
 
             NSString * errorStr = [NSString stringWithFormat:@"%s: %s", typeid(T).name(), chip::ErrorStr(err)];
@@ -58,6 +58,9 @@ public:
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
 
+protected:
+    dispatch_queue_t mQueue;
+
 private:
     static void DispatchCallbackResult(void * context, NSError * error, id value)
     {
@@ -71,8 +74,13 @@ private:
             return;
         }
 
+        if (error) {
+            // We should delete ourselves; there will be no more callbacks.
+            callbackBridge->mKeepAlive = false;
+        }
+
         dispatch_async(callbackBridge->mQueue, ^{
-            callbackBridge->mHandler(error, value);
+            callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
                 delete callbackBridge;
@@ -80,7 +88,6 @@ private:
         });
     }
 
-    dispatch_queue_t mQueue;
     ResponseHandler mHandler;
     bool mKeepAlive;
 

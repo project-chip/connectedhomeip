@@ -20,9 +20,9 @@
 
 #include <limits>
 
-#include <inet/IPPacketInfo.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/ActiveResolveAttempts.h>
@@ -347,7 +347,7 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
@@ -404,18 +404,18 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
 }
 
-CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
-    /// the same inetLayer and port for mDNS.
-    mSystemLayer = inetLayer->SystemLayer();
+    /// the same udpEndPointManager and port for mDNS.
+    mSystemLayer = &udpEndPointManager->SystemLayer();
 
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
 
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
+    return GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort);
 }
 
 void MinMdnsResolver::Shutdown()
@@ -596,6 +596,31 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
+}
+
+// Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
+// updating the delegate that ends up beeing used by the server by calling 'SetResolverDelegate'.
+// This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
+// it won't work well if requests are issued in parallel.
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 
 } // namespace Dnssd

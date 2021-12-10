@@ -309,15 +309,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreSetupDiscriminator
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint32_t & location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetRegulatoryLocation(uint8_t & location)
 {
-    return ReadConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+    return GetLocationCapability(location);
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation(uint32_t location)
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreRegulatoryLocation(uint8_t location)
 {
-    return WriteConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, location);
+    uint32_t value = location;
+    return WriteConfigValue(ConfigClass::kConfigKey_RegulatoryLocation, value);
 }
 
 template <class ConfigClass>
@@ -376,6 +377,54 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetBootReason(uint32_t & 
 
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::StoreBootReason(uint32_t bootReason)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetNodeLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreNodeLabel(const char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetPartNumber(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductURL(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductLabel(char * buf, size_t bufSize)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLocalConfigDisabled(bool & disabled)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetReachable(bool & reachable)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ConfigClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetUniqueId(char * buf, size_t bufSize)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

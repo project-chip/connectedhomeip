@@ -132,8 +132,9 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 void CommissioningWindowManager::OnSessionEstablished()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+    SessionHolder sessionHolder;
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
+        sessionHolder, Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
         &mPairingSession, CryptoContext::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {

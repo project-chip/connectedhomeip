@@ -319,7 +319,8 @@ function parse(filename)
         command : "waitForReport",
         attribute : test.attribute,
         response : test.response,
-        async : true
+        async : true,
+        allocateSubscribeDataCallback : true,
       };
       delete test.response;
 
@@ -327,8 +328,9 @@ function parse(filename)
       yaml.tests.splice(index, 0, reportTest);
 
       // Associate the "subscribeAttribute" test with the synthesized report test
-      test.hasWaitForReport = true;
-      test.waitForReport    = reportTest;
+      test.hasWaitForReport              = true;
+      test.waitForReport                 = reportTest;
+      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
     }
   });
 
