@@ -67,10 +67,7 @@ public:
         }
     }
 
-    virtual ~CASESessionManager()
-    {
-        mDNSResolver.Shutdown();
-    }
+    virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
