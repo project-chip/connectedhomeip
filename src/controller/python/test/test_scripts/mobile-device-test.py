@@ -79,7 +79,7 @@ def main():
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
-    FailIfNot(test.SetThreadOperationalDataset(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
+    FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
               "Failed to finish network commissioning")
 
     logger.info("Testing key exchange")
