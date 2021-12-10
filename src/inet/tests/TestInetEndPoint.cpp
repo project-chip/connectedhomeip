@@ -258,12 +258,10 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     err = gUDP.NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     err = gTCP.NewEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -298,12 +296,9 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = gUDP.NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
@@ -311,7 +306,6 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
 #endif // INET_CONFIG_ENABLE_IPV4
     testUDPEP->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
 
     // TcpEndPoint special cases to cover the error branch
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
@@ -350,8 +344,6 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     testTCPEP1->Free();
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 }
 
 #if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -369,10 +361,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, ++udpCount));
     }
     const int udpHighWaterMark = udpCount;
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
     int tcpCount = 0;
     SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
@@ -380,10 +370,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gTCP.NewEndPoint(&testTCPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, ++tcpCount));
     }
     const int tcpHighWaterMark = tcpCount;
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
 
 #if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool
@@ -405,10 +393,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testUDPEP[i] != nullptr)
         {
             testUDPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --udpCount));
         }
     }
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
     // Release TCP endpoints
     for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
@@ -416,10 +402,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --tcpCount));
         }
     }
-    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
 
     ShutdownNetwork();
     ShutdownSystemLayer();
