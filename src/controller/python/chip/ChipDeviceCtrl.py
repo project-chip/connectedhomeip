@@ -244,12 +244,14 @@ class ChipDeviceController(object):
 
     def SetWifiCredentials(self, ssid, credentials):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(ssid, credentials)
+            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(
+                ssid, credentials)
         )
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(threadOperationalDataset)
+            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
+                threadOperationalDataset)
         )
 
     def ResolveNode(self, nodeid):
@@ -696,10 +698,12 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
 
-            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [ c_char_p ]
+            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
+                c_char_p]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [ c_char_p, c_char_p ]
+            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
+                c_char_p, c_char_p]
             self._dmLib.pychip_DeviceController_SetWifiCredentials.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
