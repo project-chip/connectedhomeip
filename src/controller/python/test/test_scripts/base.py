@@ -153,30 +153,29 @@ class BaseTestHelper:
     def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
         self.logger.info("Commissioning network to device {}".format(nodeid))
         try:
-            (err, resp) = self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, endpoint, group, {
+            (err, resp) = self.devCtrl.ZCLSend("NetworkCommissioning", "AddOrUpdateThreadNetwork", nodeid, endpoint, group, {
                 "operationalDataset": bytes.fromhex(dataset),
-                "breadcrumb": 0,
-                "timeoutMs": 1000}, blocking=True)
+                "breadcrumb": 0}, blocking=True)
             self.logger.info(f"Received response: {resp}")
             if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 self.logger.exception("Failed to add Thread network.")
                 return False
         except Exception as ex:
-            self.logger.exception("Failed to send AddThreadNetwork command")
+            self.logger.exception(
+                "Failed to send AddOrUpdateThreadNetwork command")
             return False
         self.logger.info(
-            "Send EnableNetwork command to device {}".format(nodeid))
+            "Send ConnectNetwork command to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
+            self.devCtrl.ZCLSend("NetworkCommissioning", "ConnectNetwork", nodeid, endpoint, group, {
                 "networkID": bytes.fromhex(network_id),
-                "breadcrumb": 0,
-                "timeoutMs": 1000}, blocking=True)
+                "breadcrumb": 0}, blocking=True)
             self.logger.info(f"Received response: {resp}")
             if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 self.logger.exception("Failed to enable Thread network.")
                 return False
         except Exception as ex:
-            self.logger.exception("Failed to send EnableNetwork command")
+            self.logger.exception("Failed to send ConnectNetwork command")
             return False
         return True
 
