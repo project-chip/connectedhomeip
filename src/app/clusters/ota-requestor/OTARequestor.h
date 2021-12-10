@@ -125,6 +125,8 @@ public:
 
 private:
     struct QueryImageRequest;
+    using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
+    using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
 
@@ -206,6 +208,11 @@ private:
     CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & request);
 
     /**
+     * Verify all required fields are present in the QueryImageResponse
+     */
+    bool ValidateQueryImageResponse(const QueryImageResponseDecodableType & response) const;
+
+    /**
      * Create a ApplyUpdate request using values obtained from QueryImageResponse
      */
     CHIP_ERROR BuildApplyUpdateRequest(app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type & args);
@@ -221,17 +228,13 @@ private:
     /**
      * QueryImage callbacks
      */
-    static void
-    OnQueryImageResponse(void * context,
-                         const app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
+    static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
     static void OnQueryImageFailure(void * context, EmberAfStatus status);
 
     /**
      * ApplyUpdate callbacks
      */
-    static void
-    OnApplyUpdateResponse(void * context,
-                          const app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & response);
+    static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
     static void OnApplyUpdateFailure(void * context, EmberAfStatus);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
