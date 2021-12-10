@@ -369,7 +369,11 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, ++udpCount));
+        if (err == CHIP_NO_ERROR)
+        {
+            ++udpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
+        }
     }
     const int udpHighWaterMark = udpCount;
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
@@ -380,7 +384,11 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gTCP.NewEndPoint(&testTCPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, ++tcpCount));
+        if (err == CHIP_NO_ERROR)
+        {
+            ++tcpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
+        }
     }
     const int tcpHighWaterMark = tcpCount;
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
@@ -405,7 +413,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testUDPEP[i] != nullptr)
         {
             testUDPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --udpCount));
+            --udpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
         }
     }
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
@@ -416,7 +425,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --tcpCount));
+            --tcpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }
     }
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
