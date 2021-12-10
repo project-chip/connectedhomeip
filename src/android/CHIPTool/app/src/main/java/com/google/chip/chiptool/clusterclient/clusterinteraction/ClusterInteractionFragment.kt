@@ -16,6 +16,7 @@ import com.google.chip.chiptool.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import com.google.chip.chiptool.clusterclient.AddressUpdateFragment
+import kotlin.properties.Delegates
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.bottomNavigationBar
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.endpointList
 import kotlinx.android.synthetic.main.cluster_interaction_fragment.view.getEndpointListBtn
@@ -27,6 +28,7 @@ class ClusterInteractionFragment : Fragment() {
 
   private lateinit var scope: CoroutineScope
   private lateinit var addressUpdateFragment: AddressUpdateFragment
+  private var devicePtr by Delegates.notNull<Long>()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -73,26 +75,21 @@ class ClusterInteractionFragment : Fragment() {
 
   companion object {
     private const val TAG = "ClusterInteractionFragment"
-    var devicePtr = 0L
     fun newInstance(): ClusterInteractionFragment = ClusterInteractionFragment()
   }
 
-  private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
+  private fun showFragment(fragment: Fragment) {
     val fragmentTransaction = requireActivity().supportFragmentManager
       .beginTransaction()
       .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
-
-    if (showOnBack) {
-      fragmentTransaction.addToBackStack(null)
-    }
-
+    fragmentTransaction.addToBackStack(null)
     fragmentTransaction.commit()
   }
 
   private val bottomNavigationListener = BottomNavigationView.OnNavigationItemSelectedListener { menuItem ->
     when (menuItem.itemId) {
       R.id.clusterInteractionHistory -> {
-        val fragment = ClusterInteractionHistoryFragment()
+        val fragment = ClusterInteractionHistoryFragment.newInstance()
         showFragment(fragment)
         return@OnNavigationItemSelectedListener true
       }
@@ -107,8 +104,7 @@ class ClusterInteractionFragment : Fragment() {
 
   inner class EndpointListener : EndpointAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
-      Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
-      showFragment(ClusterDetailFragment.newInstance(position, null))
+      showFragment(ClusterDetailFragment.newInstance(devicePtr, position, null))
     }
   }
 }

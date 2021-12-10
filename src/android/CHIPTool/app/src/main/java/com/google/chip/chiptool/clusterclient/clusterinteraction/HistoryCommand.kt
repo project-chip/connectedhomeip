@@ -12,7 +12,9 @@ data class HistoryCommand(
   val commandName: String,
   val parameterList: MutableList<HistoryParameterInfo>,
   var responseValue: Map<CommandResponseInfo, Any>?,
-  var status: String?
+  var status: String?,
+  var endpointId: Int,
+  var deviceptr: Long,
 ) : Serializable
 
 data class HistoryParameterInfo(

@@ -57,18 +57,23 @@ class ClusterDetailFragment : Fragment() {
   private lateinit var selectedCluster: ChipClusters.BaseChipCluster
   private lateinit var selectedCommandCallback: DelegatedClusterCallback
   private lateinit var selectedInteractionInfo: InteractionInfo
+  private var devicePtr by Delegates.notNull<Long>()
+  private var endpointId by Delegates.notNull<Int>()
+
 
   // when user opens detail page from home page of cluster interaction, historyCommand will be
   // null, and nothing will be autocompleted. If the detail page is opened from history page,
   // cluster name, command name and potential parameter list will be filled out based on historyCommand
   private var historyCommand: HistoryCommand? = null
-  private var devicePtr = ClusterInteractionFragment.devicePtr
+
+
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR))
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
     historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
@@ -118,7 +123,9 @@ class ClusterDetailFragment : Fragment() {
           commandAutoCompleteTv.text.toString(),
           mutableListOf(),
           null,
-          null
+          null,
+          endpointId,
+          devicePtr
         )
       )
       parameterList.forEach {
@@ -363,14 +370,16 @@ class ClusterDetailFragment : Fragment() {
     private const val TAG = "ClusterDetailFragment"
     private const val ENDPOINT_ID_KEY = "endpointId"
     private const val HISTORY_COMMAND = "historyCommand"
-    var endpointId by Delegates.notNull<Int>()
+    private const val DEVICE_PTR = "devicePtr"
 
     fun newInstance(
+      devicePtr: Long,
       endpointId: Int,
       historyCommand: HistoryCommand?
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
         arguments = Bundle(2).apply {
+          putLong(DEVICE_PTR, devicePtr)
           putSerializable(HISTORY_COMMAND, historyCommand)
           putInt(ENDPOINT_ID_KEY, endpointId)
         }

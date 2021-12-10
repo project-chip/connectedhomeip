@@ -6,11 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.cluster_interaction_history_fragment.view.historyCommandList
-import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterDetailFragment.Companion.endpointId
 
 /**
  * A simple [Fragment] subclass for the cluster interaction history component
@@ -48,7 +46,7 @@ class ClusterInteractionHistoryFragment : Fragment() {
     private const val TAG = "ClusterInteractionHistoryFragment"
     // The history list is a most-recent-first, therefore adding the most recent executed
     // command on the top of the list
-    var clusterInteractionHistoryList = ArrayDeque<HistoryCommand>()
+    val clusterInteractionHistoryList = ArrayDeque<HistoryCommand>()
     fun newInstance() =
       ClusterInteractionHistoryFragment()
   }
@@ -57,7 +55,8 @@ class ClusterInteractionHistoryFragment : Fragment() {
     override fun onItemClick(position: Int) {
       showFragment(
         ClusterDetailFragment.newInstance(
-          endpointId,
+          clusterInteractionHistoryList[position].deviceptr,
+          clusterInteractionHistoryList[position].endpointId,
           clusterInteractionHistoryList[position]
         )
       )
