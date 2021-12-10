@@ -7696,9 +7696,6 @@ enum class OTADownloadProtocol : uint8_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
 #endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
@@ -7706,9 +7703,6 @@ enum class OTAQueryStatus : uint8_t
     kBusy            = 0x01,
     kNotAvailable    = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAQueryStatus                  = EmberAfOTAQueryStatus;
-#endif
 
 namespace Commands {
 // Forward-declarations so we can reference these later.

@@ -32,6 +32,7 @@
 namespace chip {
 
 using namespace app::Clusters;
+using namespace app::Clusters::OtaSoftwareUpdateProvider;
 using namespace app::Clusters::OtaSoftwareUpdateProvider::Commands;
 using namespace app::Clusters::OtaSoftwareUpdateRequestor::Commands;
 using bdx::TransferSession;
@@ -110,7 +111,7 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 
     switch (response.status)
     {
-    case EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE: {
+    case OTAQueryStatus::kUpdateAvailable: {
         // TODO: Add a method to OTARequestorDriver used to report error condictions
         VerifyOrReturn(response.imageURI.HasValue(), ChipLogError(SoftwareUpdate, "Update is available but no image URI present"));
 
@@ -129,9 +130,9 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         requestorCore->ConnectToProvider(kStartBDX);
         break;
     }
-    case EMBER_ZCL_OTA_QUERY_STATUS_BUSY:
+    case OTAQueryStatus::kBusy:
         break;
-    case EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE:
+    case OTAQueryStatus::kNotAvailable:
         break;
     // TODO: Add download protocol not supported
     // Issue #9524 should handle all response status appropriately

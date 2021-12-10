@@ -595,14 +595,6 @@ enum EmberAfOTADownloadProtocol : uint8_t
     EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 3,
 };
 
-// Enum for OTAQueryStatus
-enum EmberAfOTAQueryStatus : uint8_t
-{
-    EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE = 0,
-    EMBER_ZCL_OTA_QUERY_STATUS_BUSY             = 1,
-    EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE    = 2,
-};
-
 // Enum for OnOffDelayedAllOffEffectVariant
 enum EmberAfOnOffDelayedAllOffEffectVariant : uint8_t
 {
