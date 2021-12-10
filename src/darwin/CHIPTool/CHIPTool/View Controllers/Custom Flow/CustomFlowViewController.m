@@ -77,6 +77,7 @@
 @end
 
 NSString * const ledgerUrl = @"https://dcl.dev.dsr-corporation.com/api/modelinfo/models";
+NSString * const returnUrl = @"customflow://payload";
 
 @implementation CustomFlowViewController {
     dispatch_queue_t _captureSessionQueue;
@@ -566,7 +567,7 @@ NSString * const ledgerUrl = @"https://dcl.dev.dsr-corporation.com/api/modelinfo
         @"rendezvousInformation": _rendezVousInformation.text
     } ];
     NSString * base64EncodedString = [self encodeStringTo64:_redirectPayload];
-    NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningUrl.text, base64EncodedString, @"https://www.baidu.com"];
+    NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningUrl.text, base64EncodedString, returnUrl];
     NSURL * url = [NSURL URLWithString:urlString];
     NSLog(@"%@", url);
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];

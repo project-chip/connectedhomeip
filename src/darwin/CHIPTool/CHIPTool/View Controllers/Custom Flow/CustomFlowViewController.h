@@ -12,6 +12,7 @@
 #import <UIKit/UIKit.h>
 
 extern NSString * const ledgerUrl;
+extern NSString * const returnUrl;
 
 @interface CustomFlowViewController
     : UIViewController <AVCaptureMetadataOutputObjectsDelegate>

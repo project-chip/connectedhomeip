@@ -33,4 +33,13 @@
     [self.window makeKeyAndVisible];
     return YES;
 }
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
+{
+    // custom commissioning flow
+    NSLog(@"%@", url);
+    return YES;
+}
 @end
