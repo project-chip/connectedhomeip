@@ -185,17 +185,6 @@ public:
      */
     bool IsTimedInvoke() const { return mTimedRequest; }
 
-    enum class CommandState
-    {
-        Idle,                ///< Default state that the object starts out in, where no work has commenced
-        AddingCommand,       ///< In the process of adding a command.
-        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
-        AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
-        CommandSent,         ///< The command has been sent successfully.
-        ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
-        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
-    };
-
     /*
      * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
      * not arise during normal message processing flows that all normally call Close() above. This can only
@@ -222,7 +211,6 @@ private:
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
-        AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
         CommandSent,         ///< The command has been sent successfully.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
