@@ -67,5 +67,5 @@ RUN chown -R $USERNAME:$USERNAME /opt/ubuntu-21.04-aarch64-sysroot/usr/
 # allow licenses to be accepted
 RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
 
-# AmebaD requires access to change build_info.h 
+# AmebaD requires access to change build_info.h
 RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
