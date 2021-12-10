@@ -64,13 +64,10 @@ class ClusterDetailFragment : Fragment() {
   private var deviceId by Delegates.notNull<Long>()
   private var endpointId by Delegates.notNull<Int>()
 
-
   // when user opens detail page from home page of cluster interaction, historyCommand will be
   // null, and nothing will be autocompleted. If the detail page is opened from history page,
   // cluster name, command name and potential parameter list will be filled out based on historyCommand
   private var historyCommand: HistoryCommand? = null
-
-
 
   override fun onCreateView(
     inflater: LayoutInflater,
