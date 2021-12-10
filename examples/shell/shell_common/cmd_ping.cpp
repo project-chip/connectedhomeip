@@ -249,7 +249,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddr
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator, gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                     CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)

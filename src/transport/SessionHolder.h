@@ -34,9 +34,7 @@ class SessionHolder : public SessionReleaseDelegate
 public:
     SessionHolder() {}
     SessionHolder(SessionHandle session) : mSession(session) {}
-    ~SessionHolder() {
-        Release();
-    }
+    ~SessionHolder() { Release(); }
 
     SessionHolder(const SessionHolder &);
     SessionHolder operator=(const SessionHolder &);
@@ -49,29 +47,18 @@ public:
         mSession.SetValue(sessionHandle);
     }
 
-    void Release()
-    {
-        mSession.ClearValue();
-    }
+    void Release() { mSession.ClearValue(); }
 
     // TODO: call this function when the underlying session is released
     // Implement SessionReleaseDelegate
-    void OnSessionReleased(SessionHandle session) override
-    {
-        Release();
-    }
+    void OnSessionReleased(SessionHandle session) override { Release(); }
 
     // Check whether the SessionHolder contains a session matching given session
-    bool Contains(const SessionHandle & session) const
-    {
-        return mSession.HasValue() && mSession.Value() == session;
-    }
+    bool Contains(const SessionHandle & session) const { return mSession.HasValue() && mSession.Value() == session; }
 
     operator bool() const { return mSession.HasValue(); }
     SessionHandle Get() const { return mSession.Value(); }
-    Optional<SessionHandle> ToOpional() const {
-        return mSession;
-    }
+    Optional<SessionHandle> ToOpional() const { return mSession; }
 
 private:
     Optional<SessionHandle> mSession;

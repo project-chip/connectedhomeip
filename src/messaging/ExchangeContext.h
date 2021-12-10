@@ -186,7 +186,7 @@ private:
     ExchangeMessageDispatch * mDispatch = nullptr;
 
     SessionHolder mSession; // The connection state
-    uint16_t mExchangeId;             // Assigned exchange ID.
+    uint16_t mExchangeId;   // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over

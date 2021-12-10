@@ -118,8 +118,8 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(err);
 
     if (!disableEcho)

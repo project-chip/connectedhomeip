@@ -287,8 +287,9 @@ CHIP_ERROR Server::AddTestCommissioning()
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, CryptoContext::SessionRole::kResponder, kMinValidFabricIndex));
+    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() },
+                                             chip::kTestControllerNodeId, testSession, CryptoContext::SessionRole::kResponder,
+                                             kMinValidFabricIndex));
 
 exit:
     if (testSession)

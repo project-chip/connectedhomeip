@@ -41,8 +41,8 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
-#include <transport/SessionManager.h>
 #include <transport/SessionHolder.h>
+#include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>

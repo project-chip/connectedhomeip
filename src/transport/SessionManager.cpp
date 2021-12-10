@@ -297,8 +297,9 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
-CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                      PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric)
+CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
+                                      NodeId peerNodeId, PairingSession * pairing, CryptoContext::SessionRole direction,
+                                      FabricIndex fabric)
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();

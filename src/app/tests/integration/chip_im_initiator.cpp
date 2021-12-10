@@ -352,8 +352,7 @@ CHIP_ERROR SendWriteRequest(chip::app::WriteClientHandle & apWriteClient)
     SuccessOrExit(err =
                       writer->PutBoolean(chip::TLV::ContextTag(chip::to_underlying(chip::app::AttributeDataIB::Tag::kData)), true));
     SuccessOrExit(err = apWriteClient->FinishAttribute());
-    SuccessOrExit(
-        err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
+    SuccessOrExit(err = apWriteClient.SendWriteRequest(gSession.Get(), gMessageTimeout));
 
     gWriteCount++;
 
@@ -416,7 +415,8 @@ CHIP_ERROR EstablishSecureSession()
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(gSession, chip::Optional<chip::Transport::PeerAddress>::Value(
+    err = gSessionManager.NewPairing(gSession,
+                                     chip::Optional<chip::Transport::PeerAddress>::Value(
                                          chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, chip::Inet::InterfaceId::Null())),
                                      chip::kTestDeviceNodeId, testSecurePairingSecret, chip::CryptoContext::SessionRole::kInitiator,
                                      gFabricIndex);

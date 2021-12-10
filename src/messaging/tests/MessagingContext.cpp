@@ -37,11 +37,12 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
 
     mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetBobKeyId(), GetFriendsGroupId(), GetFabricIndex()).Value());
 
-    ReturnErrorOnFailure(mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
-                                                    &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator, mSrcFabricIndex));
+    ReturnErrorOnFailure(mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress),
+                                                    GetAliceNodeId(), &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator,
+                                                    mSrcFabricIndex));
 
-    return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(), &mPairingAliceToBob,
-                                      CryptoContext::SessionRole::kResponder, mDestFabricIndex);
+    return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(),
+                                      &mPairingAliceToBob, CryptoContext::SessionRole::kResponder, mDestFabricIndex);
 }
 
 // Shutdown all layers, finalize operations

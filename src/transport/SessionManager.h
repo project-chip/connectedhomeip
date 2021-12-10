@@ -187,8 +187,8 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          CryptoContext::SessionRole direction, FabricIndex fabric);
+    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                          PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
 
     void ExpirePairing(SessionHandle session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);

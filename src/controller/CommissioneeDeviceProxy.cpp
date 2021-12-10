@@ -166,8 +166,8 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParameters()
         ExitNow(err = CHIP_NO_ERROR);
     }
 
-    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId, &mPairing,
-                                      CryptoContext::SessionRole::kInitiator, mFabricIndex));
+    SuccessOrExit(mSessionManager->NewPairing(mSecureSession, Optional<Transport::PeerAddress>::Value(mDeviceAddress), mDeviceId,
+                                              &mPairing, CryptoContext::SessionRole::kInitiator, mFabricIndex));
     mState = ConnectionState::SecureConnected;
 
 exit:

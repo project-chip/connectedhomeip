@@ -75,8 +75,8 @@ void CASEClient::OnSessionEstablished()
 
 CHIP_ERROR CASEClient::DeriveSecureSessionHandle(SessionHolder & handle)
 {
-    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(handle,
-        Optional<Transport::PeerAddress>::Value(mPeerAddress), mPeerId.GetNodeId(), &mCASESession,
+    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
+        handle, Optional<Transport::PeerAddress>::Value(mPeerAddress), mPeerId.GetNodeId(), &mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
     if (err != CHIP_NO_ERROR)
     {

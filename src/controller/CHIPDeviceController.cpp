@@ -1001,9 +1001,9 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: the session should know which peer we are trying to connect to when started
     pairing->SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
 
-    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(mDeviceBeingCommissioned->GetSecureSessionHolder(), Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
-                                                            pairing->GetPeerNodeId(), pairing,
-                                                            CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(
+        mDeviceBeingCommissioned->GetSecureSessionHolder(), Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
+        pairing->GetPeerNodeId(), pairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));

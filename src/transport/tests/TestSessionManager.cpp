@@ -88,11 +88,11 @@ public:
 
     bool mOldConnectionDropped = false;
 
-    nlTestSuite * mSuite                          = nullptr;
+    nlTestSuite * mSuite = nullptr;
     SessionHolder mRemoteToLocalSession;
     SessionHolder mLocalToRemoteSession;
-    int ReceiveHandlerCallCount                   = 0;
-    int NewConnectionHandlerCallCount             = 0;
+    int ReceiveHandlerCallCount       = 0;
+    int NewConnectionHandlerCallCount = 0;
 
     bool LargeMessageSent = false;
 };
@@ -147,11 +147,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1,
+                                    CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Get();
@@ -235,11 +237,13 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1,
+                                    CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Get();
@@ -309,11 +313,13 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairing1(1, 2);
-    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1,
+                                    CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(2, 1);
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
+    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kDestinationNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SessionHandle localToRemoteSession = callback.mLocalToRemoteSession.Get();
@@ -417,35 +423,40 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
     // First pairing
     SecurePairingUsingTestSecret pairing1(1, 1);
     callback.mOldConnectionDropped = false;
-    err = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1, CryptoContext::SessionRole::kInitiator, 1);
+    err                            = sessionManager.NewPairing(callback.mRemoteToLocalSession, peer, kSourceNodeId, &pairing1,
+                                    CryptoContext::SessionRole::kInitiator, 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with different peer node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing2(1, 2);
     callback.mOldConnectionDropped = false;
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kSourceNodeId, &pairing2, CryptoContext::SessionRole::kResponder, 0);
+    err                            = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kSourceNodeId, &pairing2,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with undefined node ID and different local key ID (same peer key ID)
     SecurePairingUsingTestSecret pairing3(1, 3);
     callback.mOldConnectionDropped = false;
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kUndefinedNodeId, &pairing3, CryptoContext::SessionRole::kResponder, 0);
+    err                            = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kUndefinedNodeId, &pairing3,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, !callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and a given node ID
     SecurePairingUsingTestSecret pairing4(1, 2);
     callback.mOldConnectionDropped = false;
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kSourceNodeId, &pairing4, CryptoContext::SessionRole::kResponder, 0);
+    err                            = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kSourceNodeId, &pairing4,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 
     // New pairing with same local key ID, and undefined node ID
     SecurePairingUsingTestSecret pairing5(1, 1);
     callback.mOldConnectionDropped = false;
-    err = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kUndefinedNodeId, &pairing5, CryptoContext::SessionRole::kResponder, 0);
+    err                            = sessionManager.NewPairing(callback.mLocalToRemoteSession, peer, kUndefinedNodeId, &pairing5,
+                                    CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
 }
