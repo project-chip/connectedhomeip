@@ -71,10 +71,7 @@ void TLVPrettyPrinter(const char * aFormat, ...)
 
     va_start(args, aFormat);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
     vprintf(aFormat, args);
-#pragma clang diagnostic pop
 
     va_end(args);
 }

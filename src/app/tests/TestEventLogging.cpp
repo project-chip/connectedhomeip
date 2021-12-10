@@ -89,16 +89,14 @@ public:
     }
 };
 
+__attribute__((format_arg(1)))
 void SimpleDumpWriter(const char * aFormat, ...)
 {
     va_list args;
 
     va_start(args, aFormat);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
     vprintf(aFormat, args);
-#pragma clang diagnostic pop
 
     va_end(args);
 }

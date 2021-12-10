@@ -51,16 +51,14 @@ void StartDefaultThreadNetwork(void)
     chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(true);
 }
 
+__attribute__((format_arg(2)))
 void tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...)
 {
     va_list args;
 
     va_start(args, aFormat);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wformat-nonliteral"
     vprintf(aFormat, args);
-#pragma clang diagnostic pop
 
     printf("\r\n");
 
