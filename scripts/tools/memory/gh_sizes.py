@@ -113,9 +113,9 @@ CONFIG: ConfigDescription = {
     'timestamp': {
         'help': 'Build timestamp',
         'metavar': 'TIME',
-        'default': int(
+        'default': int(float(
             os.environ.get('GH_EVENT_TIMESTAMP')
-            or datetime.datetime.now().timestamp()),
+            or datetime.datetime.now().timestamp())),
     },
 }
 
