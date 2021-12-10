@@ -50,10 +50,6 @@ public:
             attrId = ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID;
             break;
         }
-        case app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::Id: {
-            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT_ATTRIBUTE_ID;
-            break;
-        }
         case app::Clusters::MediaPlayback::Attributes::Position::Id: {
             attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID;
             break;

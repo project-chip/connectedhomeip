@@ -1558,7 +1558,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTvChannelClusterChangeChannelResponseParams : NSObject
-@property (strong, nonatomic) NSArray * _Nonnull channelMatch;
+@property (strong, nonatomic) CHIPTvChannelClusterTvChannelInfo * _Nonnull channelMatch;
 @property (strong, nonatomic) NSNumber * _Nonnull errorType;
 - (instancetype)init;
 @end
@@ -1727,24 +1727,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPApplicationLauncherClusterStopAppParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterStopAppResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterHideAppParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterHideAppResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 

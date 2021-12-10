@@ -6973,6 +6973,21 @@
               "reportableChange": 0
             },
             {
+              "name": "current navigator target",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -7320,7 +7335,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7366,6 +7381,22 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "StopApp",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "HideApp",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -9022,7 +9053,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -9242,6 +9273,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "Logout",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -9502,7 +9541,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
