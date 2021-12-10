@@ -40,7 +40,9 @@ namespace Inet {
 class TCPEndPointImplLwIP : public TCPEndPoint, public EndPointStateLwIP
 {
 public:
-    TCPEndPointImplLwIP(EndPointManager<TCPEndPoint> & endPointManager) : TCPEndPoint(endPointManager), mUnackedLength(0) {}
+    TCPEndPointImplLwIP(EndPointManager<TCPEndPoint> & endPointManager) :
+        TCPEndPoint(endPointManager), mUnackedLength(0), mTCP(nullptr)
+    {}
 
     // TCPEndPoint overrides.
     CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override;
@@ -79,6 +81,7 @@ private:
 
     uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
                              // to hang-on to backing packet buffers until they are no longer needed.
+    tcp_pcb * mTCP;          // LwIP Transmission control protocol (TCP) control block.
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();

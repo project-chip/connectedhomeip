@@ -33,7 +33,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/LambdaBridge.h>
-#include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
 #include <system/SystemEvent.h>
