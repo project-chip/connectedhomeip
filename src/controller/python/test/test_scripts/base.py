@@ -152,7 +152,7 @@ class BaseTestHelper:
 
     def SetNetworkCommissioningParameters(self, dataset: str):
         self.logger.info("Setting network commissioning parameters")
-        self.devCtrl.SetThreadOperationalDataset(dataset)
+        self.devCtrl.SetThreadOperationalDataset(dataset.encode("utf-8"))
         return True
 
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
