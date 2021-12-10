@@ -87,6 +87,15 @@ private:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPartNumber(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductURL(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductLabel(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetLocalConfigDisabled(bool & disabled) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetReachable(bool & reachable) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreLocalConfigDisabled(bool disabled) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
