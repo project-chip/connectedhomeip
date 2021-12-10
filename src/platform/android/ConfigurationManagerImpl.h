@@ -53,6 +53,7 @@ public:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreLocalConfigDisabled(bool disabled) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.
