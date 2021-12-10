@@ -127,6 +127,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mSecuredServicePort)
+#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+                               .SetOtInstance(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
+#endif
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
