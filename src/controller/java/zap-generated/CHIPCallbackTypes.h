@@ -325,20 +325,12 @@ typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
 
 typedef void (*CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
 
 typedef void (*CHIPDoorLockClusterLockStateAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo::DecodableArgType);
@@ -346,6 +338,32 @@ typedef void (*CHIPDoorLockClusterLockTypeAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::LockType::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterActuatorEnabledAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::ActuatorEnabled::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterDoorStateAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::DoorState::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfTotalUsersSupportedAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterNumberOfPINUsersSupportedAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterMaxPINCodeLengthAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterMinPINCodeLengthAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterLanguageAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterAutoRelockTimeAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterSoundVolumeAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterOperatingModeAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterSupportedOperatingModesAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::SupportedOperatingModes::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterEnableOneTouchLockingAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterEnablePrivacyModeButtonAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo::DecodableArgType);
+typedef void (*CHIPDoorLockClusterWrongCodeEntryLimitAttributeCallbackType)(
+    void *, chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo::DecodableArgType);
 typedef void (*CHIPDoorLockClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPDoorLockClusterClusterRevisionAttributeCallbackType)(

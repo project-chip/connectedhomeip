@@ -313,6 +313,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeLockStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeLockTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActuatorEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeDoorStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfTotalUsersSupportedWithValue:(NSNumber * _Nonnull)value
+                                         completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeNumberOfPINUsersSupportedWithValue:(NSNumber * _Nonnull)value
+                                       completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMinPINCodeLengthWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeSupportedOperatingModesWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 

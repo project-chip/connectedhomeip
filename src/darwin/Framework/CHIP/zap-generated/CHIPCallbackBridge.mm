@@ -5023,62 +5023,52 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetCredentialStatusResponseParams new];
     {
-        response.holidayIndex = [NSNumber numberWithUnsignedChar:data.holidayIndex];
+        response.credentialExists = [NSNumber numberWithBool:data.credentialExists];
     }
     {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+        if (data.userIndex.IsNull()) {
+            response.userIndex = nil;
+        } else {
+            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
+        }
     }
     {
-        response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime];
-    }
-    {
-        response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime];
-    }
-    {
-        response.operatingMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode)];
+        if (data.nextCredentialIndex.IsNull()) {
+            response.nextCredentialIndex = nil;
+        } else {
+            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
+void CHIPDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetLogRecordResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetUserResponseParams new];
     {
-        response.logEntryId = [NSNumber numberWithUnsignedShort:data.logEntryId];
+        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
     }
     {
-        response.timestamp = [NSNumber numberWithUnsignedInt:data.timestamp];
+        if (data.userName.IsNull()) {
+            response.userName = nil;
+        } else {
+            response.userName = [[NSString alloc] initWithBytes:data.userName.Value().data()
+                                                         length:data.userName.Value().size()
+                                                       encoding:NSUTF8StringEncoding];
+        }
     }
     {
-        response.eventType = [NSNumber numberWithUnsignedChar:data.eventType];
-    }
-    {
-        response.source = [NSNumber numberWithUnsignedChar:data.source];
-    }
-    {
-        response.eventIdOrAlarmCode = [NSNumber numberWithUnsignedChar:data.eventIdOrAlarmCode];
-    }
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        response.pin = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetPINCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetPINCodeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
+        if (data.userUniqueId.IsNull()) {
+            response.userUniqueId = nil;
+        } else {
+            response.userUniqueId = [NSNumber numberWithUnsignedInt:data.userUniqueId.Value()];
+        }
     }
     {
         if (data.userStatus.IsNull()) {
@@ -5095,108 +5085,76 @@ void CHIPDoorLockClusterGetPINCodeResponseCallbackBridge::OnSuccessFn(
         }
     }
     {
-        if (data.pin.IsNull()) {
-            response.pin = nil;
+        if (data.credentialRule.IsNull()) {
+            response.credentialRule = nil;
         } else {
-            response.pin = [NSData dataWithBytes:data.pin.Value().data() length:data.pin.Value().size()];
+            response.credentialRule = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.credentialRule.Value())];
         }
+    }
+    {
+        if (data.credentials.IsNull()) {
+            response.credentials = nil;
+        } else {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.credentials.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPDoorLockClusterDlCredential * newElement_1;
+                newElement_1 = [CHIPDoorLockClusterDlCredential new];
+                newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
+                newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
+                [array_1 addObject:newElement_1];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.credentials = array_1;
+        }
+    }
+    {
+        if (data.creatorFabricIndex.IsNull()) {
+            response.creatorFabricIndex = nil;
+        } else {
+            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (data.lastModifiedFabricIndex.IsNull()) {
+            response.lastModifiedFabricIndex = nil;
+        } else {
+            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
+        }
+    }
+    {
+        response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
+void CHIPDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetRFIDCodeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        if (data.userStatus.IsNull()) {
-            response.userStatus = nil;
-        } else {
-            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
-        }
-    }
-    {
-        if (data.userType.IsNull()) {
-            response.userType = nil;
-        } else {
-            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
-        }
-    }
-    {
-        if (data.rfidCode.IsNull()) {
-            response.rfidCode = nil;
-        } else {
-            response.rfidCode = [NSData dataWithBytes:data.rfidCode.Value().data() length:data.rfidCode.Value().size()];
-        }
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetUserTypeResponseParams new];
-    {
-        response.userId = [NSNumber numberWithUnsignedShort:data.userId];
-    }
-    {
-        response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetWeekDayScheduleResponseParams new];
-    {
-        response.weekDayIndex = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
+    auto * response = [CHIPDoorLockClusterSetCredentialResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.daysMask = [NSNumber numberWithUnsignedChar:data.daysMask.Raw()];
+        if (data.userIndex.IsNull()) {
+            response.userIndex = nil;
+        } else {
+            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
+        }
     }
     {
-        response.startHour = [NSNumber numberWithUnsignedChar:data.startHour];
-    }
-    {
-        response.startMinute = [NSNumber numberWithUnsignedChar:data.startMinute];
-    }
-    {
-        response.endHour = [NSNumber numberWithUnsignedChar:data.endHour];
-    }
-    {
-        response.endMinute = [NSNumber numberWithUnsignedChar:data.endMinute];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetYearDayScheduleResponseParams new];
-    {
-        response.yearDayIndex = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
-    }
-    {
-        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
-    }
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.localStartTime = [NSNumber numberWithUnsignedInt:data.localStartTime];
-    }
-    {
-        response.localEndTime = [NSNumber numberWithUnsignedInt:data.localEndTime];
+        if (data.nextCredentialIndex.IsNull()) {
+            response.nextCredentialIndex = nil;
+        } else {
+            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };

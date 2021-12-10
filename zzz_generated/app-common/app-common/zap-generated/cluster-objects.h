@@ -16760,7 +16760,7 @@ public:
     DataModel::Nullable<uint32_t> userUniqueId;
     DlUserStatus userStatus;
     DlUserType userType;
-    DataModel::Nullable<DlCredentialRule> credentialRule;
+    DlCredentialRule credentialRule;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16781,7 +16781,7 @@ public:
     DataModel::Nullable<uint32_t> userUniqueId;
     DlUserStatus userStatus;
     DlUserType userType;
-    DataModel::Nullable<DlCredentialRule> credentialRule;
+    DlCredentialRule credentialRule;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetUser
@@ -17028,8 +17028,8 @@ public:
     DlDataOperationType operationType;
     Structs::DlCredential::Type credential;
     chip::ByteSpan credentialData;
-    DataModel::Nullable<uint16_t> userIndex;
-    DataModel::Nullable<DlUserStatus> userStatus;
+    uint16_t userIndex;
+    DlUserStatus userStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -17047,8 +17047,8 @@ public:
     DlDataOperationType operationType;
     Structs::DlCredential::DecodableType credential;
     chip::ByteSpan credentialData;
-    DataModel::Nullable<uint16_t> userIndex;
-    DataModel::Nullable<DlUserStatus> userStatus;
+    uint16_t userIndex;
+    DlUserStatus userStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetCredential

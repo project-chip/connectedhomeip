@@ -13702,7 +13702,7 @@ class DoorLock(Cluster):
                 ClusterObjectFieldDescriptor(Label="doorOpenEvents", Tag=0x00000004, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="doorClosedEvents", Tag=0x00000005, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="openPeriod", Tag=0x00000006, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="numberOfLogRecordsSupported", Tag=0x00000010, Type=uint),
+                ClusterObjectFieldDescriptor(Label="numberOfLogRecordsSupported", Tag=0x00000010, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfTotalUsersSupported", Tag=0x00000011, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfPINUsersSupported", Tag=0x00000012, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="numberOfRFIDUsersSupported", Tag=0x00000013, Type=typing.Optional[uint]),
@@ -13752,7 +13752,7 @@ class DoorLock(Cluster):
     doorOpenEvents: 'typing.Optional[uint]' = None
     doorClosedEvents: 'typing.Optional[uint]' = None
     openPeriod: 'typing.Optional[uint]' = None
-    numberOfLogRecordsSupported: 'uint' = None
+    numberOfLogRecordsSupported: 'typing.Optional[uint]' = None
     numberOfTotalUsersSupported: 'typing.Optional[uint]' = None
     numberOfPINUsersSupported: 'typing.Optional[uint]' = None
     numberOfRFIDUsersSupported: 'typing.Optional[uint]' = None
@@ -14600,7 +14600,7 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="userUniqueId", Tag=3, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="userStatus", Tag=4, Type=DoorLock.Enums.DlUserStatus),
                             ClusterObjectFieldDescriptor(Label="userType", Tag=5, Type=DoorLock.Enums.DlUserType),
-                            ClusterObjectFieldDescriptor(Label="credentialRule", Tag=6, Type=typing.Union[Nullable, DoorLock.Enums.DlCredentialRule]),
+                            ClusterObjectFieldDescriptor(Label="credentialRule", Tag=6, Type=DoorLock.Enums.DlCredentialRule),
                     ])
 
             operationType: 'DoorLock.Enums.DlDataOperationType' = 0
@@ -14609,7 +14609,7 @@ class DoorLock(Cluster):
             userUniqueId: 'typing.Union[Nullable, uint]' = NullValue
             userStatus: 'DoorLock.Enums.DlUserStatus' = 0
             userType: 'DoorLock.Enums.DlUserType' = 0
-            credentialRule: 'typing.Union[Nullable, DoorLock.Enums.DlCredentialRule]' = NullValue
+            credentialRule: 'DoorLock.Enums.DlCredentialRule' = 0
 
         @dataclass
         class GetUser(ClusterCommand):
@@ -14741,15 +14741,15 @@ class DoorLock(Cluster):
                             ClusterObjectFieldDescriptor(Label="operationType", Tag=0, Type=DoorLock.Enums.DlDataOperationType),
                             ClusterObjectFieldDescriptor(Label="credential", Tag=1, Type=DoorLock.Structs.DlCredential),
                             ClusterObjectFieldDescriptor(Label="credentialData", Tag=2, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="userIndex", Tag=3, Type=typing.Union[Nullable, uint]),
-                            ClusterObjectFieldDescriptor(Label="userStatus", Tag=4, Type=typing.Union[Nullable, DoorLock.Enums.DlUserStatus]),
+                            ClusterObjectFieldDescriptor(Label="userIndex", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="userStatus", Tag=4, Type=DoorLock.Enums.DlUserStatus),
                     ])
 
             operationType: 'DoorLock.Enums.DlDataOperationType' = 0
             credential: 'DoorLock.Structs.DlCredential' = field(default_factory=lambda: DoorLock.Structs.DlCredential())
             credentialData: 'bytes' = b""
-            userIndex: 'typing.Union[Nullable, uint]' = NullValue
-            userStatus: 'typing.Union[Nullable, DoorLock.Enums.DlUserStatus]' = NullValue
+            userIndex: 'uint' = 0
+            userStatus: 'DoorLock.Enums.DlUserStatus' = 0
 
         @dataclass
         class SetCredentialResponse(ClusterCommand):
@@ -14945,9 +14945,9 @@ class DoorLock(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
 
-            value: 'uint' = 0
+            value: 'typing.Optional[uint]' = None
 
         @dataclass
         class NumberOfTotalUsersSupported(ClusterAttributeDescriptor):

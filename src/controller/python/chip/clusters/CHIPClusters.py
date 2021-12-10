@@ -1436,103 +1436,33 @@ class ChipClusters:
             "clusterName": "DoorLock",
             "clusterId": 0x00000101,
             "commands": {
-            0x00000008: {
-                    "commandId": 0x00000008,
-                    "commandName": "ClearAllPINCodes",
+            0x00000026: {
+                    "commandId": 0x00000026,
+                    "commandName": "ClearCredential",
                     "args": {
+                        "credentialType": "int",
+                        "credentialIndex": "int",
                     },
                 },
-            0x00000019: {
-                    "commandId": 0x00000019,
-                    "commandName": "ClearAllRFIDCodes",
+            0x0000001D: {
+                    "commandId": 0x0000001D,
+                    "commandName": "ClearUser",
                     "args": {
-                    },
-                },
-            0x00000013: {
-                    "commandId": 0x00000013,
-                    "commandName": "ClearHolidaySchedule",
-                    "args": {
-                        "holidayIndex": "int",
-                    },
-                },
-            0x00000007: {
-                    "commandId": 0x00000007,
-                    "commandName": "ClearPINCode",
-                    "args": {
-                        "pinSlotIndex": "int",
-                    },
-                },
-            0x00000018: {
-                    "commandId": 0x00000018,
-                    "commandName": "ClearRFIDCode",
-                    "args": {
-                        "rfidSlotIndex": "int",
-                    },
-                },
-            0x0000000D: {
-                    "commandId": 0x0000000D,
-                    "commandName": "ClearWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
                         "userIndex": "int",
                     },
                 },
-            0x00000010: {
-                    "commandId": 0x00000010,
-                    "commandName": "ClearYearDaySchedule",
+            0x00000024: {
+                    "commandId": 0x00000024,
+                    "commandName": "GetCredentialStatus",
                     "args": {
-                        "yearDayIndex": "int",
-                        "userIndex": "int",
+                        "credentialType": "int",
+                        "credentialIndex": "int",
                     },
                 },
-            0x00000012: {
-                    "commandId": 0x00000012,
-                    "commandName": "GetHolidaySchedule",
+            0x0000001B: {
+                    "commandId": 0x0000001B,
+                    "commandName": "GetUser",
                     "args": {
-                        "holidayIndex": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "GetLogRecord",
-                    "args": {
-                        "logIndex": "int",
-                    },
-                },
-            0x00000006: {
-                    "commandId": 0x00000006,
-                    "commandName": "GetPINCode",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x00000017: {
-                    "commandId": 0x00000017,
-                    "commandName": "GetRFIDCode",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x00000015: {
-                    "commandId": 0x00000015,
-                    "commandName": "GetUserType",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "GetWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
-                        "userIndex": "int",
-                    },
-                },
-            0x0000000F: {
-                    "commandId": 0x0000000F,
-                    "commandName": "GetYearDaySchedule",
-                    "args": {
-                        "yearDayIndex": "int",
                         "userIndex": "int",
                     },
                 },
@@ -1543,79 +1473,35 @@ class ChipClusters:
                         "pinCode": "bytes",
                     },
                 },
-            0x00000011: {
-                    "commandId": 0x00000011,
-                    "commandName": "SetHolidaySchedule",
+            0x00000022: {
+                    "commandId": 0x00000022,
+                    "commandName": "SetCredential",
                     "args": {
-                        "holidayIndex": "int",
-                        "localStartTime": "int",
-                        "localEndTime": "int",
-                        "operatingMode": "int",
+                        "operationType": "int",
+                        "credentialType": "int",
+                        "credentialIndex": "int",
+                        "credentialData": "bytes",
+                        "userIndex": "int",
+                        "userStatus": "int",
                     },
                 },
-            0x00000005: {
-                    "commandId": 0x00000005,
-                    "commandName": "SetPINCode",
+            0x0000001A: {
+                    "commandId": 0x0000001A,
+                    "commandName": "SetUser",
                     "args": {
-                        "userId": "int",
+                        "operationType": "int",
+                        "userIndex": "int",
+                        "userName": "str",
+                        "userUniqueId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "pin": "bytes",
-                    },
-                },
-            0x00000016: {
-                    "commandId": 0x00000016,
-                    "commandName": "SetRFIDCode",
-                    "args": {
-                        "userId": "int",
-                        "userStatus": "int",
-                        "userType": "int",
-                        "rfidCode": "bytes",
-                    },
-                },
-            0x00000014: {
-                    "commandId": 0x00000014,
-                    "commandName": "SetUserType",
-                    "args": {
-                        "userId": "int",
-                        "userType": "int",
-                    },
-                },
-            0x0000000B: {
-                    "commandId": 0x0000000B,
-                    "commandName": "SetWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
-                        "userIndex": "int",
-                        "daysMask": "int",
-                        "startHour": "int",
-                        "startMinute": "int",
-                        "endHour": "int",
-                        "endMinute": "int",
-                    },
-                },
-            0x0000000E: {
-                    "commandId": 0x0000000E,
-                    "commandName": "SetYearDaySchedule",
-                    "args": {
-                        "yearDayIndex": "int",
-                        "userIndex": "int",
-                        "localStartTime": "int",
-                        "localEndTime": "int",
+                        "credentialRule": "int",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "bytes",
-                    },
-                },
-            0x00000003: {
-                    "commandId": 0x00000003,
-                    "commandName": "UnlockWithTimeout",
-                    "args": {
-                        "timeout": "int",
                         "pinCode": "bytes",
                     },
                 },
@@ -1638,6 +1524,86 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "bool",
                     "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "DoorState",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000011: {
+                    "attributeName": "NumberOfTotalUsersSupported",
+                    "attributeId": 0x00000011,
+                    "type": "int",
+                },
+                0x00000012: {
+                    "attributeName": "NumberOfPINUsersSupported",
+                    "attributeId": 0x00000012,
+                    "type": "int",
+                },
+                0x00000017: {
+                    "attributeName": "MaxPINCodeLength",
+                    "attributeId": 0x00000017,
+                    "type": "int",
+                },
+                0x00000018: {
+                    "attributeName": "MinPINCodeLength",
+                    "attributeId": 0x00000018,
+                    "type": "int",
+                },
+                0x00000021: {
+                    "attributeName": "Language",
+                    "attributeId": 0x00000021,
+                    "type": "str",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000023: {
+                    "attributeName": "AutoRelockTime",
+                    "attributeId": 0x00000023,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000024: {
+                    "attributeName": "SoundVolume",
+                    "attributeId": 0x00000024,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000025: {
+                    "attributeName": "OperatingMode",
+                    "attributeId": 0x00000025,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000026: {
+                    "attributeName": "SupportedOperatingModes",
+                    "attributeId": 0x00000026,
+                    "type": "int",
+                },
+                0x00000029: {
+                    "attributeName": "EnableOneTouchLocking",
+                    "attributeId": 0x00000029,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x0000002B: {
+                    "attributeName": "EnablePrivacyModeButton",
+                    "attributeId": 0x0000002B,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000030: {
+                    "attributeName": "WrongCodeEntryLimit",
+                    "attributeId": 0x00000030,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
