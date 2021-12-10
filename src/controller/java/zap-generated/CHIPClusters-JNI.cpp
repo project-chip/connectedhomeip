@@ -29693,10 +29693,10 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo;
     TypeInfo::Type cppValue;
 
-    decltype(cppValue)::UnderlyingType valueValue;
+    uint8_t valueValue;
     if (value != nullptr)
     {
-        valueValue = static_cast<decltype(valueValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
     }
     cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(valueValue);
 
@@ -29790,10 +29790,10 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo;
     TypeInfo::Type cppValue;
 
-    decltype(cppValue)::UnderlyingType valueValue;
+    uint16_t valueValue;
     if (value != nullptr)
     {
-        valueValue = static_cast<decltype(valueValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(value));
+        valueValue = chip::JniReferences::GetInstance().IntegerToPrimitive(value);
     }
     cppValue = value == nullptr ? chip::app::DataModel::Nullable<uint16_t>() : chip::app::DataModel::Nullable<uint16_t>(valueValue);
 
