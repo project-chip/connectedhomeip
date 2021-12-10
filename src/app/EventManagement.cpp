@@ -460,8 +460,8 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
 
     if (aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPath)))
     {
-        err = ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)),
-                                 ctx->mpContext->mCurrentEventNumber - 1);
+        err =
+            ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)), ctx->mpContext->mCurrentEventNumber);
     }
     return err;
 }
@@ -659,13 +659,16 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentTime.mValue += event.mDeltaTime.mValue;
+        // If the retrieved event has same priority with the one set by FetchEventSince, we need use mSamePriorityEvent to increase
+        // event number after encoding current even number, then this updated event number would be used by FetchEventSince for next
+        // use
+        apEventLoadOutContext->mSamePriorityEvent = true;
         if (IsInterestedEventPaths(apEventLoadOutContext, event))
         {
-            err = CHIP_EVENT_ID_FOUND;
+            return CHIP_EVENT_ID_FOUND;
         }
-        apEventLoadOutContext->mCurrentEventNumber++;
     }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aDepth, void * apContext)
@@ -692,6 +695,12 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         loadOutContext->mPreviousTime.mValue = loadOutContext->mCurrentTime.mValue;
         loadOutContext->mFirst               = false;
         loadOutContext->mEventCount++;
+    }
+    if (loadOutContext->mSamePriorityEvent)
+    {
+        // Update to next Event Number
+        loadOutContext->mCurrentEventNumber++;
+        loadOutContext->mSamePriorityEvent = false;
     }
 
     return err;
