@@ -30,6 +30,10 @@
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
+constexpr const char kIdentityAlpha[] = "";
+constexpr const char kIdentityBeta[]  = "";
+constexpr const char kIdentityGamma[] = "";
+
 class TestCommand
 {
 public:
@@ -135,4 +139,5 @@ protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
+    void SetIdentity(const char * name){};
 };

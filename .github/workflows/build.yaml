@@ -173,7 +173,7 @@ jobs:
                      build \
                   "
 
-            - name: Fun fake linux tests
+            - name: Run fake linux tests
               timeout-minutes: 15
               run: |
                 ./scripts/run_in_build_env.sh \

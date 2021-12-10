@@ -354,7 +354,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
 // Test the Inet resource limitations.
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
@@ -435,7 +435,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
 #endif
                                  NL_TEST_SENTINEL() };
