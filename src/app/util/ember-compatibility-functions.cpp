@@ -393,16 +393,14 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     }
 
     {
-        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
-        bool pathWasExpanded               = false;                    // TODO: get actual expanded flag
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
-            if (pathWasExpanded)
+            if (aPath.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
@@ -845,10 +843,9 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     }
 
     {
-        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
