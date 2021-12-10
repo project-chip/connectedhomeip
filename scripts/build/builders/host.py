@@ -27,6 +27,7 @@ class HostApp(Enum):
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     TV_APP = auto()
+    TESTS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -37,10 +38,12 @@ class HostApp(Enum):
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
             return 'common/pigweed/rpc_console'
-        if self == HostApp.MIN_MDNS:
+        elif self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
-        if self == HostApp.TV_APP:
+        elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.TESTS:
+            return '../'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -66,6 +69,8 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.TESTS:
+            pass
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -75,6 +80,9 @@ class HostBoard(Enum):
 
     # cross-compile support
     ARM64 = auto()
+
+    # for test support
+    FAKE = auto()
 
     def BoardName(self):
         if self == HostBoard.NATIVE:
@@ -92,12 +100,16 @@ class HostBoard(Enum):
             return arch
         elif self == HostBoard.ARM64:
             return 'arm64'
+        elif self == HostBoard.FAKE:
+            return 'fake'
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def PlatformName(self):
         if self == HostBoard.NATIVE:
             return uname().system.lower()
+        elif self == HostBoard.FAKE:
+            return 'fake'
         else:
             # Cross compilation assumes linux currently
             return 'linux'
@@ -135,6 +147,10 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append(
                 'chip_enable_group_messaging_tests=true')
 
+        if app == HostApp.TESTS:
+            self.extra_gn_options.append('chip_build_tests=true')
+            self.build_command = 'check'
+
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
             return self.extra_gn_options
@@ -149,11 +165,22 @@ class HostBuilder(GnBuilder):
             )
 
             return self.extra_gn_options
+        elif self.board == HostBoard.FAKE:
+            self.extra_gn_options.extend(
+                [
+                    'custom_toolchain="//build/toolchain/fake:fake_x64_gcc"',
+                    'chip_link_tests=true',
+                    'chip_device_platform="fake"',
+                ]
+            )
+            return self.extra_gn_options
         else:
             raise Exception('Unknown host board type: %r' % self)
 
     def GnBuildEnv(self):
         if self.board == HostBoard.NATIVE:
+            return None
+        elif self.board == HostBoard.FAKE:
             return None
         elif self.board == HostBoard.ARM64:
             return {
