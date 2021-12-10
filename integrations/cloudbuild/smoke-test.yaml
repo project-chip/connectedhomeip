@@ -14,7 +14,7 @@ steps:
 
     - name: "connectedhomeip/chip-build-vscode:0.5.33"
       id: ESP32
-      env:
+ -tests     env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
@@ -69,8 +69,10 @@ steps:
       args:
           - >-
               ./scripts/build/build_examples.py --enable-flashbundle
-              --target-glob 'linux-*' build --create-archives
-              /workspace/artifacts/
+              --target-glob 'linux-*'
+              --skip-target-glob '*-tests'
+              build
+              --create-archives /workspace/artifacts/
       waitFor:
           - Bootstrap
           - EFR32
