@@ -162,13 +162,14 @@ struct ReportEventParams : public app::ReadPrepareParams
     ReportEventParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
-    typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
-        mOnSubscriptionEstablishedCb             = nullptr;
+    typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
+        nullptr;
     app::ReadClient::InteractionType mReportType = app::ReadClient::InteractionType::Read;
 };
 
 template <typename DecodableEventType>
-CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId endpointId, ReportEventParams<DecodableEventType> && readParams)
+CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId endpointId,
+                       ReportEventParams<DecodableEventType> && readParams)
 {
     ClusterId clusterId = DecodableEventType::GetClusterId();
     EventId eventId     = DecodableEventType::GetEventId();
@@ -184,7 +185,8 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
         chip::Platform::Delete(callback);
     };
 
-    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
+    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(
+        readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
@@ -224,7 +226,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
 {
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb = onSuccessCb;
-    params.mOnErrorCb = onErrorCb;
+    params.mOnErrorCb  = onErrorCb;
     return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
 }
 
@@ -234,22 +236,21 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
  */
 template <typename DecodableEventType>
 CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                              typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onReportCb,
-                              typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
-                              uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
-                              typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
-                                  onSubscriptionEstablishedCb = nullptr)
+                          typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onReportCb,
+                          typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
+                          uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
+                          typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType
+                              onSubscriptionEstablishedCb = nullptr)
 {
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
-    params.mOnReportCb = onReportCb;
-    params.mOnErrorCb = onErrorCb;
+    params.mOnReportCb                  = onReportCb;
+    params.mOnErrorCb                   = onErrorCb;
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
 }
-
 
 } // namespace Controller
 } // namespace chip

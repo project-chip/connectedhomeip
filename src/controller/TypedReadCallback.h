@@ -130,8 +130,9 @@ public:
     using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
-                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
-        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
+                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+        mOnSuccess(aOnSuccess),
+        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
     {}
 
 private:
