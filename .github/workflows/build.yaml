@@ -92,7 +92,7 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
     build_linux:
         name: Build on Linux (gcc_release, clang, mbedtls, simulated)
-        timeout-minutes: 60
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
