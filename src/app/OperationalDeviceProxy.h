@@ -143,6 +143,12 @@ public:
      */
     CHIP_ERROR Disconnect() override;
 
+    /**
+     * Grab the SessionHolder and set state of this OperationalDeviceProxy
+     * to SecureConnected
+     */
+    void SetConnectedSession(SessionHandle handle);
+
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
     /**
