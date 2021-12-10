@@ -233,7 +233,6 @@ exit:
 
 CHIP_ERROR Server::InitCASESessionManager()
 {
-    ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
     DeviceProxyInitParams initParams = {
         .sessionManager = &mSessions,
         .exchangeMgr    = &mExchangeMgr,
@@ -246,7 +245,7 @@ CHIP_ERROR Server::InitCASESessionManager()
         .sessionInitParams = initParams,
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
-        .dnsResolver       = &mDNSResolver,
+        .dnsResolver       = nullptr,
     };
     mCASESessionManager = new (&mCASESessionManagerStorage) CASESessionManager(sessionManagerConfig);
 

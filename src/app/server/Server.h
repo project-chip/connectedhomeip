@@ -147,7 +147,6 @@ private:
     CASESessionManager * mCASESessionManager;
     CASEClientPool<kCASEClientPoolSize> mCASEClientPool;
     OperationalDeviceProxyPool<kOperationalDevicePoolSize> mDevicePool;
-    Dnssd::ResolverProxy mDNSResolver;
 
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
