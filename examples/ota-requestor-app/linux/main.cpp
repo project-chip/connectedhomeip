@@ -50,6 +50,7 @@ using chip::VendorId;
 using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;

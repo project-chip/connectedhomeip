@@ -330,15 +330,25 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     }
 }
 
+OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
+{
+
+    if (mProviderNodeId != kUndefinedNodeId)
+    {
+        ConnectToProvider(kQueryImage);
+        return kTriggerSuccessful;
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "No OTA Providers available");
+        return kNoProviderKnown;
+    }
+}
+
 // Called whenever FindOrEstablishSession fails
 void OTARequestor::OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
-}
-
-void OTARequestor::TriggerImmediateQuery()
-{
-    ConnectToProvider(kQueryImage);
 }
 
 CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)
