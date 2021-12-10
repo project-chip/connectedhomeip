@@ -1045,29 +1045,8 @@ void GeneralDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVReader * 
     cb->mCall(cb->mContext, list);
 }
 
-void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * cb =
-        Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
-void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
@@ -1082,8 +1061,29 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
         return;
     }
 
-    Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * cb =
-        Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<GroupKeyManagementGroupKeyMapListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupKeyMapListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void GroupKeyManagementClusterGroupTableListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<GroupKeyManagementGroupTableListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupTableListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
@@ -2450,6 +2450,35 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(Endpo
     Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback> * cb =
         Callback::Callback<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, errorCode, debugText);
+    return true;
+}
+
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj, /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs)
+{
+    ChipLogProgress(Zcl, "KeySetReadAllIndicesResponse:");
+    ChipLogProgress(Zcl, "  groupKeySetIDs: %p", groupKeySetIDs);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback");
+
+    Callback::Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback> * cb =
+        Callback::Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, groupKeySetIDs);
+    return true;
+}
+
+bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet)
+{
+    ChipLogProgress(Zcl, "KeySetReadResponse:");
+    ChipLogProgress(Zcl, "  groupKeySet: Not sure how to log struct GroupKeySet");
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupKeyManagementClusterKeySetReadResponseCallback");
+
+    Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback> * cb =
+        Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, GroupKeySet());
     return true;
 }
 
