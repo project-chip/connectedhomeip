@@ -15,3 +15,5 @@
 # Options from standalone-chip.mk that differ from configure defaults. These
 # options are used from examples/.
 chip_build_tests = false
+
+pw_build_PIP_CONSTRAINTS = ["//scripts/constraints.txt"]
