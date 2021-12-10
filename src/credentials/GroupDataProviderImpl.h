@@ -61,7 +61,8 @@ public:
     CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) override;
     CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info) override;
     CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index) override;
-    GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) override;
+    CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index) override;
+    GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) override;
 
     //
     // Key Sets

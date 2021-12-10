@@ -850,7 +850,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         // Update fabric
         fabric.first_group = group.id;
         fabric.group_count++;
-        return fabric.Save(mStorage);
+        ReturnErrorOnFailure(fabric.Save(mStorage));
+        if (nullptr != mListener)
+        {
+            mListener->OnEndpointAdded(fabric_index, endpoint);
+        }
+        return CHIP_NO_ERROR;
     }
 
     // Existing group
@@ -875,7 +880,12 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         ReturnErrorOnFailure(prev.Save(mStorage));
     }
     group.endpoint_count++;
-    return group.Save(mStorage);
+    ReturnErrorOnFailure(group.Save(mStorage));
+    if (nullptr != mListener)
+    {
+        mListener->OnEndpointAdded(fabric_index, endpoint);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id,
@@ -911,7 +921,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index,
     {
         group.endpoint_count--;
     }
-    return group.Save(mStorage);
+    ReturnErrorOnFailure(group.Save(mStorage));
+    if (nullptr != mListener)
+    {
+        mListener->OnEndpointRemoved(fabric_index, endpoint);
+    }
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)
@@ -1206,7 +1221,32 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
     return fabric.Save(mStorage);
 }
 
-GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKey(chip::FabricIndex fabric_index)
+CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+
+    size_t count = 0;
+    KeyMapData map(fabric_index, fabric.first_map);
+    while (count++ < fabric.map_count)
+    {
+        if (CHIP_NO_ERROR != map.Load(mStorage))
+        {
+            break;
+        }
+        map.Delete(mStorage);
+        map.id = map.next;
+    }
+
+    // Update fabric
+    fabric.first_map = 0;
+    fabric.map_count = 0;
+    return fabric.Save(mStorage);
+}
+
+GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKeys(chip::FabricIndex fabric_index)
 {
     VerifyOrReturnError(mInitialized, nullptr);
     return mGroupKeyIterators.CreateObject(*this, fabric_index);

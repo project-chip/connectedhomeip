@@ -142,6 +142,30 @@ public:
     };
 
     /**
+     *  Interface for a listener of changes in any Group configuration. Necessary
+     *  to implement attribute subscription for Group Key Management cluster, and
+     *  to react to configuration changes that may impact in-progress functional work.
+     */
+    class Listener
+    {
+    public:
+        virtual ~Listener() = default;
+        /**
+         *  Callback invoked when a new endpoint is added to a group.
+         *
+         *  @param[in] old_state  GroupState reflecting the previous entry. Set to nullptr on appends.
+         *  @param[in] new_state  GroupState reflecting the updated/new entry.
+         */
+        virtual void OnEndpointAdded(chip::FabricIndex fabric_index, const GroupEndpoint & new_mapping) = 0;
+        /**
+         *  Callback invoked when an existing endpoint is removed from a group.
+         *
+         *  @param[in] removed_state  Copy of GroupState that was just removed. Index included is no longer accessible.
+         */
+        virtual void OnEndpointRemoved(chip::FabricIndex fabric_index, const GroupEndpoint & old_mapping) = 0;
+    };
+
+    /**
      * Template used to iterate the stored group data
      */
     template <typename T>
@@ -232,6 +256,8 @@ public:
     virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
     virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
     virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index)                                    = 0;
+
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
      *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
@@ -239,7 +265,7 @@ public:
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) = 0;
+    virtual GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
@@ -262,6 +288,13 @@ public:
 
     // General
     virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+
+    // Listener
+    void SetListener(Listener * listener) { mListener = listener; };
+    void RemoveListener() { mListener = nullptr; };
+
+protected:
+    Listener * mListener = nullptr;
 };
 
 /**
