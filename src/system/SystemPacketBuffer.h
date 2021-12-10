@@ -847,6 +847,13 @@ namespace Inet {
 class UDPEndPointImplLwIP;
 } // namespace Inet
 
+#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+// TODO : Temp Implementation issue : 13085
+namespace Inet {
+class UDPEndPointImplOT;
+} // namespace Inet
+#endif
+
 namespace System {
 
 /**
@@ -864,6 +871,10 @@ private:
      */
     static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
     friend class Inet::UDPEndPointImplLwIP;
+#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+    // TODO : Temp Implementation issue : 13085
+    friend class Inet::UDPEndPointImplOT;
+#endif
 };
 
 } // namespace System

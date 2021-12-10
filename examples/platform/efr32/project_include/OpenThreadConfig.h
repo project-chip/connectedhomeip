@@ -61,6 +61,8 @@
 #define OPENTHREAD_CONFIG_DHCP6_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_TCP_ENABLE 0
 
+#define OPENTHREAD_CONFIG_MLR_ENABLE 1
+
 // Use the SiLabs-supplied default platform configuration for remainder
 // of OpenThread config options.
 //
