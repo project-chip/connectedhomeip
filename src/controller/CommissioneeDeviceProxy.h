@@ -223,15 +223,6 @@ public:
         return LoadSecureSessionParametersIfNeeded(loadedSecureSession);
     };
 
-    CHIP_ERROR SetCSRNonce(ByteSpan csrNonce)
-    {
-        VerifyOrReturnError(csrNonce.size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
-        memcpy(mCSRNonce, csrNonce.data(), csrNonce.size());
-        return CHIP_NO_ERROR;
-    }
-
-    ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
-
     MutableByteSpan GetMutableNOCCert() { return MutableByteSpan(mNOCCertBuffer, sizeof(mNOCCertBuffer)); }
 
     CHIP_ERROR SetNOCCertBufferSize(size_t new_size);
@@ -306,9 +297,6 @@ private:
     CHIP_ERROR LoadSecureSessionParametersIfNeeded(bool & didLoad);
 
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
-
-    // TODO: Offload Nonces and DAC/PAI into a new struct
-    uint8_t mCSRNonce[kOpCSRNonceLength];
 
     uint8_t mNOCCertBuffer[Credentials::kMaxCHIPCertLength];
     size_t mNOCCertBufferSize = 0;

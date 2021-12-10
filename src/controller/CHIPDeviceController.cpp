@@ -898,19 +898,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    // If the CSRNonce is passed in, using that else using a random one..
-    // TODO(cecille): Once the commissioning stages are separated, this can be removed from the device and moved down into the
-    // approprirate commissioning step.
-    if (params.HasCSRNonce())
-    {
-        ReturnErrorOnFailure(device->SetCSRNonce(params.GetCSRNonce().Value()));
-    }
-    else
-    {
-        uint8_t mCSRNonce[kOpCSRNonceLength];
-        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
-        ReturnErrorOnFailure(device->SetCSRNonce(ByteSpan(mCSRNonce)));
-    }
+
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
 
@@ -1145,7 +1133,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device)
+CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce)
 {
     ChipLogDetail(Controller, "Sending OpCSR request to %p device", device);
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
@@ -1155,7 +1143,7 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(C
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
-    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
+    ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, csrNonce));
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
     return CHIP_NO_ERROR;
@@ -1179,6 +1167,11 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
 
     commissioner->mOpCSRResponseCallback.Cancel();
     commissioner->mOnCSRFailureCallback.Cancel();
+
+    CommissioningDelegate::CommissioningReport report(CommissioningStage::kSendOpCertSigningRequest);
+    report.attestationResponse.attestationElements = NOCSRElements;
+    report.attestationResponse.signature           = AttestationSignature;
+    commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 
     if (commissioner->ProcessOpCSR(NOCSRElements, AttestationSignature) != CHIP_NO_ERROR)
     {
@@ -1704,6 +1697,16 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
         }
         SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value());
+        break;
+    case CommissioningStage::kSendOpCertSigningRequest:
+        if (!params.HasCSRNonce())
+        {
+            CommissioningDelegate::CommissioningReport report(step);
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
+    case CommissioningStage::kGenerateNOCChain:
+
         break;
     case CommissioningStage::kCheckCertificates:
         SendOperationalCertificateSigningRequestCommand(reinterpret_cast<CommissioneeDeviceProxy *>(proxy));

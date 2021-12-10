@@ -710,7 +710,7 @@ private:
     /* This function sends an OpCSR request to the device.
        The function does not hold a refernce to the device object.
      */
-    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
+    CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
     /* This function sends the operational credentials to the device.
        The function does not hold a refernce to the device object.
      */

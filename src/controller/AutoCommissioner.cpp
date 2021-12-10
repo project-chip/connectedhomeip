@@ -68,6 +68,17 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
+    if (params.HasCSRNonce())
+    {
+        VerifyOrReturnError(params.GetCSRNonce().Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
+        memcpy(mCSRNonce, params.GetCSRNonce().Value().data(), params.GetCSRNonce().Value().size());
+    }
+    else
+    {
+        Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
+    }
+    mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+
     return CHIP_NO_ERROR;
 }
 
@@ -86,6 +97,10 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendDACCertificateRequest:
         return CommissioningStage::kSendAttestationRequest;
     case CommissioningStage::kSendAttestationRequest:
+        return CommissioningStage::kSendOpCertSigningRequest;
+    case CommissioningStage::kSendOpCertSigningRequest:
+        return CommissioningStage::kGenerateNOCChain;
+    case CommissioningStage::kGenerateNOCChain:
         return CommissioningStage::kCheckCertificates;
     case CommissioningStage::kCheckCertificates:
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.

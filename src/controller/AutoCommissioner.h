@@ -62,6 +62,8 @@ private:
     uint8_t * mPAI   = nullptr;
     uint16_t mPAILen = 0;
     uint8_t mAttestationNonce[kAttestationNonceLength];
+    uint8_t mCSRNonce[kOpCSRNonceLength];
+    OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 };
 
 } // namespace Controller

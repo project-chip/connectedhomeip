@@ -35,6 +35,8 @@ enum CommissioningStage : uint8_t
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
     kSendAttestationRequest,
+    kSendOpCertSigningRequest,
+    kGenerateNOCChain,
     kCheckCertificates,
     kConfigACL,
     kWifiNetworkSetup,
