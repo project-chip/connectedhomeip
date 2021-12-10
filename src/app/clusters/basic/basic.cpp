@@ -120,7 +120,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override 
+    CHIP_ERROR Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder) override
     {
         CHIP_ERROR err;
         if (aPath.mAttributeId == app::Clusters::Basic::Attributes::NodeLabel::Id)
