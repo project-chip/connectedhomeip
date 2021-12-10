@@ -26,39 +26,15 @@
 class LockManager
 {
 public:
-    enum Action_t
-    {
-        LOCK = 0,
-        UNLOCK,
-
-        INVALID_ACTION
-    } Action;
-
-    enum State_t
-    {
-        kState_Locked = 0,
-        kState_Unlocked,
-    } State;
-
     void Init();
-    //bool InitiateAction(Action_t aAction);
 
     bool Lock(const char* pin);
     bool Unlock(const char* pin);
 
-    //using LockCallback_fn = std::function<void(Action_t)>;
-
-    //void SetCallbacks(LockCallback_fn aActionInitiated_CB, LockCallback_fn aActionCompleted_CB);
-
 private:
     friend LockManager & LockMgr(void);
 
-    //State_t mState;
-
     bool mLocked;
-
-    //LockCallback_fn mActionInitiated_CB;
-    //LockCallback_fn mActionCompleted_CB;
 
     static LockManager sLock;
 };

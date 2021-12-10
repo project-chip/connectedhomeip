@@ -35,13 +35,6 @@
 class DoorLockServer
 {
 public:
-    enum LockState
-    {
-        LOCKED,
-        UNLOCKED,
-        UNKNOWN
-    };
-
     // Where should this actually live?
     char mPin[5];
 
