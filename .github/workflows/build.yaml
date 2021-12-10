@@ -163,7 +163,11 @@ jobs:
               #       so the build command below only compiles x64
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'linux-x64-*' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps \
+                     --target-glob 'linux-x64-*' \
+                     --skip-target-glob '*{tests,thermostat-ipv6only}*' \
+                     build \
+                  "
 
             - name: Fun fake linux tests
               timeout-minutes: 15
