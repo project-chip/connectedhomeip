@@ -27,6 +27,7 @@ class HostApp(Enum):
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     TV_APP = auto()
+    TESTS = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -37,10 +38,12 @@ class HostApp(Enum):
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
             return 'common/pigweed/rpc_console'
-        if self == HostApp.MIN_MDNS:
+        elif self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
-        if self == HostApp.TV_APP:
+        elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.TESTS:
+            return '../'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -66,6 +69,8 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.TESTS:
+            pass
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -134,6 +139,10 @@ class HostBuilder(GnBuilder):
         if test_group:
             self.extra_gn_options.append(
                 'chip_enable_group_messaging_tests=true')
+
+        if app == HostApp.TESTS:
+            self.extra_gn_options.append('chip_build_tests=true')
+            self.build_command = 'check'
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

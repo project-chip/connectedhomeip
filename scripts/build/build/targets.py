@@ -195,6 +195,12 @@ def HostTargets():
 
                 yield variant_target
 
+    test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    test_target = test_target.Extend(HostBoard.NATIVE.BoardName(), board=HostBoard.NATIVE)
+    test_target = test_target.Extend('tests', app=HostApp.TESTS)
+
+    yield test_target
+
 
 def Esp32Targets():
     esp32_target = Target('esp32', Esp32Builder)
