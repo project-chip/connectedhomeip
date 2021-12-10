@@ -49,12 +49,16 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
     err = params.GetEndPointManager()->NewEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
+#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+    mUDPEndPoint->SetOtInstance(params.GetOtInstance());
+#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
+
     ChipLogDetail(Inet, "UDP::Init bind&listen port=%d", params.GetListenPort());
 
     err = mUDPEndPoint->Bind(params.GetAddressType(), Inet::IPAddress::Any, params.GetListenPort(), params.GetInterfaceId());
     SuccessOrExit(err);
 
-    err = mUDPEndPoint->Listen(OnUdpReceive, nullptr /*onReceiveError*/, this);
+    err = mUDPEndPoint->Listen(OnUdpReceive, OnUdpError, this);
     SuccessOrExit(err);
 
     mUDPEndpointType = params.GetAddressType();
@@ -123,6 +127,11 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
     {
         ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
     }
+}
+
+void UDP::OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo)
+{
+    ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
 }
 
 CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
