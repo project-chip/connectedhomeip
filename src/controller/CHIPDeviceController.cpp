@@ -1812,6 +1812,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioningCluster netCom;
@@ -1826,6 +1827,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         ChipLogProgress(Controller, "Adding thread network");
         NetworkCommissioningCluster netCom;
@@ -1840,6 +1842,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioningCluster netCom;
@@ -1855,9 +1858,11 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
             operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
         {
+            ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         ChipLogProgress(Controller, "Enabling thread network");
         NetworkCommissioningCluster netCom;
