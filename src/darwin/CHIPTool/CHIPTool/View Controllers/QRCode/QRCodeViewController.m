@@ -132,7 +132,6 @@
     [self.view addSubview:stackView];
 
     stackView.translatesAutoresizingMaskIntoConstraints = false;
-    stackView.autoresizesSubviews = NO;
     [stackView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
