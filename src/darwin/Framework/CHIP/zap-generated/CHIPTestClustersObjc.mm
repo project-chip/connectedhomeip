@@ -11080,7 +11080,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11091,14 +11091,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLift::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11109,7 +11114,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTilt::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11134,7 +11144,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11146,14 +11156,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11165,7 +11180,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11190,7 +11210,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11202,14 +11222,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11221,7 +11246,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11246,7 +11276,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11258,14 +11288,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11277,7 +11312,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
