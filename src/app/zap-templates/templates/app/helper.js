@@ -658,7 +658,6 @@ function isWeaklyTypedEnum(label)
     "OTAAnnouncementReason",
     "OTAApplyUpdateAction",
     "OTADownloadProtocol",
-    "OTAQueryStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
