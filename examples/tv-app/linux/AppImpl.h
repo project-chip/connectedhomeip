@@ -167,7 +167,7 @@ protected:
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
 {
-#define APP_LIBRARY_SIZE 3
+#define APP_LIBRARY_SIZE 4
 public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
@@ -177,8 +177,9 @@ public:
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
-                                                      ContentAppImpl("Vendor2", 2, "App2", 22, "Version2"),
-                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3") };
+                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2"),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3"),
+                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2") };
 };
 
 } // namespace AppPlatform

@@ -95,7 +95,7 @@ ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpo
                                                           std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                           const chip::CharSpan & data)
 {
-    return ContentLauncherMgr().LaunchContent(parameterList, autoplay, data);
+    return ContentLauncherMgr().LaunchContent(endpointId, parameterList, autoplay, data);
 }
 
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
