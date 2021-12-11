@@ -102,7 +102,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/content-launch-server/content-launch-server.cpp
                ${APP_CLUSTERS}/descriptor/descriptor.cpp
                ${APP_CLUSTERS}/door-lock-server/door-lock-server.cpp
-               ${APP_CLUSTERS}/general-commissioning-server/general-commissioning-server.cpp     
+               ${APP_CLUSTERS}/fixed-label-server/fixed-label-server.cpp
+               ${APP_CLUSTERS}/general-commissioning-server/general-commissioning-server.cpp
                ${APP_CLUSTERS}/groups-server/groups-server.cpp      
                ${APP_CLUSTERS}/ias-zone-server/ias-zone-server.cpp
                ${APP_CLUSTERS}/keypad-input-server/keypad-input-server.cpp

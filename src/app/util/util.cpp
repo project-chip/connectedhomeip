@@ -297,7 +297,6 @@ void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
-void MatterFixedLabelPluginServerInitCallback() {}
 void MatterSwitchPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}

@@ -23,6 +23,7 @@
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
