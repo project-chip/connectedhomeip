@@ -56,6 +56,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
+#define WC_PERCENT100THS_MIN 0
 #define WC_PERCENT100THS_MAX 10000
 
 static bool HasFeature(chip::EndpointId endpoint, WindowCoveringFeature feature)
@@ -163,46 +164,42 @@ namespace WindowCovering {
 
 bool IsOpen(chip::EndpointId endpoint)
 {
-    uint16_t liftPosition = 0;
-    uint16_t liftLimit    = 0;
-    uint16_t tiltPosition = 0;
-    uint16_t tiltLimit    = 0;
-    bool isOpen           = false;
+    EmberAfStatus liftStatus;
+    app::DataModel::Nullable<Percent100ths> liftPosition;
 
-    if (HasFeature(endpoint, WindowCoveringFeature::kLift) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift) &&
-        HasFeature(endpoint, WindowCoveringFeature::kAbsolutePosition) &&
-        EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition) &&
-        EMBER_ZCL_STATUS_SUCCESS == Attributes::InstalledOpenLimitLift::Get(endpoint, &liftLimit))
-    {
-        isOpen = liftPosition == liftLimit;
-    }
-    else if (HasFeature(endpoint, WindowCoveringFeature::kLift) &&
-             HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift) &&
-             EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition))
-    {
-        isOpen = 0 == liftPosition;
-    }
+    EmberAfStatus tiltStatus;
+    app::DataModel::Nullable<Percent100ths> tiltPosition;
 
-    if (HasFeature(endpoint, WindowCoveringFeature::kTilt) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt) &&
-        HasFeature(endpoint, WindowCoveringFeature::kAbsolutePosition) &&
-        EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition) &&
-        EMBER_ZCL_STATUS_SUCCESS == Attributes::InstalledOpenLimitTilt::Get(endpoint, &tiltLimit))
-    {
-        isOpen = isOpen && tiltPosition == tiltLimit;
-    }
-    else if (HasFeature(endpoint, WindowCoveringFeature::kTilt) &&
-             HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt) &&
-             EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition))
-    {
-        isOpen = isOpen && 0 == tiltPosition;
-    }
+    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
+    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
 
-    return isOpen;
+    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+        return false;
+
+    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
+        return false;
+
+    return ((liftPosition.Value() == WC_PERCENT100THS_MIN) && (tiltPosition.Value() == WC_PERCENT100THS_MIN));
 }
 
 bool IsClosed(chip::EndpointId endpoint)
 {
-    return !IsOpen(endpoint);
+    EmberAfStatus liftStatus;
+    app::DataModel::Nullable<Percent100ths> liftPosition;
+
+    EmberAfStatus tiltStatus;
+    app::DataModel::Nullable<Percent100ths> tiltPosition;
+
+    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
+    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
+
+    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+        return false;
+
+    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
+        return false;
+
+    return ((liftPosition.Value() == WC_PERCENT100THS_MAX) && (tiltPosition.Value() == WC_PERCENT100THS_MAX));
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
