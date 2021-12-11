@@ -16740,6 +16740,54 @@ public class ChipClusters {
 
     private native void upOrOpen(long chipClusterPtr, DefaultClusterCallback Callback);
 
+    public interface CurrentPositionLiftAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface CurrentPositionTiltAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface CurrentPositionLiftPercentageAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface CurrentPositionTiltPercentageAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface TargetPositionLiftPercent100thsAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface TargetPositionTiltPercent100thsAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface CurrentPositionLiftPercent100thsAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
+    public interface CurrentPositionTiltPercent100thsAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -16759,7 +16807,7 @@ public class ChipClusters {
       reportTypeAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionLiftAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionLiftAttribute(CurrentPositionLiftAttributeCallback callback) {
       readCurrentPositionLiftAttribute(chipClusterPtr, callback);
     }
 
@@ -16772,7 +16820,7 @@ public class ChipClusters {
       reportCurrentPositionLiftAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionTiltAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionTiltAttribute(CurrentPositionTiltAttributeCallback callback) {
       readCurrentPositionTiltAttribute(chipClusterPtr, callback);
     }
 
@@ -16798,7 +16846,8 @@ public class ChipClusters {
       reportConfigStatusAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionLiftPercentageAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionLiftPercentageAttribute(
+        CurrentPositionLiftPercentageAttributeCallback callback) {
       readCurrentPositionLiftPercentageAttribute(chipClusterPtr, callback);
     }
 
@@ -16812,7 +16861,8 @@ public class ChipClusters {
       reportCurrentPositionLiftPercentageAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionTiltPercentageAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionTiltPercentageAttribute(
+        CurrentPositionTiltPercentageAttributeCallback callback) {
       readCurrentPositionTiltPercentageAttribute(chipClusterPtr, callback);
     }
 
@@ -16839,7 +16889,8 @@ public class ChipClusters {
       reportOperationalStatusAttribute(chipClusterPtr, callback);
     }
 
-    public void readTargetPositionLiftPercent100thsAttribute(IntegerAttributeCallback callback) {
+    public void readTargetPositionLiftPercent100thsAttribute(
+        TargetPositionLiftPercent100thsAttributeCallback callback) {
       readTargetPositionLiftPercent100thsAttribute(chipClusterPtr, callback);
     }
 
@@ -16853,7 +16904,8 @@ public class ChipClusters {
       reportTargetPositionLiftPercent100thsAttribute(chipClusterPtr, callback);
     }
 
-    public void readTargetPositionTiltPercent100thsAttribute(IntegerAttributeCallback callback) {
+    public void readTargetPositionTiltPercent100thsAttribute(
+        TargetPositionTiltPercent100thsAttributeCallback callback) {
       readTargetPositionTiltPercent100thsAttribute(chipClusterPtr, callback);
     }
 
@@ -16880,7 +16932,8 @@ public class ChipClusters {
       reportEndProductTypeAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionLiftPercent100thsAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionLiftPercent100thsAttribute(
+        CurrentPositionLiftPercent100thsAttributeCallback callback) {
       readCurrentPositionLiftPercent100thsAttribute(chipClusterPtr, callback);
     }
 
@@ -16894,7 +16947,8 @@ public class ChipClusters {
       reportCurrentPositionLiftPercent100thsAttribute(chipClusterPtr, callback);
     }
 
-    public void readCurrentPositionTiltPercent100thsAttribute(IntegerAttributeCallback callback) {
+    public void readCurrentPositionTiltPercent100thsAttribute(
+        CurrentPositionTiltPercent100thsAttributeCallback callback) {
       readCurrentPositionTiltPercent100thsAttribute(chipClusterPtr, callback);
     }
 
@@ -17030,7 +17084,7 @@ public class ChipClusters {
     private native void reportTypeAttribute(long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionLiftAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionLiftAttributeCallback callback);
 
     private native void subscribeCurrentPositionLiftAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17039,7 +17093,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionTiltAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionTiltAttributeCallback callback);
 
     private native void subscribeCurrentPositionTiltAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17057,7 +17111,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionLiftPercentageAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionLiftPercentageAttributeCallback callback);
 
     private native void subscribeCurrentPositionLiftPercentageAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17066,7 +17120,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionTiltPercentageAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionTiltPercentageAttributeCallback callback);
 
     private native void subscribeCurrentPositionTiltPercentageAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17084,7 +17138,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readTargetPositionLiftPercent100thsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, TargetPositionLiftPercent100thsAttributeCallback callback);
 
     private native void subscribeTargetPositionLiftPercent100thsAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17093,7 +17147,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readTargetPositionTiltPercent100thsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, TargetPositionTiltPercent100thsAttributeCallback callback);
 
     private native void subscribeTargetPositionTiltPercent100thsAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17111,7 +17165,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionLiftPercent100thsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionLiftPercent100thsAttributeCallback callback);
 
     private native void subscribeCurrentPositionLiftPercent100thsAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -17120,7 +17174,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readCurrentPositionTiltPercent100thsAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, CurrentPositionTiltPercent100thsAttributeCallback callback);
 
     private native void subscribeCurrentPositionTiltPercent100thsAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
