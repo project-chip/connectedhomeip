@@ -26,7 +26,6 @@
 #include <ble/BLEEndPoint.h>
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
-#include <inet/InetLayer.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -111,16 +110,19 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SetGroupDataProvider(&mGroupsProvider);
 
     // Init transport before operations with secure session mgr.
-    err = mTransports.Init(
-        UdpListenParameters(&DeviceLayer::InetLayer()).SetAddressType(IPAddressType::kIPv6).SetListenPort(mSecuredServicePort)
+    err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv6)
+                               .SetListenPort(mSecuredServicePort)
 
 #if INET_CONFIG_ENABLE_IPV4
-            ,
-        UdpListenParameters(&DeviceLayer::InetLayer()).SetAddressType(IPAddressType::kIPv4).SetListenPort(mSecuredServicePort)
+                               ,
+                           UdpListenParameters(DeviceLayer::UDPEndPointManager())
+                               .SetAddressType(IPAddressType::kIPv4)
+                               .SetListenPort(mSecuredServicePort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-            ,
-        BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
+                               ,
+                           BleListenParameters(DeviceLayer::ConnectivityMgr().GetBleLayer())
 #endif
     );
 
@@ -279,13 +281,15 @@ CHIP_ERROR Server::AddTestCommissioning()
     CHIP_ERROR err            = CHIP_NO_ERROR;
     PASESession * testSession = nullptr;
     PASESessionSerializable serializedTestSession;
+    SessionHolder session;
 
     mTestPairing.ToSerializable(serializedTestSession);
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = mSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, CryptoContext::SessionRole::kResponder, kMinValidFabricIndex));
+    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() },
+                                             chip::kTestControllerNodeId, testSession, CryptoContext::SessionRole::kResponder,
+                                             kMinValidFabricIndex));
 
 exit:
     if (testSession)

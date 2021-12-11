@@ -76,29 +76,21 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
         ChipLogError(Zcl, "Failed to store name attribute.");
     }
 
+    MakeZclCharString(zclString, application->version);
+    EmberAfStatus versionStatus =
+        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_VERSION_ATTRIBUTE_ID,
+                                    zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+    if (versionStatus != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Failed to store version attribute.");
+    }
+
     EmberAfStatus productIdStatus =
         emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_PRODUCT_ID_ATTRIBUTE_ID,
                                     (uint8_t *) &application->productId, ZCL_INT16U_ATTRIBUTE_TYPE);
     if (productIdStatus != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Failed to store product id attribute.");
-    }
-
-    MakeZclCharString(zclString, application->id);
-    EmberAfStatus idStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_APPLICATION_ID_ATTRIBUTE_ID, zclString.data(),
-                                    ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    if (idStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to store id attribute.");
-    }
-
-    EmberAfStatus catalogVendorIdStatus =
-        emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_BASIC_CLUSTER_ID, ZCL_CATALOG_VENDOR_ID_ATTRIBUTE_ID,
-                                    (uint8_t *) &application->catalogVendorId, ZCL_INT16U_ATTRIBUTE_TYPE);
-    if (catalogVendorIdStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to store catalog vendor id attribute.");
     }
 
     EmberAfStatus applicationStatus =
@@ -127,6 +119,12 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get app vendor name. Error:%s", chip::ErrorStr(err));
+    }
+
+    err = es->get(section, "version", app.version, size);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to get application version. Error:%s", chip::ErrorStr(err));
     }
 
     err = es->get(section, "id", app.id, size);

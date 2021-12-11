@@ -19,15 +19,71 @@
 #include "basic.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
-#include <cstddef>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/EventLogging.h>
+#include <app/util/attribute-storage.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/PlatformManager.h>
 
+#include <cstddef>
 #include <cstring>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::Basic;
 using namespace chip::DeviceLayer;
+
+namespace {
+
+class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
+{
+    // Gets called by the current Node after completing a boot or reboot process.
+    void OnStartUp(uint32_t softwareVersion) override
+    {
+        ChipLogProgress(Zcl, "PlatformMgrDelegate: OnStartUp");
+
+        ForAllEndpointsWithServerCluster(
+            Basic::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                // If Basic cluster is implemented on this endpoint
+                Events::StartUp::Type event{ static_cast<uint32_t>(context) };
+                EventNumber eventNumber;
+
+                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
+                {
+                    ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event");
+                }
+
+                return Loop::Continue;
+            },
+            static_cast<intptr_t>(softwareVersion));
+    }
+
+    // Gets called by the current Node prior to any orderly shutdown sequence on a best-effort basis.
+    void OnShutDown() override
+    {
+        ChipLogProgress(Zcl, "PlatformMgrDelegate: OnShutDown");
+
+        ForAllEndpointsWithServerCluster(Basic::Id, [](EndpointId endpoint, intptr_t context) -> Loop {
+            // If Basic cluster is implemented on this endpoint
+            Events::ShutDown::Type event;
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event");
+            }
+
+            return Loop::Continue;
+        });
+    }
+};
+
+PlatformMgrDelegate gPlatformMgrDelegate;
+
+} // anonymous namespace
 
 void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
 {
@@ -167,4 +223,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     }
 }
 
-void MatterBasicPluginServerInitCallback() {}
+void MatterBasicPluginServerInitCallback()
+{
+    PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
+}

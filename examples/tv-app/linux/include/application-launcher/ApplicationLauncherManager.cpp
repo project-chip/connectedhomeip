@@ -79,3 +79,27 @@ ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId
 
     return response;
 }
+
+ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
+                                                              std::string data)
+{
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterStopApp");
+
+    ApplicationLauncherResponse response;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    return response;
+}
+
+ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
+                                                              std::string data)
+{
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterHideApp");
+
+    ApplicationLauncherResponse response;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    return response;
+}

@@ -108,7 +108,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
+TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo,
              &TvChannelManager::proxyGetTvChannelList>
     gTvChannelAttrAccess;
 
@@ -200,11 +200,6 @@ public:
         if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
         {
             return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
-        {
-            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
         }
 
         return CHIP_NO_ERROR;

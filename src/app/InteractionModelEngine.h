@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -275,6 +276,8 @@ private:
                          TLV::TLVReader & apPayload) override;
     bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
+    bool HasActiveRead();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
@@ -326,19 +329,20 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
- *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @param[in]    aAttributeReport      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

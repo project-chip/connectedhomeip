@@ -89,7 +89,6 @@ static_library("inet") {
     "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
-    "InetLayer.cpp",
     "InetLayer.h",
     "arpa-inet-compatibility.h",
   ]

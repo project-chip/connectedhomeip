@@ -49,6 +49,7 @@ using namespace chip;
 ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
                                                           std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                           const chip::CharSpan & data);
+
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                                       ContentLaunchBrandingInformation & brandingInformation);
 

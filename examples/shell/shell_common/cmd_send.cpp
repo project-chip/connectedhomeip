@@ -128,7 +128,7 @@ CHIP_ERROR SendMessage(streamer_t * stream)
     uint32_t payloadSize = gSendArguments.GetPayloadSize();
 
     // Create a new exchange context.
-    auto * ec = gExchangeManager.NewContext(SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex), &gMockAppDelegate);
+    auto * ec = gExchangeManager.NewContext(gSession.Get(), &gMockAppDelegate);
     VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     payloadBuf = MessagePacketBuffer::New(payloadSize);
@@ -181,8 +181,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, Transport::PeerAddress & 
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                     CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -211,13 +211,13 @@ void ProcessCommand(streamer_t * stream, char * destination)
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer())
+    err = gTCPManager.Init(Transport::TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer())
+    err = gUDPManager.Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gSendArguments.GetPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));

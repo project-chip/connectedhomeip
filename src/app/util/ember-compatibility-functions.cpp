@@ -21,6 +21,7 @@
  *          when calling ember callbacks.
  */
 
+#include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
@@ -51,6 +52,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
+using namespace chip::Access;
 
 namespace chip {
 namespace app {
@@ -352,13 +354,14 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
-                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
-                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI
+                  " (expanded=%d)",
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
 
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
@@ -369,7 +372,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         {
             AttributeListReader reader(cluster);
             bool ignored; // Our reader always tries to encode
-            return ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, &reader, &ignored);
+            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
+                                          &ignored);
         }
 
         // else to save codesize just fall through and do the metadata search
@@ -388,14 +392,34 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+    {
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            if (aPath.mExpanded)
+            {
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+                ReturnErrorOnFailure(aAttributeReports.GetError());
+                return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+            }
+        }
+    }
+
     // Value encoder will encode the whole AttributeReport, including the path, value and the version.
     // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
-    if (attrOverride != nullptr)
+    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         bool triedEncode;
-        ReturnErrorOnFailure(
-            ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, attrOverride, &triedEncode));
+        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                    attrOverride, &triedEncode));
 
         if (triedEncode)
         {
@@ -404,14 +428,13 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
 
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
-
     ReturnErrorOnFailure(aAttributeReports.GetError());
+
     TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
-
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
@@ -798,7 +821,8 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
@@ -816,6 +840,19 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     if (attributeMetadata->IsReadOnly())
     {
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
+    }
+
+    {
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
     }
 
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())

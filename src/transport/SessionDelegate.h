@@ -20,20 +20,6 @@
 
 namespace chip {
 
-class DLL_EXPORT SessionCreationDelegate
-{
-public:
-    virtual ~SessionCreationDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a new session is being established
-     *
-     * @param session   The handle to the secure session
-     */
-    virtual void OnNewSession(SessionHandle session) = 0;
-};
-
 class DLL_EXPORT SessionReleaseDelegate
 {
 public:

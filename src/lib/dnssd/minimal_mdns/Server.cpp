@@ -214,7 +214,8 @@ bool ServerBase::IsListening() const
     return listening;
 }
 
-CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
+CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
+                              uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
@@ -226,7 +227,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
     while (it->Next(&interfaceId, &addressType))
     {
         chip::Inet::UDPEndPoint * listenUdp;
-        ReturnErrorOnFailure(inetLayer->GetUDPEndPointManager()->NewEndPoint(&listenUdp));
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&listenUdp));
         std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolder(listenUdp, {});
 
         ReturnErrorOnFailure(listenUdp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
@@ -250,7 +251,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
         //     not originate from 5353 and the answers will include a query section.
         chip::Inet::UDPEndPoint * unicastQueryUdp;
-        ReturnErrorOnFailure(inetLayer->GetUDPEndPointManager()->NewEndPoint(&unicastQueryUdp));
+        ReturnErrorOnFailure(udpEndPointManager->NewEndPoint(&unicastQueryUdp));
         std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> endPointHolderUnicast(unicastQueryUdp, {});
         ReturnErrorOnFailure(unicastQueryUdp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
         ReturnErrorOnFailure(unicastQueryUdp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));

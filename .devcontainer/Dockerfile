@@ -53,8 +53,16 @@ RUN curl https://raw.githubusercontent.com/restyled-io/restyler/master/bin/resty
 RUN chmod +x /home/$USERNAME/bin/restyle-path
 RUN chown -R $USERNAME:$USERNAME /home/$USERNAME
 RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
+
 # $USERNAME needs to own the esp-idf and tools for the examples to build
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
+
 # $USERNAME needs to own west configuration to build nRF Connect examples
-RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/.west
+RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/
+
+# allow read/write access to header and libraries
+RUN chown -R $USERNAME:$USERNAME /opt/ubuntu-21.04-aarch64-sysroot/usr/
+
+# allow licenses to be accepted
+RUN chown -R $USERNAME:$USERNAME /opt/android/sdk

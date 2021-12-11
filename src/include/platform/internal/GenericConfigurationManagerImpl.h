@@ -88,8 +88,8 @@ public:
     CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint) override;
     CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetRegulatoryLocation(uint32_t & location) override;
-    CHIP_ERROR StoreRegulatoryLocation(uint32_t location) override;
+    CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
+    CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override;
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;

@@ -20,7 +20,7 @@
 
 /**
  *    @file
- *     This file implements a unit test suite for InetLayer EndPoint related features
+ *     This file implements a unit test suite for Inet EndPoint related features
  *
  */
 
@@ -37,7 +37,6 @@
 
 #include <inet/IPPrefix.h>
 #include <inet/InetError.h>
-#include <inet/InetLayer.h>
 
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
@@ -82,6 +81,12 @@ void HandleTimer(Layer * aLayer, void * aAppState)
 // Test before init network, Inet is not initialized
 static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 {
+#if INET_CONFIG_ENABLE_UDP_ENDPOINT
+    UDPEndPoint * testUDPEP = nullptr;
+#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    TCPEndPoint * testTCPEP = nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Deinit system layer and network
@@ -92,13 +97,13 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     }
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    EndPointManager<UDPEndPoint> * udpEndPointManager = gInet.GetUDPEndPointManager();
-    NL_TEST_ASSERT(inSuite, udpEndPointManager == nullptr);
+    err = gUDP.NewEndPoint(&testUDPEP);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    EndPointManager<TCPEndPoint> * tcpEndPointManager = gInet.GetTCPEndPointManager();
-    NL_TEST_ASSERT(inSuite, tcpEndPointManager == nullptr);
+    err = gTCP.NewEndPoint(&testTCPEP);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
@@ -250,11 +255,15 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
 
     // init all the EndPoints
-    err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP);
+    SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
+    err = gUDP.NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
-    err = gInet.GetTCPEndPointManager()->NewEndPoint(&testTCPEP1);
+    SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
+    err = gTCP.NewEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
     err = InterfaceId::Null().GetLinkLocalAddr(&addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -289,16 +298,20 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testUDPEP->BindInterface(IPAddressType::kIPv6, intId);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, 1));
 
-    err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP);
+    err = gUDP.NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
     buf = PacketBufferHandle::New(PacketBuffer::kMaxSize);
     err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
-    testUDPEP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
+    testUDPEP->Free();
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 0));
 
     // TcpEndPoint special cases to cover the error branch
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
@@ -337,10 +350,12 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
 
     testTCPEP1->Free();
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, 0));
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-// Test the InetLayer resource limitation
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
+// Test the Inet resource limitations.
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
     UDPEndPoint * testUDPEP[INET_CONFIG_NUM_UDP_ENDPOINTS + 1] = { nullptr };
@@ -348,17 +363,27 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    int udpCount = 0;
+    SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumUDPEps);
     for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
     {
-        err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP[i]);
+        err = gUDP.NewEndPoint(&testUDPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, ++udpCount));
     }
+    const int udpHighWaterMark = udpCount;
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
+    int tcpCount = 0;
+    SYSTEM_STATS_RESET(System::Stats::kInetLayer_NumTCPEps);
     for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
     {
-        err = gInet.GetTCPEndPointManager()->NewEndPoint(&testTCPEP[i]);
+        err = gTCP.NewEndPoint(&testTCPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, ++tcpCount));
     }
+    const int tcpHighWaterMark = tcpCount;
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
 
 #if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool
@@ -380,8 +405,10 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testUDPEP[i] != nullptr)
         {
             testUDPEP[i]->Free();
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --udpCount));
         }
     }
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
 
     // Release TCP endpoints
     for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
@@ -389,8 +416,10 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --tcpCount));
         }
     }
+    NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
 
     ShutdownNetwork();
     ShutdownSystemLayer();
@@ -406,7 +435,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
 #endif
                                  NL_TEST_SENTINEL() };

@@ -59,7 +59,7 @@ public:
         {
             return ContentLauncherMgr().GetAcceptsHeader(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
+        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id)
         {
             return ContentLauncherMgr().GetSupportedStreamingTypes(aEncoder);
         }
@@ -242,7 +242,8 @@ exit:
     return err;
 }
 
-ContentLaunchResponse ContentLauncherManager::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+ContentLaunchResponse ContentLauncherManager::LaunchContent(chip::EndpointId endpointId,
+                                                            std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                             const chip::CharSpan & data)
 {
     ContentLaunchResponse response;

@@ -20,6 +20,7 @@
 #include <lib/core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
@@ -34,6 +35,7 @@ extern chip::secure_channel::MessageCounterManager gMessageCounterManager;
 extern chip::Messaging::ExchangeManager gExchangeManager;
 extern chip::SessionManager gSessionManager;
 extern chip::Inet::IPAddress gDestAddr;
+extern chip::SessionHolder gSession;
 
 extern chip::FabricIndex gFabricIndex;
 

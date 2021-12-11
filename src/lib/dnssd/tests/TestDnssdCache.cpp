@@ -24,7 +24,6 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/DnssdCache.h>

@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/bdx/BdxUri.h>
 #include <zap-generated/CHIPClusters.h>
 
 #include "BDXDownloader.h"
@@ -114,10 +115,9 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         VerifyOrReturn(response.imageURI.HasValue(), ChipLogError(SoftwareUpdate, "Update is available but no image URI present"));
 
         // Parse out the provider node ID and file designator from the image URI
-        NodeId nodeId                         = kUndefinedNodeId;
-        char fileDesignatorBuffer[kUriMaxLen] = { 0 };
-        MutableCharSpan fileDesignator(fileDesignatorBuffer, kUriMaxLen);
-        CHIP_ERROR err = requestorCore->mBdxDownloader->ParseBdxUri(response.imageURI.Value(), nodeId, fileDesignator);
+        NodeId nodeId = kUndefinedNodeId;
+        CharSpan fileDesignator;
+        CHIP_ERROR err = bdx::ParseURI(response.imageURI.Value(), nodeId, fileDesignator);
         VerifyOrReturn(err == CHIP_NO_ERROR,
                        ChipLogError(SoftwareUpdate, "Parse BDX image URI (%.*s) returned err=%" CHIP_ERROR_FORMAT,
                                     static_cast<int>(response.imageURI.Value().size()), response.imageURI.Value().data(),
@@ -193,39 +193,22 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-CHIP_ERROR OTARequestor::SetupCASESessionManager(FabricIndex fabricIndex)
+CHIP_ERROR OTARequestor::SetupCASESessionManager()
 {
     // A previous CASE session had been established
     if (mCASESessionManager != nullptr)
     {
-        if (mCASESessionManager->GetFabricInfo()->GetFabricIndex() != fabricIndex)
-        {
-            // CSM is per fabric so if fabric index does not match the previous session, CSM needs to be set up again
-            Platform::Delete(mCASESessionManager);
-            mCASESessionManager = nullptr;
-        }
-        else
-        {
-            // Fabric index matches so use previous instance
-            return CHIP_NO_ERROR;
-        }
+        return CHIP_NO_ERROR;
     }
 
     // CSM has not been setup so create a new instance of it
     if (mCASESessionManager == nullptr)
     {
-        FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(fabricIndex);
-        if (fabricInfo == nullptr)
-        {
-            ChipLogError(SoftwareUpdate, "Did not find fabric for index %d", fabricIndex);
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-
         DeviceProxyInitParams initParams = {
             .sessionManager = &(mServer->GetSecureSessionManager()),
             .exchangeMgr    = &(mServer->GetExchangeManager()),
             .idAllocator    = &(mServer->GetSessionIDAllocator()),
-            .fabricInfo     = fabricInfo,
+            .fabricTable    = &(mServer->GetFabricTable()),
             .clientPool     = mServer->GetCASEClientPool(),
             // TODO: Determine where this should be instantiated
             .imDelegate = Platform::New<Controller::DeviceControllerInteractionModelDelegate>(),
@@ -252,16 +235,19 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(FabricIndex fabricIndex)
 
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    CHIP_ERROR err = SetupCASESessionManager(mProviderFabricIndex);
+    CHIP_ERROR err          = SetupCASESessionManager();
+    FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot setup CASESessionManager: %" CHIP_ERROR_FORMAT, err.Format()));
+    VerifyOrReturn(fabricInfo != nullptr, ChipLogError(SoftwareUpdate, "Cannot find fabric"));
 
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    err = mCASESessionManager->FindOrEstablishSession(mProviderNodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    err = mCASESessionManager->FindOrEstablishSession(fabricInfo, mProviderNodeId, &mOnConnectedCallback,
+                                                      &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
@@ -344,15 +330,25 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     }
 }
 
+OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
+{
+
+    if (mProviderNodeId != kUndefinedNodeId)
+    {
+        ConnectToProvider(kQueryImage);
+        return kTriggerSuccessful;
+    }
+    else
+    {
+        ChipLogError(SoftwareUpdate, "No OTA Providers available");
+        return kNoProviderKnown;
+    }
+}
+
 // Called whenever FindOrEstablishSession fails
 void OTARequestor::OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
 {
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
-}
-
-void OTARequestor::TriggerImmediateQuery()
-{
-    ConnectToProvider(kQueryImage);
 }
 
 CHIP_ERROR OTARequestor::BuildQueryImageRequest(QueryImageRequest & request)

@@ -92,7 +92,7 @@ jobs:
               run: scripts/run_in_build_env.sh "ninja -C ./out"
     build_linux:
         name: Build on Linux (gcc_release, clang, mbedtls, simulated)
-        timeout-minutes: 60
+        timeout-minutes: 90
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -158,12 +158,26 @@ jobs:
                       scripts/tests/gn_tests.sh
                   done
             - name: Build using build_examples.py
-              timeout-minutes: 30
-              # NOTE: only vscode image contains the cross compile arm64 sysroot
-              #       so the build command below only compiles x64
+              timeout-minutes: 40
               run: |
                 ./scripts/run_in_build_env.sh \
-                  "./scripts/build/build_examples.py --no-log-timestamps --target-glob 'linux-x64-*' build"
+                  "./scripts/build/build_examples.py --no-log-timestamps \
+                     --target linux-x64-all-clusters \
+                     --target linux-x64-all-clusters-ipv6only \
+                     --target linux-x64-chip-tool \
+                     --target linux-x64-chip-tool-ipv6only \
+                     --target linux-x64-minmdns-ipv6only \
+                     --target linux-x64-rpc-console \
+                     --target linux-x64-thermostat-ipv6only \
+                     --target linux-x64-tv-app-ipv6only \
+                     build \
+                  "
+
+            - name: Run fake linux tests
+              timeout-minutes: 15
+              run: |
+                ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py --no-log-timestamps --target linux-fake-tests build"
 
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512

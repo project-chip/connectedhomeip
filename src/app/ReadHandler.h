@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
@@ -52,6 +53,8 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     enum class ShutdownOptions
     {
         KeepCurrentExchange,
@@ -146,7 +149,9 @@ public:
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
     void UnblockUrgentEventDelivery()
     {
@@ -199,12 +204,12 @@ private:
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 
     // The event number of the last processed event for each priority level
-    EventNumber mSelfProcessedEvents[kNumPriorityLevel];
+    EventNumber mSelfProcessedEvents[kNumPriorityLevel] = { 0 };
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
-    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    EventNumber mLastScheduledEventNumber[kNumPriorityLevel] = { 0 };
+    Messaging::ExchangeManager * mpExchangeMgr               = nullptr;
+    InteractionModelDelegate * mpDelegate                    = nullptr;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions
@@ -222,10 +227,10 @@ private:
     // last chunked message.
     bool mIsChunkedReport                                    = false;
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
     bool mHoldSync                                           = false;
+    SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };

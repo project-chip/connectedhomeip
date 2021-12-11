@@ -50,6 +50,7 @@ public:
                            chip::CharSpan tempAccountIdentifier);
     CHIP_ERROR Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                      chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
+    CHIP_ERROR Logout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -103,16 +104,14 @@ public:
     CHIP_ERROR SubscribeAttributeProductId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                            uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeProductId(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeApplicationId(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeCatalogVendorId(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback,
                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                    uint16_t maxInterval);
     CHIP_ERROR ReportAttributeApplicationStatus(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeApplicationVersion(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                    uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeApplicationVersion(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -127,16 +126,14 @@ public:
     ~ApplicationLauncherCluster() {}
 
     // Cluster Commands
+    CHIP_ERROR HideApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                       chip::CharSpan applicationId);
     CHIP_ERROR LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::CharSpan data,
                          uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR StopApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                       chip::CharSpan applicationId);
 
     // Cluster Attributes
-    CHIP_ERROR SubscribeAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeCatalogVendorId(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeApplicationId(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeApplicationId(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -638,11 +635,15 @@ public:
 
     // Cluster Commands
     CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, bool autoPlay,
-                             chip::CharSpan data);
+                             chip::CharSpan data, uint8_t type, chip::CharSpan value);
     CHIP_ERROR LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::CharSpan contentURL, chip::CharSpan displayString);
+                         chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
 
     // Cluster Attributes
+    CHIP_ERROR SubscribeAttributeSupportedStreamingProtocols(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeSupportedStreamingProtocols(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -684,46 +685,21 @@ public:
     ~DoorLockCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR ClearAllPINCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ClearAllRFIDCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t holidayIndex);
-    CHIP_ERROR ClearPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                            uint16_t pinSlotIndex);
-    CHIP_ERROR ClearRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             uint16_t rfidSlotIndex);
-    CHIP_ERROR ClearWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t weekDayIndex, uint16_t userIndex);
-    CHIP_ERROR ClearYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t yearDayIndex, uint16_t userIndex);
-    CHIP_ERROR GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t holidayIndex);
-    CHIP_ERROR GetLogRecord(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t logIndex);
-    CHIP_ERROR GetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR GetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR GetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR GetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t weekDayIndex, uint16_t userIndex);
-    CHIP_ERROR GetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t yearDayIndex, uint16_t userIndex);
+    CHIP_ERROR ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                               uint8_t credentialType, uint16_t credentialIndex);
+    CHIP_ERROR ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
+    CHIP_ERROR GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t credentialType, uint16_t credentialIndex);
+    CHIP_ERROR GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userIndex);
     CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
-    CHIP_ERROR SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingMode);
-    CHIP_ERROR SetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                          uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
-    CHIP_ERROR SetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                           uint8_t userStatus, uint8_t userType, chip::ByteSpan rfidCode);
-    CHIP_ERROR SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                           uint8_t userType);
-    CHIP_ERROR SetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t weekDayIndex, uint16_t userIndex, uint8_t daysMask, uint8_t startHour,
-                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
-    CHIP_ERROR SetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t yearDayIndex, uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime);
+    CHIP_ERROR SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex, chip::ByteSpan credentialData,
+                             uint16_t userIndex, uint8_t userStatus);
+    CHIP_ERROR SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t operationType,
+                       uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
+                       uint8_t credentialRule);
     CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                           chip::ByteSpan pinCode);
-    CHIP_ERROR UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t timeout, chip::ByteSpan pinCode);
 
     // Cluster Attributes
     CHIP_ERROR SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -735,6 +711,33 @@ public:
     CHIP_ERROR SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeActuatorEnabled(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeDoorState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeDoorState(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeLanguage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeLanguage(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeAutoRelockTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeAutoRelockTime(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeSoundVolume(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeSoundVolume(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeOperatingMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOperatingMode(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeEnableOneTouchLocking(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                       uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeEnableOneTouchLocking(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeEnablePrivacyModeButton(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                         uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeEnablePrivacyModeButton(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR SubscribeAttributeWrongCodeEntryLimit(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeWrongCodeEntryLimit(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -1182,16 +1185,6 @@ public:
     CHIP_ERROR SubscribeAttributeDuration(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeDuration(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributePositionUpdatedAt(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                   uint16_t maxInterval);
-    CHIP_ERROR ReportAttributePositionUpdatedAt(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributePosition(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributePosition(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributePlaybackSpeed(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributePlaybackSpeed(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeSeekRangeEnd(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                               uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeSeekRangeEnd(Callback::Cancelable * onReportCallback);
@@ -1755,13 +1748,6 @@ public:
     CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
 
     // Cluster Attributes
-    CHIP_ERROR SubscribeAttributeTvChannelLineup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeTvChannelLineup(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeCurrentTvChannel(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                  uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeCurrentTvChannel(Callback::Cancelable * onReportCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);

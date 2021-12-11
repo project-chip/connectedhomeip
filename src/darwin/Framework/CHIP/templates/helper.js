@@ -56,9 +56,9 @@ function asExpectedEndpointForCluster(clusterName)
 function asTestValue()
 {
   if (StringHelper.isOctetString(this.type)) {
-    return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
+    return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
   } else if (StringHelper.isCharString(this.type)) {
-    return '@"Test"';
+    return `@"${"Test".substring(0, this.maxLength)}"`;
   } else if (this.isArray) {
     return '[NSArray array]';
   } else {
@@ -125,15 +125,12 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
-async function asObjectiveCClassHelper(type, cluster, options, mutable)
+async function asObjectiveCClass(type, cluster, options)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
   if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
-    if (mutable) {
-      return 'NSMutableArray';
-    }
     return 'NSArray';
   }
 
@@ -150,16 +147,6 @@ async function asObjectiveCClassHelper(type, cluster, options, mutable)
   }
 
   return 'NSNumber';
-}
-
-async function asObjectiveCClass(type, cluster, options)
-{
-  return asObjectiveCClassHelper.call(this, type, cluster, options, false);
-}
-
-async function asObjectiveCMutableClass(type, cluster, options)
-{
-  return asObjectiveCClassHelper.call(this, type, cluster, options, true);
 }
 
 async function asObjectiveCType(type, cluster, options)
@@ -218,7 +205,6 @@ exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
-exports.asObjectiveCMutableClass     = asObjectiveCMutableClass;
 exports.asObjectiveCType             = asObjectiveCType;
 exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;

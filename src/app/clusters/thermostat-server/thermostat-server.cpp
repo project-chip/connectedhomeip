@@ -67,7 +67,8 @@ constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the defaul
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
 
-#define FEATURE_MAP_OVERIDE FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
+// Uncomment out FEATURE_MAP_OVERIDE and set appropriately for testing to overide ZAP
+//#define FEATURE_MAP_OVERIDE FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
 void emberAfThermostatClusterServerInitCallback()
 {
@@ -116,10 +117,10 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     int16_t UnoccupiedCoolingSetpoint;
     int16_t UnoccupiedHeatingSetpoint;
 
-// TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
 #ifndef FEATURE_MAP_OVERIDE
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+    emberAfReadServerAttribute(endpoint, chip::app::Clusters::Thermostat::Id,
+                               chip::app::Clusters::Thermostat::Attributes::FeatureMap::Id,
+                               reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap));
 #else
     FeatureMap = FEATURE_MAP_OVERIDE;
 #endif
@@ -557,10 +558,10 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     int8_t DeadBand                          = 0;
     uint32_t FeatureMap                      = 0;
 
-    // TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
 #ifndef FEATURE_MAP_OVERIDE
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
+    emberAfReadServerAttribute(aEndpointId, chip::app::Clusters::Thermostat::Id,
+                               chip::app::Clusters::Thermostat::Attributes::FeatureMap::Id,
+                               reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap));
 #else
     FeatureMap = FEATURE_MAP_OVERIDE;
 #endif

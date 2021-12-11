@@ -849,32 +849,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPContentLauncherSupportedStreamingTypesAttributeCallback
-    : public chip::Callback::Callback<CHIPContentLauncherClusterSupportedStreamingTypesAttributeCallbackType>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPContentLauncherSupportedStreamingTypesAttributeCallback();
-
-    static void maybeDestroy(CHIPContentLauncherSupportedStreamingTypesAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPContentLauncherSupportedStreamingTypesAttributeCallback>(callback);
-        }
-    }
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list);
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPContentLauncherAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPContentLauncherClusterAttributeListAttributeCallbackType>
 {
@@ -1063,6 +1037,30 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPDoorLockDoorStateAttributeCallback : public chip::Callback::Callback<CHIPDoorLockClusterDoorStateAttributeCallbackType>
+{
+public:
+    CHIPDoorLockDoorStateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPDoorLockDoorStateAttributeCallback();
+
+    static void maybeDestroy(CHIPDoorLockDoorStateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPDoorLockDoorStateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value);
 
 private:
     jobject javaCallbackRef;
@@ -2483,20 +2481,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPTvChannelTvChannelListAttributeCallback
-    : public chip::Callback::Callback<CHIPTvChannelClusterTvChannelListAttributeCallbackType>
+class CHIPTvChannelChannelListAttributeCallback
+    : public chip::Callback::Callback<CHIPTvChannelClusterChannelListAttributeCallbackType>
 {
 public:
-    CHIPTvChannelTvChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPTvChannelChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPTvChannelTvChannelListAttributeCallback();
+    ~CHIPTvChannelChannelListAttributeCallback();
 
-    static void maybeDestroy(CHIPTvChannelTvChannelListAttributeCallback * callback)
+    static void maybeDestroy(CHIPTvChannelChannelListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPTvChannelTvChannelListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPTvChannelChannelListAttributeCallback>(callback);
         }
     }
 

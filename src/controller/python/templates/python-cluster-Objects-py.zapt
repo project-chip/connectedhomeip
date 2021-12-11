@@ -12,13 +12,34 @@ from chip import ChipUtility
 
 from chip.tlv import uint
 
-from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster, ClusterEventDescriptor
+from .ClusterObjects import ClusterObject, ClusterObjectDescriptor, ClusterObjectFieldDescriptor, ClusterCommand, ClusterAttributeDescriptor, Cluster, ClusterEvent
 from .Types import Nullable, NullValue
 
 {{#zcl_clusters}}
 @dataclass
 class {{asUpperCamelCase name}}(Cluster):
     id: typing.ClassVar[int] = {{asHex code 4}}
+
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields = [
+{{#zcl_attributes_server}}
+            {{#if entryType}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}),
+            {{else}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}),
+            {{/if}}
+{{/zcl_attributes_server}}
+            ])
+
+{{#zcl_attributes_server}}
+{{#if entryType}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+{{else}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+{{/if}}
+{{/zcl_attributes_server}}
 
 {{#zcl_enums}}
 {{#first}}
@@ -119,7 +140,7 @@ class {{asUpperCamelCase name}}(Cluster):
     class Events:
 {{/first}}
         @dataclass
-        class {{asUpperCamelCase name}}(ClusterEventDescriptor):
+        class {{asUpperCamelCase name}}(ClusterEvent):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return {{ asHex parent.code 4 }}
@@ -133,12 +154,12 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                         {{#zcl_event_fields}}
-                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase name }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}{{#if isArray}}, IsArray=True{{/if}}),
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase name }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
                         {{/zcl_event_fields}}
                     ])
 
             {{#zcl_event_fields}}
-            {{ asLowerCamelCase name }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
+            {{ asLowerCamelCase name }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_event_fields}}
 
 {{/zcl_events}}

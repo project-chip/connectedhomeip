@@ -26,6 +26,7 @@
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
+#include <access/AccessControl.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -148,18 +149,11 @@ void CommandHandler::Close()
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
                        mPendingWork);
 
-    //
-    // Shortly after this call to close and when handling an inbound message, it's entirely possible
-    // for this object (courtesy of its derived class) to be destroyed
-    // *before* the call unwinds all the way back to ExchangeContext::HandleMessage.
-    //
-    // As part of tearing down the exchange, there is logic there to invoke the delegate to notify
-    // it of impending closure - which is this object, which just got destroyed!
-    //
-    // So prevent a use-after-free, set delegate to null.
+    // OnDone below can destroy us before we unwind all the way back into the
+    // exchange code and it tries to close itself.  Make sure that it doesn't
+    // try to notify us that it's closing, since we will be dead.
     //
     // For more details, see #10344.
-    //
     if (mpExchangeCtx != nullptr)
     {
         mpExchangeCtx->SetDelegate(nullptr);
@@ -258,6 +252,23 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     SuccessOrExit(err);
 
     VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            if (err != CHIP_ERROR_ACCESS_DENIED)
+            {
+                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+            }
+            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -476,9 +487,6 @@ const char * CommandHandler::GetStateStr() const
     case State::AddedCommand:
         return "AddedCommand";
 
-    case State::AwaitingTimedStatus:
-        return "AwaitingTimedStatus";
-
     case State::CommandSent:
         return "CommandSent";
 
@@ -504,9 +512,9 @@ void CommandHandler::Abort()
     //
     if (mpExchangeCtx != nullptr)
     {
-        // We (or more precisely our subclass) might be a delegate for this
-        // exchange, and we don't want the OnExchangeClosing notification in
-        // that case.  Null out the delegate to avoid that.
+        // We might be a delegate for this exchange, and we don't want the
+        // OnExchangeClosing notification in that case.  Null out the delegate
+        // to avoid that.
         //
         // TODO: This makes all sorts of assumptions about what the delegate is
         // (notice the "might" above!) that might not hold in practice.  We

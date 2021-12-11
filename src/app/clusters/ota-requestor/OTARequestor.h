@@ -47,9 +47,16 @@ public:
 
     // Application interface declarations -- start
 
+    // Return value for various trigger-type APIs
+    enum OTATriggerResult
+    {
+        kTriggerSuccessful = 0,
+        kNoProviderKnown   = 1
+    };
+
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
-    void TriggerImmediateQuery();
+    OTATriggerResult TriggerImmediateQuery();
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -59,20 +66,34 @@ public:
     // The BDXDownloader instance should already have the ImageProcessingDelegate set.
     void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
 
-    // Application directs the Requestor to abort any processing related to
-    // the image update
+    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
+    // as the QueryImageResponse content) is preserved
     void AbortImageUpdate();
+
+    // Application directs the Requestor to abort the download in progress. All the Requestor state is
+    // cleared, UploadState is reset to Idle
+    void AbortAndResetState();
+
+    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
+    // FALSE otherwise
+    void OnUserConsent(bool result);
+
+    /* Commented out until the API is supported
+    // Application directs the Requestor to download the image using the suppiled parameter and without
+    // issuing QueryImage
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters){ return kTriggerSuccessful;}
+    */
 
     // Application interface declarations -- end
 
-    // Virtual functions from OTARequestorInterface start
+    // Virtual functions from OTARequestorInterface -- start
+
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
         const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
     // Virtual functions from OTARequestorInterface -- end
-
     /**
      * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
      * BDX transfers
@@ -170,7 +191,7 @@ private:
     /**
      * Setup CASESessionManager used to establish a session with the provider
      */
-    CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
+    CHIP_ERROR SetupCASESessionManager();
 
     /**
      * Create a QueryImage request using values from the Basic cluster attributes

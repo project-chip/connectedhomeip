@@ -67,12 +67,16 @@ using OnReadEventDataCallback           = void (*)(PyObject * appContext, chip::
 using OnSubscriptionEstablishedCallback = void (*)(PyObject * appContext, uint64_t subscriptionId);
 using OnReadErrorCallback               = void (*)(PyObject * appContext, uint32_t chiperror);
 using OnReadDoneCallback                = void (*)(PyObject * appContext);
+using OnReportBeginCallback             = void (*)(PyObject * appContext);
+using OnReportEndCallback               = void (*)(PyObject * appContext);
 
 OnReadAttributeDataCallback gOnReadAttributeDataCallback             = nullptr;
 OnReadEventDataCallback gOnReadEventDataCallback                     = nullptr;
 OnSubscriptionEstablishedCallback gOnSubscriptionEstablishedCallback = nullptr;
 OnReadErrorCallback gOnReadErrorCallback                             = nullptr;
 OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
+OnReportBeginCallback gOnReportBeginCallback                         = nullptr;
+OnReportBeginCallback gOnReportEndCallback                           = nullptr;
 
 class ReadClientCallback : public ReadClient::Callback
 {
@@ -160,6 +164,10 @@ public:
         gOnReadErrorCallback(mAppContext, aError.AsInteger());
     }
 
+    void OnReportBegin(const ReadClient * apReadClient) override { gOnReportBeginCallback(mAppContext); }
+
+    void OnReportEnd(const ReadClient * apReadClient) override { gOnReportEndCallback(mAppContext); }
+
     void OnDone(ReadClient * apReadClient) override
     {
         gOnReadDoneCallback(mAppContext);
@@ -226,13 +234,16 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
 void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
                                      OnReadEventDataCallback onReadEventDataCallback,
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
-                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback)
+                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback,
+                                     OnReportBeginCallback onReportBeginCallback, OnReportEndCallback onReportEndCallback)
 {
     gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
     gOnReadEventDataCallback           = onReadEventDataCallback;
     gOnSubscriptionEstablishedCallback = onSubscriptionEstablishedCallback;
     gOnReadErrorCallback               = onReadErrorCallback;
     gOnReadDoneCallback                = onReadDoneCallback;
+    gOnReportBeginCallback             = onReportBeginCallback;
+    gOnReportEndCallback               = onReportEndCallback;
 }
 
 chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...)

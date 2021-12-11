@@ -76,7 +76,7 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
-    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+    bool IsGroupExchangeContext() const { return (mSession && mSession.Get().IsGroupSession()); }
 
     /**
      *  Send a CHIP message on this exchange.
@@ -151,8 +151,8 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() const { return mSession.Value(); }
-    bool HasSessionHandle() const { return mSession.HasValue(); }
+    SessionHandle GetSessionHandle() const { return mSession.Get(); }
+    bool HasSessionHandle() const { return mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -185,8 +185,8 @@ private:
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    Optional<SessionHandle> mSession; // The connection state
-    uint16_t mExchangeId;             // Assigned exchange ID.
+    SessionHolder mSession; // The connection state
+    uint16_t mExchangeId;   // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over

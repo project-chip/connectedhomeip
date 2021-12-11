@@ -36,6 +36,10 @@ limitations under the License.
       <arg name="setupPIN" type="CHAR_STRING"/>
     </command>
 
+    <command source="client" code="0x02" name="Logout" optional="false">
+      <description>The purpose of this command is to instruct the Content App to clear the current user account. This command SHOULD be used by clients of a Content App to indicate the end of a user session.</description>
+    </command>
+
     <command source="server" code="0x00" name="GetSetupPINResponse" optional="false" disableDefaultResponse="true">
       <description>This message is sent in response to the GetSetupPIN Request, and contains the Setup PIN code, or null when the accounts identified in the request does not match the active account of the running Content App.</description>
       <arg name="setupPIN" type="CHAR_STRING"/>

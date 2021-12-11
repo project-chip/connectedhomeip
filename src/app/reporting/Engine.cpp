@@ -28,6 +28,8 @@
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 
+using namespace chip::Access;
+
 namespace chip {
 namespace app {
 namespace reporting {
@@ -61,13 +63,13 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 }
 
 CHIP_ERROR
-Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
+Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
                             const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
     MatterPreAttributeReadCallback(aPath);
-    ReturnErrorOnFailure(ReadSingleClusterData(aAccessingFabricIndex, aPath, aAttributeReportIBs, aEncoderState));
+    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aPath, aAttributeReportIBs, aEncoderState));
     MatterPostAttributeReadCallback(aPath);
     return CHIP_NO_ERROR;
 }
@@ -130,7 +132,7 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval, &encodeState);
+            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement,
@@ -233,8 +235,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
     TLV::TLVWriter backup;
-    bool eventClean = true;
-    EventNumber initialEvents[kNumPriorityLevel];
+    bool eventClean                = true;
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
     EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
     EventManagement & eventManager = EventManagement::GetInstance();
@@ -247,17 +248,6 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     // If the eventManager is not valid or has not been initialized,
     // skip the rest of processing
     VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
-
-    memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
-
-    for (size_t index = 0; index < kNumPriorityLevel; index++)
-    {
-        EventNumber tmpNumber = eventManager.GetFirstEventNumber(static_cast<PriorityLevel>(index));
-        if (tmpNumber > initialEvents[index])
-        {
-            initialEvents[index] = tmpNumber;
-        }
-    }
 
     eventClean = apReadHandler->CheckEventClean(eventManager);
 
@@ -435,26 +425,6 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    {
-        ChipLogDetail(DataManagement, "<RE> Dumping report data...");
-        chip::System::PacketBufferTLVReader reader;
-        ReportDataMessage::Parser report;
-
-        reader.Init(bufHandle.Retain());
-        reader.Next();
-
-        err = report.Init(reader);
-        SuccessOrExit(err);
-
-        if ((err = report.CheckSchemaValidity()) != CHIP_NO_ERROR)
-        {
-            ChipLogError(DataManagement, "<RE> Schema check failed: %s", chip::ErrorStr(err));
-        }
-        SuccessOrExit(err);
-    }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
     ChipLogDetail(DataManagement, "<RE> Sending report (payload has %" PRIu32 " bytes)...", reportDataWriter.GetLengthWritten());
     err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunks);

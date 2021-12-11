@@ -23,6 +23,50 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
+    - label: "Read attribute playback state"
+      command: "readAttribute"
+      attribute: "playback state"
+      response:
+          value: 0
+
+    - label: "Read attribute start time"
+      command: "readAttribute"
+      attribute: "start time"
+      response:
+          value: 255
+
+    - label: "Read attribute duration"
+      command: "readAttribute"
+      attribute: "duration"
+      response:
+          value: 0
+
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute position"
+      disabled: true
+      command: "readAttribute"
+      attribute: "position"
+      response:
+          value: { updatedAt: 0, position: 0 }
+
+    - label: "Read attribute playback speed"
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: 0.0
+
+    - label: "Read attribute seek range end"
+      command: "readAttribute"
+      attribute: "seek range end"
+      response:
+          value: 0
+
+    - label: "Read attribute seek range start"
+      command: "readAttribute"
+      attribute: "seek range start"
+      response:
+          value: 0
+
     - label: "Media Playback Play Command"
       command: "MediaPlay"
       response:

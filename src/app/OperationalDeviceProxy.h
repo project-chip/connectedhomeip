@@ -52,7 +52,7 @@ struct DeviceProxyInitParams
     SessionManager * sessionManager          = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    FabricTable * fabricTable                = nullptr;
     CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
@@ -64,7 +64,7 @@ struct DeviceProxyInitParams
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
@@ -87,6 +87,7 @@ public:
         mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
         mInitParams  = params;
         mPeerId      = peerId;
+        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
 
         mState = State::NeedsAddress;
     }
@@ -154,7 +155,7 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
@@ -164,7 +165,7 @@ public:
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
@@ -198,6 +199,7 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
+    FabricInfo * mFabricInfo;
     System::Layer * mSystemLayer;
 
     CASEClient * mCASEClient = nullptr;
@@ -208,7 +210,7 @@ private:
 
     State mState = State::Uninitialized;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolder mSecureSession;
 
     uint8_t mSequenceNumber = 0;
 

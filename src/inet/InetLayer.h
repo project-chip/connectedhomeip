@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <inet/InetError.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ObjectLifeCycle.h>
 #include <lib/support/Pool.h>
 #include <platform/LockTracker.h>
@@ -58,17 +60,27 @@ public:
 
     CHIP_ERROR Init(System::Layer & systemLayer)
     {
+        RegisterLayerErrorFormatter();
+        VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
         mSystemLayer = &systemLayer;
+        mLayerState.SetInitialized();
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+    CHIP_ERROR Shutdown()
+    {
+        // Return to uninitialized state to permit re-initialization.
+        VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        mSystemLayer = nullptr;
+        return CHIP_NO_ERROR;
+    }
 
     System::Layer & SystemLayer() const { return *mSystemLayer; }
 
     CHIP_ERROR NewEndPoint(EndPoint ** retEndPoint)
     {
         assertChipStackLockedByCurrentThread();
+        VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
         *retEndPoint = CreateEndPoint();
         if (*retEndPoint == nullptr)
@@ -77,16 +89,22 @@ public:
             return CHIP_ERROR_ENDPOINT_POOL_FULL;
         }
 
-        // TODO: Use the Impl's underlying ObjectPool statistics
         SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
         return CHIP_NO_ERROR;
     }
 
+    void DeleteEndPoint(EndPoint * endPoint)
+    {
+        SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
+        ReleaseEndPoint(endPoint);
+    }
+
     virtual EndPoint * CreateEndPoint()                         = 0;
-    virtual void DeleteEndPoint(EndPoint * endPoint)            = 0;
+    virtual void ReleaseEndPoint(EndPoint * endPoint)           = 0;
     virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
+    ObjectLifeCycle mLayerState;
     System::Layer * mSystemLayer;
 };
 
@@ -101,7 +119,7 @@ public:
     ~EndPointManagerImplPool() { VerifyOrDie(sEndPointPool.Allocated() == 0); }
 
     EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
-    void DeleteEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
         return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
@@ -113,63 +131,6 @@ private:
 
 class TCPEndPoint;
 class UDPEndPoint;
-
-/**
- * Provides access to UDP (and optionally TCP) EndPointManager.
- */
-class InetLayer
-{
-public:
-    InetLayer() = default;
-    ~InetLayer() { mLayerState.Destroy(); }
-
-    /**
-     *  This is the InetLayer explicit initializer. This must be called
-     *  and complete successfully before the InetLayer may be used.
-     *
-     *  The caller may provide an optional context argument which will be
-     *  passed back via any platform-specific hook functions. For
-     *  LwIP-based adaptations, this will typically be a pointer to the
-     *  event queue associated with the InetLayer instance.
-     *
-     *  @param[in]  aSystemLayer                A required instance of the chip System Layer already successfully initialized.
-     *  @param[in]  udpEndPointManager          A required instance of an implementation of EndPointManager<UDPEndPoint>.
-     *                                          This function will initialize the EndPointManager.
-     *
-     *  @retval   #CHIP_ERROR_INCORRECT_STATE   If the InetLayer is in an incorrect state.
-     *  @retval   #CHIP_NO_ERROR                On success.
-     *
-     */
-    CHIP_ERROR Init(System::Layer & aSystemLayer, EndPointManager<UDPEndPoint> * udpEndPointManager);
-
-    /**
-     *  This is the InetLayer explicit deinitializer and should be called
-     *  prior to disposing of an instantiated InetLayer instance.
-     *
-     *  Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
-     *
-     *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
-     *          the reason for shutdown failure.
-     *
-     */
-    CHIP_ERROR Shutdown();
-
-    EndPointManager<UDPEndPoint> * GetUDPEndPointManager() const { return mUDPEndPointManager; }
-
-    // Initialize the TCP EndPointManager. Must be called after Init() if the appication uses TCP.
-    CHIP_ERROR InitTCP(EndPointManager<TCPEndPoint> * tcpEndPointManager);
-    // Shut down the TCP EndPointManager. Must be called before Shutdown() if the appication uses TCP.
-    CHIP_ERROR ShutdownTCP();
-    EndPointManager<TCPEndPoint> * GetTCPEndPointManager() const { return mTCPEndPointManager; }
-
-    chip::System::Layer * SystemLayer() const { return mSystemLayer; }
-
-private:
-    ObjectLifeCycle mLayerState;
-    System::Layer * mSystemLayer;
-    EndPointManager<TCPEndPoint> * mTCPEndPointManager;
-    EndPointManager<UDPEndPoint> * mUDPEndPointManager;
-};
 
 } // namespace Inet
 } // namespace chip

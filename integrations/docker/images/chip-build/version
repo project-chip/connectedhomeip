@@ -1,1 +1,1 @@
-0.5.35 Add K32W SDKs into chip-build-vscode
+0.5.37 Version bump reason: Linux ARM Cross compile requires toolset provided by base image
