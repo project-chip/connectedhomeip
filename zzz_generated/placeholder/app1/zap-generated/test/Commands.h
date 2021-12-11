@@ -152,9 +152,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheDeviceToBeCommissioned_0() { return WaitForCommissioning(); }
+    CHIP_ERROR TestWaitForTheDeviceToBeCommissioned_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissioning();
+    }
 
-    CHIP_ERROR TestLogOnOffTestStartup_1() { return Log("*** Basic Cluster Tests Ready"); }
+    CHIP_ERROR TestLogOnOffTestStartup_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("*** Basic Cluster Tests Ready");
+    }
 
     CHIP_ERROR TestQueryInteractionModelVersion_2()
     {
