@@ -28,8 +28,33 @@ limitations under the License.
     <description>Accurate time is required for a number of reasons, including scheduling, display and validating
 security materials.</description>
     <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="UTC_TIME" type="EPOCH_US" writable="false" optional="false">UTCTime</attribute>
+    <attribute side="server" code="0x0001" define="GRANULARITY" type="ENUM8" writable="false" optional="false">Granularity</attribute>
+    <attribute side="server" code="0x0002" define="TIME_SOURCE" type="ENUM8" writable="false" optional="false">TimeSource</attribute>
+    <attribute side="server" code="0x0003" define="TRUSTED_TIME_NODE_ID" type="NODE_ID" writable="false" optional="false">TrustedTimeNodeID</attribute>
+    <attribute side="server" code="0x0004" define="DEFAULT_NTP" type="CHAR_STRING" length='128' writable="false" optional="false">DefaultNTP</attribute>
+    <attribute side="server" code="0x0005" define="TIMEZONE" type="ARRAY" entryType='TimeZoneType' length="254" writable="false" optional="false">Timezone</attribute>
+    <attribute side="server" code="0x0006" define="DST_OFFSET" type="ARRAY" entryType='DSTOffsetType' length="254" writable="false" optional="false">DSTOffset</attribute>
+    <attribute side="server" code="0x0007" define="LOCAL_TIME" type="EPOCH_US" writable="false" optional="false">LocalTime</attribute>
+    <attribute side="server" code="0x0008" define="TIMEZONE_DATABASE" type="BOOLEAN" writable="false" optional="false">TimezoneDatabase</attribute>
+    <attribute side="server" code="0x0009" define="NTP_SERVER_PORT" type="INT16S" writable="false" optional="false">NTPServerPort</attribute>
 
     <!-- Test Commands -->
 
   </cluster>
+
+  <struct name="TimeZoneType">
+    <cluster code="0x0038"/>
+    <item name="Offset" type="INT32S"/>
+    <item name="ValidAt" type="EPOCH_US"/>
+    <item name="Name" type="CHAR_STRING"/>
+  </struct>
+
+  <struct name="DSTOffsetType">
+    <cluster code="0x0038"/>
+    <item name="Offset" type="INT32S"/>
+    <item name="ValidStarting" type="EPOCH_US"/>
+    <item name="ValidUntil" type="EPOCH_US"/>
+  </struct>
+
 </configurator>

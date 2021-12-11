@@ -29,9 +29,18 @@ limitations under the License.
 may have differing preferences for the units in which values are conveying in communication to a
 user. As such, Nodes that visually or audibly convey measurable values to the user need a
 mechanism by which they can be configured to use a user’s preferred unit.</description>
+<attribute side="server" code="0x0000" define="TEMPERATURE_UNIT" type="ENUM8" writable="false" optional="false">TemperatureUnit</attribute>
+
     <!-- Base data types -->
 
     <!-- Test Commands -->
 
   </cluster>
+  <enum name="TemperatureUnit" type="ENUM8">
+    <cluster code="0x002d"/>
+    <item name="Fahrenheit" value="0x00"/>
+    <item name="Celsius" value="0x01"/>
+    <item name="Kelvin" value="0x02"/>
+  </enum>
+
 </configurator>

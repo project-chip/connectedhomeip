@@ -23,5 +23,18 @@ limitations under the License.
         <code>0x0043</code>
         <define>PROXY_DISCOVERY_CLUSTER</define>
         <description>Cluster to control Proxy Discovery</description>
+        <command source="client" code="0x00" name="ProxyDiscoverRequest" optional="false">
+            <description>ProxyDiscoverRequest</description>
+            <arg name="SourceNodeID" type="NODE_ID"/>
+            <arg name="NumAttributePaths" type="INT16U"/>
+            <arg name="NumEventPaths" type="INT16U"/>
+          </command>
+          <command source="server" code="0x01" name="ProxyDiscoveryResponse" optional="false">
+            <description>ProxyDiscoveryResponse</description>
+            <arg name="SourceNodeID" type="NODE_ID"/>
+            <arg name="NumHopsToSource" type="INT16U"/>
+            <arg name="AvailableCapacity" type="INT16U"/>
+          </command>
+      
     </cluster>
 </configurator>

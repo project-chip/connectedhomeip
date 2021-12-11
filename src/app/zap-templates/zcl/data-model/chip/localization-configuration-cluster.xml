@@ -30,8 +30,12 @@ may have differing common languages, units of measurements, and numerical format
 standards. As such, Nodes that visually or audibly convey information need a mechanism by which
 they can be configured to use a user’s preferred language, units, etc</description>
     <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="ACTIVE_LOCALE" type="CHAR_STRING" length='35' writable="false" optional="false">ActiveLocal</attribute>
+    <attribute side="server" code="0x0001" define="SUPPORTED_LOCATES" type="ARRAY" entryType='CHAR_STRING' length="254" writable="false" optional="false">SupportedLocales</attribute>
 
     <!-- Test Commands -->
 
   </cluster>
+
+
 </configurator>

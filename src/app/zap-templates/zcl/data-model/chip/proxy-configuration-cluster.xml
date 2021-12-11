@@ -23,5 +23,16 @@ limitations under the License.
         <code>0x0042</code>
         <define>PROXY_CONFIGURATION_CLUSTER</define>
         <description>Cluster to control Proxy Configuration</description>
+        <attribute side="server" code="0x0000" define="CONFIGURATION_LIST" type="ARRAY" entryType="ConfigurationStruct" length="254" writable="false" optional="false">ConfigurationList</attribute>
+      
     </cluster>
+
+
+  <struct name="ConfigurationStruct">
+    <cluster code="0x0042"/>
+    <item name="FabricIndex" type="FABRIC_ID"/>
+    <item name="ProxyAllNodes" type="BOOLEAN"/>
+    <item name="SourceList" type="NODE_ID" array="true"/>
+  </struct>
+
 </configurator>

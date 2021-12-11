@@ -23,5 +23,13 @@ limitations under the License.
         <code>0x0044</code>
         <define>PROXY_VALID_CLUSTER</define>
         <description>Cluster to control Proxy Valid</description>
+        <attribute side="server" code="0x0000" define="VALID_PROXY_LIST" type="ARRAY" entryType="ValidProxyStruct" length="254" writable="false" optional="false">ValidProxyList</attribute>
     </cluster>
+
+    <struct name="ValidProxyStruct">
+        <cluster code="0x0044"/>
+        <item name="FabricIndex" type="FABRIC_ID"/>
+        <item name="NodeID" type="NODE_ID" />
+    </struct>
+
 </configurator>
