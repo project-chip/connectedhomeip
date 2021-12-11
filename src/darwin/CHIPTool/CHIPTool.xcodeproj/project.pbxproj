@@ -27,7 +27,6 @@
 		B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2C2267426289324009DAB8B /* FabricUIViewController.m */; };
 		B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
-		EBE81CE82760330A002F1A63 /* CustomFlowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = EBE81CE72760330A002F1A63 /* CustomFlowViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,8 +93,6 @@
 		B2F51E97252DCDC000911FA5 /* TemperatureSensorViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TemperatureSensorViewController.h; sourceTree = "<group>"; };
 		B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TemperatureSensorViewController.m; sourceTree = "<group>"; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		EBE81CE62760326C002F1A63 /* CustomFlowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomFlowViewController.h; sourceTree = "<group>"; };
-		EBE81CE72760330A002F1A63 /* CustomFlowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomFlowViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -224,7 +221,6 @@
 		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				EBE81CE52760324B002F1A63 /* Custom Flow */,
 				2C460C2F25D97CB3000512D6 /* UnpairDevices */,
 				2C460C2225D7594B000512D6 /* DeviceSelector.h */,
 				2C460C2325D7594B000512D6 /* DeviceSelector.m */,
@@ -289,15 +285,6 @@
 				B2F51E98252DCDC000911FA5 /* TemperatureSensorViewController.m */,
 			);
 			path = "Temperature Sensor";
-			sourceTree = "<group>";
-		};
-		EBE81CE52760324B002F1A63 /* Custom Flow */ = {
-			isa = PBXGroup;
-			children = (
-				EBE81CE62760326C002F1A63 /* CustomFlowViewController.h */,
-				EBE81CE72760330A002F1A63 /* CustomFlowViewController.m */,
-			);
-			path = "Custom Flow";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -416,7 +403,6 @@
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
 				B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
-				EBE81CE82760330A002F1A63 /* CustomFlowViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

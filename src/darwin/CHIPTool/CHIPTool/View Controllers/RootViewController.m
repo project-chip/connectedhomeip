@@ -25,7 +25,6 @@
 #import "TemperatureSensorViewController.h"
 #import "UnpairDevicesViewController.h"
 #import "WifiViewController.h"
-#import "CustomFlowViewController.h"
 
 @implementation RootViewController
 
@@ -44,7 +43,7 @@
     [self.view addSubview:self.tableView];
     self.options = @[
         @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration",
-        @"Enable Pairing", @"Unpair Devices", @"Fabric Management", @"Provision CHIP Device With Custom Flow"
+        @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
     ];
 }
 
@@ -97,9 +96,6 @@
     case 8:
         [self pushFabric];
         break;
-    case 9:
-        [self pushCustomFlow];
-        break;
     default:
         break;
     }
@@ -132,12 +128,6 @@
 - (void)pushQRCodeScanner
 {
     QRCodeViewController * controller = [QRCodeViewController new];
-    [self.navigationController pushViewController:controller animated:YES];
-}
-
-- (void)pushCustomFlow
-{
-    CustomFlowViewController * controller = [CustomFlowViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>CommissioningCustomFlowReturnUrl</key>
+		<string>customflow://payload</string>
+		<key>CommissioningCustomFlowLedgerUrl</key>
+		<string>https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
+	</dict>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
