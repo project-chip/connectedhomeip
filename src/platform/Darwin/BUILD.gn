@@ -43,6 +43,10 @@ static_library("Darwin") {
     "CHIPP256KeypairNativeBridge.cpp",
     "CHIPP256KeypairNativeBridge.h",
     "CHIPPlatformConfig.h",
+    "CHIPPosixStorage.cpp",
+    "CHIPPosixStorage.h",
+    "CHIPPosixStorageIni.cpp",
+    "CHIPPosixStorageIni.h",
     "ConfigurationManagerImpl.cpp",
     "ConfigurationManagerImpl.h",
     "ConnectivityManagerImpl.cpp",
@@ -62,10 +66,6 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
-    "CHIPPosixStorage.cpp",
-    "CHIPPosixStorage.h",
-    "CHIPPosixStorageIni.cpp",
-    "CHIPPosixStorageIni.h",
   ]
 
   deps = [
