@@ -28,6 +28,7 @@
     MatterApplicationBasicPluginClientInitCallback();                                                                              \
     MatterApplicationLauncherPluginClientInitCallback();                                                                           \
     MatterAudioOutputPluginClientInitCallback();                                                                                   \
+    MatterBallastConfigurationPluginClientInitCallback();                                                                          \
     MatterBarrierControlPluginClientInitCallback();                                                                                \
     MatterBasicPluginClientInitCallback();                                                                                         \
     MatterBinaryInputBasicPluginClientInitCallback();                                                                              \
@@ -42,6 +43,7 @@
     MatterDoorLockPluginClientInitCallback();                                                                                      \
     MatterElectricalMeasurementPluginClientInitCallback();                                                                         \
     MatterEthernetNetworkDiagnosticsPluginClientInitCallback();                                                                    \
+    MatterFanControlPluginClientInitCallback();                                                                                    \
     MatterFixedLabelPluginClientInitCallback();                                                                                    \
     MatterFlowMeasurementPluginClientInitCallback();                                                                               \
     MatterGeneralCommissioningPluginClientInitCallback();                                                                          \
@@ -52,6 +54,9 @@
     MatterIlluminanceMeasurementPluginClientInitCallback();                                                                        \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginClientInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginClientInitCallback();                                                                     \
+    MatterLocalizationTimeFormatPluginClientInitCallback();                                                                        \
+    MatterLocalizationUnitPluginClientInitCallback();                                                                              \
     MatterLowPowerPluginClientInitCallback();                                                                                      \
     MatterMediaInputPluginClientInitCallback();                                                                                    \
     MatterMediaPlaybackPluginClientInitCallback();                                                                                 \
@@ -61,11 +66,14 @@
     MatterOtaSoftwareUpdateRequestorPluginClientInitCallback();                                                                    \
     MatterOccupancySensingPluginClientInitCallback();                                                                              \
     MatterOnOffPluginClientInitCallback();                                                                                         \
-    MatterOnOffSwitchConfigurationPluginClientInitCallback();                                                                      \
     MatterOperationalCredentialsPluginClientInitCallback();                                                                        \
+    MatterPowerConfigurationPluginClientInitCallback();                                                                            \
     MatterPowerSourcePluginClientInitCallback();                                                                                   \
     MatterPowerSourceConfigurationPluginClientInitCallback();                                                                      \
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \
+    MatterProxyConfigurationPluginClientInitCallback();                                                                            \
+    MatterProxyDiscoveryPluginClientInitCallback();                                                                                \
+    MatterProxyValidPluginClientInitCallback();                                                                                    \
     MatterPumpConfigurationAndControlPluginClientInitCallback();                                                                   \
     MatterRelativeHumidityMeasurementPluginClientInitCallback();                                                                   \
     MatterScenesPluginClientInitCallback();                                                                                        \
@@ -78,6 +86,8 @@
     MatterThermostatPluginClientInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
     MatterThreadNetworkDiagnosticsPluginClientInitCallback();                                                                      \
+    MatterTimeSynchronizationPluginClientInitCallback();                                                                           \
+    MatterUserLabelPluginClientInitCallback();                                                                                     \
     MatterWakeOnLanPluginClientInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginClientInitCallback();                                                                        \
     MatterWindowCoveringPluginClientInitCallback();

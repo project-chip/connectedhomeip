@@ -874,6 +874,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPProxyDiscoveryClusterProxyDiscoverRequestParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull sourceNodeID;
+@property (strong, nonatomic) NSNumber * _Nonnull numAttributePaths;
+@property (strong, nonatomic) NSNumber * _Nonnull numEventPaths;
+- (instancetype)init;
+@end
+
+@interface CHIPProxyDiscoveryClusterProxyDiscoveryResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull sourceNodeID;
+@property (strong, nonatomic) NSNumber * _Nonnull numHopsToSource;
+@property (strong, nonatomic) NSNumber * _Nonnull availableCapacity;
+- (instancetype)init;
+@end
+
 @interface CHIPModeSelectClusterChangeToModeParams : NSObject
 @property (strong, nonatomic, getter=getNewMode) NSNumber * _Nonnull newMode;
 - (instancetype)init;

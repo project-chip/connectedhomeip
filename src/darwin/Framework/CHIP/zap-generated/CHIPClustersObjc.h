@@ -265,6 +265,86 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Ballast Configuration
+ *
+ */
+@interface CHIPBallastConfiguration : CHIPCluster
+
+- (void)readAttributePhysicalMinLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributePhysicalMaxLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeBallastStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeMinLevelWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMinLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeMaxLevelWithCompletionHandler:(void (^)(
+                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeMaxLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributePowerOnLevelWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributePowerOnLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributePowerOnFadeTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributePowerOnFadeTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeIntrinsicBallastFactorWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+- (void)writeAttributeIntrinsicBallastFactorWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeBallastFactorAdjustmentWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler;
+- (void)writeAttributeBallastFactorAdjustmentWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampQualityWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLampTypeWithCompletionHandler:(void (^)(
+                                                       NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampTypeWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampManufacturerWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampManufacturerWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampRatedHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampRatedHoursWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampBurnHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampBurnHoursWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampAlarmModeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampAlarmModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLampBurnHoursTripPointWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLampBurnHoursTripPointWithValue:(NSNumber * _Nonnull)value
+                                    completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Barrier Control
  *
  */
@@ -1593,6 +1673,31 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Fan Control
+ *
+ */
+@interface CHIPFanControl : CHIPCluster
+
+- (void)readAttributeFanModeWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFanModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeFanModeSequenceWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFanModeSequenceWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Fixed Label
  *
  */
@@ -2149,6 +2254,57 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Localization Configuration
+ *
+ */
+@interface CHIPLocalizationConfiguration : CHIPCluster
+
+- (void)readAttributeActiveLocalWithCompletionHandler:(void (^)(
+                                                          NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
+ * Cluster Localization Time Format
+ *
+ */
+@interface CHIPLocalizationTimeFormat : CHIPCluster
+
+- (void)readAttributeHourFormatWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeActiveCalendarTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeSupportedCalendarTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
+ * Cluster Localization Unit
+ *
+ */
+@interface CHIPLocalizationUnit : CHIPCluster
+
+- (void)readAttributeTemperatureUnitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Low Power
  *
  */
@@ -2590,41 +2746,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
- * Cluster On/off Switch Configuration
- *
- */
-@interface CHIPOnOffSwitchConfiguration : CHIPCluster
-
-- (void)readAttributeSwitchTypeWithCompletionHandler:(void (^)(
-                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeSwitchTypeWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
-                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-
-- (void)readAttributeSwitchActionsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                            NSError * _Nullable error))completionHandler;
-- (void)writeAttributeSwitchActionsWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)subscribeAttributeSwitchActionsWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-
-- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
-
-@end
-
-/**
  * Cluster Operational Credentials
  *
  */
@@ -2708,6 +2829,14 @@ NS_ASSUME_NONNULL_BEGIN
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+@end
+
+/**
+ * Cluster Power Configuration
+ *
+ */
+@interface CHIPPowerConfiguration : CHIPCluster
 
 @end
 
@@ -2863,6 +2992,45 @@ NS_ASSUME_NONNULL_BEGIN
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+@end
+
+/**
+ * Cluster Proxy Configuration
+ *
+ */
+@interface CHIPProxyConfiguration : CHIPCluster
+
+- (void)readAttributeConfigurationListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
+ * Cluster Proxy Discovery
+ *
+ */
+@interface CHIPProxyDiscovery : CHIPCluster
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
+ * Cluster Proxy Valid
+ *
+ */
+@interface CHIPProxyValid : CHIPCluster
+
+- (void)readAttributeValidProxyListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 
 @end
 
@@ -4917,6 +5085,62 @@ NS_ASSUME_NONNULL_BEGIN
                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                            reportHandler:
                                                (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler;
+
+@end
+
+/**
+ * Cluster Time Synchronization
+ *
+ */
+@interface CHIPTimeSynchronization : CHIPCluster
+
+- (void)readAttributeUTCTimeWithCompletionHandler:(void (^)(
+                                                      NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeGranularityWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTimeSourceWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTrustedTimeNodeIDWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeDefaultNTPWithCompletionHandler:(void (^)(
+                                                         NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTimezoneWithCompletionHandler:(void (^)(
+                                                       NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeDSTOffsetWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLocalTimeWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeTimezoneDatabaseWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeNTPServerPortWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
+ * Cluster User Label
+ *
+ */
+@interface CHIPUserLabel : CHIPCluster
+
+- (void)readAttributeLabelListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
+                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
 
 @end
 

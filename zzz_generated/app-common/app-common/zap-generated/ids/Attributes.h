@@ -1086,6 +1086,14 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocal {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ActiveLocal
+
+namespace SupportedLocales {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace SupportedLocales
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1104,6 +1112,18 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationTimeFormat {
 namespace Attributes {
 
+namespace HourFormat {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace HourFormat
+
+namespace ActiveCalendarType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveCalendarType
+
+namespace SupportedCalendarTypes {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedCalendarTypes
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1121,6 +1141,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace LocalizationUnit {
 namespace Attributes {
+
+namespace TemperatureUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1852,6 +1876,46 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace TimeSynchronization {
 namespace Attributes {
 
+namespace UTCTime {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace UTCTime
+
+namespace Granularity {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Granularity
+
+namespace TimeSource {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace TimeSource
+
+namespace TrustedTimeNodeID {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace TrustedTimeNodeID
+
+namespace DefaultNTP {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace DefaultNTP
+
+namespace Timezone {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace Timezone
+
+namespace DSTOffset {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace DSTOffset
+
+namespace LocalTime {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace LocalTime
+
+namespace TimezoneDatabase {
+static constexpr AttributeId Id = 0x00000008;
+} // namespace TimezoneDatabase
+
+namespace NTPServerPort {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace NTPServerPort
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -2116,6 +2180,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ProxyConfiguration {
 namespace Attributes {
 
+namespace ConfigurationList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ConfigurationList
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -2151,6 +2219,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace ProxyValid {
 namespace Attributes {
+
+namespace ValidProxyList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace ValidProxyList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

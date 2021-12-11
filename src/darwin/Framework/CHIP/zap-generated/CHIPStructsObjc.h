@@ -200,6 +200,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTimeSynchronizationClusterDSTOffsetType : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull offset;
+@property (strong, nonatomic) NSNumber * _Nonnull validStarting;
+@property (strong, nonatomic) NSNumber * _Nonnull validUntil;
+- (instancetype)init;
+@end
+
+@interface CHIPTimeSynchronizationClusterTimeZoneType : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull offset;
+@property (strong, nonatomic) NSNumber * _Nonnull validAt;
+@property (strong, nonatomic) NSString * _Nonnull name;
+- (instancetype)init;
+@end
+
 @interface CHIPOperationalCredentialsClusterFabricDescriptor : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull rootPublicKey;
@@ -241,6 +255,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPUserLabelClusterLabelStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSString * _Nonnull value;
+- (instancetype)init;
+@end
+
+@interface CHIPProxyConfigurationClusterConfigurationStruct : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull proxyAllNodes;
+@property (strong, nonatomic) NSArray * _Nonnull sourceList;
+- (instancetype)init;
+@end
+
+@interface CHIPProxyValidClusterValidProxyStruct : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull nodeID;
 - (instancetype)init;
 @end
 

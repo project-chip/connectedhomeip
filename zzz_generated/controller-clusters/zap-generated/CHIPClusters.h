@@ -164,6 +164,15 @@ public:
 private:
 };
 
+class DLL_EXPORT BallastConfigurationCluster : public ClusterBase
+{
+public:
+    BallastConfigurationCluster() : ClusterBase(app::Clusters::BallastConfiguration::Id) {}
+    ~BallastConfigurationCluster() {}
+
+    // Cluster Attributes
+};
+
 class DLL_EXPORT BarrierControlCluster : public ClusterBase
 {
 public:
@@ -835,6 +844,15 @@ public:
 private:
 };
 
+class DLL_EXPORT FanControlCluster : public ClusterBase
+{
+public:
+    FanControlCluster() : ClusterBase(app::Clusters::FanControl::Id) {}
+    ~FanControlCluster() {}
+
+    // Cluster Attributes
+};
+
 class DLL_EXPORT FixedLabelCluster : public ClusterBase
 {
 public:
@@ -1112,6 +1130,33 @@ public:
 private:
 };
 
+class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
+{
+public:
+    LocalizationConfigurationCluster() : ClusterBase(app::Clusters::LocalizationConfiguration::Id) {}
+    ~LocalizationConfigurationCluster() {}
+
+    // Cluster Attributes
+};
+
+class DLL_EXPORT LocalizationTimeFormatCluster : public ClusterBase
+{
+public:
+    LocalizationTimeFormatCluster() : ClusterBase(app::Clusters::LocalizationTimeFormat::Id) {}
+    ~LocalizationTimeFormatCluster() {}
+
+    // Cluster Attributes
+};
+
+class DLL_EXPORT LocalizationUnitCluster : public ClusterBase
+{
+public:
+    LocalizationUnitCluster() : ClusterBase(app::Clusters::LocalizationUnit::Id) {}
+    ~LocalizationUnitCluster() {}
+
+    // Cluster Attributes
+};
+
 class DLL_EXPORT LowPowerCluster : public ClusterBase
 {
 public:
@@ -1378,24 +1423,6 @@ public:
 private:
 };
 
-class DLL_EXPORT OnOffSwitchConfigurationCluster : public ClusterBase
-{
-public:
-    OnOffSwitchConfigurationCluster() : ClusterBase(app::Clusters::OnOffSwitchConfiguration::Id) {}
-    ~OnOffSwitchConfigurationCluster() {}
-
-    // Cluster Attributes
-    CHIP_ERROR SubscribeAttributeSwitchType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeSwitchType(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeSwitchActions(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeSwitchActions(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
-};
-
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
 {
 public:
@@ -1440,6 +1467,15 @@ public:
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 
 private:
+};
+
+class DLL_EXPORT PowerConfigurationCluster : public ClusterBase
+{
+public:
+    PowerConfigurationCluster() : ClusterBase(app::Clusters::PowerConfiguration::Id) {}
+    ~PowerConfigurationCluster() {}
+
+    // Cluster Attributes
 };
 
 class DLL_EXPORT PowerSourceCluster : public ClusterBase
@@ -1515,6 +1551,33 @@ public:
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
+};
+
+class DLL_EXPORT ProxyConfigurationCluster : public ClusterBase
+{
+public:
+    ProxyConfigurationCluster() : ClusterBase(app::Clusters::ProxyConfiguration::Id) {}
+    ~ProxyConfigurationCluster() {}
+
+    // Cluster Attributes
+};
+
+class DLL_EXPORT ProxyDiscoveryCluster : public ClusterBase
+{
+public:
+    ProxyDiscoveryCluster() : ClusterBase(app::Clusters::ProxyDiscovery::Id) {}
+    ~ProxyDiscoveryCluster() {}
+
+    // Cluster Attributes
+};
+
+class DLL_EXPORT ProxyValidCluster : public ClusterBase
+{
+public:
+    ProxyValidCluster() : ClusterBase(app::Clusters::ProxyValid::Id) {}
+    ~ProxyValidCluster() {}
+
+    // Cluster Attributes
 };
 
 class DLL_EXPORT PumpConfigurationAndControlCluster : public ClusterBase
@@ -2403,6 +2466,24 @@ public:
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 
 private:
+};
+
+class DLL_EXPORT TimeSynchronizationCluster : public ClusterBase
+{
+public:
+    TimeSynchronizationCluster() : ClusterBase(app::Clusters::TimeSynchronization::Id) {}
+    ~TimeSynchronizationCluster() {}
+
+    // Cluster Attributes
+};
+
+class DLL_EXPORT UserLabelCluster : public ClusterBase
+{
+public:
+    UserLabelCluster() : ClusterBase(app::Clusters::UserLabel::Id) {}
+    ~UserLabelCluster() {}
+
+    // Cluster Attributes
 };
 
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase

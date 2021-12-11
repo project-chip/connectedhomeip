@@ -580,6 +580,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPBallastConfigurationAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPBallastConfigurationClusterAttributeListAttributeCallbackType>
+{
+public:
+    CHIPBallastConfigurationAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBallastConfigurationAttributeListAttributeCallback();
+
+    static void maybeDestroy(CHIPBallastConfigurationAttributeListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBallastConfigurationAttributeListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPBarrierControlAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPBarrierControlClusterAttributeListAttributeCallbackType>
 {
@@ -1129,6 +1153,30 @@ public:
         {
             callback->Cancel();
             chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPFanControlAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPFanControlClusterAttributeListAttributeCallbackType>
+{
+public:
+    CHIPFanControlAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPFanControlAttributeListAttributeCallback();
+
+    static void maybeDestroy(CHIPFanControlAttributeListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPFanControlAttributeListAttributeCallback>(callback);
         }
     }
 
@@ -1776,6 +1824,56 @@ private:
     bool keepAlive;
 };
 
+class CHIPLocalizationConfigurationSupportedLocalesAttributeCallback
+    : public chip::Callback::Callback<CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType>
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLocalizationConfigurationSupportedLocalesAttributeCallback();
+
+    static void maybeDestroy(CHIPLocalizationConfigurationSupportedLocalesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPLocalizationTimeFormatSupportedCalendarTypesAttributeCallback
+    : public chip::Callback::Callback<CHIPLocalizationTimeFormatClusterSupportedCalendarTypesAttributeCallbackType>
+{
+public:
+    CHIPLocalizationTimeFormatSupportedCalendarTypesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLocalizationTimeFormatSupportedCalendarTypesAttributeCallback();
+
+    static void maybeDestroy(CHIPLocalizationTimeFormatSupportedCalendarTypesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLocalizationTimeFormatSupportedCalendarTypesAttributeCallback>(callback);
+        }
+    }
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPLowPowerAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPLowPowerClusterAttributeListAttributeCallbackType>
 {
@@ -2044,30 +2142,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPOnOffSwitchConfigurationAttributeListAttributeCallback
-    : public chip::Callback::Callback<CHIPOnOffSwitchConfigurationClusterAttributeListAttributeCallbackType>
-{
-public:
-    CHIPOnOffSwitchConfigurationAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPOnOffSwitchConfigurationAttributeListAttributeCallback();
-
-    static void maybeDestroy(CHIPOnOffSwitchConfigurationAttributeListAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPOperationalCredentialsFabricsListAttributeCallback
     : public chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType>
 {
@@ -2280,6 +2354,59 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPProxyConfigurationConfigurationListAttributeCallback
+    : public chip::Callback::Callback<CHIPProxyConfigurationClusterConfigurationListAttributeCallbackType>
+{
+public:
+    CHIPProxyConfigurationConfigurationListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPProxyConfigurationConfigurationListAttributeCallback();
+
+    static void maybeDestroy(CHIPProxyConfigurationConfigurationListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPProxyConfigurationConfigurationListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::ProxyConfiguration::Structs::ConfigurationStruct::DecodableType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPProxyValidValidProxyListAttributeCallback
+    : public chip::Callback::Callback<CHIPProxyValidClusterValidProxyListAttributeCallbackType>
+{
+public:
+    CHIPProxyValidValidProxyListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPProxyValidValidProxyListAttributeCallback();
+
+    static void maybeDestroy(CHIPProxyValidValidProxyListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPProxyValidValidProxyListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ProxyValid::Structs::ValidProxyStruct::DecodableType> &
+            list);
 
 private:
     jobject javaCallbackRef;
@@ -3740,6 +3867,133 @@ public:
         {
             callback->Cancel();
             chip::Platform::Delete<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTimeSynchronizationTrustedTimeNodeIDAttributeCallback
+    : public chip::Callback::Callback<CHIPTimeSynchronizationClusterTrustedTimeNodeIDAttributeCallbackType>
+{
+public:
+    CHIPTimeSynchronizationTrustedTimeNodeIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTimeSynchronizationTrustedTimeNodeIDAttributeCallback();
+
+    static void maybeDestroy(CHIPTimeSynchronizationTrustedTimeNodeIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTimeSynchronizationTrustedTimeNodeIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::NodeId value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTimeSynchronizationTimezoneAttributeCallback
+    : public chip::Callback::Callback<CHIPTimeSynchronizationClusterTimezoneAttributeCallbackType>
+{
+public:
+    CHIPTimeSynchronizationTimezoneAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTimeSynchronizationTimezoneAttributeCallback();
+
+    static void maybeDestroy(CHIPTimeSynchronizationTimezoneAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTimeSynchronizationTimezoneAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTimeSynchronizationDSTOffsetAttributeCallback
+    : public chip::Callback::Callback<CHIPTimeSynchronizationClusterDSTOffsetAttributeCallbackType>
+{
+public:
+    CHIPTimeSynchronizationDSTOffsetAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTimeSynchronizationDSTOffsetAttributeCallback();
+
+    static void maybeDestroy(CHIPTimeSynchronizationDSTOffsetAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTimeSynchronizationDSTOffsetAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetType::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPUserLabelLabelListAttributeCallback : public chip::Callback::Callback<CHIPUserLabelClusterLabelListAttributeCallbackType>
+{
+public:
+    CHIPUserLabelLabelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPUserLabelLabelListAttributeCallback();
+
+    static void maybeDestroy(CHIPUserLabelLabelListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPUserLabelLabelListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPUserLabelAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPUserLabelClusterAttributeListAttributeCallbackType>
+{
+public:
+    CHIPUserLabelAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPUserLabelAttributeListAttributeCallback();
+
+    static void maybeDestroy(CHIPUserLabelAttributeListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPUserLabelAttributeListAttributeCallback>(callback);
         }
     }
 

@@ -6933,11 +6933,15 @@ class LocalizationConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="activeLocal", Tag=0x00000000, Type=str),
+                ClusterObjectFieldDescriptor(Label="supportedLocales", Tag=0x00000001, Type=typing.List[str]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    activeLocal: 'str' = None
+    supportedLocales: 'typing.List[str]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -6946,6 +6950,38 @@ class LocalizationConfiguration(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class ActiveLocal(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=str)
+
+            value: 'str' = ""
+
+        @dataclass
+        class SupportedLocales(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[str])
+
+            value: 'typing.List[str]' = field(default_factory=lambda: [])
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -7004,19 +7040,92 @@ class LocalizationTimeFormat(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="activeCalendarType", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="supportedCalendarTypes", Tag=0x00000002, Type=typing.List[LocalizationTimeFormat.Enums.CalendarType]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    hourFormat: 'uint' = None
+    activeCalendarType: 'uint' = None
+    supportedCalendarTypes: 'typing.List[LocalizationTimeFormat.Enums.CalendarType]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
+
+    class Enums:
+        class CalendarType(IntEnum):
+            kBuddhist = 0x00
+            kChinese = 0x01
+            kCoptic = 0x02
+            kEthiopian = 0x03
+            kGregorian = 0x04
+            kHebrew = 0x05
+            kIndian = 0x06
+            kIslamic = 0x07
+            kJapanese = 0x08
+            kKorean = 0x09
+            kPersian = 0x0A
+            kTaiwanese = 0x0B
+
+        class HourFormat(IntEnum):
+            k12hr = 0x00
+            k24hr = 0x01
 
 
 
 
     class Attributes:
+        @dataclass
+        class HourFormat(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ActiveCalendarType(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class SupportedCalendarTypes(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[LocalizationTimeFormat.Enums.CalendarType])
+
+            value: 'typing.List[LocalizationTimeFormat.Enums.CalendarType]' = field(default_factory=lambda: [])
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -7075,19 +7184,43 @@ class LocalizationUnit(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="temperatureUnit", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    temperatureUnit: 'uint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
+
+    class Enums:
+        class TemperatureUnit(IntEnum):
+            kFahrenheit = 0x00
+            kCelsius = 0x01
+            kKelvin = 0x02
 
 
 
 
     class Attributes:
+        @dataclass
+        class TemperatureUnit(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -11307,19 +11440,231 @@ class TimeSynchronization(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="UTCTime", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="granularity", Tag=0x00000001, Type=uint),
+                ClusterObjectFieldDescriptor(Label="timeSource", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="trustedTimeNodeID", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="defaultNTP", Tag=0x00000004, Type=str),
+                ClusterObjectFieldDescriptor(Label="timezone", Tag=0x00000005, Type=typing.List[TimeSynchronization.Structs.TimeZoneType]),
+                ClusterObjectFieldDescriptor(Label="DSTOffset", Tag=0x00000006, Type=typing.List[TimeSynchronization.Structs.DSTOffsetType]),
+                ClusterObjectFieldDescriptor(Label="localTime", Tag=0x00000007, Type=uint),
+                ClusterObjectFieldDescriptor(Label="timezoneDatabase", Tag=0x00000008, Type=bool),
+                ClusterObjectFieldDescriptor(Label="NTPServerPort", Tag=0x00000009, Type=int),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    UTCTime: 'uint' = None
+    granularity: 'uint' = None
+    timeSource: 'uint' = None
+    trustedTimeNodeID: 'uint' = None
+    defaultNTP: 'str' = None
+    timezone: 'typing.List[TimeSynchronization.Structs.TimeZoneType]' = None
+    DSTOffset: 'typing.List[TimeSynchronization.Structs.DSTOffsetType]' = None
+    localTime: 'uint' = None
+    timezoneDatabase: 'bool' = None
+    NTPServerPort: 'int' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
 
+    class Structs:
+        @dataclass
+        class DSTOffsetType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="offset", Tag=1, Type=int),
+                            ClusterObjectFieldDescriptor(Label="validStarting", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="validUntil", Tag=3, Type=uint),
+                    ])
+
+            offset: 'int' = 0
+            validStarting: 'uint' = 0
+            validUntil: 'uint' = 0
+
+        @dataclass
+        class TimeZoneType(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="offset", Tag=1, Type=int),
+                            ClusterObjectFieldDescriptor(Label="validAt", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="name", Tag=3, Type=str),
+                    ])
+
+            offset: 'int' = 0
+            validAt: 'uint' = 0
+            name: 'str' = ""
+
+
 
 
     class Attributes:
+        @dataclass
+        class UTCTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class Granularity(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class TimeSource(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class TrustedTimeNodeID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class DefaultNTP(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=str)
+
+            value: 'str' = ""
+
+        @dataclass
+        class Timezone(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[TimeSynchronization.Structs.TimeZoneType])
+
+            value: 'typing.List[TimeSynchronization.Structs.TimeZoneType]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class DSTOffset(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[TimeSynchronization.Structs.DSTOffsetType])
+
+            value: 'typing.List[TimeSynchronization.Structs.DSTOffsetType]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class LocalTime(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class TimezoneDatabase(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000008
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: 'bool' = False
+
+        @dataclass
+        class NTPServerPort(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0038
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000009
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=int)
+
+            value: 'int' = 0
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -13005,19 +13350,54 @@ class ProxyConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="configurationList", Tag=0x00000000, Type=typing.List[ProxyConfiguration.Structs.ConfigurationStruct]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    configurationList: 'typing.List[ProxyConfiguration.Structs.ConfigurationStruct]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
 
+    class Structs:
+        @dataclass
+        class ConfigurationStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="proxyAllNodes", Tag=2, Type=bool),
+                            ClusterObjectFieldDescriptor(Label="sourceList", Tag=3, Type=typing.List[uint]),
+                    ])
+
+            fabricIndex: 'uint' = 0
+            proxyAllNodes: 'bool' = False
+            sourceList: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+
 
 
     class Attributes:
+        @dataclass
+        class ConfigurationList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0042
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ProxyConfiguration.Structs.ConfigurationStruct])
+
+            value: 'typing.List[ProxyConfiguration.Structs.ConfigurationStruct]' = field(default_factory=lambda: [])
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -13087,6 +13467,45 @@ class ProxyDiscovery(Cluster):
 
 
 
+    class Commands:
+        @dataclass
+        class ProxyDiscoverRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0043
+            command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="sourceNodeID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="numAttributePaths", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="numEventPaths", Tag=2, Type=uint),
+                    ])
+
+            sourceNodeID: 'uint' = 0
+            numAttributePaths: 'uint' = 0
+            numEventPaths: 'uint' = 0
+
+        @dataclass
+        class ProxyDiscoveryResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0043
+            command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="sourceNodeID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="numHopsToSource", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="availableCapacity", Tag=2, Type=uint),
+                    ])
+
+            sourceNodeID: 'uint' = 0
+            numHopsToSource: 'uint' = 0
+            availableCapacity: 'uint' = 0
+
 
     class Attributes:
         @dataclass
@@ -13147,19 +13566,52 @@ class ProxyValid(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="validProxyList", Tag=0x00000000, Type=typing.List[ProxyValid.Structs.ValidProxyStruct]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    validProxyList: 'typing.List[ProxyValid.Structs.ValidProxyStruct]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
 
+    class Structs:
+        @dataclass
+        class ValidProxyStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="nodeID", Tag=2, Type=uint),
+                    ])
+
+            fabricIndex: 'uint' = 0
+            nodeID: 'uint' = 0
+
+
 
 
     class Attributes:
+        @dataclass
+        class ValidProxyList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0044
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[ProxyValid.Structs.ValidProxyStruct])
+
+            value: 'typing.List[ProxyValid.Structs.ValidProxyStruct]' = field(default_factory=lambda: [])
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

@@ -8284,6 +8284,30 @@ public:
 namespace LocalizationConfiguration {
 
 namespace Attributes {
+namespace ActiveLocal {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveLocal::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveLocal
+namespace SupportedLocales {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::CharSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocales::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedLocales
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8323,8 +8347,66 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationConfiguration
 namespace LocalizationTimeFormat {
+// Enum for CalendarType
+enum class CalendarType : uint8_t
+{
+    kBuddhist  = 0x00,
+    kChinese   = 0x01,
+    kCoptic    = 0x02,
+    kEthiopian = 0x03,
+    kGregorian = 0x04,
+    kHebrew    = 0x05,
+    kIndian    = 0x06,
+    kIslamic   = 0x07,
+    kJapanese  = 0x08,
+    kKorean    = 0x09,
+    kPersian   = 0x0A,
+    kTaiwanese = 0x0B,
+};
+// Enum for HourFormat
+enum class HourFormat : uint8_t
+{
+    k12hr = 0x00,
+    k24hr = 0x01,
+};
 
 namespace Attributes {
+namespace HourFormat {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HourFormat
+namespace ActiveCalendarType {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCalendarType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveCalendarType
+namespace SupportedCalendarTypes {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const CalendarType>;
+    using DecodableType    = DataModel::DecodableList<CalendarType>;
+    using DecodableArgType = const DataModel::DecodableList<CalendarType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedCalendarTypes
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8364,8 +8446,27 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationTimeFormat
 namespace LocalizationUnit {
+// Enum for TemperatureUnit
+enum class TemperatureUnit : uint8_t
+{
+    kFahrenheit = 0x00,
+    kCelsius    = 0x01,
+    kKelvin     = 0x02,
+};
 
 namespace Attributes {
+namespace TemperatureUnit {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureUnit
 namespace AttributeList {
 struct TypeInfo
 {
@@ -12471,7 +12572,174 @@ struct TypeInfo
 } // namespace EthernetNetworkDiagnostics
 namespace TimeSynchronization {
 
+namespace Structs {
+namespace DSTOffsetType {
+enum class Fields
+{
+    kOffset        = 1,
+    kValidStarting = 2,
+    kValidUntil    = 3,
+};
+
+struct Type
+{
+public:
+    int32_t offset;
+    uint64_t validStarting;
+    uint64_t validUntil;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace DSTOffsetType
+namespace TimeZoneType {
+enum class Fields
+{
+    kOffset  = 1,
+    kValidAt = 2,
+    kName    = 3,
+};
+
+struct Type
+{
+public:
+    int32_t offset;
+    uint64_t validAt;
+    chip::CharSpan name;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace TimeZoneType
+} // namespace Structs
+
 namespace Attributes {
+namespace UTCTime {
+struct TypeInfo
+{
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UTCTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UTCTime
+namespace Granularity {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Granularity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Granularity
+namespace TimeSource {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimeSource::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimeSource
+namespace TrustedTimeNodeID {
+struct TypeInfo
+{
+    using Type             = chip::NodeId;
+    using DecodableType    = chip::NodeId;
+    using DecodableArgType = chip::NodeId;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TrustedTimeNodeID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TrustedTimeNodeID
+namespace DefaultNTP {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultNTP::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DefaultNTP
+namespace Timezone {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::TimeZoneType::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::TimeZoneType::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::TimeZoneType::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Timezone::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Timezone
+namespace DSTOffset {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::DSTOffsetType::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::DSTOffsetType::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::DSTOffsetType::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DSTOffset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace DSTOffset
+namespace LocalTime {
+struct TypeInfo
+{
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LocalTime
+namespace TimezoneDatabase {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimezoneDatabase::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TimezoneDatabase
+namespace NTPServerPort {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NTPServerPort::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NTPServerPort
 namespace AttributeList {
 struct TypeInfo
 {
@@ -14378,7 +14646,50 @@ struct TypeInfo
 } // namespace UserLabel
 namespace ProxyConfiguration {
 
+namespace Structs {
+namespace ConfigurationStruct {
+enum class Fields
+{
+    kFabricIndex   = 1,
+    kProxyAllNodes = 2,
+    kSourceList    = 3,
+};
+
+struct Type
+{
+public:
+    chip::FabricId fabricIndex;
+    bool proxyAllNodes;
+    DataModel::List<const chip::NodeId> sourceList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::FabricId fabricIndex;
+    bool proxyAllNodes;
+    DataModel::DecodableList<chip::NodeId> sourceList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace ConfigurationStruct
+} // namespace Structs
+
 namespace Attributes {
+namespace ConfigurationList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::ConfigurationStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ConfigurationStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ConfigurationStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConfigurationList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ConfigurationList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -14418,6 +14729,100 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ProxyConfiguration
 namespace ProxyDiscovery {
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace ProxyDiscoverRequest {
+struct Type;
+struct DecodableType;
+} // namespace ProxyDiscoverRequest
+
+namespace ProxyDiscoveryResponse {
+struct Type;
+struct DecodableType;
+} // namespace ProxyDiscoveryResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace ProxyDiscoverRequest {
+enum class Fields
+{
+    kSourceNodeID      = 0,
+    kNumAttributePaths = 1,
+    kNumEventPaths     = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProxyDiscoverRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+
+    chip::NodeId sourceNodeID;
+    uint16_t numAttributePaths;
+    uint16_t numEventPaths;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProxyDiscoverRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+
+    chip::NodeId sourceNodeID;
+    uint16_t numAttributePaths;
+    uint16_t numEventPaths;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProxyDiscoverRequest
+namespace ProxyDiscoveryResponse {
+enum class Fields
+{
+    kSourceNodeID      = 0,
+    kNumHopsToSource   = 1,
+    kAvailableCapacity = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ProxyDiscoveryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+
+    chip::NodeId sourceNodeID;
+    uint16_t numHopsToSource;
+    uint16_t availableCapacity;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ProxyDiscoveryResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
+
+    chip::NodeId sourceNodeID;
+    uint16_t numHopsToSource;
+    uint16_t availableCapacity;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ProxyDiscoveryResponse
+} // namespace Commands
 
 namespace Attributes {
 namespace AttributeList {
@@ -14460,7 +14865,42 @@ struct TypeInfo
 } // namespace ProxyDiscovery
 namespace ProxyValid {
 
+namespace Structs {
+namespace ValidProxyStruct {
+enum class Fields
+{
+    kFabricIndex = 1,
+    kNodeID      = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricId fabricIndex;
+    chip::NodeId nodeID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ValidProxyStruct
+} // namespace Structs
+
 namespace Attributes {
+namespace ValidProxyList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::ValidProxyStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ValidProxyStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ValidProxyStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ValidProxyList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ValidProxyList
 namespace AttributeList {
 struct TypeInfo
 {

@@ -393,6 +393,36 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTimeSynchronizationClusterDSTOffsetType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _offset = @(0);
+
+        _validStarting = @(0);
+
+        _validUntil = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTimeSynchronizationClusterTimeZoneType
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _offset = @(0);
+
+        _validAt = @(0);
+
+        _name = @"";
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOperationalCredentialsClusterFabricDescriptor
 - (instancetype)init
 {
@@ -482,6 +512,34 @@ NS_ASSUME_NONNULL_BEGIN
         _label = @"";
 
         _value = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPProxyConfigurationClusterConfigurationStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _proxyAllNodes = @(0);
+
+        _sourceList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPProxyValidClusterValidProxyStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _nodeID = @(0);
     }
     return self;
 }

@@ -14166,6 +14166,18 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
 /**
+ * @brief Proxy Discovery Cluster ProxyDiscoverRequest Command callback (from client)
+ */
+bool emberAfProxyDiscoveryClusterProxyDiscoverRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ProxyDiscovery::Commands::ProxyDiscoverRequest::DecodableType & commandData);
+/**
+ * @brief Proxy Discovery Cluster ProxyDiscoveryResponse Command callback (from server)
+ */
+bool emberAfProxyDiscoveryClusterProxyDiscoveryResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                                chip::NodeId SourceNodeID, uint16_t NumHopsToSource,
+                                                                uint16_t AvailableCapacity);
+/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(

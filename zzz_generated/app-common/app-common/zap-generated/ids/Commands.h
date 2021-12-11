@@ -795,6 +795,20 @@ static constexpr CommandId Id = 0x0000000C;
 } // namespace Commands
 } // namespace OperationalCredentials
 
+namespace ProxyDiscovery {
+namespace Commands {
+
+namespace ProxyDiscoverRequest {
+static constexpr CommandId Id = 0x00000000;
+} // namespace ProxyDiscoverRequest
+
+namespace ProxyDiscoveryResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace ProxyDiscoveryResponse
+
+} // namespace Commands
+} // namespace ProxyDiscovery
+
 namespace ModeSelect {
 namespace Commands {
 

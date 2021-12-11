@@ -324,6 +324,121 @@ class ChipClusters:
                 },
             },
     }
+    _BALLAST_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "BallastConfiguration",
+            "clusterId": 0x00000301,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "PhysicalMinLevel",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "PhysicalMaxLevel",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "BallastStatus",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000010: {
+                    "attributeName": "MinLevel",
+                    "attributeId": 0x00000010,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000011: {
+                    "attributeName": "MaxLevel",
+                    "attributeId": 0x00000011,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000012: {
+                    "attributeName": "PowerOnLevel",
+                    "attributeId": 0x00000012,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000013: {
+                    "attributeName": "PowerOnFadeTime",
+                    "attributeId": 0x00000013,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000014: {
+                    "attributeName": "IntrinsicBallastFactor",
+                    "attributeId": 0x00000014,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000015: {
+                    "attributeName": "BallastFactorAdjustment",
+                    "attributeId": 0x00000015,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000020: {
+                    "attributeName": "LampQuality",
+                    "attributeId": 0x00000020,
+                    "type": "int",
+                },
+                0x00000030: {
+                    "attributeName": "LampType",
+                    "attributeId": 0x00000030,
+                    "type": "str",
+                    "writable": True,
+                },
+                0x00000031: {
+                    "attributeName": "LampManufacturer",
+                    "attributeId": 0x00000031,
+                    "type": "str",
+                    "writable": True,
+                },
+                0x00000032: {
+                    "attributeName": "LampRatedHours",
+                    "attributeId": 0x00000032,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000033: {
+                    "attributeName": "LampBurnHours",
+                    "attributeId": 0x00000033,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000034: {
+                    "attributeName": "LampAlarmMode",
+                    "attributeId": 0x00000034,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000035: {
+                    "attributeName": "LampBurnHoursTripPoint",
+                    "attributeId": 0x00000035,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _BARRIER_CONTROL_CLUSTER_INFO = {
             "clusterName": "BarrierControl",
             "clusterId": 0x00000103,
@@ -1807,6 +1922,41 @@ class ChipClusters:
                 },
             },
     }
+    _FAN_CONTROL_CLUSTER_INFO = {
+            "clusterName": "FanControl",
+            "clusterId": 0x00000202,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "FanMode",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x00000001: {
+                    "attributeName": "FanModeSequence",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                    "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _FIXED_LABEL_CLUSTER_INFO = {
             "clusterName": "FixedLabel",
             "clusterId": 0x00000040,
@@ -2416,6 +2566,75 @@ class ChipClusters:
                 },
             },
     }
+    _LOCALIZATION_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "LocalizationConfiguration",
+            "clusterId": 0x0000002B,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "ActiveLocal",
+                    "attributeId": 0x00000000,
+                    "type": "str",
+                },
+                0x00000001: {
+                    "attributeName": "SupportedLocales",
+                    "attributeId": 0x00000001,
+                    "type": "str",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _LOCALIZATION_TIME_FORMAT_CLUSTER_INFO = {
+            "clusterName": "LocalizationTimeFormat",
+            "clusterId": 0x0000002C,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "HourFormat",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "ActiveCalendarType",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "SupportedCalendarTypes",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _LOCALIZATION_UNIT_CLUSTER_INFO = {
+            "clusterName": "LocalizationUnit",
+            "clusterId": 0x0000002D,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "TemperatureUnit",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _LOW_POWER_CLUSTER_INFO = {
             "clusterName": "LowPower",
             "clusterId": 0x00000508,
@@ -3005,38 +3224,6 @@ class ChipClusters:
                 },
             },
     }
-    _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO = {
-            "clusterName": "OnOffSwitchConfiguration",
-            "clusterId": 0x00000007,
-            "commands": {
-            },
-            "attributes": {
-                0x00000000: {
-                    "attributeName": "SwitchType",
-                    "attributeId": 0x00000000,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x00000010: {
-                    "attributeName": "SwitchActions",
-                    "attributeId": 0x00000010,
-                    "type": "int",
-                    "reportable": True,
-                    "writable": True,
-                },
-                0x0000FFFB: {
-                    "attributeName": "AttributeList",
-                    "attributeId": 0x0000FFFB,
-                    "type": "int",
-                },
-                0x0000FFFD: {
-                    "attributeName": "ClusterRevision",
-                    "attributeId": 0x0000FFFD,
-                    "type": "int",
-                    "reportable": True,
-                },
-            },
-    }
     _OPERATIONAL_CREDENTIALS_CLUSTER_INFO = {
             "clusterName": "OperationalCredentials",
             "clusterId": 0x0000003E,
@@ -3152,6 +3339,14 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+            },
+    }
+    _POWER_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "PowerConfiguration",
+            "clusterId": 0x00000001,
+            "commands": {
+            },
+            "attributes": {
             },
     }
     _POWER_SOURCE_CLUSTER_INFO = {
@@ -3290,6 +3485,55 @@ class ChipClusters:
                     "attributeId": 0x0000FFFD,
                     "type": "int",
                     "reportable": True,
+                },
+            },
+    }
+    _PROXY_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "ProxyConfiguration",
+            "clusterId": 0x00000042,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "ConfigurationList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _PROXY_DISCOVERY_CLUSTER_INFO = {
+            "clusterName": "ProxyDiscovery",
+            "clusterId": 0x00000043,
+            "commands": {
+            },
+            "attributes": {
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
+    _PROXY_VALID_CLUSTER_INFO = {
+            "clusterName": "ProxyValid",
+            "clusterId": 0x00000044,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "ValidProxyList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
                 },
             },
     }
@@ -5177,6 +5421,88 @@ class ChipClusters:
                 },
             },
     }
+    _TIME_SYNCHRONIZATION_CLUSTER_INFO = {
+            "clusterName": "TimeSynchronization",
+            "clusterId": 0x00000038,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "UTCTime",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "Granularity",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "TimeSource",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "TrustedTimeNodeID",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "DefaultNTP",
+                    "attributeId": 0x00000004,
+                    "type": "str",
+                },
+                0x00000005: {
+                    "attributeName": "Timezone",
+                    "attributeId": 0x00000005,
+                    "type": "",
+                },
+                0x00000006: {
+                    "attributeName": "DSTOffset",
+                    "attributeId": 0x00000006,
+                    "type": "",
+                },
+                0x00000007: {
+                    "attributeName": "LocalTime",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                },
+                0x00000008: {
+                    "attributeName": "TimezoneDatabase",
+                    "attributeId": 0x00000008,
+                    "type": "bool",
+                },
+                0x00000009: {
+                    "attributeName": "NTPServerPort",
+                    "attributeId": 0x00000009,
+                    "type": "int",
+                },
+            },
+    }
+    _USER_LABEL_CLUSTER_INFO = {
+            "clusterName": "UserLabel",
+            "clusterId": 0x00000041,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "LabelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                    "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _WAKE_ON_LAN_CLUSTER_INFO = {
             "clusterName": "WakeOnLan",
             "clusterId": 0x00000503,
@@ -5500,6 +5826,7 @@ class ChipClusters:
     0x0000050D: _APPLICATION_BASIC_CLUSTER_INFO,
     0x0000050C: _APPLICATION_LAUNCHER_CLUSTER_INFO,
     0x0000050B: _AUDIO_OUTPUT_CLUSTER_INFO,
+    0x00000301: _BALLAST_CONFIGURATION_CLUSTER_INFO,
     0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
     0x00000028: _BASIC_CLUSTER_INFO,
     0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
@@ -5514,6 +5841,7 @@ class ChipClusters:
     0x00000101: _DOOR_LOCK_CLUSTER_INFO,
     0x00000B04: _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
     0x00000037: _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000202: _FAN_CONTROL_CLUSTER_INFO,
     0x00000040: _FIXED_LABEL_CLUSTER_INFO,
     0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
     0x00000030: _GENERAL_COMMISSIONING_CLUSTER_INFO,
@@ -5524,6 +5852,9 @@ class ChipClusters:
     0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
     0x00000509: _KEYPAD_INPUT_CLUSTER_INFO,
     0x00000008: _LEVEL_CONTROL_CLUSTER_INFO,
+    0x0000002B: _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
+    0x0000002C: _LOCALIZATION_TIME_FORMAT_CLUSTER_INFO,
+    0x0000002D: _LOCALIZATION_UNIT_CLUSTER_INFO,
     0x00000508: _LOW_POWER_CLUSTER_INFO,
     0x00000507: _MEDIA_INPUT_CLUSTER_INFO,
     0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
@@ -5533,11 +5864,14 @@ class ChipClusters:
     0x0000002A: _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
     0x00000406: _OCCUPANCY_SENSING_CLUSTER_INFO,
     0x00000006: _ON_OFF_CLUSTER_INFO,
-    0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
     0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
+    0x00000001: _POWER_CONFIGURATION_CLUSTER_INFO,
     0x0000002F: _POWER_SOURCE_CLUSTER_INFO,
     0x0000002E: _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
     0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
+    0x00000042: _PROXY_CONFIGURATION_CLUSTER_INFO,
+    0x00000043: _PROXY_DISCOVERY_CLUSTER_INFO,
+    0x00000044: _PROXY_VALID_CLUSTER_INFO,
     0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
     0x00000405: _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
     0x00000005: _SCENES_CLUSTER_INFO,
@@ -5550,6 +5884,8 @@ class ChipClusters:
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000038: _TIME_SYNCHRONIZATION_CLUSTER_INFO,
+    0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
@@ -5562,6 +5898,7 @@ class ChipClusters:
         "ApplicationBasic": _APPLICATION_BASIC_CLUSTER_INFO,
         "ApplicationLauncher": _APPLICATION_LAUNCHER_CLUSTER_INFO,
         "AudioOutput": _AUDIO_OUTPUT_CLUSTER_INFO,
+        "BallastConfiguration": _BALLAST_CONFIGURATION_CLUSTER_INFO,
         "BarrierControl": _BARRIER_CONTROL_CLUSTER_INFO,
         "Basic": _BASIC_CLUSTER_INFO,
         "BinaryInputBasic": _BINARY_INPUT_BASIC_CLUSTER_INFO,
@@ -5576,6 +5913,7 @@ class ChipClusters:
         "DoorLock": _DOOR_LOCK_CLUSTER_INFO,
         "ElectricalMeasurement": _ELECTRICAL_MEASUREMENT_CLUSTER_INFO,
         "EthernetNetworkDiagnostics": _ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "FanControl": _FAN_CONTROL_CLUSTER_INFO,
         "FixedLabel": _FIXED_LABEL_CLUSTER_INFO,
         "FlowMeasurement": _FLOW_MEASUREMENT_CLUSTER_INFO,
         "GeneralCommissioning": _GENERAL_COMMISSIONING_CLUSTER_INFO,
@@ -5586,6 +5924,9 @@ class ChipClusters:
         "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         "KeypadInput": _KEYPAD_INPUT_CLUSTER_INFO,
         "LevelControl": _LEVEL_CONTROL_CLUSTER_INFO,
+        "LocalizationConfiguration": _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
+        "LocalizationTimeFormat": _LOCALIZATION_TIME_FORMAT_CLUSTER_INFO,
+        "LocalizationUnit": _LOCALIZATION_UNIT_CLUSTER_INFO,
         "LowPower": _LOW_POWER_CLUSTER_INFO,
         "MediaInput": _MEDIA_INPUT_CLUSTER_INFO,
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,
@@ -5595,11 +5936,14 @@ class ChipClusters:
         "OtaSoftwareUpdateRequestor": _OTA_SOFTWARE_UPDATE_REQUESTOR_CLUSTER_INFO,
         "OccupancySensing": _OCCUPANCY_SENSING_CLUSTER_INFO,
         "OnOff": _ON_OFF_CLUSTER_INFO,
-        "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
+        "PowerConfiguration": _POWER_CONFIGURATION_CLUSTER_INFO,
         "PowerSource": _POWER_SOURCE_CLUSTER_INFO,
         "PowerSourceConfiguration": _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
+        "ProxyConfiguration": _PROXY_CONFIGURATION_CLUSTER_INFO,
+        "ProxyDiscovery": _PROXY_DISCOVERY_CLUSTER_INFO,
+        "ProxyValid": _PROXY_VALID_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "RelativeHumidityMeasurement": _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
         "Scenes": _SCENES_CLUSTER_INFO,
@@ -5612,6 +5956,8 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "TimeSynchronization": _TIME_SYNCHRONIZATION_CLUSTER_INFO,
+        "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,

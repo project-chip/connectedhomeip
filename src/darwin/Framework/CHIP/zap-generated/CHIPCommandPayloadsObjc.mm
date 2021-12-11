@@ -1847,6 +1847,36 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPProxyDiscoveryClusterProxyDiscoverRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sourceNodeID = @(0);
+
+        _numAttributePaths = @(0);
+
+        _numEventPaths = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPProxyDiscoveryClusterProxyDiscoveryResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _sourceNodeID = @(0);
+
+        _numHopsToSource = @(0);
+
+        _availableCapacity = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
 {

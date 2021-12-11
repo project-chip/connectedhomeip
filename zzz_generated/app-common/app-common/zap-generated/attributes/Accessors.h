@@ -1160,6 +1160,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocal {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace ActiveLocal
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1176,6 +1181,16 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LocalizationTimeFormat {
 namespace Attributes {
 
+namespace HourFormat {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace HourFormat
+
+namespace ActiveCalendarType {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace ActiveCalendarType
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
@@ -1191,6 +1206,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace LocalizationUnit {
 namespace Attributes {
+
+namespace TemperatureUnit {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace TemperatureUnit
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
@@ -1957,6 +1977,46 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 namespace TimeSynchronization {
 namespace Attributes {
+
+namespace UTCTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // epoch_us
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+} // namespace UTCTime
+
+namespace Granularity {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace Granularity
+
+namespace TimeSource {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace TimeSource
+
+namespace TrustedTimeNodeID {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::NodeId * value); // node_id
+EmberAfStatus Set(chip::EndpointId endpoint, chip::NodeId value);
+} // namespace TrustedTimeNodeID
+
+namespace DefaultNTP {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace DefaultNTP
+
+namespace LocalTime {
+EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // epoch_us
+EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+} // namespace LocalTime
+
+namespace TimezoneDatabase {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace TimezoneDatabase
+
+namespace NTPServerPort {
+EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
+EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
+} // namespace NTPServerPort
 
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32

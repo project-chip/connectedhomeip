@@ -66,6 +66,13 @@ public:
     ~AudioOutputClusterTest() {}
 };
 
+class DLL_EXPORT BallastConfigurationClusterTest : public BallastConfigurationCluster
+{
+public:
+    BallastConfigurationClusterTest() : BallastConfigurationCluster() {}
+    ~BallastConfigurationClusterTest() {}
+};
+
 class DLL_EXPORT BarrierControlClusterTest : public BarrierControlCluster
 {
 public:
@@ -164,6 +171,13 @@ public:
     ~EthernetNetworkDiagnosticsClusterTest() {}
 };
 
+class DLL_EXPORT FanControlClusterTest : public FanControlCluster
+{
+public:
+    FanControlClusterTest() : FanControlCluster() {}
+    ~FanControlClusterTest() {}
+};
+
 class DLL_EXPORT FixedLabelClusterTest : public FixedLabelCluster
 {
 public:
@@ -234,6 +248,27 @@ public:
     ~LevelControlClusterTest() {}
 };
 
+class DLL_EXPORT LocalizationConfigurationClusterTest : public LocalizationConfigurationCluster
+{
+public:
+    LocalizationConfigurationClusterTest() : LocalizationConfigurationCluster() {}
+    ~LocalizationConfigurationClusterTest() {}
+};
+
+class DLL_EXPORT LocalizationTimeFormatClusterTest : public LocalizationTimeFormatCluster
+{
+public:
+    LocalizationTimeFormatClusterTest() : LocalizationTimeFormatCluster() {}
+    ~LocalizationTimeFormatClusterTest() {}
+};
+
+class DLL_EXPORT LocalizationUnitClusterTest : public LocalizationUnitCluster
+{
+public:
+    LocalizationUnitClusterTest() : LocalizationUnitCluster() {}
+    ~LocalizationUnitClusterTest() {}
+};
+
 class DLL_EXPORT LowPowerClusterTest : public LowPowerCluster
 {
 public:
@@ -297,18 +332,18 @@ public:
     ~OnOffClusterTest() {}
 };
 
-class DLL_EXPORT OnOffSwitchConfigurationClusterTest : public OnOffSwitchConfigurationCluster
-{
-public:
-    OnOffSwitchConfigurationClusterTest() : OnOffSwitchConfigurationCluster() {}
-    ~OnOffSwitchConfigurationClusterTest() {}
-};
-
 class DLL_EXPORT OperationalCredentialsClusterTest : public OperationalCredentialsCluster
 {
 public:
     OperationalCredentialsClusterTest() : OperationalCredentialsCluster() {}
     ~OperationalCredentialsClusterTest() {}
+};
+
+class DLL_EXPORT PowerConfigurationClusterTest : public PowerConfigurationCluster
+{
+public:
+    PowerConfigurationClusterTest() : PowerConfigurationCluster() {}
+    ~PowerConfigurationClusterTest() {}
 };
 
 class DLL_EXPORT PowerSourceClusterTest : public PowerSourceCluster
@@ -330,6 +365,27 @@ class DLL_EXPORT PressureMeasurementClusterTest : public PressureMeasurementClus
 public:
     PressureMeasurementClusterTest() : PressureMeasurementCluster() {}
     ~PressureMeasurementClusterTest() {}
+};
+
+class DLL_EXPORT ProxyConfigurationClusterTest : public ProxyConfigurationCluster
+{
+public:
+    ProxyConfigurationClusterTest() : ProxyConfigurationCluster() {}
+    ~ProxyConfigurationClusterTest() {}
+};
+
+class DLL_EXPORT ProxyDiscoveryClusterTest : public ProxyDiscoveryCluster
+{
+public:
+    ProxyDiscoveryClusterTest() : ProxyDiscoveryCluster() {}
+    ~ProxyDiscoveryClusterTest() {}
+};
+
+class DLL_EXPORT ProxyValidClusterTest : public ProxyValidCluster
+{
+public:
+    ProxyValidClusterTest() : ProxyValidCluster() {}
+    ~ProxyValidClusterTest() {}
 };
 
 class DLL_EXPORT PumpConfigurationAndControlClusterTest : public PumpConfigurationAndControlCluster
@@ -414,6 +470,20 @@ class DLL_EXPORT ThreadNetworkDiagnosticsClusterTest : public ThreadNetworkDiagn
 public:
     ThreadNetworkDiagnosticsClusterTest() : ThreadNetworkDiagnosticsCluster() {}
     ~ThreadNetworkDiagnosticsClusterTest() {}
+};
+
+class DLL_EXPORT TimeSynchronizationClusterTest : public TimeSynchronizationCluster
+{
+public:
+    TimeSynchronizationClusterTest() : TimeSynchronizationCluster() {}
+    ~TimeSynchronizationClusterTest() {}
+};
+
+class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster
+{
+public:
+    UserLabelClusterTest() : UserLabelCluster() {}
+    ~UserLabelClusterTest() {}
 };
 
 class DLL_EXPORT WakeOnLanClusterTest : public WakeOnLanCluster

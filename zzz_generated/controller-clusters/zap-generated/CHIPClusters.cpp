@@ -767,6 +767,9 @@ CHIP_ERROR AudioOutputCluster::ReportAttributeClusterRevision(Callback::Cancelab
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// BallastConfiguration Cluster Commands
+// BallastConfiguration Cluster Attributes
+
 // BarrierControl Cluster Commands
 CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t percentOpen)
@@ -5131,6 +5134,9 @@ CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Cal
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// FanControl Cluster Commands
+// FanControl Cluster Attributes
+
 // FixedLabel Cluster Commands
 // FixedLabel Cluster Attributes
 CHIP_ERROR FixedLabelCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -6749,6 +6755,15 @@ CHIP_ERROR LevelControlCluster::ReportAttributeClusterRevision(Callback::Cancela
     return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+// LocalizationConfiguration Cluster Commands
+// LocalizationConfiguration Cluster Attributes
+
+// LocalizationTimeFormat Cluster Commands
+// LocalizationTimeFormat Cluster Attributes
+
+// LocalizationUnit Cluster Commands
+// LocalizationUnit Cluster Attributes
 
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -8778,59 +8793,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeClusterRevision(Callback::Cancelable * o
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-// OnOffSwitchConfiguration Cluster Commands
-// OnOffSwitchConfiguration Cluster Attributes
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOffSwitchConfiguration::Attributes::SwitchType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeSwitchType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOffSwitchConfiguration::Attributes::SwitchType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOffSwitchConfiguration::Attributes::SwitchActions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeSwitchActions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOffSwitchConfiguration::Attributes::SwitchActions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
@@ -9292,6 +9254,9 @@ CHIP_ERROR OperationalCredentialsCluster::ReportAttributeClusterRevision(Callbac
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// PowerConfiguration Cluster Commands
+// PowerConfiguration Cluster Attributes
+
 // PowerSource Cluster Commands
 // PowerSource Cluster Attributes
 CHIP_ERROR PowerSourceCluster::SubscribeAttributeStatus(Callback::Cancelable * onSuccessCallback,
@@ -9536,6 +9501,15 @@ CHIP_ERROR PressureMeasurementCluster::ReportAttributeClusterRevision(Callback::
     return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+// ProxyConfiguration Cluster Commands
+// ProxyConfiguration Cluster Attributes
+
+// ProxyDiscovery Cluster Commands
+// ProxyDiscovery Cluster Attributes
+
+// ProxyValid Cluster Commands
+// ProxyValid Cluster Attributes
 
 // PumpConfigurationAndControl Cluster Commands
 // PumpConfigurationAndControl Cluster Attributes
@@ -14596,6 +14570,12 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Callb
     return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
+
+// TimeSynchronization Cluster Commands
+// TimeSynchronization Cluster Attributes
+
+// UserLabel Cluster Commands
+// UserLabel Cluster Attributes
 
 // WakeOnLan Cluster Commands
 // WakeOnLan Cluster Attributes

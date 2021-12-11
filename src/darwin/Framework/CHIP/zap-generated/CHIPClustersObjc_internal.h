@@ -45,6 +45,10 @@
 @property (readonly) chip::Controller::AudioOutputCluster cppCluster;
 @end
 
+@interface CHIPBallastConfiguration ()
+@property (readonly) chip::Controller::BallastConfigurationCluster cppCluster;
+@end
+
 @interface CHIPBarrierControl ()
 @property (readonly) chip::Controller::BarrierControlCluster cppCluster;
 @end
@@ -101,6 +105,10 @@
 @property (readonly) chip::Controller::EthernetNetworkDiagnosticsCluster cppCluster;
 @end
 
+@interface CHIPFanControl ()
+@property (readonly) chip::Controller::FanControlCluster cppCluster;
+@end
+
 @interface CHIPFixedLabel ()
 @property (readonly) chip::Controller::FixedLabelCluster cppCluster;
 @end
@@ -141,6 +149,18 @@
 @property (readonly) chip::Controller::LevelControlCluster cppCluster;
 @end
 
+@interface CHIPLocalizationConfiguration ()
+@property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
+@end
+
+@interface CHIPLocalizationTimeFormat ()
+@property (readonly) chip::Controller::LocalizationTimeFormatCluster cppCluster;
+@end
+
+@interface CHIPLocalizationUnit ()
+@property (readonly) chip::Controller::LocalizationUnitCluster cppCluster;
+@end
+
 @interface CHIPLowPower ()
 @property (readonly) chip::Controller::LowPowerCluster cppCluster;
 @end
@@ -177,12 +197,12 @@
 @property (readonly) chip::Controller::OnOffCluster cppCluster;
 @end
 
-@interface CHIPOnOffSwitchConfiguration ()
-@property (readonly) chip::Controller::OnOffSwitchConfigurationCluster cppCluster;
-@end
-
 @interface CHIPOperationalCredentials ()
 @property (readonly) chip::Controller::OperationalCredentialsCluster cppCluster;
+@end
+
+@interface CHIPPowerConfiguration ()
+@property (readonly) chip::Controller::PowerConfigurationCluster cppCluster;
 @end
 
 @interface CHIPPowerSource ()
@@ -195,6 +215,18 @@
 
 @interface CHIPPressureMeasurement ()
 @property (readonly) chip::Controller::PressureMeasurementCluster cppCluster;
+@end
+
+@interface CHIPProxyConfiguration ()
+@property (readonly) chip::Controller::ProxyConfigurationCluster cppCluster;
+@end
+
+@interface CHIPProxyDiscovery ()
+@property (readonly) chip::Controller::ProxyDiscoveryCluster cppCluster;
+@end
+
+@interface CHIPProxyValid ()
+@property (readonly) chip::Controller::ProxyValidCluster cppCluster;
 @end
 
 @interface CHIPPumpConfigurationAndControl ()
@@ -243,6 +275,14 @@
 
 @interface CHIPThreadNetworkDiagnostics ()
 @property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
+@end
+
+@interface CHIPTimeSynchronization ()
+@property (readonly) chip::Controller::TimeSynchronizationCluster cppCluster;
+@end
+
+@interface CHIPUserLabel ()
+@property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end
 
 @interface CHIPWakeOnLan ()

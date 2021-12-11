@@ -81,6 +81,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetType::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
@@ -92,6 +96,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ProxyConfiguration::Structs::ConfigurationStruct::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ProxyValid::Structs::ValidProxyStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1203,6 +1211,68 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetType::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Offset", indent + 1, value.offset);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Offset'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ValidStarting", indent + 1, value.validStarting);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ValidStarting'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ValidUntil", indent + 1, value.validUntil);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ValidUntil'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Offset", indent + 1, value.offset);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Offset'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ValidAt", indent + 1, value.validAt);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ValidAt'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Name", indent + 1, value.name);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Name'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -1401,6 +1471,60 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ProxyConfiguration::Structs::ConfigurationStruct::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProxyAllNodes", indent + 1, value.proxyAllNodes);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ProxyAllNodes'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("SourceList", indent + 1, value.sourceList);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SourceList'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ProxyValid::Structs::ValidProxyStruct::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("NodeID", indent + 1, value.nodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'NodeID'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -3450,6 +3574,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | ApplicationBasic                                                    | 0x050D |
 | ApplicationLauncher                                                 | 0x050C |
 | AudioOutput                                                         | 0x050B |
+| BallastConfiguration                                                | 0x0301 |
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
@@ -3464,6 +3589,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | DoorLock                                                            | 0x0101 |
 | ElectricalMeasurement                                               | 0x0B04 |
 | EthernetNetworkDiagnostics                                          | 0x0037 |
+| FanControl                                                          | 0x0202 |
 | FixedLabel                                                          | 0x0040 |
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
@@ -3474,6 +3600,9 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | IlluminanceMeasurement                                              | 0x0400 |
 | KeypadInput                                                         | 0x0509 |
 | LevelControl                                                        | 0x0008 |
+| LocalizationConfiguration                                           | 0x002B |
+| LocalizationTimeFormat                                              | 0x002C |
+| LocalizationUnit                                                    | 0x002D |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
@@ -3483,11 +3612,14 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | OtaSoftwareUpdateRequestor                                          | 0x002A |
 | OccupancySensing                                                    | 0x0406 |
 | OnOff                                                               | 0x0006 |
-| OnOffSwitchConfiguration                                            | 0x0007 |
 | OperationalCredentials                                              | 0x003E |
+| PowerConfiguration                                                  | 0x0001 |
 | PowerSource                                                         | 0x002F |
 | PowerSourceConfiguration                                            | 0x002E |
 | PressureMeasurement                                                 | 0x0403 |
+| ProxyConfiguration                                                  | 0x0042 |
+| ProxyDiscovery                                                      | 0x0043 |
+| ProxyValid                                                          | 0x0044 |
 | PumpConfigurationAndControl                                         | 0x0200 |
 | RelativeHumidityMeasurement                                         | 0x0405 |
 | Scenes                                                              | 0x0005 |
@@ -3500,6 +3632,8 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | Thermostat                                                          | 0x0201 |
 | ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
+| TimeSynchronization                                                 | 0x0038 |
+| UserLabel                                                           | 0x0041 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
@@ -5322,6 +5456,915 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster BallastConfiguration                                        | 0x0301 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * PhysicalMinLevel                                                  | 0x0000 |
+| * PhysicalMaxLevel                                                  | 0x0001 |
+| * BallastStatus                                                     | 0x0002 |
+| * MinLevel                                                          | 0x0010 |
+| * MaxLevel                                                          | 0x0011 |
+| * PowerOnLevel                                                      | 0x0012 |
+| * PowerOnFadeTime                                                   | 0x0013 |
+| * IntrinsicBallastFactor                                            | 0x0014 |
+| * BallastFactorAdjustment                                           | 0x0015 |
+| * LampQuality                                                       | 0x0020 |
+| * LampType                                                          | 0x0030 |
+| * LampManufacturer                                                  | 0x0031 |
+| * LampRatedHours                                                    | 0x0032 |
+| * LampBurnHours                                                     | 0x0033 |
+| * LampAlarmMode                                                     | 0x0034 |
+| * LampBurnHoursTripPoint                                            | 0x0035 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute PhysicalMinLevel
+ */
+class ReadBallastConfigurationPhysicalMinLevel : public ModelCommand
+{
+public:
+    ReadBallastConfigurationPhysicalMinLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "physical-min-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationPhysicalMinLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PhysicalMinLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.PhysicalMinLevel response", value);
+    }
+};
+
+/*
+ * Attribute PhysicalMaxLevel
+ */
+class ReadBallastConfigurationPhysicalMaxLevel : public ModelCommand
+{
+public:
+    ReadBallastConfigurationPhysicalMaxLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "physical-max-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationPhysicalMaxLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PhysicalMaxLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.PhysicalMaxLevel response", value);
+    }
+};
+
+/*
+ * Attribute BallastStatus
+ */
+class ReadBallastConfigurationBallastStatus : public ModelCommand
+{
+public:
+    ReadBallastConfigurationBallastStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "ballast-status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationBallastStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::BallastStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.BallastStatus response", value);
+    }
+};
+
+/*
+ * Attribute MinLevel
+ */
+class ReadBallastConfigurationMinLevel : public ModelCommand
+{
+public:
+    ReadBallastConfigurationMinLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationMinLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::MinLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.MinLevel response", value);
+    }
+};
+
+class WriteBallastConfigurationMinLevel : public ModelCommand
+{
+public:
+    WriteBallastConfigurationMinLevel() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "min-level");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationMinLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::MinLevel::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute MaxLevel
+ */
+class ReadBallastConfigurationMaxLevel : public ModelCommand
+{
+public:
+    ReadBallastConfigurationMaxLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationMaxLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::MaxLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.MaxLevel response", value);
+    }
+};
+
+class WriteBallastConfigurationMaxLevel : public ModelCommand
+{
+public:
+    WriteBallastConfigurationMaxLevel() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "max-level");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationMaxLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::MaxLevel::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute PowerOnLevel
+ */
+class ReadBallastConfigurationPowerOnLevel : public ModelCommand
+{
+public:
+    ReadBallastConfigurationPowerOnLevel() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "power-on-level");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationPowerOnLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PowerOnLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.PowerOnLevel response", value);
+    }
+};
+
+class WriteBallastConfigurationPowerOnLevel : public ModelCommand
+{
+public:
+    WriteBallastConfigurationPowerOnLevel() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "power-on-level");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationPowerOnLevel() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PowerOnLevel::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute PowerOnFadeTime
+ */
+class ReadBallastConfigurationPowerOnFadeTime : public ModelCommand
+{
+public:
+    ReadBallastConfigurationPowerOnFadeTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "power-on-fade-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationPowerOnFadeTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PowerOnFadeTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.PowerOnFadeTime response", value);
+    }
+};
+
+class WriteBallastConfigurationPowerOnFadeTime : public ModelCommand
+{
+public:
+    WriteBallastConfigurationPowerOnFadeTime() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "power-on-fade-time");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationPowerOnFadeTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::PowerOnFadeTime::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint16_t mValue;
+};
+
+/*
+ * Attribute IntrinsicBallastFactor
+ */
+class ReadBallastConfigurationIntrinsicBallastFactor : public ModelCommand
+{
+public:
+    ReadBallastConfigurationIntrinsicBallastFactor() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "intrinsic-ballast-factor");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationIntrinsicBallastFactor() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBallastFactor::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.IntrinsicBallastFactor response", value);
+    }
+};
+
+class WriteBallastConfigurationIntrinsicBallastFactor : public ModelCommand
+{
+public:
+    WriteBallastConfigurationIntrinsicBallastFactor() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "intrinsic-ballast-factor");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationIntrinsicBallastFactor() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::IntrinsicBallastFactor::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute BallastFactorAdjustment
+ */
+class ReadBallastConfigurationBallastFactorAdjustment : public ModelCommand
+{
+public:
+    ReadBallastConfigurationBallastFactorAdjustment() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "ballast-factor-adjustment");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationBallastFactorAdjustment() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::BallastFactorAdjustment::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.BallastFactorAdjustment response", value);
+    }
+};
+
+class WriteBallastConfigurationBallastFactorAdjustment : public ModelCommand
+{
+public:
+    WriteBallastConfigurationBallastFactorAdjustment() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "ballast-factor-adjustment");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationBallastFactorAdjustment() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::BallastFactorAdjustment::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute LampQuality
+ */
+class ReadBallastConfigurationLampQuality : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampQuality() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-quality");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampQuality() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampQuality::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampQuality response", value);
+    }
+};
+
+/*
+ * Attribute LampType
+ */
+class ReadBallastConfigurationLampType : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampType response", value);
+    }
+};
+
+class WriteBallastConfigurationLampType : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampType() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-type");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampType::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+/*
+ * Attribute LampManufacturer
+ */
+class ReadBallastConfigurationLampManufacturer : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampManufacturer() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-manufacturer");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampManufacturer() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampManufacturer::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampManufacturer response", value);
+    }
+};
+
+class WriteBallastConfigurationLampManufacturer : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampManufacturer() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-manufacturer");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampManufacturer() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampManufacturer::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+/*
+ * Attribute LampRatedHours
+ */
+class ReadBallastConfigurationLampRatedHours : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampRatedHours() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-rated-hours");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampRatedHours() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampRatedHours::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampRatedHours response", value);
+    }
+};
+
+class WriteBallastConfigurationLampRatedHours : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampRatedHours() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-rated-hours");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampRatedHours() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampRatedHours::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+/*
+ * Attribute LampBurnHours
+ */
+class ReadBallastConfigurationLampBurnHours : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampBurnHours() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-burn-hours");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampBurnHours() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHours::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampBurnHours response", value);
+    }
+};
+
+class WriteBallastConfigurationLampBurnHours : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampBurnHours() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-burn-hours");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampBurnHours() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHours::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+/*
+ * Attribute LampAlarmMode
+ */
+class ReadBallastConfigurationLampAlarmMode : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampAlarmMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-alarm-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampAlarmMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampAlarmMode::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampAlarmMode response", value);
+    }
+};
+
+class WriteBallastConfigurationLampAlarmMode : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampAlarmMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-alarm-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampAlarmMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampAlarmMode::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute LampBurnHoursTripPoint
+ */
+class ReadBallastConfigurationLampBurnHoursTripPoint : public ModelCommand
+{
+public:
+    ReadBallastConfigurationLampBurnHoursTripPoint() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "lamp-burn-hours-trip-point");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationLampBurnHoursTripPoint() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHoursTripPoint::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.LampBurnHoursTripPoint response", value);
+    }
+};
+
+class WriteBallastConfigurationLampBurnHoursTripPoint : public ModelCommand
+{
+public:
+    WriteBallastConfigurationLampBurnHoursTripPoint() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lamp-burn-hours-trip-point");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteBallastConfigurationLampBurnHoursTripPoint() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::BallastConfiguration::Attributes::LampBurnHoursTripPoint::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadBallastConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReadBallastConfigurationAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.AttributeList response", value);
+    }
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadBallastConfigurationFeatureMap : public ModelCommand
+{
+public:
+    ReadBallastConfigurationFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.FeatureMap response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadBallastConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadBallastConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadBallastConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0301) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BallastConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::BallastConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BallastConfiguration.ClusterRevision response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -17353,6 +18396,221 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster FanControl                                                  | 0x0202 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * FanMode                                                           | 0x0000 |
+| * FanModeSequence                                                   | 0x0001 |
+| * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute FanMode
+ */
+class ReadFanControlFanMode : public ModelCommand
+{
+public:
+    ReadFanControlFanMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "fan-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFanMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FanControl::Attributes::FanMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "FanControl.FanMode response", value);
+    }
+};
+
+class WriteFanControlFanMode : public ModelCommand
+{
+public:
+    WriteFanControlFanMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "fan-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlFanMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::FanControl::Attributes::FanMode::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute FanModeSequence
+ */
+class ReadFanControlFanModeSequence : public ModelCommand
+{
+public:
+    ReadFanControlFanModeSequence() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "fan-mode-sequence");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFanModeSequence() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FanControl::Attributes::FanModeSequence::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "FanControl.FanModeSequence response", value);
+    }
+};
+
+class WriteFanControlFanModeSequence : public ModelCommand
+{
+public:
+    WriteFanControlFanModeSequence() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "fan-mode-sequence");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteFanControlFanModeSequence() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::FanControl::Attributes::FanModeSequence::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadFanControlAttributeList : public ModelCommand
+{
+public:
+    ReadFanControlAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FanControl::Attributes::AttributeList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "FanControl.AttributeList response", value);
+    }
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadFanControlFeatureMap : public ModelCommand
+{
+public:
+    ReadFanControlFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FanControl::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "FanControl.FeatureMap response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadFanControlClusterRevision : public ModelCommand
+{
+public:
+    ReadFanControlClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadFanControlClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0202) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FanControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::FanControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FanControl.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster FixedLabel                                                  | 0x0040 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -22091,6 +23349,311 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster LocalizationConfiguration                                   | 0x002B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActiveLocal                                                       | 0x0000 |
+| * SupportedLocales                                                  | 0x0001 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ActiveLocal
+ */
+class ReadLocalizationConfigurationActiveLocal : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationActiveLocal() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-local");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationActiveLocal() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocal::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.ActiveLocal response", value);
+    }
+};
+
+/*
+ * Attribute SupportedLocales
+ */
+class ReadLocalizationConfigurationSupportedLocales : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationSupportedLocales() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-locales");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationSupportedLocales() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadLocalizationConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster LocalizationTimeFormat                                      | 0x002C |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * HourFormat                                                        | 0x0000 |
+| * ActiveCalendarType                                                | 0x0001 |
+| * SupportedCalendarTypes                                            | 0x0002 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute HourFormat
+ */
+class ReadLocalizationTimeFormatHourFormat : public ModelCommand
+{
+public:
+    ReadLocalizationTimeFormatHourFormat() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "hour-format");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationTimeFormatHourFormat() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationTimeFormatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationTimeFormat::Attributes::HourFormat::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationTimeFormat.HourFormat response", value);
+    }
+};
+
+/*
+ * Attribute ActiveCalendarType
+ */
+class ReadLocalizationTimeFormatActiveCalendarType : public ModelCommand
+{
+public:
+    ReadLocalizationTimeFormatActiveCalendarType() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-calendar-type");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationTimeFormatActiveCalendarType() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationTimeFormatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationTimeFormat::Attributes::ActiveCalendarType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationTimeFormat.ActiveCalendarType response", value);
+    }
+};
+
+/*
+ * Attribute SupportedCalendarTypes
+ */
+class ReadLocalizationTimeFormatSupportedCalendarTypes : public ModelCommand
+{
+public:
+    ReadLocalizationTimeFormatSupportedCalendarTypes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-calendar-types");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationTimeFormatSupportedCalendarTypes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationTimeFormatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationTimeFormat::Attributes::SupportedCalendarTypes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationTimeFormat.SupportedCalendarTypes response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadLocalizationTimeFormatClusterRevision : public ModelCommand
+{
+public:
+    ReadLocalizationTimeFormatClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationTimeFormatClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationTimeFormatCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationTimeFormat::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationTimeFormat.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster LocalizationUnit                                            | 0x002D |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * TemperatureUnit                                                   | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute TemperatureUnit
+ */
+class ReadLocalizationUnitTemperatureUnit : public ModelCommand
+{
+public:
+    ReadLocalizationUnitTemperatureUnit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "temperature-unit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationUnitTemperatureUnit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationUnitCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationUnit::Attributes::TemperatureUnit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationUnit.TemperatureUnit response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadLocalizationUnitClusterRevision : public ModelCommand
+{
+public:
+    ReadLocalizationUnitClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationUnitClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationUnitCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationUnit::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationUnit.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster LowPower                                                    | 0x0508 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -25799,287 +27362,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster OnOffSwitchConfiguration                                    | 0x0007 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * SwitchType                                                        | 0x0000 |
-| * SwitchActions                                                     | 0x0010 |
-| * AttributeList                                                     | 0xFFFB |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Attribute SwitchType
- */
-class ReadOnOffSwitchConfigurationSwitchType : public ModelCommand
-{
-public:
-    ReadOnOffSwitchConfigurationSwitchType() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "switch-type");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadOnOffSwitchConfigurationSwitchType() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchType response", value);
-    }
-};
-
-class ReportOnOffSwitchConfigurationSwitchType : public ModelCommand
-{
-public:
-    ReportOnOffSwitchConfigurationSwitchType() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "switch-type");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportOnOffSwitchConfigurationSwitchType() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("OnOffSwitchConfiguration.SwitchType report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute SwitchActions
- */
-class ReadOnOffSwitchConfigurationSwitchActions : public ModelCommand
-{
-public:
-    ReadOnOffSwitchConfigurationSwitchActions() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "switch-actions");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadOnOffSwitchConfigurationSwitchActions() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchActions response", value);
-    }
-};
-
-class WriteOnOffSwitchConfigurationSwitchActions : public ModelCommand
-{
-public:
-    WriteOnOffSwitchConfigurationSwitchActions() : ModelCommand("write")
-    {
-        AddArgument("attr-name", "switch-actions");
-        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteOnOffSwitchConfigurationSwitchActions() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x01) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
-            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    uint8_t mValue;
-};
-
-class ReportOnOffSwitchConfigurationSwitchActions : public ModelCommand
-{
-public:
-    ReportOnOffSwitchConfigurationSwitchActions() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "switch-actions");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportOnOffSwitchConfigurationSwitchActions() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value)
-    {
-        LogValue("OnOffSwitchConfiguration.SwitchActions report", 0, value);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute AttributeList
- */
-class ReadOnOffSwitchConfigurationAttributeList : public ModelCommand
-{
-public:
-    ReadOnOffSwitchConfigurationAttributeList() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "attribute-list");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadOnOffSwitchConfigurationAttributeList() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
-    {
-        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.AttributeList response", value);
-    }
-};
-
-/*
- * Attribute ClusterRevision
- */
-class ReadOnOffSwitchConfigurationClusterRevision : public ModelCommand
-{
-public:
-    ReadOnOffSwitchConfigurationClusterRevision() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadOnOffSwitchConfigurationClusterRevision() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint16_t value)
-    {
-        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.ClusterRevision response", value);
-    }
-};
-
-class ReportOnOffSwitchConfigurationClusterRevision : public ModelCommand
-{
-public:
-    ReportOnOffSwitchConfigurationClusterRevision() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportOnOffSwitchConfigurationClusterRevision() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OnOffSwitchConfigurationCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint16_t value)
-    {
-        LogValue("OnOffSwitchConfiguration.ClusterRevision report", 0, value);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster OperationalCredentials                                      | 0x003E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -26791,6 +28073,14 @@ private:
     uint16_t mMaxInterval;
     bool mWait;
 };
+
+/*----------------------------------------------------------------------------*\
+| Cluster PowerConfiguration                                          | 0x0001 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+\*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*\
 | Cluster PowerSource                                                 | 0x002F |
@@ -28022,6 +29312,191 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ProxyConfiguration                                          | 0x0042 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ConfigurationList                                                 | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ConfigurationList
+ */
+class ReadProxyConfigurationConfigurationList : public ModelCommand
+{
+public:
+    ReadProxyConfigurationConfigurationList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "configuration-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadProxyConfigurationConfigurationList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0042) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ProxyConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ProxyConfiguration::Attributes::ConfigurationList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::ProxyConfiguration::Structs::ConfigurationStruct::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ProxyConfiguration.ConfigurationList response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadProxyConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReadProxyConfigurationClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadProxyConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0042) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ProxyConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ProxyConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ProxyConfiguration.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ProxyDiscovery                                              | 0x0043 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadProxyDiscoveryClusterRevision : public ModelCommand
+{
+public:
+    ReadProxyDiscoveryClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadProxyDiscoveryClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0043) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ProxyDiscoveryCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ProxyDiscovery::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ProxyDiscovery.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster ProxyValid                                                  | 0x0044 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ValidProxyList                                                    | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ValidProxyList
+ */
+class ReadProxyValidValidProxyList : public ModelCommand
+{
+public:
+    ReadProxyValidValidProxyList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "valid-proxy-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadProxyValidValidProxyList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0044) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ProxyValidCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ProxyValid::Attributes::ValidProxyList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ProxyValid::Structs::ValidProxyStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "ProxyValid.ValidProxyList response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadProxyValidClusterRevision : public ModelCommand
+{
+public:
+    ReadProxyValidClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadProxyValidClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0044) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ProxyValidCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ProxyValid::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ProxyValid.ClusterRevision response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -47513,6 +48988,433 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster TimeSynchronization                                         | 0x0038 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * UTCTime                                                           | 0x0000 |
+| * Granularity                                                       | 0x0001 |
+| * TimeSource                                                        | 0x0002 |
+| * TrustedTimeNodeID                                                 | 0x0003 |
+| * DefaultNTP                                                        | 0x0004 |
+| * Timezone                                                          | 0x0005 |
+| * DSTOffset                                                         | 0x0006 |
+| * LocalTime                                                         | 0x0007 |
+| * TimezoneDatabase                                                  | 0x0008 |
+| * NTPServerPort                                                     | 0x0009 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute UTCTime
+ */
+class ReadTimeSynchronizationUTCTime : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationUTCTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "utctime");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationUTCTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::UTCTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.UTCTime response", value);
+    }
+};
+
+/*
+ * Attribute Granularity
+ */
+class ReadTimeSynchronizationGranularity : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationGranularity() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "granularity");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationGranularity() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::Granularity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.Granularity response", value);
+    }
+};
+
+/*
+ * Attribute TimeSource
+ */
+class ReadTimeSynchronizationTimeSource : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationTimeSource() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "time-source");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationTimeSource() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::TimeSource::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.TimeSource response", value);
+    }
+};
+
+/*
+ * Attribute TrustedTimeNodeID
+ */
+class ReadTimeSynchronizationTrustedTimeNodeID : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationTrustedTimeNodeID() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "trusted-time-node-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationTrustedTimeNodeID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::TrustedTimeNodeID::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::NodeId value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.TrustedTimeNodeID response", value);
+    }
+};
+
+/*
+ * Attribute DefaultNTP
+ */
+class ReadTimeSynchronizationDefaultNTP : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationDefaultNTP() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "default-ntp");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationDefaultNTP() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::DefaultNTP::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.DefaultNTP response", value);
+    }
+};
+
+/*
+ * Attribute Timezone
+ */
+class ReadTimeSynchronizationTimezone : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationTimezone() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "timezone");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationTimezone() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::Timezone::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::TimeZoneType::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.Timezone response", value);
+    }
+};
+
+/*
+ * Attribute DSTOffset
+ */
+class ReadTimeSynchronizationDSTOffset : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationDSTOffset() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "dstoffset");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationDSTOffset() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::DSTOffset::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeSynchronization::Structs::DSTOffsetType::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.DSTOffset response", value);
+    }
+};
+
+/*
+ * Attribute LocalTime
+ */
+class ReadTimeSynchronizationLocalTime : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationLocalTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "local-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationLocalTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::LocalTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.LocalTime response", value);
+    }
+};
+
+/*
+ * Attribute TimezoneDatabase
+ */
+class ReadTimeSynchronizationTimezoneDatabase : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationTimezoneDatabase() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "timezone-database");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationTimezoneDatabase() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::TimezoneDatabase::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.TimezoneDatabase response", value);
+    }
+};
+
+/*
+ * Attribute NTPServerPort
+ */
+class ReadTimeSynchronizationNTPServerPort : public ModelCommand
+{
+public:
+    ReadTimeSynchronizationNTPServerPort() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "ntpserver-port");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTimeSynchronizationNTPServerPort() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0038) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TimeSynchronizationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TimeSynchronization::Attributes::NTPServerPort::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TimeSynchronization.NTPServerPort response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster UserLabel                                                   | 0x0041 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LabelList                                                         | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute LabelList
+ */
+class ReadUserLabelLabelList : public ModelCommand
+{
+public:
+    ReadUserLabelLabelList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "label-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUserLabelLabelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "UserLabel.LabelList response", value);
+    }
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadUserLabelAttributeList : public ModelCommand
+{
+public:
+    ReadUserLabelAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUserLabelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UserLabel::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "UserLabel.AttributeList response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadUserLabelClusterRevision : public ModelCommand
+{
+public:
+    ReadUserLabelClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUserLabelClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "UserLabel.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -50556,6 +52458,46 @@ void registerClusterAudioOutput(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterBallastConfiguration(Commands & commands)
+{
+    const char * clusterName = "BallastConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadBallastConfigurationPhysicalMinLevel>(),         //
+        make_unique<ReadBallastConfigurationPhysicalMaxLevel>(),         //
+        make_unique<ReadBallastConfigurationBallastStatus>(),            //
+        make_unique<ReadBallastConfigurationMinLevel>(),                 //
+        make_unique<WriteBallastConfigurationMinLevel>(),                //
+        make_unique<ReadBallastConfigurationMaxLevel>(),                 //
+        make_unique<WriteBallastConfigurationMaxLevel>(),                //
+        make_unique<ReadBallastConfigurationPowerOnLevel>(),             //
+        make_unique<WriteBallastConfigurationPowerOnLevel>(),            //
+        make_unique<ReadBallastConfigurationPowerOnFadeTime>(),          //
+        make_unique<WriteBallastConfigurationPowerOnFadeTime>(),         //
+        make_unique<ReadBallastConfigurationIntrinsicBallastFactor>(),   //
+        make_unique<WriteBallastConfigurationIntrinsicBallastFactor>(),  //
+        make_unique<ReadBallastConfigurationBallastFactorAdjustment>(),  //
+        make_unique<WriteBallastConfigurationBallastFactorAdjustment>(), //
+        make_unique<ReadBallastConfigurationLampQuality>(),              //
+        make_unique<ReadBallastConfigurationLampType>(),                 //
+        make_unique<WriteBallastConfigurationLampType>(),                //
+        make_unique<ReadBallastConfigurationLampManufacturer>(),         //
+        make_unique<WriteBallastConfigurationLampManufacturer>(),        //
+        make_unique<ReadBallastConfigurationLampRatedHours>(),           //
+        make_unique<WriteBallastConfigurationLampRatedHours>(),          //
+        make_unique<ReadBallastConfigurationLampBurnHours>(),            //
+        make_unique<WriteBallastConfigurationLampBurnHours>(),           //
+        make_unique<ReadBallastConfigurationLampAlarmMode>(),            //
+        make_unique<WriteBallastConfigurationLampAlarmMode>(),           //
+        make_unique<ReadBallastConfigurationLampBurnHoursTripPoint>(),   //
+        make_unique<WriteBallastConfigurationLampBurnHoursTripPoint>(),  //
+        make_unique<ReadBallastConfigurationAttributeList>(),            //
+        make_unique<ReadBallastConfigurationFeatureMap>(),               //
+        make_unique<ReadBallastConfigurationClusterRevision>(),          //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterBarrierControl(Commands & commands)
 {
     const char * clusterName = "BarrierControl";
@@ -51032,6 +52974,22 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterFanControl(Commands & commands)
+{
+    const char * clusterName = "FanControl";
+
+    commands_list clusterCommands = {
+        make_unique<ReadFanControlFanMode>(),          //
+        make_unique<WriteFanControlFanMode>(),         //
+        make_unique<ReadFanControlFanModeSequence>(),  //
+        make_unique<WriteFanControlFanModeSequence>(), //
+        make_unique<ReadFanControlAttributeList>(),    //
+        make_unique<ReadFanControlFeatureMap>(),       //
+        make_unique<ReadFanControlClusterRevision>(),  //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterFixedLabel(Commands & commands)
 {
     const char * clusterName = "FixedLabel";
@@ -51254,6 +53212,42 @@ void registerClusterLevelControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterLocalizationConfiguration(Commands & commands)
+{
+    const char * clusterName = "LocalizationConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadLocalizationConfigurationActiveLocal>(),      //
+        make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
+        make_unique<ReadLocalizationConfigurationClusterRevision>(),  //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterLocalizationTimeFormat(Commands & commands)
+{
+    const char * clusterName = "LocalizationTimeFormat";
+
+    commands_list clusterCommands = {
+        make_unique<ReadLocalizationTimeFormatHourFormat>(),             //
+        make_unique<ReadLocalizationTimeFormatActiveCalendarType>(),     //
+        make_unique<ReadLocalizationTimeFormatSupportedCalendarTypes>(), //
+        make_unique<ReadLocalizationTimeFormatClusterRevision>(),        //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterLocalizationUnit(Commands & commands)
+{
+    const char * clusterName = "LocalizationUnit";
+
+    commands_list clusterCommands = {
+        make_unique<ReadLocalizationUnitTemperatureUnit>(), //
+        make_unique<ReadLocalizationUnitClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterLowPower(Commands & commands)
 {
     const char * clusterName = "LowPower";
@@ -51449,23 +53443,6 @@ void registerClusterOnOff(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterOnOffSwitchConfiguration(Commands & commands)
-{
-    const char * clusterName = "OnOffSwitchConfiguration";
-
-    commands_list clusterCommands = {
-        make_unique<ReadOnOffSwitchConfigurationSwitchType>(),        //
-        make_unique<ReportOnOffSwitchConfigurationSwitchType>(),      //
-        make_unique<ReadOnOffSwitchConfigurationSwitchActions>(),     //
-        make_unique<WriteOnOffSwitchConfigurationSwitchActions>(),    //
-        make_unique<ReportOnOffSwitchConfigurationSwitchActions>(),   //
-        make_unique<ReadOnOffSwitchConfigurationAttributeList>(),     //
-        make_unique<ReadOnOffSwitchConfigurationClusterRevision>(),   //
-        make_unique<ReportOnOffSwitchConfigurationClusterRevision>(), //
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterOperationalCredentials(Commands & commands)
 {
     const char * clusterName = "OperationalCredentials";
@@ -51492,6 +53469,14 @@ void registerClusterOperationalCredentials(Commands & commands)
         make_unique<ReadOperationalCredentialsClusterRevision>(),          //
         make_unique<ReportOperationalCredentialsClusterRevision>(),        //
     };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterPowerConfiguration(Commands & commands)
+{
+    const char * clusterName = "PowerConfiguration";
+
+    commands_list clusterCommands = {};
 
     commands.Register(clusterName, clusterCommands);
 }
@@ -51552,6 +53537,38 @@ void registerClusterPressureMeasurement(Commands & commands)
         make_unique<ReadPressureMeasurementAttributeList>(),      //
         make_unique<ReadPressureMeasurementClusterRevision>(),    //
         make_unique<ReportPressureMeasurementClusterRevision>(),  //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterProxyConfiguration(Commands & commands)
+{
+    const char * clusterName = "ProxyConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadProxyConfigurationConfigurationList>(), //
+        make_unique<ReadProxyConfigurationClusterRevision>(),   //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterProxyDiscovery(Commands & commands)
+{
+    const char * clusterName = "ProxyDiscovery";
+
+    commands_list clusterCommands = {
+        make_unique<ReadProxyDiscoveryClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterProxyValid(Commands & commands)
+{
+    const char * clusterName = "ProxyValid";
+
+    commands_list clusterCommands = {
+        make_unique<ReadProxyValidValidProxyList>(),  //
+        make_unique<ReadProxyValidClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -52227,6 +54244,37 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterTimeSynchronization(Commands & commands)
+{
+    const char * clusterName = "TimeSynchronization";
+
+    commands_list clusterCommands = {
+        make_unique<ReadTimeSynchronizationUTCTime>(),           //
+        make_unique<ReadTimeSynchronizationGranularity>(),       //
+        make_unique<ReadTimeSynchronizationTimeSource>(),        //
+        make_unique<ReadTimeSynchronizationTrustedTimeNodeID>(), //
+        make_unique<ReadTimeSynchronizationDefaultNTP>(),        //
+        make_unique<ReadTimeSynchronizationTimezone>(),          //
+        make_unique<ReadTimeSynchronizationDSTOffset>(),         //
+        make_unique<ReadTimeSynchronizationLocalTime>(),         //
+        make_unique<ReadTimeSynchronizationTimezoneDatabase>(),  //
+        make_unique<ReadTimeSynchronizationNTPServerPort>(),     //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+void registerClusterUserLabel(Commands & commands)
+{
+    const char * clusterName = "UserLabel";
+
+    commands_list clusterCommands = {
+        make_unique<ReadUserLabelLabelList>(),       //
+        make_unique<ReadUserLabelAttributeList>(),   //
+        make_unique<ReadUserLabelClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterWakeOnLan(Commands & commands)
 {
     const char * clusterName = "WakeOnLan";
@@ -52348,6 +54396,7 @@ void registerClusters(Commands & commands)
     registerClusterApplicationBasic(commands);
     registerClusterApplicationLauncher(commands);
     registerClusterAudioOutput(commands);
+    registerClusterBallastConfiguration(commands);
     registerClusterBarrierControl(commands);
     registerClusterBasic(commands);
     registerClusterBinaryInputBasic(commands);
@@ -52362,6 +54411,7 @@ void registerClusters(Commands & commands)
     registerClusterDoorLock(commands);
     registerClusterElectricalMeasurement(commands);
     registerClusterEthernetNetworkDiagnostics(commands);
+    registerClusterFanControl(commands);
     registerClusterFixedLabel(commands);
     registerClusterFlowMeasurement(commands);
     registerClusterGeneralCommissioning(commands);
@@ -52372,6 +54422,9 @@ void registerClusters(Commands & commands)
     registerClusterIlluminanceMeasurement(commands);
     registerClusterKeypadInput(commands);
     registerClusterLevelControl(commands);
+    registerClusterLocalizationConfiguration(commands);
+    registerClusterLocalizationTimeFormat(commands);
+    registerClusterLocalizationUnit(commands);
     registerClusterLowPower(commands);
     registerClusterMediaInput(commands);
     registerClusterMediaPlayback(commands);
@@ -52381,11 +54434,14 @@ void registerClusters(Commands & commands)
     registerClusterOtaSoftwareUpdateRequestor(commands);
     registerClusterOccupancySensing(commands);
     registerClusterOnOff(commands);
-    registerClusterOnOffSwitchConfiguration(commands);
     registerClusterOperationalCredentials(commands);
+    registerClusterPowerConfiguration(commands);
     registerClusterPowerSource(commands);
     registerClusterPowerSourceConfiguration(commands);
     registerClusterPressureMeasurement(commands);
+    registerClusterProxyConfiguration(commands);
+    registerClusterProxyDiscovery(commands);
+    registerClusterProxyValid(commands);
     registerClusterPumpConfigurationAndControl(commands);
     registerClusterRelativeHumidityMeasurement(commands);
     registerClusterScenes(commands);
@@ -52398,6 +54454,8 @@ void registerClusters(Commands & commands)
     registerClusterThermostat(commands);
     registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
+    registerClusterTimeSynchronization(commands);
+    registerClusterUserLabel(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);
     registerClusterWindowCovering(commands);

@@ -204,6 +204,22 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for ConfigurationStruct
+typedef struct _ConfigurationStruct
+{
+    chip::FabricId FabricIndex;
+    bool ProxyAllNodes;
+    /* TYPE WARNING: array array defaults to */ uint8_t * SourceList;
+} ConfigurationStruct;
+
+// Struct for DSTOffsetType
+typedef struct _DSTOffsetType
+{
+    int32_t Offset;
+    uint64_t ValidStarting;
+    uint64_t ValidUntil;
+} DSTOffsetType;
+
 // Struct for DeviceType
 typedef struct _DeviceType
 {
@@ -477,6 +493,14 @@ typedef struct _ThreadMetrics
     uint32_t StackSize;
 } ThreadMetrics;
 
+// Struct for TimeZoneType
+typedef struct _TimeZoneType
+{
+    int32_t Offset;
+    uint64_t ValidAt;
+    chip::CharSpan Name;
+} TimeZoneType;
+
 // Struct for TransferredPhase
 typedef struct _TransferredPhase
 {
@@ -506,6 +530,13 @@ typedef struct _TvChannelLineupInfo
     chip::CharSpan postalCode;
     uint8_t lineupInfoType;
 } TvChannelLineupInfo;
+
+// Struct for ValidProxyStruct
+typedef struct _ValidProxyStruct
+{
+    chip::FabricId FabricIndex;
+    chip::NodeId NodeID;
+} ValidProxyStruct;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
