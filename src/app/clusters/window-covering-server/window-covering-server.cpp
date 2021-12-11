@@ -56,6 +56,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
+#define WC_PERCENT100THS_MIN 0
 #define WC_PERCENT100THS_MAX 10000
 
 static bool HasFeature(chip::EndpointId endpoint, Features feature)
@@ -154,30 +155,42 @@ namespace WindowCovering {
 
 bool IsOpen(chip::EndpointId endpoint)
 {
-    uint16_t liftPosition = 0;
-    uint16_t liftLimit    = 0;
-    uint16_t tiltPosition = 0;
-    uint16_t tiltLimit    = 0;
+    EmberAfStatus liftStatus;
+    app::DataModel::Nullable<Percent100ths> liftPosition;
 
-    Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition);
-    Attributes::InstalledOpenLimitLift::Get(endpoint, &liftLimit);
-    Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition);
-    Attributes::InstalledOpenLimitTilt::Get(endpoint, &tiltLimit);
-    return liftPosition == liftLimit && tiltPosition == tiltLimit;
+    EmberAfStatus tiltStatus;
+    app::DataModel::Nullable<Percent100ths> tiltPosition;
+
+    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
+    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
+
+    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+        return false;
+
+    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
+        return false;
+
+    return ((liftPosition.Value() == WC_PERCENT100THS_MIN) && (tiltPosition.Value() == WC_PERCENT100THS_MIN));
 }
 
 bool IsClosed(chip::EndpointId endpoint)
 {
-    uint16_t liftPosition = 0;
-    uint16_t liftLimit    = 0;
-    uint16_t tiltPosition = 0;
-    uint16_t tiltLimit    = 0;
+    EmberAfStatus liftStatus;
+    app::DataModel::Nullable<Percent100ths> liftPosition;
 
-    Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition);
-    Attributes::InstalledClosedLimitLift::Get(endpoint, &liftLimit);
-    Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition);
-    Attributes::InstalledClosedLimitTilt::Get(endpoint, &tiltLimit);
-    return liftPosition == liftLimit && tiltPosition == tiltLimit;
+    EmberAfStatus tiltStatus;
+    app::DataModel::Nullable<Percent100ths> tiltPosition;
+
+    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
+    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
+
+    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+        return false;
+
+    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
+        return false;
+
+    return ((liftPosition.Value() == WC_PERCENT100THS_MAX) && (tiltPosition.Value() == WC_PERCENT100THS_MAX));
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
