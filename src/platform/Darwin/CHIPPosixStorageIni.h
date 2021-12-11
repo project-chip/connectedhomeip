@@ -25,9 +25,9 @@
 
 #pragma once
 
-#include <map>
 #include <inipp/inipp.h>
 #include <lib/support/ScopedBuffer.h>
+#include <map>
 #include <platform/PersistedStorage.h>
 
 namespace chip {
