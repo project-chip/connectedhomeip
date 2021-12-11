@@ -49812,7 +49812,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLift response", value);
     }
@@ -49849,7 +49849,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.CurrentPositionLift report", 0, value); }
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        LogValue("WindowCovering.CurrentPositionLift report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -49881,7 +49884,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTilt response", value);
     }
@@ -49918,7 +49921,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("WindowCovering.CurrentPositionTilt report", 0, value); }
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        LogValue("WindowCovering.CurrentPositionTilt report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -50019,7 +50025,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint8_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercentage response", value);
     }
@@ -50056,7 +50062,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
         LogValue("WindowCovering.CurrentPositionLiftPercentage report", 0, value);
     }
@@ -50091,7 +50097,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint8_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercentage response", value);
     }
@@ -50128,7 +50134,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
         LogValue("WindowCovering.CurrentPositionTiltPercentage report", 0, value);
     }
@@ -50232,7 +50238,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionLiftPercent100ths response", value);
     }
@@ -50270,7 +50276,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         LogValue("WindowCovering.TargetPositionLiftPercent100ths report", 0, value);
     }
@@ -50305,7 +50311,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionTiltPercent100ths response", value);
     }
@@ -50343,7 +50349,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         LogValue("WindowCovering.TargetPositionTiltPercent100ths report", 0, value);
     }
@@ -50447,7 +50453,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercent100ths response", value);
     }
@@ -50485,7 +50491,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         LogValue("WindowCovering.CurrentPositionLiftPercent100ths report", 0, value);
     }
@@ -50520,7 +50526,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercent100ths response", value);
     }
@@ -50558,7 +50564,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value)
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
         LogValue("WindowCovering.CurrentPositionTiltPercent100ths report", 0, value);
     }
