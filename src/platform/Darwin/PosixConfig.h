@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include "CHIPPosixStorage.h"
 #include <functional>
 #include <inttypes.h>
 
@@ -31,6 +32,8 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+class CHIPPosixStorage;
 
 /**
  * Provides functions and definitions for accessing device configuration information on the Posix.
@@ -96,7 +99,6 @@ public:
 
     static void RunConfigUnitTest(void);
 
-protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);
@@ -104,6 +106,8 @@ protected:
 private:
     // TODO: This is temporary until Darwin implements a proper ReadConfigValue
     static uint16_t mPosixSetupDiscriminator;
+
+    static CHIPPosixStorage * GetStorageForNamespace(Key key);
 };
 
 struct PosixConfig::Key

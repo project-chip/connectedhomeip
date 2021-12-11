@@ -138,6 +138,13 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
 
+    // Force initialization of NVS namespaces if they doesn't already exist.
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipFactory);
+    SuccessOrExit(err);
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipConfig);
+    SuccessOrExit(err);
+    err = PosixConfig::EnsureNamespace(PosixConfig::kConfigNamespace_ChipCounters);
+    SuccessOrExit(err);
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<PosixConfig>::Init();
     SuccessOrExit(err);

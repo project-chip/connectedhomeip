@@ -62,6 +62,10 @@ static_library("Darwin") {
     "PosixConfig.cpp",
     "PosixConfig.h",
     "SystemPlatformConfig.h",
+    "CHIPPosixStorage.cpp",
+    "CHIPPosixStorage.h",
+    "CHIPPosixStorageIni.cpp",
+    "CHIPPosixStorageIni.h",
   ]
 
   deps = [
@@ -72,6 +76,7 @@ static_library("Darwin") {
   public_deps = [
     "${chip_root}/src/app:app_buildconfig",
     "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/inipp",
   ]
 
   public_configs = [ ":darwin_config" ]

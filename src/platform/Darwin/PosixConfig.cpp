@@ -29,11 +29,16 @@
 
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/Darwin/CHIPPosixStorage.h>
 #include <platform/Darwin/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
+
+static CHIPPosixStorage gChipPosixFactoryStorage;
+static CHIPPosixStorage gChipPosixConfigStorage;
+static CHIPPosixStorage gChipPosixCountersStorage;
 
 // *** CAUTION ***: Changing the names or namespaces of these values will *break* existing devices.
 
@@ -72,6 +77,20 @@ const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
 
+CHIPPosixStorage * PosixConfig::GetStorageForNamespace(Key key)
+{
+    if (strcmp(key.Namespace, kConfigNamespace_ChipFactory) == 0)
+        return &gChipPosixFactoryStorage;
+
+    if (strcmp(key.Namespace, kConfigNamespace_ChipConfig) == 0)
+        return &gChipPosixConfigStorage;
+
+    if (strcmp(key.Namespace, kConfigNamespace_ChipCounters) == 0)
+        return &gChipPosixCountersStorage;
+
+    return nullptr;
+}
+
 CHIP_ERROR PosixConfig::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -80,8 +99,21 @@ CHIP_ERROR PosixConfig::Init()
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, bool & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+    uint32_t intVal;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValue(key.Name, intVal);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
     SuccessOrExit(err);
+
+    val = (intVal != 0);
 
 exit:
     return err;
@@ -89,19 +121,42 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint32_t & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
 
     if (key == kConfigKey_SetupDiscriminator)
     {
         val = mPosixSetupDiscriminator;
         return CHIP_NO_ERROR;
     }
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValue(key.Name, val);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    SuccessOrExit(err);
+
+exit:
     return err;
 }
 
 CHIP_ERROR PosixConfig::ReadConfigValue(Key key, uint64_t & val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValue(key.Name, val);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
     SuccessOrExit(err);
 
 exit:
@@ -110,7 +165,22 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValueStr(key.Name, buf, bufSize, outLen);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        outLen = 0;
+        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    else if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        err = (buf == nullptr) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     SuccessOrExit(err);
 
 exit:
@@ -119,7 +189,22 @@ exit:
 
 CHIP_ERROR PosixConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ReadValueBin(key.Name, buf, bufSize, outLen);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        outLen = 0;
+        err    = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
+    else if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        err = (buf == nullptr) ? CHIP_NO_ERROR : CHIP_ERROR_BUFFER_TOO_SMALL;
+    }
     SuccessOrExit(err);
 
 exit:
@@ -128,8 +213,20 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
+
+    // Commit the value to the persistent store.
+    err = storage->Commit();
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %s", key.Namespace, key.Name, val ? "true" : "false");
 
 exit:
     return err;
@@ -137,20 +234,41 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint32_t val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
 
-    if (key == kConfigKey_SetupDiscriminator)
-    {
-        mPosixSetupDiscriminator = val;
-        return CHIP_NO_ERROR;
-    }
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->WriteValue(key.Name, val);
+    SuccessOrExit(err);
+
+    // Commit the value to the persistent store.
+    err = storage->Commit();
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu32 " (0x%" PRIX32 ")", key.Namespace, key.Name, val, val);
+
+exit:
     return err;
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValue(Key key, uint64_t val)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
+
+    // Commit the value to the persistent store.
+    err = storage->Commit();
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "NVS set: %s/%s = %" PRIu64 " (0x%" PRIX64 ")", key.Namespace, key.Name, val, val);
 
 exit:
     return err;
@@ -158,8 +276,29 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    if (str != nullptr)
+    {
+        storage = GetStorageForNamespace(key);
+        VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+        err = storage->WriteValueStr(key.Name, str);
+        SuccessOrExit(err);
+
+        // Commit the value to the persistent store.
+        err = storage->Commit();
+        SuccessOrExit(err);
+
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = \"%s\"", key.Namespace, key.Name, str);
+    }
+
+    else
+    {
+        err = ClearConfigValue(key);
+        SuccessOrExit(err);
+    }
 
 exit:
     return err;
@@ -167,17 +306,53 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    CHIP_ERROR err;
+    char * strCopy = nullptr;
+
+    if (str != nullptr)
+    {
+        strCopy = strndup(str, strLen);
+        VerifyOrExit(strCopy != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    }
+
+    err = PosixConfig::WriteConfigValueStr(key, strCopy);
 
 exit:
+    if (strCopy != nullptr)
+    {
+        free(strCopy);
+    }
     return err;
+#else
+#error "Unsupported CHIP_CONFIG_MEMORY_MGMT configuration"
+#endif
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    if (data != nullptr)
+    {
+        storage = GetStorageForNamespace(key);
+        VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+        err = storage->WriteValueBin(key.Name, data, dataLen);
+        SuccessOrExit(err);
+
+        // Commit the value to the persistent store.
+        err = storage->Commit();
+        SuccessOrExit(err);
+
+        ChipLogProgress(DeviceLayer, "NVS set: %s/%s = (blob length %zu)", key.Namespace, key.Name, dataLen);
+    }
+    else
+    {
+        err = ClearConfigValue(key);
+        SuccessOrExit(err);
+    }
 
 exit:
     return err;
@@ -185,8 +360,24 @@ exit:
 
 CHIP_ERROR PosixConfig::ClearConfigValue(Key key)
 {
-    CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    CHIP_ERROR err;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ClearValue(key.Name);
+    if (err == CHIP_ERROR_KEY_NOT_FOUND)
+    {
+        ExitNow(err = CHIP_NO_ERROR);
+    }
     SuccessOrExit(err);
+
+    // Commit the value to the persistent store.
+    err = storage->Commit();
+    SuccessOrExit(err);
+
+    ChipLogProgress(DeviceLayer, "NVS erase: %s/%s", key.Namespace, key.Name);
 
 exit:
     return err;
@@ -194,12 +385,36 @@ exit:
 
 bool PosixConfig::ConfigValueExists(Key key)
 {
-    return false;
+    CHIPPosixStorage * storage;
+
+    storage = GetStorageForNamespace(key);
+    if (storage == nullptr)
+        return false;
+
+    return storage->HasValue(key.Name);
 }
 
 CHIP_ERROR PosixConfig::EnsureNamespace(const char * ns)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    CHIPPosixStorage * storage = nullptr;
+
+    if (strcmp(ns, kConfigNamespace_ChipFactory) == 0)
+    {
+        storage = &gChipPosixFactoryStorage;
+        err     = storage->Init(CHIP_DEFAULT_FACTORY_PATH);
+    }
+    else if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
+    {
+        storage = &gChipPosixConfigStorage;
+        err     = storage->Init(CHIP_DEFAULT_CONFIG_PATH);
+    }
+    else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
+    {
+        storage = &gChipPosixCountersStorage;
+        err     = storage->Init(CHIP_DEFAULT_DATA_PATH);
+    }
+
     SuccessOrExit(err);
 
 exit:
@@ -208,8 +423,32 @@ exit:
 
 CHIP_ERROR PosixConfig::ClearNamespace(const char * ns)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    CHIPPosixStorage * storage = nullptr;
+
+    if (strcmp(ns, kConfigNamespace_ChipConfig) == 0)
+    {
+        storage = &gChipPosixConfigStorage;
+    }
+    else if (strcmp(ns, kConfigNamespace_ChipCounters) == 0)
+    {
+        storage = &gChipPosixCountersStorage;
+    }
+
+    VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
+
+    err = storage->ClearAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+    }
     SuccessOrExit(err);
+
+    err = storage->Commit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+    }
 
 exit:
     return err;
@@ -217,8 +456,31 @@ exit:
 
 CHIP_ERROR PosixConfig::FactoryResetConfig(void)
 {
-    CHIP_ERROR err = CHIP_ERROR_PERSISTED_STORAGE_FAILED;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIPPosixStorage * storage;
+
+    ChipLogProgress(DeviceLayer, "Performing factory reset configuration");
+
+    storage = &gChipPosixConfigStorage;
+    if (storage == nullptr)
+    {
+        ChipLogError(DeviceLayer, "Storage get failed");
+        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+    }
     SuccessOrExit(err);
+
+    err = storage->ClearAll();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage ClearAll failed: %s", ErrorStr(err));
+    }
+    SuccessOrExit(err);
+
+    err = storage->Commit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Storage Commit failed: %s", ErrorStr(err));
+    }
 
 exit:
     return err;
