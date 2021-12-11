@@ -18,7 +18,7 @@ class EndpointAdapter(
 
   inner class EndpointViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
                                                    View.OnClickListener {
-    val endpointId: TextView = itemView.findViewById(R.id.endpointTv)
+    val endpointId: TextView = itemView.findViewById(R.id.endpointNumberTv)
 
     init {
       itemView.setOnClickListener(this)
