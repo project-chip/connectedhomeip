@@ -41,6 +41,8 @@ template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSys
 class SecureSessionTable
 {
 public:
+    ~SecureSessionTable() { mEntries.ReleaseAll(); }
+
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
@@ -124,7 +126,7 @@ public:
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
-    BitMapObjectPool<SecureSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
+    BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

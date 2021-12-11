@@ -44,6 +44,8 @@ template <size_t N>
 class OperationalDeviceProxyPool : public OperationalDeviceProxyPoolDelegate
 {
 public:
+    ~OperationalDeviceProxyPool() { mDevicePool.ReleaseAll(); }
+
     OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) override
     {
         return mDevicePool.CreateObject(params, peerId);
@@ -88,7 +90,7 @@ public:
     }
 
 private:
-    BitMapObjectPool<OperationalDeviceProxy, N, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mDevicePool;
+    BitMapObjectPool<OperationalDeviceProxy, N> mDevicePool;
 };
 
 }; // namespace chip
