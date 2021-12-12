@@ -106,8 +106,8 @@ change the setup code for a given Content App using "setpin <vid> <pincode>":
     $ setpin 9050 34567890
 
 When a UDC message comes from a vendor id that maps to a ContentApp in the
-ContentAppPlatform, the ContentApp's AccountLogin cluster will be given the
-change to obtain a setup code. You can trigger this process using "app
+ContentAppPlatform, the AccountLogin cluster of the ContentApp endpoint will be
+given the chance to obtain a setup code. You can trigger this process using "app
 commission <udc-entry>". <udc-entry> will usually be 0 (when there is only one
 entry in the UDC cache):
 
@@ -169,9 +169,9 @@ can initiate commissioning using the Account Login cluster of the Content App:
     $ app commission <udc cache index>
     $ app commission 0
 
-If the VID does not match a ContentApp or the ContentApp's Account Login cluster
-does not provide the correct setup code, initiate commissioning by entering the
-setup code into the shell:
+If the VID does not match a ContentApp or the Account Login cluster of the
+ContentApp endpoint does not provide the correct setup code, initiate
+commissioning by entering the setup code into the shell:
 
     $ udc-commission <pincode> <udc-entry>
     $ udc-commission 34567890 0
