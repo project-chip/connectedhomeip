@@ -7,12 +7,12 @@ Desktop 20.10 (aarch64)**
 
 <hr>
 
-- [CHIP TV Example](#chip-tv-example)
-  - [Building](#building)
-  - [Exercising Commissioning](#exercising-commissioning)
-  - [App Platform commands](#app-platform-commands)
-  - [Casting](#casting)
-  - [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
+-   [CHIP TV Example](#chip-tv-example)
+    -   [Building](#building)
+    -   [Exercising Commissioning](#exercising-commissioning)
+    -   [App Platform commands](#app-platform-commands)
+    -   [Casting](#casting)
+    -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
 <hr>
 
