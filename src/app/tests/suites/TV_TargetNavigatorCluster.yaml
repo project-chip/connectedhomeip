@@ -29,8 +29,8 @@ tests:
       response:
           value:
               [
-                { identifier: 1, name: "exampleName" },
-                { identifier: 2, name: "exampleName" },
+                  { identifier: 1, name: "exampleName" },
+                  { identifier: 2, name: "exampleName" },
               ]
 
     - label: "Read attribute current navigator target"
