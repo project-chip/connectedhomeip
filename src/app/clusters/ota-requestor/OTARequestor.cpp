@@ -140,7 +140,8 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
         break;
     case OTAQueryStatus::kNotAvailable:
         break;
-    // TODO: Add download protocol not supported
+    case OTAQueryStatus::kDownloadProtocolNotSupported:
+        break;
     // Issue #9524 should handle all response status appropriately
     default:
         break;
