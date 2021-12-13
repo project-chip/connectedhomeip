@@ -231,7 +231,7 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(chip::TLV::TLVRe
                                                                 chip::Callback::Cancelable * onSuccessCallback,
                                                                 chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ContentLauncherAcceptsHeaderListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 void ContentLauncherClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);
