@@ -8453,6 +8453,15 @@ struct TypeInfo
 } // namespace PowerSourceConfiguration
 namespace PowerSource {
 
+// Bitmap for PowerSourceFeature
+enum class PowerSourceFeature : uint32_t
+{
+    kWired        = 0x1,
+    kBattery      = 0x2,
+    kRechargeable = 0x4,
+    kReplaceable  = 0x8,
+};
+
 namespace Attributes {
 namespace Status {
 struct TypeInfo
@@ -19768,6 +19777,17 @@ enum class ModeForSequence : uint8_t
 {
     kHeatSetpointFieldPresent = 0x1,
     kCoolSetpointFieldPresent = 0x2,
+};
+
+// Bitmap for ThermostatFeature
+enum class ThermostatFeature : uint32_t
+{
+    kHeating   = 0x1,
+    kCooling   = 0x2,
+    kOccupancy = 0x4,
+    kSchedule  = 0x8,
+    kSetback   = 0x10,
+    kAutomode  = 0x20,
 };
 
 namespace Commands {
