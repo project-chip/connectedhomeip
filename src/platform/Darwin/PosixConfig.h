@@ -26,6 +26,7 @@
 #include <functional>
 #include <inttypes.h>
 
+#include <platform/ConfigurationManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 namespace chip {
@@ -104,6 +105,7 @@ protected:
 private:
     // TODO: This is temporary until Darwin implements a proper ReadConfigValue
     static uint16_t mPosixSetupDiscriminator;
+    static char mLocation[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1];
 };
 
 struct PosixConfig::Key
