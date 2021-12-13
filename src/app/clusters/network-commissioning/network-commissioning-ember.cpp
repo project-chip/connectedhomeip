@@ -42,8 +42,8 @@ bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
     auto & operationalDataset = commandData.operationalDataset;
     auto & breadcrumb         = commandData.breadcrumb;
 
-    app::Clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(commandObj, commandPath, operationalDataset,
-                                                                                   breadcrumb, 0 /* ignored timeout ms */);
+    app::Clusters::NetworkCommissioning::OnAddOrUpdateThreadNetworkCommandCallbackInternal(
+        commandObj, commandPath, operationalDataset, breadcrumb, 0 /* ignored timeout ms */);
     return true;
 }
 
@@ -55,8 +55,8 @@ bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
     auto & credentials = commandData.credentials;
     auto & breadcrumb  = commandData.breadcrumb;
 
-    app::Clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(commandObj, commandPath, ssid, credentials,
-                                                                                 breadcrumb, 0 /* ignored timeout ms */);
+    app::Clusters::NetworkCommissioning::OnAddOrUpdateWiFiNetworkCommandCallbackInternal(commandObj, commandPath, ssid, credentials,
+                                                                                         breadcrumb, 0 /* ignored timeout ms */);
     return true;
 }
 
@@ -67,8 +67,8 @@ bool emberAfNetworkCommissioningClusterConnectNetworkCallback(app::CommandHandle
     auto & networkID  = commandData.networkID;
     auto & breadcrumb = commandData.breadcrumb;
 
-    app::Clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(commandObj, commandPath, networkID, breadcrumb,
-                                                                                0 /* ignored timeout ms */);
+    app::Clusters::NetworkCommissioning::OnConnectNetworkCommandCallbackInternal(commandObj, commandPath, networkID, breadcrumb,
+                                                                                 0 /* ignored timeout ms */);
     return true;
 }
 

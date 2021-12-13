@@ -55,8 +55,9 @@ public:
         CHIPCommand(commandName),
         mPairingMode(mode), mNetworkType(networkType),
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
-        mOnAddThreadNetworkCallback(OnAddNetworkResponse, this), mOnAddWiFiNetworkCallback(OnAddNetworkResponse, this),
-        mOnEnableNetworkCallback(OnEnableNetworkResponse, this), mOnFailureCallback(OnDefaultFailureResponse, this)
+        mOnAddOrUpdateThreadNetworkCallback(OnAddNetworkResponse, this),
+        mOnAddOrUpdateWiFiNetworkCallback(OnAddNetworkResponse, this), mOnConnectNetworkCallback(OnConnectNetworkResponse, this),
+        mOnFailureCallback(OnDefaultFailureResponse, this)
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
 
@@ -150,7 +151,7 @@ public:
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
     static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText, int32_t errorValue);
+    static void OnConnectNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText, int32_t errorValue);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -163,9 +164,9 @@ private:
 
     CHIP_ERROR SetupNetwork();
     CHIP_ERROR AddNetwork(PairingNetworkType networkType);
-    CHIP_ERROR AddThreadNetwork();
-    CHIP_ERROR AddWiFiNetwork();
-    CHIP_ERROR EnableNetwork();
+    CHIP_ERROR AddOrUpdateThreadNetwork();
+    CHIP_ERROR AddOrUpdateWiFiNetwork();
+    CHIP_ERROR ConnectNetwork();
     CHIP_ERROR UpdateNetworkAddress();
 
     chip::ByteSpan GetThreadNetworkId();
@@ -186,9 +187,9 @@ private:
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
 
-    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddThreadNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddWiFiNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterConnectNetworkResponseCallback> mOnEnableNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddOrUpdateThreadNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddOrUpdateWiFiNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterConnectNetworkResponseCallback> mOnConnectNetworkCallback;
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback;
     chip::CommissioneeDeviceProxy * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;

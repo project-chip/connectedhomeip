@@ -26,8 +26,8 @@ AdapterAddress
 AdapterName
 adb
 addr
-AddThreadNetwork
-AddWiFiNetwork
+AddOrUpdateThreadNetwork
+AddOrUpdateWiFiNetwork
 adk
 adoc
 AdvAutonomous
@@ -352,7 +352,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
-EnableNetwork
+ConnectNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName

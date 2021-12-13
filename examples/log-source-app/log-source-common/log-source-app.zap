@@ -1135,7 +1135,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetwork",
+              "name": "AddOrUpdateWiFiNetwork",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -1151,7 +1151,7 @@
               "outgoing": 0
             },
             {
-              "name": "AddThreadNetwork",
+              "name": "AddOrUpdateThreadNetwork",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -1175,7 +1175,7 @@
               "outgoing": 1
             },
             {
-              "name": "EnableNetwork",
+              "name": "ConnectNetwork",
               "code": 12,
               "mfgCode": null,
               "source": "client",
@@ -1234,7 +1234,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetworkResponse",
+              "name": "AddOrUpdateWiFiNetworkResponse",
               "code": 3,
               "mfgCode": null,
               "source": "server",
@@ -1250,7 +1250,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddThreadNetworkResponse",
+              "name": "AddOrUpdateThreadNetworkResponse",
               "code": 7,
               "mfgCode": null,
               "source": "server",
@@ -1274,7 +1274,7 @@
               "outgoing": 1
             },
             {
-              "name": "EnableNetworkResponse",
+              "name": "ConnectNetworkResponse",
               "code": 13,
               "mfgCode": null,
               "source": "server",

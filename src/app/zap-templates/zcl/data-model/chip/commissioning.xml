@@ -95,13 +95,13 @@ limitations under the License.
             <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true"/>
             <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true"/>
         </command>
-        <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addwifinetwork">
+        <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatewifinetwork">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Credentials" type="OCTET_STRING"/>
             <arg name="breadcrumb" type="INT64U"/>
         </command>
-        <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addthreadnetwork">
+        <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addorupdatethreadnetwork">
             <description>TODO</description>
             <arg name="OperationalDataset" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
@@ -116,18 +116,18 @@ limitations under the License.
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning enablenetwork">
+        <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning connectnetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
         </command>
-        <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning enablenetworkresponse">
+        <command source="server" code="0x07" name="ConnectNetworkResponse" optional="false" cli="chip network_commissioning connectnetworkresponse">
             <description>TODO</description>
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
             <arg name="ErrorValue" type="INT32S"/>
         </command>
-        <command source="client" code="0x08" name="ReorderNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning enablenetwork">
+        <command source="client" code="0x08" name="ReorderNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning connectnetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="NetworkIndex" type="INT8U"/>

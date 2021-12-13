@@ -203,7 +203,7 @@ CHIP_ERROR PairingCommand::SetupNetwork()
 
         err = AddNetwork(mNetworkType);
         VerifyOrExit(err == CHIP_NO_ERROR,
-                     ChipLogError(chipTool, "Setup failure! Error calling AddWiFiNetwork: %s", ErrorStr(err)));
+                     ChipLogError(chipTool, "Setup failure! Error calling AddOrUpdateWiFiNetwork: %s", ErrorStr(err)));
         break;
     }
 
@@ -213,20 +213,20 @@ exit:
 
 CHIP_ERROR PairingCommand::AddNetwork(PairingNetworkType networkType)
 {
-    return (networkType == PairingNetworkType::WiFi) ? AddWiFiNetwork() : AddThreadNetwork();
+    return (networkType == PairingNetworkType::WiFi) ? AddOrUpdateWiFiNetwork() : AddOrUpdateThreadNetwork();
 }
 
-CHIP_ERROR PairingCommand::AddThreadNetwork()
+CHIP_ERROR PairingCommand::AddOrUpdateThreadNetwork()
 {
-    Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback.Cancel();
+    Callback::Cancelable * successCallback = mOnAddOrUpdateThreadNetworkCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     return mCluster.AddOrUpdateThreadNetwork(successCallback, failureCallback, mOperationalDataset, kBreadcrumb);
 }
 
-CHIP_ERROR PairingCommand::AddWiFiNetwork()
+CHIP_ERROR PairingCommand::AddOrUpdateWiFiNetwork()
 {
-    Callback::Cancelable * successCallback = mOnAddWiFiNetworkCallback.Cancel();
+    Callback::Cancelable * successCallback = mOnAddOrUpdateWiFiNetworkCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     return mCluster.AddOrUpdateWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb);
@@ -252,9 +252,9 @@ chip::ByteSpan PairingCommand::GetThreadNetworkId()
     return ByteSpan(mExtendedPanId);
 }
 
-CHIP_ERROR PairingCommand::EnableNetwork()
+CHIP_ERROR PairingCommand::ConnectNetwork()
 {
-    Callback::Cancelable * successCallback = mOnEnableNetworkCallback.Cancel();
+    Callback::Cancelable * successCallback = mOnConnectNetworkCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     ByteSpan networkId;
@@ -293,15 +293,15 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, Cha
     // instead of the command specific response. So errorCode is not set correctly.
     // if (NetworkCommissioningStatus::kSuccess != errorCode)
     // {
-    //    ChipLogError(chipTool, "Setup failure. Error calling EnableNetwork: %d", errorCode);
+    //    ChipLogError(chipTool, "Setup failure. Error calling ConnectNetwork: %d", errorCode);
     //    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     //    return;
     // }
 
-    CHIP_ERROR err = command->EnableNetwork();
+    CHIP_ERROR err = command->ConnectNetwork();
     if (CHIP_NO_ERROR != err)
     {
-        ChipLogError(chipTool, "Setup failure. Internal error calling EnableNetwork: %s", ErrorStr(err));
+        ChipLogError(chipTool, "Setup failure. Internal error calling ConnectNetwork: %s", ErrorStr(err));
         command->SetCommandExitStatus(err);
         return;
     }
@@ -316,9 +316,9 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, Cha
     }
 }
 
-void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText, int32_t errorValue)
+void PairingCommand::OnConnectNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText, int32_t errorValue)
 {
-    ChipLogProgress(chipTool, "EnableNetworkResponse");
+    ChipLogProgress(chipTool, "ConnectNetworkResponse");
 
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
 
@@ -326,7 +326,7 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
     // instead of the command specific response. So errorCode is not set correctly.
     // if (NetworkCommissioningStatus::kSuccess != errorCode)
     // {
-    //    ChipLogError(chipTool, "Setup failure. Error calling EnableNetwork: %d", errorCode);
+    //    ChipLogError(chipTool, "Setup failure. Error calling ConnectNetwork: %d", errorCode);
     //    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
     //    return;
     // }
