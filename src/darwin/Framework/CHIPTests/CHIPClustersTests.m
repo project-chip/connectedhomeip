@@ -9011,6 +9011,181 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_DD_1_2_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Precondition : Manual pairing code is printed on the device or in additional provided materials);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify the first digit of the pairing code);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : The first digit must be between 0 and 7 If the digit is between 0
+            and 3 the code length must be 11 digits(VID_PID flag not set).If the digit is between 4
+            and 7 the code length must be 21 digits VID_PID flag set);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000003_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, If the pairing code is 11 digits the VID_PID flag is not set verify the encoded elements);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000004_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : Digits 2 through 6 must be between 00000 and 65535 Digits 7 through 10 must be between 0000 and 8191);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000005_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, If the pairing code is 21 digits the VIDPID flag is set verify the encoded elements);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000006_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : Digits 2 through 6 must be between 00000 and 65535 Digits 7 through 10 must be between 0000
+            and 8191 Digits 11 through 15 must be between 00000 and 65535 Digits 16 through 20 must be between 00000 and 65535);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000007_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Verify the check digit of the pairing code digit 11
+            or 21 by entering the preceding digits in to the checksum script Test Harness);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_2_000008_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : Verify the final digit(11 or 21)
+            of the pairing code printed on the DUT matches the generated digit by the script Test Harness);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_6_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Scan the DUT's QR code using a QR code reader);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_6_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : Verify the QR code gets scanned successfully Verify The QR code must be of sufficient size
+            and contrast respective to surface material as to be readable with standard readers such as smartphones in normal
+                lighting conditions Refer to spec 5.1.2.2 “Example QR Code Sizes
+            and Payloads”);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_6_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify QR code version);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_6_000003_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome : QR code version must be of version 1 or higher);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_7_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Precondition : Manual pairing code is printed on the device or in additional provided materials);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_7_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify using instruments);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_7_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : The Manual Pairing Code should be printed using a minimum font size of 6 points typically producing a typeface height
+              of 2.1 mm(6 / 72 inches)
+                  .);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_9_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Precondition : Manual pairing code is printed on the device or in additional provided materials);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_9_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Provide the 11 digit / 21 digit pairing code from the Device in text speech or any format supported by DUT);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_9_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Expected Outcome
+        : Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_DM_1_1_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
@@ -29934,31 +30109,7 @@ uint16_t readAttributeVendorIdDefaultValue;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000001_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read location"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read location Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@"XX"]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestBasicInformation_000002_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000001_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write location"];
 
@@ -29980,7 +30131,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000003_ReadAttribute
+- (void)testSendClusterTestBasicInformation_000002_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read back location"];
 
@@ -30004,7 +30155,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000004_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000003_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Restore initial location value"];
 
@@ -30026,7 +30177,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000005_ReadAttribute
+- (void)testSendClusterTestBasicInformation_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read AttributeList value"];
 
