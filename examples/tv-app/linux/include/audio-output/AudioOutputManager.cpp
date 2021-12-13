@@ -40,7 +40,8 @@ CHIP_ERROR AudioOutputManager::Init()
     return err;
 }
 
-CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::EndpointId mEndpointId,
+                                                             chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here

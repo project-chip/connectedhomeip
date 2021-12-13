@@ -137,13 +137,13 @@ DECLARE_DYNAMIC_ATTRIBUTE(ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID, ARRAY, kDescriptorAt
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(contentAppClusters)
 DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
     DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, applicationBasicAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, keypadInputAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, applicationLauncherAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, accountLoginAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, contentLauncherAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, mediaPlaybackAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, targetNavigatorAttrs),
-    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_BASIC_CLUSTER_ID, channelAttrs) DECLARE_DYNAMIC_CLUSTER_LIST_END;
+    DECLARE_DYNAMIC_CLUSTER(ZCL_KEYPAD_INPUT_CLUSTER_ID, keypadInputAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_APPLICATION_LAUNCHER_CLUSTER_ID, applicationLauncherAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_ACCOUNT_LOGIN_CLUSTER_ID, accountLoginAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_CONTENT_LAUNCH_CLUSTER_ID, contentLauncherAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_MEDIA_PLAYBACK_CLUSTER_ID, mediaPlaybackAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_TARGET_NAVIGATOR_CLUSTER_ID, targetNavigatorAttrs),
+    DECLARE_DYNAMIC_CLUSTER(ZCL_TV_CHANNEL_CLUSTER_ID, channelAttrs) DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
@@ -191,6 +191,34 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
+ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApp application, std::string data)
+{
+    std::string appId(application.applicationId.data(), application.applicationId.size());
+    ChipLogProgress(DeviceLayer,
+                    "ApplicationLauncherResponse: LaunchApp application.catalogVendorId=%d "
+                    "application.applicationId=%s data=%s",
+                    application.catalogVendorId, appId.c_str(), data.c_str());
+
+    ApplicationLauncherResponse response;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+
+    return response;
+}
+
+ContentLaunchResponse ContentLauncherImpl::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                         std::string data)
+{
+    ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
+
+    ContentLaunchResponse response;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = "Example app data";
+    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    return response;
+}
+
 ContentAppFactoryImpl::ContentAppFactoryImpl()
 {
     mContentApps[1].GetAccountLogin()->SetSetupPIN(34567890);
@@ -199,16 +227,39 @@ ContentAppFactoryImpl::ContentAppFactoryImpl()
 
 ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
 {
-    for (unsigned int i = 0; i < sizeof(mContentApps); i++)
+    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
     {
         ContentAppImpl app = mContentApps[i];
         if (app.GetApplicationBasic()->GetVendorId() == vendorId)
         {
-            AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
             return &mContentApps[i];
         }
     }
     ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendor %d not found ", vendorId);
+
+    return nullptr;
+}
+
+ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApp application)
+{
+    std::string appId(application.applicationId.data(), application.applicationId.size());
+    ChipLogProgress(DeviceLayer,
+                    "ContentAppFactoryImpl: LoadContentAppByAppId application.catalogVendorId=%d "
+                    "application.applicationIdSize=%ld application.applicationId=%s ",
+                    application.catalogVendorId, application.applicationId.size(), appId.c_str());
+
+    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
+    {
+        ContentAppImpl app = mContentApps[i];
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasic()->GetApplicationName());
+        if (strcmp(app.GetApplicationBasic()->GetApplicationName(), appId.c_str()) == 0)
+        {
+            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            return &mContentApps[i];
+        }
+    }
+    ChipLogProgress(DeviceLayer, "LoadContentAppByAppId() - app id %s not found ", appId.c_str());
 
     return nullptr;
 }

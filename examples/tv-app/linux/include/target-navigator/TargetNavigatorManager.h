@@ -20,6 +20,7 @@
 #include <app/AttributeAccessInterface.h>
 
 #include <lib/core/CHIPError.h>
+#include <list>
 #include <string>
 #include <vector>
 
@@ -27,5 +28,7 @@ class TargetNavigatorManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetTargetInfoList(chip::EndpointId endpointId, chip::app::AttributeValueEncoder & aEncoder);
+
+protected:
 };

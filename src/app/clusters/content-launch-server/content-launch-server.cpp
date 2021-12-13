@@ -46,8 +46,10 @@
 
 using namespace chip;
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
+                                                          std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                           const chip::CharSpan & data);
+
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                                       ContentLaunchBrandingInformation & brandingInformation);
 
@@ -62,7 +64,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     auto & data     = commandData.data;
     std::list<ContentLaunchParamater> parameterList;
 
-    ContentLaunchResponse resp = contentLauncherClusterLaunchContent(parameterList, autoplay, data);
+    ContentLaunchResponse resp = contentLauncherClusterLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
     VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
     response.contentLaunchStatus = resp.status;

@@ -43,7 +43,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here
