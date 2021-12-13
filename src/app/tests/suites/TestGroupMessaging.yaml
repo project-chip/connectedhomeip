@@ -51,7 +51,7 @@ tests:
       command: "readAttribute"
       attribute: "location"
       response:
-          value: ""
+          value: "XX"
 
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
