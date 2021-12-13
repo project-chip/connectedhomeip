@@ -55,3 +55,18 @@ private:
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCOde);
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
+
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId,
+                                                                                const char * newLanguage);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId,
+                                                                                      uint32_t newTime);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId,
+                                                                                             bool enable);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId,
+                                                                                               bool enable);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId,
+                                                                                           uint8_t newLimit);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId,
+                                                                                                    uint8_t newTime);
