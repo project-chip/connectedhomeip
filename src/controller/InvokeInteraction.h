@@ -98,7 +98,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle ses
                      uint16_t timedInvokeTimeoutMs)
 {
     return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
-                                timedInvokeTimeoutMs);
+                                MakeOptional(timedInvokeTimeoutMs));
 }
 
 template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
