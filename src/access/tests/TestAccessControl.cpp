@@ -685,7 +685,7 @@ void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, accessControl.DeleteEntry(pos) == CHIP_NO_ERROR);
             }
 
-            NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data) - count) == CHIP_NO_ERROR);
+            NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data) - count) == CHIP_NO_ERROR);
         }
     }
 }
