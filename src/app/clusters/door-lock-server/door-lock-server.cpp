@@ -44,6 +44,9 @@ EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
 DoorLockServer DoorLockServer::instance;
 
+// TODO: Remove hardcoded pin when SetCredential command is implemented.
+chip::ByteSpan mPin({1,2,3,4});
+
 /**********************************************************
  * DoorLockServer Implementation
  *********************************************************/
@@ -61,8 +64,7 @@ DoorLockServer & DoorLockServer::Instance()
 void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
     emberAfDoorLockClusterPrintln("Door Lock cluster initialized at %d", endpointId);
-    // TODO: Remove hardcode
-    strcpy(mPin, "1234");
+
     SetLockState(endpointId, DlLockState::kLocked);;
     SetActuatorEnabled(endpointId, true);
 }
@@ -88,7 +90,7 @@ bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newAct
 
     emberAfDoorLockClusterPrintln("Setting Actuator Enabled State to '%hhu'", actuatorState);
 
-    bool status = Attributes::ActuatorEnabled::Set(endpointId, actuatorState);
+    auto status = Attributes::ActuatorEnabled::Set(endpointId, actuatorState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Unable to set the Actuator Enabled State to %hhu: internal error", actuatorState);
@@ -102,7 +104,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDo
     auto doorState = static_cast<uint8_t>(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting Door State to '%hhu'", doorState);
-    bool status = Attributes::DoorState::Set(endpointId, doorState);
+    auto status = Attributes::DoorState::Set(endpointId, doorState);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -151,32 +153,28 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
     bool require_pin = false;
     Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
 
-    if(require_pin)
+    if(commandData.pinCode.HasValue())
     {
-        if(!commandData.pinCode.HasValue())
+        // TODO: Search through list of stored PINs and check each.
+        if(mPin.data_equal(commandData.pinCode.Value()))
         {
-            success = false; // Just to be explicit. success == false at this point anywyay
+            success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, commandData.pinCode);
         }
         else
         {
-            const char *cmd_pin = reinterpret_cast<const char*>(commandData.pinCode.Value().data());
-            char *mPin = DoorLockServer::Instance().mPin;
-            if(strncmp(mPin, cmd_pin, 4) == 0)
-            {
-                success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, cmd_pin);
-            }
-            else
-            {
-                success = false;
-            }
+            success = false; // Just to be explicit. success == false at this point anyway
         }
     }
     else
     {
-        const char *cmd_pin = commandData.pinCode.HasValue() ?
-            reinterpret_cast<const char*>(commandData.pinCode.Value().data()) :
-            NULL;
-        success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, cmd_pin);
+        if(!require_pin)
+        {
+            success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, commandData.pinCode);
+        }
+        else
+        {
+            success = false;
+        }
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
@@ -201,32 +199,28 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     bool require_pin = false;
     Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
 
-    if(require_pin)
+    if(commandData.pinCode.HasValue())
     {
-        if(!commandData.pinCode.HasValue())
+        // TODO: Search through list of stored PINs and check each.
+        if(mPin.data_equal(commandData.pinCode.Value()))
         {
-            success = false; // Just to be explicit. success == false at this point anywyay
+            success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, commandData.pinCode);
         }
         else
         {
-            const char *cmd_pin = reinterpret_cast<const char*>(commandData.pinCode.Value().data());
-            char *mPin = DoorLockServer::Instance().mPin;
-            if(strncmp(mPin, cmd_pin, 4) == 0)
-            {
-                success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, cmd_pin);
-            }
-            else
-            {
-                success = false;
-            }
+            success = false; // Just to be explicit. success == false at this point anyway
         }
     }
     else
     {
-        const char *cmd_pin = commandData.pinCode.HasValue() ?
-            reinterpret_cast<const char*>(commandData.pinCode.Value().data()) :
-            NULL;
-        success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, cmd_pin);
+        if(!require_pin)
+        {
+            success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, commandData.pinCode);
+        }
+        else
+        {
+            success = false;
+        }
     }
 
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);

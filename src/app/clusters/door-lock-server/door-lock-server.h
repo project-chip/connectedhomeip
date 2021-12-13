@@ -35,9 +35,6 @@
 class DoorLockServer
 {
 public:
-    // Where should this actually live?
-    char mPin[5];
-
     static DoorLockServer & Instance();
     static DoorLockServer instance;
 
@@ -56,5 +53,5 @@ public:
 
 };
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCOde);
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);

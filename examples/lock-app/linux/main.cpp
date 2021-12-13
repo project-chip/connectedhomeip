@@ -31,14 +31,14 @@ using namespace chip::app::Clusters::DoorLock;
 // should wait for door to be locked on lock command and return success) but
 // door lock server should check pin before even calling the lock-door
 // callback.
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCode)
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
 {
-    return LockMgr().Lock(PINCode);
+    return LockManager::Instance().Lock(pinCode);
 }
 
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode)
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode)
 {
-    return LockMgr().Unlock(PINCode);
+    return LockManager::Instance().Unlock(pinCode);
 }
 
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
@@ -59,7 +59,7 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-    LockMgr().Init();
+    LockManager::Instance().Init();
     ChipLinuxAppMainLoop();
     return 0;
 }

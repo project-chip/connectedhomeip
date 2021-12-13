@@ -23,23 +23,18 @@
 
 #include <functional>
 
+#include <app/util/af.h>
+
 class LockManager
 {
 public:
     void Init();
 
-    bool Lock(const char* pin);
-    bool Unlock(const char* pin);
+    bool Lock(chip::Optional<chip::ByteSpan> pin);
+    bool Unlock(chip::Optional<chip::ByteSpan> pin);
 
+    static LockManager & Instance();
+    static LockManager instance;
 private:
-    friend LockManager & LockMgr(void);
-
     bool mLocked;
-
-    static LockManager sLock;
 };
-
-inline LockManager & LockMgr(void)
-{
-    return LockManager::sLock;
-}

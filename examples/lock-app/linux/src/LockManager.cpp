@@ -22,20 +22,25 @@
 #include <cstring>
 #include <lib/support/logging/CHIPLogging.h>
 
-LockManager LockManager::sLock;
+LockManager LockManager::instance;
+
+LockManager & LockManager::Instance()
+{
+    return instance;
+}
 
 void LockManager::Init()
 {
     mLocked = false;
 }
 
-bool LockManager::Lock(const char* pin)
+bool LockManager::Lock(chip::Optional<chip::ByteSpan> pin)
 {
     mLocked = true;
     return true;
 }
 
-bool LockManager::Unlock(const char* pin)
+bool LockManager::Unlock(chip::Optional<chip::ByteSpan> pin)
 {
     mLocked = false;
     return true;
