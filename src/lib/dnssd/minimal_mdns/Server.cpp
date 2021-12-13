@@ -189,8 +189,6 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
-    //if (!IsListening()) return;
-
     mEndpoints.ForEachActiveObject([&](auto * endpoint) {
         ShutdownEndpoint(*endpoint);
         return chip::Loop::Continue;
