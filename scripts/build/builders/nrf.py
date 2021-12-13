@@ -73,7 +73,8 @@ class NrfApp(Enum):
         elif self == NrfApp.PUMP_CONTROLLER:
             return 'chip-nrfconnect-pump-controller-example'
         elif self == NrfApp.UNIT_TESTS:
-            raise Exception('Unit tests compile natively and do not have a flashbundle')
+            raise Exception(
+                'Unit tests compile natively and do not have a flashbundle')
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -165,7 +166,6 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
             # pollute the source directory
             self._Execute(['ctest', ' --build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
                           title='Run Tests ' + self.identifier)
-
 
     def _generate_flashbundle(self):
         logging.info(f'Generating flashbundle at {self.output_dir}')
