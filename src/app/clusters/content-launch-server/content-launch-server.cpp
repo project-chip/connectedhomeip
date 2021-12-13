@@ -129,7 +129,6 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::Attri
 
 } // anonymous namespace
 
-
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
