@@ -41,6 +41,7 @@ public:
     // By id
     CHIP_ERROR SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info) override;
     CHIP_ERROR GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info) override;
+    CHIP_ERROR RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id) override;
     // By index
     CHIP_ERROR SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info) override;
     CHIP_ERROR GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info) override;

@@ -702,6 +702,17 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupInfo(chip::FabricIndex fabric_index, c
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id)
+{
+    FabricData fabric(fabric_index);
+    GroupData group;
+
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+    VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
+
+    return RemoveGroupInfoAt(fabric_index, group.index);
+}
+
 CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);

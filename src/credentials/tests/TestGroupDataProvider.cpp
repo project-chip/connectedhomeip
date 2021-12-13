@@ -173,7 +173,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     // Remove Groups
 
-    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupInfoAt(kFabric1, 2));
+    NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupInfo(kFabric1, kGroup3));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupInfoAt(kFabric2, 0));
 
     // Remaining entries shift up
