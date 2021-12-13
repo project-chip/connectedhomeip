@@ -513,18 +513,10 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
     switch (operationType)
     {
     case DlDataOperationType::kAdd:
-        // Nullable wrappers here for future: so far chip-tool doesn't play well with them, so I've been forced to use
-        // non-nullable types. But I thought it was a good idea to wrap them into Nullables so in future we will only have to change
-        // this line instead of SetUser function.
         return DoorLockServer::Instance().CreateUser(commandPath.mEndpointId, userIndex, fabricIndex, userName, userUniqueId,
-                                                     Nullable<DlUserStatus>(userStatus), Nullable<DlUserType>(userType),
-                                                     Nullable<DlCredentialRule>(credentialRule));
                                                      userStatus, userType, credentialRule);
     case DlDataOperationType::kModify:
         return DoorLockServer::Instance().ModifyUser(commandPath.mEndpointId, userIndex, fabricIndex, commandData.userName,
-                                                     commandData.userUniqueId, Nullable<DlUserStatus>(commandData.userStatus),
-                                                     Nullable<DlUserType>(commandData.userType),
-                                                     Nullable<DlCredentialRule>(commandData.credentialRule));
                                                      commandData.userUniqueId, commandData.userStatus, commandData.userType,
                                                      commandData.credentialRule);
     case DlDataOperationType::kClear:
@@ -671,7 +663,31 @@ bool emberAfDoorLockClusterSetCredentialCallback(
 {
     emberAfDoorLockClusterPrintln("[SetCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
-    // TODO: Implement clearing the user
+    auto & operationType = commandData.operationType;
+    //    auto & credential = commandData.credential;
+    //    auto & credentialData = commandData.credentialData;
+    auto & userIndex = commandData.userIndex;
+    //    auto & userStatus = commandData.userStatus;
+
+    switch (operationType)
+    {
+    case DlDataOperationType::kAdd: {
+        if (userIndex.IsNull())
+        {
+            // TODO: Create new credential and user
+        }
+        // TODO: Create new credential and modify the user if possible
+    }
+    break;
+    case DlDataOperationType::kModify:
+        // TODO: Modify the credential if possible
+        break;
+    case DlDataOperationType::kClear:
+        // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return true;
+    }
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -682,7 +698,7 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
 {
     emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
-    // TODO: Implement clearing the user
+    // TODO: Implement getting the credential status
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -693,7 +709,7 @@ bool emberAfDoorLockClusterClearCredentialCallback(
 {
     emberAfDoorLockClusterPrintln("[ClearCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
-    // TODO: Implement clearing the user
+    // TODO: Implement clearing the credential
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -991,7 +1007,7 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, Emb
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-#if 1
+#if DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION
 static EmberAfPluginDoorLockUserInfo gs_users[100];
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
@@ -1029,4 +1045,4 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
 {
     return false;
 }
-#endif
+#endif /* DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION */
