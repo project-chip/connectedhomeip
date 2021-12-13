@@ -158,19 +158,17 @@ tests:
     - label:
           "2: read the RO optional attribute default:
           TargetPositionLiftPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
       response:
-          #minValue: 0
-          #maxValue: 10000
           constraints:
               type: Percent100ths
+              minValue: 0
+              maxValue: 10000
 
     - label:
           "3a: write a value into the RO optional attribute:
           TargetPositionLiftPercent100ths"
-      disabled: true
       command: "writeAttribute"
       attribute: "TargetPositionLiftPercent100ths"
       arguments:
@@ -181,32 +179,28 @@ tests:
     - label:
           "3b: reads back the RO optional attribute:
           TargetPositionLiftPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionLiftPercent100ths"
       response:
-          #notValue: 20000
           constraints:
               type: Percent100ths
-
+              notValue: 20000
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
           TargetPositionTiltPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       response:
-          #minValue: 0
-          #maxValue: 10000
           constraints:
               type: Percent100ths
+              minValue: 0
+              maxValue: 10000
 
     - label:
           "3a: write a value into the RO optional attribute:
           TargetPositionTiltPercent100ths"
-      disabled: true
       command: "writeAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       arguments:
@@ -217,31 +211,28 @@ tests:
     - label:
           "3b: reads back the RO optional attribute:
           TargetPositionTiltPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "TargetPositionTiltPercent100ths"
       response:
-          #notValue: 20000
           constraints:
               type: Percent100ths
+              notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
           CurrentPositionLiftPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       response:
-          #minValue: 0
-          #maxValue: 10000
           constraints:
               type: Percent100ths
+              minValue: 0
+              maxValue: 10000
 
     - label:
           "3a: write a value into the RO optional attribute:
           CurrentPositionLiftPercent100ths"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       arguments:
@@ -252,31 +243,28 @@ tests:
     - label:
           "3b: reads back the RO optional attribute:
           CurrentPositionLiftPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercent100ths"
       response:
-          #notValue: 20000
           constraints:
               type: Percent100ths
+              notValue: 20000
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
     - label:
           "2: read the RO optional attribute default:
           CurrentPositionTiltPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       response:
-          #minValue: 0
-          #maxValue: 10000
           constraints:
               type: Percent100ths
+              minValue: 0
+              maxValue: 10000
 
     - label:
           "3a: write a value into the RO optional attribute:
           CurrentPositionTiltPercent100ths"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       arguments:
@@ -287,13 +275,12 @@ tests:
     - label:
           "3b: reads back the RO optional attribute:
           CurrentPositionTiltPercent100ths"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercent100ths"
       response:
-          #notValue: 20000
           constraints:
               type: Percent100ths
+              notValue: 20000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
     - label: "2: read the RO optional attribute default: InstalledOpenLimitLift"
@@ -510,18 +497,16 @@ tests:
 
     ### Attribute[  3]: CurrentPositionLift  ====================
     - label: "4: read the RO optional attribute default: CurrentPositionLift"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLift"
       response:
-          #minValue: 0
-          #maxValue: 65535
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "5a: write a value into the RO optional attribute: CurrentPositionLift"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionLift"
       arguments:
@@ -530,29 +515,26 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionLift"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLift"
       response:
-          #minValue: 0
-          #maxValue: 65535
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     ### Attribute[  4]: CurrentPositionTilt  ====================
     - label: "4: read the RO optional attribute default: CurrentPositionTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       response:
-          #minValue: 0
-          #maxValue: 65535
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     - label:
           "5a: write a value into the RO optional attribute: CurrentPositionTilt"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionTilt"
       arguments:
@@ -561,14 +543,13 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionTilt"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTilt"
       response:
-          #minValue: 0
-          #maxValue: 65535
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65535
 
     ### Attribute[  5]: NumberOfActuationsLift  ====================
     - label: "4: read the RO optional attribute default: NumberOfActuationsLift"
@@ -638,19 +619,17 @@ tests:
     - label:
           "4: read the RO optional attribute default:
           CurrentPositionLiftPercentage"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:
-          #minValue: 0
-          #maxValue: 100
           constraints:
               type: Percent
+              minValue: 0
+              maxValue: 100
 
     - label:
           "5a: write a value into the RO optional attribute:
           CurrentPositionLiftPercentage"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionLiftPercentage"
       arguments:
@@ -661,31 +640,28 @@ tests:
     - label:
           "5b: reads back the RO optional attribute:
           CurrentPositionLiftPercentage"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionLiftPercentage"
       response:
-          #notValue: 200
           constraints:
               type: Percent
+              notValue: 200
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
     - label:
           "4: read the RO optional attribute default:
           CurrentPositionTiltPercentage"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:
-          #minValue: 0
-          #maxValue: 100
           constraints:
               type: Percent
+              minValue: 0
+              maxValue: 100
 
     - label:
           "5a: write a value into the RO optional attribute:
           CurrentPositionTiltPercentage"
-      disabled: true
       command: "writeAttribute"
       attribute: "CurrentPositionTiltPercentage"
       arguments:
@@ -696,14 +672,12 @@ tests:
     - label:
           "5b: reads back the RO optional attribute:
           CurrentPositionTiltPercentage"
-      disabled: true
       command: "readAttribute"
       attribute: "CurrentPositionTiltPercentage"
       response:
-          #notValue: 200
           constraints:
               type: Percent
-
+              notValue: 200
     ###################################################
     # FYI Non Tested deprecated attributes
     # 20 VelocityLift
