@@ -67,6 +67,7 @@ jobs:
                         --target linux-arm64-chip-tool-ipv6only \
                         --target linux-arm64-minmdns \
                         --target linux-arm64-thermostat-no-ble \
+                        --target linux-arm64-lock \
                         build \
                      "
             - name: Bloat report - chip-tool

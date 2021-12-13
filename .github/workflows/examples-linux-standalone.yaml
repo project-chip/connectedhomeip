@@ -131,7 +131,10 @@ jobs:
             - name: Build example Standalone Door Lock App
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/lock-app/linux out/lock_app_debug
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-lock \
+                        build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     linux debug lock-app \
                     out/lock_app_debug/chip-lock-app \
