@@ -32,6 +32,10 @@
 #define DOOR_LOCK_SERVER_ENDPOINT 1
 #endif
 
+#ifndef DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION
+#define DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION 1
+#endif
+
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
