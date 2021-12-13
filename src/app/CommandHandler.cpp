@@ -254,7 +254,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
 
     {
-        if (mpExchangeCtx == nullptr || mpExchangeCtx->HasSessionHandle() == false)
+        if (mpExchangeCtx == nullptr || !mpExchangeCtx->HasSessionHandle())
         {
             // No exchange context or session handle means no subject descriptor so cannot check access control
             return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
