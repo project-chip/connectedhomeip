@@ -120,7 +120,7 @@ CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, 
         outLen = strlen(mLocation);
         return CHIP_NO_ERROR;
     }
-    
+
     return err;
 }
 
