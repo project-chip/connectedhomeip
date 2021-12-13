@@ -471,8 +471,8 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
         (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
         (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
 
-        (void) Attributes::CurrentPositionLiftPercent::Get(endpoint, &current);
-        (void) Attributes::TargetPositionLiftPercent::Set(endpoint, current);
+        (void) Attributes::CurrentPositionLiftPercentage::Get(endpoint, &current);
+        (void) Attributes::TargetPositionLiftPercentage::Set(endpoint, current);
     }
 
     if (HasFeature(endpoint, Features::Tilt) && HasFeature(endpoint, Features::PositionAwareTilt))
@@ -480,8 +480,8 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
         (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
         (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
 
-        (void) Attributes::CurrentPositionTiltPercent::Get(endpoint, &current);
-        (void) Attributes::TargetPositionTiltPercent::Set(endpoint, current);
+        (void) Attributes::CurrentPositionTiltPercentage::Get(endpoint, &current);
+        (void) Attributes::TargetPositionTiltPercentage::Set(endpoint, current);
     }
 
     return EMBER_SUCCESS == emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
