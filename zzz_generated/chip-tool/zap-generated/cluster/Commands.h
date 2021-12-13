@@ -111,19 +111,23 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1679,6 +1683,37 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Width", indent + 1, value.width);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Width'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Height", indent + 1, value.height);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Height'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -1727,6 +1762,37 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExternalIDList'",
                             IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ImageUrl'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Color", indent + 1, value.color);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Color'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Size'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1789,68 +1855,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Width", indent + 1, value.width);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Width'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Height", indent + 1, value.height);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Height'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ImageUrl'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Color", indent + 1, value.color);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Color'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Size'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -1883,6 +1887,53 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CatalogVendorId'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ApplicationId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Application", indent + 1, value.application);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Application'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2273,10 +2324,46 @@ static void OnAccountLoginGetSetupPINResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnApplicationLauncherHideAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received HideAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void OnApplicationLauncherLaunchAppResponseSuccess(
     void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
 {
     ChipLogProgress(Zcl, "Received LaunchAppResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("status", 1, data.status);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnApplicationLauncherStopAppResponseSuccess(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received StopAppResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
@@ -2298,11 +2385,11 @@ static void OnContentLauncherLaunchContentResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
+        err = LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2316,11 +2403,11 @@ static void OnContentLauncherLaunchURLResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
+        err = LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2353,84 +2440,44 @@ static void OnDiagnosticLogsRetrieveLogsResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
-static void OnDoorLockGetHolidayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+static void OnDoorLockGetCredentialStatusResponseSuccess(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetHolidayScheduleResponse:");
+    ChipLogProgress(Zcl, "Received GetCredentialStatusResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("holidayIndex", 1, data.holidayIndex);
+        err = LogValue("credentialExists", 1, data.credentialExists);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("localStartTime", 1, data.localStartTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localEndTime", 1, data.localEndTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("operatingMode", 1, data.operatingMode);
+        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
 };
 
-static void
-OnDoorLockGetLogRecordResponseSuccess(void * context,
-                                      const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
+static void OnDoorLockGetUserResponseSuccess(void * context,
+                                             const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetLogRecordResponse:");
+    ChipLogProgress(Zcl, "Received GetUserResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("logEntryId", 1, data.logEntryId);
+        err = LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timestamp", 1, data.timestamp);
+        err = LogValue("userName", 1, data.userName);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("eventType", 1, data.eventType);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("source", 1, data.source);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("eventIdOrAlarmCode", 1, data.eventIdOrAlarmCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("pin", 1, data.pin);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void
-OnDoorLockGetPINCodeResponseSuccess(void * context,
-                                    const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetPINCodeResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
+        err = LogValue("userUniqueId", 1, data.userUniqueId);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2442,7 +2489,23 @@ OnDoorLockGetPINCodeResponseSuccess(void * context,
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("pin", 1, data.pin);
+        err = LogValue("credentialRule", 1, data.credentialRule);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("credentials", 1, data.credentials);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("creatorFabricIndex", 1, data.creatorFabricIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("lastModifiedFabricIndex", 1, data.lastModifiedFabricIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("nextUserIndex", 1, data.nextUserIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2450,59 +2513,14 @@ OnDoorLockGetPINCodeResponseSuccess(void * context,
 };
 
 static void
-OnDoorLockGetRFIDCodeResponseSuccess(void * context,
-                                     const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
+OnDoorLockSetCredentialResponseSuccess(void * context,
+                                       const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetRFIDCodeResponse:");
+    ChipLogProgress(Zcl, "Received SetCredentialResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userStatus", 1, data.userStatus);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userType", 1, data.userType);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("rfidCode", 1, data.rfidCode);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void
-OnDoorLockGetUserTypeResponseSuccess(void * context,
-                                     const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetUserTypeResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userType", 1, data.userType);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnDoorLockGetWeekDayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetWeekDayScheduleResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("weekDayIndex", 1, data.weekDayIndex);
+        err = LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2510,57 +2528,7 @@ static void OnDoorLockGetWeekDayScheduleResponseSuccess(
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("daysMask", 1, data.daysMask);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("startHour", 1, data.startHour);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("startMinute", 1, data.startMinute);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("endHour", 1, data.endHour);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("endMinute", 1, data.endMinute);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnDoorLockGetYearDayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetYearDayScheduleResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("yearDayIndex", 1, data.yearDayIndex);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userIndex", 1, data.userIndex);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("status", 1, data.status);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localStartTime", 1, data.localStartTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localEndTime", 1, data.localEndTime);
+        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3473,6 +3441,66 @@ static void OnTestClusterTestSpecificResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnThermostatGetRelayStatusLogResponseSuccess(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetRelayStatusLogResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("timeOfDay", 1, data.timeOfDay);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("relayStatus", 1, data.relayStatus);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("localTemperature", 1, data.localTemperature);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("humidityInPercentage", 1, data.humidityInPercentage);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("setpoint", 1, data.setpoint);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("unreadEntries", 1, data.unreadEntries);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnThermostatGetWeeklyScheduleResponseSuccess(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetWeeklyScheduleResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("numberOfTransitionsForSequence", 1, data.numberOfTransitionsForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("dayOfWeekForSequence", 1, data.dayOfWeekForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("modeForSequence", 1, data.modeForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("payload", 1, data.payload);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -3771,6 +3799,7 @@ public:
 | Commands:                                                           |        |
 | * GetSetupPIN                                                       |   0x00 |
 | * Login                                                             |   0x01 |
+| * Logout                                                            |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AttributeList                                                     | 0xFFFB |
@@ -3824,6 +3853,26 @@ public:
 
 private:
     chip::app::Clusters::AccountLogin::Commands::Login::Type mRequest;
+};
+
+/*
+ * Command Logout
+ */
+class AccountLoginLogout : public ModelCommand
+{
+public:
+    AccountLoginLogout() : ModelCommand("logout") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::AccountLogin::Commands::Logout::Type mRequest;
 };
 
 /*
@@ -4217,9 +4266,9 @@ private:
 | * VendorId                                                          | 0x0001 |
 | * ApplicationName                                                   | 0x0002 |
 | * ProductId                                                         | 0x0003 |
-| * ApplicationId                                                     | 0x0005 |
-| * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationStatus                                                 | 0x0007 |
+| * ApplicationApp                                                    | 0x0004 |
+| * ApplicationStatus                                                 | 0x0005 |
+| * ApplicationVersion                                                | 0x0006 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4529,144 +4578,6 @@ private:
 };
 
 /*
- * Attribute ApplicationId
- */
-class ReadApplicationBasicApplicationId : public ModelCommand
-{
-public:
-    ReadApplicationBasicApplicationId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::CharSpan value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationId response", value);
-    }
-};
-
-class ReportApplicationBasicApplicationId : public ModelCommand
-{
-public:
-    ReportApplicationBasicApplicationId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("ApplicationBasic.ApplicationId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CatalogVendorId
- */
-class ReadApplicationBasicCatalogVendorId : public ModelCommand
-{
-public:
-    ReadApplicationBasicCatalogVendorId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint16_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationBasicCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationBasicCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint16_t value) { LogValue("ApplicationBasic.CatalogVendorId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute ApplicationStatus
  */
 class ReadApplicationBasicApplicationStatus : public ModelCommand
@@ -4728,6 +4639,78 @@ public:
     }
 
     static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationBasic.ApplicationStatus report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute ApplicationVersion
+ */
+class ReadApplicationBasicApplicationVersion : public ModelCommand
+{
+public:
+    ReadApplicationBasicApplicationVersion() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-version");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationBasicApplicationVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationVersion response", value);
+    }
+};
+
+class ReportApplicationBasicApplicationVersion : public ModelCommand
+{
+public:
+    ReportApplicationBasicApplicationVersion() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "application-version");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportApplicationBasicApplicationVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("ApplicationBasic.ApplicationVersion report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -4838,15 +4821,39 @@ private:
 | Cluster ApplicationLauncher                                         | 0x050C |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * HideApp                                                           |   0x02 |
 | * LaunchApp                                                         |   0x00 |
+| * StopApp                                                           |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
-| * CatalogVendorId                                                   | 0x0001 |
-| * ApplicationId                                                     | 0x0002 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command HideApp
+ */
+class ApplicationLauncherHideApp : public ModelCommand
+{
+public:
+    ApplicationLauncherHideApp() : ModelCommand("hide-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherHideAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type mRequest;
+};
 
 /*
  * Command LaunchApp
@@ -4857,8 +4864,7 @@ public:
     ApplicationLauncherLaunchApp() : ModelCommand("launch-app")
     {
         AddArgument("Data", &mRequest.data);
-        AddArgument("CatalogVendorId", 0, UINT16_MAX, &mRequest.catalogVendorId);
-        AddArgument("ApplicationId", &mRequest.applicationId);
+        // application Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -4872,6 +4878,30 @@ public:
 
 private:
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type mRequest;
+};
+
+/*
+ * Command StopApp
+ */
+class ApplicationLauncherStopApp : public ModelCommand
+{
+public:
+    ApplicationLauncherStopApp() : ModelCommand("stop-app")
+    {
+        // application Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherStopAppResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type mRequest;
 };
 
 /*
@@ -4939,144 +4969,6 @@ public:
     {
         LogValue("ApplicationLauncher.ApplicationLauncherList report", 0, value);
     }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CatalogVendorId
- */
-class ReadApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherCatalogVendorId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationLauncher.CatalogVendorId report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute ApplicationId
- */
-class ReadApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherApplicationId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationId response", value);
-    }
-};
-
-class ReportApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherApplicationId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationLauncher.ApplicationId report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -13573,7 +13465,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AcceptsHeaderList                                                 | 0x0000 |
-| * SupportedStreamingTypes                                           | 0x0001 |
+| * SupportedStreamingProtocols                                       | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -13588,6 +13480,7 @@ public:
     {
         AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
         AddArgument("Data", &mRequest.data);
+        // search Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -13613,6 +13506,7 @@ public:
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
+        // brandingInformation Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -13701,18 +13595,18 @@ private:
 };
 
 /*
- * Attribute SupportedStreamingTypes
+ * Attribute SupportedStreamingProtocols
  */
-class ReadContentLauncherSupportedStreamingTypes : public ModelCommand
+class ReadContentLauncherSupportedStreamingProtocols : public ModelCommand
 {
 public:
-    ReadContentLauncherSupportedStreamingTypes() : ModelCommand("read")
+    ReadContentLauncherSupportedStreamingProtocols() : ModelCommand("read")
     {
-        AddArgument("attr-name", "supported-streaming-types");
+        AddArgument("attr-name", "supported-streaming-protocols");
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherSupportedStreamingTypes() {}
+    ~ReadContentLauncherSupportedStreamingProtocols() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13720,31 +13614,55 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingTypes response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingProtocols response", value);
     }
 };
 
-class ReportContentLauncherSupportedStreamingTypes : public ModelCommand
+class WriteContentLauncherSupportedStreamingProtocols : public ModelCommand
 {
 public:
-    ReportContentLauncherSupportedStreamingTypes() : ModelCommand("report")
+    WriteContentLauncherSupportedStreamingProtocols() : ModelCommand("write")
     {
-        AddArgument("attr-name", "supported-streaming-types");
+        AddArgument("attr-name", "supported-streaming-protocols");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteContentLauncherSupportedStreamingProtocols() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ContentLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class ReportContentLauncherSupportedStreamingProtocols : public ModelCommand
+{
+public:
+    ReportContentLauncherSupportedStreamingProtocols() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-streaming-protocols");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~ReportContentLauncherSupportedStreamingTypes() {}
+    ~ReportContentLauncherSupportedStreamingProtocols() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13754,7 +13672,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -13763,11 +13681,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    static void OnValueReport(void * context, uint32_t value)
     {
-        LogValue("ContentLauncher.SupportedStreamingTypes report", 0, value);
+        LogValue("ContentLauncher.SupportedStreamingProtocols report", 0, value);
     }
 
 private:
@@ -14352,368 +14268,130 @@ public:
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ClearAllPINCodes                                                  |   0x08 |
-| * ClearAllRFIDCodes                                                 |   0x19 |
-| * ClearHolidaySchedule                                              |   0x13 |
-| * ClearPINCode                                                      |   0x07 |
-| * ClearRFIDCode                                                     |   0x18 |
-| * ClearWeekDaySchedule                                              |   0x0D |
-| * ClearYearDaySchedule                                              |   0x10 |
-| * GetHolidaySchedule                                                |   0x12 |
-| * GetLogRecord                                                      |   0x04 |
-| * GetPINCode                                                        |   0x06 |
-| * GetRFIDCode                                                       |   0x17 |
-| * GetUserType                                                       |   0x15 |
-| * GetWeekDaySchedule                                                |   0x0C |
-| * GetYearDaySchedule                                                |   0x0F |
+| * ClearCredential                                                   |   0x26 |
+| * ClearUser                                                         |   0x1D |
+| * GetCredentialStatus                                               |   0x24 |
+| * GetUser                                                           |   0x1B |
 | * LockDoor                                                          |   0x00 |
-| * SetHolidaySchedule                                                |   0x11 |
-| * SetPINCode                                                        |   0x05 |
-| * SetRFIDCode                                                       |   0x16 |
-| * SetUserType                                                       |   0x14 |
-| * SetWeekDaySchedule                                                |   0x0B |
-| * SetYearDaySchedule                                                |   0x0E |
+| * SetCredential                                                     |   0x22 |
+| * SetUser                                                           |   0x1A |
 | * UnlockDoor                                                        |   0x01 |
-| * UnlockWithTimeout                                                 |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
 | * LockType                                                          | 0x0001 |
 | * ActuatorEnabled                                                   | 0x0002 |
+| * DoorState                                                         | 0x0003 |
+| * NumberOfTotalUsersSupported                                       | 0x0011 |
+| * NumberOfPINUsersSupported                                         | 0x0012 |
+| * MaxPINCodeLength                                                  | 0x0017 |
+| * MinPINCodeLength                                                  | 0x0018 |
+| * Language                                                          | 0x0021 |
+| * AutoRelockTime                                                    | 0x0023 |
+| * SoundVolume                                                       | 0x0024 |
+| * OperatingMode                                                     | 0x0025 |
+| * SupportedOperatingModes                                           | 0x0026 |
+| * EnableOneTouchLocking                                             | 0x0029 |
+| * EnablePrivacyModeButton                                           | 0x002B |
+| * WrongCodeEntryLimit                                               | 0x0030 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command ClearAllPINCodes
+ * Command ClearCredential
  */
-class DoorLockClearAllPINCodes : public ModelCommand
+class DoorLockClearCredential : public ModelCommand
 {
 public:
-    DoorLockClearAllPINCodes() : ModelCommand("clear-all-pincodes") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    DoorLockClearCredential() : ModelCommand("clear-credential")
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Type mRequest;
-};
-
-/*
- * Command ClearAllRFIDCodes
- */
-class DoorLockClearAllRFIDCodes : public ModelCommand
-{
-public:
-    DoorLockClearAllRFIDCodes() : ModelCommand("clear-all-rfidcodes") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Type mRequest;
-};
-
-/*
- * Command ClearHolidaySchedule
- */
-class DoorLockClearHolidaySchedule : public ModelCommand
-{
-public:
-    DoorLockClearHolidaySchedule() : ModelCommand("clear-holiday-schedule")
-    {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
+        // credential Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
 };
 
 /*
- * Command ClearPINCode
+ * Command ClearUser
  */
-class DoorLockClearPINCode : public ModelCommand
+class DoorLockClearUser : public ModelCommand
 {
 public:
-    DoorLockClearPINCode() : ModelCommand("clear-pincode")
+    DoorLockClearUser() : ModelCommand("clear-user")
     {
-        AddArgument("PinSlotIndex", 0, UINT16_MAX, &mRequest.pinSlotIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearPINCode::Type mRequest;
-};
-
-/*
- * Command ClearRFIDCode
- */
-class DoorLockClearRFIDCode : public ModelCommand
-{
-public:
-    DoorLockClearRFIDCode() : ModelCommand("clear-rfidcode")
-    {
-        AddArgument("RfidSlotIndex", 0, UINT16_MAX, &mRequest.rfidSlotIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearWeekDaySchedule
- */
-class DoorLockClearWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockClearWeekDaySchedule() : ModelCommand("clear-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::ClearUser::Type mRequest;
 };
 
 /*
- * Command ClearYearDaySchedule
+ * Command GetCredentialStatus
  */
-class DoorLockClearYearDaySchedule : public ModelCommand
+class DoorLockGetCredentialStatus : public ModelCommand
 {
 public:
-    DoorLockClearYearDaySchedule() : ModelCommand("clear-year-day-schedule")
+    DoorLockGetCredentialStatus() : ModelCommand("get-credential-status")
     {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        // credential Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type mRequest;
-};
-
-/*
- * Command GetHolidaySchedule
- */
-class DoorLockGetHolidaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetHolidaySchedule() : ModelCommand("get-holiday-schedule")
-    {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetHolidayScheduleResponseSuccess, OnDefaultFailure,
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetCredentialStatusResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
 };
 
 /*
- * Command GetLogRecord
+ * Command GetUser
  */
-class DoorLockGetLogRecord : public ModelCommand
+class DoorLockGetUser : public ModelCommand
 {
 public:
-    DoorLockGetLogRecord() : ModelCommand("get-log-record")
+    DoorLockGetUser() : ModelCommand("get-user")
     {
-        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetLogRecordResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type mRequest;
-};
-
-/*
- * Command GetPINCode
- */
-class DoorLockGetPINCode : public ModelCommand
-{
-public:
-    DoorLockGetPINCode() : ModelCommand("get-pincode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetPINCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetPINCode::Type mRequest;
-};
-
-/*
- * Command GetRFIDCode
- */
-class DoorLockGetRFIDCode : public ModelCommand
-{
-public:
-    DoorLockGetRFIDCode() : ModelCommand("get-rfidcode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetRFIDCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Type mRequest;
-};
-
-/*
- * Command GetUserType
- */
-class DoorLockGetUserType : public ModelCommand
-{
-public:
-    DoorLockGetUserType() : ModelCommand("get-user-type")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserTypeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserType::Type mRequest;
-};
-
-/*
- * Command GetWeekDaySchedule
- */
-class DoorLockGetWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetWeekDaySchedule() : ModelCommand("get-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetWeekDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type mRequest;
-};
-
-/*
- * Command GetYearDaySchedule
- */
-class DoorLockGetYearDaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetYearDaySchedule() : ModelCommand("get-year-day-schedule")
-    {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetYearDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::GetUser::Type mRequest;
 };
 
 /*
@@ -14741,173 +14419,67 @@ private:
 };
 
 /*
- * Command SetHolidaySchedule
+ * Command SetCredential
  */
-class DoorLockSetHolidaySchedule : public ModelCommand
+class DoorLockSetCredential : public ModelCommand
 {
 public:
-    DoorLockSetHolidaySchedule() : ModelCommand("set-holiday-schedule")
+    DoorLockSetCredential() : ModelCommand("set-credential")
     {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
-        AddArgument("OperatingMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operatingMode)> *>(&mRequest.operatingMode));
+        AddArgument("OperationType", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        // credential Struct parsing is not supported yet
+        AddArgument("CredentialData", &mRequest.credentialData);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("UserStatus", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetCredentialResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::SetCredential::Type mRequest;
 };
 
 /*
- * Command SetPINCode
+ * Command SetUser
  */
-class DoorLockSetPINCode : public ModelCommand
+class DoorLockSetUser : public ModelCommand
 {
 public:
-    DoorLockSetPINCode() : ModelCommand("set-pincode")
+    DoorLockSetUser() : ModelCommand("set-user")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("OperationType", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("UserName", &mRequest.userName);
+        AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
         AddArgument("UserStatus", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
         AddArgument("UserType", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("Pin", &mRequest.pin);
+        AddArgument("CredentialRule", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.credentialRule)> *>(&mRequest.credentialRule));
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::SetPINCode::Type mRequest;
-};
-
-/*
- * Command SetRFIDCode
- */
-class DoorLockSetRFIDCode : public ModelCommand
-{
-public:
-    DoorLockSetRFIDCode() : ModelCommand("set-rfidcode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("RfidCode", &mRequest.rfidCode);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Type mRequest;
-};
-
-/*
- * Command SetUserType
- */
-class DoorLockSetUserType : public ModelCommand
-{
-public:
-    DoorLockSetUserType() : ModelCommand("set-user-type")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserType::Type mRequest;
-};
-
-/*
- * Command SetWeekDaySchedule
- */
-class DoorLockSetWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockSetWeekDaySchedule() : ModelCommand("set-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("DaysMask", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::DoorLock::DlDaysMaskMap> *>(&mRequest.daysMask));
-        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour);
-        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute);
-        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour);
-        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type mRequest;
-};
-
-/*
- * Command SetYearDaySchedule
- */
-class DoorLockSetYearDaySchedule : public ModelCommand
-{
-public:
-    DoorLockSetYearDaySchedule() : ModelCommand("set-year-day-schedule")
-    {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::SetUser::Type mRequest;
 };
 
 /*
@@ -14932,31 +14504,6 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type mRequest;
-};
-
-/*
- * Command UnlockWithTimeout
- */
-class DoorLockUnlockWithTimeout : public ModelCommand
-{
-public:
-    DoorLockUnlockWithTimeout() : ModelCommand("unlock-with-timeout")
-    {
-        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
-        AddArgument("PinCode", &mRequest.pinCode);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
 };
 
 /*
@@ -15167,6 +14714,898 @@ public:
     }
 
     static void OnValueReport(void * context, bool value) { LogValue("DoorLock.ActuatorEnabled report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute DoorState
+ */
+class ReadDoorLockDoorState : public ModelCommand
+{
+public:
+    ReadDoorLockDoorState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "door-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockDoorState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::DoorState::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.DoorState response", value);
+    }
+};
+
+class ReportDoorLockDoorState : public ModelCommand
+{
+public:
+    ReportDoorLockDoorState() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "door-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockDoorState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::DoorState::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+    {
+        LogValue("DoorLock.DoorState report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NumberOfTotalUsersSupported
+ */
+class ReadDoorLockNumberOfTotalUsersSupported : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfTotalUsersSupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-total-users-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfTotalUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfTotalUsersSupported response", value);
+    }
+};
+
+/*
+ * Attribute NumberOfPINUsersSupported
+ */
+class ReadDoorLockNumberOfPINUsersSupported : public ModelCommand
+{
+public:
+    ReadDoorLockNumberOfPINUsersSupported() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "number-of-pinusers-supported");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockNumberOfPINUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfPINUsersSupported response", value);
+    }
+};
+
+/*
+ * Attribute MaxPINCodeLength
+ */
+class ReadDoorLockMaxPINCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMaxPINCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "max-pincode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMaxPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.MaxPINCodeLength response", value);
+    }
+};
+
+/*
+ * Attribute MinPINCodeLength
+ */
+class ReadDoorLockMinPINCodeLength : public ModelCommand
+{
+public:
+    ReadDoorLockMinPINCodeLength() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "min-pincode-length");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockMinPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.MinPINCodeLength response", value);
+    }
+};
+
+/*
+ * Attribute Language
+ */
+class ReadDoorLockLanguage : public ModelCommand
+{
+public:
+    ReadDoorLockLanguage() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "language");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockLanguage() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.Language response", value);
+    }
+};
+
+class WriteDoorLockLanguage : public ModelCommand
+{
+public:
+    WriteDoorLockLanguage() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "language");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockLanguage() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+class ReportDoorLockLanguage : public ModelCommand
+{
+public:
+    ReportDoorLockLanguage() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "language");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockLanguage() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("DoorLock.Language report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AutoRelockTime
+ */
+class ReadDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    ReadDoorLockAutoRelockTime() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockAutoRelockTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.AutoRelockTime response", value);
+    }
+};
+
+class WriteDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    WriteDoorLockAutoRelockTime() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockAutoRelockTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class ReportDoorLockAutoRelockTime : public ModelCommand
+{
+public:
+    ReportDoorLockAutoRelockTime() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "auto-relock-time");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockAutoRelockTime() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("DoorLock.AutoRelockTime report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SoundVolume
+ */
+class ReadDoorLockSoundVolume : public ModelCommand
+{
+public:
+    ReadDoorLockSoundVolume() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "sound-volume");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockSoundVolume() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.SoundVolume response", value);
+    }
+};
+
+class WriteDoorLockSoundVolume : public ModelCommand
+{
+public:
+    WriteDoorLockSoundVolume() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "sound-volume");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockSoundVolume() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class ReportDoorLockSoundVolume : public ModelCommand
+{
+public:
+    ReportDoorLockSoundVolume() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "sound-volume");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockSoundVolume() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.SoundVolume report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute OperatingMode
+ */
+class ReadDoorLockOperatingMode : public ModelCommand
+{
+public:
+    ReadDoorLockOperatingMode() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "operating-mode");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockOperatingMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.OperatingMode response", value);
+    }
+};
+
+class WriteDoorLockOperatingMode : public ModelCommand
+{
+public:
+    WriteDoorLockOperatingMode() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "operating-mode");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockOperatingMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::DoorLock::DlOperatingMode mValue;
+};
+
+class ReportDoorLockOperatingMode : public ModelCommand
+{
+public:
+    ReportDoorLockOperatingMode() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "operating-mode");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockOperatingMode() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+    {
+        LogValue("DoorLock.OperatingMode report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute SupportedOperatingModes
+ */
+class ReadDoorLockSupportedOperatingModes : public ModelCommand
+{
+public:
+    ReadDoorLockSupportedOperatingModes() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-operating-modes");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockSupportedOperatingModes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::SupportedOperatingModes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.SupportedOperatingModes response", value);
+    }
+};
+
+/*
+ * Attribute EnableOneTouchLocking
+ */
+class ReadDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    ReadDoorLockEnableOneTouchLocking() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockEnableOneTouchLocking() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.EnableOneTouchLocking response", value);
+    }
+};
+
+class WriteDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    WriteDoorLockEnableOneTouchLocking() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockEnableOneTouchLocking() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportDoorLockEnableOneTouchLocking : public ModelCommand
+{
+public:
+    ReportDoorLockEnableOneTouchLocking() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "enable-one-touch-locking");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockEnableOneTouchLocking() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnableOneTouchLocking report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute EnablePrivacyModeButton
+ */
+class ReadDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    ReadDoorLockEnablePrivacyModeButton() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockEnablePrivacyModeButton() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.EnablePrivacyModeButton response", value);
+    }
+};
+
+class WriteDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    WriteDoorLockEnablePrivacyModeButton() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockEnablePrivacyModeButton() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    bool mValue;
+};
+
+class ReportDoorLockEnablePrivacyModeButton : public ModelCommand
+{
+public:
+    ReportDoorLockEnablePrivacyModeButton() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "enable-privacy-mode-button");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockEnablePrivacyModeButton() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("DoorLock.EnablePrivacyModeButton report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute WrongCodeEntryLimit
+ */
+class ReadDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    ReadDoorLockWrongCodeEntryLimit() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadDoorLockWrongCodeEntryLimit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.WrongCodeEntryLimit response", value);
+    }
+};
+
+class WriteDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    WriteDoorLockWrongCodeEntryLimit() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteDoorLockWrongCodeEntryLimit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint8_t mValue;
+};
+
+class ReportDoorLockWrongCodeEntryLimit : public ModelCommand
+{
+public:
+    ReportDoorLockWrongCodeEntryLimit() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "wrong-code-entry-limit");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockWrongCodeEntryLimit() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.WrongCodeEntryLimit report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -22210,11 +22649,9 @@ private:
 | * PlaybackState                                                     | 0x0000 |
 | * StartTime                                                         | 0x0001 |
 | * Duration                                                          | 0x0002 |
-| * PositionUpdatedAt                                                 | 0x0003 |
-| * Position                                                          | 0x0004 |
-| * PlaybackSpeed                                                     | 0x0005 |
-| * SeekRangeEnd                                                      | 0x0006 |
-| * SeekRangeStart                                                    | 0x0007 |
+| * PlaybackSpeed                                                     | 0x0004 |
+| * SeekRangeEnd                                                      | 0x0005 |
+| * SeekRangeStart                                                    | 0x0006 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -22659,144 +23096,6 @@ private:
 };
 
 /*
- * Attribute PositionUpdatedAt
- */
-class ReadMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPositionUpdatedAt() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPositionUpdatedAt() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.PositionUpdatedAt response", value);
-    }
-};
-
-class ReportMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPositionUpdatedAt() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPositionUpdatedAt() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.PositionUpdatedAt report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute Position
- */
-class ReadMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPosition() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(this, OnAttributeResponse,
-                                                                                                         OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.Position response", value);
-    }
-};
-
-class ReportMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPosition() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.Position report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute PlaybackSpeed
  */
 class ReadMediaPlaybackPlaybackSpeed : public ModelCommand
@@ -22820,49 +23119,10 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint64_t value)
+    static void OnAttributeResponse(void * context, float value)
     {
         OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackSpeed response", value);
     }
-};
-
-class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "playback-speed");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPlaybackSpeed() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint64_t value) { LogValue("MediaPlayback.PlaybackSpeed report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*
@@ -31755,9 +32015,7 @@ private:
 | * SkipChannel                                                       |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * TvChannelList                                                     | 0x0000 |
-| * TvChannelLineup                                                   | 0x0001 |
-| * CurrentTvChannel                                                  | 0x0002 |
+| * ChannelList                                                       | 0x0000 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -31836,18 +32094,18 @@ private:
 };
 
 /*
- * Attribute TvChannelList
+ * Attribute ChannelList
  */
-class ReadTvChannelTvChannelList : public ModelCommand
+class ReadTvChannelChannelList : public ModelCommand
 {
 public:
-    ReadTvChannelTvChannelList() : ModelCommand("read")
+    ReadTvChannelChannelList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tv-channel-list");
+        AddArgument("attr-name", "channel-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelTvChannelList() {}
+    ~ReadTvChannelChannelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31855,31 +32113,31 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(this, OnAttributeResponse,
-                                                                                                          OnDefaultFailure);
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
     static void OnAttributeResponse(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
     {
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelList response", value);
+        OnGeneralAttributeResponse(context, "TvChannel.ChannelList response", value);
     }
 };
 
-class ReportTvChannelTvChannelList : public ModelCommand
+class ReportTvChannelChannelList : public ModelCommand
 {
 public:
-    ReportTvChannelTvChannelList() : ModelCommand("report")
+    ReportTvChannelChannelList() : ModelCommand("report")
     {
-        AddArgument("attr-name", "tv-channel-list");
+        AddArgument("attr-name", "channel-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~ReportTvChannelTvChannelList() {}
+    ~ReportTvChannelChannelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31889,7 +32147,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -31902,146 +32160,8 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
     {
-        LogValue("TvChannel.TvChannelList report", 0, value);
+        LogValue("TvChannel.ChannelList report", 0, value);
     }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute TvChannelLineup
- */
-class ReadTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReadTvChannelTvChannelLineup() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelTvChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelLineup response", value);
-    }
-};
-
-class ReportTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReportTvChannelTvChannelLineup() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelTvChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TvChannel.TvChannelLineup report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CurrentTvChannel
- */
-class ReadTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReadTvChannelCurrentTvChannel() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelCurrentTvChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.CurrentTvChannel response", value);
-    }
-};
-
-class ReportTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReportTvChannelCurrentTvChannel() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelCurrentTvChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, chip::ByteSpan value) { LogValue("TvChannel.CurrentTvChannel report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32156,6 +32276,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TargetNavigatorList                                               | 0x0000 |
+| * CurrentNavigatorTarget                                            | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -32260,6 +32381,36 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute CurrentNavigatorTarget
+ */
+class ReadTargetNavigatorCurrentNavigatorTarget : public ModelCommand
+{
+public:
+    ReadTargetNavigatorCurrentNavigatorTarget() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-navigator-target");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTargetNavigatorCurrentNavigatorTarget() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0505) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TargetNavigator.CurrentNavigatorTarget response", value);
+    }
 };
 
 /*
@@ -40554,8 +40705,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnThermostatGetRelayStatusLogResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -40582,8 +40733,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnThermostatGetWeeklyScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -50381,6 +50532,7 @@ void registerClusterAccountLogin(Commands & commands)
     commands_list clusterCommands = {
         make_unique<AccountLoginGetSetupPIN>(),           //
         make_unique<AccountLoginLogin>(),                 //
+        make_unique<AccountLoginLogout>(),                //
         make_unique<ReadAccountLoginAttributeList>(),     //
         make_unique<ReadAccountLoginClusterRevision>(),   //
         make_unique<ReportAccountLoginClusterRevision>(), //
@@ -50411,24 +50563,22 @@ void registerClusterApplicationBasic(Commands & commands)
     const char * clusterName = "ApplicationBasic";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationBasicChangeStatus>(),            //
-        make_unique<ReadApplicationBasicVendorName>(),          //
-        make_unique<ReportApplicationBasicVendorName>(),        //
-        make_unique<ReadApplicationBasicVendorId>(),            //
-        make_unique<ReportApplicationBasicVendorId>(),          //
-        make_unique<ReadApplicationBasicApplicationName>(),     //
-        make_unique<ReportApplicationBasicApplicationName>(),   //
-        make_unique<ReadApplicationBasicProductId>(),           //
-        make_unique<ReportApplicationBasicProductId>(),         //
-        make_unique<ReadApplicationBasicApplicationId>(),       //
-        make_unique<ReportApplicationBasicApplicationId>(),     //
-        make_unique<ReadApplicationBasicCatalogVendorId>(),     //
-        make_unique<ReportApplicationBasicCatalogVendorId>(),   //
-        make_unique<ReadApplicationBasicApplicationStatus>(),   //
-        make_unique<ReportApplicationBasicApplicationStatus>(), //
-        make_unique<ReadApplicationBasicAttributeList>(),       //
-        make_unique<ReadApplicationBasicClusterRevision>(),     //
-        make_unique<ReportApplicationBasicClusterRevision>(),   //
+        make_unique<ApplicationBasicChangeStatus>(),             //
+        make_unique<ReadApplicationBasicVendorName>(),           //
+        make_unique<ReportApplicationBasicVendorName>(),         //
+        make_unique<ReadApplicationBasicVendorId>(),             //
+        make_unique<ReportApplicationBasicVendorId>(),           //
+        make_unique<ReadApplicationBasicApplicationName>(),      //
+        make_unique<ReportApplicationBasicApplicationName>(),    //
+        make_unique<ReadApplicationBasicProductId>(),            //
+        make_unique<ReportApplicationBasicProductId>(),          //
+        make_unique<ReadApplicationBasicApplicationStatus>(),    //
+        make_unique<ReportApplicationBasicApplicationStatus>(),  //
+        make_unique<ReadApplicationBasicApplicationVersion>(),   //
+        make_unique<ReportApplicationBasicApplicationVersion>(), //
+        make_unique<ReadApplicationBasicAttributeList>(),        //
+        make_unique<ReadApplicationBasicClusterRevision>(),      //
+        make_unique<ReportApplicationBasicClusterRevision>(),    //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -50438,12 +50588,10 @@ void registerClusterApplicationLauncher(Commands & commands)
     const char * clusterName = "ApplicationLauncher";
 
     commands_list clusterCommands = {
+        make_unique<ApplicationLauncherHideApp>(),                     //
         make_unique<ApplicationLauncherLaunchApp>(),                   //
+        make_unique<ApplicationLauncherStopApp>(),                     //
         make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
-        make_unique<ReadApplicationLauncherCatalogVendorId>(),         //
-        make_unique<ReportApplicationLauncherCatalogVendorId>(),       //
-        make_unique<ReadApplicationLauncherApplicationId>(),           //
-        make_unique<ReportApplicationLauncherApplicationId>(),         //
         make_unique<ReadApplicationLauncherAttributeList>(),           //
         make_unique<ReadApplicationLauncherClusterRevision>(),         //
         make_unique<ReportApplicationLauncherClusterRevision>(),       //
@@ -50784,13 +50932,15 @@ void registerClusterContentLauncher(Commands & commands)
     const char * clusterName = "ContentLauncher";
 
     commands_list clusterCommands = {
-        make_unique<ContentLauncherLaunchContent>(),               //
-        make_unique<ContentLauncherLaunchURL>(),                   //
-        make_unique<ReadContentLauncherAcceptsHeaderList>(),       //
-        make_unique<ReadContentLauncherSupportedStreamingTypes>(), //
-        make_unique<ReadContentLauncherAttributeList>(),           //
-        make_unique<ReadContentLauncherClusterRevision>(),         //
-        make_unique<ReportContentLauncherClusterRevision>(),       //
+        make_unique<ContentLauncherLaunchContent>(),                     //
+        make_unique<ContentLauncherLaunchURL>(),                         //
+        make_unique<ReadContentLauncherAcceptsHeaderList>(),             //
+        make_unique<ReadContentLauncherSupportedStreamingProtocols>(),   //
+        make_unique<WriteContentLauncherSupportedStreamingProtocols>(),  //
+        make_unique<ReportContentLauncherSupportedStreamingProtocols>(), //
+        make_unique<ReadContentLauncherAttributeList>(),                 //
+        make_unique<ReadContentLauncherClusterRevision>(),               //
+        make_unique<ReportContentLauncherClusterRevision>(),             //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -50827,38 +50977,51 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearAllPINCodes>(),      //
-        make_unique<DoorLockClearAllRFIDCodes>(),     //
-        make_unique<DoorLockClearHolidaySchedule>(),  //
-        make_unique<DoorLockClearPINCode>(),          //
-        make_unique<DoorLockClearRFIDCode>(),         //
-        make_unique<DoorLockClearWeekDaySchedule>(),  //
-        make_unique<DoorLockClearYearDaySchedule>(),  //
-        make_unique<DoorLockGetHolidaySchedule>(),    //
-        make_unique<DoorLockGetLogRecord>(),          //
-        make_unique<DoorLockGetPINCode>(),            //
-        make_unique<DoorLockGetRFIDCode>(),           //
-        make_unique<DoorLockGetUserType>(),           //
-        make_unique<DoorLockGetWeekDaySchedule>(),    //
-        make_unique<DoorLockGetYearDaySchedule>(),    //
-        make_unique<DoorLockLockDoor>(),              //
-        make_unique<DoorLockSetHolidaySchedule>(),    //
-        make_unique<DoorLockSetPINCode>(),            //
-        make_unique<DoorLockSetRFIDCode>(),           //
-        make_unique<DoorLockSetUserType>(),           //
-        make_unique<DoorLockSetWeekDaySchedule>(),    //
-        make_unique<DoorLockSetYearDaySchedule>(),    //
-        make_unique<DoorLockUnlockDoor>(),            //
-        make_unique<DoorLockUnlockWithTimeout>(),     //
-        make_unique<ReadDoorLockLockState>(),         //
-        make_unique<ReportDoorLockLockState>(),       //
-        make_unique<ReadDoorLockLockType>(),          //
-        make_unique<ReportDoorLockLockType>(),        //
-        make_unique<ReadDoorLockActuatorEnabled>(),   //
-        make_unique<ReportDoorLockActuatorEnabled>(), //
-        make_unique<ReadDoorLockAttributeList>(),     //
-        make_unique<ReadDoorLockClusterRevision>(),   //
-        make_unique<ReportDoorLockClusterRevision>(), //
+        make_unique<DoorLockClearCredential>(),                 //
+        make_unique<DoorLockClearUser>(),                       //
+        make_unique<DoorLockGetCredentialStatus>(),             //
+        make_unique<DoorLockGetUser>(),                         //
+        make_unique<DoorLockLockDoor>(),                        //
+        make_unique<DoorLockSetCredential>(),                   //
+        make_unique<DoorLockSetUser>(),                         //
+        make_unique<DoorLockUnlockDoor>(),                      //
+        make_unique<ReadDoorLockLockState>(),                   //
+        make_unique<ReportDoorLockLockState>(),                 //
+        make_unique<ReadDoorLockLockType>(),                    //
+        make_unique<ReportDoorLockLockType>(),                  //
+        make_unique<ReadDoorLockActuatorEnabled>(),             //
+        make_unique<ReportDoorLockActuatorEnabled>(),           //
+        make_unique<ReadDoorLockDoorState>(),                   //
+        make_unique<ReportDoorLockDoorState>(),                 //
+        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(), //
+        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),   //
+        make_unique<ReadDoorLockMaxPINCodeLength>(),            //
+        make_unique<ReadDoorLockMinPINCodeLength>(),            //
+        make_unique<ReadDoorLockLanguage>(),                    //
+        make_unique<WriteDoorLockLanguage>(),                   //
+        make_unique<ReportDoorLockLanguage>(),                  //
+        make_unique<ReadDoorLockAutoRelockTime>(),              //
+        make_unique<WriteDoorLockAutoRelockTime>(),             //
+        make_unique<ReportDoorLockAutoRelockTime>(),            //
+        make_unique<ReadDoorLockSoundVolume>(),                 //
+        make_unique<WriteDoorLockSoundVolume>(),                //
+        make_unique<ReportDoorLockSoundVolume>(),               //
+        make_unique<ReadDoorLockOperatingMode>(),               //
+        make_unique<WriteDoorLockOperatingMode>(),              //
+        make_unique<ReportDoorLockOperatingMode>(),             //
+        make_unique<ReadDoorLockSupportedOperatingModes>(),     //
+        make_unique<ReadDoorLockEnableOneTouchLocking>(),       //
+        make_unique<WriteDoorLockEnableOneTouchLocking>(),      //
+        make_unique<ReportDoorLockEnableOneTouchLocking>(),     //
+        make_unique<ReadDoorLockEnablePrivacyModeButton>(),     //
+        make_unique<WriteDoorLockEnablePrivacyModeButton>(),    //
+        make_unique<ReportDoorLockEnablePrivacyModeButton>(),   //
+        make_unique<ReadDoorLockWrongCodeEntryLimit>(),         //
+        make_unique<WriteDoorLockWrongCodeEntryLimit>(),        //
+        make_unique<ReportDoorLockWrongCodeEntryLimit>(),       //
+        make_unique<ReadDoorLockAttributeList>(),               //
+        make_unique<ReadDoorLockClusterRevision>(),             //
+        make_unique<ReportDoorLockClusterRevision>(),           //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -51188,36 +51351,31 @@ void registerClusterMediaPlayback(Commands & commands)
     const char * clusterName = "MediaPlayback";
 
     commands_list clusterCommands = {
-        make_unique<MediaPlaybackMediaFastForward>(),        //
-        make_unique<MediaPlaybackMediaNext>(),               //
-        make_unique<MediaPlaybackMediaPause>(),              //
-        make_unique<MediaPlaybackMediaPlay>(),               //
-        make_unique<MediaPlaybackMediaPrevious>(),           //
-        make_unique<MediaPlaybackMediaRewind>(),             //
-        make_unique<MediaPlaybackMediaSeek>(),               //
-        make_unique<MediaPlaybackMediaSkipBackward>(),       //
-        make_unique<MediaPlaybackMediaSkipForward>(),        //
-        make_unique<MediaPlaybackMediaStartOver>(),          //
-        make_unique<MediaPlaybackMediaStop>(),               //
-        make_unique<ReadMediaPlaybackPlaybackState>(),       //
-        make_unique<ReportMediaPlaybackPlaybackState>(),     //
-        make_unique<ReadMediaPlaybackStartTime>(),           //
-        make_unique<ReportMediaPlaybackStartTime>(),         //
-        make_unique<ReadMediaPlaybackDuration>(),            //
-        make_unique<ReportMediaPlaybackDuration>(),          //
-        make_unique<ReadMediaPlaybackPositionUpdatedAt>(),   //
-        make_unique<ReportMediaPlaybackPositionUpdatedAt>(), //
-        make_unique<ReadMediaPlaybackPosition>(),            //
-        make_unique<ReportMediaPlaybackPosition>(),          //
-        make_unique<ReadMediaPlaybackPlaybackSpeed>(),       //
-        make_unique<ReportMediaPlaybackPlaybackSpeed>(),     //
-        make_unique<ReadMediaPlaybackSeekRangeEnd>(),        //
-        make_unique<ReportMediaPlaybackSeekRangeEnd>(),      //
-        make_unique<ReadMediaPlaybackSeekRangeStart>(),      //
-        make_unique<ReportMediaPlaybackSeekRangeStart>(),    //
-        make_unique<ReadMediaPlaybackAttributeList>(),       //
-        make_unique<ReadMediaPlaybackClusterRevision>(),     //
-        make_unique<ReportMediaPlaybackClusterRevision>(),   //
+        make_unique<MediaPlaybackMediaFastForward>(),      //
+        make_unique<MediaPlaybackMediaNext>(),             //
+        make_unique<MediaPlaybackMediaPause>(),            //
+        make_unique<MediaPlaybackMediaPlay>(),             //
+        make_unique<MediaPlaybackMediaPrevious>(),         //
+        make_unique<MediaPlaybackMediaRewind>(),           //
+        make_unique<MediaPlaybackMediaSeek>(),             //
+        make_unique<MediaPlaybackMediaSkipBackward>(),     //
+        make_unique<MediaPlaybackMediaSkipForward>(),      //
+        make_unique<MediaPlaybackMediaStartOver>(),        //
+        make_unique<MediaPlaybackMediaStop>(),             //
+        make_unique<ReadMediaPlaybackPlaybackState>(),     //
+        make_unique<ReportMediaPlaybackPlaybackState>(),   //
+        make_unique<ReadMediaPlaybackStartTime>(),         //
+        make_unique<ReportMediaPlaybackStartTime>(),       //
+        make_unique<ReadMediaPlaybackDuration>(),          //
+        make_unique<ReportMediaPlaybackDuration>(),        //
+        make_unique<ReadMediaPlaybackPlaybackSpeed>(),     //
+        make_unique<ReadMediaPlaybackSeekRangeEnd>(),      //
+        make_unique<ReportMediaPlaybackSeekRangeEnd>(),    //
+        make_unique<ReadMediaPlaybackSeekRangeStart>(),    //
+        make_unique<ReportMediaPlaybackSeekRangeStart>(),  //
+        make_unique<ReadMediaPlaybackAttributeList>(),     //
+        make_unique<ReadMediaPlaybackClusterRevision>(),   //
+        make_unique<ReportMediaPlaybackClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -51619,17 +51777,13 @@ void registerClusterTvChannel(Commands & commands)
     const char * clusterName = "TvChannel";
 
     commands_list clusterCommands = {
-        make_unique<TvChannelChangeChannel>(),          //
-        make_unique<TvChannelChangeChannelByNumber>(),  //
-        make_unique<TvChannelSkipChannel>(),            //
-        make_unique<ReadTvChannelTvChannelList>(),      //
-        make_unique<ReadTvChannelTvChannelLineup>(),    //
-        make_unique<ReportTvChannelTvChannelLineup>(),  //
-        make_unique<ReadTvChannelCurrentTvChannel>(),   //
-        make_unique<ReportTvChannelCurrentTvChannel>(), //
-        make_unique<ReadTvChannelAttributeList>(),      //
-        make_unique<ReadTvChannelClusterRevision>(),    //
-        make_unique<ReportTvChannelClusterRevision>(),  //
+        make_unique<TvChannelChangeChannel>(),         //
+        make_unique<TvChannelChangeChannelByNumber>(), //
+        make_unique<TvChannelSkipChannel>(),           //
+        make_unique<ReadTvChannelChannelList>(),       //
+        make_unique<ReadTvChannelAttributeList>(),     //
+        make_unique<ReadTvChannelClusterRevision>(),   //
+        make_unique<ReportTvChannelClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -51639,11 +51793,12 @@ void registerClusterTargetNavigator(Commands & commands)
     const char * clusterName = "TargetNavigator";
 
     commands_list clusterCommands = {
-        make_unique<TargetNavigatorNavigateTarget>(),          //
-        make_unique<ReadTargetNavigatorTargetNavigatorList>(), //
-        make_unique<ReadTargetNavigatorAttributeList>(),       //
-        make_unique<ReadTargetNavigatorClusterRevision>(),     //
-        make_unique<ReportTargetNavigatorClusterRevision>(),   //
+        make_unique<TargetNavigatorNavigateTarget>(),             //
+        make_unique<ReadTargetNavigatorTargetNavigatorList>(),    //
+        make_unique<ReadTargetNavigatorCurrentNavigatorTarget>(), //
+        make_unique<ReadTargetNavigatorAttributeList>(),          //
+        make_unique<ReadTargetNavigatorClusterRevision>(),        //
+        make_unique<ReportTargetNavigatorClusterRevision>(),      //
     };
 
     commands.Register(clusterName, clusterCommands);

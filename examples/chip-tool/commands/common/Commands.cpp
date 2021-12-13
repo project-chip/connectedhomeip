@@ -26,6 +26,79 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 
+#include <lib/support/CHIPArgParser.hpp>
+
+#include <core/CHIPBuildConfig.h>
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+namespace {
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+enum
+{
+    kOptionTraceFile = 0x1000,
+    kOptionTraceLog,
+};
+
+bool HandleTraceOptions(const char * program, chip::ArgParser::OptionSet * options, int identifier, const char * name,
+                        const char * value)
+{
+    switch (identifier)
+    {
+    case kOptionTraceLog:
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+        return true;
+    case kOptionTraceFile:
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(value));
+        return true;
+    default:
+        chip::ArgParser::PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", program, name);
+        return false;
+    }
+}
+
+chip::ArgParser::OptionDef traceCmdLineOptionDefs[] = { { "trace_file", chip::ArgParser::kArgumentRequired, kOptionTraceFile },
+                                                        { "trace_log", chip::ArgParser::kNoArgument, kOptionTraceLog },
+                                                        {} };
+
+const char * traceOptionHelp = "  --trace_file <file>\n"
+                               "       Output trace data to the specified file.\n"
+                               "  --trace_log\n"
+                               "       Output trace data to the log stream.\n"
+                               "\n";
+chip::ArgParser::OptionSet traceCmdLineOptions = { HandleTraceOptions, traceCmdLineOptionDefs, "TRACE OPTIONS", traceOptionHelp };
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+const char * kAppName     = "chip-tool";
+const char * kUsage       = "Usage: chip-tool [options] cluster command_name [param1] [param2]";
+const char * kVersion     = nullptr; // Unknown
+const char * kDescription = "A command line tool that uses Matter to send messages to a Matter server.";
+chip::ArgParser::HelpOptions helpOptions(kAppName, kUsage, kVersion, kDescription);
+
+chip::ArgParser::OptionSet * allOptions[] = {
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    &traceCmdLineOptions,
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    &helpOptions, nullptr
+};
+
+int gPositionalArgc       = 0;
+char ** gPositionalArgv   = nullptr;
+const char * gProgramName = nullptr;
+
+bool GetPositionalArgs(const char * prog, int argc, char * argv[])
+{
+    gProgramName    = prog;
+    gPositionalArgc = argc;
+    gPositionalArgv = argv;
+    return true;
+}
+
+} // namespace
+
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
     for (auto & command : commandsList)
@@ -46,71 +119,81 @@ int Commands::Run(int argc, char ** argv)
 
     chip::Logging::SetLogFilter(mStorage.GetLoggingLevel());
 
-    err = RunCommand(argc, argv);
+    VerifyOrExit(chip::ArgParser::ParseArgs("chip-tool", argc, argv, allOptions, GetPositionalArgs),
+                 ChipLogError(chipTool, "Error parsing arguments"));
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::InitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+
+    err = RunCommand();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err)));
 
 exit:
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand()
 {
     std::map<std::string, CommandsVector>::iterator cluster;
     Command * command = nullptr;
 
-    if (argc <= 1)
+    if (gPositionalArgc <= 0)
     {
         ChipLogError(chipTool, "Missing cluster name");
-        ShowClusters(argv[0]);
+        ShowClusters(gProgramName);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    cluster = GetCluster(argv[1]);
+    cluster = GetCluster(gPositionalArgv[0]);
     if (cluster == mClusters.end())
     {
-        ChipLogError(chipTool, "Unknown cluster: %s", argv[1]);
-        ShowClusters(argv[0]);
+        ChipLogError(chipTool, "Unknown cluster: %s", gPositionalArgv[1]);
+        ShowClusters(gProgramName);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (argc <= 2)
+    if (gPositionalArgc <= 1)
     {
         ChipLogError(chipTool, "Missing command name");
-        ShowCluster(argv[0], argv[1], cluster->second);
+        ShowCluster(gProgramName, gPositionalArgv[0], cluster->second);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (!IsGlobalCommand(argv[2]))
+    if (!IsGlobalCommand(gPositionalArgv[1]))
     {
-        command = GetCommand(cluster->second, argv[2]);
+        command = GetCommand(cluster->second, gPositionalArgv[1]);
         if (command == nullptr)
         {
-            ChipLogError(chipTool, "Unknown command: %s", argv[2]);
-            ShowCluster(argv[0], argv[1], cluster->second);
+            ChipLogError(chipTool, "Unknown command: %s", gPositionalArgv[1]);
+            ShowCluster(gProgramName, gPositionalArgv[0], cluster->second);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
     else
     {
-        if (argc <= 3)
+        if (gPositionalArgc <= 2)
         {
             ChipLogError(chipTool, "Missing attribute name");
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ShowClusterAttributes(gProgramName, gPositionalArgv[0], gPositionalArgv[1], cluster->second);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
 
-        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(cluster->second, gPositionalArgv[1], gPositionalArgv[2]);
         if (command == nullptr)
         {
-            ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
-            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
+            ChipLogError(chipTool, "Unknown attribute: %s", gPositionalArgv[2]);
+            ShowClusterAttributes(gProgramName, gPositionalArgv[0], gPositionalArgv[1], cluster->second);
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
     }
 
-    if (!command->InitArguments(argc - 3, &argv[3]))
+    if (!command->InitArguments(gPositionalArgc - 2, &gPositionalArgv[2]))
     {
-        ShowCommand(argv[0], argv[1], command);
+        ShowCommand(gProgramName, gPositionalArgv[0], command);
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 

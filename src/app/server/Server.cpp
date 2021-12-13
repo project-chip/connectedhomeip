@@ -281,13 +281,15 @@ CHIP_ERROR Server::AddTestCommissioning()
     CHIP_ERROR err            = CHIP_NO_ERROR;
     PASESession * testSession = nullptr;
     PASESessionSerializable serializedTestSession;
+    SessionHolder session;
 
     mTestPairing.ToSerializable(serializedTestSession);
 
     testSession = chip::Platform::New<PASESession>();
     testSession->FromSerializable(serializedTestSession);
-    SuccessOrExit(err = mSessions.NewPairing(Optional<PeerAddress>{ PeerAddress::Uninitialized() }, chip::kTestControllerNodeId,
-                                             testSession, CryptoContext::SessionRole::kResponder, kMinValidFabricIndex));
+    SuccessOrExit(err = mSessions.NewPairing(session, Optional<PeerAddress>{ PeerAddress::Uninitialized() },
+                                             chip::kTestControllerNodeId, testSession, CryptoContext::SessionRole::kResponder,
+                                             kMinValidFabricIndex));
 
 exit:
     if (testSession)

@@ -77,11 +77,12 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general_diagnostics_server/general_diagnostics_server.cpp               
+               ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp

@@ -14498,12 +14498,12 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CurrentWeeklySchedule Command callback (from server)
+ * @brief Thermostat Cluster GetWeeklyScheduleResponse Command callback (from server)
  */
-bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                           uint8_t modeForSequence,
-                                                           /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                               uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 /**
  * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
  */
@@ -14511,11 +14511,12 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster RelayStatusLog Command callback (from server)
+ * @brief Thermostat Cluster GetRelayStatusLogResponse Command callback (from server)
  */
-bool emberAfThermostatClusterRelayStatusLogCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                    uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
-                                                    uint8_t humidityInPercentage, int16_t setpoint, uint16_t unreadEntries);
+bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+                                                               uint8_t humidityInPercentage, int16_t setpoint,
+                                                               uint16_t unreadEntries);
 /**
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */
@@ -14817,9 +14818,9 @@ bool emberAfTvChannelClusterChangeChannelCallback(
 /**
  * @brief TV Channel Cluster ChangeChannelResponse Command callback (from server)
  */
-bool emberAfTvChannelClusterChangeChannelResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                          /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
-                                                          uint8_t ErrorType);
+bool emberAfTvChannelClusterChangeChannelResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType);
 /**
  * @brief TV Channel Cluster ChangeChannelByNumber Command callback (from client)
  */
@@ -15014,7 +15015,7 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
  * @brief Content Launcher Cluster LaunchContentResponse Command callback (from server)
  */
 bool emberAfContentLauncherClusterLaunchContentResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                chip::CharSpan data, uint8_t contentLaunchStatus);
+                                                                uint8_t contentLaunchStatus, chip::CharSpan data);
 /**
  * @brief Content Launcher Cluster LaunchURL Command callback (from client)
  */
@@ -15025,7 +15026,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
  * @brief Content Launcher Cluster LaunchURLResponse Command callback (from server)
  */
 bool emberAfContentLauncherClusterLaunchURLResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                            chip::CharSpan data, uint8_t contentLaunchStatus);
+                                                            uint8_t contentLaunchStatus, chip::CharSpan data);
 /**
  * @brief Audio Output Cluster SelectOutput Command callback (from client)
  */
@@ -15050,6 +15051,28 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(
 bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
                                                                 uint8_t status, chip::CharSpan data);
 /**
+ * @brief Application Launcher Cluster StopApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterStopAppCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplicationLauncher::Commands::StopApp::DecodableType & commandData);
+/**
+ * @brief Application Launcher Cluster StopAppResponse Command callback (from server)
+ */
+bool emberAfApplicationLauncherClusterStopAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                              uint8_t status, chip::CharSpan data);
+/**
+ * @brief Application Launcher Cluster HideApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterHideAppCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ApplicationLauncher::Commands::HideApp::DecodableType & commandData);
+/**
+ * @brief Application Launcher Cluster HideAppResponse Command callback (from server)
+ */
+bool emberAfApplicationLauncherClusterHideAppResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                              uint8_t status, chip::CharSpan data);
+/**
  * @brief Application Basic Cluster ChangeStatus Command callback (from client)
  */
 bool emberAfApplicationBasicClusterChangeStatusCallback(
@@ -15072,6 +15095,12 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(chip::EndpointId endp
 bool emberAfAccountLoginClusterLoginCallback(chip::app::CommandHandler * commandObj,
                                              const chip::app::ConcreteCommandPath & commandPath,
                                              const chip::app::Clusters::AccountLogin::Commands::Login::DecodableType & commandData);
+/**
+ * @brief Account Login Cluster Logout Command callback (from client)
+ */
+bool emberAfAccountLoginClusterLogoutCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::AccountLogin::Commands::Logout::DecodableType & commandData);
 /**
  * @brief Test Cluster Cluster Test Command callback (from client)
  */

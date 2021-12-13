@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/util/basic-types.h>
 #include <lib/core/NodeId.h>
 #include <lib/core/Optional.h>
@@ -30,6 +31,8 @@ class SessionManager;
 class SessionHandle
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     SessionHandle(NodeId peerNodeId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric) {}
 
     SessionHandle(Transport::UnauthenticatedSessionHandle session) :
@@ -55,13 +58,9 @@ public:
     void SetFabricIndex(FabricIndex fabricId) { mFabric = fabricId; }
     void SetGroupId(GroupId groupId) { mGroupId.SetValue(groupId); }
 
-    bool operator==(const SessionHandle & that) const
-    {
-        // TODO: Temporarily keep the old logic, check why only those two fields are used in comparison.
-        return mPeerNodeId == that.mPeerNodeId && mPeerSessionId == that.mPeerSessionId;
-    }
+    SubjectDescriptor GetSubjectDescriptor() const;
 
-    bool MatchIncomingSession(const SessionHandle & that) const
+    bool operator==(const SessionHandle & that) const
     {
         if (IsSecure())
         {

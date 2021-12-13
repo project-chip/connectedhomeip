@@ -72,6 +72,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::Logout::Id: {
+            Commands::Logout::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfAccountLoginClusterLogoutCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         default: {
             // Unrecognized command ID, error status will apply.
             apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
@@ -207,12 +216,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
+        case Commands::HideApp::Id: {
+            Commands::HideApp::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfApplicationLauncherClusterHideAppCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::LaunchApp::Id: {
             Commands::LaunchApp::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfApplicationLauncherClusterLaunchAppCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::StopApp::Id: {
+            Commands::StopApp::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfApplicationLauncherClusterStopAppCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

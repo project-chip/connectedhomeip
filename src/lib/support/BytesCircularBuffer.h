@@ -58,6 +58,9 @@ public:
      */
     CHIP_ERROR Push(const ByteSpan & payload);
 
+    /// @brief Same as previous Push, but payload can be spread into 2 spans.
+    CHIP_ERROR Push(const ByteSpan & payload1, const ByteSpan & payload2);
+
     /** @brief discard the oldest byte sequence in the buffer.
      *
      *  @returns CHIP_NO_ERROR if successful

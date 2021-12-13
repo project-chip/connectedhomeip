@@ -659,6 +659,10 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     if (event.mPriority == apEventLoadOutContext->mPriority)
     {
         apEventLoadOutContext->mCurrentTime.mValue += event.mDeltaTime.mValue;
+        // If the retrieved event has the same priority as the one set by FetchEventSince, we need to use mSamePriorityEvent to
+        // increase the event number after encoding the current event number.  Then this updated event number will be used by
+        // FetchEventSince for next use
+        apEventLoadOutContext->mSamePriorityEvent = true;
         if (IsInterestedEventPaths(apEventLoadOutContext, event))
         {
             return CHIP_EVENT_ID_FOUND;
@@ -692,7 +696,13 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         loadOutContext->mFirst               = false;
         loadOutContext->mEventCount++;
     }
-    loadOutContext->mCurrentEventNumber++;
+    if (loadOutContext->mSamePriorityEvent)
+    {
+        // Update to next Event Number
+        loadOutContext->mCurrentEventNumber++;
+        loadOutContext->mSamePriorityEvent = false;
+    }
+
     return err;
 }
 
@@ -771,6 +781,21 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         envelope->mFieldsToRead |= 1 << to_underlying(EventDataIB::Tag::kPriority);
     }
 
+    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)))
+    {
+        uint64_t deltaSystemTime;
+        ReturnErrorOnFailure(reader.Get(deltaSystemTime));
+        envelope->mDeltaTime.mType  = Timestamp::Type::kSystem;
+        envelope->mDeltaTime.mValue = deltaSystemTime;
+    }
+
+    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)))
+    {
+        uint64_t deltaEpochTime;
+        ReturnErrorOnFailure(reader.Get(deltaEpochTime));
+        envelope->mDeltaTime.mType  = Timestamp::Type::kEpoch;
+        envelope->mDeltaTime.mValue = deltaEpochTime;
+    }
     return CHIP_NO_ERROR;
 }
 

@@ -58,6 +58,8 @@ protected:
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
+    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList);
+
     // ===== Support methods that can be overridden by the implementation subclass.
 
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
@@ -72,6 +74,13 @@ private:
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.
 extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetFixedLabelList(EndpointId endpoint,
+                                                                            LabelList<kMaxFixedLabels> & labelList)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace Internal
 } // namespace DeviceLayer

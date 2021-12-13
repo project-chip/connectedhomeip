@@ -27,5 +27,5 @@ class TvChannelManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTvChannelList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetTvChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

@@ -36,7 +36,7 @@
 using namespace chip;
 
 namespace {
-template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(app::AttributeValueEncoder &)>
+template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(uint16_t, app::AttributeValueEncoder &)>
 class TvAttrAccess : public app::AttributeAccessInterface
 {
 public:
@@ -46,7 +46,7 @@ public:
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {
-            return (Manager().*Getter)(aEncoder);
+            return (Manager().*Getter)(aPath.mEndpointId, aEncoder);
         }
 
         return CHIP_NO_ERROR;
@@ -108,7 +108,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
+TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo,
              &TvChannelManager::proxyGetTvChannelList>
     gTvChannelAttrAccess;
 
@@ -200,11 +200,6 @@ public:
         if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
         {
             return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
-        {
-            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
         }
 
         return CHIP_NO_ERROR;

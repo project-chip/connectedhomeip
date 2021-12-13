@@ -92,17 +92,17 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
         SuccessOrExit(err);
     }
 
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RegulatoryConfig))
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR;
-        err               = WriteConfigValue(PosixConfig::kCounterKey_RegulatoryConfig, location);
+        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+        err               = WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location);
         SuccessOrExit(err);
     }
 
-    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_LocationCapability))
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
     {
-        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR;
-        err               = WriteConfigValue(PosixConfig::kCounterKey_LocationCapability, location);
+        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+        err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
         SuccessOrExit(err);
     }
 
@@ -335,11 +335,11 @@ CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
     return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryConfig(uint8_t & location)
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
 {
     uint32_t value = 0;
 
-    CHIP_ERROR err = ReadConfigValue(PosixConfig::kCounterKey_RegulatoryConfig, value);
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
 
     if (err == CHIP_NO_ERROR)
     {
@@ -354,7 +354,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
 {
     uint32_t value = 0;
 
-    CHIP_ERROR err = ReadConfigValue(PosixConfig::kCounterKey_LocationCapability, value);
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_LocationCapability, value);
 
     if (err == CHIP_NO_ERROR)
     {

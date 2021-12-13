@@ -30,6 +30,16 @@ const ListHelper      = require('./ListHelper.js');
 const StringHelper    = require('./StringHelper.js');
 const ChipTypesHelper = require('./ChipTypesHelper.js');
 
+// Helper for better error reporting.
+function ensureState(condition, error)
+{
+  if (!condition) {
+    let err = new Error(error);
+    console.log(`${error}: ` + err.stack);
+    throw err;
+  }
+}
+
 //
 // Load Step 1
 //
@@ -431,12 +441,14 @@ const Clusters = {
   ready : new Deferred()
 };
 
-Clusters.init = function(context, packageId) {
+Clusters.init = async function(context) {
   if (this.ready.running)
   {
     return this.ready;
   }
   this.ready.running = true;
+
+  let packageId = await templateUtil.ensureZclPackageId(context).catch(err => { console.log(err); throw err; });
 
   const loadTypes = [
     loadAtomics.call(context, packageId),
@@ -468,14 +480,17 @@ Clusters.init = function(context, packageId) {
 //
 function asBlocks(promise, options)
 {
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
+  return promise.then(data => templateUtil.collectBlocks(data, options, this))
 }
 
-function asPromise(promise)
+function ensureClusters(context)
 {
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
+  // Kick off Clusters initialization.  This is async, but that's fine: all the
+  // getters on Clusters wait on that initialziation to complete.
+  ensureState(context, "Don't have a context");
+
+  Clusters.init(context);
+  return Clusters;
 }
 
 //
@@ -483,24 +498,30 @@ function asPromise(promise)
 //
 const kResponseFilter = (isResponse, item) => isResponse == item.isResponse;
 
+Clusters.ensureReady = function()
+{
+    ensureState(this.ready.running);
+    return this.ready;
+}
+
 Clusters.getClusters = function()
 {
-    return this.ready.then(() => this._clusters);
+    return this.ensureReady().then(() => this._clusters);
 }
 
 Clusters.getCommands = function()
 {
-    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, false)));
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, false)));
 }
 
 Clusters.getResponses = function()
 {
-    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, true)));
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, true)));
 }
 
 Clusters.getAttributes = function()
 {
-    return this.ready.then(() => this._attributes);
+    return this.ensureReady().then(() => this._attributes);
 }
 
 //
@@ -520,7 +541,7 @@ Clusters.getResponsesByClusterName = function(name)
 
 Clusters.getAttributesByClusterName = function(name)
 {
-    return this.ready.then(() => {
+    return this.ensureReady().then(() => {
       const clusterId = this._clusters.find(kNameFilter.bind(null, name)).id;
       const filter = attribute => attribute.clusterId == clusterId;
       return this.getAttributes().then(items => items.filter(filter));
@@ -601,6 +622,5 @@ Clusters.getServerAttributes = function(name)
 //
 // Module exports
 //
-exports.Clusters  = Clusters;
-exports.asBlocks  = asBlocks;
-exports.asPromise = asPromise;
+exports.asBlocks = asBlocks;
+exports.ensureClusters = ensureClusters;

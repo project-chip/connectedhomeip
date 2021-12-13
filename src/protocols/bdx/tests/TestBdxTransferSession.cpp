@@ -278,7 +278,7 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
 // Helper method for preparing a sending a Block message between two TransferSession objects. The sender refers to the node that is
 // sending Blocks. Uses a static counter incremented with each call. Also verifies that block data received matches what was sent.
 void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, TransferSession & sender, TransferSession & receiver,
-                                 TransferSession::OutputEvent & outEvent, bool isEof)
+                                 TransferSession::OutputEvent & outEvent, bool isEof, uint32_t inBlockCounter)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     static uint8_t dataCount = 0;
@@ -319,6 +319,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     if (outEvent.EventType == TransferSession::OutputEventType::kBlockReceived && outEvent.blockdata.Data != nullptr)
     {
         NL_TEST_ASSERT(inSuite, !memcmp(fakeBlockData, outEvent.blockdata.Data, outEvent.blockdata.Length));
+        NL_TEST_ASSERT(inSuite, outEvent.blockdata.BlockCounter == inBlockCounter);
     }
     VerifyNoMoreOutput(inSuite, inContext, receiver);
 }
@@ -414,7 +415,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
 
     // Test BlockQuery -> Block -> BlockAck
     SendAndVerifyQuery(inSuite, inContext, respondingSender, initiatingReceiver, outEvent);
-    SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, false);
+    SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, false, numBlocksSent);
     numBlocksSent++;
 
     // Test only one block can be prepared at a time, without receiving a response to the first
@@ -441,7 +442,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
         bool isEof = (numBlocksSent == numBlockSends - 1);
 
         SendAndVerifyQuery(inSuite, inContext, respondingSender, initiatingReceiver, outEvent);
-        SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, isEof);
+        SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, isEof, numBlocksSent);
 
         numBlocksSent++;
     }
@@ -509,14 +510,16 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     SendAndVerifyAcceptMsg(inSuite, inContext, outEvent, respondingReceiver, TransferRole::kReceiver, acceptData, initiatingSender,
                            initOptions);
 
+    uint32_t numBlocksSent = 0;
     // Test multiple Block -> BlockAck -> Block
     for (int i = 0; i < 3; i++)
     {
-        SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false);
+        SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false, numBlocksSent);
         SendAndVerifyBlockAck(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false);
+        numBlocksSent++;
     }
 
-    SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true);
+    SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true, numBlocksSent);
     SendAndVerifyBlockAck(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true);
 }
 

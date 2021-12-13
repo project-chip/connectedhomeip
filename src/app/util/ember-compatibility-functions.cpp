@@ -52,6 +52,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
+using namespace chip::Access;
 
 namespace chip {
 namespace app {
@@ -353,13 +354,14 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
-                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
-                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI
+                  " (expanded=%d)",
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
 
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
@@ -370,7 +372,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         {
             AttributeListReader reader(cluster);
             bool ignored; // Our reader always tries to encode
-            return ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, &reader, &ignored);
+            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
+                                          &ignored);
         }
 
         // else to save codesize just fall through and do the metadata search
@@ -390,16 +393,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
 
     {
-        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
-        bool pathWasExpanded               = false;                    // TODO: get actual expanded flag
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
             ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
-            if (pathWasExpanded)
+            if (aPath.mExpanded)
             {
                 return CHIP_NO_ERROR;
             }
@@ -417,8 +418,8 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         bool triedEncode;
-        ReturnErrorOnFailure(
-            ReadViaAccessInterface(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState, attrOverride, &triedEncode));
+        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                    attrOverride, &triedEncode));
 
         if (triedEncode)
         {
@@ -820,7 +821,8 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
@@ -841,10 +843,9 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     }
 
     {
-        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
-        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
         err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {

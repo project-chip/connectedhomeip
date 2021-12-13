@@ -55,7 +55,7 @@ CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::app::AttributeVa
     });
 }
 
-TargetNavigatorResponse targetNavigatorClusterNavigateTarget(uint8_t target, std::string data)
+TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId endpointId, uint8_t target, std::string data)
 {
     // TODO: Insert code here
     TargetNavigatorResponse response;

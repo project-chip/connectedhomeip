@@ -60,6 +60,7 @@ chip::Protocols::Echo::EchoClient gEchoClient;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::Inet::IPAddress gDestAddr;
+chip::SessionHolder gSession;
 
 // The last time a CHIP Echo was attempted to be sent.
 chip::System::Clock::Timestamp gLastEchoTime = chip::System::Clock::kZero;
@@ -166,7 +167,7 @@ CHIP_ERROR EstablishSecureSession()
     }
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
+    err = gSessionManager.NewPairing(gSession, peerAddr, chip::kTestDeviceNodeId, testSecurePairingSecret,
                                      chip::CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
@@ -257,7 +258,7 @@ int main(int argc, char * argv[])
     err = EstablishSecureSession();
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, chip::SessionHandle(chip::kTestDeviceNodeId, 1, 1, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, gSession.Get());
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

@@ -35,6 +35,7 @@ public:
 
     virtual U * CreateObject(ConstructorArguments... args)              = 0;
     virtual void ReleaseObject(U * element)                             = 0;
+    virtual void ReleaseAll()                                           = 0;
     virtual void ResetObject(U * element, ConstructorArguments... args) = 0;
 
     template <typename Function>
@@ -52,11 +53,11 @@ protected:
     virtual Loop ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
 };
 
-template <class T, size_t N, OnObjectPoolDestruction A, typename Interface>
+template <class T, size_t N, typename Interface>
 class PoolProxy;
 
-template <class T, size_t N, OnObjectPoolDestruction A, typename U, typename... ConstructorArguments>
-class PoolProxy<T, N, A, std::tuple<U, ConstructorArguments...>> : public PoolInterface<U, ConstructorArguments...>
+template <class T, size_t N, typename U, typename... ConstructorArguments>
+class PoolProxy<T, N, std::tuple<U, ConstructorArguments...>> : public PoolInterface<U, ConstructorArguments...>
 {
 public:
     static_assert(std::is_base_of<U, T>::value, "Interface type is not derived from Pool type");
@@ -67,6 +68,8 @@ public:
     virtual U * CreateObject(ConstructorArguments... args) override { return Impl().CreateObject(std::move(args)...); }
 
     virtual void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
+
+    virtual void ReleaseAll() override { Impl().ReleaseAll(); }
 
     virtual void ResetObject(U * element, ConstructorArguments... args) override
     {
@@ -80,7 +83,7 @@ protected:
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
 
-    virtual BitMapObjectPool<T, N, A> & Impl() = 0;
+    virtual BitMapObjectPool<T, N> & Impl() = 0;
 };
 
 /*
@@ -94,18 +97,18 @@ protected:
  *                     PoolInterface<U, ConstructorArguments...>, the PoolImpl can be converted to the interface type
  *                     and passed around
  */
-template <class T, size_t N, OnObjectPoolDestruction A, typename... Interfaces>
-class PoolImpl : public PoolProxy<T, N, A, Interfaces>...
+template <class T, size_t N, typename... Interfaces>
+class PoolImpl : public PoolProxy<T, N, Interfaces>...
 {
 public:
     PoolImpl() {}
     virtual ~PoolImpl() override {}
 
 protected:
-    virtual BitMapObjectPool<T, N, A> & Impl() override { return mImpl; }
+    virtual BitMapObjectPool<T, N> & Impl() override { return mImpl; }
 
 private:
-    BitMapObjectPool<T, N, A> mImpl;
+    BitMapObjectPool<T, N> mImpl;
 };
 
 } // namespace chip

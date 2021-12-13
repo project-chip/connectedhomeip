@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -228,6 +229,20 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         fabricListChanged();
+
+        // The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.
+        ForAllEndpointsWithServerCluster(Basic::Id, [](EndpointId endpoint, intptr_t context) -> Loop {
+            // If Basic cluster is implemented on this endpoint
+            Basic::Events::Leave::Type event;
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            }
+
+            return Loop::Continue;
+        });
     }
 
     // Gets called when a fabric is loaded into the FabricTable from KVS store.

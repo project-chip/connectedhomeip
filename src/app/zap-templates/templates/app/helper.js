@@ -97,15 +97,16 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic',
-  'Identify',
+  'Color Control',
   'Groups',
-  'Scenes',
+  'IAS Zone',
+  'Identify',
+  'Level Control',
   'Occupancy Sensing',
   'On/Off',
-  'Level Control',
-  'Color Control',
-  'IAS Zone',
   'Pump Configuration and Control',
+  'Scenes',
+  'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
@@ -658,7 +659,6 @@ function isWeaklyTypedEnum(label)
     "OTAAnnouncementReason",
     "OTAApplyUpdateAction",
     "OTADownloadProtocol",
-    "OTAQueryStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
