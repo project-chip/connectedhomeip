@@ -268,9 +268,12 @@ public:
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
         AddArgument("{{asUpperCamelCase label}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}},
-          {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
-          {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
-          {{else}}&{{>field}}
+          {{~#if isNullable}}&{{>field}}
+          {{else}}
+            {{~#if ./isEnum}}reinterpret_cast<std::underlying_type_t<decltype({{>field}})> *>(&{{>field}})
+            {{else ./isBitmap}}reinterpret_cast<std::underlying_type_t<chip::app::Clusters::{{asUpperCamelCase parent.clusterName}}::{{asUpperCamelCase type}}> *>(&{{>field}})
+            {{else}}&{{>field}}
+            {{/if~}}
           {{/if~}}
         );
         {{/if}}
