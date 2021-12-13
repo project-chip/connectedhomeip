@@ -176,7 +176,8 @@ bool IsOpen(chip::EndpointId endpoint)
     {
         isOpen = liftPosition == liftLimit;
     }
-    else if (HasFeature(endpoint, WindowCoveringFeature::kLift) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift) &&
+    else if (HasFeature(endpoint, WindowCoveringFeature::kLift) &&
+             HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift) &&
              EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &liftPosition))
     {
         isOpen = 0 == liftPosition;
@@ -189,7 +190,8 @@ bool IsOpen(chip::EndpointId endpoint)
     {
         isOpen = isOpen && tiltPosition == tiltLimit;
     }
-    else if (HasFeature(endpoint, WindowCoveringFeature::kTilt) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt) &&
+    else if (HasFeature(endpoint, WindowCoveringFeature::kTilt) &&
+             HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt) &&
              EMBER_ZCL_STATUS_SUCCESS == Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &tiltPosition))
     {
         isOpen = isOpen && 0 == tiltPosition;
@@ -464,7 +466,7 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
                                                const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
-    uint16_t current = 0;
+    uint16_t current          = 0;
     chip::EndpointId endpoint = commandPath.mEndpointId;
 
     if (HasFeature(endpoint, WindowCoveringFeature::kLift) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
