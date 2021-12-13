@@ -465,6 +465,7 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
     uint16_t current = 0;
+    chip::EndpointId endpoint = commandPath.mEndpointId;
 
     if (HasFeature(endpoint, Features::Lift) && HasFeature(endpoint, Features::PositionAwareLift))
     {
