@@ -2543,12 +2543,12 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSData class]]) {
+                        if (![value[i_0] isKindOfClass:[NSString class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSData *) value[i_0];
-                        listHolder_0->mList[i_0] = [self asByteSpan:element_0];
+                        auto element_0 = (NSString *) value[i_0];
+                        listHolder_0->mList[i_0] = [self asCharSpan:element_0];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
