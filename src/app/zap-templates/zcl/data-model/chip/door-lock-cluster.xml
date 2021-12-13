@@ -467,8 +467,8 @@ limitations under the License.
             <description>Set an ID for RFID access into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
-            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
+            <arg name="userType" type="DlUserType" isNullable="true" />
             <arg name="rfidCode" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & RID - for now optional -->

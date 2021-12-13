@@ -519,11 +519,14 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
         return DoorLockServer::Instance().CreateUser(commandPath.mEndpointId, userIndex, fabricIndex, userName, userUniqueId,
                                                      Nullable<DlUserStatus>(userStatus), Nullable<DlUserType>(userType),
                                                      Nullable<DlCredentialRule>(credentialRule));
+                                                     userStatus, userType, credentialRule);
     case DlDataOperationType::kModify:
         return DoorLockServer::Instance().ModifyUser(commandPath.mEndpointId, userIndex, fabricIndex, commandData.userName,
                                                      commandData.userUniqueId, Nullable<DlUserStatus>(commandData.userStatus),
                                                      Nullable<DlUserType>(commandData.userType),
                                                      Nullable<DlCredentialRule>(commandData.credentialRule));
+                                                     commandData.userUniqueId, commandData.userStatus, commandData.userType,
+                                                     commandData.credentialRule);
     case DlDataOperationType::kClear:
         // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
