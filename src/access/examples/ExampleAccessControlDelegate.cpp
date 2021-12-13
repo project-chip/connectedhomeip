@@ -18,6 +18,7 @@
 
 #include "ExampleAccessControlDelegate.h"
 
+#include <access/AccessControlEntryCodec.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -127,34 +128,6 @@ public:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-public:
-    static const chip::TLV::Tag kTagNode = chip::TLV::ContextTag(1);
-
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
-    {
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(kTagNode, mNode));
-
-        return writer.EndContainer(container);
-    }
-
-    CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
-    {
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // mNode
-        ReturnErrorOnFailure(reader.Next(kTagNode));
-        ReturnErrorOnFailure(reader.Get(mNode));
-
-        return reader.ExitContainer(container);
-    }
-
 private:
     static bool IsValid(NodeId node) { return node != kUndefinedNodeId; }
 
@@ -208,39 +181,6 @@ public:
             return CHIP_NO_ERROR;
         }
         return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-public:
-    static const chip::TLV::Tag kTagCluster    = chip::TLV::ContextTag(1);
-    static const chip::TLV::Tag kTagDeviceType = chip::TLV::ContextTag(2);
-
-    CHIP_ERROR Serialize(chip::TLV::TLVWriter & writer)
-    {
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(kTagCluster, mCluster));
-        ReturnErrorOnFailure(writer.Put(kTagDeviceType, mDeviceType));
-
-        return writer.EndContainer(container);
-    }
-
-    CHIP_ERROR Deserialize(chip::TLV::TLVReader & reader)
-    {
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // mCluster
-        ReturnErrorOnFailure(reader.Next(kTagCluster));
-        ReturnErrorOnFailure(reader.Get(mCluster));
-        // mFabricIndex
-        ReturnErrorOnFailure(reader.Next(kTagDeviceType));
-        ReturnErrorOnFailure(reader.Get(mDeviceType));
-
-        return reader.ExitContainer(container);
     }
 
 private:
@@ -544,100 +484,6 @@ public:
             absoluteIndex++;
         }
         index = found ? toIndex : ArraySize(acl);
-    }
-
-public:
-    static const chip::TLV::Tag kTagInUse       = chip::TLV::ContextTag(1);
-    static const chip::TLV::Tag kTagFabricIndex = chip::TLV::ContextTag(2);
-    static const chip::TLV::Tag kTagAuthMode    = chip::TLV::ContextTag(3);
-    static const chip::TLV::Tag kTagPrivilege   = chip::TLV::ContextTag(4);
-    static const chip::TLV::Tag kTagSubjects    = chip::TLV::ContextTag(5);
-    static const chip::TLV::Tag kTagTargets     = chip::TLV::ContextTag(6);
-    static const size_t kStorageBufferSize      = 192;
-
-    CHIP_ERROR Serialize(chip::PersistentStorageDelegate * storage, const char * key)
-    {
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        chip::TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::TLVType::kTLVType_Structure, container));
-
-        ReturnErrorOnFailure(writer.Put(kTagInUse, mInUse));
-        ReturnErrorOnFailure(writer.Put(kTagFabricIndex, mFabricIndex));
-        ReturnErrorOnFailure(writer.Put(kTagAuthMode, mAuthMode));
-        ReturnErrorOnFailure(writer.Put(kTagPrivilege, mPrivilege));
-
-        chip::TLV::TLVType internalContainer;
-        ReturnErrorOnFailure(writer.StartContainer(kTagSubjects, chip::TLV::TLVType::kTLVType_Array, internalContainer));
-        for (size_t i = 0; i < kMaxSubjects; ++i)
-        {
-            ReturnErrorOnFailure(mSubjects[i].Serialize(writer));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(internalContainer));
-
-        ReturnErrorOnFailure(writer.StartContainer(kTagTargets, chip::TLV::TLVType::kTLVType_Array, internalContainer));
-        for (size_t i = 0; i < kMaxTargets; ++i)
-        {
-            ReturnErrorOnFailure(mTargets[i].Serialize(writer));
-        }
-        ReturnErrorOnFailure(writer.EndContainer(internalContainer));
-
-        ReturnErrorOnFailure(writer.EndContainer(container));
-        ReturnErrorOnFailure(writer.Finalize());
-
-        return storage->SyncSetKeyValue(key, buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
-    }
-
-    CHIP_ERROR Deserialize(chip::PersistentStorageDelegate * storage, const char * key)
-    {
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        uint16_t bufferSize                = static_cast<uint16_t>(sizeof(buffer));
-        ReturnErrorOnFailure(storage->SyncGetKeyValue(key, buffer, bufferSize));
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer, bufferSize);
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Structure, CHIP_ERROR_INTERNAL);
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // mInUse
-        ReturnErrorOnFailure(reader.Next(kTagInUse));
-        ReturnErrorOnFailure(reader.Get(mInUse));
-        // mFabricIndex
-        ReturnErrorOnFailure(reader.Next(kTagFabricIndex));
-        ReturnErrorOnFailure(reader.Get(mFabricIndex));
-        // mAuthMode
-        ReturnErrorOnFailure(reader.Next(kTagAuthMode));
-        ReturnErrorOnFailure(reader.Get(mAuthMode));
-        // mPrivilege
-        ReturnErrorOnFailure(reader.Next(kTagPrivilege));
-        ReturnErrorOnFailure(reader.Get(mPrivilege));
-
-        // mSubjects
-        chip::TLV::TLVType innerContainer;
-        ReturnErrorOnFailure(reader.Next(kTagSubjects));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Array, CHIP_ERROR_INTERNAL);
-        ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
-        for (size_t i = 0; i < kMaxSubjects; ++i)
-        {
-            ReturnErrorOnFailure(mSubjects[i].Deserialize(reader));
-        }
-        ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
-
-        // mTargets
-        ReturnErrorOnFailure(reader.Next(kTagTargets));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::TLVType::kTLVType_Array, CHIP_ERROR_INTERNAL);
-        ReturnErrorOnFailure(reader.EnterContainer(innerContainer));
-        for (size_t i = 0; i < kMaxTargets; ++i)
-        {
-            ReturnErrorOnFailure(mTargets[i].Deserialize(reader));
-        }
-        ReturnErrorOnFailure(reader.ExitContainer(innerContainer));
-
-        return reader.ExitContainer(container);
     }
 
 public:
@@ -1262,23 +1108,47 @@ private:
 
     // The version of the storage data format. Increment this key when the format of the data model changes.
     static const uint32_t kExampleAclStorageVersion = 1;
-    static const size_t kStorageBufferSize          = 32;
+    static const size_t kMetadataStorageBufferSize  = 32;
+    static const size_t kEntryStorageBufferSize     = 192;
     static const chip::TLV::Tag kTagVersion         = chip::TLV::ContextTag(1);
+    static const chip::TLV::Tag kTagEntryCount      = chip::TLV::ContextTag(2);
+
+    struct Constants : public chip::Access::AccessControlEntryCodecConstants
+    {
+        Constants()
+        {
+            encodedAuthPase = 1;
+            encodedAuthCase = 2;
+            encodedAuthGroup = 3;
+            encodedPrivilegeView = 4;
+            encodedPrivilegeProxyView = 5;
+            encodedPrivilegeOperate = 6;
+            encodedPrivilegeManage = 7;
+            encodedPrivilegeAdminister = 8;
+            fabricIndexTag = chip::TLV::ContextTag(1);
+            privilegeTag = chip::TLV::ContextTag(2);
+            authModeTag = chip::TLV::ContextTag(3);
+            subjectsTag = chip::TLV::ContextTag(4);
+            targetsTag = chip::TLV::ContextTag(5);
+            targetClusterTag = chip::TLV::ContextTag(6);
+            targetEndpointTag = chip::TLV::ContextTag(7);
+            targetDeviceTypeTag = chip::TLV::ContextTag(8);
+        }
+    };
 
     CHIP_ERROR LoadFromFlash()
     {
         VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        uint8_t buffer[kStorageBufferSize] = { 0 };
-        uint16_t size                      = static_cast<uint16_t>(sizeof(buffer));
+        uint8_t buffer[kMetadataStorageBufferSize] = { 0 };
+        uint16_t size                              = static_cast<uint16_t>(sizeof(buffer));
         chip::DefaultStorageKeyAllocator key;
         ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlList(), buffer, size));
 
         chip::TLV::TLVReader reader;
         reader.Init(buffer, size);
 
-        ReturnErrorOnFailure(reader.Next(chip::TLV::AnonymousTag));
-        VerifyOrReturnError(reader.GetType() == chip::TLV::kTLVType_Structure, CHIP_ERROR_INTERNAL);
+        ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag));
 
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(reader.EnterContainer(container));
@@ -1289,10 +1159,27 @@ private:
         ReturnErrorOnFailure(reader.Get(version));
         VerifyOrReturnError(version == kExampleAclStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
 
-        // Entries
-        for (size_t i = 0; i < EntryStorage::kNumberOfFabrics * EntryStorage::kEntriesPerFabric; ++i)
+        // Entry count
+        ReturnErrorOnFailure(reader.Next(kTagEntryCount));
+        uint32_t entryCount;
+        ReturnErrorOnFailure(reader.Get(entryCount));
+
+        for (auto & storage : EntryStorage::acl)
         {
-            ReturnErrorOnFailure(EntryStorage::acl[i].Deserialize(mStorageDelegate, key.AccessControlEntry(i)));
+            storage.Clear();
+        }
+
+        // Entries
+        chip::Access::AccessControlEntryCodec<Constants> codec;
+        for (size_t i = 0; i < entryCount; ++i)
+        {
+            uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
+            uint16_t bufferSize = static_cast<uint16_t>(sizeof(buffer));
+            ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlEntry(i), entryBuffer, bufferSize));
+            chip::TLV::TLVReader entryReader;
+            entryReader.Init(entryBuffer, bufferSize);
+            ReturnErrorOnFailure(codec.Decode(entryReader));
+            CreateEntry(nullptr, codec.entry, nullptr);
         }
         return reader.ExitContainer(container);
     }
@@ -1301,19 +1188,31 @@ private:
     {
         VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-        uint8_t buffer[kStorageBufferSize] = { 0 };
+        uint8_t buffer[kMetadataStorageBufferSize] = { 0 };
         chip::TLV::TLVWriter writer;
-        writer.Init(buffer, sizeof(buffer));
+        writer.Init(buffer);
         chip::DefaultStorageKeyAllocator key;
         chip::TLV::TLVType container;
         ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::TLVType::kTLVType_Structure, container));
         ReturnErrorOnFailure(writer.Put(kTagVersion, kExampleAclStorageVersion));
-        for (size_t i = 0; i < EntryStorage::kNumberOfFabrics * EntryStorage::kEntriesPerFabric; ++i)
-        {
-            ReturnErrorOnFailure(EntryStorage::acl[i].Serialize(mStorageDelegate, key.AccessControlEntry(i)));
-        }
+
+        size_t entryCount;
+        ReturnErrorOnFailure(GetEntryCount(entryCount));
+        ReturnErrorOnFailure(writer.Put(kTagEntryCount, static_cast<uint32_t>(entryCount)));
+
         ReturnErrorOnFailure(writer.EndContainer(container));
         ReturnErrorOnFailure(writer.Finalize());
+
+        chip::Access::AccessControlEntryCodec<Constants> codec;
+        for (size_t i = 0; i < entryCount; ++i)
+        {
+            uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
+            chip::TLV::TLVWriter entryWriter;
+            entryWriter.Init(entryBuffer);
+            ReadEntry(i, codec.entry, nullptr);
+            ReturnErrorOnFailure(codec.Encode(entryWriter, chip::TLV::AnonymousTag));
+            ReturnErrorOnFailure(mStorageDelegate->SyncSetKeyValue(key.AccessControlEntry(i), entryBuffer, static_cast<uint16_t>(entryWriter.GetLengthWritten())));
+        }
 
         return mStorageDelegate->SyncSetKeyValue(key.AccessControlList(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
     }
