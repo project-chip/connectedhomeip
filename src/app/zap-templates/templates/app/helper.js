@@ -653,7 +653,6 @@ function isWeaklyTypedEnum(label)
     "MediaPlaybackState",
     "MediaPlaybackStatus",
     "MoveMode",
-    "NetworkCommissioningError",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
     "OTAAnnouncementReason",

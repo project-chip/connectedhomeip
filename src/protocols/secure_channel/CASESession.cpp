@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -129,12 +128,11 @@ CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
-    memset(&cachableSession, 0, sizeof(cachableSession));
     cachableSession.mSharedSecretLen = LittleEndian::HostSwap16(static_cast<uint16_t>(mSharedSecret.Length()));
     cachableSession.mPeerNodeId      = LittleEndian::HostSwap64(peerNodeId);
     for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        cachableSession.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
+        cachableSession.mPeerCATs.values[i] = LittleEndian::HostSwap32(GetPeerCATs().values[i]);
     }
     // TODO: Get the fabric index
     cachableSession.mLocalFabricIndex      = 0;
@@ -154,10 +152,10 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     memcpy(mSharedSecret, cachableSession.mSharedSecret, length);
 
     SetPeerNodeId(LittleEndian::HostSwap64(cachableSession.mPeerNodeId));
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        peerCATs.val[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.val[i]);
+        peerCATs.values[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.values[i]);
     }
     SetPeerCATs(peerCATs);
     SetSessionTimeStamp(LittleEndian::HostSwap64(cachableSession.mSessionSetupTimeStamp));
@@ -852,9 +850,11 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId, static_cast<uint32_t>(sizeof(mResumptionId))));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
-    SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
-    SetPeerCATs(peerCATs);
+    {
+        CATValues peerCATs;
+        SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
+        SetPeerCATs(peerCATs);
+    }
 
     // Retrieve responderMRPParams if present
     if (tlvReader.Next() != CHIP_END_OF_TLV)
@@ -1120,9 +1120,11 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
-    SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
-    SetPeerCATs(peerCATs);
+    {
+        CATValues peerCATs;
+        SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
+        SetPeerCATs(peerCATs);
+    }
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 

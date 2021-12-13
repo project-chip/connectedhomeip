@@ -106,12 +106,13 @@ namespace {
 NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
-void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                               ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnAddOrUpdateThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler,
+                                                       const app::ConcreteCommandPath & commandPath, ByteSpan operationalDataset,
+                                                       uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    Commands::AddThreadNetworkResponse::Type response;
+    Commands::NetworkConfigResponse::Type response;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
+    NetworkCommissioningStatus err = NetworkCommissioningStatus::kBoundsExceeded;
 
     for (size_t i = 0; i < kMaxNetworks; i++)
     {
@@ -123,7 +124,7 @@ void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHa
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogDetail(Zcl, "Failed to parse Thread operational dataset: %s", ErrorStr(error));
-                err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+                err = NetworkCommissioningStatus::kUnknownError;
                 break;
             }
 
@@ -138,7 +139,7 @@ void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHa
             sNetworks[i].mNetworkType = NetworkType::kThread;
             sNetworks[i].mEnabled     = false;
 
-            err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS;
+            err = NetworkCommissioningStatus::kSuccess;
             break;
         }
     }
@@ -146,76 +147,76 @@ void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHa
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, err);
-    response.errorCode = err;
+    ChipLogDetail(Zcl, "AddOrUpdateThreadNetwork: %" PRIu8, to_underlying(err));
+    response.networkingStatus = err;
 #else
-    // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
-    // return "Command not found" error.
-    response.errorCode = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+    // The target does not supports ThreadNetwork. We should not add AddOrUpdateThreadNetwork command in that case then the upper
+    // layer will return "Command not found" error.
+    response.networkingStatus = NetworkCommissioningStatus::kUnknownError;
 #endif
     apCommandHandler->AddResponseData(commandPath, response);
 }
 
-void OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                             ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnAddOrUpdateWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler,
+                                                     const app::ConcreteCommandPath & commandPath, ByteSpan ssid,
+                                                     ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    Commands::AddWiFiNetworkResponse::Type response;
+    Commands::NetworkConfigResponse::Type response;
 #if defined(CHIP_DEVICE_LAYER_TARGET)
-    EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
+    NetworkCommissioningStatus err = NetworkCommissioningStatus::kBoundsExceeded;
 
     for (size_t i = 0; i < kMaxNetworks; i++)
     {
         if (sNetworks[i].mNetworkType == NetworkType::kUndefined)
         {
-            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mData.mWiFi.mSSID),
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mData.mWiFi.mSSID), err = NetworkCommissioningStatus::kOutOfRange);
             memcpy(sNetworks[i].mData.mWiFi.mSSID, ssid.data(), ssid.size());
 
             using WiFiSSIDLenType = decltype(sNetworks[i].mData.mWiFi.mSSIDLen);
-            VerifyOrExit(CanCastTo<WiFiSSIDLenType>(ssid.size()), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            VerifyOrExit(CanCastTo<WiFiSSIDLenType>(ssid.size()), err = NetworkCommissioningStatus::kOutOfRange);
             sNetworks[i].mData.mWiFi.mSSIDLen = static_cast<WiFiSSIDLenType>(ssid.size());
 
             VerifyOrExit(credentials.size() <= sizeof(sNetworks[i].mData.mWiFi.mCredentials),
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+                         err = NetworkCommissioningStatus::kOutOfRange);
             memcpy(sNetworks[i].mData.mWiFi.mCredentials, credentials.data(), credentials.size());
 
             using WiFiCredentialsLenType = decltype(sNetworks[i].mData.mWiFi.mCredentialsLen);
-            VerifyOrExit(CanCastTo<WiFiCredentialsLenType>(ssid.size()), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            VerifyOrExit(CanCastTo<WiFiCredentialsLenType>(ssid.size()), err = NetworkCommissioningStatus::kOutOfRange);
             sNetworks[i].mData.mWiFi.mCredentialsLen = static_cast<WiFiCredentialsLenType>(credentials.size());
 
-            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mNetworkID), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            VerifyOrExit(ssid.size() <= sizeof(sNetworks[i].mNetworkID), err = NetworkCommissioningStatus::kOutOfRange);
             memcpy(sNetworks[i].mNetworkID, sNetworks[i].mData.mWiFi.mSSID, ssid.size());
 
             using NetworkIDLenType = decltype(sNetworks[i].mNetworkIDLen);
-            VerifyOrExit(CanCastTo<NetworkIDLenType>(ssid.size()), err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_OUT_OF_RANGE);
+            VerifyOrExit(CanCastTo<NetworkIDLenType>(ssid.size()), err = NetworkCommissioningStatus::kOutOfRange);
             sNetworks[i].mNetworkIDLen = static_cast<NetworkIDLenType>(ssid.size());
 
             sNetworks[i].mNetworkType = NetworkType::kWiFi;
             sNetworks[i].mEnabled     = false;
 
-            err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS;
+            err = NetworkCommissioningStatus::kSuccess;
             break;
         }
     }
 
-    VerifyOrExit(err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS, );
+    VerifyOrExit(err == NetworkCommissioningStatus::kSuccess, );
 
     ChipLogDetail(Zcl, "WiFi provisioning data: SSID: %.*s", static_cast<int>(ssid.size()), ssid.data());
 exit:
     // TODO: We should encode response command here.
 
-    ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, err);
-    response.errorCode = err;
+    ChipLogDetail(Zcl, "AddOrUpdateWiFiNetwork: %" PRIu8, to_underlying(err));
+    response.networkingStatus = err;
 #else
     // The target does not supports WiFiNetwork.
     // return "Command not found" error.
-    response.errorCode = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+    response.networkingStatus = NetworkCommissioningStatus::kUnknownError;
 #endif
     apCommandHandler->AddResponseData(commandPath, response);
 }
 
 namespace {
-CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
+CHIP_ERROR DoConnectNetwork(NetworkInfo * network)
 {
     switch (network->mNetworkType)
     {
@@ -256,12 +257,12 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
 }
 } // namespace
 
-void OnEnableNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
-                                            ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
+void OnConnectNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
+                                             ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
-    Commands::EnableNetworkResponse::Type response;
+    Commands::ConnectNetworkResponse::Type response;
     size_t networkSeq;
-    EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
+    NetworkCommissioningStatus err = NetworkCommissioningStatus::kNetworkIDNotFound;
 
     for (networkSeq = 0; networkSeq < kMaxNetworks; networkSeq++)
     {
@@ -271,18 +272,18 @@ void OnEnableNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandl
         {
             // TODO: Currently, we cannot figure out the detailed error from network provisioning on DeviceLayer, we should
             // implement this in device layer.
-            VerifyOrExit(DoEnableNetwork(&sNetworks[networkSeq]) == CHIP_NO_ERROR,
-                         err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR);
-            ExitNow(err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS);
+            VerifyOrExit(DoConnectNetwork(&sNetworks[networkSeq]) == CHIP_NO_ERROR,
+                         err = NetworkCommissioningStatus::kUnknownError);
+            ExitNow(err = NetworkCommissioningStatus::kSuccess);
         }
     }
     // TODO: We should encode response command here.
 exit:
-    if (err == EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS)
+    if (err == NetworkCommissioningStatus::kSuccess)
     {
-        DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().EnableNetworkForOperational(networkID);
+        DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(networkID);
     }
-    response.errorCode = err;
+    response.networkingStatus = err;
     apCommandHandler->AddResponseData(commandPath, response);
 }
 

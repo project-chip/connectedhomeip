@@ -60,13 +60,13 @@ constexpr size_t kCASEResumptionIDSize = 16;
 
 struct CASESessionCachable
 {
-    uint16_t mSharedSecretLen;
-    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
-    FabricIndex mLocalFabricIndex;
-    NodeId mPeerNodeId;
-    Credentials::CATValues mPeerCATs;
-    uint8_t mResumptionId[kCASEResumptionIDSize];
-    uint64_t mSessionSetupTimeStamp;
+    uint16_t mSharedSecretLen                              = 0;
+    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length] = { 0 };
+    FabricIndex mLocalFabricIndex                          = 0;
+    NodeId mPeerNodeId                                     = kUndefinedNodeId;
+    CATValues mPeerCATs;
+    uint8_t mResumptionId[kCASEResumptionIDSize] = { 0 };
+    uint64_t mSessionSetupTimeStamp              = 0;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession

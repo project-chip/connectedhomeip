@@ -92,9 +92,9 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     PASESession pairing;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     peerCATs = pairing.GetPeerCATs();
-    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &Credentials::kUndefinedCATs, sizeof(Credentials::CATValues)) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kUndefinedCATs, sizeof(CATValues)) == 0);
 
     gLoopback.Reset();
 

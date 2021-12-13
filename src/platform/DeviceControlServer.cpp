@@ -98,7 +98,7 @@ exit:
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceControlServer::EnableNetworkForOperational(ByteSpan networkID)
+CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)
 {
     ChipDeviceEvent event;
     event.Type = DeviceEventType::kOperationalNetworkEnabled;

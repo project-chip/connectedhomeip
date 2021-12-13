@@ -9873,11 +9873,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace GeneralCommissioning
 namespace NetworkCommissioning {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for NetworkCommissioningError
-enum class NetworkCommissioningError : uint8_t
+// Enum for NetworkCommissioningStatus
+enum class NetworkCommissioningStatus : uint8_t
 {
     kSuccess                = 0x00,
     kOutOfRange             = 0x01,
@@ -9891,30 +9888,54 @@ enum class NetworkCommissioningError : uint8_t
     kOtherConnectionFailure = 0x09,
     kIPV6Failed             = 0x0A,
     kIPBindFailed           = 0x0B,
-    kLabel9                 = 0x0C,
-    kLabel10                = 0x0D,
-    kLabel11                = 0x0E,
-    kLabel12                = 0x0F,
-    kLabel13                = 0x10,
-    kLabel14                = 0x11,
-    kLabel15                = 0x12,
-    kUnknownError           = 0x13,
+    kUnknownError           = 0x0C,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkCommissioningError       = EmberAfNetworkCommissioningError;
-#endif
 
 namespace Structs {
-namespace ThreadInterfaceScanResult {
+namespace NetworkInfo {
 enum class Fields
 {
-    kDiscoveryResponse = 1,
+    kNetworkID = 1,
+    kConnected = 2,
 };
 
 struct Type
 {
 public:
-    chip::ByteSpan discoveryResponse;
+    chip::ByteSpan networkID;
+    bool connected;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace NetworkInfo
+namespace ThreadInterfaceScanResult {
+enum class Fields
+{
+    kPanId           = 1,
+    kExtendedPanId   = 2,
+    kNetworkName     = 3,
+    kChannel         = 4,
+    kVersion         = 5,
+    kExtendedAddress = 6,
+    kRssi            = 7,
+    kLqi             = 8,
+};
+
+struct Type
+{
+public:
+    uint64_t panId;
+    uint64_t extendedPanId;
+    chip::CharSpan networkName;
+    uint16_t channel;
+    uint8_t version;
+    uint64_t extendedAddress;
+    int8_t rssi;
+    uint8_t lqi;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9926,11 +9947,12 @@ using DecodableType = Type;
 namespace WiFiInterfaceScanResult {
 enum class Fields
 {
-    kSecurity      = 1,
-    kSsid          = 2,
-    kBssid         = 3,
-    kChannel       = 4,
-    kFrequencyBand = 5,
+    kSecurity = 1,
+    kSsid     = 2,
+    kBssid    = 3,
+    kChannel  = 4,
+    kWiFiBand = 5,
+    kRssi     = 6,
 };
 
 struct Type
@@ -9940,7 +9962,8 @@ public:
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
     uint8_t channel;
-    uint32_t frequencyBand;
+    uint32_t wiFiBand;
+    int8_t rssi;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9964,75 +9987,40 @@ struct Type;
 struct DecodableType;
 } // namespace ScanNetworksResponse
 
-namespace AddWiFiNetwork {
+namespace AddOrUpdateWiFiNetwork {
 struct Type;
 struct DecodableType;
-} // namespace AddWiFiNetwork
+} // namespace AddOrUpdateWiFiNetwork
 
-namespace AddWiFiNetworkResponse {
+namespace AddOrUpdateThreadNetwork {
 struct Type;
 struct DecodableType;
-} // namespace AddWiFiNetworkResponse
-
-namespace UpdateWiFiNetwork {
-struct Type;
-struct DecodableType;
-} // namespace UpdateWiFiNetwork
-
-namespace UpdateWiFiNetworkResponse {
-struct Type;
-struct DecodableType;
-} // namespace UpdateWiFiNetworkResponse
-
-namespace AddThreadNetwork {
-struct Type;
-struct DecodableType;
-} // namespace AddThreadNetwork
-
-namespace AddThreadNetworkResponse {
-struct Type;
-struct DecodableType;
-} // namespace AddThreadNetworkResponse
-
-namespace UpdateThreadNetwork {
-struct Type;
-struct DecodableType;
-} // namespace UpdateThreadNetwork
-
-namespace UpdateThreadNetworkResponse {
-struct Type;
-struct DecodableType;
-} // namespace UpdateThreadNetworkResponse
+} // namespace AddOrUpdateThreadNetwork
 
 namespace RemoveNetwork {
 struct Type;
 struct DecodableType;
 } // namespace RemoveNetwork
 
-namespace RemoveNetworkResponse {
+namespace NetworkConfigResponse {
 struct Type;
 struct DecodableType;
-} // namespace RemoveNetworkResponse
+} // namespace NetworkConfigResponse
 
-namespace EnableNetwork {
+namespace ConnectNetwork {
 struct Type;
 struct DecodableType;
-} // namespace EnableNetwork
+} // namespace ConnectNetwork
 
-namespace EnableNetworkResponse {
+namespace ConnectNetworkResponse {
 struct Type;
 struct DecodableType;
-} // namespace EnableNetworkResponse
+} // namespace ConnectNetworkResponse
 
-namespace DisableNetwork {
+namespace ReorderNetwork {
 struct Type;
 struct DecodableType;
-} // namespace DisableNetwork
-
-namespace DisableNetworkResponse {
-struct Type;
-struct DecodableType;
-} // namespace DisableNetworkResponse
+} // namespace ReorderNetwork
 
 } // namespace Commands
 
@@ -10042,7 +10030,6 @@ enum class Fields
 {
     kSsid       = 0,
     kBreadcrumb = 1,
-    kTimeoutMs  = 2,
 };
 
 struct Type
@@ -10054,7 +10041,6 @@ public:
 
     chip::ByteSpan ssid;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10071,16 +10057,15 @@ public:
 
     chip::ByteSpan ssid;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworks
 namespace ScanNetworksResponse {
 enum class Fields
 {
-    kErrorCode         = 0,
+    kNetworkingStatus  = 0,
     kDebugText         = 1,
-    kWifiScanResults   = 2,
+    kWiFiScanResults   = 2,
     kThreadScanResults = 3,
 };
 
@@ -10091,9 +10076,9 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::List<const Structs::WiFiInterfaceScanResult::Type> wifiScanResults;
+    DataModel::List<const Structs::WiFiInterfaceScanResult::Type> wiFiScanResults;
     DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10109,37 +10094,35 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ScanNetworksResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wifiScanResults;
+    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wiFiScanResults;
     DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
-namespace AddWiFiNetwork {
+namespace AddOrUpdateWiFiNetwork {
 enum class Fields
 {
     kSsid        = 0,
     kCredentials = 1,
     kBreadcrumb  = 2,
-    kTimeoutMs   = 3,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateWiFiNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10147,149 +10130,35 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateWiFiNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan ssid;
     chip::ByteSpan credentials;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace AddWiFiNetwork
-namespace AddWiFiNetworkResponse {
-enum class Fields
-{
-    kErrorCode = 0,
-    kDebugText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::AddWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace AddWiFiNetworkResponse
-namespace UpdateWiFiNetwork {
-enum class Fields
-{
-    kSsid        = 0,
-    kCredentials = 1,
-    kBreadcrumb  = 2,
-    kTimeoutMs   = 3,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    chip::ByteSpan ssid;
-    chip::ByteSpan credentials;
-    uint64_t breadcrumb;
-    uint32_t timeoutMs;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    chip::ByteSpan ssid;
-    chip::ByteSpan credentials;
-    uint64_t breadcrumb;
-    uint32_t timeoutMs;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UpdateWiFiNetwork
-namespace UpdateWiFiNetworkResponse {
-enum class Fields
-{
-    kErrorCode = 0,
-    kDebugText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UpdateWiFiNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UpdateWiFiNetworkResponse
-namespace AddThreadNetwork {
+}; // namespace AddOrUpdateWiFiNetwork
+namespace AddOrUpdateThreadNetwork {
 enum class Fields
 {
     kOperationalDataset = 0,
     kBreadcrumb         = 1,
-    kTimeoutMs          = 2,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateThreadNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10297,129 +10166,19 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::AddOrUpdateThreadNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan operationalDataset;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace AddThreadNetwork
-namespace AddThreadNetworkResponse {
-enum class Fields
-{
-    kErrorCode = 0,
-    kDebugText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::AddThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace AddThreadNetworkResponse
-namespace UpdateThreadNetwork {
-enum class Fields
-{
-    kOperationalDataset = 0,
-    kBreadcrumb         = 1,
-    kTimeoutMs          = 2,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    chip::ByteSpan operationalDataset;
-    uint64_t breadcrumb;
-    uint32_t timeoutMs;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetwork::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    chip::ByteSpan operationalDataset;
-    uint64_t breadcrumb;
-    uint32_t timeoutMs;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UpdateThreadNetwork
-namespace UpdateThreadNetworkResponse {
-enum class Fields
-{
-    kErrorCode = 0,
-    kDebugText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UpdateThreadNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UpdateThreadNetworkResponse
+}; // namespace AddOrUpdateThreadNetwork
 namespace RemoveNetwork {
 enum class Fields
 {
     kNetworkID  = 0,
     kBreadcrumb = 1,
-    kTimeoutMs  = 2,
 };
 
 struct Type
@@ -10431,11 +10190,10 @@ public:
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10448,25 +10206,24 @@ public:
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace RemoveNetwork
-namespace RemoveNetworkResponse {
+namespace NetworkConfigResponse {
 enum class Fields
 {
-    kErrorCode = 0,
-    kDebugText = 1,
+    kNetworkingStatus = 0,
+    kDebugText        = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RemoveNetworkResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10479,36 +10236,34 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::RemoveNetworkResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NetworkConfigResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace RemoveNetworkResponse
-namespace EnableNetwork {
+}; // namespace NetworkConfigResponse
+namespace ConnectNetwork {
 enum class Fields
 {
     kNetworkID  = 0,
     kBreadcrumb = 1,
-    kTimeoutMs  = 2,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::EnableNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ConnectNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10516,31 +10271,32 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::EnableNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ConnectNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace EnableNetwork
-namespace EnableNetworkResponse {
+}; // namespace ConnectNetwork
+namespace ConnectNetworkResponse {
 enum class Fields
 {
-    kErrorCode = 0,
-    kDebugText = 1,
+    kNetworkingStatus = 0,
+    kDebugText        = 1,
+    kErrorValue       = 2,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::EnableNetworkResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
+    int32_t errorValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10552,36 +10308,37 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::EnableNetworkResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ConnectNetworkResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
-    uint8_t errorCode;
+    NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
+    int32_t errorValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace EnableNetworkResponse
-namespace DisableNetwork {
+}; // namespace ConnectNetworkResponse
+namespace ReorderNetwork {
 enum class Fields
 {
-    kNetworkID  = 0,
-    kBreadcrumb = 1,
-    kTimeoutMs  = 2,
+    kNetworkID    = 0,
+    kNetworkIndex = 1,
+    kBreadcrumb   = 2,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DisableNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ReorderNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
+    uint8_t networkIndex;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType;
+    using ResponseType = Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -10589,54 +10346,115 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::DisableNetwork::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ReorderNetwork::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
 
     chip::ByteSpan networkID;
+    uint8_t networkIndex;
     uint64_t breadcrumb;
-    uint32_t timeoutMs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace DisableNetwork
-namespace DisableNetworkResponse {
-enum class Fields
-{
-    kErrorCode = 0,
-    kDebugText = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::DisableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::DisableNetworkResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
-
-    uint8_t errorCode;
-    chip::CharSpan debugText;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace DisableNetworkResponse
+}; // namespace ReorderNetwork
 } // namespace Commands
 
 namespace Attributes {
 
+namespace MaxNetworks {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxNetworks::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxNetworks
+namespace Networks {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::NetworkInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::NetworkInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::NetworkInfo::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Networks::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Networks
+namespace ScanMaxTimeSeconds {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ScanMaxTimeSeconds::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ScanMaxTimeSeconds
+namespace ConnectMaxTimeSeconds {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ConnectMaxTimeSeconds::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ConnectMaxTimeSeconds
+namespace InterfaceEnabled {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::InterfaceEnabled::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace InterfaceEnabled
+namespace LastNetworkingStatus {
+struct TypeInfo
+{
+    using Type             = NetworkCommissioningStatus;
+    using DecodableType    = NetworkCommissioningStatus;
+    using DecodableArgType = NetworkCommissioningStatus;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkingStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LastNetworkingStatus
+namespace LastNetworkID {
+struct TypeInfo
+{
+    using Type             = chip::ByteSpan;
+    using DecodableType    = chip::ByteSpan;
+    using DecodableArgType = chip::ByteSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LastNetworkID
+namespace LastConnectErrorValue {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LastConnectErrorValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LastConnectErrorValue
 namespace AttributeList {
 struct TypeInfo
 {
@@ -10682,6 +10500,14 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::MaxNetworks::TypeInfo::DecodableType maxNetworks;
+        Attributes::Networks::TypeInfo::DecodableType networks;
+        Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableType scanMaxTimeSeconds;
+        Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableType connectMaxTimeSeconds;
+        Attributes::InterfaceEnabled::TypeInfo::DecodableType interfaceEnabled;
+        Attributes::LastNetworkingStatus::TypeInfo::DecodableType lastNetworkingStatus;
+        Attributes::LastNetworkID::TypeInfo::DecodableType lastNetworkID;
+        Attributes::LastConnectErrorValue::TypeInfo::DecodableType lastConnectErrorValue;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;

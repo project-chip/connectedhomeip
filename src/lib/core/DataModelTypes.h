@@ -28,7 +28,6 @@ namespace chip {
 
 typedef uint8_t ActionId;
 typedef uint32_t AttributeId;
-typedef uint32_t CASEAuthTag;
 typedef uint32_t ClusterId;
 typedef uint8_t ClusterStatus;
 typedef uint32_t CommandId;

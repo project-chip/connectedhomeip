@@ -914,12 +914,12 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
             // valid NOC was done above.
             ReturnErrorCodeIf(catCount == cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
             VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
-            cats.val[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
+            cats.values[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
         }
     }
     for (uint8_t i = catCount; i < cats.size(); ++i)
     {
-        cats.val[i] = kUndefinedCAT;
+        cats.values[i] = kUndefinedCAT;
     }
 
     return CHIP_NO_ERROR;
