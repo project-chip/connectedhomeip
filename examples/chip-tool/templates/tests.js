@@ -173,6 +173,7 @@ function getTests()
     'TV_MediaPlaybackCluster',
     'TV_TvChannelCluster',
     'TV_LowPowerCluster',
+    'TV_ContentLauncherCluster',
     'TV_MediaInputCluster',
   ];
 
