@@ -94,7 +94,7 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(chip::En
     // TODO: Insert code here
     ContentLaunchResponse response;
     response.err    = CHIP_NO_ERROR;
-    response.data   = "Example data";
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
     return response;
 }
@@ -106,7 +106,7 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string conte
     // TODO: Insert code here
     ContentLaunchResponse response;
     response.err    = CHIP_NO_ERROR;
-    response.data   = "Example data";
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
     return response;
 }

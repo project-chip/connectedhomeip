@@ -39,12 +39,21 @@
  ******************************************************************************/
 
 #include "content-launch-server.h"
+
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/enums.h>
+
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/data-model/Encode.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <list>
 
 using namespace chip;
+using namespace chip::app;
 
 ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
                                                           std::list<ContentLaunchParamater> parameterList, bool autoplay,
@@ -52,6 +61,74 @@ ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpo
 
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                                       ContentLaunchBrandingInformation & brandingInformation);
+
+namespace {
+
+class OctetStringData
+{
+public:
+    uint8_t * Data() { return mDataBuf; }
+    size_t Length() const { return mDataLen; }
+    void SetLength(size_t size) { mDataLen = size; }
+
+private:
+    uint8_t mDataBuf[5];
+    size_t mDataLen = 0;
+};
+
+class ContentLauncherAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
+    {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder);
+};
+
+ContentLauncherAttrAccess gContentLauncherAttrAccess;
+OctetStringData gListOctetStringData[5];
+
+CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id: {
+        return ReadAcceptsHeaderAttribute(aEncoder);
+    }
+    case app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
+        return ReadSupportedStreamingProtocols(aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t index = 0; index < 2; index++)
+        {
+            CharSpan span("example", strlen("example"));
+            ReturnErrorOnFailure(encoder.Encode(span));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder)
+{
+    uint8_t streamingProtocols = 0;
+    return aEncoder.Encode(streamingProtocols);
+}
+
+} // anonymous namespace
+
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -115,4 +192,10 @@ exit:
     return true;
 }
 
-void MatterContentLauncherPluginServerInitCallback() {}
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterContentLauncherPluginServerInitCallback(void)
+{
+    registerAttributeAccessOverride(&gContentLauncherAttrAccess);
+}
