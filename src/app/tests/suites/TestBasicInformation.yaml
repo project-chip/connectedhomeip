@@ -24,6 +24,7 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "Read location"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:

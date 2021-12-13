@@ -35,6 +35,7 @@ tests:
           value: "us"
 
     - label: "Read back Attribute"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
@@ -48,6 +49,7 @@ tests:
           value: ""
 
     - label: "Read back Attribute"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
