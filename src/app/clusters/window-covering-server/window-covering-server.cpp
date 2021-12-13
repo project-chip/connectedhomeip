@@ -218,12 +218,12 @@ EmberAfWcType TypeGet(chip::EndpointId endpoint)
 void ConfigStatusSet(chip::EndpointId endpoint, const ConfigStatus & status)
 {
     /* clang-format off */
-    uint8_t value = (status.operational ? 0x01 : 0) 
-                    | (status.online ? 0x02 : 0) 
-                    | (status.liftIsReversed ? 0x04 : 0) 
-                    | (status.liftIsPA ? 0x08 : 0) 
-                    | (status.tiltIsPA ? 0x10 : 0) 
-                    | (status.liftIsEncoderControlled ? 0x20 : 0) 
+    uint8_t value = (status.operational ? 0x01 : 0)
+                    | (status.online ? 0x02 : 0)
+                    | (status.liftIsReversed ? 0x04 : 0)
+                    | (status.liftIsPA ? 0x08 : 0)
+                    | (status.tiltIsPA ? 0x10 : 0)
+                    | (status.liftIsEncoderControlled ? 0x20 : 0)
                     | (status.tiltIsEncoderControlled ? 0x40 : 0);
     /* clang-format on */
     Attributes::ConfigStatus::Set(endpoint, value);
@@ -301,16 +301,16 @@ const Mode ModeGet(chip::EndpointId endpoint)
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status)
 {
     /* clang-format off */
-    uint16_t value = (status.remoteLockout ? 0x0001 : 0) 
-                     | (status.tamperDetection ? 0x0002 : 0) 
+    uint16_t value = (status.remoteLockout ? 0x0001 : 0)
+                     | (status.tamperDetection ? 0x0002 : 0)
                      | (status.failedCommunication ? 0x0004 : 0)
-                     | (status.positionFailure ? 0x0008 : 0) 
-                     | (status.thermalProtection ? 0x0010 : 0) 
-                     | (status.obstacleDetected ? 0x0020 : 0) 
-                     | (status.powerIssue ? 0x0040 : 0) 
+                     | (status.positionFailure ? 0x0008 : 0)
+                     | (status.thermalProtection ? 0x0010 : 0)
+                     | (status.obstacleDetected ? 0x0020 : 0)
+                     | (status.powerIssue ? 0x0040 : 0)
                      | (status.stopInput ? 0x0080 : 0);
-    value |= (uint16_t) (status.motorJammed ? 0x0100 : 0) 
-             | (uint16_t) (status.hardwareFailure ? 0x0200 : 0) 
+    value |= (uint16_t) (status.motorJammed ? 0x0100 : 0)
+             | (uint16_t) (status.hardwareFailure ? 0x0200 : 0)
              | (uint16_t) (status.manualOperation ? 0x0400 : 0);
     /* clang-format on */
     Attributes::SafetyStatus::Set(endpoint, value);
