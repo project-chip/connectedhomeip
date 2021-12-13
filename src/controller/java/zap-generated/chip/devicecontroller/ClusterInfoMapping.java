@@ -902,7 +902,8 @@ public class ClusterInfoMapping {
     @Override
     public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // Add String field here after ByteSpan is properly emitted in C++ layer
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<String>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
