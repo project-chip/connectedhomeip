@@ -9902,6 +9902,15 @@ enum class NetworkCommissioningStatus : uint8_t
     kIPBindFailed           = 0x0B,
     kUnknownError           = 0x0C,
 };
+// Enum for WiFiBand
+enum class WiFiBand : uint8_t
+{
+    k2g4  = 0x00,
+    k3g65 = 0x01,
+    k5g   = 0x02,
+    k6g   = 0x03,
+    k60g  = 0x04,
+};
 
 namespace Structs {
 namespace NetworkInfo {
@@ -9973,8 +9982,8 @@ public:
     uint8_t security;
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint8_t channel;
-    uint32_t wiFiBand;
+    uint16_t channel;
+    WiFiBand wiFiBand;
     int8_t rssi;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
