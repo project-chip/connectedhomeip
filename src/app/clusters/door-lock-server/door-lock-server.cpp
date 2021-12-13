@@ -989,11 +989,11 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, Emb
 }
 
 #if 1
-static EmberAfPluginDoorLockUserInfo users[100];
+static EmberAfPluginDoorLockUserInfo gs_users[100];
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    user = users[userIndex];
+    user = gs_users[userIndex];
     return true;
 }
 
@@ -1002,15 +1002,28 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
                                   DoorLock::DlCredentialRule credentialRule)
 {
-    strcpy(users[userIndex].userName, userName);
-    users[userIndex].userUniqueId   = uniqueId;
-    users[userIndex].userStatus     = userStatus;
-    users[userIndex].userType       = usertype;
-    users[userIndex].credentialRule = credentialRule;
-    users[userIndex].lastModifiedBy = modifier;
-    users[userIndex].createdBy      = creator;
+    strcpy(gs_users[userIndex].userName, userName);
+    gs_users[userIndex].userUniqueId   = uniqueId;
+    gs_users[userIndex].userStatus     = userStatus;
+    gs_users[userIndex].userType       = usertype;
+    gs_users[userIndex].credentialRule = credentialRule;
+    gs_users[userIndex].lastModifiedBy = modifier;
+    gs_users[userIndex].createdBy      = creator;
 
     return true;
 }
 
+static EmberAfPluginDoorLockCredentialInfo gs_credentials[100];
+
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
+{
+    return false;
+}
+
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+                                        DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+{
+    return false;
+}
 #endif

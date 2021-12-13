@@ -267,7 +267,7 @@ limitations under the License.
             <arg name="pinCode" type="OCTET_STRING" optional="true" />
         </command>
         <!-- Conformance feature LOG - for now optional -->
-        <command source="client" code="4" name="GetLogRecord" responseName="GetLogRecordResponse" optional="true">
+        <command source="client" code="4" name="GetLogRecord" response="GetLogRecordResponse" optional="true">
             <description>Request a log record.</description>
             <access op="invoke" role="manage" />
             <arg name="logIndex" type="INT16U" />
@@ -289,12 +289,12 @@ limitations under the License.
             <description>Set a PIN Code into the lock.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
-            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
+            <arg name="userType" type="DlUserType" isNullable="true" />
             <arg name="pin" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & PIN - for now optional -->
-        <command source="client" code="6" name="GetPINCode" responseName="GetPINCodeResponse" optional="true">
+        <command source="client" code="6" name="GetPINCode" response="GetPINCodeResponse" optional="true">
             <description>Retrieve a PIN Code.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -327,7 +327,7 @@ limitations under the License.
             <arg name="userStatus" type="DlUserStatus" />
         </command>
         <!-- Conformance feature !USR & (PIN | RID | FGP) - for now optional -->
-        <command source="client" code="10" name="GetUserStatus" responseName="GetUserStatusResponse" optional="true">
+        <command source="client" code="10" name="GetUserStatus" response="GetUserStatusResponse" optional="true">
             <description>Get the status of a user.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -352,7 +352,7 @@ limitations under the License.
             <arg name="endMinute" type="INT8U" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
-        <command source="client" code="12" name="GetWeekDaySchedule" responseName="GetWeekDayScheduleResponse" optional="true">
+        <command source="client" code="12" name="GetWeekDaySchedule" response="GetWeekDayScheduleResponse" optional="true">
             <description>Retrieve the specific weekly schedule for the specific user.</description>
             <access op="invoke" role="administer" />
             <arg name="weekDayIndex" type="INT8U" />
@@ -388,7 +388,7 @@ limitations under the License.
             <arg name="localEndTime" type="epoch_s" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
-        <command source="client" code="15" name="GetYearDaySchedule" responseName="GetYearDayScheduleResponse" optional="true">
+        <command source="client" code="15" name="GetYearDaySchedule" response="GetYearDayScheduleResponse" optional="true">
             <description>Returns the year day schedule data for the specified schedule and user indexes.</description>
             <access op="invoke" role="administer" />
             <arg name="yearDayIndex" type="INT8U" />
@@ -421,7 +421,7 @@ limitations under the License.
             <arg name="operatingMode" type="DlOperatingMode" />
         </command>
         <!-- Conformance feature SCH - for now optional -->
-        <command source="client" code="18" name="GetHolidaySchedule" responseName="GetHolidayScheduleResponse" optional="true">
+        <command source="client" code="18" name="GetHolidaySchedule" response="GetHolidayScheduleResponse" optional="true">
             <description>Get the holiday schedule for the specified index.</description>
             <access op="invoke" role="administer" />
             <arg name="holidayIndex" type="INT8U" />
@@ -450,7 +450,7 @@ limitations under the License.
             <arg name="userType" type="DlUserType" />
         </command>
         <!-- Conformance feature !USR & (PIN | RID | FGP) - for now optional -->
-        <command source="client" code="21" name="GetUserType" responseName="GetUserTypeResponse" optional="true">
+        <command source="client" code="21" name="GetUserType" response="GetUserTypeResponse" optional="true">
             <description>Retrieve the user type for a specific user.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -472,7 +472,7 @@ limitations under the License.
             <arg name="rfidCode" type="OCTET_STRING" />
         </command>
         <!-- Conformance feature !USR & RID - for now optional -->
-        <command source="client" code="23" name="GetRFIDCode" responseName="GetRFIDCodeResponse" optional="true">
+        <command source="client" code="23" name="GetRFIDCode" response="GetRFIDCodeResponse" optional="true">
             <description>Retrieve an RFID code.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
@@ -505,12 +505,12 @@ limitations under the License.
             <arg name="userIndex" type="INT16U" />
             <arg name="userName" type="CHAR_STRING" isNullable="true" />
             <arg name="userUniqueId" type="INT32U" isNullable="true" />
-            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="credentialRule" type="DlCredentialRule" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
+            <arg name="userType" type="DlUserType" isNullable="true" />
+            <arg name="credentialRule" type="DlCredentialRule" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="27" name="GetUser" responseName="GetUserResponse" optional="true">
+        <command source="client" code="27" name="GetUser" response="GetUserResponse" optional="true">
             <description>Retrieve User.</description>
             <access op="invoke" role="administer" />
             <arg name="userIndex" type="INT16U" />
@@ -559,14 +559,14 @@ limitations under the License.
             <arg name="data" type="CHAR_STRING" optional="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="34" name="SetCredential" responseName="SetCredentialResponse" optional="true">
+        <command source="client" code="34" name="SetCredential" response="SetCredentialResponse" optional="true">
             <description>Set a credential (e.g. PIN, RFID, Fingerprint, etc.) into the lock for a new user, existing user, or ProgrammingUser.</description>
             <access op="invoke" role="administer" />
             <arg name="operationType" type="DlDataOperationType" />
             <arg name="credential" type="DlCredential" />
             <arg name="credentialData" type="LONG_OCTET_STRING" />
-            <arg name="userIndex" type="INT16U" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userIndex" type="INT16U" isNullable="true" />
+            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
@@ -577,7 +577,7 @@ limitations under the License.
             <arg name="nextCredentialIndex" type="INT16U" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
-        <command source="client" code="36" name="GetCredentialStatus" responseName="GetCredentialStatusResponse" optional="true">
+        <command source="client" code="36" name="GetCredentialStatus" response="GetCredentialStatusResponse" optional="true">
             <description>Retrieve the status of a particular credential (e.g. PIN, RFID, Fingerprint, etc.) by index.</description>
             <access op="invoke" role="administer" />
             <arg name="credential" type="DlCredential" />
