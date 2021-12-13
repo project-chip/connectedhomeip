@@ -27,7 +27,7 @@ tests:
       command: "readAttribute"
       attribute: "accepts header list"
       response:
-          value: ["example1", "example2"]
+          value: ["example", "example"]
 
     - label: "Read attribute supported streaming protocols"
       command: "readAttribute"
