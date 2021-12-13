@@ -130,6 +130,7 @@ public:
         printf("TV_MediaPlaybackCluster\n");
         printf("TV_TvChannelCluster\n");
         printf("TV_LowPowerCluster\n");
+        printf("TV_ContentLauncherCluster\n");
         printf("TV_MediaInputCluster\n");
         printf("TestCluster\n");
         printf("TestClusterComplexTypes\n");
@@ -33967,6 +33968,215 @@ private:
     void OnSuccessResponse_1() { NextTest(); }
 };
 
+class TV_ContentLauncherCluster : public TestCommand
+{
+public:
+    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TV_ContentLauncherCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TV_ContentLauncherCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute accepts header list\n");
+            err = TestReadAttributeAcceptsHeaderList_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute supported streaming protocols\n");
+            err = TestReadAttributeSupportedStreamingProtocols_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Launch Content Command\n");
+            err = TestLaunchContentCommand_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Launch URL Command\n");
+            err = TestLaunchUrlCommand_4();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 5;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptsHeaderList)
+    {
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_1(acceptsHeaderList);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint32_t supportedStreamingProtocols)
+    {
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_2(supportedStreamingProtocols);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadAttributeAcceptsHeaderList_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ContentLauncherClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptsHeaderList)
+    {
+        auto iter = acceptsHeaderList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 0));
+        VerifyOrReturn(CheckValueAsString("acceptsHeaderList[0]", iter.GetValue(), chip::CharSpan("example", 7)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 1));
+        VerifyOrReturn(CheckValueAsString("acceptsHeaderList[1]", iter.GetValue(), chip::CharSpan("example", 7)));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeSupportedStreamingProtocols_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ContentLauncherClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint32_t supportedStreamingProtocols)
+    {
+        VerifyOrReturn(CheckValue("supportedStreamingProtocols", supportedStreamingProtocols, 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLaunchContentCommand_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type;
+
+        RequestType request;
+        request.autoPlay = true;
+        request.data     = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
+
+        request.search = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::Type>();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_3(data.contentLaunchStatus, data.data);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_3(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::ContentLaunchStatus contentLaunchStatus, chip::CharSpan data)
+    {
+        VerifyOrReturn(CheckValue("contentLaunchStatus", contentLaunchStatus, 0));
+
+        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLaunchUrlCommand_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type;
+
+        RequestType request;
+        request.contentURL    = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
+        request.displayString = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
+
+        request.brandingInformation =
+            chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::Type>();
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_4(data.contentLaunchStatus, data.data);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_4(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::ContentLaunchStatus contentLaunchStatus, chip::CharSpan data)
+    {
+        VerifyOrReturn(CheckValue("contentLaunchStatus", contentLaunchStatus, 0));
+
+        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
+
+        NextTest();
+    }
+};
+
 class TV_MediaInputCluster : public TestCommand
 {
 public:
@@ -51739,6 +51949,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_MediaPlaybackCluster>(),
         make_unique<TV_TvChannelCluster>(),
         make_unique<TV_LowPowerCluster>(),
+        make_unique<TV_ContentLauncherCluster>(),
         make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),
         make_unique<TestClusterComplexTypes>(),

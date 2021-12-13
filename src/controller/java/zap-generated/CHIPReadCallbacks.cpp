@@ -2807,7 +2807,7 @@ CHIPContentLauncherAcceptsHeaderListAttributeCallback::~CHIPContentLauncherAccep
 }
 
 void CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2844,13 +2844,13 @@ void CHIPContentLauncherAcceptsHeaderListAttributeCallback::CallbackFn(
     {
         auto & entry              = iter.GetValue();
         bool entryNull            = false;
-        chip::ByteSpan entryValue = entry;
+        chip::CharSpan entryValue = entry;
 
-        jbyteArray entryObject = nullptr;
+        jstring entryObject = nullptr;
+        chip::UtfString entryStr(env, entryValue);
         if (!entryNull)
         {
-            entryObject = env->NewByteArray(entryValue.size());
-            env->SetByteArrayRegion(entryObject, 0, entryValue.size(), reinterpret_cast<const jbyte *>(entryValue.data()));
+            entryObject = jstring(entryStr.jniValue());
         }
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
