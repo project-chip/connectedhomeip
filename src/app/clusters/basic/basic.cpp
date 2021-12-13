@@ -101,7 +101,9 @@ public:
             {
                 CharSpan span(location, codeLen);
                 aEncoder.Encode(span);
-            } else {
+            }
+            else
+            {
                 // "XX" is the default value of the location attribute
                 aEncoder.Encode(CharSpan("XX", strlen("XX")));
             }
