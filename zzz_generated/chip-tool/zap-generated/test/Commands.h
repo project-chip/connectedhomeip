@@ -3797,7 +3797,7 @@ private:
     void OnSuccessResponse_10(uint16_t currentX)
     {
         VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", currentX, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", currentX, 65279U));
 
         NextTest();
     }
@@ -3880,7 +3880,7 @@ private:
     void OnSuccessResponse_14(uint16_t currentY)
     {
         VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", currentY, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", currentY, 65279U));
 
         NextTest();
     }
@@ -3943,7 +3943,7 @@ private:
     void OnSuccessResponse_17(uint16_t colorTemperature)
     {
         VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279U));
 
         NextTest();
     }
@@ -4603,7 +4603,7 @@ private:
     void OnSuccessResponse_49(uint16_t colorCapabilities)
     {
         VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", colorCapabilities, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", colorCapabilities, 65279U));
 
         NextTest();
     }
@@ -4686,7 +4686,7 @@ private:
     void OnSuccessResponse_53(uint16_t colorTempPhysicalMin)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 65279U));
 
         NextTest();
     }
@@ -4769,7 +4769,7 @@ private:
     void OnSuccessResponse_57(uint16_t colorTempPhysicalMax)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
 
         NextTest();
     }
@@ -4898,7 +4898,7 @@ private:
     void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds)
     {
         VerifyOrReturn(CheckConstraintType("startUpColorTemperatureMireds", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279U));
 
         NextTest();
     }
@@ -4979,7 +4979,7 @@ private:
     void OnSuccessResponse_67(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("remainingTime", remainingTime, 254));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("remainingTime", remainingTime, 254U));
 
         NextTest();
     }
@@ -5189,7 +5189,7 @@ private:
     void OnSuccessResponse_77(uint16_t primary1X)
     {
         VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", primary1X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", primary1X, 65279U));
 
         NextTest();
     }
@@ -5252,7 +5252,7 @@ private:
     void OnSuccessResponse_80(uint16_t primary1Y)
     {
         VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", primary1Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", primary1Y, 65279U));
 
         NextTest();
     }
@@ -5335,7 +5335,7 @@ private:
     void OnSuccessResponse_84(uint16_t primary2X)
     {
         VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", primary2X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", primary2X, 65279U));
 
         NextTest();
     }
@@ -5398,7 +5398,7 @@ private:
     void OnSuccessResponse_87(uint16_t primary2Y)
     {
         VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", primary2Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", primary2Y, 65279U));
 
         NextTest();
     }
@@ -5481,7 +5481,7 @@ private:
     void OnSuccessResponse_91(uint16_t primary3X)
     {
         VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", primary3X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", primary3X, 65279U));
 
         NextTest();
     }
@@ -5544,7 +5544,7 @@ private:
     void OnSuccessResponse_94(uint16_t primary3Y)
     {
         VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", primary3Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", primary3Y, 65279U));
 
         NextTest();
     }
@@ -5627,7 +5627,7 @@ private:
     void OnSuccessResponse_98(uint16_t primary4X)
     {
         VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", primary4X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", primary4X, 65279U));
 
         NextTest();
     }
@@ -5690,7 +5690,7 @@ private:
     void OnSuccessResponse_101(uint16_t primary4Y)
     {
         VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", primary4Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", primary4Y, 65279U));
 
         NextTest();
     }
@@ -5773,7 +5773,7 @@ private:
     void OnSuccessResponse_105(uint16_t primary5X)
     {
         VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", primary5X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", primary5X, 65279U));
 
         NextTest();
     }
@@ -5836,7 +5836,7 @@ private:
     void OnSuccessResponse_108(uint16_t primary5Y)
     {
         VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", primary5Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", primary5Y, 65279U));
 
         NextTest();
     }
@@ -5919,7 +5919,7 @@ private:
     void OnSuccessResponse_112(uint16_t primary6X)
     {
         VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", primary6X, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", primary6X, 65279U));
 
         NextTest();
     }
@@ -5982,7 +5982,7 @@ private:
     void OnSuccessResponse_115(uint16_t primary6Y)
     {
         VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", primary6Y, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", primary6Y, 65279U));
 
         NextTest();
     }
@@ -6065,7 +6065,7 @@ private:
     void OnSuccessResponse_119(uint16_t whitePointX)
     {
         VerifyOrReturn(CheckConstraintType("whitePointX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointX", whitePointX, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointX", whitePointX, 65279U));
 
         NextTest();
     }
@@ -6124,7 +6124,7 @@ private:
     void OnSuccessResponse_122(uint16_t whitePointY)
     {
         VerifyOrReturn(CheckConstraintType("whitePointY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointY", whitePointY, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointY", whitePointY, 65279U));
 
         NextTest();
     }
@@ -6183,7 +6183,7 @@ private:
     void OnSuccessResponse_125(uint16_t colorPointRX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRX", colorPointRX, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRX", colorPointRX, 65279U));
 
         NextTest();
     }
@@ -6242,7 +6242,7 @@ private:
     void OnSuccessResponse_128(uint16_t colorPointRY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRY", colorPointRY, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRY", colorPointRY, 65279U));
 
         NextTest();
     }
@@ -6321,7 +6321,7 @@ private:
     void OnSuccessResponse_132(uint16_t colorPointGX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGX", colorPointGX, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGX", colorPointGX, 65279U));
 
         NextTest();
     }
@@ -6380,7 +6380,7 @@ private:
     void OnSuccessResponse_135(uint16_t colorPointGY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGY", colorPointGY, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGY", colorPointGY, 65279U));
 
         NextTest();
     }
@@ -6459,7 +6459,7 @@ private:
     void OnSuccessResponse_139(uint16_t colorPointBX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBX", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBX", colorPointBX, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBX", colorPointBX, 65279U));
 
         NextTest();
     }
@@ -6518,7 +6518,7 @@ private:
     void OnSuccessResponse_142(uint16_t colorPointBY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBY", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBY", colorPointBY, 65279));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBY", colorPointBY, 65279U));
 
         NextTest();
     }
@@ -23053,7 +23053,7 @@ private:
     void OnSuccessResponse_2(uint16_t minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", minMeasuredValue, 9999));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", minMeasuredValue, 9999U));
 
         NextTest();
     }
@@ -29016,8 +29016,8 @@ private:
     void OnSuccessResponse_1(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("clusterRevision", clusterRevision, 5));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("clusterRevision", clusterRevision, 200));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("clusterRevision", clusterRevision, 5U));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("clusterRevision", clusterRevision, 200U));
 
         NextTest();
     }
@@ -29081,7 +29081,7 @@ private:
     void OnSuccessResponse_4(uint32_t featureMap)
     {
         VerifyOrReturn(CheckConstraintType("featureMap", "", "uint32"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("featureMap", featureMap, 32768));
+        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("featureMap", featureMap, 32768UL));
 
         NextTest();
     }
@@ -30255,7 +30255,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
         VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000));
+            CheckConstraintMaxValue<uint16_t>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000U));
 
         NextTest();
     }
@@ -30323,7 +30323,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
         VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000));
+            CheckConstraintMaxValue<uint16_t>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000U));
 
         NextTest();
     }
@@ -30391,7 +30391,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
         VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000));
+            CheckConstraintMaxValue<uint16_t>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
 
         NextTest();
     }
@@ -30459,7 +30459,7 @@ private:
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
         VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000));
+            CheckConstraintMaxValue<uint16_t>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
 
         NextTest();
     }
@@ -30526,7 +30526,7 @@ private:
     void OnSuccessResponse_28(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
 
         NextTest();
     }
@@ -30571,7 +30571,7 @@ private:
     void OnSuccessResponse_30(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
 
         NextTest();
     }
@@ -30593,7 +30593,7 @@ private:
     void OnSuccessResponse_31(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
 
         NextTest();
     }
@@ -30638,7 +30638,7 @@ private:
     void OnSuccessResponse_33(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
 
         NextTest();
     }
@@ -30660,7 +30660,7 @@ private:
     void OnSuccessResponse_34(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
 
         NextTest();
     }
@@ -30705,7 +30705,7 @@ private:
     void OnSuccessResponse_36(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
 
         NextTest();
     }
@@ -30727,7 +30727,7 @@ private:
     void OnSuccessResponse_37(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
 
         NextTest();
     }
@@ -30772,7 +30772,7 @@ private:
     void OnSuccessResponse_39(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
 
         NextTest();
     }
@@ -30793,7 +30793,7 @@ private:
     void OnSuccessResponse_40(uint16_t safetyStatus)
     {
         VerifyOrReturn(CheckConstraintType("safetyStatus", "", "map16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("safetyStatus", safetyStatus, 2047));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("safetyStatus", safetyStatus, 2047U));
 
         NextTest();
     }
@@ -30857,7 +30857,7 @@ private:
     void OnSuccessResponse_43(uint16_t currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
 
         NextTest();
     }
@@ -30900,7 +30900,7 @@ private:
     void OnSuccessResponse_45(uint16_t currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
 
         NextTest();
     }
@@ -30921,7 +30921,7 @@ private:
     void OnSuccessResponse_46(uint16_t currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
 
         NextTest();
     }
@@ -30964,7 +30964,7 @@ private:
     void OnSuccessResponse_48(uint16_t currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
 
         NextTest();
     }
@@ -49071,7 +49071,7 @@ private:
 
     void OnSuccessResponse_2(uint32_t int32u)
     {
-        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("int32u", int32u, 5));
+        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("int32u", int32u, 5UL));
 
         NextTest();
     }
@@ -49091,7 +49091,7 @@ private:
 
     void OnSuccessResponse_3(uint32_t int32u)
     {
-        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("int32u", int32u, 5));
+        VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("int32u", int32u, 5UL));
 
         NextTest();
     }
