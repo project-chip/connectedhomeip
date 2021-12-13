@@ -842,7 +842,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
 
 private:
     jobject javaCallbackRef;

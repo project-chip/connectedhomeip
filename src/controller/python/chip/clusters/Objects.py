@@ -28653,14 +28653,14 @@ class ContentLauncher(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="acceptsHeaderList", Tag=0x00000000, Type=typing.List[bytes]),
+                ClusterObjectFieldDescriptor(Label="acceptsHeaderList", Tag=0x00000000, Type=typing.List[str]),
                 ClusterObjectFieldDescriptor(Label="supportedStreamingProtocols", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    acceptsHeaderList: 'typing.List[bytes]' = None
+    acceptsHeaderList: 'typing.List[str]' = None
     supportedStreamingProtocols: 'uint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
@@ -28861,9 +28861,9 @@ class ContentLauncher(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
+                return ClusterObjectFieldDescriptor(Type=typing.List[str])
 
-            value: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            value: 'typing.List[str]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedStreamingProtocols(ClusterAttributeDescriptor):

@@ -1830,7 +1830,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
 };
 
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge
