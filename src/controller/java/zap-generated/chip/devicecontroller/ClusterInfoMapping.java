@@ -2450,8 +2450,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAddThreadNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.AddThreadNetworkResponseCallback,
+  public static class DelegatedConnectNetworkResponseCallback
+      implements ChipClusters.NetworkCommissioningCluster.ConnectNetworkResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2461,12 +2461,15 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer NetworkingStatus, String DebugText, Long ErrorValue) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo NetworkingStatusResponseValue =
+          new CommandResponseInfo("NetworkingStatus", "int");
+      responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
+      CommandResponseInfo ErrorValueResponseValue = new CommandResponseInfo("ErrorValue", "long");
+      responseValues.put(ErrorValueResponseValue, ErrorValue);
       callback.onSuccess(responseValues);
     }
 
@@ -2476,8 +2479,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedAddWiFiNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.AddWiFiNetworkResponseCallback,
+  public static class DelegatedNetworkConfigResponseCallback
+      implements ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2487,90 +2490,13 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(Integer NetworkingStatus, String DebugText) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedDisableNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.DisableNetworkResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer errorCode, String debugText) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedEnableNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.EnableNetworkResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer errorCode, String debugText) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedRemoveNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.RemoveNetworkResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer errorCode, String debugText) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
+      CommandResponseInfo NetworkingStatusResponseValue =
+          new CommandResponseInfo("NetworkingStatus", "int");
+      responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
       callback.onSuccess(responseValues);
     }
 
@@ -2591,20 +2517,21 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText
-        // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+    public void onSuccess(Integer NetworkingStatus, String DebugText
+        // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
-        // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      // wifiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+      CommandResponseInfo NetworkingStatusResponseValue =
+          new CommandResponseInfo("NetworkingStatus", "int");
+      responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
+      CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
+      responseValues.put(DebugTextResponseValue, DebugText);
+      // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
-      // threadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -2615,8 +2542,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedUpdateThreadNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.UpdateThreadNetworkResponseCallback,
+  public static class DelegatedNetworkCommissioningClusterNetworksAttributeCallback
+      implements ChipClusters.NetworkCommissioningCluster.NetworksAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -2626,61 +2553,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer errorCode, String debugText) {
+    public void onSuccess(
+        List<ChipClusters.NetworkCommissioningCluster.NetworksAttribute> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedUpdateWiFiNetworkResponseCallback
-      implements ChipClusters.NetworkCommissioningCluster.UpdateWiFiNetworkResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(Integer errorCode, String debugText) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo errorCodeResponseValue = new CommandResponseInfo("errorCode", "int");
-      responseValues.put(errorCodeResponseValue, errorCode);
-      CommandResponseInfo debugTextResponseValue = new CommandResponseInfo("debugText", "String");
-      responseValues.put(debugTextResponseValue, debugText);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedNetworkCommissioningClusterAttributeListAttributeCallback
-      implements ChipClusters.NetworkCommissioningCluster.AttributeListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Object> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipClusters.NetworkCommissioningCluster.NetworksAttribute>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
@@ -7634,146 +7512,96 @@ public class ClusterInfoMapping {
     commandMap.put("modeSelect", modeSelectClusterInteractionInfoMap);
     Map<String, InteractionInfo> networkCommissioningClusterInteractionInfoMap =
         new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> networkCommissioningaddThreadNetworkCommandParams =
+    Map<String, CommandParameterInfo> networkCommissioningaddOrUpdateThreadNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
-        networkCommissioningaddThreadNetworkoperationalDatasetCommandParameterInfo =
+        networkCommissioningaddOrUpdateThreadNetworkoperationalDatasetCommandParameterInfo =
             new CommandParameterInfo("operationalDataset", byte[].class);
-    networkCommissioningaddThreadNetworkCommandParams.put(
+    networkCommissioningaddOrUpdateThreadNetworkCommandParams.put(
         "operationalDataset",
-        networkCommissioningaddThreadNetworkoperationalDatasetCommandParameterInfo);
+        networkCommissioningaddOrUpdateThreadNetworkoperationalDatasetCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningaddThreadNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningaddThreadNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningaddThreadNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningaddThreadNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningaddThreadNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningaddThreadNetworktimeoutMsCommandParameterInfo);
+    CommandParameterInfo
+        networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo =
+            new CommandParameterInfo("breadcrumb", long.class);
+    networkCommissioningaddOrUpdateThreadNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo);
 
     // Populate commands
-    InteractionInfo networkCommissioningaddThreadNetworkInteractionInfo =
+    InteractionInfo networkCommissioningaddOrUpdateThreadNetworkInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .addThreadNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.AddThreadNetworkResponseCallback)
+                  .addOrUpdateThreadNetwork(
+                      (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("operationalDataset"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedAddThreadNetworkResponseCallback(),
-            networkCommissioningaddThreadNetworkCommandParams);
+            () -> new DelegatedNetworkConfigResponseCallback(),
+            networkCommissioningaddOrUpdateThreadNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
-        "addThreadNetwork", networkCommissioningaddThreadNetworkInteractionInfo);
-    Map<String, CommandParameterInfo> networkCommissioningaddWiFiNetworkCommandParams =
+        "addOrUpdateThreadNetwork", networkCommissioningaddOrUpdateThreadNetworkInteractionInfo);
+    Map<String, CommandParameterInfo> networkCommissioningaddOrUpdateWiFiNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo networkCommissioningaddWiFiNetworkssidCommandParameterInfo =
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkssidCommandParameterInfo =
         new CommandParameterInfo("ssid", byte[].class);
-    networkCommissioningaddWiFiNetworkCommandParams.put(
-        "ssid", networkCommissioningaddWiFiNetworkssidCommandParameterInfo);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put(
+        "ssid", networkCommissioningaddOrUpdateWiFiNetworkssidCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningaddWiFiNetworkcredentialsCommandParameterInfo =
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo =
         new CommandParameterInfo("credentials", byte[].class);
-    networkCommissioningaddWiFiNetworkCommandParams.put(
-        "credentials", networkCommissioningaddWiFiNetworkcredentialsCommandParameterInfo);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put(
+        "credentials", networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningaddWiFiNetworkbreadcrumbCommandParameterInfo =
+    CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo =
         new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningaddWiFiNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningaddWiFiNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningaddWiFiNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningaddWiFiNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningaddWiFiNetworktimeoutMsCommandParameterInfo);
+    networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo);
 
     // Populate commands
-    InteractionInfo networkCommissioningaddWiFiNetworkInteractionInfo =
+    InteractionInfo networkCommissioningaddOrUpdateWiFiNetworkInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .addWiFiNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.AddWiFiNetworkResponseCallback)
+                  .addOrUpdateWiFiNetwork(
+                      (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("ssid"),
                       (byte[]) commandArguments.get("credentials"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedAddWiFiNetworkResponseCallback(),
-            networkCommissioningaddWiFiNetworkCommandParams);
+            () -> new DelegatedNetworkConfigResponseCallback(),
+            networkCommissioningaddOrUpdateWiFiNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
-        "addWiFiNetwork", networkCommissioningaddWiFiNetworkInteractionInfo);
-    Map<String, CommandParameterInfo> networkCommissioningdisableNetworkCommandParams =
+        "addOrUpdateWiFiNetwork", networkCommissioningaddOrUpdateWiFiNetworkInteractionInfo);
+    Map<String, CommandParameterInfo> networkCommissioningconnectNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo networkCommissioningdisableNetworknetworkIDCommandParameterInfo =
+    CommandParameterInfo networkCommissioningconnectNetworknetworkIDCommandParameterInfo =
         new CommandParameterInfo("networkID", byte[].class);
-    networkCommissioningdisableNetworkCommandParams.put(
-        "networkID", networkCommissioningdisableNetworknetworkIDCommandParameterInfo);
+    networkCommissioningconnectNetworkCommandParams.put(
+        "networkID", networkCommissioningconnectNetworknetworkIDCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningdisableNetworkbreadcrumbCommandParameterInfo =
+    CommandParameterInfo networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo =
         new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningdisableNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningdisableNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningdisableNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningdisableNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningdisableNetworktimeoutMsCommandParameterInfo);
+    networkCommissioningconnectNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo);
 
     // Populate commands
-    InteractionInfo networkCommissioningdisableNetworkInteractionInfo =
+    InteractionInfo networkCommissioningconnectNetworkInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .disableNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.DisableNetworkResponseCallback)
+                  .connectNetwork(
+                      (ChipClusters.NetworkCommissioningCluster.ConnectNetworkResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedDisableNetworkResponseCallback(),
-            networkCommissioningdisableNetworkCommandParams);
+            () -> new DelegatedConnectNetworkResponseCallback(),
+            networkCommissioningconnectNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
-        "disableNetwork", networkCommissioningdisableNetworkInteractionInfo);
-    Map<String, CommandParameterInfo> networkCommissioningenableNetworkCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo networkCommissioningenableNetworknetworkIDCommandParameterInfo =
-        new CommandParameterInfo("networkID", byte[].class);
-    networkCommissioningenableNetworkCommandParams.put(
-        "networkID", networkCommissioningenableNetworknetworkIDCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningenableNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningenableNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningenableNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningenableNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningenableNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningenableNetworktimeoutMsCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo networkCommissioningenableNetworkInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .enableNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.EnableNetworkResponseCallback)
-                          callback,
-                      (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
-            },
-            () -> new DelegatedEnableNetworkResponseCallback(),
-            networkCommissioningenableNetworkCommandParams);
-    networkCommissioningClusterInteractionInfoMap.put(
-        "enableNetwork", networkCommissioningenableNetworkInteractionInfo);
+        "connectNetwork", networkCommissioningconnectNetworkInteractionInfo);
     Map<String, CommandParameterInfo> networkCommissioningremoveNetworkCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningremoveNetworknetworkIDCommandParameterInfo =
@@ -7786,27 +7614,54 @@ public class ClusterInfoMapping {
     networkCommissioningremoveNetworkCommandParams.put(
         "breadcrumb", networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningremoveNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningremoveNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningremoveNetworktimeoutMsCommandParameterInfo);
-
     // Populate commands
     InteractionInfo networkCommissioningremoveNetworkInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.NetworkCommissioningCluster) cluster)
                   .removeNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.RemoveNetworkResponseCallback)
+                      (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("networkID"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
-            () -> new DelegatedRemoveNetworkResponseCallback(),
+            () -> new DelegatedNetworkConfigResponseCallback(),
             networkCommissioningremoveNetworkCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "removeNetwork", networkCommissioningremoveNetworkInteractionInfo);
+    Map<String, CommandParameterInfo> networkCommissioningreorderNetworkCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioningreorderNetworknetworkIDCommandParameterInfo =
+        new CommandParameterInfo("networkID", byte[].class);
+    networkCommissioningreorderNetworkCommandParams.put(
+        "networkID", networkCommissioningreorderNetworknetworkIDCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningreorderNetworknetworkIndexCommandParameterInfo =
+        new CommandParameterInfo("networkIndex", int.class);
+    networkCommissioningreorderNetworkCommandParams.put(
+        "networkIndex", networkCommissioningreorderNetworknetworkIndexCommandParameterInfo);
+
+    CommandParameterInfo networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo =
+        new CommandParameterInfo("breadcrumb", long.class);
+    networkCommissioningreorderNetworkCommandParams.put(
+        "breadcrumb", networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo networkCommissioningreorderNetworkInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .reorderNetwork(
+                      (ChipClusters.NetworkCommissioningCluster.NetworkConfigResponseCallback)
+                          callback,
+                      (byte[]) commandArguments.get("networkID"),
+                      (Integer) commandArguments.get("networkIndex"),
+                      (Long) commandArguments.get("breadcrumb"));
+            },
+            () -> new DelegatedNetworkConfigResponseCallback(),
+            networkCommissioningreorderNetworkCommandParams);
+    networkCommissioningClusterInteractionInfoMap.put(
+        "reorderNetwork", networkCommissioningreorderNetworkInteractionInfo);
     Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo networkCommissioningscanNetworksssidCommandParameterInfo =
@@ -7819,11 +7674,6 @@ public class ClusterInfoMapping {
     networkCommissioningscanNetworksCommandParams.put(
         "breadcrumb", networkCommissioningscanNetworksbreadcrumbCommandParameterInfo);
 
-    CommandParameterInfo networkCommissioningscanNetworkstimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningscanNetworksCommandParams.put(
-        "timeoutMs", networkCommissioningscanNetworkstimeoutMsCommandParameterInfo);
-
     // Populate commands
     InteractionInfo networkCommissioningscanNetworksInteractionInfo =
         new InteractionInfo(
@@ -7833,87 +7683,12 @@ public class ClusterInfoMapping {
                       (ChipClusters.NetworkCommissioningCluster.ScanNetworksResponseCallback)
                           callback,
                       (byte[]) commandArguments.get("ssid"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
+                      (Long) commandArguments.get("breadcrumb"));
             },
             () -> new DelegatedScanNetworksResponseCallback(),
             networkCommissioningscanNetworksCommandParams);
     networkCommissioningClusterInteractionInfoMap.put(
         "scanNetworks", networkCommissioningscanNetworksInteractionInfo);
-    Map<String, CommandParameterInfo> networkCommissioningupdateThreadNetworkCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo
-        networkCommissioningupdateThreadNetworkoperationalDatasetCommandParameterInfo =
-            new CommandParameterInfo("operationalDataset", byte[].class);
-    networkCommissioningupdateThreadNetworkCommandParams.put(
-        "operationalDataset",
-        networkCommissioningupdateThreadNetworkoperationalDatasetCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningupdateThreadNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningupdateThreadNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningupdateThreadNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningupdateThreadNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningupdateThreadNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningupdateThreadNetworktimeoutMsCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo networkCommissioningupdateThreadNetworkInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .updateThreadNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.UpdateThreadNetworkResponseCallback)
-                          callback,
-                      (byte[]) commandArguments.get("operationalDataset"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
-            },
-            () -> new DelegatedUpdateThreadNetworkResponseCallback(),
-            networkCommissioningupdateThreadNetworkCommandParams);
-    networkCommissioningClusterInteractionInfoMap.put(
-        "updateThreadNetwork", networkCommissioningupdateThreadNetworkInteractionInfo);
-    Map<String, CommandParameterInfo> networkCommissioningupdateWiFiNetworkCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo networkCommissioningupdateWiFiNetworkssidCommandParameterInfo =
-        new CommandParameterInfo("ssid", byte[].class);
-    networkCommissioningupdateWiFiNetworkCommandParams.put(
-        "ssid", networkCommissioningupdateWiFiNetworkssidCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningupdateWiFiNetworkcredentialsCommandParameterInfo =
-        new CommandParameterInfo("credentials", byte[].class);
-    networkCommissioningupdateWiFiNetworkCommandParams.put(
-        "credentials", networkCommissioningupdateWiFiNetworkcredentialsCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningupdateWiFiNetworkbreadcrumbCommandParameterInfo =
-        new CommandParameterInfo("breadcrumb", long.class);
-    networkCommissioningupdateWiFiNetworkCommandParams.put(
-        "breadcrumb", networkCommissioningupdateWiFiNetworkbreadcrumbCommandParameterInfo);
-
-    CommandParameterInfo networkCommissioningupdateWiFiNetworktimeoutMsCommandParameterInfo =
-        new CommandParameterInfo("timeoutMs", long.class);
-    networkCommissioningupdateWiFiNetworkCommandParams.put(
-        "timeoutMs", networkCommissioningupdateWiFiNetworktimeoutMsCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo networkCommissioningupdateWiFiNetworkInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.NetworkCommissioningCluster) cluster)
-                  .updateWiFiNetwork(
-                      (ChipClusters.NetworkCommissioningCluster.UpdateWiFiNetworkResponseCallback)
-                          callback,
-                      (byte[]) commandArguments.get("ssid"),
-                      (byte[]) commandArguments.get("credentials"),
-                      (Long) commandArguments.get("breadcrumb"),
-                      (Long) commandArguments.get("timeoutMs"));
-            },
-            () -> new DelegatedUpdateWiFiNetworkResponseCallback(),
-            networkCommissioningupdateWiFiNetworkCommandParams);
-    networkCommissioningClusterInteractionInfoMap.put(
-        "updateWiFiNetwork", networkCommissioningupdateWiFiNetworkInteractionInfo);
     commandMap.put("networkCommissioning", networkCommissioningClusterInteractionInfoMap);
     Map<String, InteractionInfo> otaSoftwareUpdateProviderClusterInteractionInfoMap =
         new LinkedHashMap<>();

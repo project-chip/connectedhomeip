@@ -40,24 +40,14 @@ typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)
                                                                                  chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterAddThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                            chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterAddWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                          chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterDisableNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                          chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterEnableNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                         chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterRemoveNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                         chip::CharSpan debugText);
+typedef void (*NetworkCommissioningClusterConnectNetworkResponseCallback)(void * context, uint8_t NetworkingStatus,
+                                                                          chip::CharSpan DebugText, int32_t ErrorValue);
+typedef void (*NetworkCommissioningClusterNetworkConfigResponseCallback)(void * context, uint8_t NetworkingStatus,
+                                                                         chip::CharSpan DebugText);
 typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
-    void * context, uint8_t errorCode, chip::CharSpan debugText,
-    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
-typedef void (*NetworkCommissioningClusterUpdateThreadNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                               chip::CharSpan debugText);
-typedef void (*NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback)(void * context, uint8_t errorCode,
-                                                                             chip::CharSpan debugText);
+    void * context, uint8_t NetworkingStatus, chip::CharSpan DebugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * WiFiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * ThreadScanResults);
 typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
                                                                          chip::ByteSpan Signature);
 typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
@@ -74,6 +64,13 @@ typedef void (*GeneralCommissioningBasicCommissioningInfoListListAttributeCallba
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & data);
+void NetworkCommissioningClusterNetworksListAttributeFilter(chip::TLV::TLVReader * data,
+                                                            chip::Callback::Cancelable * onSuccessCallback,
+                                                            chip::Callback::Cancelable * onFailureCallback);
+typedef void (*NetworkCommissioningNetworksListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        data);
 void OperationalCredentialsClusterFabricsListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                  chip::Callback::Cancelable * onSuccessCallback,
                                                                  chip::Callback::Cancelable * onFailureCallback);

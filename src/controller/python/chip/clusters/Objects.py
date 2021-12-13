@@ -8138,17 +8138,33 @@ class NetworkCommissioning(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="maxNetworks", Tag=0x00000000, Type=uint),
+                ClusterObjectFieldDescriptor(Label="networks", Tag=0x00000001, Type=typing.List[NetworkCommissioning.Structs.NetworkInfo]),
+                ClusterObjectFieldDescriptor(Label="scanMaxTimeSeconds", Tag=0x00000002, Type=uint),
+                ClusterObjectFieldDescriptor(Label="connectMaxTimeSeconds", Tag=0x00000003, Type=uint),
+                ClusterObjectFieldDescriptor(Label="interfaceEnabled", Tag=0x00000004, Type=bool),
+                ClusterObjectFieldDescriptor(Label="lastNetworkingStatus", Tag=0x00000005, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
+                ClusterObjectFieldDescriptor(Label="lastNetworkID", Tag=0x00000006, Type=bytes),
+                ClusterObjectFieldDescriptor(Label="lastConnectErrorValue", Tag=0x00000007, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    maxNetworks: 'uint' = None
+    networks: 'typing.List[NetworkCommissioning.Structs.NetworkInfo]' = None
+    scanMaxTimeSeconds: 'uint' = None
+    connectMaxTimeSeconds: 'uint' = None
+    interfaceEnabled: 'bool' = None
+    lastNetworkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = None
+    lastNetworkID: 'bytes' = None
+    lastConnectErrorValue: 'uint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
     class Enums:
-        class NetworkCommissioningError(IntEnum):
+        class NetworkCommissioningStatus(IntEnum):
             kSuccess = 0x00
             kOutOfRange = 0x01
             kBoundsExceeded = 0x02
@@ -8161,27 +8177,47 @@ class NetworkCommissioning(Cluster):
             kOtherConnectionFailure = 0x09
             kIPV6Failed = 0x0A
             kIPBindFailed = 0x0B
-            kLabel9 = 0x0C
-            kLabel10 = 0x0D
-            kLabel11 = 0x0E
-            kLabel12 = 0x0F
-            kLabel13 = 0x10
-            kLabel14 = 0x11
-            kLabel15 = 0x12
-            kUnknownError = 0x13
+            kUnknownError = 0x0C
 
 
     class Structs:
+        @dataclass
+        class NetworkInfo(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="networkID", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="connected", Tag=2, Type=bool),
+                    ])
+
+            networkID: 'bytes' = b""
+            connected: 'bool' = False
+
         @dataclass
         class ThreadInterfaceScanResult(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="discoveryResponse", Tag=1, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="panId", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="extendedPanId", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkName", Tag=3, Type=str),
+                            ClusterObjectFieldDescriptor(Label="channel", Tag=4, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="version", Tag=5, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="extendedAddress", Tag=6, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="rssi", Tag=7, Type=int),
+                            ClusterObjectFieldDescriptor(Label="lqi", Tag=8, Type=uint),
                     ])
 
-            discoveryResponse: 'bytes' = b""
+            panId: 'uint' = 0
+            extendedPanId: 'uint' = 0
+            networkName: 'str' = ""
+            channel: 'uint' = 0
+            version: 'uint' = 0
+            extendedAddress: 'uint' = 0
+            rssi: 'int' = 0
+            lqi: 'uint' = 0
 
         @dataclass
         class WiFiInterfaceScanResult(ClusterObject):
@@ -8193,14 +8229,16 @@ class NetworkCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=2, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="bssid", Tag=3, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="channel", Tag=4, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="frequencyBand", Tag=5, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="rssi", Tag=6, Type=int),
                     ])
 
             security: 'uint' = 0
             ssid: 'bytes' = b""
             bssid: 'bytes' = b""
             channel: 'uint' = 0
-            frequencyBand: 'uint' = 0
+            wiFiBand: 'uint' = 0
+            rssi: 'int' = 0
 
 
 
@@ -8217,12 +8255,10 @@ class NetworkCommissioning(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
             ssid: 'bytes' = b""
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
         class ScanNetworksResponse(ClusterCommand):
@@ -8234,19 +8270,19 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="wifiScanResults", Tag=2, Type=typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]),
+                            ClusterObjectFieldDescriptor(Label="wiFiScanResults", Tag=2, Type=typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]),
                             ClusterObjectFieldDescriptor(Label="threadScanResults", Tag=3, Type=typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]),
                     ])
 
-            errorCode: 'uint' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
             debugText: 'str' = ""
-            wifiScanResults: 'typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]' = field(default_factory=lambda: [])
+            wiFiScanResults: 'typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]' = field(default_factory=lambda: [])
             threadScanResults: 'typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]' = field(default_factory=lambda: [])
 
         @dataclass
-        class AddWiFiNetwork(ClusterCommand):
+        class AddOrUpdateWiFiNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
@@ -8258,33 +8294,31 @@ class NetworkCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="credentials", Tag=1, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=3, Type=uint),
                     ])
 
             ssid: 'bytes' = b""
             credentials: 'bytes' = b""
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
-        class AddWiFiNetworkResponse(ClusterCommand):
+        class AddOrUpdateThreadNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0003
-            is_client: typing.ClassVar[bool] = False
+            is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="operationalDataset", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
                     ])
 
-            errorCode: 'uint' = 0
-            debugText: 'str' = ""
+            operationalDataset: 'bytes' = b""
+            breadcrumb: 'uint' = 0
 
         @dataclass
-        class UpdateWiFiNetwork(ClusterCommand):
+        class RemoveNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
@@ -8293,19 +8327,15 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="ssid", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="credentials", Tag=1, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
                     ])
 
-            ssid: 'bytes' = b""
-            credentials: 'bytes' = b""
+            networkID: 'bytes' = b""
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
-        class UpdateWiFiNetworkResponse(ClusterCommand):
+        class NetworkConfigResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = False
@@ -8314,15 +8344,15 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
             debugText: 'str' = ""
 
         @dataclass
-        class AddThreadNetwork(ClusterCommand):
+        class ConnectNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
@@ -8331,17 +8361,15 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="operationalDataset", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            operationalDataset: 'bytes' = b""
+            networkID: 'bytes' = b""
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
 
         @dataclass
-        class AddThreadNetworkResponse(ClusterCommand):
+        class ConnectNetworkResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = False
@@ -8350,15 +8378,17 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkingStatus", Tag=0, Type=NetworkCommissioning.Enums.NetworkCommissioningStatus),
                             ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="errorValue", Tag=2, Type=int),
                     ])
 
-            errorCode: 'uint' = 0
+            networkingStatus: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
             debugText: 'str' = ""
+            errorValue: 'int' = 0
 
         @dataclass
-        class UpdateThreadNetwork(ClusterCommand):
+        class ReorderNetwork(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0031
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
@@ -8367,142 +8397,145 @@ class NetworkCommissioning(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="operationalDataset", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
-                    ])
-
-            operationalDataset: 'bytes' = b""
-            breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
-
-        @dataclass
-        class UpdateThreadNetworkResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x0009
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
-                    ])
-
-            errorCode: 'uint' = 0
-            debugText: 'str' = ""
-
-        @dataclass
-        class RemoveNetwork(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000A
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
                             ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="networkIndex", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=2, Type=uint),
                     ])
 
             networkID: 'bytes' = b""
+            networkIndex: 'uint' = 0
             breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
-
-        @dataclass
-        class RemoveNetworkResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000B
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
-                    ])
-
-            errorCode: 'uint' = 0
-            debugText: 'str' = ""
-
-        @dataclass
-        class EnableNetwork(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000C
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
-                    ])
-
-            networkID: 'bytes' = b""
-            breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
-
-        @dataclass
-        class EnableNetworkResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000D
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
-                    ])
-
-            errorCode: 'uint' = 0
-            debugText: 'str' = ""
-
-        @dataclass
-        class DisableNetwork(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000E
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="networkID", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="breadcrumb", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="timeoutMs", Tag=2, Type=uint),
-                    ])
-
-            networkID: 'bytes' = b""
-            breadcrumb: 'uint' = 0
-            timeoutMs: 'uint' = 0
-
-        @dataclass
-        class DisableNetworkResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0031
-            command_id: typing.ClassVar[int] = 0x000F
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="errorCode", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="debugText", Tag=1, Type=str),
-                    ])
-
-            errorCode: 'uint' = 0
-            debugText: 'str' = ""
 
 
     class Attributes:
+        @dataclass
+        class MaxNetworks(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class Networks(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[NetworkCommissioning.Structs.NetworkInfo])
+
+            value: 'typing.List[NetworkCommissioning.Structs.NetworkInfo]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class ScanMaxTimeSeconds(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class ConnectMaxTimeSeconds(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class InterfaceEnabled(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000004
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: 'bool' = False
+
+        @dataclass
+        class LastNetworkingStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000005
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=NetworkCommissioning.Enums.NetworkCommissioningStatus)
+
+            value: 'NetworkCommissioning.Enums.NetworkCommissioningStatus' = 0
+
+        @dataclass
+        class LastNetworkID(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000006
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bytes)
+
+            value: 'bytes' = b""
+
+        @dataclass
+        class LastConnectErrorValue(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0031
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

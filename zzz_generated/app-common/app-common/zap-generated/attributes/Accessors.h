@@ -1411,6 +1411,41 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace NetworkCommissioning {
 namespace Attributes {
 
+namespace MaxNetworks {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace MaxNetworks
+
+namespace ScanMaxTimeSeconds {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace ScanMaxTimeSeconds
+
+namespace ConnectMaxTimeSeconds {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace ConnectMaxTimeSeconds
+
+namespace InterfaceEnabled {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace InterfaceEnabled
+
+namespace LastNetworkingStatus {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // NetworkCommissioningStatus
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace LastNetworkingStatus
+
+namespace LastNetworkID {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
+} // namespace LastNetworkID
+
+namespace LastConnectErrorValue {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace LastConnectErrorValue
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);

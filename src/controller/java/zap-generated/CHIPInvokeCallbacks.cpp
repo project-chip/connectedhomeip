@@ -2046,9 +2046,9 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
-CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback(
+CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2064,7 +2064,7 @@ CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::CHIPNetworkComm
     }
 }
 
-CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback()
+CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::~CHIPNetworkCommissioningClusterConnectNetworkResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2075,9 +2075,8 @@ CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::~CHIPNetworkCom
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::CallbackFn(
-    void * context,
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & dataResponse)
+void CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2087,36 +2086,42 @@ void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::CallbackFn
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterConnectNetworkResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
+                                                  "(Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/Long;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
+    jobject NetworkingStatus;
 
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
+    std::string NetworkingStatusClassName     = "java/lang/Integer";
+    std::string NetworkingStatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    jobject DebugText;
 
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
+    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
+    DebugText = DebugTextUtfString.jniValue();
+    jobject ErrorValue;
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    std::string ErrorValueClassName     = "java/lang/Long";
+    std::string ErrorValueCtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<int32_t>(ErrorValueClassName.c_str(), ErrorValueCtorSignature.c_str(),
+                                                                  dataResponse.errorValue, ErrorValue);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, ErrorValue);
 }
-CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback(
+CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CHIPNetworkCommissioningClusterNetworkConfigResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2132,7 +2137,7 @@ CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CHIPNetworkCommis
     }
 }
 
-CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback()
+CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::~CHIPNetworkCommissioningClusterNetworkConfigResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -2143,8 +2148,8 @@ CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::~CHIPNetworkCommi
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & dataResponse)
+void CHIPNetworkCommissioningClusterNetworkConfigResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2154,10 +2159,10 @@ void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -2168,219 +2173,18 @@ void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
+    jobject NetworkingStatus;
 
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
+    std::string NetworkingStatusClassName     = "java/lang/Integer";
+    std::string NetworkingStatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    jobject DebugText;
 
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
+    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
+    DebugText = DebugTextUtfString.jniValue();
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
-}
-CHIPNetworkCommissioningClusterDisableNetworkResponseCallback::CHIPNetworkCommissioningClusterDisableNetworkResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPNetworkCommissioningClusterDisableNetworkResponseCallback::~CHIPNetworkCommissioningClusterDisableNetworkResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPNetworkCommissioningClusterDisableNetworkResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterDisableNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject errorCode;
-
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
-}
-CHIPNetworkCommissioningClusterEnableNetworkResponseCallback::CHIPNetworkCommissioningClusterEnableNetworkResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPNetworkCommissioningClusterEnableNetworkResponseCallback::~CHIPNetworkCommissioningClusterEnableNetworkResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPNetworkCommissioningClusterEnableNetworkResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterEnableNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject errorCode;
-
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
-}
-CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback::CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback::~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject errorCode;
-
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText);
 }
 CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CHIPNetworkCommissioningClusterScanNetworksResponseCallback(
     jobject javaCallback) :
@@ -2436,162 +2240,24 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject errorCode;
+    jobject NetworkingStatus;
 
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
+    std::string NetworkingStatusClassName     = "java/lang/Integer";
+    std::string NetworkingStatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus>(
+        NetworkingStatusClassName.c_str(), NetworkingStatusCtorSignature.c_str(), dataResponse.networkingStatus, NetworkingStatus);
+    jobject DebugText;
 
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-    jobject wifiScanResults;
+    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
+    DebugText = DebugTextUtfString.jniValue();
+    jobject WiFiScanResults;
 
-    wifiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
-    jobject threadScanResults;
+    WiFiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    jobject ThreadScanResults;
 
-    threadScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    ThreadScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText, wifiScanResults, threadScanResults);
-}
-CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback::
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback::
-    ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback::CallbackFn(
-    void * context,
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject errorCode;
-
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
-}
-CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback::CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback::
-    ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback::CallbackFn(
-    void * context,
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject errorCode;
-
-    std::string errorCodeClassName     = "java/lang/Integer";
-    std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
-    jobject debugText;
-
-    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
-    debugText = debugTextUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
 }
 CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(
     jobject javaCallback) :

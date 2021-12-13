@@ -354,7 +354,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, 1));
 }
 
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 // Test the Inet resource limitations.
 static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 {
@@ -369,7 +369,11 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gUDP.NewEndPoint(&testUDPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, ++udpCount));
+        if (err == CHIP_NO_ERROR)
+        {
+            ++udpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
+        }
     }
     const int udpHighWaterMark = udpCount;
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
@@ -380,7 +384,11 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     {
         err = gTCP.NewEndPoint(&testTCPEP[i]);
         NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
-        NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, ++tcpCount));
+        if (err == CHIP_NO_ERROR)
+        {
+            ++tcpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
+        }
     }
     const int tcpHighWaterMark = tcpCount;
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
@@ -405,7 +413,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testUDPEP[i] != nullptr)
         {
             testUDPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --udpCount));
+            --udpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, udpCount));
         }
     }
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumUDPEps, udpHighWaterMark));
@@ -416,7 +425,8 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
-            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, --tcpCount));
+            --tcpCount;
+            NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumTCPEps, tcpCount));
         }
     }
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(System::Stats::kInetLayer_NumTCPEps, tcpHighWaterMark));
@@ -435,7 +445,7 @@ static const nlTest sTests[] = { NL_TEST_DEF("InetEndPoint::PreTest", TestInetPr
                                  NL_TEST_DEF("InetEndPoint::TestInetError", TestInetError),
                                  NL_TEST_DEF("InetEndPoint::TestInetInterface", TestInetInterface),
                                  NL_TEST_DEF("InetEndPoint::TestInetEndPoint", TestInetEndPointInternal),
-#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP && (!defined(CHIP_DEVICE_LAYER_TARGET_FAKE) || CHIP_DEVICE_LAYER_TARGET_FAKE != 1)
+#if !CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
                                  NL_TEST_DEF("InetEndPoint::TestEndPointLimit", TestInetEndPointLimit),
 #endif
                                  NL_TEST_SENTINEL() };

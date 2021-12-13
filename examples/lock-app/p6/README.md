@@ -121,13 +121,13 @@ Once P6 is up and running, we need to set up a device controller on Raspberry Pi
             We have chosen a random node ID which is 1234.
 
 -   Add credentials of the Wi-Fi network you want the P6 to connect to, using
-    the `AddWiFiNetwork` command and then enable the P6 to connect to it using
-    `EnableWiFiNetwork` command. In this example, we have used `WIFI_SSID` and
-    `WIFI_PASSWORD` as the SSID and passphrase respectively.
+    the `AddOrUpdateWiFiNetwork` command and then enable the P6 to connect to it
+    using `EnableWiFiNetwork` command. In this example, we have used `WIFI_SSID`
+    and `WIFI_PASSWORD` as the SSID and passphrase respectively.
 
-         - chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:WIFI_SSID credentials=str:WIFI_PASSWORD breadcrumb=0 timeoutMs=1000
+         - chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 1234 0 0 ssid=str:WIFI_SSID credentials=str:WIFI_PASSWORD breadcrumb=0
 
-         - chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:WIFI_SSID breadcrumb=0 timeoutMs=1000
+         - chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:WIFI_SSID breadcrumb=0
 
 -   Close the BLE connection to P6, as it is not required hereafter.
 

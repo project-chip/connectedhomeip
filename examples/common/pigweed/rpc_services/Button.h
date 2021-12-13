@@ -23,7 +23,7 @@
 namespace chip {
 namespace rpc {
 
-class Button : public generated::Button<Button>
+class Button : public pw_rpc::nanopb::Button::Service<Button>
 {
 public:
     virtual ~Button() = default;
