@@ -64,18 +64,6 @@ ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & con
 
 namespace {
 
-class OctetStringData
-{
-public:
-    uint8_t * Data() { return mDataBuf; }
-    size_t Length() const { return mDataLen; }
-    void SetLength(size_t size) { mDataLen = size; }
-
-private:
-    uint8_t mDataBuf[5];
-    size_t mDataLen = 0;
-};
-
 class ContentLauncherAttrAccess : public app::AttributeAccessInterface
 {
 public:
@@ -90,7 +78,6 @@ private:
 };
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
-OctetStringData gListOctetStringData[5];
 
 CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
@@ -128,7 +115,6 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::Attri
 }
 
 } // anonymous namespace
-
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

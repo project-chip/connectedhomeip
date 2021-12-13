@@ -1364,7 +1364,7 @@ class ChipClusters:
                 0x00000000: {
                     "attributeName": "AcceptsHeaderList",
                     "attributeId": 0x00000000,
-                    "type": "bytes",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000001: {
