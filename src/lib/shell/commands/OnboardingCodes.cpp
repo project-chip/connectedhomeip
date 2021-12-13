@@ -74,8 +74,7 @@ static CHIP_ERROR GetOnboardingManualPairingCode(bool printHeader, chip::Rendezv
     {
         streamer_printf(sout, "ManualPairingCode: ");
     }
-    ReturnErrorOnFailure(
-        GetManualPairingCode(manualPairingCode, aRendezvousFlags));
+    ReturnErrorOnFailure(GetManualPairingCode(manualPairingCode, aRendezvousFlags));
     streamer_printf(sout, "%s\r\n", manualPairingCode.c_str());
     return CHIP_NO_ERROR;
 }
@@ -89,27 +88,34 @@ static CHIP_ERROR PrintAllOnboardingCodes(chip::RendezvousInformationFlags aRend
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR RendezvousStringToFlag(char *str, chip::RendezvousInformationFlags *aRendezvousFlags) {
-    if (str == nullptr) {
+static CHIP_ERROR RendezvousStringToFlag(char * str, chip::RendezvousInformationFlags * aRendezvousFlags)
+{
+    if (str == nullptr)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (aRendezvousFlags == nullptr) {
+    if (aRendezvousFlags == nullptr)
+    {
         return CHIP_NO_ERROR;
     }
 
-    if (strcmp(str, "none") == 0) {
+    if (strcmp(str, "none") == 0)
+    {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kNone;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "softap") == 0) {
+    else if (strcmp(str, "softap") == 0)
+    {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kSoftAP;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "ble") == 0) {
+    else if (strcmp(str, "ble") == 0)
+    {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kBLE;
         return CHIP_NO_ERROR;
     }
-    else if (strcmp(str, "onnetwork") == 0) {
+    else if (strcmp(str, "onnetwork") == 0)
+    {
         *aRendezvousFlags = chip::RendezvousInformationFlag::kOnNetwork;
         return CHIP_NO_ERROR;
     }
@@ -120,12 +126,14 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 {
     chip::RendezvousInformationFlags aRendezvousFlags;
 
-    if (argc == 0) {
+    if (argc == 0)
+    {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     CHIP_ERROR err = RendezvousStringToFlag(argv[0], &aRendezvousFlags);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return err;
     }
 
@@ -155,8 +163,10 @@ static CHIP_ERROR OnboardingHandler(int argc, char ** argv)
 void RegisterOnboardingCodesCommands()
 {
 
-    static const shell_command_t sDeviceComand = { &OnboardingHandler, "onboardingcodes",
-                                                   "Dump device onboarding codes. Usage: onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]" };
+    static const shell_command_t sDeviceComand = {
+        &OnboardingHandler, "onboardingcodes",
+        "Dump device onboarding codes. Usage: onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]"
+    };
 
     // Register the root `device` command with the top-level shell.
     Engine::Root().RegisterCommands(&sDeviceComand, 1);
