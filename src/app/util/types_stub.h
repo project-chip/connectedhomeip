@@ -495,8 +495,30 @@ enum
  */
 struct EmberBindingTableEntry
 {
+    EmberBindingTableEntry() = default;
+
+    EmberBindingTableEntry(chip::FabricIndex fabric, chip::NodeId node, chip::GroupId group, chip::EndpointId localEndpoint,
+                           chip::EndpointId remoteEndpoint, chip::ClusterId cluster) :
+        fabricIndex(fabric),
+        local(localEndpoint), clusterId(cluster), remote(remoteEndpoint)
+    {
+        if (group)
+        {
+            type    = EMBER_MULTICAST_BINDING;
+            groupId = group;
+            remote  = 0;
+        }
+        else
+        {
+            type   = EMBER_UNICAST_BINDING;
+            nodeId = node;
+        }
+    }
+
     /** The type of binding. */
     EmberBindingType type;
+
+    chip::FabricIndex fabricIndex;
     /** The endpoint on the local node. */
     chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
@@ -539,7 +561,8 @@ struct EmberBindingTableEntry
             return false;
         }
 
-        return local == other.local && clusterId == other.clusterId && remote == other.remote && networkIndex == other.networkIndex;
+        return fabricIndex == other.fabricIndex && local == other.local && clusterId == other.clusterId && remote == other.remote &&
+            networkIndex == other.networkIndex;
     }
 };
 

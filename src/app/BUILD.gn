@@ -40,6 +40,8 @@ static_library("app") {
     "AttributePathExpandIterator.h",
     "AttributePathParams.h",
     "BufferedReadCallback.cpp",
+    "BindingCallbackStub.cpp",
+    "CASEClient.h",
     "CASEClient.cpp",
     "CASEClient.h",
     "CASEClientPool.h",

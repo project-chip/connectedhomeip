@@ -25,39 +25,15 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/bindings/BindingManager.h>
 #include <app/util/binding-table.h>
+#include <bits/stdint-uintn.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::Binding;
 
-EmberStatus prepareBinding(EmberBindingTableEntry & binding, NodeId nodeId, GroupId groupId, EndpointId endpointId,
-                           ClusterId clusterId)
-{
-    if (groupId && nodeId)
-    {
-        return EMBER_BAD_ARGUMENT;
-    }
-
-    binding.clusterId    = clusterId;
-    binding.local        = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
-    binding.networkIndex = 0;
-
-    if (groupId)
-    {
-        binding.type    = EMBER_MULTICAST_BINDING;
-        binding.groupId = groupId;
-        binding.remote  = 0;
-    }
-    else
-    {
-        binding.type   = EMBER_UNICAST_BINDING;
-        binding.nodeId = nodeId;
-        binding.remote = endpointId;
-    }
-
-    return EMBER_SUCCESS;
-}
+// TODO: add binding table to the persistent storage
 
 EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * bindingIndex)
 {
@@ -94,20 +70,21 @@ EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
 bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::Bind::DecodableType & commandData)
 {
-    auto & nodeId     = commandData.nodeId;
-    auto & groupId    = commandData.groupId;
-    auto & endpointId = commandData.endpointId;
-    auto & clusterId  = commandData.clusterId;
+    NodeId nodeId             = commandData.nodeId;
+    GroupId groupId           = commandData.groupId;
+    ClusterId clusterId       = commandData.clusterId;
+    EndpointId remoteEndpoint = commandData.endpointId;
+    EndpointId localEndpoint  = commandPath.mEndpointId;
+    FabricIndex fabricIndex   = commandObj->GetAccessingFabricIndex();
 
     ChipLogDetail(Zcl, "RX: BindCallback");
 
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
+    if (groupId && nodeId)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
+        ChipLogError(Zcl, "Binding: Invalid request");
     }
 
+    EmberBindingTableEntry bindingEntry(fabricIndex, nodeId, groupId, localEndpoint, remoteEndpoint, clusterId);
     uint8_t bindingIndex;
     if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_NOT_FOUND)
     {
@@ -121,33 +98,63 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
         return true;
     }
 
+    if (BindingManager::GetInstance().CreateBinding(fabricIndex, nodeId, localEndpoint, clusterId) != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
     emberSetBinding(bindingIndex, &bindingEntry);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
+uint8_t GetNumberOfBindingForNode(FabricIndex fabric, NodeId node)
+{
+    uint8_t numBinding = 0;
+    EmberBindingTableEntry entry;
+    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    {
+        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING && entry.fabricIndex == fabric &&
+            entry.nodeId == node)
+        {
+            numBinding++;
+        }
+    }
+    return numBinding;
+}
+
 bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                          const Commands::Unbind::DecodableType & commandData)
 {
-    auto & nodeId     = commandData.nodeId;
-    auto & groupId    = commandData.groupId;
-    auto & endpointId = commandData.endpointId;
-    auto & clusterId  = commandData.clusterId;
+    NodeId nodeId             = commandData.nodeId;
+    GroupId groupId           = commandData.groupId;
+    ClusterId clusterId       = commandData.clusterId;
+    EndpointId remoteEndpoint = commandData.endpointId;
+    EndpointId localEndpoint  = commandPath.mEndpointId;
+    FabricIndex fabricIndex   = commandObj->GetAccessingFabricIndex();
 
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 
-    EmberBindingTableEntry bindingEntry;
-    if (prepareBinding(bindingEntry, nodeId, groupId, endpointId, clusterId) != EMBER_SUCCESS)
+    if (groupId && nodeId)
     {
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
-        return true;
+        ChipLogError(Zcl, "Binding: Invalid request");
     }
 
+    EmberBindingTableEntry bindingEntry(fabricIndex, nodeId, groupId, localEndpoint, remoteEndpoint, clusterId);
     uint8_t bindingIndex;
     if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_SUCCESS)
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_NOT_FOUND);
         return true;
+    }
+
+    if (GetNumberOfBindingForNode(fabricIndex, nodeId) == 1)
+    {
+        CHIP_ERROR err = BindingManager::GetInstance().DisconnectDevice(fabricIndex, nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        }
     }
 
     emberDeleteBinding(bindingIndex);
@@ -156,3 +163,16 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
 }
 
 void MatterBindingPluginServerInitCallback() {}
+
+void MatterBindingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
+{
+    EmberBindingTableEntry entry;
+    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
+    {
+        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING &&
+            entry.local == attributePath.mEndpointId && entry.clusterId == attributePath.mClusterId)
+        {
+            BindingManager::GetInstance().NotifyBoundClusterChanged(entry.local, entry.clusterId);
+        }
+    }
+}

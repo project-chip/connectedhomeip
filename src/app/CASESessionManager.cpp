@@ -118,6 +118,7 @@ void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
     VerifyOrReturn(session != nullptr, ChipLogDetail(Controller, "OnSessionReleased was called for unknown device, ignoring it."));
 
     session->OnSessionReleased(sessionHandle);
+    ReleaseSession(session);
 }
 
 OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)

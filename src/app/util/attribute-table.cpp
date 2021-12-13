@@ -601,6 +601,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
 
         MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
+        MatterBindingClusterServerAttributeChangedCallback(attributePath);
 
         // Post write attribute callback for all attributes changes, regardless
         // of cluster.
