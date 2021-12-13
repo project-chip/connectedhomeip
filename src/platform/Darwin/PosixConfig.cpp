@@ -71,6 +71,8 @@ const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNam
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";
 
 uint16_t PosixConfig::mPosixSetupDiscriminator = 0xF00; // CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
+char PosixConfig::mLocation[DeviceLayer::ConfigurationManager::kMaxLocationLength + 1] = { 0 };
+
 
 CHIP_ERROR PosixConfig::Init()
 {
@@ -111,9 +113,14 @@ exit:
 CHIP_ERROR PosixConfig::ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_CountryCode)
+    {
+        strncpy(buf,mLocation,bufSize);
+        outLen = strlen(mLocation);
+        return CHIP_NO_ERROR;
+    }
+    
     return err;
 }
 
@@ -168,9 +175,13 @@ exit:
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     CHIP_ERROR err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-    SuccessOrExit(err);
 
-exit:
+    if (key == kConfigKey_CountryCode)
+    {
+        strncpy(mLocation,str,sizeof(mLocation));
+        mLocation[strLen] = '\0';
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 
