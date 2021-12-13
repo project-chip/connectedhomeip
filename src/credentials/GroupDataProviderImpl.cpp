@@ -749,7 +749,6 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     FabricData fabric(fabric_index);
     GroupData group;
-    bool new_group = false;
 
     // Load fabric, defaults to zero
     CHIP_ERROR err = fabric.Load(mStorage);
@@ -759,9 +758,9 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     bool found = group.Find(mStorage, fabric, info.group_id);
     VerifyOrReturnError(!found || (group.index == index), CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    found          = group.Get(mStorage, fabric, index);
-    new_group      = (group.group_id != info.group_id);
-    group.group_id = info.group_id;
+    found                = group.Get(mStorage, fabric, index);
+    const bool new_group = (group.group_id != info.group_id);
+    group.group_id       = info.group_id;
     group.SetName(info.name);
 
     if (found)
@@ -866,7 +865,10 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
     }
     // Update fabric info
     ReturnErrorOnFailure(fabric.Save(mStorage));
-    GroupRemoved(fabric_index, group);
+    if (mListener)
+    {
+        mListener->OnGroupRemoved(fabric_index, group);
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -1182,10 +1184,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index
     size_t endpoint_index = 0;
     while (endpoint_index < group.endpoint_count)
     {
-        if (CHIP_NO_ERROR != endpoint.Load(mStorage))
-        {
-            break;
-        }
+        ReturnErrorOnFailure(endpoint.Load(mStorage));
         endpoint.Delete(mStorage);
         endpoint.id = endpoint.next;
         endpoint_index++;

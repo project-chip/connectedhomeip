@@ -95,7 +95,7 @@ static KeySet kKeySet1(kKeysetId1, KeySet::SecurityPolicy::kLowLatency, 1);
 static KeySet kKeySet2(kKeysetId2, KeySet::SecurityPolicy::kLowLatency, 2);
 static KeySet kKeySet3(kKeysetId3, KeySet::SecurityPolicy::kStandard, 3);
 
-class TestListener : public GroupDataProvider::Listener
+class TestListener : public GroupDataProvider::GroupListener
 {
 public:
     chip::FabricIndex fabric_index = kUndefinedFabricIndex;

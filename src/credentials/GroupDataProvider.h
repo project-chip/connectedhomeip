@@ -144,10 +144,10 @@ public:
     /**
      *  Interface to listen for changes in the Group info.
      */
-    class Listener
+    class GroupListener
     {
     public:
-        virtual ~Listener() = default;
+        virtual ~GroupListener() = default;
         /**
          *  Callback invoked when a new group is added.
          *
@@ -232,16 +232,16 @@ public:
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
     virtual GroupInfoIterator * IterateGroupInfo(chip::FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -257,8 +257,8 @@ public:
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the keyset mappings during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -273,8 +273,8 @@ public:
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, chip::KeysetId keyset_id)             = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the key sets table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -287,7 +287,7 @@ public:
     virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
 
     // Listener
-    void SetListener(Listener * listener) { mListener = listener; };
+    void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
 protected:
@@ -298,15 +298,7 @@ protected:
             mListener->OnGroupAdded(fabric_index, new_group);
         }
     }
-    void GroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group)
-    {
-        if (mListener)
-        {
-            mListener->OnGroupRemoved(fabric_index, old_group);
-        }
-    }
-
-    Listener * mListener = nullptr;
+    GroupListener * mListener = nullptr;
 };
 
 /**
