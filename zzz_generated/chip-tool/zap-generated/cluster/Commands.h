@@ -13549,7 +13549,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
         OnGeneralAttributeResponse(context, "ContentLauncher.AcceptsHeaderList response", value);
     }
@@ -13586,7 +13586,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
         LogValue("ContentLauncher.AcceptsHeaderList report", 0, value);
     }
