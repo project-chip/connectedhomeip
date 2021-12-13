@@ -46,20 +46,43 @@ namespace AppPlatform {
 EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer,
                                               uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d)",
+    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d",
                     GetApplicationBasic()->GetApplicationName(), static_cast<uint16_t>(clusterId),
                     static_cast<uint16_t>(attributeId));
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
     {
-        ret = GetApplicationBasic()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+        return GetApplicationBasic()->HandleReadAttribute(attributeId, buffer, maxReadLength);
     }
     if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
     {
-        ret = GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
     }
-    return ret;
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
+    {
+        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
+    }
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer)
@@ -68,17 +91,15 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::Attrib
                     GetApplicationBasic()->GetApplicationName(), static_cast<uint16_t>(clusterId),
                     static_cast<uint16_t>(attributeId));
 
-    EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
-
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
     {
-        ret = GetApplicationBasic()->HandleWriteAttribute(attributeId, buffer);
+        return GetApplicationBasic()->HandleWriteAttribute(attributeId, buffer);
     }
     if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
     {
-        ret = GetAccountLogin()->HandleWriteAttribute(attributeId, buffer);
+        return GetAccountLogin()->HandleWriteAttribute(attributeId, buffer);
     }
-    return ret;
+    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus ApplicationBasic::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
