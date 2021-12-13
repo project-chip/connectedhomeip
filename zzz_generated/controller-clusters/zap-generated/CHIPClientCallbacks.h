@@ -128,6 +128,12 @@ typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * co
 typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * context, bool wasPresent, bool wasNull, uint8_t value,
                                                                        uint8_t originalValue);
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*ThermostatClusterGetRelayStatusLogResponseCallback)(void * context, uint16_t timeOfDay, uint16_t relayStatus,
+                                                                   int16_t localTemperature, uint8_t humidityInPercentage,
+                                                                   int16_t setpoint, uint16_t unreadEntries);
+typedef void (*ThermostatClusterGetWeeklyScheduleResponseCallback)(void * context, uint8_t numberOfTransitionsForSequence,
+                                                                   uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 
 // List specific responses
 void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
