@@ -66,7 +66,7 @@ static bool HasFeature(chip::EndpointId endpoint, Features feature)
                                    chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id,
                                    reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap)))
     {
-        return (FeatureMap & chip::to_underlying(feature)) != 0;
+        return ((uint32_t)FeatureMap & (uint32_t)chip::to_underlying(feature)) != 0;
     }
 
     return false;
