@@ -56,4 +56,19 @@ constexpr bool IsOperationalNodeId(NodeId aNodeId)
     return (aNodeId != kUndefinedNodeId) && (aNodeId <= kMaxOperationalNodeId);
 }
 
+constexpr bool IsGroupId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinGroupNodeId);
+}
+
+constexpr bool IsCASEAuthTag(NodeId aNodeId)
+{
+    return (aNodeId >= kMinCASEAuthTag) && (aNodeId <= kMaxCASEAuthTag);
+}
+
+constexpr bool IsPAKEKeyId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinPAKEKeyId) && (aNodeId <= kMaxPAKEKeyId);
+}
+
 } // namespace chip
