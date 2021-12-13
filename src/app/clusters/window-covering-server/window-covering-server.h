@@ -28,9 +28,11 @@ namespace WindowCovering {
 
 enum class Features
 {
-    Lift          = 0x01,
-    Tilt          = 0x02,
-    PositionAware = 0x04
+    Lift              = 1 << 0,
+    Tilt              = 1 << 1,
+    PositionAwareLift = 1 << 2,
+    AbsolutePosition  = 1 << 3,
+    PositionAwareTilt = 1 << 4,
 };
 
 struct Mode
