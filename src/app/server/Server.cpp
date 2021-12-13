@@ -17,8 +17,6 @@
 
 #include <app/server/Server.h>
 
-#include <new>
-
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
@@ -82,6 +80,22 @@ static ::chip::PersistedCounter sInfoEventIdCounter;
 static ::chip::PersistedCounter sDebugEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+
+Server::Server() :
+    mCASESessionManager(CASESessionManagerConfig {
+        .sessionInitParams =  {
+            .sessionManager = &mSessions,
+            .exchangeMgr    = &mExchangeMgr,
+            .idAllocator    = &mSessionIDAllocator,
+            .fabricTable    = &mFabrics,
+            .clientPool     = &mCASEClientPool,
+            .imDelegate     = nullptr,
+        },
+        .dnsCache          = nullptr,
+        .devicePool        = &mDevicePool,
+        .dnsResolver       = nullptr,
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+{}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {
@@ -217,7 +231,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err = InitCASESessionManager();
+    err = mCASESessionManager.Init();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -231,32 +245,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR Server::InitCASESessionManager()
-{
-    DeviceProxyInitParams initParams = {
-        .sessionManager = &mSessions,
-        .exchangeMgr    = &mExchangeMgr,
-        .idAllocator    = &mSessionIDAllocator,
-        .fabricTable    = &mFabrics,
-        .clientPool     = &mCASEClientPool,
-        .imDelegate     = nullptr,
-    };
-    CASESessionManagerConfig sessionManagerConfig = {
-        .sessionInitParams = initParams,
-        .dnsCache          = nullptr,
-        .devicePool        = &mDevicePool,
-        .dnsResolver       = nullptr,
-    };
-    mCASESessionManager = new (&mCASESessionManagerStorage) CASESessionManager(sessionManagerConfig);
-
-    return mCASESessionManager == nullptr ? CHIP_ERROR_NO_MEMORY : CHIP_NO_ERROR;
-}
-
 void Server::Shutdown()
 {
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-    mCASESessionManager->~CASESessionManager();
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();

@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include <app/CASEClientPool.h>
-#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/Server.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
@@ -31,7 +29,6 @@
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
-using chip::CASEClientPool;
 using chip::CharSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
@@ -40,7 +37,6 @@ using chip::LinuxOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
-using chip::OperationalDeviceProxyPool;
 using chip::OTADownloader;
 using chip::OTAImageProcessorParams;
 using chip::OTARequestor;

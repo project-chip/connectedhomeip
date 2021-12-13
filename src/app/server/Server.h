@@ -69,7 +69,7 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
-    CASESessionManager * GetCASESessionManager() { return mCASESessionManager; }
+    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -90,7 +90,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage) {}
+    Server();
 
     static Server sServer;
 
@@ -130,8 +130,6 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
-    CHIP_ERROR InitCASESessionManager();
-
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -140,13 +138,9 @@ private:
     SessionManager mSessions;
     CASEServer mCASEServer;
 
-    static constexpr size_t kCASEClientPoolSize        = CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS;
-    static constexpr size_t kOperationalDevicePoolSize = CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES;
-
-    std::aligned_storage_t<sizeof(CASESessionManager), sizeof(void *)> mCASESessionManagerStorage;
-    CASESessionManager * mCASESessionManager;
-    CASEClientPool<kCASEClientPoolSize> mCASEClientPool;
-    OperationalDeviceProxyPool<kOperationalDevicePoolSize> mDevicePool;
+    CASESessionManager mCASESessionManager;
+    CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
 
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
