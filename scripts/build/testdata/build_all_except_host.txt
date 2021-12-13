@@ -1080,7 +1080,7 @@ cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release
 ninja -C {out}/nrf-native-posix-64-tests
 
 # Run Tests nrf-native-posix-64-tests
-bash -c 'cd {out}/nrf-native-posix-64-tests && ctest -V --output-on-failure'
+ctest ' --build-nocmake' -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
 # Building nrf-nrf52840-light
 ninja -C {out}/nrf-nrf52840-light

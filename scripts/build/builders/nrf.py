@@ -160,12 +160,10 @@ west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
                       title='Building ' + self.identifier)
 
         if self.app == NrfApp.UNIT_TESTS:
-            # 'cd' is because running the tests creates a file named 'flash.bin' in the 
-            # current directory. Try to not pollute the source directory.
-            #
-            # Note: running zephyr/zephyr.elf works just as fine, but ctest seems 
-            # to have more options
-            self._Execute(['bash', '-c', "cd %s && ctest -V --output-on-failure" % self.output_dir],
+            # Note: running zephyr/zephyr.elf has the same result except it creates
+            # a flash.bin in the current directory. ctest has more options and does not
+            # pollute the source directory
+            self._Execute(['ctest', ' --build-nocmake', '-V', '--output-on-failure', '--test-dir', self.output_dir],
                           title='Run Tests ' + self.identifier)
 
 
