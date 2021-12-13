@@ -276,16 +276,10 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
         status = Attributes::UniqueID::Set(endpoint, CharSpan(uniqueId, strlen(uniqueId)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Unique Id: 0x%02x", status));
     }
-
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gBasicAttrAttrAccess);
-        attrAccessRegistered = true;
-    }
 }
 
 void MatterBasicPluginServerInitCallback()
 {
     PlatformMgr().SetDelegate(&gPlatformMgrDelegate);
+    registerAttributeAccessOverride(&gBasicAttrAttrAccess);
 }
