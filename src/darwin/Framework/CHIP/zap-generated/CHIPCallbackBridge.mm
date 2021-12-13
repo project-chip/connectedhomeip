@@ -5992,6 +5992,65 @@ void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
+{
+    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
+    {
+        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
+    }
+    {
+        response.relayStatus = [NSNumber numberWithUnsignedShort:data.relayStatus];
+    }
+    {
+        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
+    }
+    {
+        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
+    }
+    {
+        response.setpoint = [NSNumber numberWithShort:data.setpoint];
+    }
+    {
+        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPThermostatClusterGetWeeklyScheduleResponseParams new];
+    {
+        response.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:data.numberOfTransitionsForSequence];
+    }
+    {
+        response.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:data.dayOfWeekForSequence.Raw()];
+    }
+    {
+        response.modeForSequence = [NSNumber numberWithUnsignedChar:data.modeForSequence.Raw()];
+    }
+    {
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.payload.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        response.payload = array_0;
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value)
 {

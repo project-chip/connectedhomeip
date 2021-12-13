@@ -4074,6 +4074,89 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedGetRelayStatusLogResponseCallback
+      implements ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        Integer timeOfDay,
+        Integer relayStatus,
+        Integer localTemperature,
+        Integer humidityInPercentage,
+        Integer setpoint,
+        Integer unreadEntries) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo timeOfDayResponseValue = new CommandResponseInfo("timeOfDay", "int");
+      responseValues.put(timeOfDayResponseValue, timeOfDay);
+      CommandResponseInfo relayStatusResponseValue = new CommandResponseInfo("relayStatus", "int");
+      responseValues.put(relayStatusResponseValue, relayStatus);
+      CommandResponseInfo localTemperatureResponseValue =
+          new CommandResponseInfo("localTemperature", "int");
+      responseValues.put(localTemperatureResponseValue, localTemperature);
+      CommandResponseInfo humidityInPercentageResponseValue =
+          new CommandResponseInfo("humidityInPercentage", "int");
+      responseValues.put(humidityInPercentageResponseValue, humidityInPercentage);
+      CommandResponseInfo setpointResponseValue = new CommandResponseInfo("setpoint", "int");
+      responseValues.put(setpointResponseValue, setpoint);
+      CommandResponseInfo unreadEntriesResponseValue =
+          new CommandResponseInfo("unreadEntries", "int");
+      responseValues.put(unreadEntriesResponseValue, unreadEntries);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedGetWeeklyScheduleResponseCallback
+      implements ChipClusters.ThermostatCluster.GetWeeklyScheduleResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        Integer numberOfTransitionsForSequence,
+        Integer dayOfWeekForSequence,
+        Integer modeForSequence
+        // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo numberOfTransitionsForSequenceResponseValue =
+          new CommandResponseInfo("numberOfTransitionsForSequence", "int");
+      responseValues.put(
+          numberOfTransitionsForSequenceResponseValue, numberOfTransitionsForSequence);
+      CommandResponseInfo dayOfWeekForSequenceResponseValue =
+          new CommandResponseInfo("dayOfWeekForSequence", "int");
+      responseValues.put(dayOfWeekForSequenceResponseValue, dayOfWeekForSequence);
+      CommandResponseInfo modeForSequenceResponseValue =
+          new CommandResponseInfo("modeForSequence", "int");
+      responseValues.put(modeForSequenceResponseValue, modeForSequence);
+      // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedThermostatClusterAttributeListAttributeCallback
       implements ChipClusters.ThermostatCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -9184,9 +9267,10 @@ public class ClusterInfoMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
-                  .getRelayStatusLog((DefaultClusterCallback) callback);
+                  .getRelayStatusLog(
+                      (ChipClusters.ThermostatCluster.GetRelayStatusLogResponseCallback) callback);
             },
-            () -> new DelegatedDefaultClusterCallback(),
+            () -> new DelegatedGetRelayStatusLogResponseCallback(),
             thermostatgetRelayStatusLogCommandParams);
     thermostatClusterInteractionInfoMap.put(
         "getRelayStatusLog", thermostatgetRelayStatusLogInteractionInfo);
@@ -9208,11 +9292,11 @@ public class ClusterInfoMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ThermostatCluster) cluster)
                   .getWeeklySchedule(
-                      (DefaultClusterCallback) callback,
+                      (ChipClusters.ThermostatCluster.GetWeeklyScheduleResponseCallback) callback,
                       (Integer) commandArguments.get("daysToReturn"),
                       (Integer) commandArguments.get("modeToReturn"));
             },
-            () -> new DelegatedDefaultClusterCallback(),
+            () -> new DelegatedGetWeeklyScheduleResponseCallback(),
             thermostatgetWeeklyScheduleCommandParams);
     thermostatClusterInteractionInfoMap.put(
         "getWeeklySchedule", thermostatgetWeeklyScheduleInteractionInfo);

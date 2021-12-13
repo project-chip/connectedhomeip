@@ -17510,7 +17510,7 @@ class Thermostat(Cluster):
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHold", Tag=0x00000023, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="temperatureSetpointHoldDuration", Tag=0x00000024, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="thermostatProgrammingOperationMode", Tag=0x00000025, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="hvacRelayState", Tag=0x00000029, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="thermostatRunningState", Tag=0x00000029, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeSource", Tag=0x00000030, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeAmount", Tag=0x00000031, Type=typing.Optional[int]),
                 ClusterObjectFieldDescriptor(Label="setpointChangeSourceTimestamp", Tag=0x00000032, Type=typing.Optional[uint]),
@@ -17558,7 +17558,7 @@ class Thermostat(Cluster):
     temperatureSetpointHold: 'typing.Optional[uint]' = None
     temperatureSetpointHoldDuration: 'typing.Optional[uint]' = None
     thermostatProgrammingOperationMode: 'typing.Optional[uint]' = None
-    hvacRelayState: 'typing.Optional[uint]' = None
+    thermostatRunningState: 'typing.Optional[uint]' = None
     setpointChangeSource: 'typing.Optional[uint]' = None
     setpointChangeAmount: 'typing.Optional[int]' = None
     setpointChangeSourceTimestamp: 'typing.Optional[uint]' = None
@@ -17601,7 +17601,7 @@ class Thermostat(Cluster):
             amount: 'int' = 0
 
         @dataclass
-        class CurrentWeeklySchedule(ClusterCommand):
+        class GetWeeklyScheduleResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = False
@@ -17643,7 +17643,7 @@ class Thermostat(Cluster):
             payload: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
-        class RelayStatusLog(ClusterCommand):
+        class GetRelayStatusLogResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0201
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
@@ -18209,7 +18209,7 @@ class Thermostat(Cluster):
             value: 'typing.Optional[uint]' = None
 
         @dataclass
-        class HvacRelayState(ClusterAttributeDescriptor):
+        class ThermostatRunningState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0201

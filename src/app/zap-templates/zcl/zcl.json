@@ -54,6 +54,7 @@
         "target-navigator-cluster.xml",
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
+        "thermostat-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
         "time-synchronization-cluster.xml",
         "tv-channel-cluster.xml",

@@ -897,4 +897,34 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPThermostatClusterGetRelayStatusLogResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPThermostatClusterGetWeeklyScheduleResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetWeeklyScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetWeeklyScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 } // namespace chip

@@ -13848,12 +13848,12 @@ public class ChipClusters {
       clearWeeklySchedule(chipClusterPtr, callback);
     }
 
-    public void getRelayStatusLog(DefaultClusterCallback callback) {
+    public void getRelayStatusLog(GetRelayStatusLogResponseCallback callback) {
       getRelayStatusLog(chipClusterPtr, callback);
     }
 
     public void getWeeklySchedule(
-        DefaultClusterCallback callback, Integer daysToReturn, Integer modeToReturn) {
+        GetWeeklyScheduleResponseCallback callback, Integer daysToReturn, Integer modeToReturn) {
       getWeeklySchedule(chipClusterPtr, callback, daysToReturn, modeToReturn);
     }
 
@@ -13878,11 +13878,12 @@ public class ChipClusters {
 
     private native void clearWeeklySchedule(long chipClusterPtr, DefaultClusterCallback Callback);
 
-    private native void getRelayStatusLog(long chipClusterPtr, DefaultClusterCallback Callback);
+    private native void getRelayStatusLog(
+        long chipClusterPtr, GetRelayStatusLogResponseCallback Callback);
 
     private native void getWeeklySchedule(
         long chipClusterPtr,
-        DefaultClusterCallback Callback,
+        GetWeeklyScheduleResponseCallback Callback,
         Integer daysToReturn,
         Integer modeToReturn);
 
@@ -13896,6 +13897,30 @@ public class ChipClusters {
 
     private native void setpointRaiseLower(
         long chipClusterPtr, DefaultClusterCallback Callback, Integer mode, Integer amount);
+
+    public interface GetRelayStatusLogResponseCallback {
+      void onSuccess(
+          Integer timeOfDay,
+          Integer relayStatus,
+          Integer localTemperature,
+          Integer humidityInPercentage,
+          Integer setpoint,
+          Integer unreadEntries);
+
+      void onError(Exception error);
+    }
+
+    public interface GetWeeklyScheduleResponseCallback {
+      void onSuccess(
+          Integer numberOfTransitionsForSequence,
+          Integer dayOfWeekForSequence,
+          Integer modeForSequence
+          // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          );
+
+      void onError(Exception error);
+    }
 
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
