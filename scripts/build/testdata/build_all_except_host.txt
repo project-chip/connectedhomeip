@@ -509,6 +509,11 @@ mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/
 # Generating mbed-CY8CPROTO_062_4343W-shell-release
 cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
 
+# Generating nrf-native-posix-64-tests
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
+
 # Generating nrf-nrf52840-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
@@ -1070,6 +1075,12 @@ bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-shell-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release
+
+# Building nrf-native-posix-64-tests
+ninja -C {out}/nrf-native-posix-64-tests
+
+# Run Tests nrf-native-posix-64-tests
+bash -c 'cd {out}/nrf-native-posix-64-tests && ctest -V --output-on-failure'
 
 # Building nrf-nrf52840-light
 ninja -C {out}/nrf-nrf52840-light

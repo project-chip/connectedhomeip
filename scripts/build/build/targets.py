@@ -258,6 +258,8 @@ def Efr32Targets():
 def NrfTargets():
     target = Target('nrf', NrfConnectBuilder)
 
+    yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
+
     targets = [
         target.Extend('nrf5340', board=NrfBoard.NRF5340),
         target.Extend('nrf52840', board=NrfBoard.NRF52840),
