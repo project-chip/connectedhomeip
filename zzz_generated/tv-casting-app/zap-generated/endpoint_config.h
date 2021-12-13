@@ -1661,6 +1661,9 @@
     const EmberAfGenericClusterFunction chipFuncArrayDoorLockServer[] = {                                                          \
         (EmberAfGenericClusterFunction) MatterDoorLockClusterServerAttributeChangedCallback,                                       \
     };                                                                                                                             \
+    const EmberAfGenericClusterFunction chipFuncArrayThermostatServer[] = {                                                        \
+        (EmberAfGenericClusterFunction) emberAfThermostatClusterServerInitCallback,                                                \
+    };                                                                                                                             \
     const EmberAfGenericClusterFunction chipFuncArrayColorControlServer[] = {                                                      \
         (EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback,                                              \
     };                                                                                                                             \
@@ -1787,9 +1790,12 @@
             {                                                                                                                      \
                 0x0103, ZAP_ATTRIBUTE_INDEX(260), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                \
-            {                                                                                                                      \
-                0x0201, ZAP_ATTRIBUTE_INDEX(265), 10, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
-            }, /* Endpoint: 1, Cluster: Thermostat (server) */                                                                     \
+            { 0x0201,                                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(265),                                                                                            \
+              10,                                                                                                                  \
+              17,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayThermostatServer }, /* Endpoint: 1, Cluster: Thermostat (server) */                                     \
             { 0x0300,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(275),                                                                                            \
               51,                                                                                                                  \
