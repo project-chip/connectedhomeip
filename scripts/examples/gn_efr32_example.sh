@@ -34,7 +34,7 @@ else
     if [ -z "$4" ]; then
         gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3"
     else
-        gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\"" "$2/$3" "$4"
+        gn gen --check --fail-on-unused-args --root="$1" --args="efr32_board=\"$3\" $4" "$2/$3"
     fi
     ninja -v -C "$2/$3"
     #print stats
