@@ -1117,6 +1117,10 @@ typedef void (*CHIPTestClusterClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*CHIPThermostatClusterLocalTemperatureAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo::DecodableArgType);

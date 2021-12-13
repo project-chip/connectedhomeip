@@ -3046,3 +3046,43 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, 
     cb->mCall(cb->mContext, returnValue);
     return true;
 }
+
+bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+                                                               uint8_t humidityInPercentage, int16_t setpoint,
+                                                               uint16_t unreadEntries)
+{
+    ChipLogProgress(Zcl, "GetRelayStatusLogResponse:");
+    ChipLogProgress(Zcl, "  timeOfDay: %" PRIu16 "", timeOfDay);
+    ChipLogProgress(Zcl, "  relayStatus: %" PRIu16 "", relayStatus);
+    ChipLogProgress(Zcl, "  localTemperature: %" PRId16 "", localTemperature);
+    ChipLogProgress(Zcl, "  humidityInPercentage: %" PRIu8 "", humidityInPercentage);
+    ChipLogProgress(Zcl, "  setpoint: %" PRId16 "", setpoint);
+    ChipLogProgress(Zcl, "  unreadEntries: %" PRIu16 "", unreadEntries);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ThermostatClusterGetRelayStatusLogResponseCallback");
+
+    Callback::Callback<ThermostatClusterGetRelayStatusLogResponseCallback> * cb =
+        Callback::Callback<ThermostatClusterGetRelayStatusLogResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, timeOfDay, relayStatus, localTemperature, humidityInPercentage, setpoint, unreadEntries);
+    return true;
+}
+
+bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                               uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload)
+{
+    ChipLogProgress(Zcl, "GetWeeklyScheduleResponse:");
+    ChipLogProgress(Zcl, "  numberOfTransitionsForSequence: %" PRIu8 "", numberOfTransitionsForSequence);
+    ChipLogProgress(Zcl, "  dayOfWeekForSequence: %" PRIu8 "", dayOfWeekForSequence);
+    ChipLogProgress(Zcl, "  modeForSequence: %" PRIu8 "", modeForSequence);
+    ChipLogProgress(Zcl, "  payload: %p", payload);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ThermostatClusterGetWeeklyScheduleResponseCallback");
+
+    Callback::Callback<ThermostatClusterGetWeeklyScheduleResponseCallback> * cb =
+        Callback::Callback<ThermostatClusterGetWeeklyScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
+    return true;
+}

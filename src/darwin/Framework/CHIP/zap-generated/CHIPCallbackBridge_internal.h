@@ -139,6 +139,10 @@ typedef void (*CHIPTestClusterClusterTestNullableOptionalResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -4698,6 +4702,32 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
+};
+
+class CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
+};
+
+class CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge

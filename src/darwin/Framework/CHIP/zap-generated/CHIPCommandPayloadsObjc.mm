@@ -2465,7 +2465,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
+@implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2499,7 +2499,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterRelayStatusLogParams
+@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {

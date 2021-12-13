@@ -4164,9 +4164,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPThermostat : CHIPCluster
 
 - (void)clearWeeklyScheduleWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)getRelayStatusLogWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler;
 - (void)getWeeklyScheduleWithParams:(CHIPThermostatClusterGetWeeklyScheduleParams *)params
-                  completionHandler:(StatusCompletion)completionHandler;
+                  completionHandler:(void (^)(CHIPThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler;
 - (void)setWeeklyScheduleWithParams:(CHIPThermostatClusterSetWeeklyScheduleParams *)params
                   completionHandler:(StatusCompletion)completionHandler;
 - (void)setpointRaiseLowerWithParams:(CHIPThermostatClusterSetpointRaiseLowerParams *)params

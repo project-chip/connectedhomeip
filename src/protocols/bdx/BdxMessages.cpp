@@ -575,3 +575,48 @@ bool DataBlock::operator==(const DataBlock & another) const
 
     return ((BlockCounter == another.BlockCounter) && dataMatches);
 }
+
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+Encoding::LittleEndian::BufferWriter & BlockQueryWithSkip::WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const
+{
+    aBuffer.Put32(BlockCounter);
+    aBuffer.Put64(BytesToSkip);
+    return aBuffer;
+}
+
+CHIP_ERROR BlockQueryWithSkip::Parse(System::PacketBufferHandle aBuffer)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint8_t * bufStart = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
+    SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
+    SuccessOrExit(bufReader.Read64(&BytesToSkip).StatusCode());
+
+exit:
+    if (bufReader.StatusCode() != CHIP_NO_ERROR)
+    {
+        err = bufReader.StatusCode();
+    }
+    return err;
+}
+
+size_t BlockQueryWithSkip::MessageSize() const
+{
+    BufferWriter emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
+}
+
+bool BlockQueryWithSkip::operator==(const BlockQueryWithSkip & another) const
+{
+    return (BlockCounter == another.BlockCounter && BytesToSkip == another.BytesToSkip);
+}
+
+#if CHIP_AUTOMATION_LOGGING
+void BlockQueryWithSkip::LogMessage(bdx::MessageType messageType) const
+{
+    ChipLogAutomation("BlockQueryWithSkip");
+    ChipLogAutomation("  Block Counter: %" PRIu32, BlockCounter);
+    ChipLogAutomation("  Bytes To Skip: %" PRIu64, BytesToSkip);
+}
+#endif // CHIP_AUTOMATION_LOGGING

@@ -14457,12 +14457,12 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CurrentWeeklySchedule Command callback (from server)
+ * @brief Thermostat Cluster GetWeeklyScheduleResponse Command callback (from server)
  */
-bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                           uint8_t modeForSequence,
-                                                           /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                               uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 /**
  * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
  */
@@ -14470,11 +14470,12 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster RelayStatusLog Command callback (from server)
+ * @brief Thermostat Cluster GetRelayStatusLogResponse Command callback (from server)
  */
-bool emberAfThermostatClusterRelayStatusLogCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                    uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
-                                                    uint8_t humidityInPercentage, int16_t setpoint, uint16_t unreadEntries);
+bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+                                                               uint8_t humidityInPercentage, int16_t setpoint,
+                                                               uint16_t unreadEntries);
 /**
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */

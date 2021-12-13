@@ -69,5 +69,7 @@ jobs:
                 USER_EMAIL: ${{ secrets.MATTER_PAT_EMAIL }}
                 USER_NAME: ${{ secrets.MATTER_PAT_NAME }}
                 GITHUB_REPOSITORY: ${{ github.GITHUB_REPOSITORY }}
+            - name: Commit
+              run: git commit -a -m "Regenerating ZAP"
             - name: Push
               run: git push

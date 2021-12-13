@@ -21,6 +21,7 @@ limitations under the License.
         <item name="UpdateAvailable" value="0x0"/>
         <item name="Busy" value="0x1"/>
         <item name="NotAvailable" value="0x2"/>
+        <item name="DownloadProtocolNotSupported" value="0x3"/>
     </enum>
     <enum name="OTAApplyUpdateAction" type="ENUM8">
         <cluster code="0x0029"/>

@@ -2920,9 +2920,9 @@ namespace ThermostatProgrammingOperationMode {
 static constexpr AttributeId Id = 0x00000025;
 } // namespace ThermostatProgrammingOperationMode
 
-namespace HvacRelayState {
+namespace ThermostatRunningState {
 static constexpr AttributeId Id = 0x00000029;
-} // namespace HvacRelayState
+} // namespace ThermostatRunningState
 
 namespace SetpointChangeSource {
 static constexpr AttributeId Id = 0x00000030;

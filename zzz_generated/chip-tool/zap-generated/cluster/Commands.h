@@ -3444,6 +3444,66 @@ static void OnTestClusterTestSpecificResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnThermostatGetRelayStatusLogResponseSuccess(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetRelayStatusLogResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("timeOfDay", 1, data.timeOfDay);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("relayStatus", 1, data.relayStatus);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("localTemperature", 1, data.localTemperature);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("humidityInPercentage", 1, data.humidityInPercentage);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("setpoint", 1, data.setpoint);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("unreadEntries", 1, data.unreadEntries);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnThermostatGetWeeklyScheduleResponseSuccess(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received GetWeeklyScheduleResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("numberOfTransitionsForSequence", 1, data.numberOfTransitionsForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("dayOfWeekForSequence", 1, data.dayOfWeekForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("modeForSequence", 1, data.modeForSequence);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("payload", 1, data.payload);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster Name                                                        |   ID   |
 |---------------------------------------------------------------------+--------|
@@ -40834,8 +40894,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnThermostatGetRelayStatusLogResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -40862,8 +40922,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnThermostatGetWeeklyScheduleResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:

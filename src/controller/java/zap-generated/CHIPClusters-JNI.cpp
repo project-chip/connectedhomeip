@@ -30698,8 +30698,10 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
 
     chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type request;
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPThermostatClusterGetRelayStatusLogResponseCallback,
+                    void (*)(CHIPThermostatClusterGetRelayStatusLogResponseCallback *)>
+        onSuccess(Platform::New<CHIPThermostatClusterGetRelayStatusLogResponseCallback>(callback),
+                  Platform::Delete<CHIPThermostatClusterGetRelayStatusLogResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -30714,7 +30716,8 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
@@ -30739,8 +30742,10 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
     request.modeToReturn =
         static_cast<decltype(request.modeToReturn)>(chip::JniReferences::GetInstance().IntegerToPrimitive(modeToReturn));
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPThermostatClusterGetWeeklyScheduleResponseCallback,
+                    void (*)(CHIPThermostatClusterGetWeeklyScheduleResponseCallback *)>
+        onSuccess(Platform::New<CHIPThermostatClusterGetWeeklyScheduleResponseCallback>(callback),
+                  Platform::Delete<CHIPThermostatClusterGetWeeklyScheduleResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -30755,7 +30760,8 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);

@@ -11734,7 +11734,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace SetpointRaiseLower.
-namespace CurrentWeeklySchedule {
+namespace GetWeeklyScheduleResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -11781,7 +11781,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace CurrentWeeklySchedule.
+} // namespace GetWeeklyScheduleResponse.
 namespace SetWeeklySchedule {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -11830,7 +11830,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace SetWeeklySchedule.
-namespace RelayStatusLog {
+namespace GetRelayStatusLogResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -11884,7 +11884,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RelayStatusLog.
+} // namespace GetRelayStatusLogResponse.
 namespace GetWeeklySchedule {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {

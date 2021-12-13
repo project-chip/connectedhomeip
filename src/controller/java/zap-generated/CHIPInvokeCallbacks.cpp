@@ -3822,4 +3822,182 @@ void CHIPTestClusterClusterTestSpecificResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
+CHIPThermostatClusterGetRelayStatusLogResponseCallback::CHIPThermostatClusterGetRelayStatusLogResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPThermostatClusterGetRelayStatusLogResponseCallback::~CHIPThermostatClusterGetRelayStatusLogResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPThermostatClusterGetRelayStatusLogResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPThermostatClusterGetRelayStatusLogResponseCallback,
+                    void (*)(CHIPThermostatClusterGetRelayStatusLogResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPThermostatClusterGetRelayStatusLogResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPThermostatClusterGetRelayStatusLogResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(
+        env, javaCallbackRef, "onSuccess",
+        "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+        &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject timeOfDay;
+
+    std::string timeOfDayClassName     = "java/lang/Integer";
+    std::string timeOfDayCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(timeOfDayClassName.c_str(), timeOfDayCtorSignature.c_str(),
+                                                                   dataResponse.timeOfDay, timeOfDay);
+    jobject relayStatus;
+
+    std::string relayStatusClassName     = "java/lang/Integer";
+    std::string relayStatusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(relayStatusClassName.c_str(), relayStatusCtorSignature.c_str(),
+                                                                   dataResponse.relayStatus, relayStatus);
+    jobject localTemperature;
+
+    std::string localTemperatureClassName     = "java/lang/Integer";
+    std::string localTemperatureCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(
+        localTemperatureClassName.c_str(), localTemperatureCtorSignature.c_str(), dataResponse.localTemperature, localTemperature);
+    jobject humidityInPercentage;
+
+    std::string humidityInPercentageClassName     = "java/lang/Integer";
+    std::string humidityInPercentageCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(humidityInPercentageClassName.c_str(),
+                                                                  humidityInPercentageCtorSignature.c_str(),
+                                                                  dataResponse.humidityInPercentage, humidityInPercentage);
+    jobject setpoint;
+
+    std::string setpointClassName     = "java/lang/Integer";
+    std::string setpointCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<int16_t>(setpointClassName.c_str(), setpointCtorSignature.c_str(),
+                                                                  dataResponse.setpoint, setpoint);
+    jobject unreadEntries;
+
+    std::string unreadEntriesClassName     = "java/lang/Integer";
+    std::string unreadEntriesCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
+        unreadEntriesClassName.c_str(), unreadEntriesCtorSignature.c_str(), dataResponse.unreadEntries, unreadEntries);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, timeOfDay, relayStatus, localTemperature, humidityInPercentage, setpoint,
+                        unreadEntries);
+}
+CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CHIPThermostatClusterGetWeeklyScheduleResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPThermostatClusterGetWeeklyScheduleResponseCallback::~CHIPThermostatClusterGetWeeklyScheduleResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPThermostatClusterGetWeeklyScheduleResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPThermostatClusterGetWeeklyScheduleResponseCallback,
+                    void (*)(CHIPThermostatClusterGetWeeklyScheduleResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPThermostatClusterGetWeeklyScheduleResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPThermostatClusterGetWeeklyScheduleResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess",
+                                                  "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject numberOfTransitionsForSequence;
+
+    std::string numberOfTransitionsForSequenceClassName     = "java/lang/Integer";
+    std::string numberOfTransitionsForSequenceCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
+        numberOfTransitionsForSequenceClassName.c_str(), numberOfTransitionsForSequenceCtorSignature.c_str(),
+        dataResponse.numberOfTransitionsForSequence, numberOfTransitionsForSequence);
+    jobject dayOfWeekForSequence;
+
+    std::string dayOfWeekForSequenceClassName     = "java/lang/Integer";
+    std::string dayOfWeekForSequenceCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::BitFlags<chip::app::Clusters::Thermostat::DayOfWeek>>(
+        dayOfWeekForSequenceClassName.c_str(), dayOfWeekForSequenceCtorSignature.c_str(), dataResponse.dayOfWeekForSequence,
+        dayOfWeekForSequence);
+    jobject modeForSequence;
+
+    std::string modeForSequenceClassName     = "java/lang/Integer";
+    std::string modeForSequenceCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::BitFlags<chip::app::Clusters::Thermostat::ModeForSequence>>(
+        modeForSequenceClassName.c_str(), modeForSequenceCtorSignature.c_str(), dataResponse.modeForSequence, modeForSequence);
+    jobject payload;
+
+    payload = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence,
+                        payload);
+}
 } // namespace chip

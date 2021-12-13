@@ -7699,9 +7699,10 @@ using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
-    kUpdateAvailable = 0x00,
-    kBusy            = 0x01,
-    kNotAvailable    = 0x02,
+    kUpdateAvailable              = 0x00,
+    kBusy                         = 0x01,
+    kNotAvailable                 = 0x02,
+    kDownloadProtocolNotSupported = 0x03,
 };
 
 namespace Commands {
@@ -8452,6 +8453,15 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerSourceConfiguration
 namespace PowerSource {
+
+// Bitmap for PowerSourceFeature
+enum class PowerSourceFeature : uint32_t
+{
+    kWired        = 0x1,
+    kBattery      = 0x2,
+    kRechargeable = 0x4,
+    kReplaceable  = 0x8,
+};
 
 namespace Attributes {
 namespace Status {
@@ -19588,6 +19598,17 @@ enum class ModeForSequence : uint8_t
     kCoolSetpointFieldPresent = 0x2,
 };
 
+// Bitmap for ThermostatFeature
+enum class ThermostatFeature : uint32_t
+{
+    kHeating   = 0x1,
+    kCooling   = 0x2,
+    kOccupancy = 0x4,
+    kSchedule  = 0x8,
+    kSetback   = 0x10,
+    kAutomode  = 0x20,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -19596,20 +19617,20 @@ struct Type;
 struct DecodableType;
 } // namespace SetpointRaiseLower
 
-namespace CurrentWeeklySchedule {
+namespace GetWeeklyScheduleResponse {
 struct Type;
 struct DecodableType;
-} // namespace CurrentWeeklySchedule
+} // namespace GetWeeklyScheduleResponse
 
 namespace SetWeeklySchedule {
 struct Type;
 struct DecodableType;
 } // namespace SetWeeklySchedule
 
-namespace RelayStatusLog {
+namespace GetRelayStatusLogResponse {
 struct Type;
 struct DecodableType;
-} // namespace RelayStatusLog
+} // namespace GetRelayStatusLogResponse
 
 namespace GetWeeklySchedule {
 struct Type;
@@ -19664,7 +19685,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetpointRaiseLower
-namespace CurrentWeeklySchedule {
+namespace GetWeeklyScheduleResponse {
 enum class Fields
 {
     kNumberOfTransitionsForSequence = 0,
@@ -19677,7 +19698,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CurrentWeeklySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
@@ -19695,7 +19716,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::CurrentWeeklySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeeklyScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint8_t numberOfTransitionsForSequence;
@@ -19704,7 +19725,7 @@ public:
     DataModel::DecodableList<uint8_t> payload;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace CurrentWeeklySchedule
+}; // namespace GetWeeklyScheduleResponse
 namespace SetWeeklySchedule {
 enum class Fields
 {
@@ -19746,7 +19767,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SetWeeklySchedule
-namespace RelayStatusLog {
+namespace GetRelayStatusLogResponse {
 enum class Fields
 {
     kTimeOfDay            = 0,
@@ -19761,7 +19782,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RelayStatusLog::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay;
@@ -19781,7 +19802,7 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::RelayStatusLog::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRelayStatusLogResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
 
     uint16_t timeOfDay;
@@ -19792,7 +19813,7 @@ public:
     uint16_t unreadEntries;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace RelayStatusLog
+}; // namespace GetRelayStatusLogResponse
 namespace GetWeeklySchedule {
 enum class Fields
 {
@@ -19812,7 +19833,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -19870,7 +19891,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -20259,7 +20280,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatProgrammingOperationMode
-namespace HvacRelayState {
+namespace ThermostatRunningState {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -20267,10 +20288,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::HvacRelayState::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningState::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace HvacRelayState
+} // namespace ThermostatRunningState
 namespace SetpointChangeSource {
 struct TypeInfo
 {
