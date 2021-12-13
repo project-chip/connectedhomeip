@@ -1049,6 +1049,7 @@ public:
         }
     }
 
+<<<<<<< HEAD
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
     static void OnSubscriptionEstablished(void * context)
     {
@@ -1056,6 +1057,9 @@ public:
             reinterpret_cast<CHIPContentLauncherAcceptsHeaderListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
+=======
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
+>>>>>>> 0c9156e9e (Zap generate files)
 
 private:
     jobject javaCallbackRef;

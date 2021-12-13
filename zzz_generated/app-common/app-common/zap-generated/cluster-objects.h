@@ -32109,6 +32109,13 @@ enum class ContentLaunchStatus : uint8_t
 using ContentLaunchStatus             = EmberAfContentLaunchStatus;
 #endif
 
+// Bitmap for SupportedStreamingProtocol
+enum class SupportedStreamingProtocol : uint32_t
+{
+    kDash = 0x1,
+    kHls  = 0x2,
+};
+
 namespace Structs {
 namespace ContentLaunchDimension {
 enum class Fields
@@ -32411,9 +32418,9 @@ namespace Attributes {
 namespace AcceptsHeaderList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = DataModel::List<const chip::CharSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }

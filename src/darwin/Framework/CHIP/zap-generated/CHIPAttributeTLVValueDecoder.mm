@@ -1948,8 +1948,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSData * newElement_0;
-                newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+                NSString * newElement_0;
+                newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named
