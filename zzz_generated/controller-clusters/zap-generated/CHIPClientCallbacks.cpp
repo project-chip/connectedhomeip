@@ -574,28 +574,6 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
     cb->mCall(cb->mContext, list);
 }
 
-void ContentLauncherClusterSupportedStreamingTypesListAttributeFilter(TLV::TLVReader * tlvData,
-                                                                      Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * cb =
-        Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
 void ContentLauncherClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback)
 {
@@ -1748,8 +1726,8 @@ void SwitchClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     cb->mCall(cb->mContext, list);
 }
 
-void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
+void TvChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
@@ -1764,8 +1742,8 @@ void TvChannelClusterTvChannelListListAttributeFilter(TLV::TLVReader * tlvData, 
         return;
     }
 
-    Callback::Callback<TvChannelTvChannelListListAttributeCallback> * cb =
-        Callback::Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<TvChannelChannelListListAttributeCallback> * cb =
+        Callback::Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
@@ -2240,6 +2218,21 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, 
     return true;
 }
 
+bool emberAfApplicationLauncherClusterHideAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                              chip::CharSpan data)
+{
+    ChipLogProgress(Zcl, "HideAppResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
+    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterHideAppResponseCallback");
+
+    Callback::Callback<ApplicationLauncherClusterHideAppResponseCallback> * cb =
+        Callback::Callback<ApplicationLauncherClusterHideAppResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, status, data);
+    return true;
+}
+
 bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                 uint8_t status, chip::CharSpan data)
 {
@@ -2255,33 +2248,48 @@ bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpo
     return true;
 }
 
+bool emberAfApplicationLauncherClusterStopAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                              chip::CharSpan data)
+{
+    ChipLogProgress(Zcl, "StopAppResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
+    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterStopAppResponseCallback");
+
+    Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback> * cb =
+        Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, status, data);
+    return true;
+}
+
 bool emberAfContentLauncherClusterLaunchContentResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                chip::CharSpan data, uint8_t contentLaunchStatus)
+                                                                uint8_t contentLaunchStatus, chip::CharSpan data)
 {
     ChipLogProgress(Zcl, "LaunchContentResponse:");
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
 
     Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> * cb =
         Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, data, contentLaunchStatus);
+    cb->mCall(cb->mContext, contentLaunchStatus, data);
     return true;
 }
 
 bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            chip::CharSpan data, uint8_t contentLaunchStatus)
+                                                            uint8_t contentLaunchStatus, chip::CharSpan data)
 {
     ChipLogProgress(Zcl, "LaunchURLResponse:");
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
     ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
+    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
 
     Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> * cb =
         Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, data, contentLaunchStatus);
+    cb->mCall(cb->mContext, contentLaunchStatus, data);
     return true;
 }
 
@@ -2302,134 +2310,64 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t holidayIndex, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingMode)
+bool emberAfDoorLockClusterGetCredentialStatusResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                               bool credentialExists, uint16_t userIndex,
+                                                               uint16_t nextCredentialIndex)
 {
-    ChipLogProgress(Zcl, "GetHolidayScheduleResponse:");
-    ChipLogProgress(Zcl, "  holidayIndex: %" PRIu8 "", holidayIndex);
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
-    ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
-    ChipLogProgress(Zcl, "  operatingMode: %" PRIu8 "", operatingMode);
+    ChipLogProgress(Zcl, "GetCredentialStatusResponse:");
+    ChipLogProgress(Zcl, "  credentialExists: %d", credentialExists);
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
+    ChipLogProgress(Zcl, "  nextCredentialIndex: %" PRIu16 "", nextCredentialIndex);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetHolidayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetCredentialStatusResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, holidayIndex, status, localStartTime, localEndTime, operatingMode);
+    Callback::Callback<DoorLockClusterGetCredentialStatusResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetCredentialStatusResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, credentialExists, userIndex, nextCredentialIndex);
     return true;
 }
 
-bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t logEntryId,
-                                                        uint32_t timestamp, uint8_t eventType, uint8_t source,
-                                                        uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin)
+bool emberAfDoorLockClusterGetUserResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userIndex,
+                                                   chip::CharSpan userName, uint32_t userUniqueId, uint8_t userStatus,
+                                                   uint8_t userType, uint8_t credentialRule,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
+                                                   chip::FabricIndex creatorFabricIndex, chip::FabricIndex lastModifiedFabricIndex,
+                                                   uint16_t nextUserIndex)
 {
-    ChipLogProgress(Zcl, "GetLogRecordResponse:");
-    ChipLogProgress(Zcl, "  logEntryId: %" PRIu16 "", logEntryId);
-    ChipLogProgress(Zcl, "  timestamp: %" PRIu32 "", timestamp);
-    ChipLogProgress(Zcl, "  eventType: %" PRIu8 "", eventType);
-    ChipLogProgress(Zcl, "  source: %" PRIu8 "", source);
-    ChipLogProgress(Zcl, "  eventIdOrAlarmCode: %" PRIu8 "", eventIdOrAlarmCode);
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetLogRecordResponseCallback");
-
-    Callback::Callback<DoorLockClusterGetLogRecordResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetLogRecordResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin);
-    return true;
-}
-
-bool emberAfDoorLockClusterGetPINCodeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                      uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
-{
-    ChipLogProgress(Zcl, "GetPINCodeResponse:");
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
+    ChipLogProgress(Zcl, "GetUserResponse:");
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
+    ChipLogProgress(Zcl, "  userName: %.*s", static_cast<int>(userName.size()), userName.data());
+    ChipLogProgress(Zcl, "  userUniqueId: %" PRIu32 "", userUniqueId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    ChipLogProgress(Zcl, "  pin: %zu", pin.size());
+    ChipLogProgress(Zcl, "  credentialRule: %" PRIu8 "", credentialRule);
+    ChipLogProgress(Zcl, "  credentials: %p", credentials);
+    ChipLogProgress(Zcl, "  creatorFabricIndex: %" PRIu8 "", creatorFabricIndex);
+    ChipLogProgress(Zcl, "  lastModifiedFabricIndex: %" PRIu8 "", lastModifiedFabricIndex);
+    ChipLogProgress(Zcl, "  nextUserIndex: %" PRIu16 "", nextUserIndex);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPINCodeResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetUserResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetPINCodeResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetPINCodeResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, userId, userStatus, userType, pin);
+    Callback::Callback<DoorLockClusterGetUserResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetUserResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, userIndex, userName, userUniqueId, userStatus, userType, credentialRule, credentials,
+              creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
     return true;
 }
 
-bool emberAfDoorLockClusterGetRFIDCodeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                       uint8_t userStatus, uint8_t userType, chip::ByteSpan rfidCode)
+bool emberAfDoorLockClusterSetCredentialResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                         uint16_t userIndex, uint16_t nextCredentialIndex)
 {
-    ChipLogProgress(Zcl, "GetRFIDCodeResponse:");
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
-    ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    ChipLogProgress(Zcl, "  rfidCode: %zu", rfidCode.size());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRFIDCodeResponseCallback");
-
-    Callback::Callback<DoorLockClusterGetRFIDCodeResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetRFIDCodeResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, userId, userStatus, userType, rfidCode);
-    return true;
-}
-
-bool emberAfDoorLockClusterGetUserTypeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                       uint8_t userType)
-{
-    ChipLogProgress(Zcl, "GetUserTypeResponse:");
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
-    ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetUserTypeResponseCallback");
-
-    Callback::Callback<DoorLockClusterGetUserTypeResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetUserTypeResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, userId, userType);
-    return true;
-}
-
-bool emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t weekDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
-                                                              uint8_t endHour, uint8_t endMinute)
-{
-    ChipLogProgress(Zcl, "GetWeekDayScheduleResponse:");
-    ChipLogProgress(Zcl, "  weekDayIndex: %" PRIu8 "", weekDayIndex);
-    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
+    ChipLogProgress(Zcl, "SetCredentialResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  daysMask: %" PRIu8 "", daysMask);
-    ChipLogProgress(Zcl, "  startHour: %" PRIu8 "", startHour);
-    ChipLogProgress(Zcl, "  startMinute: %" PRIu8 "", startMinute);
-    ChipLogProgress(Zcl, "  endHour: %" PRIu8 "", endHour);
-    ChipLogProgress(Zcl, "  endMinute: %" PRIu8 "", endMinute);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetWeekDayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
-    return true;
-}
-
-bool emberAfDoorLockClusterGetYearDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t yearDayIndex, uint16_t userIndex, uint8_t status,
-                                                              uint32_t localStartTime, uint32_t localEndTime)
-{
-    ChipLogProgress(Zcl, "GetYearDayScheduleResponse:");
-    ChipLogProgress(Zcl, "  yearDayIndex: %" PRIu8 "", yearDayIndex);
     ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
-    ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
+    ChipLogProgress(Zcl, "  nextCredentialIndex: %" PRIu16 "", nextCredentialIndex);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetYearDayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetCredentialResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, yearDayIndex, userIndex, status, localStartTime, localEndTime);
+    Callback::Callback<DoorLockClusterSetCredentialResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterSetCredentialResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, status, userIndex, nextCredentialIndex);
     return true;
 }
 
@@ -3048,19 +2986,19 @@ bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::Com
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch,
-                                                          uint8_t ErrorType)
+bool emberAfTvChannelClusterChangeChannelResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType)
 {
     ChipLogProgress(Zcl, "ChangeChannelResponse:");
-    ChipLogProgress(Zcl, "  ChannelMatch: %p", ChannelMatch);
-    ChipLogProgress(Zcl, "  ErrorType: %" PRIu8 "", ErrorType);
+    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct TvChannelInfo");
+    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TvChannelClusterChangeChannelResponseCallback");
 
     Callback::Callback<TvChannelClusterChangeChannelResponseCallback> * cb =
         Callback::Callback<TvChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, ChannelMatch, ErrorType);
+    cb->mCall(cb->mContext, TvChannelInfo(), errorType);
     return true;
 }
 
@@ -3179,5 +3117,45 @@ bool emberAfTestClusterClusterTestSpecificResponseCallback(EndpointId endpoint, 
     Callback::Callback<TestClusterClusterTestSpecificResponseCallback> * cb =
         Callback::Callback<TestClusterClusterTestSpecificResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, returnValue);
+    return true;
+}
+
+bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+                                                               uint8_t humidityInPercentage, int16_t setpoint,
+                                                               uint16_t unreadEntries)
+{
+    ChipLogProgress(Zcl, "GetRelayStatusLogResponse:");
+    ChipLogProgress(Zcl, "  timeOfDay: %" PRIu16 "", timeOfDay);
+    ChipLogProgress(Zcl, "  relayStatus: %" PRIu16 "", relayStatus);
+    ChipLogProgress(Zcl, "  localTemperature: %" PRId16 "", localTemperature);
+    ChipLogProgress(Zcl, "  humidityInPercentage: %" PRIu8 "", humidityInPercentage);
+    ChipLogProgress(Zcl, "  setpoint: %" PRId16 "", setpoint);
+    ChipLogProgress(Zcl, "  unreadEntries: %" PRIu16 "", unreadEntries);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ThermostatClusterGetRelayStatusLogResponseCallback");
+
+    Callback::Callback<ThermostatClusterGetRelayStatusLogResponseCallback> * cb =
+        Callback::Callback<ThermostatClusterGetRelayStatusLogResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, timeOfDay, relayStatus, localTemperature, humidityInPercentage, setpoint, unreadEntries);
+    return true;
+}
+
+bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                               uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload)
+{
+    ChipLogProgress(Zcl, "GetWeeklyScheduleResponse:");
+    ChipLogProgress(Zcl, "  numberOfTransitionsForSequence: %" PRIu8 "", numberOfTransitionsForSequence);
+    ChipLogProgress(Zcl, "  dayOfWeekForSequence: %" PRIu8 "", dayOfWeekForSequence);
+    ChipLogProgress(Zcl, "  modeForSequence: %" PRIu8 "", modeForSequence);
+    ChipLogProgress(Zcl, "  payload: %p", payload);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ThermostatClusterGetWeeklyScheduleResponseCallback");
+
+    Callback::Callback<ThermostatClusterGetWeeklyScheduleResponseCallback> * cb =
+        Callback::Callback<ThermostatClusterGetWeeklyScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, numberOfTransitionsForSequence, dayOfWeekForSequence, modeForSequence, payload);
     return true;
 }

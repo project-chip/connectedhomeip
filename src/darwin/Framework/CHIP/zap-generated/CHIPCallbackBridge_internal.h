@@ -33,28 +33,24 @@ typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataM
 
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterHideAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterStopAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType &);
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
@@ -153,6 +149,10 @@ typedef void (*CHIPTestClusterClusterTestNullableOptionalResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestSpecificResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*IdentifyClusterIdentifyEffectIdentifierAttributeCallback)(void *,
                                                                          chip::app::Clusters::Identify::IdentifyEffectIdentifier);
@@ -502,10 +502,6 @@ typedef void (*ContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, chip::app::Clusters::ContentLauncher::ContentLaunchStatus);
 typedef void (*NullableContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> &);
-typedef void (*ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType);
-typedef void (*NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> &);
 typedef void (*AudioOutputClusterAudioOutputTypeAttributeCallback)(void *, chip::app::Clusters::AudioOutput::AudioOutputType);
 typedef void (*NullableAudioOutputClusterAudioOutputTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::AudioOutputType> &);
@@ -1855,37 +1851,6 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3427,26 +3392,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
+class CHIPTvChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPTvChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelTvChannelListListAttributeCallbackBridge
+class CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPTvChannelChannelListListAttributeCallbackBridge
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelTvChannelListListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPTvChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4086,6 +4050,19 @@ public:
                             const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
+class CHIPApplicationLauncherClusterHideAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterHideAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+};
+
 class CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
@@ -4097,6 +4074,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+};
+
+class CHIPApplicationLauncherClusterStopAppResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterStopAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
 };
 
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
@@ -4138,91 +4128,39 @@ public:
                             const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+class CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+    CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
+                            const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>
+class CHIPDoorLockClusterGetUserResponseCallbackBridge : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPDoorLockClusterGetUserResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                     bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetUserResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetPINCodeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>
+class CHIPDoorLockClusterSetCredentialResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetPINCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPDoorLockClusterSetCredentialResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                           bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterSetCredentialResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-};
-
-class CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+                            const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
 };
 
 class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
@@ -4841,6 +4779,32 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
+};
+
+class CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
+};
+
+class CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge
@@ -10687,68 +10651,6 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value);
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

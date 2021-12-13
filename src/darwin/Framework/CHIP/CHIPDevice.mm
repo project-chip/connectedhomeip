@@ -15,15 +15,34 @@
  *    limitations under the License.
  */
 
+#import "CHIPAttributeTLVValueDecoder_Internal.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
+
+#include <app/AttributePathParams.h>
+#include <app/BufferedReadCallback.h>
+#include <app/InteractionModelEngine.h>
+#include <app/ReadClient.h>
+#include <app/util/error-mapping.h>
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::Protocols::InteractionModel;
 
 @interface CHIPDevice ()
 
 @property (nonatomic, readonly, strong, nonnull) NSRecursiveLock * lock;
 @property (readonly) chip::DeviceProxy * cppDevice;
 
+@end
+
+@interface CHIPAttributePath ()
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path;
+@end
+
+@interface CHIPAttributeReport ()
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value;
 @end
 
 @implementation CHIPDevice
@@ -49,4 +68,251 @@
     return _cppDevice;
 }
 
+typedef void (^ReportCallback)(NSArray * _Nullable value, NSError * _Nullable error);
+
+namespace {
+
+class SubscriptionCallback final : public ReadClient::Callback {
+public:
+    SubscriptionCallback(dispatch_queue_t queue, ReportCallback reportCallback,
+        SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler)
+        : mQueue(queue)
+        , mReportCallback(reportCallback)
+        , mSubscriptionEstablishedHandler(subscriptionEstablishedHandler)
+        , mBufferedReadAdapter(*this)
+    {
+    }
+
+    BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
+
+    // We need to exist to get a ReadClient, so can't take this as a constructor argument.
+    void SetReadClient(ReadClient * aReadClient) { mReadClient = aReadClient; }
+
+private:
+    void OnReportBegin(const ReadClient * apReadClient) override;
+
+    void OnReportEnd(const ReadClient * apReadClient) override;
+
+    void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
+        const StatusIB & aStatus) override;
+
+    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override;
+
+    void OnDone(ReadClient * apReadClient) override;
+
+    void OnSubscriptionEstablished(const ReadClient * apReadClient) override;
+
+    void ReportError(CHIP_ERROR err);
+    void ReportError(EmberAfStatus status);
+    void ReportError(NSError * _Nullable err);
+
+private:
+    dispatch_queue_t mQueue;
+    // We set mReportCallback to nil when queueing error reports, so we
+    // make sure to only report one error.
+    ReportCallback _Nullable mReportCallback = nil;
+    SubscriptionEstablishedHandler _Nullable mSubscriptionEstablishedHandler;
+    BufferedReadCallback mBufferedReadAdapter;
+    NSMutableArray * _Nullable mReports = nil;
+
+    // Our lifetime management is a little complicated.  On error we
+    // attempt to shut down the ReadClient, but asynchronously.  While
+    // that's pending, someone else (e.g. an error it runs into) could
+    // shut it down.  And if someone else does shut it down we want to
+    // make sure we delete ourselves.
+    //
+    // To handle this, enforce the following rules:
+    //
+    // 1) mReadClient becomes null when OnDone is called, since that
+    //    means it has shut down and we should not shut it down.
+    // 2) We guarantee that mReportCallback is only invoked with an error once.
+    // 3) We ensure that we delete ourselves only from OnDone or a queued-up
+    //    error callback, but not both, by tracking whether we have a queued-up
+    //    deletion.
+    ReadClient * mReadClient = nullptr;
+    bool mHaveQueuedDeletion = false;
+};
+
+} // anonymous namespace
+
+- (void)subscribeWithQueue:(dispatch_queue_t)queue
+                minInterval:(uint16_t)minInterval
+                maxInterval:(uint16_t)maxInterval
+              reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+{
+    DeviceProxy * device = [self internalDevice];
+    if (!device) {
+        dispatch_async(queue, ^{
+            reportHandler(nil, [CHIPError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
+        });
+        return;
+    }
+    AttributePathParams attributePath; // Wildcard endpoint, cluster, attribute.
+    ReadPrepareParams params(device->GetSecureSession().Value());
+    params.mMinIntervalFloorSeconds = minInterval;
+    params.mMaxIntervalCeilingSeconds = maxInterval;
+    params.mpAttributePathParamsList = &attributePath;
+    params.mAttributePathParamsListSize = 1;
+
+    auto callback = new SubscriptionCallback(queue, reportHandler, subscriptionEstablishedHandler);
+
+    ReadClient * readClient;
+    CHIP_ERROR err = InteractionModelEngine::GetInstance()->NewReadClient(
+        &readClient, ReadClient::InteractionType::Subscribe, &(callback->GetBufferedCallback()));
+    if (err != CHIP_NO_ERROR) {
+        dispatch_async(queue, ^{
+            reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
+        });
+        delete callback;
+        return;
+    }
+
+    err = readClient->SendRequest(params);
+    if (err != CHIP_NO_ERROR) {
+        dispatch_async(queue, ^{
+            reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
+        });
+        readClient->Shutdown();
+        delete callback;
+        return;
+    }
+
+    // Callback will be deleted when OnDone is called or an error is
+    // encountered.
+
+    callback->SetReadClient(readClient);
+}
 @end
+
+@implementation CHIPAttributePath
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path
+{
+    if (self = [super init]) {
+        _endpoint = @(path.mEndpointId);
+        _cluster = @(path.mClusterId);
+        _attribute = @(path.mAttributeId);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAttributeReport
+- (instancetype)initWithPath:(const ConcreteDataAttributePath &)path value:(nullable id)value
+{
+    if (self = [super init]) {
+        _path = [[CHIPAttributePath alloc] initWithPath:path];
+        _value = value;
+    }
+    return self;
+}
+@end
+
+namespace {
+void SubscriptionCallback::OnReportBegin(const ReadClient * apReadClient) { mReports = [NSMutableArray new]; }
+
+void SubscriptionCallback::OnReportEnd(const ReadClient * apReadClient)
+{
+    __block NSArray * reports = mReports;
+    mReports = nil;
+    if (mReportCallback) {
+        dispatch_async(mQueue, ^{
+            mReportCallback(reports, nil);
+        });
+    }
+    // Else we have a pending error already.
+}
+
+void SubscriptionCallback::OnAttributeData(
+    const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+{
+    if (aPath.IsListItemOperation()) {
+        ReportError(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    if (aStatus.mStatus != Status::Success) {
+        ReportError(ToEmberAfStatus(aStatus.mStatus));
+        return;
+    }
+
+    if (apData == nullptr) {
+        ReportError(CHIP_ERROR_INVALID_ARGUMENT);
+        return;
+    }
+
+    CHIP_ERROR err;
+    id _Nullable value = CHIPDecodeAttributeValue(aPath, *apData, &err);
+    if (err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH) {
+        // We don't know this attribute; just skip it.
+        return;
+    }
+
+    if (err != CHIP_NO_ERROR) {
+        ReportError(err);
+        return;
+    }
+
+    if (mReports == nil) {
+        // Never got a OnReportBegin?
+        ReportError(CHIP_ERROR_INCORRECT_STATE);
+        return;
+    }
+
+    [mReports addObject:[[CHIPAttributeReport alloc] initWithPath:aPath value:value]];
+}
+
+void SubscriptionCallback::OnError(const ReadClient * apReadClient, CHIP_ERROR aError)
+{
+    ReportError([CHIPError errorForCHIPErrorCode:aError]);
+}
+
+void SubscriptionCallback::OnDone(ReadClient * apReadClient)
+{
+    if (!mHaveQueuedDeletion) {
+        delete this;
+        return; // Make sure we touch nothing else.
+    }
+
+    // Ensure that we don't try to shut down the already-shut-down ReadClient.
+    mReadClient = nullptr;
+}
+
+void SubscriptionCallback::OnSubscriptionEstablished(const ReadClient * apReadClient)
+{
+    if (mSubscriptionEstablishedHandler) {
+        dispatch_async(mQueue, mSubscriptionEstablishedHandler);
+        // Don't need it anymore.
+        mSubscriptionEstablishedHandler = nil;
+    }
+}
+
+void SubscriptionCallback::ReportError(CHIP_ERROR err) { ReportError([CHIPError errorForCHIPErrorCode:err]); }
+
+void SubscriptionCallback::ReportError(EmberAfStatus status) { ReportError([CHIPError errorForZCLErrorCode:status]); }
+
+void SubscriptionCallback::ReportError(NSError * _Nullable err)
+{
+    if (!err) {
+        // Very strange... Someone tried to create a CHIPError for a success status?
+        return;
+    }
+
+    if (mHaveQueuedDeletion) {
+        // Already have an error report pending which will delete us.
+        return;
+    }
+    __block ReportCallback callback = mReportCallback;
+    __block auto * myself = this;
+    mReportCallback = nil;
+    dispatch_async(mQueue, ^{
+        callback(nil, err);
+        if (mReadClient) {
+            mReadClient->Shutdown(); // This will not delete us, because
+                                     // mHaveQueuedDeletion is set.
+        };
+        delete myself;
+    });
+    mHaveQueuedDeletion = true;
+}
+} // anonymous namespace

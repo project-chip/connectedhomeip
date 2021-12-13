@@ -221,13 +221,13 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState);
+        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))

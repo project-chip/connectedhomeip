@@ -52,6 +52,7 @@
    <xi:include href="chip/target-navigator-cluster.xml" />
    <xi:include href="chip/temperature-measurement-cluster.xml" />
    <xi:include href="chip/test-cluster.xml" />
+   <xi:include href="chip/thermostat-cluster.xml" />
    <xi:include href="chip/thread-network-diagnostics-cluster.xml" />
    <xi:include href="chip/time-synchronization-cluster.xml" />
    <xi:include href="chip/tv-channel-cluster.xml" />

@@ -2888,9 +2888,9 @@ namespace ThermostatProgrammingOperationMode {
 static constexpr AttributeId Id = 0x00000025;
 } // namespace ThermostatProgrammingOperationMode
 
-namespace HvacRelayState {
+namespace ThermostatRunningState {
 static constexpr AttributeId Id = 0x00000029;
-} // namespace HvacRelayState
+} // namespace ThermostatRunningState
 
 namespace SetpointChangeSource {
 static constexpr AttributeId Id = 0x00000030;
@@ -4756,17 +4756,17 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace TvChannel {
 namespace Attributes {
 
-namespace TvChannelList {
+namespace ChannelList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace TvChannelList
+} // namespace ChannelList
 
-namespace TvChannelLineup {
+namespace ChannelLineup {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace TvChannelLineup
+} // namespace ChannelLineup
 
-namespace CurrentTvChannel {
+namespace CurrentChannel {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace CurrentTvChannel
+} // namespace CurrentChannel
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4824,24 +4824,20 @@ namespace Duration {
 static constexpr AttributeId Id = 0x00000002;
 } // namespace Duration
 
-namespace PositionUpdatedAt {
-static constexpr AttributeId Id = 0x00000003;
-} // namespace PositionUpdatedAt
-
 namespace Position {
-static constexpr AttributeId Id = 0x00000004;
+static constexpr AttributeId Id = 0x00000003;
 } // namespace Position
 
 namespace PlaybackSpeed {
-static constexpr AttributeId Id = 0x00000005;
+static constexpr AttributeId Id = 0x00000004;
 } // namespace PlaybackSpeed
 
 namespace SeekRangeEnd {
-static constexpr AttributeId Id = 0x00000006;
+static constexpr AttributeId Id = 0x00000005;
 } // namespace SeekRangeEnd
 
 namespace SeekRangeStart {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000006;
 } // namespace SeekRangeStart
 
 namespace AttributeList {
@@ -4928,9 +4924,9 @@ namespace AcceptsHeaderList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace AcceptsHeaderList
 
-namespace SupportedStreamingTypes {
+namespace SupportedStreamingProtocols {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace SupportedStreamingTypes
+} // namespace SupportedStreamingProtocols
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -4980,13 +4976,9 @@ namespace ApplicationLauncherList {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace ApplicationLauncherList
 
-namespace CatalogVendorId {
+namespace ApplicationLauncherApp {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace CatalogVendorId
-
-namespace ApplicationId {
-static constexpr AttributeId Id = 0x00000002;
-} // namespace ApplicationId
+} // namespace ApplicationLauncherApp
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -5022,17 +5014,17 @@ namespace ProductId {
 static constexpr AttributeId Id = 0x00000003;
 } // namespace ProductId
 
-namespace ApplicationId {
-static constexpr AttributeId Id = 0x00000005;
-} // namespace ApplicationId
-
-namespace CatalogVendorId {
-static constexpr AttributeId Id = 0x00000006;
-} // namespace CatalogVendorId
+namespace ApplicationApp {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace ApplicationApp
 
 namespace ApplicationStatus {
-static constexpr AttributeId Id = 0x00000007;
+static constexpr AttributeId Id = 0x00000005;
 } // namespace ApplicationStatus
+
+namespace ApplicationVersion {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace ApplicationVersion
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

@@ -238,7 +238,14 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    uint64_t upTime = 0;
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
+    uint64_t upTime                                   = 0;
+
+    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
@@ -261,13 +268,51 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList)
+{
+    // In Linux simulation, return following hardcoded labelList on all endpoints.
+    FixedLabel::Structs::LabelStruct::Type room;
+    FixedLabel::Structs::LabelStruct::Type orientation;
+    FixedLabel::Structs::LabelStruct::Type floor;
+    FixedLabel::Structs::LabelStruct::Type direction;
+
+    room.label = CharSpan("room", strlen("room"));
+    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+
+    orientation.label = CharSpan("orientation", strlen("orientation"));
+    orientation.value = CharSpan("North", strlen("North"));
+
+    floor.label = CharSpan("floor", strlen("floor"));
+    floor.value = CharSpan("2", strlen("2"));
+
+    direction.label = CharSpan("direction", strlen("direction"));
+    direction.value = CharSpan("up", strlen("up"));
+
+    labelList.add(room);
+    labelList.add(orientation);
+    labelList.add(floor);
+    labelList.add(direction);
+
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
-    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    if (delegate != nullptr)
+    if (generalDiagnosticsDelegate != nullptr)
     {
-        delegate->OnDeviceRebooted();
+        generalDiagnosticsDelegate->OnDeviceRebooted();
+    }
+
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint16_t softwareVersion;
+
+        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
+        platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 

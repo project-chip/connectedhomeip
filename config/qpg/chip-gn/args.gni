@@ -39,3 +39,5 @@ chip_system_project_config_include = "<CHIPProjectConfig.h>"
 chip_ble_project_config_include = ""
 
 custom_toolchain = "//config/qpg/chip-gn/toolchain:qpgtoolchain"
+
+pw_build_PIP_CONSTRAINTS = [ "//scripts/constraints.txt" ]

@@ -958,32 +958,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -4061,6 +4036,57 @@
           ]
         },
         {
+          "name": "Fixed Label",
+          "code": 64,
+          "mfgCode": null,
+          "define": "FIXED_LABEL_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "Fixed Label",
+          "code": 64,
+          "mfgCode": null,
+          "define": "FIXED_LABEL_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "label list",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Door Lock",
           "code": 257,
           "mfgCode": null,
@@ -6843,7 +6869,7 @@
           ],
           "attributes": [
             {
-              "name": "tv channel list",
+              "name": "channel list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6858,12 +6884,12 @@
               "reportableChange": 0
             },
             {
-              "name": "tv channel lineup",
+              "name": "channel lineup",
               "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -6873,12 +6899,12 @@
               "reportableChange": 0
             },
             {
-              "name": "current tv channel",
+              "name": "current channel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -6970,6 +6996,21 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "current navigator target",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -7320,7 +7361,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -7366,6 +7407,22 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "StopApp",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "HideApp",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -7420,27 +7477,12 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application launcher app",
               "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "application id",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -8876,12 +8918,12 @@
               "reportableChange": 0
             },
             {
-              "name": "position updated at",
+              "name": "position",
               "code": 3,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -8891,7 +8933,7 @@
               "reportableChange": 0
             },
             {
-              "name": "position",
+              "name": "playback speed",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -8906,7 +8948,7 @@
               "reportableChange": 0
             },
             {
-              "name": "playback speed",
+              "name": "seek range end",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -8921,23 +8963,8 @@
               "reportableChange": 0
             },
             {
-              "name": "seek range end",
-              "code": 6,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
               "name": "seek range start",
-              "code": 7,
+              "code": 6,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -9052,7 +9079,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -9188,7 +9215,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -9203,7 +9230,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -9218,7 +9245,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application status",
+              "name": "allowed vendor list",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -9272,6 +9299,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 1
+            },
+            {
+              "name": "Logout",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -9532,7 +9567,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -9659,7 +9694,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -9674,7 +9709,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -9689,7 +9724,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application status",
+              "name": "allowed vendor list",
               "code": 7,
               "mfgCode": null,
               "side": "server",
@@ -9936,7 +9971,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -9951,7 +9986,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -9966,7 +10001,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application status",
+              "name": "allowed vendor list",
               "code": 7,
               "mfgCode": null,
               "side": "server",

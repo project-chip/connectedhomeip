@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-const { Clusters }      = require('../ClustersHelper.js');
-const { DelayCommands } = require('./TestDelayCommands.js');
-const { LogCommands }   = require('./TestLogCommands.js');
+const { ensureClusters } = require('../ClustersHelper.js');
+const { DelayCommands }  = require('./TestDelayCommands.js');
+const { LogCommands }    = require('./TestLogCommands.js');
 
 const SimulatedClusters = [
   DelayCommands,
@@ -29,21 +29,21 @@ function getSimulatedCluster(clusterName)
   return SimulatedClusters.find(cluster => cluster.name == clusterName);
 }
 
-function getClusters()
+function getClusters(context)
 {
-  return Clusters.getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
+  return ensureClusters(context).getClusters().then(clusters => clusters.concat(SimulatedClusters).flat(1));
 }
 
-function getCommands(clusterName)
+function getCommands(context, clusterName)
 {
   const cluster = getSimulatedCluster(clusterName);
-  return cluster ? Promise.resolve(cluster.commands) : Clusters.getClientCommands(clusterName);
+  return cluster ? Promise.resolve(cluster.commands) : ensureClusters(context).getClientCommands(clusterName);
 }
 
-function getAttributes(clusterName)
+function getAttributes(context, clusterName)
 {
   const cluster = getSimulatedCluster(clusterName);
-  return cluster ? Promise.resolve(cluster.attributes) : Clusters.getServerAttributes(clusterName);
+  return cluster ? Promise.resolve(cluster.attributes) : ensureClusters(context).getServerAttributes(clusterName);
 }
 
 function isTestOnlyCluster(clusterName)

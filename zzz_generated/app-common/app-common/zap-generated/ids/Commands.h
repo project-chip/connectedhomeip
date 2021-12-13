@@ -1042,17 +1042,17 @@ namespace SetpointRaiseLower {
 static constexpr CommandId Id = 0x00000000;
 } // namespace SetpointRaiseLower
 
-namespace CurrentWeeklySchedule {
+namespace GetWeeklyScheduleResponse {
 static constexpr CommandId Id = 0x00000000;
-} // namespace CurrentWeeklySchedule
+} // namespace GetWeeklyScheduleResponse
 
 namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace RelayStatusLog {
+namespace GetRelayStatusLogResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace RelayStatusLog
+} // namespace GetRelayStatusLogResponse
 
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
@@ -1504,6 +1504,22 @@ namespace LaunchAppResponse {
 static constexpr CommandId Id = 0x00000000;
 } // namespace LaunchAppResponse
 
+namespace StopApp {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StopApp
+
+namespace StopAppResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StopAppResponse
+
+namespace HideApp {
+static constexpr CommandId Id = 0x00000002;
+} // namespace HideApp
+
+namespace HideAppResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace HideAppResponse
+
 } // namespace Commands
 } // namespace ApplicationLauncher
 
@@ -1531,6 +1547,10 @@ static constexpr CommandId Id = 0x00000000;
 namespace Login {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Login
+
+namespace Logout {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Logout
 
 } // namespace Commands
 } // namespace AccountLogin

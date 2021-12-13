@@ -89,13 +89,18 @@ public:
             return CHIP_ERROR_ENDPOINT_POOL_FULL;
         }
 
-        // TODO: Use the Impl's underlying ObjectPool statistics
         SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
         return CHIP_NO_ERROR;
     }
 
+    void DeleteEndPoint(EndPoint * endPoint)
+    {
+        SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
+        ReleaseEndPoint(endPoint);
+    }
+
     virtual EndPoint * CreateEndPoint()                         = 0;
-    virtual void DeleteEndPoint(EndPoint * endPoint)            = 0;
+    virtual void ReleaseEndPoint(EndPoint * endPoint)           = 0;
     virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
@@ -114,7 +119,7 @@ public:
     ~EndPointManagerImplPool() { VerifyOrDie(sEndPointPool.Allocated() == 0); }
 
     EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
-    void DeleteEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    void ReleaseEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
     Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
         return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });

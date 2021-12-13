@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
@@ -52,6 +53,8 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     enum class ShutdownOptions
     {
         KeepCurrentExchange,
@@ -146,7 +149,9 @@ public:
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 
     void UnblockUrgentEventDelivery()
     {
@@ -222,10 +227,10 @@ private:
     // last chunked message.
     bool mIsChunkedReport                                    = false;
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
     bool mHoldSync                                           = false;
+    SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };

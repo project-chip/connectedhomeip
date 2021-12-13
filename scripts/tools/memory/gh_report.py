@@ -170,7 +170,9 @@ class SizeDatabase(memdf.util.sqlite.Database):
             pr          INTEGER DEFAULT 0,  -- Github PR number
             time        INTEGER NOT NULL,   -- Unix-epoch timestamp
             artifact    INTEGER DEFAULT 0,  -- Github artifact ID
-            commented   INTEGER DEFAULT 0,
+            commented   INTEGER DEFAULT 0,  -- 1 if recorded in a GH comment
+            ref         TEXT,               -- Target git ref
+            event       TEXT,               -- Github build trigger event
             UNIQUE(thing_id, hash, parent, pr, time, artifact)
         )
         """, """
@@ -194,13 +196,15 @@ class SizeDatabase(memdf.util.sqlite.Database):
         """
         Add a size report to the database.
 
-        The incoming arguments must contain the non-ID column names from
-        ‘thing’ and ‘build’ tables, plus a 'sizes' entry that is a sequence
-        of mappings containing 'name' and 'size'.
+        The incoming arguments must contain the required non-ID column names
+        from ‘thing’ and ‘build’ tables, plus a 'sizes' entry that is a
+        sequence of mappings containing 'name' and 'size'.
         """
         td = {k: kwargs[k] for k in ('platform', 'config', 'target')}
         thing = self.store_and_return_id('thing', **td)
-        bd = {k: kwargs[k] for k in ('hash', 'parent', 'time')}
+        bd = {k: kwargs[k] for k in ('hash', 'parent', 'time', 'event')}
+        if 'ref' in kwargs:
+            bd['ref'] = kwargs['ref']
         cd = {k: kwargs.get(k, 0) for k in ('pr', 'artifact', 'commented')}
         build = self.store_and_return_id('build', thing_id=thing, **bd, **cd)
         if build is None:
@@ -213,11 +217,11 @@ class SizeDatabase(memdf.util.sqlite.Database):
         """Add sizes from a JSON size report."""
         r = origin.copy()
         r.update(json.loads(s))
-        by = r.get('by', 'section')
-        r['sizes'] = [{
-            'name': i[by],
-            'size': i['size']
-        } for i in r['frames'][by]]
+        r['sizes'] = []
+        # Add section sizes.
+        for i in r['frames'].get('section', []):
+            r['sizes'].append({'name': i['section'], 'size': i['size']})
+        # Add segment sizes.
         for i in r['frames'].get('wr', []):
             r['sizes'].append({
                 'name': ('(read only)', '(read/write)')[int(i['wr'])],
@@ -257,7 +261,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         artifact_pages = self.config['github.limit-artifact-pages']
 
         # Size artifacts have names of the form:
-        #   Size,{group},{pr},{commit_hash},{parent_hash}
+        #   Size,{group},{pr},{commit_hash},{parent_hash}[,{event}]
         # Record them keyed by group and commit_hash to match them up
         # after we have the entire list.
         page = 0
@@ -266,12 +270,17 @@ class SizeDatabase(memdf.util.sqlite.Database):
             if not i.artifacts:
                 break
             for a in i.artifacts:
-                if a.name.startswith('Size,'):
-                    _, group, pr, commit, parent, *_ = (a.name + ',').split(
-                        ',', 5)
+                if a.name.startswith('Size,') and a.name.count(',') >= 4:
+                    _, group, pr, commit, parent, *etc = a.name.split(',')
                     a.parent = parent
                     a.pr = pr
                     a.created_at = dateutil.parser.isoparse(a.created_at)
+                    # Old artifact names don't include the event.
+                    if etc:
+                        event = etc[0]
+                    else:
+                        event = 'push' if pr == '0' else 'pull_request'
+                    a.event = event
                     if group not in size_artifacts:
                         size_artifacts[group] = {}
                     size_artifacts[group][commit] = a
@@ -286,7 +295,7 @@ class SizeDatabase(memdf.util.sqlite.Database):
         for group, group_reports in size_artifacts.items():
             logging.debug('ASG: group %s', group)
             for report in group_reports.values():
-                if self.config['report.pr' if int(report.pr) else 'report.push']:
+                if self.should_report(report.event):
                     if report.parent not in group_reports:
                         logging.debug('ASN:  No match for %s', report.name)
                         continue
@@ -308,8 +317,10 @@ class SizeDatabase(memdf.util.sqlite.Database):
             try:
                 blob = self.gh.actions.download_artifact(i, 'zip')
             except Exception as e:
+                blob = None
                 logging.error('Failed to download artifact %d: %s', i, e)
-            self.add_sizes_from_zipfile(io.BytesIO(blob), {'artifact': i})
+            if blob:
+                self.add_sizes_from_zipfile(io.BytesIO(blob), {'artifact': i})
 
     def read_inputs(self):
         """Read size report from github and/or local files."""
@@ -321,11 +332,15 @@ class SizeDatabase(memdf.util.sqlite.Database):
     def select_matching_commits(self):
         """Find matching builds, where one's commit is the other's parent."""
         return self.execute('''
-            SELECT DISTINCT c.pr AS pr, c.hash AS hash, p.hash AS parent
-                FROM build c
-                INNER JOIN build p ON p.hash = c.parent
-                WHERE c.commented = 0
-                ORDER BY c.time DESC, c.pr, c.hash, p.hash
+            SELECT DISTINCT
+                c.event as event,
+                c.pr AS pr,
+                c.hash AS hash,
+                p.hash AS parent
+              FROM build c
+              INNER JOIN build p ON p.hash = c.parent
+              WHERE c.commented = 0
+              ORDER BY c.time DESC, c.pr, c.hash, p.hash
             ''')
 
     def set_commented(self, build_ids: Iterable[int]):
@@ -362,6 +377,14 @@ class SizeDatabase(memdf.util.sqlite.Database):
             for artifact_id in stale_artifacts:
                 logging.info('DSA: deleting obsolete artifact %d', artifact_id)
                 self.delete_artifact(artifact_id)
+
+    def should_report(self, event: Optional[str] = None) -> bool:
+        """Return true if reporting is enabled for the event."""
+        if event is None:
+            return self.config['report.pr'] or self.config['report.push']
+        if event == 'pull_request':
+            return self.config['report.pr']
+        return self.config['report.push']
 
 
 def gh_open(config: Config) -> Optional[ghapi.core.GhApi]:
@@ -647,7 +670,7 @@ def v1_comment_summary(df: pd.DataFrame) -> str:
 
 def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
     """Report on all new comparable commits."""
-    if not (db.config['report.pr'] or db.config['report.push']):
+    if not db.should_report():
         return {}
 
     comment_count = 0
@@ -655,13 +678,11 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
     comment_enabled = (db.config['github.comment']
                        or db.config['github.dryrun-comment'])
 
-    report_push = db.config['report.push']
-    report_pr = db.config['report.pr']
     only_pr = db.config['github.limit-pr']
 
     dfs = {}
-    for pr, commit, parent in db.select_matching_commits().fetchall():
-        if not (report_pr if pr else report_push):
+    for event, pr, commit, parent in db.select_matching_commits().fetchall():
+        if not db.should_report(event):
             continue
 
         # Github doesn't have a way to fetch artifacts associated with a
@@ -672,7 +693,7 @@ def report_matching_commits(db: SizeDatabase) -> Dict[str, pd.DataFrame]:
         df = changes_for_commit(db, pr, commit, parent)
         dfs[df.attrs['name']] = df
 
-        if (pr and comment_enabled
+        if (event == 'pull_request' and comment_enabled
                 and (comment_limit == 0 or comment_limit > comment_count)):
             if gh_send_change_report(db, df):
                 # Mark the originating builds, and remove the originating

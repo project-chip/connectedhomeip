@@ -95,6 +95,9 @@ void SessionManager::Shutdown()
 {
     CancelExpiryTimer();
 
+    mSessionReleaseDelegates.ReleaseAll();
+    mSessionRecoveryDelegates.ReleaseAll();
+
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;
@@ -297,8 +300,9 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
     });
 }
 
-CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
-                                      PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric)
+CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr,
+                                      NodeId peerNodeId, PairingSession * pairing, CryptoContext::SessionRole direction,
+                                      FabricIndex fabric)
 {
     uint16_t peerSessionId  = pairing->GetPeerSessionId();
     uint16_t localSessionId = pairing->GetLocalSessionId();
@@ -335,11 +339,7 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
     ReturnErrorOnFailure(pairing->DeriveSecureSession(session->GetCryptoContext(), direction));
 
     session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
-    SessionHandle sessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric);
-    mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * cb) {
-        cb->get().OnNewSession(sessionHandle);
-        return Loop::Continue;
-    });
+    sessionHolder.Grab(SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric));
 
     return CHIP_NO_ERROR;
 }

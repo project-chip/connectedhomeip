@@ -87,7 +87,7 @@ limitations under the License.
             <access op="write" role="manage" />
         </attribute>
         <!-- Conformance feature LOG - for now optional -->
-        <attribute side="server" code="16" define="NUM_LOG_RECORDS_SUPPORTED" type="INT16U" default="0" writable="false">NumberOfLogRecordsSupported</attribute>
+        <attribute side="server" code="16" define="NUM_LOG_RECORDS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfLogRecordsSupported</attribute>
         <!-- Conformance feature USR - for now optional -->
         <attribute side="server" code="17" define="NUM_TOTAL_USERS_SUPPORTED" type="INT16U" default="0" writable="false" optional="true">NumberOfTotalUsersSupported</attribute>
         <!-- Conformance feature PIN - for now optional -->
@@ -507,7 +507,7 @@ limitations under the License.
             <arg name="userUniqueId" type="INT32U" isNullable="true" />
             <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
             <arg name="userType" type="DlUserType" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
-            <arg name="credentialRule" type="DlCredentialRule" isNullable="true" />
+            <arg name="credentialRule" type="DlCredentialRule" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="27" name="GetUser" responseName="GetUserResponse" optional="true">
@@ -565,8 +565,8 @@ limitations under the License.
             <arg name="operationType" type="DlDataOperationType" />
             <arg name="credential" type="DlCredential" />
             <arg name="credentialData" type="LONG_OCTET_STRING" />
-            <arg name="userIndex" type="INT16U" isNullable="true" />
-            <arg name="userStatus" type="DlUserStatus" isNullable="true" />
+            <arg name="userIndex" type="INT16U" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
+            <arg name="userStatus" type="DlUserStatus" /> <!-- TODO: should be nullable but chip-tool's generators doesn't handle them well. Fix whenever generators are fixed -->
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">

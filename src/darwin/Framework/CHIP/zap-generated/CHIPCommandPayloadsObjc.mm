@@ -2324,7 +2324,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = @(0);
 
-        _credentialRule = nil;
+        _credentialRule = @(0);
     }
     return self;
 }
@@ -2438,9 +2438,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialData = [NSData data];
 
-        _userIndex = nil;
+        _userIndex = @(0);
 
-        _userStatus = nil;
+        _userStatus = @(0);
     }
     return self;
 }
@@ -2570,7 +2570,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
+@implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2604,7 +2604,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterRelayStatusLogParams
+@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3310,7 +3310,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _channelMatch = [NSArray array];
+        _channelMatch = [CHIPTvChannelClusterTvChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3576,6 +3576,8 @@ NS_ASSUME_NONNULL_BEGIN
         _autoPlay = @(0);
 
         _data = @"";
+
+        _search = [NSArray array];
     }
     return self;
 }
@@ -3586,9 +3588,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
-
         _contentLaunchStatus = @(0);
+
+        _data = @"";
     }
     return self;
 }
@@ -3602,6 +3604,8 @@ NS_ASSUME_NONNULL_BEGIN
         _contentURL = @"";
 
         _displayString = @"";
+
+        _brandingInformation = [NSArray array];
     }
     return self;
 }
@@ -3612,9 +3616,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
-
         _contentLaunchStatus = @(0);
+
+        _data = @"";
     }
     return self;
 }
@@ -3651,15 +3655,61 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = @"";
 
-        _catalogVendorId = @(0);
-
-        _applicationId = @"";
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
     }
     return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterStopAppParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterStopAppResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {

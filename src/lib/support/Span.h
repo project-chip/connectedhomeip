@@ -88,6 +88,12 @@ public:
         return Span(mDataBuf + offset, length);
     }
 
+    Span SubSpan(size_t offset) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        return Span(mDataBuf + offset, mDataLen - offset);
+    }
+
     // Allow reducing the size of a span.
     void reduce_size(size_t new_size)
     {

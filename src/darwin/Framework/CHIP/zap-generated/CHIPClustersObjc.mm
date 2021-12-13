@@ -322,6 +322,23 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    AccountLogin::Commands::Logout::Type request;
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable value, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
@@ -647,64 +664,6 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributeApplicationIdWithCompletionHandler:(void (^)(
-                                                            NSString * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationBasic::Attributes::ApplicationId::TypeInfo;
-        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPCharStringAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::ApplicationId::TypeInfo;
-            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeCatalogVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler
-{
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationBasic::Attributes::CatalogVendorId::TypeInfo;
-        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt16uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationBasic::Attributes::CatalogVendorId::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
 - (void)readAttributeApplicationStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {
@@ -730,6 +689,35 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeApplicationVersionWithCompletionHandler:(void (^)(NSString * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)subscribeAttributeApplicationVersionWithMinInterval:(uint16_t)minInterval
+                                                maxInterval:(uint16_t)maxInterval
+                                    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                              reportHandler:
+                                                  (void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -784,6 +772,23 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterHideAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    ApplicationLauncher::Commands::HideApp::Type request;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
+
+    new CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
           completionHandler:(void (^)(CHIPApplicationLauncherClusterLaunchAppResponseParams * _Nullable data,
                                 NSError * _Nullable error))completionHandler
@@ -791,12 +796,29 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::LaunchApp::Type request;
     request.data = [self asCharSpan:params.data];
-    request.catalogVendorId = params.catalogVendorId.unsignedShortValue;
-    request.applicationId = [self asCharSpan:params.applicationId];
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
+        completionHandler:(void (^)(CHIPApplicationLauncherClusterStopAppResponseParams * _Nullable data,
+                              NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    ApplicationLauncher::Commands::StopApp::Type request;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
+
+    new CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -830,64 +852,6 @@ using namespace chip::app::Clusters;
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval,
                 CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeCatalogVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))completionHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeCatalogVendorIdWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeApplicationIdWithCompletionHandler:(void (^)(
-                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationLauncher::Attributes::ApplicationId::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributeApplicationIdWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ApplicationLauncher::Attributes::ApplicationId::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -4966,6 +4930,55 @@ using namespace chip::app::Clusters;
     ContentLauncher::Commands::LaunchContent::Type request;
     request.autoPlay = params.autoPlay.boolValue;
     request.data = [self asCharSpan:params.data];
+    {
+        using ListType_0 = std::remove_reference_t<decltype(request.search)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        if (params.search.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.search.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i_0 = 0; i_0 < params.search.count; ++i_0) {
+                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterContentLaunchParamater class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (CHIPContentLauncherClusterContentLaunchParamater *) params.search[i_0];
+                listHolder_0->mList[i_0].type = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(
+                    element_0.type.unsignedCharValue);
+                listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
+                {
+                    using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].externalIDList)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    if (element_0.externalIDList.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.externalIDList.count);
+                        if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                            return;
+                        }
+                        listFreer.add(listHolder_2);
+                        for (size_t i_2 = 0; i_2 < element_0.externalIDList.count; ++i_2) {
+                            if (![element_0.externalIDList[i_2]
+                                    isKindOfClass:[CHIPContentLauncherClusterContentLaunchAdditionalInfo class]]) {
+                                // Wrong kind of value.
+                                return;
+                            }
+                            auto element_2
+                                = (CHIPContentLauncherClusterContentLaunchAdditionalInfo *) element_0.externalIDList[i_2];
+                            listHolder_2->mList[i_2].name = [self asCharSpan:element_2.name];
+                            listHolder_2->mList[i_2].value = [self asCharSpan:element_2.value];
+                        }
+                        listHolder_0->mList[i_0].externalIDList = ListType_2(listHolder_2->mList, element_0.externalIDList.count);
+                    } else {
+                        listHolder_0->mList[i_0].externalIDList = ListType_2();
+                    }
+                }
+            }
+            request.search = ListType_0(listHolder_0->mList, params.search.count);
+        } else {
+            request.search = ListType_0();
+        }
+    }
 
     new CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -4983,6 +4996,64 @@ using namespace chip::app::Clusters;
     ContentLauncher::Commands::LaunchURL::Type request;
     request.contentURL = [self asCharSpan:params.contentURL];
     request.displayString = [self asCharSpan:params.displayString];
+    {
+        using ListType_0 = std::remove_reference_t<decltype(request.brandingInformation)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        if (params.brandingInformation.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.brandingInformation.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i_0 = 0; i_0 < params.brandingInformation.count; ++i_0) {
+                if (![params.brandingInformation[i_0]
+                        isKindOfClass:[CHIPContentLauncherClusterContentLaunchBrandingInformation class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (CHIPContentLauncherClusterContentLaunchBrandingInformation *) params.brandingInformation[i_0];
+                listHolder_0->mList[i_0].providerName = [self asCharSpan:element_0.providerName];
+                listHolder_0->mList[i_0].background.imageUrl = [self asCharSpan:element_0.background.imageUrl];
+                listHolder_0->mList[i_0].background.color = [self asCharSpan:element_0.background.color];
+                listHolder_0->mList[i_0].background.size.width = element_0.background.size.width.doubleValue;
+                listHolder_0->mList[i_0].background.size.height = element_0.background.size.height.doubleValue;
+                listHolder_0->mList[i_0].background.size.metric
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].background.size.metric)>>(
+                        element_0.background.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].logo.imageUrl = [self asCharSpan:element_0.logo.imageUrl];
+                listHolder_0->mList[i_0].logo.color = [self asCharSpan:element_0.logo.color];
+                listHolder_0->mList[i_0].logo.size.width = element_0.logo.size.width.doubleValue;
+                listHolder_0->mList[i_0].logo.size.height = element_0.logo.size.height.doubleValue;
+                listHolder_0->mList[i_0].logo.size.metric
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].logo.size.metric)>>(
+                        element_0.logo.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].progressBar.imageUrl = [self asCharSpan:element_0.progressBar.imageUrl];
+                listHolder_0->mList[i_0].progressBar.color = [self asCharSpan:element_0.progressBar.color];
+                listHolder_0->mList[i_0].progressBar.size.width = element_0.progressBar.size.width.doubleValue;
+                listHolder_0->mList[i_0].progressBar.size.height = element_0.progressBar.size.height.doubleValue;
+                listHolder_0->mList[i_0].progressBar.size.metric
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].progressBar.size.metric)>>(
+                        element_0.progressBar.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].splash.imageUrl = [self asCharSpan:element_0.splash.imageUrl];
+                listHolder_0->mList[i_0].splash.color = [self asCharSpan:element_0.splash.color];
+                listHolder_0->mList[i_0].splash.size.width = element_0.splash.size.width.doubleValue;
+                listHolder_0->mList[i_0].splash.size.height = element_0.splash.size.height.doubleValue;
+                listHolder_0->mList[i_0].splash.size.metric
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].splash.size.metric)>>(
+                        element_0.splash.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].waterMark.imageUrl = [self asCharSpan:element_0.waterMark.imageUrl];
+                listHolder_0->mList[i_0].waterMark.color = [self asCharSpan:element_0.waterMark.color];
+                listHolder_0->mList[i_0].waterMark.size.width = element_0.waterMark.size.width.doubleValue;
+                listHolder_0->mList[i_0].waterMark.size.height = element_0.waterMark.size.height.doubleValue;
+                listHolder_0->mList[i_0].waterMark.size.metric
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].waterMark.size.metric)>>(
+                        element_0.waterMark.size.metric.unsignedCharValue);
+            }
+            request.brandingInformation = ListType_0(listHolder_0->mList, params.brandingInformation.count);
+        } else {
+            request.brandingInformation = ListType_0();
+        }
+    }
 
     new CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -5023,34 +5094,51 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributeSupportedStreamingTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                      NSError * _Nullable error))completionHandler
+- (void)readAttributeSupportedStreamingProtocolsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler
 {
-    new CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo;
-            auto successFn = Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(success);
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeSupportedStreamingProtocolsWithValue:(NSNumber * _Nonnull)value
+                                         completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)subscribeAttributeSupportedStreamingTypesWithMinInterval:(uint16_t)minInterval
-                                                     maxInterval:(uint16_t)maxInterval
-                                         subscriptionEstablished:
-                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                   reportHandler:
-                                                       (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeSupportedStreamingProtocolsWithMinInterval:(uint16_t)minInterval
+                                                         maxInterval:(uint16_t)maxInterval
+                                             subscriptionEstablished:
+                                                 (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                       reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                         NSError * _Nullable error))reportHandler
 {
-    new CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge(
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo;
-            auto successFn = Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval, CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -5315,10 +5403,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)clearAllPINCodesWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)clearCredentialWithParams:(CHIPDoorLockClusterClearCredentialParams *)params
+                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearAllPINCodes::Type request;
+    DoorLock::Commands::ClearCredential::Type request;
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -5332,85 +5424,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearAllRFIDCodesWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearAllRFIDCodes::Type request;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearPINCodeWithParams:(CHIPDoorLockClusterClearPINCodeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearPINCode::Type request;
-    request.pinSlotIndex = params.pinSlotIndex.unsignedShortValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearRFIDCodeWithParams:(CHIPDoorLockClusterClearRFIDCodeParams *)params
-              completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearRFIDCode::Type request;
-    request.rfidSlotIndex = params.rfidSlotIndex.unsignedShortValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
+    DoorLock::Commands::ClearUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -5425,135 +5442,35 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearYearDayScheduleWithParams:(CHIPDoorLockClusterClearYearDayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
+- (void)getCredentialStatusWithParams:(CHIPDoorLockClusterGetCredentialStatusParams *)params
+                    completionHandler:(void (^)(CHIPDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
+    DoorLock::Commands::GetCredentialStatus::Type request;
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+
+    new CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)getUserWithParams:(CHIPDoorLockClusterGetUserParams *)params
+        completionHandler:
+            (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    DoorLock::Commands::GetUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-
-    new CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
+    new CHIPDoorLockClusterGetUserResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getLogRecordWithParams:(CHIPDoorLockClusterGetLogRecordParams *)params
-             completionHandler:(void (^)(CHIPDoorLockClusterGetLogRecordResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetLogRecord::Type request;
-    request.logIndex = params.logIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetLogRecordResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getPINCodeWithParams:(CHIPDoorLockClusterGetPINCodeParams *)params
-           completionHandler:
-               (void (^)(CHIPDoorLockClusterGetPINCodeResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetPINCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetPINCodeResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetPINCodeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getRFIDCodeWithParams:(CHIPDoorLockClusterGetRFIDCodeParams *)params
-            completionHandler:(void (^)(CHIPDoorLockClusterGetRFIDCodeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetRFIDCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getUserTypeWithParams:(CHIPDoorLockClusterGetUserTypeParams *)params
-            completionHandler:(void (^)(CHIPDoorLockClusterGetUserTypeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetUserType::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetUserTypeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getWeekDayScheduleWithParams:(CHIPDoorLockClusterGetWeekDayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getYearDayScheduleWithParams:(CHIPDoorLockClusterGetYearDayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPDoorLockClusterGetUserResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -5583,124 +5500,52 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
+- (void)setCredentialWithParams:(CHIPDoorLockClusterSetCredentialParams *)params
+              completionHandler:(void (^)(CHIPDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-    request.localStartTime = params.localStartTime.unsignedIntValue;
-    request.localEndTime = params.localEndTime.unsignedIntValue;
-    request.operatingMode
-        = static_cast<std::remove_reference_t<decltype(request.operatingMode)>>(params.operatingMode.unsignedCharValue);
+    DoorLock::Commands::SetCredential::Type request;
+    request.operationType
+        = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+    request.credentialData = [self asByteSpan:params.credentialData];
+    request.userIndex = params.userIndex.unsignedShortValue;
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+    new CHIPDoorLockClusterSetCredentialResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)setPINCodeWithParams:(CHIPDoorLockClusterSetPINCodeParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetPINCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
+    DoorLock::Commands::SetUser::Type request;
+    request.operationType
+        = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+    request.userIndex = params.userIndex.unsignedShortValue;
+    if (params.userName == nil) {
+        request.userName.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userName.SetNonNull();
+        nonNullValue_0 = [self asCharSpan:params.userName];
+    }
+    if (params.userUniqueId == nil) {
+        request.userUniqueId.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
+        nonNullValue_0 = params.userUniqueId.unsignedIntValue;
+    }
     request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
     request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-    request.pin = [self asByteSpan:params.pin];
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setRFIDCodeWithParams:(CHIPDoorLockClusterSetRFIDCodeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetRFIDCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-    request.rfidCode = [self asByteSpan:params.rfidCode];
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setUserTypeWithParams:(CHIPDoorLockClusterSetUserTypeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetUserType::Type request;
-    request.userId = params.userId.unsignedShortValue;
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-    request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(params.daysMask.unsignedCharValue);
-    request.startHour = params.startHour.unsignedCharValue;
-    request.startMinute = params.startMinute.unsignedCharValue;
-    request.endHour = params.endHour.unsignedCharValue;
-    request.endMinute = params.endMinute.unsignedCharValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setYearDayScheduleWithParams:(CHIPDoorLockClusterSetYearDayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-    request.localStartTime = params.localStartTime.unsignedIntValue;
-    request.localEndTime = params.localEndTime.unsignedIntValue;
+    request.credentialRule
+        = static_cast<std::remove_reference_t<decltype(request.credentialRule)>>(params.credentialRule.unsignedCharValue);
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -5724,29 +5569,6 @@ using namespace chip::app::Clusters;
             auto & definedValue_0 = request.pinCode.Emplace();
             definedValue_0 = [self asByteSpan:params.pinCode];
         }
-    }
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)unlockWithTimeoutWithParams:(CHIPDoorLockClusterUnlockWithTimeoutParams *)params
-                  completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::UnlockWithTimeout::Type request;
-    request.timeout = params.timeout.unsignedShortValue;
-    if (params.pinCode != nil) {
-        auto & definedValue_0 = request.pinCode.Emplace();
-        definedValue_0 = [self asByteSpan:params.pinCode];
     }
 
     new CHIPCommandSuccessCallbackBridge(
@@ -5846,6 +5668,425 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval, CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeDoorStateWithCompletionHandler:(void (^)(
+                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::DoorState::TypeInfo;
+            auto successFn = Callback<NullableDoorLockClusterDlDoorStateAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeDoorStateWithMinInterval:(uint16_t)minInterval
+                                       maxInterval:(uint16_t)maxInterval
+                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::DoorState::TypeInfo;
+            auto successFn = Callback<NullableDoorLockClusterDlDoorStateAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval,
+                CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeNumberOfTotalUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                          NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeNumberOfPINUsersSupportedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                        NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeMaxPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::MaxPINCodeLength::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeMinPINCodeLengthWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::MinPINCodeLength::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeLanguageWithCompletionHandler:(void (^)(
+                                                       NSString * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::Language::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeLanguageWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::Language::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = [self asCharSpan:value];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeLanguageWithMinInterval:(uint16_t)minInterval
+                                      maxInterval:(uint16_t)maxInterval
+                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                    reportHandler:(void (^)(NSString * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPCharStringAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::Language::TypeInfo;
+            auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeAutoRelockTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::AutoRelockTime::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeAutoRelockTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::AutoRelockTime::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedIntValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeAutoRelockTimeWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                          reportHandler:
+                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt32uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::AutoRelockTime::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeSoundVolumeWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::SoundVolume::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeSoundVolumeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::SoundVolume::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeSoundVolumeWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::SoundVolume::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeOperatingModeWithCompletionHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPDoorLockClusterDlOperatingModeAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::OperatingMode::TypeInfo;
+            auto successFn = Callback<DoorLockClusterDlOperatingModeAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeOperatingModeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::OperatingMode::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeOperatingModeWithMinInterval:(uint16_t)minInterval
+                                           maxInterval:(uint16_t)maxInterval
+                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                         reportHandler:
+                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::OperatingMode::TypeInfo;
+            auto successFn = Callback<DoorLockClusterDlOperatingModeAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval,
+                CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeSupportedOperatingModesWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::SupportedOperatingModes::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeEnableOneTouchLockingWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeEnableOneTouchLockingWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeEnableOneTouchLockingWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                       subscriptionEstablished:
+                                           (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                 reportHandler:
+                                                     (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeEnablePrivacyModeButtonWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                      NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeEnablePrivacyModeButtonWithValue:(NSNumber * _Nonnull)value
+                                     completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeEnablePrivacyModeButtonWithMinInterval:(uint16_t)minInterval
+                                                     maxInterval:(uint16_t)maxInterval
+                                         subscriptionEstablished:
+                                             (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                   reportHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))reportHandler
+{
+    new CHIPBooleanAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeWrongCodeEntryLimitWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeWrongCodeEntryLimitWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)subscribeAttributeWrongCodeEntryLimitWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                     subscriptionEstablished:
+                                         (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                               reportHandler:
+                                                   (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -9345,90 +9586,15 @@ using namespace chip::app::Clusters;
         subscriptionEstablishedHandler);
 }
 
-- (void)readAttributePositionUpdatedAtWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler
-{
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributePositionUpdatedAtWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributePositionWithCompletionHandler:(void (^)(
-                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
-}
-
-- (void)subscribeAttributePositionWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
-                          subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                    reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::Position::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
 - (void)readAttributePlaybackSpeedWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt64uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+    new CHIPFloatAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
         using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
-        auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
+        auto successFn = Callback<FloatAttributeCallback>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
-}
-
-- (void)subscribeAttributePlaybackSpeedWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:
-                                             (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt64uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = MediaPlayback::Attributes::PlaybackSpeed::TypeInfo;
-            auto successFn = Callback<Int64uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
 }
 
 - (void)readAttributeSeekRangeEndWithCompletionHandler:(void (^)(
@@ -10707,7 +10873,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = OnOff::Attributes::StartUpOnOff::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10859,7 +11025,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12488,7 +12654,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -12535,7 +12701,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -13581,92 +13747,32 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)readAttributeTvChannelListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+- (void)readAttributeChannelListWithCompletionHandler:(void (^)(
+                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPTvChannelTvChannelListListAttributeCallbackBridge(
+    new CHIPTvChannelChannelListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelList::TypeInfo;
-            auto successFn = Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = TvChannel::Attributes::ChannelList::TypeInfo;
+            auto successFn = Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)subscribeAttributeTvChannelListWithMinInterval:(uint16_t)minInterval
-                                           maxInterval:(uint16_t)maxInterval
-                               subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                         reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeChannelListWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge(
+    new CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelList::TypeInfo;
-            auto successFn = Callback<TvChannelTvChannelListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = TvChannel::Attributes::ChannelList::TypeInfo;
+            auto successFn = Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval,
-                CHIPTvChannelTvChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeTvChannelLineupWithCompletionHandler:(void (^)(
-                                                              NSData * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPOctetStringAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelLineup::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeTvChannelLineupWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::TvChannelLineup::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeCurrentTvChannelWithCompletionHandler:(void (^)(NSData * _Nullable value,
-                                                               NSError * _Nullable error))completionHandler
-{
-    new CHIPOctetStringAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::CurrentTvChannel::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)subscribeAttributeCurrentTvChannelWithMinInterval:(uint16_t)minInterval
-                                              maxInterval:(uint16_t)maxInterval
-                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                            reportHandler:
-                                                (void (^)(NSData * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPOctetStringAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TvChannel::Attributes::CurrentTvChannel::TypeInfo;
-            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -13768,6 +13874,17 @@ using namespace chip::app::Clusters;
                 CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeCurrentNavigatorTargetWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
@@ -15580,7 +15697,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = TestCluster::Attributes::Enum8::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -15625,7 +15742,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = TestCluster::Attributes::Enum16::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedShortValue);
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -17778,7 +17895,7 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedCharValue);
+                nonNullValue_0 = value.unsignedCharValue;
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -17831,7 +17948,7 @@ using namespace chip::app::Clusters;
                 cppValue.SetNull();
             } else {
                 auto & nonNullValue_0 = cppValue.SetNonNull();
-                nonNullValue_0 = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(value.unsignedShortValue);
+                nonNullValue_0 = value.unsignedShortValue;
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
@@ -18413,25 +18530,23 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getRelayStatusLogWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     Thermostat::Commands::GetRelayStatusLog::Type request;
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+    new CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)getWeeklyScheduleWithParams:(CHIPThermostatClusterGetWeeklyScheduleParams *)params
-                  completionHandler:(StatusCompletion)completionHandler
+                  completionHandler:(void (^)(CHIPThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     Thermostat::Commands::GetWeeklySchedule::Type request;
@@ -18440,13 +18555,9 @@ using namespace chip::app::Clusters;
     request.modeToReturn
         = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(params.modeToReturn.unsignedCharValue);
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+    new CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -19027,7 +19138,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19075,7 +19186,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = Thermostat::Attributes::SystemMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19288,7 +19399,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19336,7 +19447,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -19384,7 +19495,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            cppValue = value.unsignedCharValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);

@@ -97,6 +97,10 @@ private:
     }
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     void _LockChipStack() {}
     bool _TryLockChipStack() { return true; }

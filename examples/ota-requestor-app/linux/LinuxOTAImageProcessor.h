@@ -19,8 +19,8 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-#include <app/clusters/ota-requestor/OTAImageProcessor.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/OTAImageProcessor.h>
 
 #include <fstream>
 
@@ -32,6 +32,7 @@ public:
     //////////// OTAImageProcessorInterface Implementation ///////////////
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
+    CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 

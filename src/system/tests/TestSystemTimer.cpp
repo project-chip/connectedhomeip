@@ -49,21 +49,50 @@
 using chip::ErrorStr;
 using namespace chip::System;
 
-static void ServiceEvents(Layer & aLayer)
+template <class LayerImpl, typename Enable = void>
+class LayerEvents
 {
+public:
+    static bool HasServiceEvents() { return false; }
+    static void ServiceEvents(Layer & aLayer) {}
+};
+
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    static_cast<LayerSocketsLoop &>(aLayer).PrepareEvents();
-    static_cast<LayerSocketsLoop &>(aLayer).WaitForEvents();
-    static_cast<LayerSocketsLoop &>(aLayer).HandleEvents();
+
+template <class LayerImpl>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerSocketsLoop, LayerImpl>::value>::type>
+{
+public:
+    static bool HasServiceEvents() { return true; }
+    static void ServiceEvents(Layer & aLayer)
+    {
+        LayerSocketsLoop & layer = static_cast<LayerSocketsLoop &>(aLayer);
+        layer.PrepareEvents();
+        layer.WaitForEvents();
+        layer.HandleEvents();
+    }
+};
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    if (aLayer.IsInitialized())
+
+template <class LayerImpl>
+class LayerEvents<LayerImpl, typename std::enable_if<std::is_base_of<LayerImplLwIP, LayerImpl>::value>::type>
+{
+public:
+    static bool HasServiceEvents() { return true; }
+    static void ServiceEvents(Layer & aLayer)
     {
-        static_cast<LayerImplLwIP &>(aLayer).HandlePlatformTimer();
+        LayerImplLwIP & layer = static_cast<LayerImplLwIP &>(aLayer);
+        if (layer.IsInitialized())
+        {
+            layer.HandlePlatformTimer();
+        }
     }
+};
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-}
 
 // Test input vector format.
 static const uint32_t MAX_NUM_TIMERS = 1000;
@@ -122,6 +151,9 @@ void HandleTimer10Success(Layer * systemLayer, void * aState)
 
 static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 {
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
     chip::System::Clock::Milliseconds32 timeout_overflow_0ms = chip::System::Clock::Milliseconds32(652835029);
     chip::System::Clock::Milliseconds32 timeout_10ms         = chip::System::Clock::Milliseconds32(10);
 
@@ -135,7 +167,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 
     while (!sOverflowTestDone)
     {
-        ServiceEvents(lSys);
+        LayerEvents<LayerImpl>::ServiceEvents(lSys);
     }
 
     lSys.CancelTimer(HandleTimerFailed, aContext);
@@ -160,12 +192,68 @@ void HandleGreedyTimer(Layer * aLayer, void * aState)
 
 static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
 {
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
     TestContext & lContext = *static_cast<TestContext *>(aContext);
     Layer & lSys           = *lContext.mLayer;
 
     lSys.StartTimer(chip::System::Clock::kZero, HandleGreedyTimer, aContext);
 
-    ServiceEvents(lSys);
+    LayerEvents<LayerImpl>::ServiceEvents(lSys);
+}
+
+void CheckOrder(nlTestSuite * inSuite, void * aContext)
+{
+    if (!LayerEvents<LayerImpl>::HasServiceEvents())
+        return;
+
+    TestContext & testContext = *static_cast<TestContext *>(aContext);
+    Layer & systemLayer       = *testContext.mLayer;
+    nlTestSuite * const suite = testContext.mTestSuite;
+
+    struct TestState
+    {
+        void Record(char c)
+        {
+            size_t n = strlen(record);
+            if (n + 1 < sizeof(record))
+            {
+                record[n++] = c;
+                record[n]   = 0;
+            }
+        }
+        static void A(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('A'); }
+        static void B(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('B'); }
+        static void C(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('C'); }
+        static void D(Layer * layer, void * state) { static_cast<TestState *>(state)->Record('D'); }
+        char record[5] = { 0 };
+    };
+    TestState testState;
+    NL_TEST_ASSERT(suite, testState.record[0] == 0);
+
+    Clock::ClockBase * const savedClock = &SystemClock();
+    Clock::Internal::MockClock mockClock;
+    Clock::Internal::SetSystemClockForTesting(&mockClock);
+
+    using namespace Clock::Literals;
+    systemLayer.StartTimer(300_ms, TestState::D, &testState);
+    systemLayer.StartTimer(100_ms, TestState::B, &testState);
+    systemLayer.StartTimer(200_ms, TestState::C, &testState);
+    systemLayer.StartTimer(0_ms, TestState::A, &testState);
+
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "A") == 0);
+
+    mockClock.AdvanceMonotonic(100_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "AB") == 0);
+
+    mockClock.AdvanceMonotonic(200_ms);
+    LayerEvents<LayerImpl>::ServiceEvents(systemLayer);
+    NL_TEST_ASSERT(suite, strcmp(testState.record, "ABCD") == 0);
+
+    Clock::Internal::SetSystemClockForTesting(savedClock);
 }
 
 // Test the implementation helper classes TimerPool, TimerList, and TimerData.
@@ -210,6 +298,9 @@ void chip::System::TestTimer::CheckTimerPool(nlTestSuite * inSuite, void * aCont
     TimerPool<Timer> pool;
     NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 0);
     SYSTEM_STATS_RESET(Stats::kSystemLayer_NumTimers);
+    SYSTEM_STATS_RESET_HIGH_WATER_MARK_FOR_TESTING(Stats::kSystemLayer_NumTimers);
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_IN_USE(Stats::kSystemLayer_NumTimers, 0));
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(Stats::kSystemLayer_NumTimers, 0));
 
     // Test TimerPool::Create() and TimerData accessors.
 
@@ -217,9 +308,7 @@ void chip::System::TestTimer::CheckTimerPool(nlTestSuite * inSuite, void * aCont
     {
         timer.timer = pool.Create(systemLayer, timer.awakenTime, timer.onComplete, &testState);
     }
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 4);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_IN_USE(Stats::kSystemLayer_NumTimers, 4));
 
     for (auto & timer : testTimer)
     {
@@ -300,24 +389,19 @@ void chip::System::TestTimer::CheckTimerPool(nlTestSuite * inSuite, void * aCont
     testTimer[0].timer = nullptr;
     NL_TEST_ASSERT(suite, testState.count == 1);
     NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 3);
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 3);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_IN_USE(Stats::kSystemLayer_NumTimers, 3));
 
     // Test TimerPool::Release()
     pool.Release(testTimer[1].timer);
     testTimer[1].timer = nullptr;
     NL_TEST_ASSERT(suite, testState.count == 1);
     NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 2);
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 2);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_IN_USE(Stats::kSystemLayer_NumTimers, 2));
 
     pool.ReleaseAll();
     NL_TEST_ASSERT(suite, pool.mTimerPool.Allocated() == 0);
-#if CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-    NL_TEST_ASSERT(suite, Stats::GetResourcesInUse()[Stats::kSystemLayer_NumTimers] == 0);
-#endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_IN_USE(Stats::kSystemLayer_NumTimers, 0));
+    NL_TEST_ASSERT(suite, SYSTEM_STATS_TEST_HIGH_WATER_MARK(Stats::kSystemLayer_NumTimers, 4));
 }
 
 // Test Suite
@@ -330,6 +414,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("Timer::TestOverflow",             CheckOverflow),
     NL_TEST_DEF("Timer::TestTimerStarvation",      CheckStarvation),
+    NL_TEST_DEF("Timer::TestTimerOrder",           CheckOrder),
     NL_TEST_DEF("Timer::TestTimerPool",            chip::System::TestTimer::CheckTimerPool),
     NL_TEST_SENTINEL()
 };

@@ -50,6 +50,7 @@ using chip::VendorId;
 using chip::Callback::Callback;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
@@ -230,7 +231,7 @@ int main(int argc, char * argv[])
     if (delayQueryTimeInSec > 0)
     {
         // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
+        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
 
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);

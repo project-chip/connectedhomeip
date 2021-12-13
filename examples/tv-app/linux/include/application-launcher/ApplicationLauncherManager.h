@@ -28,5 +28,5 @@ class ApplicationLauncherManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetApplicationList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

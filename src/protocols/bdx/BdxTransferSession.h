@@ -34,6 +34,7 @@ public:
         kAcceptReceived,
         kBlockReceived,
         kQueryReceived,
+        kQueryWithSkipReceived,
         kAckReceived,
         kAckEOFReceived,
         kStatusReceived,
@@ -77,9 +78,10 @@ public:
 
     struct BlockData
     {
-        const uint8_t * Data = nullptr;
-        size_t Length        = 0;
-        bool IsEof           = false;
+        const uint8_t * Data  = nullptr;
+        size_t Length         = 0;
+        bool IsEof            = false;
+        uint32_t BlockCounter = 0;
     };
 
     struct MessageTypeData
@@ -96,6 +98,11 @@ public:
         {
             return HasProtocol(Protocols::MessageTypeTraits<TMessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
         }
+    };
+
+    struct TransferSkipData
+    {
+        uint64_t BytesToSkip = 0;
     };
 
     /**
@@ -120,6 +127,7 @@ public:
             BlockData blockdata;
             StatusReportData statusData;
             MessageTypeData msgTypeData;
+            TransferSkipData bytesToSkip;
         };
 
         OutputEvent() : EventType(OutputEventType::kNone) { statusData = { StatusCode::kNone }; }
@@ -133,6 +141,7 @@ public:
         static OutputEvent BlockDataEvent(BlockData data, System::PacketBufferHandle msg);
         static OutputEvent StatusReportEvent(OutputEventType type, StatusReportData data);
         static OutputEvent MsgToSendEvent(MessageTypeData typeData, System::PacketBufferHandle msg);
+        static OutputEvent QueryWithSkipEvent(TransferSkipData bytesToSkip);
     };
 
     /**
@@ -222,6 +231,17 @@ public:
 
     /**
      * @brief
+     *   Prepare a BlockQueryWithSkip message. The Block counter will be populated automatically.
+     *
+     * @param bytesToSkip Number of bytes to seek skip
+     *
+     * @return CHIP_ERROR The result of the preparation of a BlockQueryWithSkip message. May also indicate if the TransferSession
+     * object is unable to handle this request.
+     */
+    CHIP_ERROR PrepareBlockQueryWithSkip(const uint64_t & bytesToSkip);
+
+    /**
+     * @brief
      *   Prepare a Block message. The Block counter will be populated automatically.
      *
      * @param inData Contains data for filling out the Block message
@@ -302,6 +322,7 @@ private:
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
     void HandleSendAccept(System::PacketBufferHandle msgData);
     void HandleBlockQuery(System::PacketBufferHandle msgData);
+    void HandleBlockQueryWithSkip(System::PacketBufferHandle msgData);
     void HandleBlock(System::PacketBufferHandle msgData);
     void HandleBlockEOF(System::PacketBufferHandle msgData);
     void HandleBlockAck(System::PacketBufferHandle msgData);
@@ -345,6 +366,7 @@ private:
     TransferAcceptData mTransferAcceptData;
     BlockData mBlockEventData;
     MessageTypeData mMsgTypeData;
+    TransferSkipData mBytesToSkip;
 
     size_t mNumBytesProcessed = 0;
 

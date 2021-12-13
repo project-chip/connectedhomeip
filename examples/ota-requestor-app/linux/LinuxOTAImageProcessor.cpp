@@ -40,6 +40,11 @@ CHIP_ERROR LinuxOTAImageProcessor::Finalize()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR LinuxOTAImageProcessor::Apply()
+{
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LinuxOTAImageProcessor::Abort()
 {
     if (mParams.imageFile.empty())

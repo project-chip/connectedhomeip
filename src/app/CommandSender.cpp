@@ -206,18 +206,11 @@ void CommandSender::Close()
     mTimedRequest     = false;
     MoveToState(State::AwaitingDestruction);
 
-    //
-    // Shortly after this call to close and when handling an inbound message, it's entirely possible
-    // for this object (courtesy of its derived class) to be destroyed
-    // *before* the call unwinds all the way back to ExchangeContext::HandleMessage.
-    //
-    // As part of tearing down the exchange, there is logic there to invoke the delegate to notify
-    // it of impending closure - which is this object, which just got destroyed!
-    //
-    // So prevent a use-after-free, set delegate to null.
+    // OnDone below can destroy us before we unwind all the way back into the
+    // exchange code and it tries to close itself.  Make sure that it doesn't
+    // try to notify us that it's closing, since we will be dead.
     //
     // For more details, see #10344.
-    //
     if (mpExchangeCtx != nullptr)
     {
         mpExchangeCtx->SetDelegate(nullptr);
@@ -445,9 +438,9 @@ void CommandSender::Abort()
     //
     if (mpExchangeCtx != nullptr)
     {
-        // We (or more precisely our subclass) might be a delegate for this
-        // exchange, and we don't want the OnExchangeClosing notification in
-        // that case.  Null out the delegate to avoid that.
+        // We might be a delegate for this exchange, and we don't want the
+        // OnExchangeClosing notification in that case.  Null out the delegate
+        // to avoid that.
         //
         // TODO: This makes all sorts of assumptions about what the delegate is
         // (notice the "might" above!) that might not hold in practice.  We

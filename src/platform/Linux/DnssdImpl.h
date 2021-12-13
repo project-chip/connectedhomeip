@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 #include <avahi-client/client.h>
@@ -133,6 +134,12 @@ private:
         MdnsAvahi * mInstance;
         DnssdResolveCallback mCallback;
         void * mContext;
+        char mName[Common::kInstanceNameMaxLength + 1];
+        AvahiIfIndex mInterface;
+        AvahiProtocol mTransport;
+        AvahiProtocol mAddressType;
+        std::string mFullType;
+        uint8_t mAttempts = 0;
     };
 
     MdnsAvahi() : mClient(nullptr), mGroup(nullptr) {}

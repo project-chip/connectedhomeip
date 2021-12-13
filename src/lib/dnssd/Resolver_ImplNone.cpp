@@ -17,6 +17,7 @@
 
 #include "Resolver.h"
 
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -47,5 +48,21 @@ Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
 }
+
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 } // namespace Dnssd
 } // namespace chip

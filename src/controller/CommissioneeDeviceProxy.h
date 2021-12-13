@@ -41,6 +41,7 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -157,14 +158,6 @@ public:
 
     /**
      * @brief
-     *   Called when a new pairing is being established
-     *
-     * @param session A handle to the secure session
-     */
-    void OnNewConnection(SessionHandle session);
-
-    /**
-     * @brief
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
@@ -211,9 +204,10 @@ public:
 
     NodeId GetDeviceId() const override { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
@@ -304,7 +298,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolder mSecureSession;
 
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 

@@ -19,7 +19,9 @@
 /* This file contains the decalarions for the Linux implementation of the
  * the OTARequestorDriver interface class
  */
-#include "app/clusters/ota-requestor/OTARequestorDriver.h"
+#include <platform/OTARequestorDriver.h>
+
+namespace chip {
 
 class LinuxOTARequestorDriver : public OTARequestorDriver
 {
@@ -34,5 +36,11 @@ class LinuxOTARequestorDriver : public OTARequestorDriver
     // Notify the application that the download is complete and the image can be applied
     void ImageDownloadComplete();
 
+    // Application is directed to complete user consent: either return ImmediateYes/ImmediateNo
+    // without blocking or return Requested and call OTARequestor::OnUserConsent() later.
+    virtual UserConsentAction RequestUserConsent();
+
     // Virtual functions from OTARequestorDriver -- end
 };
+
+} // namespace chip

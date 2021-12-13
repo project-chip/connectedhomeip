@@ -62,7 +62,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mIsChunkedReport    = false;
     mInteractionType    = aInteractionType;
     mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
+    mSubjectDescriptor  = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
     mHoldSync           = false;
     if (apExchangeContext != nullptr)
     {

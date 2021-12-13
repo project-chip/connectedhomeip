@@ -183,7 +183,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     index = static_cast<uint16_t>(realIndex);
     for (uint16_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
     {
-        if (emAfEndpoints[i].endpoint == id)
+        if (emAfEndpoints[i].endpoint == id && emAfEndpoints[i].endpointType != NULL)
         {
             return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
         }

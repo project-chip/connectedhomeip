@@ -42,15 +42,15 @@ public:
     ChannelInfoAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::TvChannel::Id) {}
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
-        if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::TvChannelList::Id)
+        if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::ChannelList::Id)
         {
             return TvChannelMgr().getTvChannelList(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::TvChannelLineup::Id)
+        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::ChannelLineup::Id)
         {
             return TvChannelMgr().getTvChannelLineup(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::CurrentTvChannel::Id)
+        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::CurrentChannel::Id)
         {
             return TvChannelMgr().getCurrentTvChannel(aEncoder);
         }
