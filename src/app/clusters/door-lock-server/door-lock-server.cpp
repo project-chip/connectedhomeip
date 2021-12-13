@@ -239,6 +239,8 @@ bool DoorLockServer::CreateUser(chip::EndpointId endpointId, uint16_t userIndex,
                                   endpointId, creatorFabricIdx, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
                                   newCredentialRule);
 
+    // TODO: Send LockUserChange event
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -250,6 +252,9 @@ EmberAfStatus DoorLockServer::ClearUser(chip::EndpointId endpointId, uint16_t us
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
+
+    // TODO: Send LockUserChange event
+
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
@@ -326,6 +331,8 @@ bool DoorLockServer::ModifyUser(chip::EndpointId endpointId, uint16_t userIndex,
                  "hhu,credentialRule=%hhu]",
                  endpointId, modifierFabricIndex, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
                  newCredentialRule);
+
+    // TODO: Send LockUserChange event
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -614,7 +621,7 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
                                              const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
     auto & userIndex = commandData.userIndex;
-    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [userIndex=%d]", userIndex);
+    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     uint16_t maxNumberOfUsers = 0;
     if (userIndex != 0xFFFE && !DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
@@ -659,13 +666,7 @@ bool emberAfDoorLockClusterSetCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Set Credential command (not implemented)");
-    // SetCredential command fields are:
-    // DlDataOperationType operationType;
-    // Structs::DlCredential::Type credential;
-    // chip::ByteSpan credentialData;
-    // uint16_t userIndex;
-    // DlUserStatus userStatus;
+    emberAfDoorLockClusterPrintln("[SetCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -676,9 +677,7 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Get Credential Status command (not implemented)");
-    // GetCredentialStatus command fields are:
-    // Structs::DlCredential::Type credential;
+    emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
@@ -689,9 +688,7 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Clear Credential command (not implemented)");
-    // ClearCredential command fields are:
-    // Structs::DlCredential::Type credential;
+    emberAfDoorLockClusterPrintln("[ClearCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
     // TODO: Implement clearing the user
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
