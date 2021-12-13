@@ -149,20 +149,14 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     );
 
+    err = mListener.init(&mTransports);
+    SuccessOrExit(err);
+    mGroupsProvider.SetListener(&mListener);
+
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     SuccessOrExit(err);
-
-// Enable Group Listening
-// TODO : Fix this once GroupDataProvider is implemented #Issue 11075
-// for (iterate through all GroupDataProvider multicast Address)
-// {
-#ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
-    err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(0, 1234), true);
-    SuccessOrExit(err);
-#endif
-    //}
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
     SuccessOrExit(err);
@@ -237,7 +231,35 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     SuccessOrExit(err);
 
     err = mCASESessionManager.Init();
+#if !CONFIG_OPENTHREAD_ENABLED
+    {
+        ChipLogProgress(AppServer, "Adding Multicast groups");
+        ConstFabricIterator fabricIterator = mFabrics.cbegin();
+        while (!fabricIterator.IsAtEnd())
+        {
+            FabricInfo fabric = *fabricIterator;
+            Credentials::GroupDataProvider::GroupInfo groupInfo;
 
+            Credentials::GroupDataProvider::GroupInfoIterator * iterator =
+                mGroupsProvider.IterateGroupInfo(fabric.GetFabricIndex());
+            while (iterator->Next(groupInfo))
+            {
+                err = mTransports.MulticastGroupJoinLeave(
+                    Transport::PeerAddress::Multicast(fabric.GetFabricIndex(), groupInfo.group_id), true);
+                if (err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(AppServer, "Error when trying to join Group %" PRIu16 " of fabric index %" PRIu16,
+                                 fabric.GetFabricIndex(), groupInfo.group_id);
+                    iterator->Release();
+                    SuccessOrExit(err);
+                }
+            }
+
+            fabricIterator++;
+            iterator->Release();
+        }
+    }
+#endif // CONFIG_OPENTHREAD_ENABLED
 exit:
     if (err != CHIP_NO_ERROR)
     {
