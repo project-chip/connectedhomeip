@@ -7699,9 +7699,10 @@ using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
-    kUpdateAvailable = 0x00,
-    kBusy            = 0x01,
-    kNotAvailable    = 0x02,
+    kUpdateAvailable              = 0x00,
+    kBusy                         = 0x01,
+    kNotAvailable                 = 0x02,
+    kDownloadProtocolNotSupported = 0x03,
 };
 
 namespace Commands {

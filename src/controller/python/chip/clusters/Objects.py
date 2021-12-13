@@ -6535,6 +6535,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             kUpdateAvailable = 0x00
             kBusy = 0x01
             kNotAvailable = 0x02
+            kDownloadProtocolNotSupported = 0x03
 
 
 
