@@ -23,7 +23,7 @@ declare_args() {
   qpg_sdk_root = "${chip_root}/third_party/qpg_sdk/repo"
 
   # Target IC for QPG SDK
-  qpg_target_ic = "qpg6100"
+  qpg_target_ic = "qpg6105"
 }
 
 assert(qpg_sdk_root != "", "qpg_sdk_root must be specified")

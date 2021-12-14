@@ -19,7 +19,8 @@ import("//build_overrides/qpg_sdk.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 
 # QPGxxxx settings and OT glue code
-openthread_qpg_family = "${qpg_target_ic}"
+#openthread_qpg_family = "${qpg_target_ic}"
+openthread_qpg_family = "qpg6100"
 openthread_qpg_root = "${chip_root}/third_party/openthread/ot-qorvo"
 
 config("openthread_qpg_config") {

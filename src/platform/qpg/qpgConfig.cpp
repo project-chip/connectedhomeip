@@ -40,7 +40,7 @@ namespace Internal {
 
 CHIP_ERROR QPGConfig::Init()
 {
-    qvCHIP_Nvm_Init();
+    qvCHIP_KvsInit();
 
     return CHIP_NO_ERROR;
 }
