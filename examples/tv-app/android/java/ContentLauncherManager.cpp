@@ -58,11 +58,13 @@ ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & con
     return ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
 }
 
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList() {
+std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
+{
     return ContentLauncherMgr().GetAcceptsHeader();
 }
 
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols() {
+uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
+{
     return ContentLauncherMgr().mGetSupportedStreamingProtocols();
 }
 
@@ -122,7 +124,8 @@ std::list<std::string> ContentLauncherManager::GetAcceptsHeader(chip::app::Attri
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jobjectArray acceptedHeadersArray = (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
+        jobjectArray acceptedHeadersArray =
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
@@ -135,10 +138,9 @@ std::list<std::string> ContentLauncherManager::GetAcceptsHeader(chip::app::Attri
         for (int i = 0; i < size; i++)
         {
 
-            jstring jAcceptedHeader  = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
-            const char *convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
-            std::string acceptedHeader = std::string(convertedValue, length)
-            acceptedHeadersList.push_front(acceptedHeader);
+            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
+            const char * convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
+            std::string acceptedHeader  = std::string(convertedValue, length) acceptedHeadersList.push_front(acceptedHeader);
         }
     }
 
@@ -153,8 +155,8 @@ exit:
 
 uint32_t ContentLauncherManager::GetSupportedStreamingProtocols()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
     uint32_t supportedStreamingProtocols = 0;
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
@@ -163,7 +165,8 @@ uint32_t ContentLauncherManager::GetSupportedStreamingProtocols()
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jint jSupportedStreamingProtocols = (jint) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocols);
+        jint jSupportedStreamingProtocols =
+            (jint) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocols);
         supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
         if (env->ExceptionCheck())
         {

@@ -25,16 +25,17 @@
 #include <list>
 #include <string>
 
-
 bool lowPowerClusterSleep()
 {
     return true;
 }
 
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols() {
+uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
+{
     return 0;
 }
 
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList() {
-    return {"example","example"};
+std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
+{
+    return { "example", "example" };
 }

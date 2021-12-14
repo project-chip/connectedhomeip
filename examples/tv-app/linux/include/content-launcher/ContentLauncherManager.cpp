@@ -70,9 +70,7 @@ CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeVal
 CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::proxyGetSupportedStreamingTypes ");
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        return CHIP_NO_ERROR;
-    });
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
 }
 
 ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(chip::EndpointId endpointId,
@@ -125,12 +123,13 @@ ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & con
     return ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
 }
 
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList() {
-    return { "example" , "example" };
+std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
+{
+    return { "example", "example" };
 }
 
-
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols() {
+uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
+{
     uint32_t streamingProtocols = 0;
     return streamingProtocols;
 }
