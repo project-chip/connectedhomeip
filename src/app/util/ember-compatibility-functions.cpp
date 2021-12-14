@@ -860,19 +860,22 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    CHIP_ERROR preparationError = CHIP_NO_ERROR;
     uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
+    CHIP_ERROR preparationError = prepareWriteData(attributeMetadata, aReader, dataLen);
+    if (preparationError == CHIP_NO_ERROR)
+    {
+        if (dataLen > attributeMetadata->size)
+        {
+            ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+        }
+    }
+    else if (preparationError != CHIP_ERROR_INVALID_DATA_LIST)
     {
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
     }
-
-    if (dataLen > attributeMetadata->size)
-    {
-        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
-    }
+    //else, can not prepare and check data yet, let the AccessOverride to handle it.
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
