@@ -469,6 +469,11 @@ limitations under the License.
         Command description for StopWithOnOff
       </description>
     </command>
+    <bitmap name="LevelControlFeature" type="BITMAP32">
+      <field name="OnOff" mask="0x1"/>
+      <field name="Lighting" mask="0x2"/>
+      <field name="Frequency" mask="0x4"/>
+    </bitmap>  
   </cluster>
   <cluster>
     <name>Alarms</name>
