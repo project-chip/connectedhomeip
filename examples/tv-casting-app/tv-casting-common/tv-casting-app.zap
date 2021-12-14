@@ -11849,10 +11849,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -11900,10 +11900,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [

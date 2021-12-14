@@ -171,7 +171,7 @@ function getTests()
     'TV_WakeOnLanCluster',
     'TV_ApplicationBasicCluster',
     'TV_MediaPlaybackCluster',
-    'TV_TvChannelCluster',
+    'TV_ChannelCluster',
     'TV_LowPowerCluster',
     'TV_MediaInputCluster',
   ];
