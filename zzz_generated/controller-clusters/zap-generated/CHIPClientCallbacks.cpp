@@ -532,6 +532,48 @@ void BridgedDeviceBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * 
     cb->mCall(cb->mContext, list);
 }
 
+void ChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ChannelChannelListListAttributeCallback> * cb =
+        Callback::Callback<ChannelChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void ChannelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::AttributeId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ChannelAttributeListListAttributeCallback> * cb =
+        Callback::Callback<ChannelAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void ColorControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -1726,48 +1768,6 @@ void SwitchClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     cb->mCall(cb->mContext, list);
 }
 
-void TvChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<TvChannelChannelListListAttributeCallback> * cb =
-        Callback::Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
-void TvChannelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<TvChannelAttributeListListAttributeCallback> * cb =
-        Callback::Callback<TvChannelAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
 void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                   Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
@@ -2281,6 +2281,22 @@ bool emberAfApplicationLauncherClusterStopAppResponseCallback(EndpointId endpoin
     Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback> * cb =
         Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, data);
+    return true;
+}
+
+bool emberAfChannelClusterChangeChannelResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType)
+{
+    ChipLogProgress(Zcl, "ChangeChannelResponse:");
+    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct ChannelInfo");
+    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ChannelClusterChangeChannelResponseCallback");
+
+    Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
+        Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, ChannelInfo(), errorType);
     return true;
 }
 
@@ -2931,22 +2947,6 @@ bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::Com
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
-    return true;
-}
-
-bool emberAfTvChannelClusterChangeChannelResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj,
-    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType)
-{
-    ChipLogProgress(Zcl, "ChangeChannelResponse:");
-    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct TvChannelInfo");
-    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("TvChannelClusterChangeChannelResponseCallback");
-
-    Callback::Callback<TvChannelClusterChangeChannelResponseCallback> * cb =
-        Callback::Callback<TvChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, TvChannelInfo(), errorType);
     return true;
 }
 

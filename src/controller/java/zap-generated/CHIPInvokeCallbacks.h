@@ -84,6 +84,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPChannelClusterChangeChannelResponseCallback
+    : public Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>
+{
+public:
+    CHIPChannelClusterChangeChannelResponseCallback(jobject javaCallback);
+
+    ~CHIPChannelClusterChangeChannelResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPContentLauncherClusterLaunchContentResponseCallback
     : public Callback::Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>
 {
@@ -681,21 +696,6 @@ public:
     ~CHIPScenesClusterViewSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPTvChannelClusterChangeChannelResponseCallback
-    : public Callback::Callback<CHIPTvChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    CHIPTvChannelClusterChangeChannelResponseCallback(jobject javaCallback);
-
-    ~CHIPTvChannelClusterChangeChannelResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

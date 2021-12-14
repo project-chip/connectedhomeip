@@ -77,6 +77,7 @@ public:
         delete onReportBridgedActionsSetupUrlCallback;
         delete onReportBridgedActionsClusterRevisionCallback;
         delete onReportBridgedDeviceBasicClusterRevisionCallback;
+        delete onReportChannelClusterRevisionCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlRemainingTimeCallback;
@@ -306,7 +307,6 @@ public:
         delete onReportSwitchMultiPressMaxCallback;
         delete onReportSwitchFeatureMapCallback;
         delete onReportSwitchClusterRevisionCallback;
-        delete onReportTvChannelClusterRevisionCallback;
         delete onReportTargetNavigatorClusterRevisionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportTemperatureMeasurementMinMeasuredValueCallback;
@@ -613,6 +613,8 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0xFFFD,
                                        onReportBridgedDeviceBasicClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportChannelClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -1198,8 +1200,6 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFC, onReportSwitchFeatureMapCallback->Cancel(),
                                        BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFD, onReportSwitchClusterRevisionCallback->Cancel(),
-                                       BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportTvChannelClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0505, 0xFFFD,
                                        onReportTargetNavigatorClusterRevisionCallback->Cancel(),
@@ -1881,6 +1881,9 @@ private:
         onReportBridgedDeviceBasicClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)>(
                 ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadChannelClusterRevision::OnAttributeResponse)> * onReportChannelClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadChannelClusterRevision::OnAttributeResponse)>(
+            ReadChannelClusterRevision::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)>(
             ReadColorControlCurrentHue::OnAttributeResponse, this);
@@ -2738,10 +2741,6 @@ private:
     chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)> * onReportSwitchClusterRevisionCallback =
         new chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)>(
             ReadSwitchClusterRevision::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)> *
-        onReportTvChannelClusterRevisionCallback =
-            new chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)>(
-                ReadTvChannelClusterRevision::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)> *
         onReportTargetNavigatorClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)>(
@@ -3092,17 +3091,17 @@ private:
             new chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)>(
                 ReadThermostatClusterRevision::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
+        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
             new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)>(
                 ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(
-        &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
+    chip::Callback::Callback<
+        decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
@@ -3181,8 +3180,8 @@ private:
             new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)>(
                 ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)> *
-        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<decltype(
-            &ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
+        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<
+            decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
             ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)> *
         onReportThreadNetworkDiagnosticsParentChangeCountCallback =

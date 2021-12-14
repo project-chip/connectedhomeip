@@ -128,7 +128,7 @@ public:
         printf("TV_WakeOnLanCluster\n");
         printf("TV_ApplicationBasicCluster\n");
         printf("TV_MediaPlaybackCluster\n");
-        printf("TV_TvChannelCluster\n");
+        printf("TV_ChannelCluster\n");
         printf("TV_LowPowerCluster\n");
         printf("TV_MediaInputCluster\n");
         printf("TestCluster\n");
@@ -33672,10 +33672,10 @@ private:
     }
 };
 
-class TV_TvChannelCluster : public TestCommand
+class TV_ChannelCluster : public TestCommand
 {
 public:
-    TV_TvChannelCluster() : TestCommand("TV_TvChannelCluster"), mTestIndex(0) {}
+    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0) {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -33684,12 +33684,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: TV_TvChannelCluster\n");
+            ChipLogProgress(chipTool, " **** Test Start: TV_ChannelCluster\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: TV_TvChannelCluster\n");
+            ChipLogProgress(chipTool, " **** Test Complete: TV_ChannelCluster\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -33707,8 +33707,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute TV Channel list\n");
-            err = TestReadAttributeTvChannelList_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute Channel list\n");
+            err = TestReadAttributeChannelList_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Change Channel Command\n");
@@ -33737,15 +33737,14 @@ private:
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_1(status);
+        (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_1(status);
     }
 
     static void OnSuccessCallback_1(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            channelList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
     {
-        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1(channelList);
+        (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_1(channelList);
     }
 
     //
@@ -33758,13 +33757,13 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadAttributeTvChannelList_1()
+    CHIP_ERROR TestReadAttributeChannelList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TvChannelClusterTest cluster;
+        chip::Controller::ChannelClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
@@ -33772,8 +33771,7 @@ private:
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            channelList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
     {
         auto iter = channelList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter, 0));
@@ -33798,17 +33796,17 @@ private:
     CHIP_ERROR TestChangeChannelCommand_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
 
         RequestType request;
         request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorType);
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorType);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_2(status);
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_2(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -33817,8 +33815,8 @@ private:
 
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(const chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::TvChannel::TvChannelErrorType errorType)
+    void OnSuccessResponse_2(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
+                             chip::app::Clusters::Channel::ChannelErrorType errorType)
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
@@ -33835,18 +33833,18 @@ private:
     CHIP_ERROR TestChangeChannelByNumberCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
 
         RequestType request;
         request.majorNumber = 1U;
         request.minorNumber = 2U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_3();
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_3(status);
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_3(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -33860,17 +33858,17 @@ private:
     CHIP_ERROR TestSkipChannelCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TvChannel::Commands::SkipChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
 
         RequestType request;
         request.count = 1U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_4();
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_4();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_4(status);
+            (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_4(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -51737,7 +51735,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TV_WakeOnLanCluster>(),
         make_unique<TV_ApplicationBasicCluster>(),
         make_unique<TV_MediaPlaybackCluster>(),
-        make_unique<TV_TvChannelCluster>(),
+        make_unique<TV_ChannelCluster>(),
         make_unique<TV_LowPowerCluster>(),
         make_unique<TV_MediaInputCluster>(),
         make_unique<TestCluster>(),

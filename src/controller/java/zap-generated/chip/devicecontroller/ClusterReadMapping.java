@@ -984,6 +984,46 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute",
         readBridgedDeviceBasicClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("bridgedDeviceBasic", readBridgedDeviceBasicInteractionInfo);
+    Map<String, InteractionInfo> readChannelInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readChannelChannelListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readChannelChannelListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .readChannelListAttribute(
+                      (ChipClusters.ChannelCluster.ChannelListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedChannelClusterChannelListAttributeCallback(),
+            readChannelChannelListCommandParams);
+    readChannelInteractionInfo.put(
+        "readChannelListAttribute", readChannelChannelListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readChannelAttributeListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readChannelAttributeListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .readAttributeListAttribute(
+                      (ChipClusters.ChannelCluster.AttributeListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedChannelClusterAttributeListAttributeCallback(),
+            readChannelAttributeListCommandParams);
+    readChannelInteractionInfo.put(
+        "readAttributeListAttribute", readChannelAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readChannelClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readChannelClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readChannelClusterRevisionCommandParams);
+    readChannelInteractionInfo.put(
+        "readClusterRevisionAttribute", readChannelClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("channel", readChannelInteractionInfo);
     Map<String, InteractionInfo> readColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readColorControlCurrentHueCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -5077,46 +5117,6 @@ public class ClusterReadMapping {
     readSwitchInteractionInfo.put(
         "readClusterRevisionAttribute", readSwitchClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("switch", readSwitchInteractionInfo);
-    Map<String, InteractionInfo> readTvChannelInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readTvChannelChannelListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readTvChannelChannelListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .readChannelListAttribute(
-                      (ChipClusters.TvChannelCluster.ChannelListAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedTvChannelClusterChannelListAttributeCallback(),
-            readTvChannelChannelListCommandParams);
-    readTvChannelInteractionInfo.put(
-        "readChannelListAttribute", readTvChannelChannelListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readTvChannelAttributeListCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readTvChannelAttributeListAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .readAttributeListAttribute(
-                      (ChipClusters.TvChannelCluster.AttributeListAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedTvChannelClusterAttributeListAttributeCallback(),
-            readTvChannelAttributeListCommandParams);
-    readTvChannelInteractionInfo.put(
-        "readAttributeListAttribute", readTvChannelAttributeListAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readTvChannelClusterRevisionCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readTvChannelClusterRevisionAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
-            readTvChannelClusterRevisionCommandParams);
-    readTvChannelInteractionInfo.put(
-        "readClusterRevisionAttribute", readTvChannelClusterRevisionAttributeInteractionInfo);
-    readAttributeMap.put("tvChannel", readTvChannelInteractionInfo);
     Map<String, InteractionInfo> readTargetNavigatorInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readTargetNavigatorTargetNavigatorListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

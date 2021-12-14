@@ -16,12 +16,12 @@
  *
  */
 
+#include "ChannelManager.h"
 #include "ContentLauncherManager.h"
 #include "KeypadInputManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
-#include "ChannelManager.h"
 #include "WakeOnLanManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>

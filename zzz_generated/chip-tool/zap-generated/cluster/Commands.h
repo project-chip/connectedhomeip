@@ -103,9 +103,9 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType & value);
+                    const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::DecodableType & value);
+                    const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1599,7 +1599,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType & value)
+                    const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1647,7 +1647,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::DecodableType & value)
+                    const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2461,6 +2461,25 @@ static void OnApplicationLauncherStopAppResponseSuccess(
     if (err == CHIP_NO_ERROR)
     {
         err = LogValue("data", 1, data.data);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void
+OnChannelChangeChannelResponseSuccess(void * context,
+                                      const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received ChangeChannelResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("channelMatch", 1, data.channelMatch);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("errorType", 1, data.errorType);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3291,25 +3310,6 @@ static void OnScenesViewSceneResponseSuccess(void * context,
     command->SetCommandExitStatus(err);
 };
 
-static void
-OnTvChannelChangeChannelResponseSuccess(void * context,
-                                        const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received ChangeChannelResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("channelMatch", 1, data.channelMatch);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("errorType", 1, data.errorType);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
 static void OnTargetNavigatorNavigateTargetResponseSuccess(
     void * context, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data)
 {
@@ -3520,6 +3520,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | BooleanState                                                        | 0x0045 |
 | BridgedActions                                                      | 0x0025 |
 | BridgedDeviceBasic                                                  | 0x0039 |
+| Channel                                                             | 0x0504 |
 | ColorControl                                                        | 0x0300 |
 | ContentLauncher                                                     | 0x050A |
 | Descriptor                                                          | 0x001D |
@@ -3556,7 +3557,6 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | Scenes                                                              | 0x0005 |
 | SoftwareDiagnostics                                                 | 0x0034 |
 | Switch                                                              | 0x003B |
-| TvChannel                                                           | 0x0504 |
 | TargetNavigator                                                     | 0x0505 |
 | TemperatureMeasurement                                              | 0x0402 |
 | TestCluster                                                         | 0x050F |
@@ -8793,6 +8793,268 @@ public:
     }
 
     static void OnValueReport(void * context, uint16_t value) { LogValue("BridgedDeviceBasic.ClusterRevision report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster Channel                                                     | 0x0504 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+| * ChangeChannel                                                     |   0x00 |
+| * ChangeChannelByNumber                                             |   0x01 |
+| * SkipChannel                                                       |   0x02 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ChannelList                                                       | 0x0000 |
+| * AttributeList                                                     | 0xFFFB |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ChangeChannel
+ */
+class ChannelChangeChannel : public ModelCommand
+{
+public:
+    ChannelChangeChannel() : ModelCommand("change-channel")
+    {
+        AddArgument("Match", &mRequest.match);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnChannelChangeChannelResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::Channel::Commands::ChangeChannel::Type mRequest;
+};
+
+/*
+ * Command ChangeChannelByNumber
+ */
+class ChannelChangeChannelByNumber : public ModelCommand
+{
+public:
+    ChannelChangeChannelByNumber() : ModelCommand("change-channel-by-number")
+    {
+        AddArgument("MajorNumber", 0, UINT16_MAX, &mRequest.majorNumber);
+        AddArgument("MinorNumber", 0, UINT16_MAX, &mRequest.minorNumber);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000001) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type mRequest;
+};
+
+/*
+ * Command SkipChannel
+ */
+class ChannelSkipChannel : public ModelCommand
+{
+public:
+    ChannelSkipChannel() : ModelCommand("skip-channel")
+    {
+        AddArgument("Count", 0, UINT16_MAX, &mRequest.count);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::Channel::Commands::SkipChannel::Type mRequest;
+};
+
+/*
+ * Attribute ChannelList
+ */
+class ReadChannelChannelList : public ModelCommand
+{
+public:
+    ReadChannelChannelList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "channel-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadChannelChannelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "Channel.ChannelList response", value);
+    }
+};
+
+class ReportChannelChannelList : public ModelCommand
+{
+public:
+    ReportChannelChannelList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "channel-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportChannelChannelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+    {
+        LogValue("Channel.ChannelList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AttributeList
+ */
+class ReadChannelAttributeList : public ModelCommand
+{
+public:
+    ReadChannelAttributeList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "attribute-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadChannelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Channel.AttributeList response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadChannelClusterRevision : public ModelCommand
+{
+public:
+    ReadChannelClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadChannelClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Channel.ClusterRevision response", value);
+    }
+};
+
+class ReportChannelClusterRevision : public ModelCommand
+{
+public:
+    ReportChannelClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportChannelClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Channel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("Channel.ClusterRevision report", 0, value); }
 
 private:
     uint16_t mMinInterval;
@@ -32197,268 +32459,6 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster TvChannel                                                   | 0x0504 |
-|------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * ChangeChannel                                                     |   0x00 |
-| * ChangeChannelByNumber                                             |   0x01 |
-| * SkipChannel                                                       |   0x02 |
-|------------------------------------------------------------------------------|
-| Attributes:                                                         |        |
-| * ChannelList                                                       | 0x0000 |
-| * AttributeList                                                     | 0xFFFB |
-| * ClusterRevision                                                   | 0xFFFD |
-\*----------------------------------------------------------------------------*/
-
-/*
- * Command ChangeChannel
- */
-class TvChannelChangeChannel : public ModelCommand
-{
-public:
-    TvChannelChangeChannel() : ModelCommand("change-channel")
-    {
-        AddArgument("Match", &mRequest.match);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnTvChannelChangeChannelResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type mRequest;
-};
-
-/*
- * Command ChangeChannelByNumber
- */
-class TvChannelChangeChannelByNumber : public ModelCommand
-{
-public:
-    TvChannelChangeChannelByNumber() : ModelCommand("change-channel-by-number")
-    {
-        AddArgument("MajorNumber", 0, UINT16_MAX, &mRequest.majorNumber);
-        AddArgument("MinorNumber", 0, UINT16_MAX, &mRequest.minorNumber);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000001) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type mRequest;
-};
-
-/*
- * Command SkipChannel
- */
-class TvChannelSkipChannel : public ModelCommand
-{
-public:
-    TvChannelSkipChannel() : ModelCommand("skip-channel")
-    {
-        AddArgument("Count", 0, UINT16_MAX, &mRequest.count);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::TvChannel::Commands::SkipChannel::Type mRequest;
-};
-
-/*
- * Attribute ChannelList
- */
-class ReadTvChannelChannelList : public ModelCommand
-{
-public:
-    ReadTvChannelChannelList() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "channel-list");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelChannelList() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnAttributeResponse,
-                                                                                                        OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.ChannelList response", value);
-    }
-};
-
-class ReportTvChannelChannelList : public ModelCommand
-{
-public:
-    ReportTvChannelChannelList() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "channel-list");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelChannelList() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
-    {
-        LogValue("TvChannel.ChannelList report", 0, value);
-    }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute AttributeList
- */
-class ReadTvChannelAttributeList : public ModelCommand
-{
-public:
-    ReadTvChannelAttributeList() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "attribute-list");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelAttributeList() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::AttributeList::TypeInfo>(this, OnAttributeResponse,
-                                                                                                          OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.AttributeList response", value);
-    }
-};
-
-/*
- * Attribute ClusterRevision
- */
-class ReadTvChannelClusterRevision : public ModelCommand
-{
-public:
-    ReadTvChannelClusterRevision() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelClusterRevision() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint16_t value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.ClusterRevision response", value);
-    }
-};
-
-class ReportTvChannelClusterRevision : public ModelCommand
-{
-public:
-    ReportTvChannelClusterRevision() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "cluster-revision");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelClusterRevision() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-    static void OnValueReport(void * context, uint16_t value) { LogValue("TvChannel.ClusterRevision report", 0, value); }
-
-private:
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*----------------------------------------------------------------------------*\
 | Cluster TargetNavigator                                             | 0x0505 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -51041,6 +51041,22 @@ void registerClusterBridgedDeviceBasic(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterChannel(Commands & commands)
+{
+    const char * clusterName = "Channel";
+
+    commands_list clusterCommands = {
+        make_unique<ChannelChangeChannel>(),         //
+        make_unique<ChannelChangeChannelByNumber>(), //
+        make_unique<ChannelSkipChannel>(),           //
+        make_unique<ReadChannelChannelList>(),       //
+        make_unique<ReadChannelAttributeList>(),     //
+        make_unique<ReadChannelClusterRevision>(),   //
+        make_unique<ReportChannelClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterColorControl(Commands & commands)
 {
     const char * clusterName = "ColorControl";
@@ -52040,22 +52056,6 @@ void registerClusterSwitch(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-void registerClusterTvChannel(Commands & commands)
-{
-    const char * clusterName = "TvChannel";
-
-    commands_list clusterCommands = {
-        make_unique<TvChannelChangeChannel>(),         //
-        make_unique<TvChannelChangeChannelByNumber>(), //
-        make_unique<TvChannelSkipChannel>(),           //
-        make_unique<ReadTvChannelChannelList>(),       //
-        make_unique<ReadTvChannelAttributeList>(),     //
-        make_unique<ReadTvChannelClusterRevision>(),   //
-        make_unique<ReportTvChannelClusterRevision>(), //
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}
 void registerClusterTargetNavigator(Commands & commands)
 {
     const char * clusterName = "TargetNavigator";
@@ -52694,6 +52694,7 @@ void registerClusters(Commands & commands)
     registerClusterBooleanState(commands);
     registerClusterBridgedActions(commands);
     registerClusterBridgedDeviceBasic(commands);
+    registerClusterChannel(commands);
     registerClusterColorControl(commands);
     registerClusterContentLauncher(commands);
     registerClusterDescriptor(commands);
@@ -52730,7 +52731,6 @@ void registerClusters(Commands & commands)
     registerClusterScenes(commands);
     registerClusterSoftwareDiagnostics(commands);
     registerClusterSwitch(commands);
-    registerClusterTvChannel(commands);
     registerClusterTargetNavigator(commands);
     registerClusterTemperatureMeasurement(commands);
     registerClusterTestCluster(commands);

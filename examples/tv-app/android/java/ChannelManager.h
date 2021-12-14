@@ -41,7 +41,7 @@ private:
     friend ChannelManager & ChannelMgr();
 
     static ChannelManager sInstance;
-    jobject mChannelManagerObject    = nullptr;
+    jobject mChannelManagerObject      = nullptr;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
     jmethodID mGetCurrentChannelMethod = nullptr;
