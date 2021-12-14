@@ -105,13 +105,13 @@ public:
         {
         case chip::Dnssd::DiscoveryFilterType::kNone:
             break;
-        case chip::Dnssd::DiscoveryFilterType::kShort:
+        case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
             AddArgument("discriminator", 0, 15, &mDiscoveryFilterCode);
             break;
-        case chip::Dnssd::DiscoveryFilterType::kLong:
+        case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
             AddArgument("discriminator", 0, 4096, &mDiscoveryFilterCode);
             break;
-        case chip::Dnssd::DiscoveryFilterType::kVendor:
+        case chip::Dnssd::DiscoveryFilterType::kVendorId:
             AddArgument("vendor-id", 0, UINT16_MAX, &mDiscoveryFilterCode);
             break;
         case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:

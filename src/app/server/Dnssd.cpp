@@ -360,7 +360,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         }
         else
         {
-            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
         }
     }
     else
@@ -380,7 +380,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         }
         else
         {
-            advertiseParameters.SetPairingInstr(chip::Optional<const char *>::Value(pairingInst));
+            advertiseParameters.SetPairingInstruction(chip::Optional<const char *>::Value(pairingInst));
         }
     }
 

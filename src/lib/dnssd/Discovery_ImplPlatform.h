@@ -69,16 +69,20 @@ private:
     static void HandleDnssdInit(void * context, CHIP_ERROR initError);
     static void HandleDnssdError(void * context, CHIP_ERROR initError);
     static CHIP_ERROR GenerateRotatingDeviceId(char rotatingDeviceIdHexBuffer[], size_t & rotatingDeviceIdHexBufferSize);
-#ifdef DETAIL_LOGGING
-    static void PrintEntries(const DnssdService * service);
-#endif
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, const OperationalAdvertisingParameters & params);
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, const CommissionAdvertisingParameters & params);
+    CHIP_ERROR PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize, const char ** subTypes,
+                              size_t subTypeSize, uint16_t port, const chip::ByteSpan & mac, DnssdServiceProtocol procotol,
+                              PeerId peerId);
 
-    OperationalAdvertisingParameters mOperationalAdvertisingParams;
+    OperationalAdvertisingParameters mOperationalNodeAdvertisingParams;
     CommissionAdvertisingParameters mCommissionableNodeAdvertisingParams;
-    CommissionAdvertisingParameters mCommissionerAdvertisingParams;
-    bool mIsOperationalPublishing        = false;
+    CommissionAdvertisingParameters mCommissionerNodeAdvertisingParams;
+    bool mIsOperationalNodePublishing    = false;
     bool mIsCommissionableNodePublishing = false;
-    bool mIsCommissionerPublishing       = false;
+    bool mIsCommissionerNodePublishing   = false;
     uint8_t mCommissionableInstanceName[sizeof(uint64_t)];
 
     bool mDnssdInitialized = false;
