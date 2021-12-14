@@ -134,7 +134,7 @@ std::list<std::string> ContentLauncherManager::GetAcceptsHeader(chip::app::Attri
         jint size = env->GetArrayLength(acceptedHeadersArray);
         for (int i = 0; i < size; i++)
         {
-            
+
             jstring jAcceptedHeader  = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
             const char *convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
             std::string acceptedHeader = std::string(convertedValue, length)
