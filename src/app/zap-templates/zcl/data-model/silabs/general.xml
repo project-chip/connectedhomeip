@@ -391,7 +391,7 @@ limitations under the License.
     <define>LEVEL_CONTROL_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
     <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
@@ -469,11 +469,6 @@ limitations under the License.
         Command description for StopWithOnOff
       </description>
     </command>
-    <bitmap name="LevelControlFeature" type="BITMAP32">
-      <field name="OnOff" mask="0x1"/>
-      <field name="Lighting" mask="0x2"/>
-      <field name="Frequency" mask="0x4"/>
-    </bitmap>  
   </cluster>
   <cluster>
     <name>Alarms</name>
@@ -561,4 +556,9 @@ limitations under the License.
     <attribute side="server" code="0x006F" define="STATUS_FLAGS" type="BITMAP8" min="0x00" max="0x0F" writable="false" default="0x00" reportable="true" optional="false">status flags</attribute>
     <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
   </cluster>
+  <bitmap name="LevelControlFeature" type="BITMAP32">
+      <field name="OnOff" mask="0x1"/>
+      <field name="Lighting" mask="0x2"/>
+      <field name="Frequency" mask="0x4"/>
+    </bitmap>  
 </configurator>
