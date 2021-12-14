@@ -227,52 +227,9 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-CHIP_ERROR OTARequestor::SetupCASESessionManager()
-{
-    // A previous CASE session had been established
-    if (mCASESessionManager != nullptr)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    // CSM has not been setup so create a new instance of it
-    if (mCASESessionManager == nullptr)
-    {
-        DeviceProxyInitParams initParams = {
-            .sessionManager = &(mServer->GetSecureSessionManager()),
-            .exchangeMgr    = &(mServer->GetExchangeManager()),
-            .idAllocator    = &(mServer->GetSessionIDAllocator()),
-            .fabricTable    = &(mServer->GetFabricTable()),
-            .clientPool     = mServer->GetCASEClientPool(),
-            // TODO: Determine where this should be instantiated
-            .imDelegate = Platform::New<Controller::DeviceControllerInteractionModelDelegate>(),
-        };
-
-        CASESessionManagerConfig sessionManagerConfig = {
-            .sessionInitParams = initParams,
-            .dnsCache          = nullptr,
-            .devicePool        = mServer->GetDevicePool(),
-            .dnsResolver       = nullptr,
-        };
-
-        mCASESessionManager = Platform::New<CASESessionManager>(sessionManagerConfig);
-    }
-
-    if (mCASESessionManager == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Failed in creating an instance of CASESessionManager");
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
-    return CHIP_NO_ERROR;
-}
-
 void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
-    CHIP_ERROR err          = SetupCASESessionManager();
     FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(SoftwareUpdate, "Cannot setup CASESessionManager: %" CHIP_ERROR_FORMAT, err.Format()));
     VerifyOrReturn(fabricInfo != nullptr, ChipLogError(SoftwareUpdate, "Cannot find fabric"));
 
     // Set the action to take once connection is successfully established
@@ -280,8 +237,8 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    err = mCASESessionManager->FindOrEstablishSession(fabricInfo, mProviderNodeId, &mOnConnectedCallback,
-                                                      &mOnConnectionFailureCallback);
+    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo, mProviderNodeId, &mOnConnectedCallback,
+                                                                 &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
