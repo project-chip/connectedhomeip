@@ -1,1 +1,1 @@
-0.5.37 Version bump reason: Linux ARM Cross compile requires toolset provided by base image
+0.5.38 Version bump reason: [Ameba] Support pigweed-app
