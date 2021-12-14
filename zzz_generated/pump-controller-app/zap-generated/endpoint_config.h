@@ -553,7 +553,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 162
+#define GENERATED_ATTRIBUTE_COUNT 164
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -742,6 +742,10 @@
             { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* label list */            \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */       \
                                                                                                                                    \
+            /* Endpoint: 0, Cluster: User Label (server) */                                                                        \
+            { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* label list */            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */       \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: On/Off (client) */                                                                            \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */              \
                                                                                                                                    \
@@ -775,7 +779,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 20
+#define GENERATED_CLUSTER_COUNT 21
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -824,22 +828,25 @@
                 0x0040, ZAP_ATTRIBUTE_INDEX(150), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
             {                                                                                                                      \
-                0x0006, ZAP_ATTRIBUTE_INDEX(152), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0041, ZAP_ATTRIBUTE_INDEX(152), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
+            {                                                                                                                      \
+                0x0006, ZAP_ATTRIBUTE_INDEX(154), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: On/Off (client) */                                                                         \
             {                                                                                                                      \
-                0x001D, ZAP_ATTRIBUTE_INDEX(153), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x001D, ZAP_ATTRIBUTE_INDEX(155), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
             {                                                                                                                      \
-                0x0200, ZAP_ATTRIBUTE_INDEX(158), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0200, ZAP_ATTRIBUTE_INDEX(160), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (client) */                                                 \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(159), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0402, ZAP_ATTRIBUTE_INDEX(161), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0403, ZAP_ATTRIBUTE_INDEX(160), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0403, ZAP_ATTRIBUTE_INDEX(162), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pressure Measurement (client) */                                                           \
             {                                                                                                                      \
-                0x0404, ZAP_ATTRIBUTE_INDEX(161), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0404, ZAP_ATTRIBUTE_INDEX(163), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Flow Measurement (client) */                                                               \
     }
 
@@ -848,7 +855,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 14, 995 }, { ZAP_CLUSTER_INDEX(14), 6, 10 },                                                       \
+        { ZAP_CLUSTER_INDEX(0), 15, 997 }, { ZAP_CLUSTER_INDEX(15), 6, 10 },                                                       \
     }
 
 // Largest attribute size is needed for various buffers
@@ -858,7 +865,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (246)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1005)
+#define ATTRIBUTE_MAX_SIZE (1007)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

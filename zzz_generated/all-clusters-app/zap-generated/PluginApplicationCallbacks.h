@@ -79,6 +79,7 @@
     MatterThermostatPluginServerInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginServerInitCallback();                                                          \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWakeOnLanPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();                                                                        \
     MatterWindowCoveringPluginServerInitCallback();

@@ -245,6 +245,10 @@
 @property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
 @end
 
+@interface CHIPUserLabel ()
+@property (readonly) chip::Controller::UserLabelCluster cppCluster;
+@end
+
 @interface CHIPWakeOnLan ()
 @property (readonly) chip::Controller::WakeOnLanCluster cppCluster;
 @end

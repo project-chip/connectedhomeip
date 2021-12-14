@@ -14491,6 +14491,9 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Callb
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+// UserLabel Cluster Commands
+// UserLabel Cluster Attributes
+
 // WakeOnLan Cluster Commands
 // WakeOnLan Cluster Attributes
 CHIP_ERROR WakeOnLanCluster::SubscribeAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,

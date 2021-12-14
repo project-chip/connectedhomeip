@@ -7553,6 +7553,33 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute",
         readThreadNetworkDiagnosticsClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("threadNetworkDiagnostics", readThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> readUserLabelInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readUserLabelLabelListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUserLabelLabelListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UserLabelCluster) cluster)
+                  .readLabelListAttribute(
+                      (ChipClusters.UserLabelCluster.LabelListAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedUserLabelClusterLabelListAttributeCallback(),
+            readUserLabelLabelListCommandParams);
+    readUserLabelInteractionInfo.put(
+        "readLabelListAttribute", readUserLabelLabelListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readUserLabelClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readUserLabelClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.UserLabelCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readUserLabelClusterRevisionCommandParams);
+    readUserLabelInteractionInfo.put(
+        "readClusterRevisionAttribute", readUserLabelClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("userLabel", readUserLabelInteractionInfo);
     Map<String, InteractionInfo> readWakeOnLanInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readWakeOnLanWakeOnLanMacAddressCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

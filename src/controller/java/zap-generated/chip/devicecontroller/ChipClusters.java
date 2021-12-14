@@ -16282,6 +16282,63 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 
+  public static class UserLabelCluster extends BaseChipCluster {
+    public UserLabelCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("65");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public static class LabelListAttribute {
+      public String label;
+      public String value;
+
+      public LabelListAttribute(String label, String value) {
+        this.label = label;
+        this.value = value;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("String label: ");
+        output.append(this.label);
+        output.append("\n");
+
+        output.append("String value: ");
+        output.append(this.value);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface LabelListAttributeCallback {
+      void onSuccess(List<LabelListAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public void readLabelListAttribute(LabelListAttributeCallback callback) {
+      readLabelListAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readLabelListAttribute(
+        long chipClusterPtr, LabelListAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class WakeOnLanCluster extends BaseChipCluster {
     public WakeOnLanCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

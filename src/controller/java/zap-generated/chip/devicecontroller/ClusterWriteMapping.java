@@ -2367,6 +2367,8 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeThreadNetworkDiagnosticsInteractionInfo =
         new LinkedHashMap<>();
     writeAttributeMap.put("threadNetworkDiagnostics", writeThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkDiagnosticsInteractionInfo = new LinkedHashMap<>();

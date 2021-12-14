@@ -4939,6 +4939,20 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster User Label
+ *
+ */
+@interface CHIPUserLabel : CHIPCluster
+
+- (void)readAttributeLabelListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Wake on LAN
  *
  */

@@ -2401,6 +2401,15 @@ public:
 private:
 };
 
+class DLL_EXPORT UserLabelCluster : public ClusterBase
+{
+public:
+    UserLabelCluster() : ClusterBase(app::Clusters::UserLabel::Id) {}
+    ~UserLabelCluster() {}
+
+    // Cluster Attributes
+};
+
 class DLL_EXPORT WakeOnLanCluster : public ClusterBase
 {
 public:

@@ -3945,6 +3945,34 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPUserLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>
+{
+public:
+    CHIPUserLabelLabelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<UserLabelLabelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value);
+};
+
+class CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge : public CHIPUserLabelLabelListListAttributeCallbackBridge
+{
+public:
+    CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPUserLabelLabelListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPWakeOnLanAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<WakeOnLanAttributeListListAttributeCallback>
 {
 public:

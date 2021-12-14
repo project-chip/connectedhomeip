@@ -35881,6 +35881,15 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, reportClusterRevisionAttribute
 
     onReport.release();
 }
+JNI_METHOD(jlong, UserLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    UserLabelCluster * cppCluster = new UserLabelCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;

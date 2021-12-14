@@ -35,5 +35,6 @@
     MatterPowerSourcePluginServerInitCallback();                                                                                   \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();                                                                        \
     MatterWindowCoveringPluginServerInitCallback();

@@ -4259,6 +4259,33 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedUserLabelClusterLabelListAttributeCallback
+      implements ChipClusters.UserLabelCluster.LabelListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipClusters.UserLabelCluster.LabelListAttribute> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipClusters.UserLabelCluster.LabelListAttribute>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedWakeOnLanClusterAttributeListAttributeCallback
       implements ChipClusters.WakeOnLanCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -4630,6 +4657,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.ThreadNetworkDiagnosticsCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInfo);
+    ClusterInfo userLabelClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.UserLabelCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("userLabel", userLabelClusterInfo);
     ClusterInfo wakeOnLanClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.WakeOnLanCluster(ptr, endpointId),
@@ -4726,6 +4758,7 @@ public class ClusterInfoMapping {
     destination
         .get("threadNetworkDiagnostics")
         .combineCommands(source.get("threadNetworkDiagnostics"));
+    destination.get("userLabel").combineCommands(source.get("userLabel"));
     destination.get("wakeOnLan").combineCommands(source.get("wakeOnLan"));
     destination.get("wiFiNetworkDiagnostics").combineCommands(source.get("wiFiNetworkDiagnostics"));
     destination.get("windowCovering").combineCommands(source.get("windowCovering"));
@@ -9164,6 +9197,8 @@ public class ClusterInfoMapping {
     threadNetworkDiagnosticsClusterInteractionInfoMap.put(
         "resetCounts", threadNetworkDiagnosticsresetCountsInteractionInfo);
     commandMap.put("threadNetworkDiagnostics", threadNetworkDiagnosticsClusterInteractionInfoMap);
+    Map<String, InteractionInfo> userLabelClusterInteractionInfoMap = new LinkedHashMap<>();
+    commandMap.put("userLabel", userLabelClusterInteractionInfoMap);
     Map<String, InteractionInfo> wakeOnLanClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("wakeOnLan", wakeOnLanClusterInteractionInfoMap);
     Map<String, InteractionInfo> wiFiNetworkDiagnosticsClusterInteractionInfoMap =
