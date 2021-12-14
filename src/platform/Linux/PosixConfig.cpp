@@ -57,7 +57,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion     = { kConfigNa
 const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const PosixConfig::Key PosixConfig::kConfigKey_NodeLabel       = { kConfigNamespace_ChipFactory, "node-label" };
+const PosixConfig::Key PosixConfig::kConfigKey_NodeLabel           = { kConfigNamespace_ChipFactory, "node-label" };
 
 // Keys stored in the Chip-config namespace
 const PosixConfig::Key PosixConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
