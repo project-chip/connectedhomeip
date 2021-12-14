@@ -16869,7 +16869,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 1));
 
         NextTest();
     }
@@ -16942,7 +16942,7 @@ private:
 
     void OnSuccessResponse_5(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 255));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
 
         NextTest();
     }
@@ -17015,7 +17015,7 @@ private:
 
     void OnSuccessResponse_9(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 1));
 
         NextTest();
     }
@@ -17107,7 +17107,7 @@ private:
 
     void OnSuccessResponse_14(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckConstraintNotValue("currentLevel", currentLevel, 255));
+        VerifyOrReturn(CheckConstraintNotValue("currentLevel", currentLevel, 254));
 
         NextTest();
     }

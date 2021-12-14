@@ -27,13 +27,13 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 0
+          value: 1
 
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 255
+          value: 254
 
     - label: "sends a Move up command"
       command: "Move"
@@ -60,13 +60,13 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 255
+          value: 254
 
     - label: "reads min level attribute from DUT"
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 0
+          value: 1
 
     - label: "sends a Move down command"
       command: "Move"
@@ -93,7 +93,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 0
+          value: 1
 
     - label: "Write default move rate attribute from DUT"
       command: "writeAttribute"
@@ -133,4 +133,4 @@ tests:
       attribute: "current level"
       response:
           constraints:
-              notValue: 255
+              notValue: 254

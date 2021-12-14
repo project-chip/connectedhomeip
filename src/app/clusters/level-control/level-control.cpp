@@ -142,7 +142,7 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
     return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
-#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     uint8_t options;
@@ -161,7 +161,7 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
         }
     }
 }
-#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
@@ -624,7 +624,7 @@ static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t tran
     if (commandId == Commands::MoveToLevelWithOnOff::Id)
     {
         uint32_t featureMap;
-        if (Attributes::FeatureMap::Get(Endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+        if (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
             READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
         {
             OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
@@ -682,7 +682,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     case EMBER_ZCL_MOVE_MODE_DOWN:
         state->increasing  = false;
         state->moveToLevel = minLevel;
-        difference         = currentLevel - minLevel;
+        difference         = static_cast<uint8_t>(currentLevel - minLevel);
         break;
     default:
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
@@ -804,7 +804,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         if (currentLevel - minLevel < stepSize)
         {
             state->moveToLevel = minLevel;
-            actualStepSize     = (currentLevel - minLevel);
+            actualStepSize     = static_cast<uint8_t>(currentLevel - minLevel);
         }
         else
         {
@@ -994,7 +994,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
     // If Those read only attribute are enabled we use those values as our set minLevel and maxLevel
-    // if get isn't possible, value stats at default
+    // if get isn't possible, value stays at default
     Attributes::MinLevel::Get(endpoint, &minLevel);
     Attributes::MaxLevel::Get(endpoint, &maxLevel);
 
