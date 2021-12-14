@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <lib/core/NodeId.h>
+#include <lib/core/GroupId.h>
 
 #include <cstdint>
 
