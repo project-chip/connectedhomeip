@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: TV Channel Cluster Tests
+name: Channel Cluster Tests
 
 config:
-    cluster: "TV Channel"
+    cluster: "Channel"
     endpoint: 1
 
 tests:
@@ -23,7 +23,7 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Read attribute TV Channel list"
+    - label: "Read attribute Channel list"
       command: "readAttribute"
       attribute: "Channel list"
       response:
