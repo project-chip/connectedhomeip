@@ -25,23 +25,23 @@
 #include <string>
 #include <vector>
 
-class TvChannelManager
+class ChannelManager
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR getTvChannelList(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getTvChannelLineup(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getCurrentTvChannel(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR getChannelList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR getChannelLineup(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR getCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
-    TvChannelInfo ChangeChannelByMatch(std::string name);
+    ChannelInfo ChangeChannelByMatch(std::string name);
     bool changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber);
     bool skipChannnel(uint16_t count);
 
 private:
-    friend TvChannelManager & TvChannelMgr();
+    friend ChannelManager & ChannelMgr();
 
-    static TvChannelManager sInstance;
-    jobject mTvChannelManagerObject    = nullptr;
+    static ChannelManager sInstance;
+    jobject mChannelManagerObject    = nullptr;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
     jmethodID mGetCurrentChannelMethod = nullptr;
@@ -51,7 +51,7 @@ private:
     jmethodID mskipChannelMethod           = nullptr;
 };
 
-inline class TvChannelManager & TvChannelMgr()
+inline class ChannelManager & ChannelMgr()
 {
-    return TvChannelManager::sInstance;
+    return ChannelManager::sInstance;
 }
