@@ -6570,43 +6570,9 @@ class OtaSoftwareUpdateProvider(Cluster):
             metadataForProvider: 'typing.Optional[bytes]' = None
 
         @dataclass
-        class ApplyUpdateRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="newVersion", Tag=1, Type=uint),
-                    ])
-
-            updateToken: 'bytes' = b""
-            newVersion: 'uint' = 0
-
-        @dataclass
-        class NotifyUpdateApplied(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0002
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=1, Type=uint),
-                    ])
-
-            updateToken: 'bytes' = b""
-            softwareVersion: 'uint' = 0
-
-        @dataclass
         class QueryImageResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -6633,9 +6599,26 @@ class OtaSoftwareUpdateProvider(Cluster):
             metadataForRequestor: 'typing.Optional[bytes]' = None
 
         @dataclass
+        class ApplyUpdateRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0029
+            command_id: typing.ClassVar[int] = 0x0002
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="newVersion", Tag=1, Type=uint),
+                    ])
+
+            updateToken: 'bytes' = b""
+            newVersion: 'uint' = 0
+
+        @dataclass
         class ApplyUpdateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -6648,6 +6631,23 @@ class OtaSoftwareUpdateProvider(Cluster):
 
             action: 'OtaSoftwareUpdateProvider.Enums.OTAApplyUpdateAction' = 0
             delayedActionTime: 'uint' = 0
+
+        @dataclass
+        class NotifyUpdateApplied(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0029
+            command_id: typing.ClassVar[int] = 0x0004
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=1, Type=uint),
+                    ])
+
+            updateToken: 'bytes' = b""
+            softwareVersion: 'uint' = 0
 
 
     class Attributes:

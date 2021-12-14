@@ -2794,16 +2794,16 @@ class ChipClusters:
             "clusterName": "OtaSoftwareUpdateProvider",
             "clusterId": 0x00000029,
             "commands": {
-            0x00000001: {
-                    "commandId": 0x00000001,
+            0x00000002: {
+                    "commandId": 0x00000002,
                     "commandName": "ApplyUpdateRequest",
                     "args": {
                         "updateToken": "bytes",
                         "newVersion": "int",
                     },
                 },
-            0x00000002: {
-                    "commandId": 0x00000002,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "NotifyUpdateApplied",
                     "args": {
                         "updateToken": "bytes",

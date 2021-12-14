@@ -8172,25 +8172,25 @@ struct Type;
 struct DecodableType;
 } // namespace QueryImage
 
-namespace ApplyUpdateRequest {
-struct Type;
-struct DecodableType;
-} // namespace ApplyUpdateRequest
-
-namespace NotifyUpdateApplied {
-struct Type;
-struct DecodableType;
-} // namespace NotifyUpdateApplied
-
 namespace QueryImageResponse {
 struct Type;
 struct DecodableType;
 } // namespace QueryImageResponse
 
+namespace ApplyUpdateRequest {
+struct Type;
+struct DecodableType;
+} // namespace ApplyUpdateRequest
+
 namespace ApplyUpdateResponse {
 struct Type;
 struct DecodableType;
 } // namespace ApplyUpdateResponse
+
+namespace NotifyUpdateApplied {
+struct Type;
+struct DecodableType;
+} // namespace NotifyUpdateApplied
 
 } // namespace Commands
 
@@ -8248,76 +8248,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryImage
-namespace ApplyUpdateRequest {
-enum class Fields
-{
-    kUpdateToken = 0,
-    kNewVersion  = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-
-    chip::ByteSpan updateToken;
-    uint32_t newVersion;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-
-    chip::ByteSpan updateToken;
-    uint32_t newVersion;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ApplyUpdateRequest
-namespace NotifyUpdateApplied {
-enum class Fields
-{
-    kUpdateToken     = 0,
-    kSoftwareVersion = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-
-    chip::ByteSpan updateToken;
-    uint32_t softwareVersion;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
-
-    chip::ByteSpan updateToken;
-    uint32_t softwareVersion;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace NotifyUpdateApplied
 namespace QueryImageResponse {
 enum class Fields
 {
@@ -8371,6 +8301,41 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace QueryImageResponse
+namespace ApplyUpdateRequest {
+enum class Fields
+{
+    kUpdateToken = 0,
+    kNewVersion  = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t newVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ApplyUpdateRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t newVersion;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ApplyUpdateRequest
 namespace ApplyUpdateResponse {
 enum class Fields
 {
@@ -8406,6 +8371,41 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ApplyUpdateResponse
+namespace NotifyUpdateApplied {
+enum class Fields
+{
+    kUpdateToken     = 0,
+    kSoftwareVersion = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t softwareVersion;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::NotifyUpdateApplied::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
+
+    chip::ByteSpan updateToken;
+    uint32_t softwareVersion;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace NotifyUpdateApplied
 } // namespace Commands
 
 namespace Attributes {
