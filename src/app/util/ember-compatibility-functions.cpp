@@ -875,7 +875,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
     }
-    //else, can not prepare and check data yet, let the AccessOverride to handle it.
+    // else, can not prepare and check data yet, let the AccessOverride to handle it.
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
