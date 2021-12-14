@@ -48,20 +48,21 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/util.h>
 
 #include <app/reporting/reporting.h>
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
-#endif // EMBER_AF_PLUGIN_SCENES
+#endif
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
 #endif // EMBER_AF_PLUGIN_ON_OFF
 
-#ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
-#include "app/framework/plugin/zll-level-control-server/zll-level-control-server.h"
-#endif // EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
+#ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
+#include <app/clusters/color-control-server/color-control-server.h>
+#endif
 
 #include <assert.h>
 
@@ -69,7 +70,7 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
 
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
 #endif
 
@@ -79,13 +80,8 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 #define FASTEST_TRANSITION_TIME_MS (MILLISECOND_TICKS_PER_SECOND / EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE)
 #endif
 
-#ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
-#define MIN_LEVEL EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER_MINIMUM_LEVEL
-#define MAX_LEVEL EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER_MAXIMUM_LEVEL
-#else
-#define MIN_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL
-#define MAX_LEVEL EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL
-#endif
+#define LEVEL_CONTROL_LIGHTING_MIN_LEVEL 0x01
+#define LEVEL_CONTROL_LIGHTING_MAX_LEVEL 0xFE
 
 #define INVALID_STORED_LEVEL 0xFFFF
 
@@ -107,6 +103,9 @@ typedef struct
 
 static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
+static uint8_t minLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+static uint8_t maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
@@ -120,12 +119,12 @@ static void setOnOffValue(EndpointId endpoint, bool onOff);
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride);
 
-#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint) reallyUpdateCoupledColorTemp(endpoint)
 #else
 #define updateCoupledColorTemp(endpoint)
-#endif // LEVEL...OPTIONS_ATTRIBUTE && COLOR...SERVER_TEMP
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS && EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
@@ -143,7 +142,7 @@ static EmberAfLevelControlState * getState(EndpointId endpoint)
     return (ep == 0xFFFF ? NULL : &stateTable[ep]);
 }
 
-#if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
+#if !defined(IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     uint8_t options;
@@ -154,12 +153,15 @@ static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
         return;
     }
 
-    if (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL))
+    if (emberAfContainsAttribute(endpoint, ColorControl::Id, ColorControl::Attributes::ColorTemperature::Id, true))
     {
-        emberAfPluginLevelControlCoupledColorTempChangeCallback(endpoint);
+        if (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL))
+        {
+            emberAfPluginLevelControlCoupledColorTempChangeCallback(endpoint);
+        }
     }
 }
-#endif // LEVEL...OPTIONS_ATTRIBUTE && COLOR...SERVER_TEMP
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
 
 void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
@@ -173,13 +175,6 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
 
     state->elapsedTimeMs += state->eventDurationMs;
-
-#if !defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER)
-    if (emberAfPluginZllLevelControlServerIgnoreMoveToLevelMoveStepStop(endpoint, state->commandId))
-    {
-        return;
-    }
-#endif
 
     // Read the attribute; print error message and return if it can't be read
     status = Attributes::CurrentLevel::Get(endpoint, &currentLevel);
@@ -200,13 +195,13 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     }
     else if (state->increasing)
     {
-        assert(currentLevel < MAX_LEVEL);
+        assert(currentLevel < maxLevel);
         assert(currentLevel < state->moveToLevel);
         currentLevel++;
     }
     else
     {
-        assert(MIN_LEVEL < currentLevel);
+        assert(minLevel < currentLevel);
         assert(state->moveToLevel < currentLevel);
         currentLevel--;
     }
@@ -238,8 +233,8 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
         if (state->commandId == Commands::MoveToLevelWithOnOff::Id || state->commandId == Commands::MoveWithOnOff::Id ||
             state->commandId == Commands::StepWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (currentLevel != MIN_LEVEL));
-            if (currentLevel == MIN_LEVEL && state->useOnLevel)
+            setOnOffValue(endpoint, (currentLevel != minLevel));
+            if (currentLevel == minLevel && state->useOnLevel)
             {
                 status = Attributes::CurrentLevel::Set(endpoint, state->onLevel);
                 if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -279,27 +274,30 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
 {
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE
-    // Convert milliseconds to tenths of a second, rounding any fractional value
-    // up to the nearest whole value.  This means:
-    //
-    //   0 ms = 0.00 ds = 0 ds
-    //   1 ms = 0.01 ds = 1 ds
-    //   ...
-    //   100 ms = 1.00 ds = 1 ds
-    //   101 ms = 1.01 ds = 2 ds
-    //   ...
-    //   200 ms = 2.00 ds = 2 ds
-    //   201 ms = 2.01 ds = 3 ds
-    //   ...
-    //
-    // This is done to ensure that the attribute, in tenths of a second, only
-    // goes to zero when the remaining time in milliseconds is actually zero.
-    uint16_t remainingTimeDs = (remainingTimeMs + 99) / 100;
-    EmberStatus status       = Attributes::LevelControlRemainingTime::Set(endpoint, remainingTypeDs);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, LevelControl::Attributes::RemainingTime::Id, true))
     {
-        emberAfLevelControlClusterPrintln("ERR: writing remaining time %x", status);
+        // Convert milliseconds to tenths of a second, rounding any fractional value
+        // up to the nearest whole value.  This means:
+        //
+        //   0 ms = 0.00 ds = 0 ds
+        //   1 ms = 0.01 ds = 1 ds
+        //   ...
+        //   100 ms = 1.00 ds = 1 ds
+        //   101 ms = 1.01 ds = 2 ds
+        //   ...
+        //   200 ms = 2.00 ds = 2 ds
+        //   201 ms = 2.01 ds = 3 ds
+        //   ...
+        //
+        // This is done to ensure that the attribute, in tenths of a second, only
+        // goes to zero when the remaining time in milliseconds is actually zero.
+        uint16_t remainingTimeDs = static_cast<uint16_t>((remainingTimeMs + 99) / 100);
+        EmberStatus status       = LevelControl::Attributes::RemainingTime::Set(endpoint, remainingTimeDs);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: writing remaining time %x", status);
+        }
     }
 #endif
 }
@@ -317,86 +315,88 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
 
 static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
 {
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE
-    // From 3.10.2.2.8.1 of ZCL7 document 14-0127-20j-zcl-ch-3-general.docx:
-    //   "Command execution SHALL NOT continue beyond the Options processing if
-    //    all of these criteria are true:
-    //      - The command is one of the ‘without On/Off’ commands: Move, Move to
-    //        Level, Stop, or Step.
-    //      - The On/Off cluster exists on the same endpoint as this cluster.
-    //      - The OnOff attribute of the On/Off cluster, on this endpoint, is 0x00
-    //        (FALSE).
-    //      - The value of the ExecuteIfOff bit is 0."
-    if (commandId > Commands::Stop::Id)
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::Options::Id, true))
     {
-        return true;
+        // From 3.10.2.2.8.1 of ZCL7 document 14-0127-20j-zcl-ch-3-general.docx:
+        //   "Command execution SHALL NOT continue beyond the Options processing if
+        //    all of these criteria are true:
+        //      - The command is one of the ‘without On/Off’ commands: Move, Move to
+        //        Level, Stop, or Step.
+        //      - The On/Off cluster exists on the same endpoint as this cluster.
+        //      - The OnOff attribute of the On/Off cluster, on this endpoint, is 0x00
+        //        (FALSE).
+        //      - The value of the ExecuteIfOff bit is 0."
+        if (commandId > Commands::Stop::Id)
+        {
+            return true;
+        }
+
+        if (!emberAfContainsServer(endpoint, OnOff::Id))
+        {
+            return true;
+        }
+
+        uint8_t options;
+        EmberAfStatus status = Attributes::Options::Get(endpoint, &options);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("Unable to read Options attribute: 0x%X", status);
+            // If we can't read the attribute, then we should just assume that it has its
+            // default value.
+            options = 0x00;
+        }
+
+        bool on;
+        status = OnOff::Attributes::OnOff::Get(endpoint, &on);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("Unable to read OnOff attribute: 0x%X", status);
+            return true;
+        }
+        // The device is on - hence ExecuteIfOff does not matter
+        if (on)
+        {
+            return true;
+        }
+        // The OptionsMask & OptionsOverride fields SHALL both be present or both
+        // omitted in the command. A temporary Options bitmap SHALL be created from
+        // the Options attribute, using the OptionsMask & OptionsOverride fields, if
+        // present. Each bit of the temporary Options bitmap SHALL be determined as
+        // follows:
+        // Each bit in the Options attribute SHALL determine the corresponding bit in
+        // the temporary Options bitmap, unless the OptionsMask field is present and
+        // has the corresponding bit set to 1, in which case the corresponding bit in
+        // the OptionsOverride field SHALL determine the corresponding bit in the
+        // temporary Options bitmap.
+        // The resulting temporary Options bitmap SHALL then be processed as defined
+        // in section 3.10.2.2.3.
+
+        // ---------- The following order is important in decission making -------
+        // -----------more readable ----------
+        //
+        if (optionMask == 0xFF && optionOverride == 0xFF)
+        {
+            // 0xFF are the default values passed to the command handler when
+            // the payload is not present - in that case there is use of option
+            // attribute to decide execution of the command
+            return READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        }
+        // ---------- The above is to distinguish if the payload is present or not
+
+        if (READBITS(optionMask, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF))
+        {
+            // Mask is present and set in the command payload, this indicates
+            // use the over ride as temporary option
+            return READBITS(optionOverride, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
+        }
+        // if we are here - use the option bits
+        return (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
     }
 
-    if (!emberAfContainsServer(endpoint, OnOff::Id))
-    {
-        return true;
-    }
-
-    uint8_t options;
-    EmberAfStatus status = Attributes::Options::Get(&options);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfLevelControlClusterPrintln("Unable to read Options attribute: 0x%X", status);
-        // If we can't read the attribute, then we should just assume that it has its
-        // default value.
-        options = 0x00;
-    }
-
-    bool on;
-    status = OnOff::Attributes::OnOff::Get(endpoint, &on);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfLevelControlClusterPrintln("Unable to read OnOff attribute: 0x%X", status);
-        return true;
-    }
-    // The device is on - hence ExecuteIfOff does not matter
-    if (on)
-    {
-        return true;
-    }
-    // The OptionsMask & OptionsOverride fields SHALL both be present or both
-    // omitted in the command. A temporary Options bitmap SHALL be created from
-    // the Options attribute, using the OptionsMask & OptionsOverride fields, if
-    // present. Each bit of the temporary Options bitmap SHALL be determined as
-    // follows:
-    // Each bit in the Options attribute SHALL determine the corresponding bit in
-    // the temporary Options bitmap, unless the OptionsMask field is present and
-    // has the corresponding bit set to 1, in which case the corresponding bit in
-    // the OptionsOverride field SHALL determine the corresponding bit in the
-    // temporary Options bitmap.
-    // The resulting temporary Options bitmap SHALL then be processed as defined
-    // in section 3.10.2.2.3.
-
-    // ---------- The following order is important in decission making -------
-    // -----------more readable ----------
-    //
-    if (optionMask == 0xFF && optionOverride == 0xFF)
-    {
-        // 0xFF are the default values passed to the command handler when
-        // the payload is not present - in that case there is use of option
-        // attribute to decide execution of the command
-        return READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
-    }
-    // ---------- The above is to distinguish if the payload is present or not
-
-    if (READBITS(optionMask, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF))
-    {
-        // Mask is present and set in the command payload, this indicates
-        // use the over ride as temporary option
-        return READBITS(optionOverride, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF);
-    }
-    // if we are here - use the option bits
-    return (READBITS(options, EMBER_ZCL_LEVEL_CONTROL_OPTIONS_EXECUTE_IF_OFF));
-
-#else
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_OPTIONS
     // By default, we return true to continue supporting backwards compatibility.
     return true;
-#endif
 }
 
 bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -531,13 +531,13 @@ static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t tran
 
     // Move To Level commands cause the device to move from its current level to
     // the specified level at the specified rate.
-    if (MAX_LEVEL <= level)
+    if (maxLevel <= level)
     {
-        state->moveToLevel = MAX_LEVEL;
+        state->moveToLevel = maxLevel;
     }
-    else if (level <= MIN_LEVEL)
+    else if (level <= minLevel)
     {
-        state->moveToLevel = MIN_LEVEL;
+        state->moveToLevel = minLevel;
     }
     else
     {
@@ -552,7 +552,7 @@ static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t tran
     {
         if (commandId == Commands::MoveToLevelWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != MIN_LEVEL));
+            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -575,23 +575,30 @@ static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t tran
     // as fast as it is able.
     if (transitionTimeDs == 0xFFFF)
     {
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
-        status = Attributes::OnOffTransitionTime::Get(endpoint, &transitionTimeDs);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
+        if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id, true))
         {
-            emberAfLevelControlClusterPrintln("ERR: reading on/off transition time %x", status);
-            goto send_default_response;
-        }
+            status = Attributes::OnOffTransitionTime::Get(endpoint, &transitionTimeDs);
+            if (status != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                emberAfLevelControlClusterPrintln("ERR: reading on/off transition time %x", status);
+                goto send_default_response;
+            }
 
-        // Transition time comes in (or is stored, in the case of On/Off Transition
-        // Time) as tenths of a second, but we work in milliseconds.
-        state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
-#else  // ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
-       // If the Transition Time field is 0xFFFF and On/Off Transition Time,
-       // which is an optional attribute, is not present, the device shall move to
-       // its new level as fast as it is able.
+            // Transition time comes in (or is stored, in the case of On/Off Transition
+            // Time) as tenths of a second, but we work in milliseconds.
+            state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
+        }
+        else
+        {
+            state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
+        }
+#else
+        // If the Transition Time field is 0xFFFF and On/Off Transition Time,
+        // which is an optional attribute, is not present, the device shall move to
+        // its new level as fast as it is able.
         state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
-#endif // ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
     }
     else
     {
@@ -614,12 +621,15 @@ static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t tran
     schedule(endpoint, state->eventDurationMs);
     status = EMBER_ZCL_STATUS_SUCCESS;
 
-#ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
     if (commandId == Commands::MoveToLevelWithOnOff::Id)
     {
-        emberAfPluginZllLevelControlServerMoveToLevelWithOnOffZllExtensions(emberAfCurrentCommand());
+        uint32_t featureMap;
+        if (Attributes::FeatureMap::Get(Endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+            READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
+        {
+            OnOff::Attributes::GlobalSceneControl::Set(endpoint, true);
+        }
     }
-#endif
 
 send_default_response:
     if (emberAfCurrentCommand()->apsFrame->clusterId == LevelControl::Id)
@@ -666,13 +676,13 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     {
     case EMBER_ZCL_MOVE_MODE_UP:
         state->increasing  = true;
-        state->moveToLevel = MAX_LEVEL;
-        difference         = static_cast<uint8_t>(MAX_LEVEL - currentLevel);
+        state->moveToLevel = maxLevel;
+        difference         = static_cast<uint8_t>(maxLevel - currentLevel);
         break;
     case EMBER_ZCL_MOVE_MODE_DOWN:
         state->increasing  = false;
-        state->moveToLevel = MIN_LEVEL;
-        difference         = currentLevel - MIN_LEVEL;
+        state->moveToLevel = minLevel;
+        difference         = currentLevel - minLevel;
         break;
     default:
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
@@ -687,7 +697,7 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     {
         if (commandId == Commands::MoveWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != MIN_LEVEL));
+            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -779,10 +789,10 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     {
     case EMBER_ZCL_STEP_MODE_UP:
         state->increasing = true;
-        if (MAX_LEVEL - currentLevel < stepSize)
+        if (maxLevel - currentLevel < stepSize)
         {
-            state->moveToLevel = MAX_LEVEL;
-            actualStepSize     = static_cast<uint8_t>(MAX_LEVEL - currentLevel);
+            state->moveToLevel = maxLevel;
+            actualStepSize     = static_cast<uint8_t>(maxLevel - currentLevel);
         }
         else
         {
@@ -791,10 +801,10 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
         break;
     case EMBER_ZCL_STEP_MODE_DOWN:
         state->increasing = false;
-        if (currentLevel - MIN_LEVEL < stepSize)
+        if (currentLevel - minLevel < stepSize)
         {
-            state->moveToLevel = MIN_LEVEL;
-            actualStepSize     = (currentLevel - MIN_LEVEL);
+            state->moveToLevel = minLevel;
+            actualStepSize     = (currentLevel - minLevel);
         }
         else
         {
@@ -814,7 +824,7 @@ static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize,
     {
         if (commandId == Commands::StepWithOnOff::Id)
         {
-            setOnOffValue(endpoint, (state->moveToLevel != MIN_LEVEL));
+            setOnOffValue(endpoint, (state->moveToLevel != minLevel));
         }
         if (currentLevel == state->moveToLevel)
         {
@@ -893,10 +903,10 @@ send_default_response:
 // Quotes are from table 3.46.
 void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool newValue)
 {
+    app::DataModel::Nullable<uint8_t> resolvedLevel;
     uint8_t temporaryCurrentLevelCache;
     uint16_t currentOnOffTransitionTime;
-    uint8_t resolvedLevel;
-    uint8_t minimumLevelAllowedForTheDevice = MIN_LEVEL;
+    uint8_t minimumLevelAllowedForTheDevice = minLevel;
     EmberAfStatus status;
 
     // "Temporarily store CurrentLevel."
@@ -908,30 +918,44 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     }
 
     // Read the OnLevel attribute.
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
-    status = Attributes::OnLevel::Get(endpoint, &resolvedLevel);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnLevel::Id, true))
     {
-        emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-        return;
-    }
+        status = Attributes::OnLevel::Get(endpoint, resolvedLevel);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+            return;
+        }
 
-    if (resolvedLevel == 0xFF)
+        if (resolvedLevel.Value() == 0xFF)
+        {
+            // OnLevel has undefined value; fall back to CurrentLevel.
+            resolvedLevel.Value() = temporaryCurrentLevelCache;
+        }
+    }
+    else
     {
-        // OnLevel has undefined value; fall back to CurrentLevel.
-        resolvedLevel = temporaryCurrentLevelCache;
+        resolvedLevel.Value() = temporaryCurrentLevelCache;
     }
 #else
-    resolvedLevel              = temporaryCurrentLevelCache;
+    resolvedLevel.Value() = temporaryCurrentLevelCache;
 #endif
 
     // Read the OnOffTransitionTime attribute.
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
-    status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
+    if (emberAfContainsAttribute(endpoint, LevelControl::Id, Attributes::OnOffTransitionTime::Id, true))
     {
-        emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
-        return;
+        status = Attributes::OnOffTransitionTime::Get(endpoint, &currentOnOffTransitionTime);
+        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        {
+            emberAfLevelControlClusterPrintln("ERR: reading current level %x", status);
+            return;
+        }
+    }
+    else
+    {
+        currentOnOffTransitionTime = 0xFFFF;
     }
 #else
     currentOnOffTransitionTime = 0xFFFF;
@@ -950,7 +974,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
         // "Move CurrentLevel to OnLevel, or to the stored level if OnLevel is not
         // defined, over the time period OnOffTransitionTime."
-        moveToLevelHandler(Commands::MoveToLevel::Id, resolvedLevel, currentOnOffTransitionTime, 0xFF, 0xFF,
+        moveToLevelHandler(Commands::MoveToLevel::Id, resolvedLevel.Value(), currentOnOffTransitionTime, 0xFF, 0xFF,
                            INVALID_STORED_LEVEL); // Don't revert to stored level
     }
     else
@@ -969,8 +993,27 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-    // StartUp behavior relies StartUpCurrentLevel attributes being non-volatile.
+    // If Those read only attribute are enabled we use those values as our set minLevel and maxLevel
+    // if get isn't possible, value stats at default
+    Attributes::MinLevel::Get(endpoint, &minLevel);
+    Attributes::MaxLevel::Get(endpoint, &maxLevel);
+
+    if (Attributes::FeatureMap::Get(Endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+        READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
+    {
+        if (minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
+        {
+            minLevel = LEVEL_CONTROL_LIGHTING_MIN_LEVEL;
+        }
+
+        if (maxLevel > LEVEL_CONTROL_LIGHTING_MAX_LEVEL)
+        {
+            maxLevel = LEVEL_CONTROL_LIGHTING_MAX_LEVEL;
+        }
+    }
+
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
+    // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
     if (areStartUpLevelControlServerAttributesNonVolatile(endpoint))
     {
         // Read the StartUpOnOff attribute and set the OnOff attribute as per
@@ -998,7 +1041,7 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                 switch (startUpCurrentLevel)
                 {
                 case STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM:
-                    currentLevel = MIN_LEVEL;
+                    currentLevel = minLevel;
                     break;
                 case STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL:
                     // Just fetched it.
@@ -1007,13 +1050,13 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                     // Otherwise set to specified value 0x01-0xFE.
                     // But, need to enforce currentLevel's min/max, right?
                     // Spec doesn't mention this.
-                    if (startUpCurrentLevel < MIN_LEVEL)
+                    if (startUpCurrentLevel < minLevel)
                     {
-                        currentLevel = MIN_LEVEL;
+                        currentLevel = minLevel;
                     }
-                    else if (startUpCurrentLevel > MAX_LEVEL)
+                    else if (startUpCurrentLevel > maxLevel)
                     {
-                        currentLevel = MAX_LEVEL;
+                        currentLevel = maxLevel;
                     }
                     else
                     {
@@ -1029,25 +1072,24 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     emberAfPluginLevelControlClusterServerPostInitCallback(endpoint);
 }
 
-#ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
+#ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER);
+    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, CLUSTER_MASK_SERVER);
     if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
-    metadata =
-        emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER);
+    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, CLUSTER_MASK_SERVER);
     if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
-    return true;
+    return false;
 }
 #endif
 

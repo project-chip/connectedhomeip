@@ -279,6 +279,10 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
+bool emberAfHasTokenizedAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                  bool asServer);
+
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();
 } // namespace chip

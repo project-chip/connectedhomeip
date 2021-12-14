@@ -43,6 +43,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/util.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -194,7 +195,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 
 void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 {
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     // StartUp behavior relies on OnOff and StartUpOnOff attributes being non-volatile.
     if (areStartUpOnOffServerAttributesNonVolatile(endpoint))
     {
@@ -222,7 +223,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         {
             // Initialise updated value to 0
             bool updatedOnOff = 0;
-            status            = Attributes::OnOff::Get(endpoint, &udpateOnOff);
+            status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
                 switch (startUpOnOff)
@@ -247,7 +248,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             }
         }
     }
-#endif
+#endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
 
@@ -481,7 +482,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     }
 }
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
@@ -495,12 +496,15 @@ bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint
     metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, CLUSTER_MASK_SERVER);
     if (!metadata->IsNonVolatile())
     {
-        return false;
+        if (emberAfHasTokenizedAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true))
+        {
+            return true;
+        }
     }
 
-    return true;
+    return false;
 }
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 
 /**
  * @brief event control object for an endpoint

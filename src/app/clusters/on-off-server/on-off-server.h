@@ -62,9 +62,9 @@ private:
      * Functions Definitions
      *********************************************************/
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
-    bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+    bool areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint);
+#endif
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 

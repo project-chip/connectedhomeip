@@ -981,6 +981,26 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
     }
 }
 
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer)
+{
+    uint8_t mask = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+    return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, 0) != nullptr);
+}
+
+bool emberAfHasTokenizedAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                  bool asServer)
+{
+    uint8_t mask                        = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
+    EmberAfAttributeMetadata * metadata = emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, 0);
+
+    if (metadata == nullptr)
+    {
+        return false;
+    }
+
+    return emberAfAttributeIsTokenized(metadata);
+}
+
 chip::Messaging::ExchangeManager * chip::ExchangeManager()
 {
     return emAfExchangeMgr;
