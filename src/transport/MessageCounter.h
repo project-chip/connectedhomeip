@@ -112,8 +112,8 @@ public:
 
     /**
      * Initialize a local message counter with random value between [1, 2^28]. This increases the difficulty of traffic analysis
-     * attacks by making it harder to determine how long a particular session has been open. The initial counter is always 1 or higher
-     * to guarantee first message is always greater than initial peer counter set to 0.
+     * attacks by making it harder to determine how long a particular session has been open. The initial counter is always 1 or
+     * higher to guarantee first message is always greater than initial peer counter set to 0.
      */
     LocalSessionMessageCounter() { mValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1; }
 
