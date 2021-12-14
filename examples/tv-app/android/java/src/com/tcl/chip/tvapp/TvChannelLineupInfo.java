@@ -17,7 +17,7 @@
  */
 package com.tcl.chip.tvapp;
 
-public class TvChannelLineupInfo {
+public class ChannelLineupInfo {
   public static final int LINEUP_INFO_TYPE_MSO = 0x00;
 
   public String operatorName;
@@ -25,11 +25,11 @@ public class TvChannelLineupInfo {
   public String postalCode;
   public int lineupInfoType;
 
-  public TvChannelLineupInfo(String operatorName, String lineupName, String postalCode) {
+  public ChannelLineupInfo(String operatorName, String lineupName, String postalCode) {
     this(operatorName, lineupName, postalCode, LINEUP_INFO_TYPE_MSO);
   }
 
-  public TvChannelLineupInfo(
+  public ChannelLineupInfo(
       String operatorName, String lineupName, String postalCode, int lineupInfoType) {
     this.operatorName = operatorName;
     this.lineupName = lineupName;
@@ -39,7 +39,7 @@ public class TvChannelLineupInfo {
 
   @Override
   public String toString() {
-    return "TvChannelLineupInfo{"
+    return "ChannelLineupInfo{"
         + "operatorName='"
         + operatorName
         + '\''

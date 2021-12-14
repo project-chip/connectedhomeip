@@ -17,15 +17,15 @@
  */
 package com.tcl.chip.tvapp;
 
-public interface TvChannelManager {
+public interface ChannelManager {
 
-  TvChannelInfo[] getChannelList();
+  ChannelInfo[] getChannelList();
 
-  TvChannelLineupInfo getLineup();
+  ChannelLineupInfo getLineup();
 
-  TvChannelInfo getCurrentChannel();
+  ChannelInfo getCurrentChannel();
 
-  TvChannelInfo changeChannel(String match);
+  ChannelInfo changeChannel(String match);
 
   boolean changeChannelByNumber(int majorNumber, int minorNumber);
 

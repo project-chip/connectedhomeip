@@ -15,7 +15,7 @@ import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
 import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.TvChannelManagerStub;
+import com.tcl.chip.tvapp.ChannelManagerStub;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
@@ -38,7 +38,7 @@ public class MatterServant {
     tvApp.setContentLaunchManager(new ContentLaunchManagerStub());
     tvApp.setLowPowerManager(new LowPowerManagerStub());
     tvApp.setMediaPlaybackManager(new MediaPlaybackManagerStub());
-    tvApp.setTvChannelManager(new TvChannelManagerStub());
+    tvApp.setChannelManager(new ChannelManagerStub());
 
     Context applicationContext = context.getApplicationContext();
     AndroidChipPlatform chipPlatform =
