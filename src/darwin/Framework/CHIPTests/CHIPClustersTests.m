@@ -9088,6 +9088,107 @@ CHIPDevice * GetConnectedDevice(void)
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTest_TC_DD_1_5_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum in URI Record Type Definition RTD URI);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_6_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Scan the DUTs QR code using a QR code reader);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_6_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1 verification"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Verify the QR code gets scanned successfully and the QR code must be of sufficient size
+            and contrast respective to surface material as to be readable with standard readers such as smartphones in normal
+                lighting conditions);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_6_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 2 verificaiton"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify QR code version is 1 or higher);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_7_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify manual pairing code is printed on the device or in additional provided materials);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_7_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically producing a typeface
+            height of 2.1 mm);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_8_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Scan the device QR code using DUT);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_8_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1 verification"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTest_TC_DD_1_9_000000_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, Verify that the manual pairing code is printed on the device or in additional provided materials);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_9_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DD_1_9_000002_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1 verification"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue,
+        Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTest_TC_DM_1_1_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
@@ -33972,31 +34073,7 @@ uint16_t readAttributeVendorIdDefaultValue;
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000001_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read location"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read location Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@"XX"]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestBasicInformation_000002_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000001_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write location"];
 
@@ -34018,31 +34095,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000003_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read back location"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestBasic * cluster = [[CHIPTestBasic alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeLocationWithCompletionHandler:^(NSString * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read back location Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertTrue([actualValue isEqualToString:@"us"]);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTestBasicInformation_000004_WriteAttribute
+- (void)testSendClusterTestBasicInformation_000002_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Restore initial location value"];
 
@@ -34064,7 +34117,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestBasicInformation_000005_ReadAttribute
+- (void)testSendClusterTestBasicInformation_000003_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read AttributeList value"];
 
