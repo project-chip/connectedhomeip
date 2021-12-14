@@ -14,23 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
 
-class OTARequesterImpl
+#include "ESPOTARequestorDriver.h"
+#include "esp_log.h"
+
+#define TAG "OTARequestorDriver"
+
+namespace chip {
+
+bool ESPOTARequestorDriver::CheckImageDownloadAllowed()
 {
-public:
-    static OTARequesterImpl & GetInstance(void)
-    {
-        static OTARequesterImpl instance;
-        return instance;
-    }
+    return true;
+}
 
-    void SendQueryImageCommand(const char * ipAddress, uint32_t nodeId);
+void ESPOTARequestorDriver::ImageDownloadComplete()
+{
+    ESP_LOGI(TAG, "Image download complete");
+}
 
-    void SendApplyUpdateRequestCommand(const char * ipAddress, uint32_t nodeId);
+UserConsentAction ESPOTARequestorDriver::RequestUserConsent()
+{
+    return ImmediateYes;    
+}
 
-    void SendNotifyUpdateAppliedCommand(const char * ipAddress, uint32_t nodeId);
-
-private:
-    OTARequesterImpl() {}
-};
+}

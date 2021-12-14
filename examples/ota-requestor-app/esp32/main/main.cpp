@@ -29,6 +29,8 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include <app/server/Server.h>
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 
 #include <cmath>
 #include <cstdio>
@@ -40,7 +42,9 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include "OTARequesterImpl.h"
+#include "ESPOTAImageProcessor.h"
+#include "ESPOTARequestorDriver.h"
+#include "platform/OTARequestorInterface.h"
 #include <argtable3/argtable3.h>
 #include <esp_console.h>
 
@@ -52,57 +56,28 @@ using namespace ::chip::DeviceLayer;
 
 struct CmdArgs
 {
-    struct arg_str * ipAddr;
-    struct arg_int * nodeId;
     struct arg_end * end;
 };
 
 namespace {
 const char * TAG = "ota-requester-app";
+constexpr size_t kMaxActiveCaseClients = 2;
+constexpr size_t kMaxActiveDevices     = 8;
 static DeviceCallbacks EchoCallbacks;
-CmdArgs queryImageCmdArgs, applyUpdateCmdArgs;
+CmdArgs applyUpdateCmdArgs;
+
+OTARequestor gRequestorCore;
+ESPOTARequestorDriver gRequestorUser;
+BDXDownloader gDownloader;
+ESPOTAImageProcessor gImageProcessor;
+CASEClientPool<kMaxActiveCaseClients> gCASEClientPool;
+OperationalDeviceProxyPool<kMaxActiveDevices> gDevicePool;
 } // namespace
-
-void QueryImageTimerHandler(Layer * systemLayer, void * appState)
-{
-    ESP_LOGI(TAG, "Calling SendQueryImageCommand()");
-    OTARequesterImpl::GetInstance().SendQueryImageCommand(queryImageCmdArgs.ipAddr->sval[0], queryImageCmdArgs.nodeId->ival[0]);
-}
-
-void ApplyUpdateTimerHandler(Layer * systemLayer, void * appState)
-{
-    ESP_LOGI(TAG, "Calling SendApplyUpdateRequestCommand()");
-    OTARequesterImpl::GetInstance().SendApplyUpdateRequestCommand(queryImageCmdArgs.ipAddr->sval[0],
-                                                                  queryImageCmdArgs.nodeId->ival[0]);
-}
-
-int ESPQueryImageCmdHandler(int argc, char ** argv)
-{
-    int nerrors = arg_parse(argc, argv, (void **) &queryImageCmdArgs);
-    if (nerrors != 0)
-    {
-        arg_print_errors(stderr, queryImageCmdArgs.end, argv[0]);
-        return 1;
-    }
-    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", queryImageCmdArgs.ipAddr->sval[0], queryImageCmdArgs.nodeId->ival[0]);
-
-    /* Start one shot timer with 1 second timeout to send ApplyUpdateRequest command */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), QueryImageTimerHandler, nullptr);
-    return 0;
-}
 
 int ESPApplyUpdateCmdHandler(int argc, char ** argv)
 {
-    int nerrors = arg_parse(argc, argv, (void **) &applyUpdateCmdArgs);
-    if (nerrors != 0)
-    {
-        arg_print_errors(stderr, applyUpdateCmdArgs.end, argv[0]);
-        return 1;
-    }
-    ESP_LOGI(TAG, "ipAddr:%s nodeId:%x", applyUpdateCmdArgs.ipAddr->sval[0], applyUpdateCmdArgs.nodeId->ival[0]);
-
-    /* Start one shot timer with 1 second timeout to Query for OTA image */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), ApplyUpdateTimerHandler, nullptr);
+    gRequestorCore.ApplyUpdate();
+    ESP_LOGI(TAG, "Apply the Update");
     return 0;
 }
 
@@ -118,25 +93,14 @@ void ESPInitConsole(void)
 
     esp_console_register_help_command();
 
-    esp_console_cmd_t queryImageCommand, applyUpdateCommand;
-    memset(&queryImageCommand, 0, sizeof(queryImageCommand));
+    esp_console_cmd_t  applyUpdateCommand;
     memset(&applyUpdateCommand, 0, sizeof(applyUpdateCommand));
 
-    queryImageCmdArgs.ipAddr = arg_str0(NULL, NULL, "<ipv4>", "OTA Provider IP Address");
-    queryImageCmdArgs.nodeId = arg_int0(NULL, NULL, "<nodeID>", "OTA Provider Node ID in decimal");
-    queryImageCmdArgs.end    = arg_end(1);
-
-    queryImageCommand.command = "QueryImage", queryImageCommand.help = "Query for OTA image",
-    queryImageCommand.func = &ESPQueryImageCmdHandler, queryImageCommand.argtable = &queryImageCmdArgs;
-
-    applyUpdateCmdArgs.ipAddr = arg_str0(NULL, NULL, "<ipv4>", "OTA Provider IP Address");
-    applyUpdateCmdArgs.nodeId = arg_int0(NULL, NULL, "<nodeID>", "OTA Provider Node ID in decimal");
     applyUpdateCmdArgs.end    = arg_end(1);
 
     applyUpdateCommand.command = "ApplyUpdateRequest", applyUpdateCommand.help = "Request to OTA update image",
     applyUpdateCommand.func = &ESPApplyUpdateCmdHandler, applyUpdateCommand.argtable = &applyUpdateCmdArgs;
 
-    esp_console_cmd_register(&queryImageCommand);
     esp_console_cmd_register(&applyUpdateCommand);
 
     esp_console_new_repl_uart(&uartConfig, &replConfig, &repl);
@@ -181,15 +145,20 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     ESPInitConsole();
+    SetRequestorInstance(&gRequestorCore);
+
+    Server * server = &(Server::GetInstance());
+    server->SetCASEClientPool(&gCASEClientPool);
+    server->SetDevicePool(&gDevicePool);
+    gRequestorCore.SetServerInstance(server);
+    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+
+    OTAImageProcessorParams ipParams;
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    gRequestorCore.SetBDXDownloader(&gDownloader);
+
 }
 
-// TODO: We should use the function definition in /src/app/clusters/ota-requestor/ClusterInterface.cpp
-// Temporarily add this function.
-
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
-{
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
-}
