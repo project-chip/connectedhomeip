@@ -77,6 +77,10 @@ public:
         delete onReportBridgedActionsSetupUrlCallback;
         delete onReportBridgedActionsClusterRevisionCallback;
         delete onReportBridgedDeviceBasicClusterRevisionCallback;
+<<<<<<< HEAD
+=======
+        delete onReportChannelClusterRevisionCallback;
+>>>>>>> 5fcfb9c5f (Zap regen)
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlRemainingTimeCallback;
@@ -306,7 +310,10 @@ public:
         delete onReportSwitchMultiPressMaxCallback;
         delete onReportSwitchFeatureMapCallback;
         delete onReportSwitchClusterRevisionCallback;
+<<<<<<< HEAD
         delete onReportTvChannelClusterRevisionCallback;
+=======
+>>>>>>> 5fcfb9c5f (Zap regen)
         delete onReportTargetNavigatorClusterRevisionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
         delete onReportTemperatureMeasurementMinMeasuredValueCallback;
@@ -614,6 +621,11 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0xFFFD,
                                        onReportBridgedDeviceBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+<<<<<<< HEAD
+=======
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportChannelClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+>>>>>>> 5fcfb9c5f (Zap regen)
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0001,
@@ -1199,8 +1211,11 @@ public:
                                        BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFD, onReportSwitchClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+<<<<<<< HEAD
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportTvChannelClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+=======
+>>>>>>> 5fcfb9c5f (Zap regen)
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0505, 0xFFFD,
                                        onReportTargetNavigatorClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
@@ -1881,6 +1896,12 @@ private:
         onReportBridgedDeviceBasicClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)>(
                 ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse, this);
+<<<<<<< HEAD
+=======
+    chip::Callback::Callback<decltype(&ReadChannelClusterRevision::OnAttributeResponse)> * onReportChannelClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadChannelClusterRevision::OnAttributeResponse)>(
+            ReadChannelClusterRevision::OnAttributeResponse, this);
+>>>>>>> 5fcfb9c5f (Zap regen)
     chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)>(
             ReadColorControlCurrentHue::OnAttributeResponse, this);
@@ -2738,10 +2759,13 @@ private:
     chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)> * onReportSwitchClusterRevisionCallback =
         new chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)>(
             ReadSwitchClusterRevision::OnAttributeResponse, this);
+<<<<<<< HEAD
     chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)> *
         onReportTvChannelClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)>(
                 ReadTvChannelClusterRevision::OnAttributeResponse, this);
+=======
+>>>>>>> 5fcfb9c5f (Zap regen)
     chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)> *
         onReportTargetNavigatorClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)>(

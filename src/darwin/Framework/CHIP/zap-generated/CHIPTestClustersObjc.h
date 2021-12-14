@@ -208,6 +208,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Channel
+ *
+ */
+@interface CHIPTestChannel : CHIPChannel
+
+- (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster Color Control
  *
  */
@@ -809,18 +821,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeMultiPressMaxWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-
-@end
-
-/**
- * Cluster TV Channel
- *
- */
-@interface CHIPTestTvChannel : CHIPTvChannel
-
-- (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

@@ -192,6 +192,27 @@ public:
     ~BridgedDeviceBasicCluster() {}
 };
 
+class DLL_EXPORT ChannelCluster : public ClusterBase
+{
+public:
+    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
+    ~ChannelCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             chip::CharSpan match);
+    CHIP_ERROR ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t majorNumber, uint16_t minorNumber);
+    CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
+
+    // Cluster Attributes
+    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
+
+private:
+};
+
 class DLL_EXPORT ColorControlCluster : public ClusterBase
 {
 public:
@@ -672,6 +693,7 @@ public:
     ~SwitchCluster() {}
 };
 
+<<<<<<< HEAD
 class DLL_EXPORT TvChannelCluster : public ClusterBase
 {
 public:
@@ -686,6 +708,8 @@ public:
     CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
 };
 
+=======
+>>>>>>> 5e91ccb80 (Zap regen)
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
 {
 public:

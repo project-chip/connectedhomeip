@@ -30,12 +30,12 @@
 
 #include "include/application-launcher/ApplicationLauncherManager.h"
 #include "include/audio-output/AudioOutputManager.h"
+#include "include/channel/ChannelManager.h"
 #include "include/content-launcher/ContentLauncherManager.h"
 #include "include/keypad-input/KeypadInputManager.h"
 #include "include/media-input/MediaInputManager.h"
 #include "include/media-playback/MediaPlaybackManager.h"
 #include "include/target-navigator/TargetNavigatorManager.h"
-#include "include/channel/ChannelManager.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <lib/shell/Engine.h>

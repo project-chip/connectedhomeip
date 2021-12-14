@@ -1002,6 +1002,55 @@ private:
     bool keepAlive;
 };
 
+class CHIPChannelChannelListAttributeCallback : public chip::Callback::Callback<CHIPChannelClusterChannelListAttributeCallbackType>
+{
+public:
+    CHIPChannelChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPChannelChannelListAttributeCallback();
+
+    static void maybeDestroy(CHIPChannelChannelListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPChannelChannelListAttributeCallback>(callback);
+        }
+    }
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPChannelAttributeListAttributeCallback
+    : public chip::Callback::Callback<CHIPChannelClusterAttributeListAttributeCallbackType>
+{
+public:
+    CHIPChannelAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPChannelAttributeListAttributeCallback();
+
+    static void maybeDestroy(CHIPChannelAttributeListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPChannelAttributeListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPColorControlAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPColorControlClusterAttributeListAttributeCallbackType>
 {
@@ -3099,6 +3148,7 @@ private:
     bool keepAlive;
 };
 
+<<<<<<< HEAD
 class CHIPTvChannelChannelListAttributeCallback
     : public chip::Callback::Callback<CHIPTvChannelClusterChannelListAttributeCallbackType>
 {
@@ -3161,6 +3211,8 @@ private:
     bool keepAlive;
 };
 
+=======
+>>>>>>> f97b37a6b (Zap regen)
 class CHIPTargetNavigatorTargetNavigatorListAttributeCallback
     : public chip::Callback::Callback<CHIPTargetNavigatorClusterTargetNavigatorListAttributeCallbackType>
 {
