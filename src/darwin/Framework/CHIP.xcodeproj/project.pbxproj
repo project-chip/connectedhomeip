@@ -620,6 +620,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 				SUPPORTS_TEXT_BASED_API = YES;
@@ -671,6 +672,7 @@
 					"-framework",
 					CoreBluetooth,
 					"-lnetwork",
+					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
 				"OTHER_LDFLAGS[sdk=macosx*]" = (
 					"-framework",
@@ -680,6 +682,7 @@
 					CoreBluetooth,
 					"-framework",
 					CoreData,
+					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -753,6 +756,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "-Wl,-unexported_symbol,\"__Z*\"";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos macosx";
 				SUPPORTS_TEXT_BASED_API = YES;
@@ -803,6 +807,7 @@
 					Foundation,
 					"-framework",
 					CoreBluetooth,
+					"-Wl,-unexported_symbol,\"__Z*\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.chip.CHIP;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -838,7 +843,7 @@
 				BA09EB772474882200605257 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		B20252A12459E34F00F97062 /* Build configuration list for PBXNativeTarget "CHIP" */ = {
 			isa = XCConfigurationList;
@@ -847,7 +852,7 @@
 				BA09EB782474882200605257 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 		B20252A42459E34F00F97062 /* Build configuration list for PBXNativeTarget "CHIPTests" */ = {
 			isa = XCConfigurationList;
@@ -856,7 +861,7 @@
 				BA09EB792474882200605257 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
