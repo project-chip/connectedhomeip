@@ -795,9 +795,9 @@ void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
             continue;
         }
 
-        if (!emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
+        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
         {
-            continue;
+            break;
         }
     }
 }
