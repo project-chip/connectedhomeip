@@ -55,7 +55,7 @@
    <xi:include href="chip/thermostat-cluster.xml" />
    <xi:include href="chip/thread-network-diagnostics-cluster.xml" />
    <xi:include href="chip/time-synchronization-cluster.xml" />
-   <xi:include href="chip/tv-channel-cluster.xml" />
+   <xi:include href="chip/channel-cluster.xml" />
    <xi:include href="chip/user-label-cluster.xml" />
    <xi:include href="chip/wake-on-lan-cluster.xml" />
    <xi:include href="chip/wifi-network-diagnostics-cluster.xml" />
