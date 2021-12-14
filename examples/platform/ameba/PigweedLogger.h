@@ -27,4 +27,3 @@ int putString(const char * buffer, size_t size);
 SemaphoreHandle_t * getSemaphore();
 
 } // namespace PigweedLogger
-
