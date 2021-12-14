@@ -68,7 +68,7 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
             {
                 ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event");
             }
