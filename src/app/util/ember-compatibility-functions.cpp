@@ -860,17 +860,6 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
-    {
-        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
-        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
-
-        if (valueDecoder.TriedDecode())
-        {
-            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
-        }
-    }
-
     CHIP_ERROR preparationError = CHIP_NO_ERROR;
     uint16_t dataLen            = 0;
     if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
@@ -883,6 +872,17 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     {
         ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+    }
+
+    if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
+    {
+        AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
+        ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
+
+        if (valueDecoder.TriedDecode())
+        {
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+        }
     }
 
     auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
