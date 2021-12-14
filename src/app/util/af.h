@@ -159,24 +159,6 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
  */
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
-namespace chip {
-namespace app {
-
-using EndpointCallback = Loop (*)(EndpointId endpoint, intptr_t context);
-
-/**
- * @brief calls user-supplied function for every endpoint that has the given
- * server cluster, until either the function returns Loop::Break or we run out
- * of endpoints.
- *
- * Returns Loop::Break if the callee did, or Loop::Finished if we ran out of
- * endpoints.
- */
-Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context = 0);
-
-} // namespace app
-} // namespace chip
-
 /**
  * @brief Returns true if endpoint contains cluster client.
  *
@@ -1823,3 +1805,39 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+
+namespace chip {
+namespace app {
+
+class EnabledEndpointsWithServerCluster
+{
+public:
+    EnabledEndpointsWithServerCluster(ClusterId clusterId);
+
+    // Instead of having a separate Iterator class, optimize for codesize by
+    // just reusing ourselves as our own iterator.  We could do a bit better
+    // here with C++17 and using a different type for the end iterator, but this
+    // is the best I've found with C++14 so far.
+    //
+    // This does mean that you can only iterate a given
+    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
+    // in practice.
+    EnabledEndpointsWithServerCluster & begin() { return *this; }
+    const EnabledEndpointsWithServerCluster & end() const { return *this; }
+
+    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
+
+    EnabledEndpointsWithServerCluster & operator++();
+
+    EndpointId operator*() const { return emberAfEndpointFromIndex(mEndpointIndex); }
+
+private:
+    void EnsureMatchingEndpoint();
+
+    uint16_t mEndpointIndex = 0;
+    uint16_t mEndpointCount = emberAfEndpointCount();
+    ClusterId mClusterId;
+};
+
+} // namespace app
+} // namespace chip
