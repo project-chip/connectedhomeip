@@ -184,7 +184,7 @@ CHIP_ERROR TCPEndPointImplLwIP::GetPeerInfo(IPAddress * retAddr, uint16_t * retP
     {
         *retPort = mTCP->remote_port;
         *retAddr = IPAddress(mTCP->remote_ip);
-        res = CHIP_NO_ERROR;
+        res      = CHIP_NO_ERROR;
     }
 
     // Unlock LwIP stack
@@ -205,7 +205,7 @@ CHIP_ERROR TCPEndPointImplLwIP::GetLocalInfo(IPAddress * retAddr, uint16_t * ret
     {
         *retPort = mTCP->local_port;
         *retAddr = IPAddress(mTCP->local_ip);
-        res = CHIP_NO_ERROR;
+        res      = CHIP_NO_ERROR;
     }
 
     // Unlock LwIP stack

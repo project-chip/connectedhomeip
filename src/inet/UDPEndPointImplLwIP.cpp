@@ -372,9 +372,9 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     {
         pktInfo->SrcAddress  = IPAddress(*addr);
         pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-        pktInfo->Interface = InterfaceId(ip_current_netif());
-        pktInfo->SrcPort   = port;
-        pktInfo->DestPort  = pcb->local_port;
+        pktInfo->Interface   = InterfaceId(ip_current_netif());
+        pktInfo->SrcPort     = port;
+        pktInfo->DestPort    = pcb->local_port;
     }
 
     ep->Retain();
