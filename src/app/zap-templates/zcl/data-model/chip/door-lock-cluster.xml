@@ -567,6 +567,7 @@ limitations under the License.
             <arg name="credentialData" type="LONG_OCTET_STRING" />
             <arg name="userIndex" type="INT16U" isNullable="true" />
             <arg name="userStatus" type="DlUserStatus" isNullable="true" />
+            <arg name="userType" type="DlUserType" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="server" code="35" name="SetCredentialResponse" disableDefaultResponse="true" optional="true">
@@ -704,12 +705,6 @@ limitations under the License.
         <item value="3" name="DoorForcedOpen" />
         <item value="4" name="DoorUnspecifiedError" />
         <item value="5" name="DoorAjar" />
-    </enum>
-
-    <enum name="DlDoorLockStatus" type="ENUM8">
-        <cluster code="0x0101" />
-        <item value="2" name="Duplicate" />
-        <item value="3" name="Occupied" />
     </enum>
 
     <enum name="DlLockDataType" type="ENUM8">
