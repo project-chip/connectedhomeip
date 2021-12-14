@@ -17,7 +17,7 @@
 
 /****************************************************************************
  * @file
- * @brief Implementation for the Fixed Label Server Cluster
+ * @brief Implementation for the User Label Server Cluster
  ***************************************************************************/
 
 #include <app-common/zap-generated/af-structs.h>
@@ -33,16 +33,16 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::FixedLabel;
-using namespace chip::app::Clusters::FixedLabel::Attributes;
+using namespace chip::app::Clusters::UserLabel;
+using namespace chip::app::Clusters::UserLabel::Attributes;
 
 namespace {
 
-class FixedLabelAttrAccess : public AttributeAccessInterface
+class UserLabelAttrAccess : public AttributeAccessInterface
 {
 public:
-    // Register for the Fixed Label cluster on all endpoints.
-    FixedLabelAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), FixedLabel::Id) {}
+    // Register for the User Label cluster on all endpoints.
+    UserLabelAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UserLabel::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
@@ -50,12 +50,12 @@ private:
     CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
-CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxFixedLabels> labelList;
+    DeviceLayer::LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
 
-    if (DeviceLayer::PlatformMgr().GetFixedLabelList(endpoint, labelList) == CHIP_NO_ERROR)
+    if (DeviceLayer::PlatformMgr().GetUserLabelList(endpoint, labelList) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&labelList](const auto & encoder) -> CHIP_ERROR {
             for (auto label : labelList)
@@ -74,11 +74,11 @@ CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeVal
     return err;
 }
 
-FixedLabelAttrAccess gAttrAccess;
+UserLabelAttrAccess gAttrAccess;
 
-CHIP_ERROR FixedLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == FixedLabel::Id);
+    VerifyOrDie(aPath.mClusterId == UserLabel::Id);
 
     switch (aPath.mAttributeId)
     {
@@ -93,7 +93,7 @@ CHIP_ERROR FixedLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
 }
 } // anonymous namespace
 
-void MatterFixedLabelPluginServerInitCallback(void)
+void MatterUserLabelPluginServerInitCallback(void)
 {
     registerAttributeAccessOverride(&gAttrAccess);
 }

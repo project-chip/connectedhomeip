@@ -3978,6 +3978,57 @@
           ]
         },
         {
+          "name": "User Label",
+          "code": 65,
+          "mfgCode": null,
+          "define": "USER_LABEL_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "User Label",
+          "code": 65,
+          "mfgCode": null,
+          "define": "USER_LABEL_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "label list",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "Occupancy Sensing",
           "code": 1030,
           "mfgCode": null,

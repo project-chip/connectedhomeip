@@ -318,7 +318,6 @@ void MatterPollControlPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterLocalizationUnitPluginServerInitCallback() {}
 void MatterLocalizationTimeFormatPluginServerInitCallback() {}
-void MatterUserLabelPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}

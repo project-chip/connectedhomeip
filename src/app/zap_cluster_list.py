@@ -82,7 +82,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TIME_CLUSTER': [],
     'TIME_SYNCHRONIZATION_CLUSTER': [],
     'TV_CHANNEL_CLUSTER': ['tv-channel-server'],
-    'USER_LABEL_CLUSTER': [],
+    'USER_LABEL_CLUSTER': ['user-label-server'],
     'WAKE_ON_LAN_CLUSTER': [],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': ['wifi-network-diagnostics-server'],
     'WINDOW_COVERING_CLUSTER': ['window-covering-server'],

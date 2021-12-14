@@ -31,7 +31,7 @@ namespace DeviceLayer {
 static constexpr size_t kMaxFixedLabels = 10;
 static constexpr size_t kMaxUserLabels  = 10;
 
-template <size_t N>
+template <typename T, size_t N>
 class LabelList
 {
 public:
@@ -39,13 +39,13 @@ public:
     class Iterator
     {
     public:
-        Iterator(const LabelList<N> * LabelList, int index);
-        app::Clusters::FixedLabel::Structs::LabelStruct::Type operator*() const;
+        Iterator(const LabelList<T, N> * LabelList, int index);
+        T operator*() const;
         Iterator & operator++();
         bool operator!=(const Iterator & other) const;
 
     private:
-        const LabelList<N> * mLabelListPtr;
+        const LabelList<T, N> * mLabelListPtr;
         int mIndex = -1;
     };
 
@@ -53,24 +53,24 @@ public:
     LabelList() = default;
     ~LabelList() { mSize = 0; }
 
-    CHIP_ERROR add(const app::Clusters::FixedLabel::Structs::LabelStruct::Type & label);
+    CHIP_ERROR add(const T & label);
 
     size_t size() const;
-    const app::Clusters::FixedLabel::Structs::LabelStruct::Type & operator[](int index) const;
+    const T & operator[](int index) const;
 
     Iterator begin() const;
     Iterator end() const;
 
 private:
-    app::Clusters::FixedLabel::Structs::LabelStruct::Type mList[N];
+    T mList[N];
     int mSize = 0;
 };
 
 /*
  * LabelList methods
  **/
-template <size_t N>
-inline CHIP_ERROR LabelList<N>::add(const app::Clusters::FixedLabel::Structs::LabelStruct::Type & label)
+template <typename T, size_t N>
+inline CHIP_ERROR LabelList<T, N>::add(const T & label)
 {
     if (mSize == N)
     {
@@ -83,53 +83,53 @@ inline CHIP_ERROR LabelList<N>::add(const app::Clusters::FixedLabel::Structs::La
     return CHIP_NO_ERROR;
 }
 
-template <size_t N>
-inline size_t LabelList<N>::size() const
+template <typename T, size_t N>
+inline size_t LabelList<T, N>::size() const
 {
     return static_cast<size_t>(mSize);
 }
 
-template <size_t N>
-inline const app::Clusters::FixedLabel::Structs::LabelStruct::Type & LabelList<N>::operator[](int index) const
+template <typename T, size_t N>
+inline const T & LabelList<T, N>::operator[](int index) const
 {
     VerifyOrDie(index < mSize);
     return mList[index];
 }
 
-template <size_t N>
-inline typename LabelList<N>::Iterator LabelList<N>::begin() const
+template <typename T, size_t N>
+inline typename LabelList<T, N>::Iterator LabelList<T, N>::begin() const
 {
-    return LabelList<N>::Iterator{ this, 0 };
+    return LabelList<T, N>::Iterator{ this, 0 };
 }
 
-template <size_t N>
-inline typename LabelList<N>::Iterator LabelList<N>::end() const
+template <typename T, size_t N>
+inline typename LabelList<T, N>::Iterator LabelList<T, N>::end() const
 {
-    return LabelList<N>::Iterator{ this, mSize };
+    return LabelList<T, N>::Iterator{ this, mSize };
 }
 
 /*
  * Iterator methods
  **/
-template <size_t N>
-inline LabelList<N>::Iterator::Iterator(const LabelList<N> * pLabelList, int index) : mLabelListPtr(pLabelList), mIndex(index)
+template <typename T, size_t N>
+inline LabelList<T, N>::Iterator::Iterator(const LabelList<T, N> * pLabelList, int index) : mLabelListPtr(pLabelList), mIndex(index)
 {}
 
-template <size_t N>
-inline app::Clusters::FixedLabel::Structs::LabelStruct::Type LabelList<N>::Iterator::operator*() const
+template <typename T, size_t N>
+inline T LabelList<T, N>::Iterator::operator*() const
 {
     return mLabelListPtr->operator[](mIndex);
 }
 
-template <size_t N>
-inline typename LabelList<N>::Iterator & LabelList<N>::Iterator::operator++()
+template <typename T, size_t N>
+inline typename LabelList<T, N>::Iterator & LabelList<T, N>::Iterator::operator++()
 {
     ++mIndex;
     return *this;
 }
 
-template <size_t N>
-inline bool LabelList<N>::Iterator::operator!=(const LabelList<N>::Iterator & other) const
+template <typename T, size_t N>
+inline bool LabelList<T, N>::Iterator::operator!=(const LabelList<T, N>::Iterator & other) const
 {
     return mIndex != other.mIndex;
 }
