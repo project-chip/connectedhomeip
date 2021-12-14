@@ -42,7 +42,7 @@ SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
         {
             subjectDescriptor.authMode = AuthMode::kPase;
             subjectDescriptor.subject  = mPeerNodeId;
-            // TODO: there are cases where PASE can have a fabric, need to add that here
+            // TODO(#10242): PASE *can* have fabric in some situations
         }
         else if (mGroupId.HasValue())
         {
