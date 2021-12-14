@@ -36,4 +36,3 @@ static_library("pw_rpc") {
 
   complete_static_lib = true
 }
-

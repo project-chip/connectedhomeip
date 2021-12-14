@@ -89,4 +89,3 @@ SemaphoreHandle_t * getSemaphore()
 }
 
 } // namespace PigweedLogger
-

@@ -23,8 +23,8 @@
 
 #include "serial_api.h"
 
-#define UART_TX     PA_18
-#define UART_RX     PA_19
+#define UART_TX PA_18
+#define UART_RX PA_19
 
 serial_t sobj;
 int console_getchar(uint8_t * chr)
@@ -42,7 +42,7 @@ int console_putchar(const char * chr)
 void console_init(void)
 {
     serial_init(&sobj, UART_TX, UART_RX);
-    serial_baud(&sobj, 115200); 
+    serial_baud(&sobj, 115200);
     serial_format(&sobj, 8, ParityNone, 1);
 }
 
@@ -85,4 +85,3 @@ StatusWithSize WriteLine(const std::string_view & s)
 }
 
 } // namespace pw::sys_io
-

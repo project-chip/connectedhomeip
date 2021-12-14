@@ -17,12 +17,12 @@
  */
 
 #if CONFIG_ENABLE_PW_RPC
+#include "FreeRTOS.h"
 #include "PigweedLoggerMutex.h"
 #include "RpcService.h"
-#include "FreeRTOS.h"
-#include "task.h"
 #include "pw_sys_io_ameba/init.h"
 #include "sys_api.h"
+#include "task.h"
 //#include "esp_log.h"
 //#include "freertos/FreeRTOS.h"
 //#include "freertos/event_groups.h"
@@ -32,7 +32,6 @@
 #include "pw_rpc/server.h"
 #include "pw_sys_io/sys_io.h"
 #include "support/CodeUtils.h"
-
 
 #if defined(PW_RPC_ATTRIBUTE_SERVICE) && PW_RPC_ATTRIBUTE_SERVICE
 #include "pigweed/rpc_services/Attributes.h"
