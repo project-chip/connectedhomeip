@@ -32,4 +32,3 @@ pw_source_set("pw_sys_io_ameba") {
 
   public_configs = [ ":default_config" ]
 }
-
