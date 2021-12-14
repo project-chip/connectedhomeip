@@ -29749,7 +29749,7 @@ class TestCluster(Cluster):
                 ClusterObjectFieldDescriptor(Label="vendorId", Tag=0x00000022, Type=uint),
                 ClusterObjectFieldDescriptor(Label="listNullablesAndOptionalsStruct", Tag=0x00000023, Type=typing.List[TestCluster.Structs.NullablesAndOptionalsStruct]),
                 ClusterObjectFieldDescriptor(Label="enumAttr", Tag=0x00000024, Type=TestCluster.Enums.SimpleEnum),
-                ClusterObjectFieldDescriptor(Label="struct", Tag=0x00000025, Type=TestCluster.Structs.SimpleStruct),
+                ClusterObjectFieldDescriptor(Label="structAttr", Tag=0x00000025, Type=TestCluster.Structs.SimpleStruct),
                 ClusterObjectFieldDescriptor(Label="rangeRestrictedInt8u", Tag=0x00000026, Type=uint),
                 ClusterObjectFieldDescriptor(Label="rangeRestrictedInt8s", Tag=0x00000027, Type=int),
                 ClusterObjectFieldDescriptor(Label="rangeRestrictedInt16u", Tag=0x00000028, Type=uint),
@@ -29832,7 +29832,7 @@ class TestCluster(Cluster):
     vendorId: 'uint' = None
     listNullablesAndOptionalsStruct: 'typing.List[TestCluster.Structs.NullablesAndOptionalsStruct]' = None
     enumAttr: 'TestCluster.Enums.SimpleEnum' = None
-    struct: 'TestCluster.Structs.SimpleStruct' = None
+    structAttr: 'TestCluster.Structs.SimpleStruct' = None
     rangeRestrictedInt8u: 'uint' = None
     rangeRestrictedInt8s: 'int' = None
     rangeRestrictedInt16u: 'uint' = None
@@ -31186,7 +31186,7 @@ class TestCluster(Cluster):
             value: 'TestCluster.Enums.SimpleEnum' = 0
 
         @dataclass
-        class Struct(ClusterAttributeDescriptor):
+        class StructAttr(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x050F

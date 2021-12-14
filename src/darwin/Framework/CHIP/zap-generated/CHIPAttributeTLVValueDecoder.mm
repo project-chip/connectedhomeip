@@ -6829,8 +6829,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
-        case Attributes::Struct::Id: {
-            using TypeInfo = Attributes::Struct::TypeInfo;
+        case Attributes::StructAttr::Id: {
+            using TypeInfo = Attributes::StructAttr::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

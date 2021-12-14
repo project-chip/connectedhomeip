@@ -4271,7 +4271,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000025: {
-                    "attributeName": "Struct",
+                    "attributeName": "StructAttr",
                     "attributeId": 0x00000025,
                     "type": "",
                     "reportable": True,

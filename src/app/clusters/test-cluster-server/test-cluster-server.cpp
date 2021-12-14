@@ -112,7 +112,7 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ListNullablesAndOptionalsStruct::Id: {
         return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return ReadStructAttribute(aEncoder);
     }
     case ListLongOctetString::Id: {
@@ -145,7 +145,7 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case ListNullablesAndOptionalsStruct::Id: {
         return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return WriteStructAttribute(aDecoder);
     }
     case NullableStruct::Id: {

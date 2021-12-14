@@ -5242,9 +5242,9 @@ namespace EnumAttr {
 static constexpr AttributeId Id = 0x00000024;
 } // namespace EnumAttr
 
-namespace Struct {
+namespace StructAttr {
 static constexpr AttributeId Id = 0x00000025;
-} // namespace Struct
+} // namespace StructAttr
 
 namespace RangeRestrictedInt8u {
 static constexpr AttributeId Id = 0x00000026;
