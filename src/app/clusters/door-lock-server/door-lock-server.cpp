@@ -233,9 +233,12 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
 
     switch (attributePath.mAttributeId)
     {
-    case chip::app::Clusters::DoorLock::Attributes::Language::Id:
-        res = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, reinterpret_cast<const char *>(value + 1));
+    case chip::app::Clusters::DoorLock::Attributes::Language::Id: {
+        char lang[3 + 1] = { 0 };
+        memcpy(lang, &value[1], value[0]);
+        res = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, lang);
         break;
+    }
 
     case chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::Id: {
         uint32_t newRelockTime = *(reinterpret_cast<uint32_t *>(value));
