@@ -25,11 +25,6 @@
 #include <list>
 #include <string>
 
-bool lowPowerClusterSleep()
-{
-    return true;
-}
-
 uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
 {
     return 0;

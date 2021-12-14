@@ -45,52 +45,6 @@ using namespace chip;
 
 ContentLauncherManager ContentLauncherManager::sInstance;
 
-namespace {
-
-class ContentLauncherAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
-    {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
-        {
-            return ContentLauncherMgr().GetAcceptsHeader(aEncoder);
-        }
-        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id)
-        {
-            return ContentLauncherMgr().GetSupportedStreamingTypes(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-ContentLauncherAttrAccess gContentLauncherAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Content Launch Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
 ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
                                                           std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                                           const chip::CharSpan & data)
@@ -102,6 +56,16 @@ ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & con
                                                       ContentLaunchBrandingInformation & brandingInformation)
 {
     return ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
+}
+
+std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
+{
+    return ContentLauncherMgr().GetAcceptsHeader();
+}
+
+uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
+{
+    return ContentLauncherMgr().mGetSupportedStreamingProtocols();
 }
 
 void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
@@ -122,10 +86,10 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mGetSupportedStreamingTypesMethod = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingTypes", "()[I");
-    if (mGetSupportedStreamingTypesMethod == nullptr)
+    mGetSupportedStreamingProtocols = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()[I");
+    if (mGetSupportedStreamingProtocols == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'getSupportedStreamingTypes' method");
+        ChipLogError(Zcl, "Failed to access MediaInputManager 'getSupportedStreamingProtocols' method");
         env->ExceptionClear();
     }
 
@@ -148,18 +112,20 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     }
 }
 
-CHIP_ERROR ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
+std::list<std::string> ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::list<std::string> acceptedHeadersList;
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptsHeader");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetAcceptsHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray headersArray = (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
+    {
+        jobjectArray acceptedHeadersArray =
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
@@ -168,24 +134,16 @@ CHIP_ERROR ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEnc
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        jint size = env->GetArrayLength(headersArray);
+        jint size = env->GetArrayLength(acceptedHeadersArray);
         for (int i = 0; i < size; i++)
         {
-            jstring acceptsheader = (jstring) env->GetObjectArrayElement(headersArray, i);
-            if (acceptsheader != nullptr)
-            {
-                JniUtfString header(env, acceptsheader);
 
-                chip::ByteSpan bHeader((const uint8_t *) (header.c_str()), (size_t)(header.size()));
-                ReturnErrorOnFailure(encoder.Encode(bHeader));
-
-                // Todo: should be chanSpan?
-                // ReturnErrorOnFailure(encoder.Encode(header.charSpan()));
-            }
+            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
+            const char * convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
+            std::string acceptedHeader  = std::string(convertedValue, strlen(convertedValue));
+            acceptedHeadersList.push_front(acceptedHeader);
         }
-
-        return CHIP_NO_ERROR;
-    });
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -193,53 +151,40 @@ exit:
         ChipLogError(Zcl, "ContentLauncherManager::GetAcceptsHeader status error: %s", err.AsString());
     }
 
-    return err;
+    return acceptedHeadersList;
 }
 
-CHIP_ERROR ContentLauncherManager::GetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
+uint32_t ContentLauncherManager::GetSupportedStreamingProtocols()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
+    uint32_t supportedStreamingProtocols = 0;
 
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingTypes");
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetSupportedStreamingTypesMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetSupportedStreamingProtocols != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
-        jintArray typesArray = (jintArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingTypesMethod);
+    {
+        jint jSupportedStreamingProtocols =
+            (jint) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocols);
+        supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
         if (env->ExceptionCheck())
         {
-            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetSupportedStreamingTypes");
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
             env->ExceptionDescribe();
             env->ExceptionClear();
             return CHIP_ERROR_INCORRECT_STATE;
         }
-
-        jboolean isCopy = JNI_FALSE;
-        jint * ptypes   = env->GetIntArrayElements(typesArray, &isCopy);
-        jint size       = env->GetArrayLength(typesArray);
-
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        for (int i = 0; i < size; i++)
-        {
-            err = encoder.Encode(static_cast<uint8_t>(ptypes[i]));
-            if (err != CHIP_NO_ERROR)
-            {
-                break;
-            }
-        }
-        env->ReleaseIntArrayElements(typesArray, ptypes, 0);
-        return err;
-    });
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "ContentLauncherManager::GetAcceptsHeader status error: %s", err.AsString());
+        ChipLogError(Zcl, "ContentLauncherManager::GetSupportedStreamingProtocols status error: %s", err.AsString());
     }
 
-    return err;
+    return supportedStreamingProtocols;
 }
 
 ContentLaunchResponse ContentLauncherManager::LaunchContent(chip::EndpointId endpointId,
