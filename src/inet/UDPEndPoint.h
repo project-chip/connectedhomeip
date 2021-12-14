@@ -292,8 +292,9 @@ protected:
 template <>
 struct EndPointProperties<UDPEndPoint>
 {
-    static constexpr const char * Name  = "UDP";
-    static constexpr int SystemStatsKey = System::Stats::kInetLayer_NumUDPEps;
+    static constexpr const char * kName   = "UDP";
+    static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_UDP_ENDPOINTS;
+    static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumUDPEps;
 };
 
 } // namespace Inet

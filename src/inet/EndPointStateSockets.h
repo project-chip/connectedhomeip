@@ -30,6 +30,9 @@
 namespace chip {
 namespace Inet {
 
+/**
+ * Definitions shared by all sockets-based EndPoint classes.
+ */
 class DLL_EXPORT EndPointStateSockets
 {
 protected:

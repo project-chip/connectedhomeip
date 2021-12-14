@@ -39,8 +39,8 @@ namespace Inet {
  * Template providing traits for EndPoint types used by EndPointManager.
  *
  * Instances must define:
- *      static constexpr const char * Name;
- *      static constexpr int SystemStatsKey;
+ *      static constexpr const char * kName;
+ *      static constexpr int kSystemStatsKey;
  */
 template <class EndPointType>
 struct EndPointProperties;
@@ -56,12 +56,13 @@ public:
     using EndPointVisitor = Loop (*)(EndPoint *);
 
     EndPointManager() {}
-    virtual ~EndPointManager() {}
+    virtual ~EndPointManager() { VerifyOrDie(mLayerState.Destroy()); }
 
     CHIP_ERROR Init(System::Layer & systemLayer)
     {
         RegisterLayerErrorFormatter();
         VerifyOrReturnError(mLayerState.SetInitializing(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(systemLayer.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         mSystemLayer = &systemLayer;
         mLayerState.SetInitialized();
         return CHIP_NO_ERROR;
@@ -71,6 +72,7 @@ public:
     {
         // Return to uninitialized state to permit re-initialization.
         VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(mSystemLayer->IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
         mSystemLayer = nullptr;
         return CHIP_NO_ERROR;
     }
@@ -85,17 +87,17 @@ public:
         *retEndPoint = CreateEndPoint();
         if (*retEndPoint == nullptr)
         {
-            ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::Name);
+            ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::kName);
             return CHIP_ERROR_ENDPOINT_POOL_FULL;
         }
 
-        SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
+        SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
         return CHIP_NO_ERROR;
     }
 
     void DeleteEndPoint(EndPoint * endPoint)
     {
-        SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
+        SYSTEM_STATS_DECREMENT(EndPointProperties<EndPointType>::kSystemStatsKey);
         ReleaseEndPoint(endPoint);
     }
 
@@ -108,7 +110,7 @@ private:
     System::Layer * mSystemLayer;
 };
 
-template <typename EndPointImpl, unsigned int NUM_ENDPOINTS>
+template <typename EndPointImpl>
 class EndPointManagerImplPool : public EndPointManager<typename EndPointImpl::EndPoint>
 {
 public:
@@ -126,7 +128,7 @@ public:
     }
 
 private:
-    ObjectPool<EndPointImpl, NUM_ENDPOINTS> sEndPointPool;
+    ObjectPool<EndPointImpl, EndPointProperties<EndPoint>::kNumEndPoints> sEndPointPool;
 };
 
 class TCPEndPoint;

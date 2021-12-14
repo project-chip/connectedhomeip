@@ -34,7 +34,7 @@
 namespace chip {
 namespace Inet {
 
-using UDPEndPointManagerImpl = EndPointManagerImplPool<UDPEndPointImpl, INET_CONFIG_NUM_UDP_ENDPOINTS>;
+using UDPEndPointManagerImpl = EndPointManagerImplPool<UDPEndPointImpl>;
 
 } // namespace Inet
 } // namespace chip
