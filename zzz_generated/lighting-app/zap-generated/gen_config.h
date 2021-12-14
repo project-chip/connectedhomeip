@@ -114,8 +114,8 @@
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_SERVER
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL
 // User options for server plugin Level Control
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 255
-#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 0
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL 254
+#define EMBER_AF_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL 1
 #define EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE 0
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included

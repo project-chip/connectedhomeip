@@ -94,15 +94,6 @@
 EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                           chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                              uint16_t manufacturerCode);
-#else
-#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
-    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
-#endif
-
 /**
  * @brief Returns true if endpoint contains a cluster, checking for mfg code.
  *

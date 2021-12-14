@@ -62,9 +62,9 @@ private:
      * Functions Definitions
      *********************************************************/
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
