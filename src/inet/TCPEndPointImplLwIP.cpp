@@ -74,8 +74,6 @@ CHIP_ERROR TCPEndPointImplLwIP::BindImpl(IPAddressType addrType, const IPAddress
             ip_set_option(mTCP, SOF_REUSEADDR);
         }
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-
         ip_addr_t ipAddr;
         if (addr != IPAddress::Any)
         {
@@ -94,25 +92,6 @@ CHIP_ERROR TCPEndPointImplLwIP::BindImpl(IPAddressType addrType, const IPAddress
         else
             res = INET_ERROR_WRONG_ADDRESS_TYPE;
         res = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipAddr, port));
-
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-
-        if (addrType == IPAddressType::kIPv6)
-        {
-            ip6_addr_t ipv6Addr = addr.ToIPv6();
-            res                 = chip::System::MapErrorLwIP(tcp_bind_ip6(mTCP, &ipv6Addr, port));
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
-        {
-            ip_addr_t ipv4Addr = addr.ToIPv4();
-            res                = chip::System::MapErrorLwIP(tcp_bind(mTCP, &ipv4Addr, port));
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-        else
-            res = INET_ERROR_WRONG_ADDRESS_TYPE;
-
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
 
     // Unlock LwIP stack
@@ -168,25 +147,8 @@ CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t por
         tcp_arg(mTCP, this);
         tcp_err(mTCP, LwIPHandleError);
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t lwipAddr = addr.ToLwIPAddr();
         res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-        if (addrType == IPAddressType::kIPv6)
-        {
-            ip6_addr_t lwipAddr = addr.ToIPv6();
-            res                 = chip::System::MapErrorLwIP(tcp_connect_ip6(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
-        {
-            ip_addr_t lwipAddr = addr.ToIPv4();
-            res                = chip::System::MapErrorLwIP(tcp_connect(mTCP, &lwipAddr, port, LwIPHandleConnectComplete));
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-        else
-            res = INET_ERROR_WRONG_ADDRESS_TYPE;
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
         // Ensure that TCP timers are started
         if (res == CHIP_NO_ERROR)
@@ -221,16 +183,7 @@ CHIP_ERROR TCPEndPointImplLwIP::GetPeerInfo(IPAddress * retAddr, uint16_t * retP
     if (mTCP != nullptr)
     {
         *retPort = mTCP->remote_port;
-
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         *retAddr = IPAddress(mTCP->remote_ip);
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-#if INET_CONFIG_ENABLE_IPV4
-        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress(mTCP->remote_ip.ip6) : IPAddress(mTCP->remote_ip.ip4);
-#else  // !INET_CONFIG_ENABLE_IPV4
-        *retAddr                    = IPAddress(mTCP->remote_ip.ip6);
-#endif // !INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         res = CHIP_NO_ERROR;
     }
 
@@ -251,16 +204,7 @@ CHIP_ERROR TCPEndPointImplLwIP::GetLocalInfo(IPAddress * retAddr, uint16_t * ret
     if (mTCP != nullptr)
     {
         *retPort = mTCP->local_port;
-
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         *retAddr = IPAddress(mTCP->local_ip);
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-#if INET_CONFIG_ENABLE_IPV4
-        *retAddr = PCB_ISIPV6(mTCP) ? IPAddress(mTCP->local_ip.ip6) : IPAddress(mTCP->local_ip.ip4);
-#else  // !INET_CONFIG_ENABLE_IPV4
-        *retAddr                    = IPAddress(mTCP->local_ip.ip6);
-#endif // !INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         res = CHIP_NO_ERROR;
     }
 
@@ -656,8 +600,6 @@ TCPEndPointImplLwIP::BufferOffset TCPEndPointImplLwIP::FindStartOfUnsent()
 CHIP_ERROR TCPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 {
     // IMMPORTANT: This method MUST be called with the LwIP stack LOCKED!
-
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     if (mTCP == NULL)
     {
         switch (addrType)
@@ -705,37 +647,6 @@ CHIP_ERROR TCPEndPointImplLwIP::GetPCB(IPAddressType addrType)
             break;
         }
     }
-#else // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
-    if (mTCP == NULL)
-    {
-        if (addrType == IPAddressType::kIPv6)
-            mTCP = tcp_new_ip6();
-#if INET_CONFIG_ENABLE_IPV4
-        else if (addrType == IPAddressType::kIPv4)
-            mTCP = tcp_new();
-#endif // INET_CONFIG_ENABLE_IPV4
-        else
-            return INET_ERROR_WRONG_ADDRESS_TYPE;
-        if (mTCP == NULL)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            mLwIPEndPointType = LwIPEndPointType::TCP;
-        }
-    }
-    else
-    {
-#if INET_CONFIG_ENABLE_IPV4
-        const IPAddressType pcbType = PCB_ISIPV6(mTCP) ? IPAddressType::kIPv6 : IPAddressType::kIPv4;
-#else  // !INET_CONFIG_ENABLE_IPV4
-        const IPAddressType pcbType = IPAddressType::kIPv6;
-#endif // !INET_CONFIG_ENABLE_IPV4
-        if (addrType != pcbType)
-            return INET_ERROR_WRONG_ADDRESS_TYPE;
-    }
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
     return CHIP_NO_ERROR;
 }

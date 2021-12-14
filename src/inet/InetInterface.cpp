@@ -96,7 +96,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
     struct netif * intf;
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#if defined(NETIF_FOREACH)
     NETIF_FOREACH(intf)
 #else
     for (intf = netif_list; intf != NULL; intf = intf->next)
@@ -120,7 +120,7 @@ bool InterfaceIterator::Next()
     // Verify the previous netif is still on the list if netifs.  If so,
     // advance to the next nextif.
     struct netif * prevNetif = mCurNetif;
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#if defined(NETIF_FOREACH)
     NETIF_FOREACH(mCurNetif)
 #else
     for (mCurNetif = netif_list; mCurNetif != NULL; mCurNetif = mCurNetif->next)
@@ -152,12 +152,7 @@ bool InterfaceIterator::IsUp()
 
 bool InterfaceIterator::SupportsMulticast()
 {
-    return HasCurrent() &&
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        (mCurNetif->flags & (NETIF_FLAG_IGMP | NETIF_FLAG_MLD6 | NETIF_FLAG_BROADCAST)) != 0;
-#else
-        (mCurNetif->flags & NETIF_FLAG_POINTTOPOINT) == 0;
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
+    return HasCurrent() && (mCurNetif->flags & (NETIF_FLAG_IGMP | NETIF_FLAG_MLD6 | NETIF_FLAG_BROADCAST)) != 0;
 }
 
 bool InterfaceIterator::HasBroadcastAddress()
