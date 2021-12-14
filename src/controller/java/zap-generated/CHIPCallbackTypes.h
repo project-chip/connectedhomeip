@@ -1312,6 +1312,11 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackTyp
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPUserLabelClusterLabelListAttributeCallbackType)(
+    void *, const chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo::DecodableType &);
+typedef void (*CHIPUserLabelClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
 typedef void (*CHIPWakeOnLanClusterWakeOnLanMacAddressAttributeCallbackType)(
     void *, chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo::DecodableArgType);
 typedef void (*CHIPWakeOnLanClusterAttributeListAttributeCallbackType)(

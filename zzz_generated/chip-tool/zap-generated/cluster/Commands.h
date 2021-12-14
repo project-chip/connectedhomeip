@@ -3563,6 +3563,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | Thermostat                                                          | 0x0201 |
 | ThermostatUserInterfaceConfiguration                                | 0x0204 |
 | ThreadNetworkDiagnostics                                            | 0x0035 |
+| UserLabel                                                           | 0x0041 |
 | WakeOnLan                                                           | 0x0503 |
 | WiFiNetworkDiagnostics                                              | 0x0036 |
 | WindowCovering                                                      | 0x0102 |
@@ -47762,6 +47763,78 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster UserLabel                                                   | 0x0041 |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * LabelList                                                         | 0x0000 |
+| * ClusterRevision                                                   | 0xFFFD |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute LabelList
+ */
+class ReadUserLabelLabelList : public ModelCommand
+{
+public:
+    ReadUserLabelLabelList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "label-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUserLabelLabelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "UserLabel.LabelList response", value);
+    }
+};
+
+/*
+ * Attribute ClusterRevision
+ */
+class ReadUserLabelClusterRevision : public ModelCommand
+{
+public:
+    ReadUserLabelClusterRevision() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadUserLabelClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "UserLabel.ClusterRevision response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster WakeOnLan                                                   | 0x0503 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -52482,6 +52555,17 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterUserLabel(Commands & commands)
+{
+    const char * clusterName = "UserLabel";
+
+    commands_list clusterCommands = {
+        make_unique<ReadUserLabelLabelList>(),       //
+        make_unique<ReadUserLabelClusterRevision>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterWakeOnLan(Commands & commands)
 {
     const char * clusterName = "WakeOnLan";
@@ -52653,6 +52737,7 @@ void registerClusters(Commands & commands)
     registerClusterThermostat(commands);
     registerClusterThermostatUserInterfaceConfiguration(commands);
     registerClusterThreadNetworkDiagnostics(commands);
+    registerClusterUserLabel(commands);
     registerClusterWakeOnLan(commands);
     registerClusterWiFiNetworkDiagnostics(commands);
     registerClusterWindowCovering(commands);

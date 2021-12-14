@@ -3753,6 +3753,31 @@ private:
     bool keepAlive;
 };
 
+class CHIPUserLabelLabelListAttributeCallback : public chip::Callback::Callback<CHIPUserLabelClusterLabelListAttributeCallbackType>
+{
+public:
+    CHIPUserLabelLabelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPUserLabelLabelListAttributeCallback();
+
+    static void maybeDestroy(CHIPUserLabelLabelListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPUserLabelLabelListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPWakeOnLanAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPWakeOnLanClusterAttributeListAttributeCallbackType>
 {

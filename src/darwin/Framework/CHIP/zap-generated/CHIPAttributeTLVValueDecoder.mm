@@ -8676,6 +8676,64 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
         }
         break;
     }
+    case Clusters::UserLabel::Id: {
+        using namespace Clusters::UserLabel;
+        switch (aPath.mAttributeId) {
+        case Attributes::LabelList::Id: {
+            using TypeInfo = Attributes::LabelList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPUserLabelClusterLabelStruct * newElement_0;
+                newElement_0 = [CHIPUserLabelClusterLabelStruct new];
+                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                              length:entry_0.label.size()
+                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                              length:entry_0.label.size()
+                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                              length:entry_0.value.size()
+                                                            encoding:NSUTF8StringEncoding];
+                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                              length:entry_0.value.size()
+                                                            encoding:NSUTF8StringEncoding];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
+            return value;
+        }
+        case Attributes::ClusterRevision::Id: {
+            using TypeInfo = Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
     case Clusters::WakeOnLan::Id: {
         using namespace Clusters::WakeOnLan;
         switch (aPath.mAttributeId) {

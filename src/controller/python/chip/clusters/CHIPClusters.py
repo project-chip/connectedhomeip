@@ -5189,6 +5189,24 @@ class ChipClusters:
                 },
             },
     }
+    _USER_LABEL_CLUSTER_INFO = {
+            "clusterName": "UserLabel",
+            "clusterId": 0x00000041,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "LabelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _WAKE_ON_LAN_CLUSTER_INFO = {
             "clusterName": "WakeOnLan",
             "clusterId": 0x00000503,
@@ -5562,6 +5580,7 @@ class ChipClusters:
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
@@ -5624,6 +5643,7 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,

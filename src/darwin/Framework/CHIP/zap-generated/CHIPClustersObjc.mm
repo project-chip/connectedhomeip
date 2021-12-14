@@ -21536,6 +21536,38 @@ using namespace chip::app::Clusters;
 
 @end
 
+@implementation CHIPUserLabel
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeLabelListWithCompletionHandler:(void (^)(
+                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPUserLabelLabelListListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = UserLabel::Attributes::LabelList::TypeInfo;
+            auto successFn = Callback<UserLabelLabelListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                              NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = UserLabel::Attributes::ClusterRevision::TypeInfo;
+        auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+@end
+
 @implementation CHIPWakeOnLan
 
 - (chip::Controller::ClusterBase *)getCluster

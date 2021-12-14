@@ -180,7 +180,10 @@ public:
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
-    CHIP_ERROR GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList);
+    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
+                                 LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
+                                LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
 private:
     bool mInitialized                   = false;
@@ -424,9 +427,18 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duratio
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
 }
 
-inline CHIP_ERROR PlatformManager::GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList)
+inline CHIP_ERROR
+PlatformManager::GetFixedLabelList(EndpointId endpoint,
+                                   LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR
+PlatformManager::GetUserLabelList(EndpointId endpoint,
+                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
 }
 
 } // namespace DeviceLayer

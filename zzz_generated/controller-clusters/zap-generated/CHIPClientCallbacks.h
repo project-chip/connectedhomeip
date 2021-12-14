@@ -602,6 +602,11 @@ void ThreadNetworkDiagnosticsClusterAttributeListListAttributeFilter(chip::TLV::
                                                                      chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ThreadNetworkDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void UserLabelClusterLabelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                  chip::Callback::Cancelable * onFailureCallback);
+typedef void (*UserLabelLabelListListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & data);
 void WakeOnLanClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*WakeOnLanAttributeListListAttributeCallback)(void * context,
