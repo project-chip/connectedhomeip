@@ -39,6 +39,8 @@
 #include <lwip/tcpip.h>
 #include <lwip/udp.h>
 
+static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
+
 #if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
     !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 #define HAVE_LWIP_MULTICAST_LOOP 0
