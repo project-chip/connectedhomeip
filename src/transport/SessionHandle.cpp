@@ -47,7 +47,7 @@ SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
         else if (mGroupId.HasValue())
         {
             subjectDescriptor.authMode = AuthMode::kGroup;
-            subjectDescriptor.subject  = kMinGroupNodeId | mGroupId.Value();
+            subjectDescriptor.subject  = NodeIdFromGroupId(mGroupId.Value());
         }
     }
     return subjectDescriptor;
