@@ -51,7 +51,7 @@ extern "C" void ChipTest(void)
 
     printf("***** CHIP ameba pigweed example *****\r\n");
 
-    //pw_sys_io_Init();
+    // pw_sys_io_Init();
 
     xTaskCreate(RunRpcService, "RPC_Task", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY, &sRpcTaskHandle);
 }

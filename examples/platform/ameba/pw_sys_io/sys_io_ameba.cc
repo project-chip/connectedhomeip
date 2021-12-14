@@ -23,8 +23,8 @@
 
 #include "serial_api.h"
 
-#define UART_TX     PA_18
-#define UART_RX     PA_19
+#define UART_TX PA_18
+#define UART_RX PA_19
 
 serial_t sobj;
 int console_getchar(uint8_t * chr)
