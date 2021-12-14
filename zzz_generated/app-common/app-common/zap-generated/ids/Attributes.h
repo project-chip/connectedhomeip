@@ -4785,7 +4785,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WakeOnLan
 
-namespace TvChannel {
+namespace Channel {
 namespace Attributes {
 
 namespace ChannelList {
@@ -4813,7 +4813,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Attributes {

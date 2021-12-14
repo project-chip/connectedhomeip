@@ -29934,21 +29934,21 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace WakeOnLan
-namespace TvChannel {
-// Enum for TvChannelErrorType
-enum class TvChannelErrorType : uint8_t
+namespace Channel {
+// Enum for ChannelErrorType
+enum class ChannelErrorType : uint8_t
 {
     kMultipleMatches = 0x00,
     kNoMatches       = 0x01,
 };
-// Enum for TvChannelLineupInfoType
-enum class TvChannelLineupInfoType : uint8_t
+// Enum for ChannelLineupInfoType
+enum class ChannelLineupInfoType : uint8_t
 {
     kMso = 0x00,
 };
 
 namespace Structs {
-namespace TvChannelInfo {
+namespace ChannelInfo {
 enum class Fields
 {
     kMajorNumber       = 1,
@@ -29973,8 +29973,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TvChannelInfo
-namespace TvChannelLineupInfo {
+} // namespace ChannelInfo
+namespace ChannelLineupInfo {
 enum class Fields
 {
     kOperatorName   = 1,
@@ -29989,7 +29989,7 @@ public:
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    TvChannelLineupInfoType lineupInfoType;
+    ChannelLineupInfoType lineupInfoType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -29997,7 +29997,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TvChannelLineupInfo
+} // namespace ChannelLineupInfo
 } // namespace Structs
 
 namespace Commands {
@@ -30037,13 +30037,13 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     chip::CharSpan match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType;
+    using ResponseType = Clusters::Channel::Commands::ChangeChannelResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30052,7 +30052,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     chip::CharSpan match;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30070,10 +30070,10 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::TvChannelInfo::Type channelMatch;
-    TvChannelErrorType errorType;
+    Structs::ChannelInfo::Type channelMatch;
+    ChannelErrorType errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30086,10 +30086,10 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::TvChannelInfo::DecodableType channelMatch;
-    TvChannelErrorType errorType;
+    Structs::ChannelInfo::DecodableType channelMatch;
+    ChannelErrorType errorType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -30105,7 +30105,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
@@ -30121,7 +30121,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
@@ -30139,7 +30139,7 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t count;
 
@@ -30154,7 +30154,7 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t count;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30167,11 +30167,11 @@ namespace Attributes {
 namespace ChannelList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::TvChannelInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> &;
+    using Type             = DataModel::List<const Structs::ChannelInfo::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ChannelInfo::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ChannelInfo::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30179,11 +30179,11 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = Structs::TvChannelLineupInfo::Type;
-    using DecodableType    = Structs::TvChannelLineupInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelLineupInfo::DecodableType &;
+    using Type             = Structs::ChannelLineupInfo::Type;
+    using DecodableType    = Structs::ChannelLineupInfo::DecodableType;
+    using DecodableArgType = const Structs::ChannelLineupInfo::DecodableType &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30191,11 +30191,11 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type             = Structs::TvChannelInfo::Type;
-    using DecodableType    = Structs::TvChannelInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelInfo::DecodableType &;
+    using Type             = Structs::ChannelInfo::Type;
+    using DecodableType    = Structs::ChannelInfo::DecodableType;
+    using DecodableArgType = const Structs::ChannelInfo::DecodableType &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30207,7 +30207,7 @@ struct TypeInfo
     using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
     using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30219,7 +30219,7 @@ struct TypeInfo
     using DecodableType    = uint32_t;
     using DecodableArgType = uint32_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30231,7 +30231,7 @@ struct TypeInfo
     using DecodableType    = uint16_t;
     using DecodableArgType = uint16_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30241,7 +30241,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -30254,7 +30254,7 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 namespace TargetNavigator {
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t

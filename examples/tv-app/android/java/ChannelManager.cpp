@@ -127,8 +127,7 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mChangeChannelMethod =
-        env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/tcl/chip/tvapp/ChannelInfo;");
+    mChangeChannelMethod = env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/tcl/chip/tvapp/ChannelInfo;");
     if (mChangeChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannel' method");
@@ -396,8 +395,8 @@ bool ChannelManager::changeChannelByNumber(uint16_t majorNumber, uint16_t minorN
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received ChannelManager::ChannelClusterChangeChannelByNumber majorNumber %d, minorNumber %d",
-                    majorNumber, minorNumber);
+    ChipLogProgress(Zcl, "Received ChannelManager::ChannelClusterChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
+                    minorNumber);
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mchangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mchangeChannelByNumberMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));

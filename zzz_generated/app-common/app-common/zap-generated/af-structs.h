@@ -204,6 +204,25 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
+// Struct for ChannelInfo
+typedef struct _ChannelInfo
+{
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
+} ChannelInfo;
+
+// Struct for ChannelLineupInfo
+typedef struct _ChannelLineupInfo
+{
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
+    uint8_t lineupInfoType;
+} ChannelLineupInfo;
+
 // Struct for DeviceType
 typedef struct _DeviceType
 {
@@ -501,25 +520,6 @@ typedef struct _TransferredPhase
     uint16_t energy;
     uint16_t maxActivationDelay;
 } TransferredPhase;
-
-// Struct for TvChannelInfo
-typedef struct _TvChannelInfo
-{
-    uint16_t majorNumber;
-    uint16_t minorNumber;
-    chip::CharSpan name;
-    chip::CharSpan callSign;
-    chip::CharSpan affiliateCallSign;
-} TvChannelInfo;
-
-// Struct for TvChannelLineupInfo
-typedef struct _TvChannelLineupInfo
-{
-    chip::CharSpan operatorName;
-    chip::CharSpan lineupName;
-    chip::CharSpan postalCode;
-    uint8_t lineupInfoType;
-} TvChannelLineupInfo;
 
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult

@@ -810,6 +810,86 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedChangeChannelResponseCallback
+      implements ChipClusters.ChannelCluster.ChangeChannelResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess( // channelMatch: Struct ChannelInfo
+        // Conversion from this type to Java is not properly implemented yet
+        Integer errorType) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // channelMatch: Struct ChannelInfo
+      // Conversion from this type to Java is not properly implemented yet
+      CommandResponseInfo errorTypeResponseValue = new CommandResponseInfo("errorType", "int");
+      responseValues.put(errorTypeResponseValue, errorType);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedChannelClusterChannelListAttributeCallback
+      implements ChipClusters.ChannelCluster.ChannelListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipClusters.ChannelCluster.ChannelListAttribute> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList", "List<ChipClusters.ChannelCluster.ChannelListAttribute>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedChannelClusterAttributeListAttributeCallback
+      implements ChipClusters.ChannelCluster.AttributeListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Object> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedColorControlClusterAttributeListAttributeCallback
       implements ChipClusters.ColorControlCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -3422,86 +3502,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedChangeChannelResponseCallback
-      implements ChipClusters.TvChannelCluster.ChangeChannelResponseCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess( // channelMatch: Struct TvChannelInfo
-        // Conversion from this type to Java is not properly implemented yet
-        Integer errorType) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // channelMatch: Struct TvChannelInfo
-      // Conversion from this type to Java is not properly implemented yet
-      CommandResponseInfo errorTypeResponseValue = new CommandResponseInfo("errorType", "int");
-      responseValues.put(errorTypeResponseValue, errorType);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception error) {
-      callback.onFailure(error);
-    }
-  }
-
-  public static class DelegatedTvChannelClusterChannelListAttributeCallback
-      implements ChipClusters.TvChannelCluster.ChannelListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipClusters.TvChannelCluster.ChannelListAttribute> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipClusters.TvChannelCluster.ChannelListAttribute>");
-
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedTvChannelClusterAttributeListAttributeCallback
-      implements ChipClusters.TvChannelCluster.AttributeListAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<Object> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedNavigateTargetResponseCallback
       implements ChipClusters.TargetNavigatorCluster.NavigateTargetResponseCallback,
           DelegatedClusterCallback {
@@ -4440,6 +4440,10 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.BridgedDeviceBasicCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInfo);
+    ClusterInfo channelClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.ChannelCluster(ptr, endpointId), new HashMap<>());
+    clusterMap.put("channel", channelClusterInfo);
     ClusterInfo colorControlClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.ColorControlCluster(ptr, endpointId),
@@ -4620,11 +4624,6 @@ public class ClusterInfoMapping {
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.SwitchCluster(ptr, endpointId), new HashMap<>());
     clusterMap.put("switch", switchClusterInfo);
-    ClusterInfo tvChannelClusterInfo =
-        new ClusterInfo(
-            (ptr, endpointId) -> new ChipClusters.TvChannelCluster(ptr, endpointId),
-            new HashMap<>());
-    clusterMap.put("tvChannel", tvChannelClusterInfo);
     ClusterInfo targetNavigatorClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.TargetNavigatorCluster(ptr, endpointId),
@@ -4697,6 +4696,7 @@ public class ClusterInfoMapping {
     destination.get("booleanState").combineCommands(source.get("booleanState"));
     destination.get("bridgedActions").combineCommands(source.get("bridgedActions"));
     destination.get("bridgedDeviceBasic").combineCommands(source.get("bridgedDeviceBasic"));
+    destination.get("channel").combineCommands(source.get("channel"));
     destination.get("colorControl").combineCommands(source.get("colorControl"));
     destination.get("contentLauncher").combineCommands(source.get("contentLauncher"));
     destination.get("descriptor").combineCommands(source.get("descriptor"));
@@ -4747,7 +4747,6 @@ public class ClusterInfoMapping {
     destination.get("scenes").combineCommands(source.get("scenes"));
     destination.get("softwareDiagnostics").combineCommands(source.get("softwareDiagnostics"));
     destination.get("switch").combineCommands(source.get("switch"));
-    destination.get("tvChannel").combineCommands(source.get("tvChannel"));
     destination.get("targetNavigator").combineCommands(source.get("targetNavigator"));
     destination.get("temperatureMeasurement").combineCommands(source.get("temperatureMeasurement"));
     destination.get("testCluster").combineCommands(source.get("testCluster"));
@@ -5555,6 +5554,69 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> bridgedDeviceBasicClusterInteractionInfoMap =
         new LinkedHashMap<>();
     commandMap.put("bridgedDeviceBasic", bridgedDeviceBasicClusterInteractionInfoMap);
+    Map<String, InteractionInfo> channelClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> channelchangeChannelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo channelchangeChannelmatchCommandParameterInfo =
+        new CommandParameterInfo("match", String.class);
+    channelchangeChannelCommandParams.put("match", channelchangeChannelmatchCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo channelchangeChannelInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .changeChannel(
+                      (ChipClusters.ChannelCluster.ChangeChannelResponseCallback) callback,
+                      (String) commandArguments.get("match"));
+            },
+            () -> new DelegatedChangeChannelResponseCallback(),
+            channelchangeChannelCommandParams);
+    channelClusterInteractionInfoMap.put("changeChannel", channelchangeChannelInteractionInfo);
+    Map<String, CommandParameterInfo> channelchangeChannelByNumberCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo channelchangeChannelByNumbermajorNumberCommandParameterInfo =
+        new CommandParameterInfo("majorNumber", int.class);
+    channelchangeChannelByNumberCommandParams.put(
+        "majorNumber", channelchangeChannelByNumbermajorNumberCommandParameterInfo);
+
+    CommandParameterInfo channelchangeChannelByNumberminorNumberCommandParameterInfo =
+        new CommandParameterInfo("minorNumber", int.class);
+    channelchangeChannelByNumberCommandParams.put(
+        "minorNumber", channelchangeChannelByNumberminorNumberCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo channelchangeChannelByNumberInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .changeChannelByNumber(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("majorNumber"),
+                      (Integer) commandArguments.get("minorNumber"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            channelchangeChannelByNumberCommandParams);
+    channelClusterInteractionInfoMap.put(
+        "changeChannelByNumber", channelchangeChannelByNumberInteractionInfo);
+    Map<String, CommandParameterInfo> channelskipChannelCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo channelskipChannelcountCommandParameterInfo =
+        new CommandParameterInfo("count", int.class);
+    channelskipChannelCommandParams.put("count", channelskipChannelcountCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo channelskipChannelInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ChannelCluster) cluster)
+                  .skipChannel(
+                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("count"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            channelskipChannelCommandParams);
+    channelClusterInteractionInfoMap.put("skipChannel", channelskipChannelInteractionInfo);
+    commandMap.put("channel", channelClusterInteractionInfoMap);
     Map<String, InteractionInfo> colorControlClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> colorControlcolorLoopSetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -8454,70 +8516,6 @@ public class ClusterInfoMapping {
     commandMap.put("softwareDiagnostics", softwareDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> switchClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("switch", switchClusterInteractionInfoMap);
-    Map<String, InteractionInfo> tvChannelClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> tvChannelchangeChannelCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo tvChannelchangeChannelmatchCommandParameterInfo =
-        new CommandParameterInfo("match", String.class);
-    tvChannelchangeChannelCommandParams.put(
-        "match", tvChannelchangeChannelmatchCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo tvChannelchangeChannelInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .changeChannel(
-                      (ChipClusters.TvChannelCluster.ChangeChannelResponseCallback) callback,
-                      (String) commandArguments.get("match"));
-            },
-            () -> new DelegatedChangeChannelResponseCallback(),
-            tvChannelchangeChannelCommandParams);
-    tvChannelClusterInteractionInfoMap.put("changeChannel", tvChannelchangeChannelInteractionInfo);
-    Map<String, CommandParameterInfo> tvChannelchangeChannelByNumberCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo tvChannelchangeChannelByNumbermajorNumberCommandParameterInfo =
-        new CommandParameterInfo("majorNumber", int.class);
-    tvChannelchangeChannelByNumberCommandParams.put(
-        "majorNumber", tvChannelchangeChannelByNumbermajorNumberCommandParameterInfo);
-
-    CommandParameterInfo tvChannelchangeChannelByNumberminorNumberCommandParameterInfo =
-        new CommandParameterInfo("minorNumber", int.class);
-    tvChannelchangeChannelByNumberCommandParams.put(
-        "minorNumber", tvChannelchangeChannelByNumberminorNumberCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo tvChannelchangeChannelByNumberInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .changeChannelByNumber(
-                      (DefaultClusterCallback) callback,
-                      (Integer) commandArguments.get("majorNumber"),
-                      (Integer) commandArguments.get("minorNumber"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            tvChannelchangeChannelByNumberCommandParams);
-    tvChannelClusterInteractionInfoMap.put(
-        "changeChannelByNumber", tvChannelchangeChannelByNumberInteractionInfo);
-    Map<String, CommandParameterInfo> tvChannelskipChannelCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo tvChannelskipChannelcountCommandParameterInfo =
-        new CommandParameterInfo("count", int.class);
-    tvChannelskipChannelCommandParams.put("count", tvChannelskipChannelcountCommandParameterInfo);
-
-    // Populate commands
-    InteractionInfo tvChannelskipChannelInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.TvChannelCluster) cluster)
-                  .skipChannel(
-                      (DefaultClusterCallback) callback, (Integer) commandArguments.get("count"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            tvChannelskipChannelCommandParams);
-    tvChannelClusterInteractionInfoMap.put("skipChannel", tvChannelskipChannelInteractionInfo);
-    commandMap.put("tvChannel", tvChannelClusterInteractionInfoMap);
     Map<String, InteractionInfo> targetNavigatorClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> targetNavigatornavigateTargetCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

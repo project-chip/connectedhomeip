@@ -18884,9 +18884,9 @@ namespace Events {
 } // namespace Events
 
 } // namespace WakeOnLan
-namespace TvChannel {
+namespace Channel {
 namespace Structs {
-namespace TvChannelInfo {
+namespace ChannelInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -18937,8 +18937,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TvChannelInfo
-namespace TvChannelLineupInfo {
+} // namespace ChannelInfo
+namespace ChannelLineupInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -18985,7 +18985,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TvChannelLineupInfo
+} // namespace ChannelLineupInfo
 } // namespace Structs
 
 namespace Commands {
@@ -19169,7 +19169,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {
 } // namespace Events
 
-} // namespace TvChannel
+} // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
 namespace NavigateTargetTargetInfo {

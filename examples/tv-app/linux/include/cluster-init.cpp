@@ -19,10 +19,10 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
+#include "channel/ChannelManager.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "channel/ChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -108,8 +108,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<ChannelManager, app::Clusters::Channel::Attributes::ChannelList::TypeInfo,
-             &ChannelManager::proxyGetChannelList>
+TvAttrAccess<ChannelManager, app::Clusters::Channel::Attributes::ChannelList::TypeInfo, &ChannelManager::proxyGetChannelList>
     gChannelAttrAccess;
 
 } // anonymous namespace

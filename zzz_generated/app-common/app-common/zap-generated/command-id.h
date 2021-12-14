@@ -355,7 +355,7 @@
 #define ZCL_START_WARNING_COMMAND_ID (0x00)
 #define ZCL_SQUAWK_COMMAND_ID (0x01)
 
-// Commands for cluster: TV Channel
+// Commands for cluster: Channel
 #define ZCL_CHANGE_CHANNEL_COMMAND_ID (0x00)
 #define ZCL_CHANGE_CHANNEL_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_CHANGE_CHANNEL_BY_NUMBER_COMMAND_ID (0x01)

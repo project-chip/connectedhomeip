@@ -287,6 +287,69 @@ void CHIPApplicationLauncherClusterStopAppResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
+CHIPChannelClusterChangeChannelResponseCallback::CHIPChannelClusterChangeChannelResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPChannelClusterChangeChannelResponseCallback::~CHIPChannelClusterChangeChannelResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPChannelClusterChangeChannelResponseCallback, void (*)(CHIPChannelClusterChangeChannelResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPChannelClusterChangeChannelResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPChannelClusterChangeChannelResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject channelMatch;
+
+    channelMatch = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    jobject errorType;
+
+    std::string errorTypeClassName     = "java/lang/Integer";
+    std::string errorTypeCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::Channel::ChannelErrorType>(
+        errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
+}
 CHIPContentLauncherClusterLaunchContentResponseCallback::CHIPContentLauncherClusterLaunchContentResponseCallback(
     jobject javaCallback) :
     Callback::Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>(CallbackFn, this)
@@ -3209,70 +3272,6 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
     extensionFieldSets = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
-}
-CHIPTvChannelClusterChangeChannelResponseCallback::CHIPTvChannelClusterChangeChannelResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPTvChannelClusterChangeChannelResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPTvChannelClusterChangeChannelResponseCallback::~CHIPTvChannelClusterChangeChannelResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPTvChannelClusterChangeChannelResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPTvChannelClusterChangeChannelResponseCallback,
-                    void (*)(CHIPTvChannelClusterChangeChannelResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPTvChannelClusterChangeChannelResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPTvChannelClusterChangeChannelResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject channelMatch;
-
-    channelMatch = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
-    jobject errorType;
-
-    std::string errorTypeClassName     = "java/lang/Integer";
-    std::string errorTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TvChannel::TvChannelErrorType>(
-        errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
 }
 CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CHIPTargetNavigatorClusterNavigateTargetResponseCallback(
     jobject javaCallback) :
