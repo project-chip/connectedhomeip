@@ -3304,6 +3304,18 @@ public class ClusterReadMapping {
             readLevelControlAttributeListCommandParams);
     readLevelControlInteractionInfo.put(
         "readAttributeListAttribute", readLevelControlAttributeListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readLevelControlFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readLevelControlFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LevelControlCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readLevelControlFeatureMapCommandParams);
+    readLevelControlInteractionInfo.put(
+        "readFeatureMapAttribute", readLevelControlFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readLevelControlClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readLevelControlClusterRevisionAttributeInteractionInfo =

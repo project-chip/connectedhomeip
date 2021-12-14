@@ -21203,6 +21203,7 @@ private:
 | * DefaultMoveRate                                                   | 0x0014 |
 | * StartUpCurrentLevel                                               | 0x4000 |
 | * AttributeList                                                     | 0xFFFB |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -22600,6 +22601,36 @@ public:
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
         OnGeneralAttributeResponse(context, "LevelControl.AttributeList response", value);
+    }
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadLevelControlFeatureMap : public ModelCommand
+{
+public:
+    ReadLevelControlFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLevelControlFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LevelControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.FeatureMap response", value);
     }
 };
 
@@ -51848,6 +51879,7 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<WriteLevelControlStartUpCurrentLevel>(),  //
         make_unique<ReportLevelControlStartUpCurrentLevel>(), //
         make_unique<ReadLevelControlAttributeList>(),         //
+        make_unique<ReadLevelControlFeatureMap>(),            //
         make_unique<ReadLevelControlClusterRevision>(),       //
         make_unique<ReportLevelControlClusterRevision>(),     //
     };
