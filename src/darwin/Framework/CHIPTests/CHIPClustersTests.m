@@ -27290,6 +27290,120 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+bool testSendClusterTestCluster_000298_WaitForReport_Fulfilled = false;
+ResponseHandler test_TestCluster_list_int8u_Reported = nil;
+- (void)testSendClusterTestCluster_000298_WaitForReport
+{
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    test_TestCluster_list_int8u_Reported = ^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Report: Subscribe to list attribute Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 4);
+            XCTAssertEqual([actualValue[0] unsignedCharValue], 1);
+            XCTAssertEqual([actualValue[1] unsignedCharValue], 2);
+            XCTAssertEqual([actualValue[2] unsignedCharValue], 3);
+            XCTAssertEqual([actualValue[3] unsignedCharValue], 4);
+        }
+
+        testSendClusterTestCluster_000298_WaitForReport_Fulfilled = true;
+    };
+}
+- (void)testSendClusterTestCluster_000299_SubscribeAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Subscribe to list attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    uint16_t minIntervalArgument = 2U;
+    uint16_t maxIntervalArgument = 10U;
+    [cluster subscribeAttributeListInt8uWithMinInterval:minIntervalArgument
+        maxInterval:maxIntervalArgument
+        subscriptionEstablished:^{
+            XCTAssertEqual(testSendClusterTestCluster_000298_WaitForReport_Fulfilled, true);
+            [expectation fulfill];
+        }
+        reportHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+            NSLog(@"Subscribe to list attribute Error: %@", err);
+
+            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+            if (test_TestCluster_list_int8u_Reported != nil) {
+                ResponseHandler callback = test_TestCluster_list_int8u_Reported;
+                test_TestCluster_list_int8u_Reported = nil;
+                callback(value, err);
+            }
+        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000300_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write subscribed-to list attribute"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id listInt8uArgument;
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [NSNumber numberWithUnsignedChar:5];
+        temp_0[1] = [NSNumber numberWithUnsignedChar:6];
+        temp_0[2] = [NSNumber numberWithUnsignedChar:7];
+        temp_0[3] = [NSNumber numberWithUnsignedChar:8];
+        listInt8uArgument = temp_0;
+    }
+    [cluster writeAttributeListInt8uWithValue:listInt8uArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write subscribed-to list attribute Error: %@", err);
+
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                [expectation fulfill];
+                            }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000301_WaitForReport
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Check for list attribute report"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    test_TestCluster_list_int8u_Reported = ^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Check for list attribute report Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue count], 4);
+            XCTAssertEqual([actualValue[0] unsignedCharValue], 5);
+            XCTAssertEqual([actualValue[1] unsignedCharValue], 6);
+            XCTAssertEqual([actualValue[2] unsignedCharValue], 7);
+            XCTAssertEqual([actualValue[3] unsignedCharValue], 8);
+        }
+
+        [expectation fulfill];
+    };
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestSaveAs_000000_WaitForCommissionee
 {

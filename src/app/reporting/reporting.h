@@ -39,6 +39,7 @@
 
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/af-types.h>
 
 /** @brief Reporting Attribute Change
@@ -55,3 +56,8 @@ void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::Clu
  * Same but with just an attribute path and no data available.
  */
 void MatterReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
+
+/*
+ * Same but with a nicer attribute path.
+ */
+void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath);

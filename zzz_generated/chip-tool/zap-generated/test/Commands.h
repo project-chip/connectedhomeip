@@ -35461,6 +35461,22 @@ public:
                             " ***** Test Step 297 : Send a command that takes an optional parameter but do not set it.\n");
             err = TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_297();
             break;
+        case 298:
+            ChipLogProgress(chipTool, " ***** Test Step 298 : Report: Subscribe to list attribute\n");
+            err = TestReportSubscribeToListAttribute_298();
+            break;
+        case 299:
+            ChipLogProgress(chipTool, " ***** Test Step 299 : Subscribe to list attribute\n");
+            err = TestSubscribeToListAttribute_299();
+            break;
+        case 300:
+            ChipLogProgress(chipTool, " ***** Test Step 300 : Write subscribed-to list attribute\n");
+            err = TestWriteSubscribedToListAttribute_300();
+            break;
+        case 301:
+            ChipLogProgress(chipTool, " ***** Test Step 301 : Check for list attribute report\n");
+            err = TestCheckForListAttributeReport_301();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -35472,7 +35488,11 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 298;
+    const uint16_t mTestCount = 302;
+
+    typedef void (*Test_TestCluster_list_int8u_ReportCallback)(void * context,
+                                                               const chip::app::DataModel::DecodableList<uint8_t> & value);
+    Test_TestCluster_list_int8u_ReportCallback mTest_TestCluster_list_int8u_Reported = nullptr;
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
@@ -37808,6 +37828,52 @@ private:
     {
         (static_cast<TestCluster *>(context))->OnSuccessResponse_295(listInt8u);
     }
+
+    static void OnFailureCallback_298(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_298(status);
+    }
+
+    static void OnSuccessCallback_298(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_298(listInt8u);
+    }
+
+    bool mReceivedReport_298 = false;
+
+    static void OnFailureCallback_299(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_299(status);
+    }
+
+    static void OnSuccessCallback_299(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_299(listInt8u);
+    }
+
+    static void OnSubscriptionEstablished_299(void * context)
+    {
+        (static_cast<TestCluster *>(context))->OnSubscriptionEstablishedResponse_299();
+    }
+
+    static void OnFailureCallback_300(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_300(status);
+    }
+
+    static void OnSuccessCallback_300(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_300(); }
+
+    static void OnFailureCallback_301(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_301(status);
+    }
+
+    static void OnSuccessCallback_301(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_301(listInt8u);
+    }
+
+    bool mReceivedReport_301 = false;
 
     //
     // Tests methods
@@ -44369,6 +44435,123 @@ private:
     void OnFailureResponse_297(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_297() { NextTest(); }
+
+    CHIP_ERROR TestReportSubscribeToListAttribute_298()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_TestCluster_list_int8u_Reported = OnSuccessCallback_298;
+        return WaitForMs(0);
+    }
+
+    void OnFailureResponse_298(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_298(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        mReceivedReport_298 = true;
+
+        auto iter = listInt8u.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
+        VerifyOrReturn(CheckValue("listInt8u[0]", iter.GetValue(), 1));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
+        VerifyOrReturn(CheckValue("listInt8u[1]", iter.GetValue(), 2));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
+        VerifyOrReturn(CheckValue("listInt8u[2]", iter.GetValue(), 3));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
+        VerifyOrReturn(CheckValue("listInt8u[3]", iter.GetValue(), 4));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
+    }
+
+    CHIP_ERROR TestSubscribeToListAttribute_299()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t minIntervalArgument;
+        minIntervalArgument = 2U;
+        uint16_t maxIntervalArgument;
+        maxIntervalArgument = 10U;
+
+        ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            this, OnSuccessCallback_299, OnFailureCallback_299, minIntervalArgument, maxIntervalArgument,
+            OnSubscriptionEstablished_299));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_299(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_299(const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        if (mTest_TestCluster_list_int8u_Reported)
+        {
+            auto callback                         = mTest_TestCluster_list_int8u_Reported;
+            mTest_TestCluster_list_int8u_Reported = nullptr;
+            callback(this, value);
+        }
+    }
+
+    void OnSubscriptionEstablishedResponse_299()
+    {
+        VerifyOrReturn(mReceivedReport_298, Exit("Initial report not received!"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteSubscribedToListAttribute_300()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::List<const uint8_t> listInt8uArgument;
+
+        uint8_t listInt8uList[4];
+        listInt8uList[0]  = 5;
+        listInt8uList[1]  = 6;
+        listInt8uList[2]  = 7;
+        listInt8uList[3]  = 8;
+        listInt8uArgument = listInt8uList;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            listInt8uArgument, this, OnSuccessCallback_300, OnFailureCallback_300));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_300(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_300() { NextTest(); }
+
+    CHIP_ERROR TestCheckForListAttributeReport_301()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        mTest_TestCluster_list_int8u_Reported = OnSuccessCallback_301;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_301(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_301(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        mReceivedReport_301 = true;
+
+        auto iter = listInt8u.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
+        VerifyOrReturn(CheckValue("listInt8u[0]", iter.GetValue(), 5));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 1));
+        VerifyOrReturn(CheckValue("listInt8u[1]", iter.GetValue(), 6));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 2));
+        VerifyOrReturn(CheckValue("listInt8u[2]", iter.GetValue(), 7));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 3));
+        VerifyOrReturn(CheckValue("listInt8u[3]", iter.GetValue(), 8));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(listInt8u)>("listInt8u", iter, 4));
+
+        NextTest();
+    }
 };
 
 class TestClusterComplexTypes : public TestCommand
