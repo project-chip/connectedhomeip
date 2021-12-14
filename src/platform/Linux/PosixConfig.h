@@ -76,6 +76,7 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_NodeLabel;
 
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;

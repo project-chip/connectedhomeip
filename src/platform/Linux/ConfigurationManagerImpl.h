@@ -45,6 +45,8 @@ public:
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR GetLocationCapability(uint8_t & location) override;
+    CHIP_ERROR GetNodeLabel(char * buf, size_t bufSize) override;
+    CHIP_ERROR StoreNodeLabel(const char * buf, size_t bufSize) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:

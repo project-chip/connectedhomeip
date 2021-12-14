@@ -365,5 +365,16 @@ CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
     return err;
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetNodeLabel(char * buf, size_t bufSize)
+{
+    size_t dateLen;
+    return ReadConfigValueStr(PosixConfig::kConfigKey_NodeLabel, buf, bufSize, dateLen);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreNodeLabel(const char * buf, size_t bufSize)
+{
+    return WriteConfigValueStr(PosixConfig::kConfigKey_NodeLabel, buf, bufSize);
+}
+
 } // namespace DeviceLayer
 } // namespace chip
