@@ -62,6 +62,11 @@ ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpo
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                                       ContentLaunchBrandingInformation & brandingInformation);
 
+
+std::list<std::string> contentLauncherClusterGetAcceptsHeaderList();
+
+uint32_t contentLauncherClusterGetSupportedStreamingProtocols();
+
 namespace {
 
 class ContentLauncherAttrAccess : public app::AttributeAccessInterface
@@ -98,10 +103,13 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
 CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder)
 {
+    std::list<std::string> acceptsHeaderList = contentLauncherClusterGetAcceptsHeaderList();
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < 2; index++)
-        {
-            CharSpan span("example", strlen("example"));
+
+        std::list<std::string> acceptsHeaderList = contentLauncherClusterGetAcceptsHeaderList();
+
+        for (std::string acceptedHeader : acceptsHeaderList) {
+            CharSpan span(acceptedHeader.c_str(), strlen(acceptedHeader.c_str()));
             ReturnErrorOnFailure(encoder.Encode(span));
         }
         return CHIP_NO_ERROR;
@@ -110,7 +118,7 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeV
 
 CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder)
 {
-    uint8_t streamingProtocols = 0;
+    uint32_t streamingProtocols = contentLauncherClusterGetSupportedStreamingProtocols();
     return aEncoder.Encode(streamingProtocols);
 }
 
