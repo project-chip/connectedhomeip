@@ -22,10 +22,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceLayer.h>
 
-#include "LinuxOTAImageProcessor.h"
-#include "LinuxOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Linux/OTAImageProcessorImpl.h"
+#include "platform/Linux/OTARequestorDriverImpl.h"
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -33,11 +33,11 @@ using chip::CharSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
-using chip::LinuxOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
+using chip::OTAImageProcessorImpl;
 using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;
@@ -52,9 +52,9 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 OTARequestor gRequestorCore;
-LinuxOTARequestorDriver gRequestorUser;
+OTARequestorDriverImpl gRequestorUser;
 BDXDownloader gDownloader;
-LinuxOTAImageProcessor gImageProcessor;
+OTAImageProcessorImpl gImageProcessor;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);

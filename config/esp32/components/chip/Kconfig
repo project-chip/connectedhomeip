@@ -149,6 +149,12 @@ menu "CHIP Core"
             help
                 The maximum number of simultaneously timers in the CHIP System Layer.
 
+        config ENABLE_OTA_REQUESTOR
+            bool "Enable OTA Requestor"
+            default n
+            help
+                Enable this option to enable OTA Requestor for example
+
     endmenu # "System Options"
 
     menu "Security Options"
