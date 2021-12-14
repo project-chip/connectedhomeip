@@ -9933,92 +9933,88 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)addThreadNetworkWithParams:(CHIPNetworkCommissioningClusterAddThreadNetworkParams *)params
-                 completionHandler:(void (^)(CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+- (void)addOrUpdateThreadNetworkWithParams:(CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
+                         completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::AddThreadNetwork::Type request;
+    NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
     request.operationalDataset = [self asByteSpan:params.operationalDataset];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
 
-    new CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(
+    new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)addWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterAddWiFiNetworkParams *)params
-               completionHandler:(void (^)(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+- (void)addOrUpdateWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
+                       completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::AddWiFiNetwork::Type request;
+    NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
     request.ssid = [self asByteSpan:params.ssid];
     request.credentials = [self asByteSpan:params.credentials];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
 
-    new CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(
+    new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)disableNetworkWithParams:(CHIPNetworkCommissioningClusterDisableNetworkParams *)params
-               completionHandler:(void (^)(CHIPNetworkCommissioningClusterDisableNetworkResponseParams * _Nullable data,
+- (void)connectNetworkWithParams:(CHIPNetworkCommissioningClusterConnectNetworkParams *)params
+               completionHandler:(void (^)(CHIPNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    NetworkCommissioning::Commands::DisableNetwork::Type request;
+    NetworkCommissioning::Commands::ConnectNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
 
-    new CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(
+    new CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)enableNetworkWithParams:(CHIPNetworkCommissioningClusterEnableNetworkParams *)params
-              completionHandler:(void (^)(CHIPNetworkCommissioningClusterEnableNetworkResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    NetworkCommissioning::Commands::EnableNetwork::Type request;
-    request.networkID = [self asByteSpan:params.networkID];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
-
-    new CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)removeNetworkWithParams:(CHIPNetworkCommissioningClusterRemoveNetworkParams *)params
-              completionHandler:(void (^)(CHIPNetworkCommissioningClusterRemoveNetworkResponseParams * _Nullable data,
+              completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     NetworkCommissioning::Commands::RemoveNetwork::Type request;
     request.networkID = [self asByteSpan:params.networkID];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
 
-    new CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(
+    new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)reorderNetworkWithParams:(CHIPNetworkCommissioningClusterReorderNetworkParams *)params
+               completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    NetworkCommissioning::Commands::ReorderNetwork::Type request;
+    request.networkID = [self asByteSpan:params.networkID];
+    request.networkIndex = params.networkIndex.unsignedCharValue;
+    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
+
+    new CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -10032,7 +10028,6 @@ using namespace chip::app::Clusters;
     NetworkCommissioning::Commands::ScanNetworks::Type request;
     request.ssid = [self asByteSpan:params.ssid];
     request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
 
     new CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -10042,55 +10037,113 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)updateThreadNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateThreadNetworkParams *)params
-                    completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler
+- (void)readAttributeMaxNetworksWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    ListFreer listFreer;
-    NetworkCommissioning::Commands::UpdateThreadNetwork::Type request;
-    request.operationalDataset = [self asByteSpan:params.operationalDataset];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
-
-    new CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn
-                = Callback<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = NetworkCommissioning::Attributes::MaxNetworks::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
-- (void)updateWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams *)params
-                  completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+- (void)readAttributeNetworksWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    ListFreer listFreer;
-    NetworkCommissioning::Commands::UpdateWiFiNetwork::Type request;
-    request.ssid = [self asByteSpan:params.ssid];
-    request.credentials = [self asByteSpan:params.credentials];
-    request.breadcrumb = params.breadcrumb.unsignedLongLongValue;
-    request.timeoutMs = params.timeoutMs.unsignedIntValue;
-
-    new CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(
+    new CHIPNetworkCommissioningNetworksListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn
-                = Callback<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPNetworkCommissioningAttributeListListAttributeCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = NetworkCommissioning::Attributes::AttributeList::TypeInfo;
-            auto successFn = Callback<NetworkCommissioningAttributeListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = NetworkCommissioning::Attributes::Networks::TypeInfo;
+            auto successFn = Callback<NetworkCommissioningNetworksListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
+}
+
+- (void)readAttributeScanMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeConnectMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo;
+        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)readAttributeInterfaceEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
+        auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeLastNetworkingStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler
+{
+    new CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo;
+            auto successFn
+                = Callback<NetworkCommissioningClusterNetworkCommissioningStatusAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeLastNetworkIDWithCompletionHandler:(void (^)(
+                                                            NSData * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPOctetStringAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = NetworkCommissioning::Attributes::LastNetworkID::TypeInfo;
+            auto successFn = Callback<OctetStringAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeLastConnectErrorValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo;
+        auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
 }
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
@@ -18530,25 +18583,23 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)getRelayStatusLogWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     Thermostat::Commands::GetRelayStatusLog::Type request;
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+    new CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
 - (void)getWeeklyScheduleWithParams:(CHIPThermostatClusterGetWeeklyScheduleParams *)params
-                  completionHandler:(StatusCompletion)completionHandler
+                  completionHandler:(void (^)(CHIPThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
     Thermostat::Commands::GetWeeklySchedule::Type request;
@@ -18557,13 +18608,9 @@ using namespace chip::app::Clusters;
     request.modeToReturn
         = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(params.modeToReturn.unsignedCharValue);
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+    new CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });

@@ -132,24 +132,17 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        ForAllEndpointsWithServerCluster(
-            SoftwareDiagnostics::Id,
-            [](EndpointId endpoint, intptr_t context) -> Loop {
-                // If Software Diagnostics cluster is implemented on this endpoint
-                SoftwareDiagnostics::Structs::SoftwareFault::Type * pSoftwareFault =
-                    reinterpret_cast<SoftwareDiagnostics::Structs::SoftwareFault::Type *>(context);
+        for (auto endpoint : EnabledEndpointsWithServerCluster(SoftwareDiagnostics::Id))
+        {
+            // If Software Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
+            Events::SoftwareFault::Type event{ softwareFault };
 
-                EventNumber eventNumber;
-                Events::SoftwareFault::Type event{ *pSoftwareFault };
-
-                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-                {
-                    ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
-                }
-
-                return Loop::Continue;
-            },
-            reinterpret_cast<intptr_t>(&softwareFault));
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "SoftwareDiagnosticsDelegate: Failed to record SoftwareFault event");
+            }
+        }
     }
 };
 

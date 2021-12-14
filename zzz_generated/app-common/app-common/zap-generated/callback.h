@@ -13932,57 +13932,21 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(
  * @brief Network Commissioning Cluster ScanNetworksResponse Command callback (from server)
  */
 bool emberAfNetworkCommissioningClusterScanNetworksResponseCallback(
-    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t errorCode, chip::CharSpan debugText,
-    /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-    /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj, uint8_t NetworkingStatus, chip::CharSpan DebugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * WiFiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * ThreadScanResults);
 /**
- * @brief Network Commissioning Cluster AddWiFiNetwork Command callback (from client)
+ * @brief Network Commissioning Cluster AddOrUpdateWiFiNetwork Command callback (from client)
  */
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(
+bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::DecodableType & commandData);
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData);
 /**
- * @brief Network Commissioning Cluster AddWiFiNetworkResponse Command callback (from server)
+ * @brief Network Commissioning Cluster AddOrUpdateThreadNetwork Command callback (from client)
  */
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                      chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                      chip::CharSpan debugText);
-/**
- * @brief Network Commissioning Cluster UpdateWiFiNetwork Command callback (from client)
- */
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(
+bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::DecodableType & commandData);
-/**
- * @brief Network Commissioning Cluster UpdateWiFiNetworkResponse Command callback (from server)
- */
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                         chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                         chip::CharSpan debugText);
-/**
- * @brief Network Commissioning Cluster AddThreadNetwork Command callback (from client)
- */
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::DecodableType & commandData);
-/**
- * @brief Network Commissioning Cluster AddThreadNetworkResponse Command callback (from server)
- */
-bool emberAfNetworkCommissioningClusterAddThreadNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                        chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                        chip::CharSpan debugText);
-/**
- * @brief Network Commissioning Cluster UpdateThreadNetwork Command callback (from client)
- */
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::DecodableType & commandData);
-/**
- * @brief Network Commissioning Cluster UpdateThreadNetworkResponse Command callback (from server)
- */
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                           chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                           chip::CharSpan debugText);
+    const chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::DecodableType & commandData);
 /**
  * @brief Network Commissioning Cluster RemoveNetwork Command callback (from client)
  */
@@ -13990,35 +13954,30 @@ bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::DecodableType & commandData);
 /**
- * @brief Network Commissioning Cluster RemoveNetworkResponse Command callback (from server)
+ * @brief Network Commissioning Cluster NetworkConfigResponse Command callback (from server)
  */
-bool emberAfNetworkCommissioningClusterRemoveNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                     chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                     chip::CharSpan debugText);
+bool emberAfNetworkCommissioningClusterNetworkConfigResponseCallback(chip::EndpointId endpoint,
+                                                                     chip::app::CommandSender * commandObj,
+                                                                     uint8_t NetworkingStatus, chip::CharSpan DebugText);
 /**
- * @brief Network Commissioning Cluster EnableNetwork Command callback (from client)
+ * @brief Network Commissioning Cluster ConnectNetwork Command callback (from client)
  */
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(
+bool emberAfNetworkCommissioningClusterConnectNetworkCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::DecodableType & commandData);
+    const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::DecodableType & commandData);
 /**
- * @brief Network Commissioning Cluster EnableNetworkResponse Command callback (from server)
+ * @brief Network Commissioning Cluster ConnectNetworkResponse Command callback (from server)
  */
-bool emberAfNetworkCommissioningClusterEnableNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                     chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                     chip::CharSpan debugText);
+bool emberAfNetworkCommissioningClusterConnectNetworkResponseCallback(chip::EndpointId endpoint,
+                                                                      chip::app::CommandSender * commandObj,
+                                                                      uint8_t NetworkingStatus, chip::CharSpan DebugText,
+                                                                      int32_t ErrorValue);
 /**
- * @brief Network Commissioning Cluster DisableNetwork Command callback (from client)
+ * @brief Network Commissioning Cluster ReorderNetwork Command callback (from client)
  */
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(
+bool emberAfNetworkCommissioningClusterReorderNetworkCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::DecodableType & commandData);
-/**
- * @brief Network Commissioning Cluster DisableNetworkResponse Command callback (from server)
- */
-bool emberAfNetworkCommissioningClusterDisableNetworkResponseCallback(chip::EndpointId endpoint,
-                                                                      chip::app::CommandSender * commandObj, uint8_t errorCode,
-                                                                      chip::CharSpan debugText);
+    const chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::DecodableType & commandData);
 /**
  * @brief Diagnostic Logs Cluster RetrieveLogsRequest Command callback (from client)
  */
@@ -14498,12 +14457,12 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster CurrentWeeklySchedule Command callback (from server)
+ * @brief Thermostat Cluster GetWeeklyScheduleResponse Command callback (from server)
  */
-bool emberAfThermostatClusterCurrentWeeklyScheduleCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                           uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
-                                                           uint8_t modeForSequence,
-                                                           /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+bool emberAfThermostatClusterGetWeeklyScheduleResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint8_t numberOfTransitionsForSequence, uint8_t dayOfWeekForSequence,
+                                                               uint8_t modeForSequence,
+                                                               /* TYPE WARNING: array array defaults to */ uint8_t * payload);
 /**
  * @brief Thermostat Cluster SetWeeklySchedule Command callback (from client)
  */
@@ -14511,11 +14470,12 @@ bool emberAfThermostatClusterSetWeeklyScheduleCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::DecodableType & commandData);
 /**
- * @brief Thermostat Cluster RelayStatusLog Command callback (from server)
+ * @brief Thermostat Cluster GetRelayStatusLogResponse Command callback (from server)
  */
-bool emberAfThermostatClusterRelayStatusLogCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                    uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
-                                                    uint8_t humidityInPercentage, int16_t setpoint, uint16_t unreadEntries);
+bool emberAfThermostatClusterGetRelayStatusLogResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+                                                               uint16_t timeOfDay, uint16_t relayStatus, int16_t localTemperature,
+                                                               uint8_t humidityInPercentage, int16_t setpoint,
+                                                               uint16_t unreadEntries);
 /**
  * @brief Thermostat Cluster GetWeeklySchedule Command callback (from client)
  */

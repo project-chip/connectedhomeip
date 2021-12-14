@@ -31,7 +31,7 @@
 namespace chip {
 namespace rpc {
 
-class Wifi final : public generated::Wifi<Wifi>
+class Wifi final : public pw_rpc::nanopb::Wifi::Service<Wifi>
 {
 public:
     // Singleton

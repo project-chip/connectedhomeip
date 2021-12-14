@@ -30,7 +30,7 @@
 namespace chip {
 namespace rpc {
 
-class Device : public generated::Device<Device>
+class Device : public pw_rpc::nanopb::Device::Service<Device>
 {
 public:
     virtual ~Device() = default;
