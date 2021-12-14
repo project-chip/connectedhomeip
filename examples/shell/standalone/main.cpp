@@ -51,7 +51,9 @@ int main()
     cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
+#if CHIP_SHELL_ENABLE_CMD_SERVER
     cmd_app_server_init();
+#endif
 
     Engine::Root().RunMainLoop();
     return 0;

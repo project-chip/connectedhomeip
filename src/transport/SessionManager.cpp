@@ -661,7 +661,7 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
 }
 
 /**
- * Provides a means to get diagnositic information such as number of sessions.
+ * Provides a means to get diagnostic information such as number of sessions.
  */
 [[maybe_unused]]
 CHIP_ERROR SessionManager::ForEachSessionHandle(void * context, SessionHandleCallback lambda)
