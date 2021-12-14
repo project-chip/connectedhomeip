@@ -1925,24 +1925,27 @@ private:
     bool keepAlive;
 };
 
-class CHIPNetworkCommissioningAttributeListAttributeCallback
-    : public chip::Callback::Callback<CHIPNetworkCommissioningClusterAttributeListAttributeCallbackType>
+class CHIPNetworkCommissioningNetworksAttributeCallback
+    : public chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>
 {
 public:
-    CHIPNetworkCommissioningAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPNetworkCommissioningNetworksAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPNetworkCommissioningAttributeListAttributeCallback();
+    ~CHIPNetworkCommissioningNetworksAttributeCallback();
 
-    static void maybeDestroy(CHIPNetworkCommissioningAttributeListAttributeCallback * callback)
+    static void maybeDestroy(CHIPNetworkCommissioningNetworksAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPNetworkCommissioningAttributeListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPNetworkCommissioningNetworksAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            list);
 
 private:
     jobject javaCallbackRef;
@@ -3744,6 +3747,31 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPUserLabelLabelListAttributeCallback : public chip::Callback::Callback<CHIPUserLabelClusterLabelListAttributeCallbackType>
+{
+public:
+    CHIPUserLabelLabelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPUserLabelLabelListAttributeCallback();
+
+    static void maybeDestroy(CHIPUserLabelLabelListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPUserLabelLabelListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & list);
 
 private:
     jobject javaCallbackRef;

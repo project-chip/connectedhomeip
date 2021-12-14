@@ -26,4 +26,5 @@
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
-    MatterOperationalCredentialsPluginServerInitCallback();
+    MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterUserLabelPluginServerInitCallback();

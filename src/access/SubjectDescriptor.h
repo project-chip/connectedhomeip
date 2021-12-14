@@ -20,6 +20,7 @@
 
 #include "AuthMode.h"
 
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/NodeId.h>
 
@@ -36,9 +37,11 @@ struct SubjectDescriptor
 
     // NOTE: due to packing there should be free bytes here
 
-    // Holds subjects according to auth mode, and the latter two are only valid
-    // if auth mode is CASE.
-    NodeId subjects[3] = { kUndefinedNodeId, kUndefinedNodeId, kUndefinedNodeId };
+    // Holds subject according to auth mode.
+    NodeId subject = kUndefinedNodeId;
+
+    // CASE Authenticated Tags (CATs) only valid if auth mode is CASE.
+    CATValues cats;
 };
 
 } // namespace Access

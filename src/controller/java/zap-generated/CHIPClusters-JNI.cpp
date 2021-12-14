@@ -16208,24 +16208,22 @@ JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, job
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jobject breadcrumb,
- jobject timeoutMs)
+JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jobject breadcrumb)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
-    chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
 
     request.operationalDataset = chip::JniByteArray(env, static_cast<jbyteArray>(operationalDataset)).byteSpan();
     request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>(callback),
+                  Platform::Delete<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -16240,7 +16238,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>::FromCancelable(
+    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
@@ -16252,25 +16250,23 @@ JNI_METHOD(void, NetworkCommissioningCluster, addThreadNetwork)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jobject breadcrumb,
- jobject timeoutMs)
+JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jobject breadcrumb)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
-    chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
 
     request.ssid        = chip::JniByteArray(env, static_cast<jbyteArray>(ssid)).byteSpan();
     request.credentials = chip::JniByteArray(env, static_cast<jbyteArray>(credentials)).byteSpan();
     request.breadcrumb  = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs   = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>(callback),
+                  Platform::Delete<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -16285,7 +16281,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>::FromCancelable(
+    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
@@ -16297,23 +16293,22 @@ JNI_METHOD(void, NetworkCommissioningCluster, addWiFiNetwork)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb, jobject timeoutMs)
+JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
-    chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type request;
+    chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Type request;
 
     request.networkID  = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
     request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterDisableNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterDisableNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterConnectNetworkResponseCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback>(callback),
+                  Platform::Delete<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -16328,50 +16323,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, disableNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>::FromCancelable(
-        onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb, jobject timeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    NetworkCommissioningCluster * cppCluster;
-
-    chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type request;
-
-    request.networkID  = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterEnableNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterEnableNetworkResponseCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>::FromCancelable(
+    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>::FromCancelable(
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
@@ -16384,7 +16336,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, enableNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb, jobject timeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16394,12 +16346,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
 
     request.networkID  = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
     request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback>);
+    std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>(callback),
+                  Platform::Delete<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -16414,7 +16365,51 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>::FromCancelable(
+    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject networkIndex, jobject breadcrumb)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    NetworkCommissioningCluster * cppCluster;
+
+    chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Type request;
+
+    request.networkID = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
+    request.networkIndex =
+        static_cast<decltype(request.networkIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(networkIndex));
+    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+
+    std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
+                    void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>(callback),
+                  Platform::Delete<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>::FromCancelable(
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
@@ -16427,7 +16422,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jobject breadcrumb, jobject timeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jobject breadcrumb)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16437,7 +16432,6 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
 
     request.ssid       = chip::JniByteArray(env, static_cast<jbyteArray>(ssid)).byteSpan();
     request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterScanNetworksResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterScanNetworksResponseCallback *)>
@@ -16469,92 +16463,40 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, NetworkCommissioningCluster, updateThreadNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jobject breadcrumb,
- jobject timeoutMs)
+
+JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
 {
     chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    NetworkCommissioningCluster * cppCluster;
+    using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
+    TypeInfo::Type cppValue;
 
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type request;
+    cppValue = static_cast<decltype(cppValue)>(chip::JniReferences::GetInstance().BooleanToPrimitive(value));
 
-    request.operationalDataset = chip::JniByteArray(env, static_cast<jbyteArray>(operationalDataset)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    std::unique_ptr<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
     VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
-    cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    NetworkCommissioningCluster * cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn =
-        chip::Callback::Callback<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>::FromCancelable(
-            onSuccess->Cancel());
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, NetworkCommissioningCluster, updateWiFiNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jobject breadcrumb,
- jobject timeoutMs)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    NetworkCommissioningCluster * cppCluster;
-
-    chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type request;
-
-    request.ssid        = chip::JniByteArray(env, static_cast<jbyteArray>(ssid)).byteSpan();
-    request.credentials = chip::JniByteArray(env, static_cast<jbyteArray>(credentials)).byteSpan();
-    request.breadcrumb  = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs   = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
-
-    std::unique_ptr<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback,
-                    void (*)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback *)>
-        onSuccess(Platform::New<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(callback),
-                  Platform::Delete<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>::FromCancelable(
-        onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -30756,8 +30698,10 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
 
     chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type request;
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPThermostatClusterGetRelayStatusLogResponseCallback,
+                    void (*)(CHIPThermostatClusterGetRelayStatusLogResponseCallback *)>
+        onSuccess(Platform::New<CHIPThermostatClusterGetRelayStatusLogResponseCallback>(callback),
+                  Platform::Delete<CHIPThermostatClusterGetRelayStatusLogResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -30772,7 +30716,8 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
@@ -30797,8 +30742,10 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
     request.modeToReturn =
         static_cast<decltype(request.modeToReturn)>(chip::JniReferences::GetInstance().IntegerToPrimitive(modeToReturn));
 
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPThermostatClusterGetWeeklyScheduleResponseCallback,
+                    void (*)(CHIPThermostatClusterGetWeeklyScheduleResponseCallback *)>
+        onSuccess(Platform::New<CHIPThermostatClusterGetWeeklyScheduleResponseCallback>(callback),
+                  Platform::Delete<CHIPThermostatClusterGetWeeklyScheduleResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -30813,7 +30760,8 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
     err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
@@ -35933,6 +35881,15 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, reportClusterRevisionAttribute
 
     onReport.release();
 }
+JNI_METHOD(jlong, UserLabelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    UserLabelCluster * cppCluster = new UserLabelCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, WakeOnLanCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;

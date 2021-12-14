@@ -638,25 +638,29 @@ typedef void (*CHIPModeSelectClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ModeSelect::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPModeSelectClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ModeSelect::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType &);
 typedef void (*CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType)(
     void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType &);
-typedef void (*CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType &);
 
-typedef void (*CHIPNetworkCommissioningClusterAttributeListAttributeCallbackType)(
-    void *, const chip::app::Clusters::NetworkCommissioning::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterMaxNetworksAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterNetworksAttributeCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterScanMaxTimeSecondsAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterConnectMaxTimeSecondsAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterInterfaceEnabledAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterLastNetworkingStatusAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterLastNetworkIDAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkID::TypeInfo::DecodableArgType);
+typedef void (*CHIPNetworkCommissioningClusterLastConnectErrorValueAttributeCallbackType)(
+    void *, chip::app::Clusters::NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo::DecodableArgType);
 typedef void (*CHIPNetworkCommissioningClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPNetworkCommissioningClusterClusterRevisionAttributeCallbackType)(
@@ -1027,8 +1031,8 @@ typedef void (*CHIPTestClusterClusterListNullablesAndOptionalsStructAttributeCal
     void *, const chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterEnumAttrAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo::DecodableArgType);
-typedef void (*CHIPTestClusterClusterStructAttributeCallbackType)(
-    void *, chip::app::Clusters::TestCluster::Attributes::Struct::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterStructAttrAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::StructAttr::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt8uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt8sAttributeCallbackType)(
@@ -1113,6 +1117,10 @@ typedef void (*CHIPTestClusterClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPThermostatClusterGetRelayStatusLogResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType &);
+typedef void (*CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType &);
 
 typedef void (*CHIPThermostatClusterLocalTemperatureAttributeCallbackType)(
     void *, chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo::DecodableArgType);
@@ -1303,6 +1311,11 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackTyp
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+
+typedef void (*CHIPUserLabelClusterLabelListAttributeCallbackType)(
+    void *, const chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo::DecodableType &);
+typedef void (*CHIPUserLabelClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPWakeOnLanClusterWakeOnLanMacAddressAttributeCallbackType)(
     void *, chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo::DecodableArgType);

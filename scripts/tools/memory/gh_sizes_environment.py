@@ -59,7 +59,13 @@ elif github['event_name'] == 'push':
     parent = github['event']['before']
     timestamp = dateutil.parser.isoparse(
         github['event']['head_commit']['timestamp']).timestamp()
-    pr = 0
+
+    # Try to find the PR being committed by scraping the commit message.
+    m = re.search(r'\(#(\d+)\)', github['event']['head_commit']['message'])
+    if m:
+        pr = m.group(1)
+    else:
+        pr = 0
 
 # Environment variables for subsequent workflow steps are set by
 # writing to the file named by `$GITHUB_ENV`.

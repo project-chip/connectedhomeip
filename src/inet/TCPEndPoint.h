@@ -691,8 +691,9 @@ protected:
 template <>
 struct EndPointProperties<TCPEndPoint>
 {
-    static constexpr const char * Name  = "TCP";
-    static constexpr int SystemStatsKey = System::Stats::kInetLayer_NumTCPEps;
+    static constexpr const char * kName   = "TCP";
+    static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
+    static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
 };
 
 } // namespace Inet

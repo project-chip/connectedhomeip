@@ -1338,6 +1338,38 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace NetworkCommissioning {
 namespace Attributes {
 
+namespace MaxNetworks {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace MaxNetworks
+
+namespace Networks {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace Networks
+
+namespace ScanMaxTimeSeconds {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace ScanMaxTimeSeconds
+
+namespace ConnectMaxTimeSeconds {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace ConnectMaxTimeSeconds
+
+namespace InterfaceEnabled {
+static constexpr AttributeId Id = 0x00000004;
+} // namespace InterfaceEnabled
+
+namespace LastNetworkingStatus {
+static constexpr AttributeId Id = 0x00000005;
+} // namespace LastNetworkingStatus
+
+namespace LastNetworkID {
+static constexpr AttributeId Id = 0x00000006;
+} // namespace LastNetworkID
+
+namespace LastConnectErrorValue {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace LastConnectErrorValue
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -2888,9 +2920,9 @@ namespace ThermostatProgrammingOperationMode {
 static constexpr AttributeId Id = 0x00000025;
 } // namespace ThermostatProgrammingOperationMode
 
-namespace HvacRelayState {
+namespace ThermostatRunningState {
 static constexpr AttributeId Id = 0x00000029;
-} // namespace HvacRelayState
+} // namespace ThermostatRunningState
 
 namespace SetpointChangeSource {
 static constexpr AttributeId Id = 0x00000030;
@@ -5210,9 +5242,9 @@ namespace EnumAttr {
 static constexpr AttributeId Id = 0x00000024;
 } // namespace EnumAttr
 
-namespace Struct {
+namespace StructAttr {
 static constexpr AttributeId Id = 0x00000025;
-} // namespace Struct
+} // namespace StructAttr
 
 namespace RangeRestrictedInt8u {
 static constexpr AttributeId Id = 0x00000026;

@@ -48948,8 +48948,10 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 20));
         VerifyOrReturn(CheckValue("serverList[20]", iter.GetValue(), 64UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 21));
-        VerifyOrReturn(CheckValue("serverList[21]", iter.GetValue(), 1029UL));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter, 22));
+        VerifyOrReturn(CheckValue("serverList[21]", iter.GetValue(), 65UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 22));
+        VerifyOrReturn(CheckValue("serverList[22]", iter.GetValue(), 1029UL));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter, 23));
 
         NextTest();
     }

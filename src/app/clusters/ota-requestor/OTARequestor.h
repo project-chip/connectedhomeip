@@ -102,7 +102,11 @@ public:
      * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
      * BDX transfers
      */
-    void SetServerInstance(Server * server) { mServer = server; }
+    void SetServerInstance(Server * server)
+    {
+        mServer             = server;
+        mCASESessionManager = server->GetCASESessionManager();
+    }
 
     /**
      * Called to establish a session to mProviderNodeId on mProviderFabricIndex. This must be called from the same externally
@@ -196,11 +200,6 @@ private:
         chip::Messaging::ExchangeContext * mExchangeCtx;
         chip::BDXDownloader * mDownloader;
     };
-
-    /**
-     * Setup CASESessionManager used to establish a session with the provider
-     */
-    CHIP_ERROR SetupCASESessionManager();
 
     /**
      * Create a QueryImage request using values from the Basic cluster attributes

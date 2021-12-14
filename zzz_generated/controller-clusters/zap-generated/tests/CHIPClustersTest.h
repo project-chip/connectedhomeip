@@ -416,6 +416,13 @@ public:
     ~ThreadNetworkDiagnosticsClusterTest() {}
 };
 
+class DLL_EXPORT UserLabelClusterTest : public UserLabelCluster
+{
+public:
+    UserLabelClusterTest() : UserLabelCluster() {}
+    ~UserLabelClusterTest() {}
+};
+
 class DLL_EXPORT WakeOnLanClusterTest : public WakeOnLanCluster
 {
 public:

@@ -40,4 +40,5 @@
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

@@ -32,22 +32,13 @@ struct tcp_pcb;
 namespace chip {
 namespace Inet {
 
+/**
+ * Definitions shared by all LwIP EndPoint classes.
+ */
 class DLL_EXPORT EndPointStateLwIP
 {
 protected:
     EndPointStateLwIP() : mLwIPEndPointType(LwIPEndPointType::Unknown) {}
-
-    /** Encapsulated LwIP protocol control block */
-    union
-    {
-        const void * mVoid; /**< An untyped protocol control buffer reference */
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
-#endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
-#endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    };
 
     enum class LwIPEndPointType : uint8_t
     {

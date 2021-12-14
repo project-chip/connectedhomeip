@@ -32,7 +32,7 @@ namespace Inet {
 class UDPEndPointImplLwIP : public UDPEndPoint, public EndPointStateLwIP
 {
 public:
-    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
+    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager), mUDP(nullptr) {}
 
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
@@ -84,6 +84,8 @@ private:
 #else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port);
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
+
+    udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
 };
 
 using UDPEndPointImpl = UDPEndPointImplLwIP;

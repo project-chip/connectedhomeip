@@ -81,6 +81,7 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp

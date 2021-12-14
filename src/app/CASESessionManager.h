@@ -53,18 +53,22 @@ class CASESessionManager : public SessionReleaseDelegate, public Dnssd::Resolver
 public:
     CASESessionManager() = delete;
 
-    CASESessionManager(CASESessionManagerConfig & params)
+    CASESessionManager(const CASESessionManagerConfig & params)
     {
         VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
         mConfig = params;
+    }
 
+    CHIP_ERROR Init()
+    {
         if (mConfig.dnsResolver == nullptr)
         {
-            VerifyOrDie(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
+            ReturnErrorOnFailure(mDNSResolver.Init(DeviceLayer::UDPEndPointManager()));
             mDNSResolver.SetResolverDelegate(this);
             mConfig.dnsResolver = &mDNSResolver;
         }
+        return CHIP_NO_ERROR;
     }
 
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
