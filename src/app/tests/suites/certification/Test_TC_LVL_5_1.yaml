@@ -54,7 +54,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          constraints:
+              minValue: 128
+              maxValue: 129
 
     - label: "Sends step down command to DUT"
       command: "Step"

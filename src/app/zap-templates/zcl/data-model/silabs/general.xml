@@ -395,7 +395,7 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="CURRENT_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" reportable="true" default="0x00" optional="false">current level</attribute>
     <attribute side="server" code="0x0001" define="LEVEL_CONTROL_REMAINING_TIME" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">remaining time</attribute>
     <attribute side="server" code="0x0002" define="MINIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">min level</attribute>
-    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFF" optional="true">max level</attribute>
+    <attribute side="server" code="0x0003" define="MAXIMUM_LEVEL" type="INT8U" min="0x00" max="0xFF" writable="false" default="0xFE" optional="true">max level</attribute>
     <attribute side="server" code="0x0004" define="CURRENT_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">current frequency</attribute>
     <attribute side="server" code="0x0005" define="MIN_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">min frequency</attribute>
     <attribute side="server" code="0x0006" define="MAX_FREQUENCY" type="INT16U" min="0x0000" max="0xFFFF" writable="false" default="0x0000" optional="true">max frequency</attribute>

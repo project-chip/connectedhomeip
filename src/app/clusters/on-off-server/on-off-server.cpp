@@ -156,11 +156,25 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
             return status;
         }
+
+        // If initiatedByLevelChange is false, then we assume that the level change
+        // ZCL stuff has not happened and we do it here
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        {
+            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
+        }
     }
     else // Set Off
     {
         emberAfOnOffClusterPrintln("Off Command - OnTime :  0");
         Attributes::OnTime::Set(endpoint, 0); // Reset onTime
+
+        // If initiatedByLevelChange is false, then we assume that the level change
+        // ZCL stuff has not happened and we do it here
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        {
+            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
+        }
 
         // write the new on/off value
         status = Attributes::OnOff::Set(endpoint, newValue);
