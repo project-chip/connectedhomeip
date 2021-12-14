@@ -20,22 +20,22 @@
  * interface class
  */
 
-#include "LinuxOTARequestorDriver.h"
+#include "OTARequestorDriverImpl.h"
 
 using namespace chip;
 
 // A call into the application logic to give it a chance to allow or stop the Requestor
 // from proceeding with actual image download. Returning TRUE will allow the download
 // to proceed, returning FALSE will abort the download process.
-bool LinuxOTARequestorDriver::CheckImageDownloadAllowed()
+bool OTARequestorDriverImpl::CheckImageDownloadAllowed()
 {
     return true;
 }
 
 // Notify the application that the download is complete and the image can be applied
-void LinuxOTARequestorDriver::ImageDownloadComplete() {}
+void OTARequestorDriverImpl::ImageDownloadComplete() {}
 
-UserConsentAction LinuxOTARequestorDriver::RequestUserConsent()
+UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
 {
     return ImmediateYes;
 }

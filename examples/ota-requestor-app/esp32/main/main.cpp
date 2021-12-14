@@ -28,9 +28,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app/server/Server.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/server/Server.h>
 
 #include <cmath>
 #include <cstdio>
@@ -42,8 +42,8 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include "ESPOTAImageProcessor.h"
-#include "ESPOTARequestorDriver.h"
+#include "OTAImageProcessorImpl.h"
+#include "OTARequestorDriverImpl.h"
 #include "platform/OTARequestorInterface.h"
 #include <argtable3/argtable3.h>
 #include <esp_console.h>
@@ -61,17 +61,13 @@ struct CmdArgs
 
 namespace {
 const char * TAG = "ota-requester-app";
-constexpr size_t kMaxActiveCaseClients = 2;
-constexpr size_t kMaxActiveDevices     = 8;
 static DeviceCallbacks EchoCallbacks;
 CmdArgs applyUpdateCmdArgs;
 
 OTARequestor gRequestorCore;
-ESPOTARequestorDriver gRequestorUser;
+OTARequestorDriverImpl gRequestorUser;
 BDXDownloader gDownloader;
-ESPOTAImageProcessor gImageProcessor;
-CASEClientPool<kMaxActiveCaseClients> gCASEClientPool;
-OperationalDeviceProxyPool<kMaxActiveDevices> gDevicePool;
+OTAImageProcessorImpl gImageProcessor;
 } // namespace
 
 int ESPApplyUpdateCmdHandler(int argc, char ** argv)
@@ -93,10 +89,10 @@ void ESPInitConsole(void)
 
     esp_console_register_help_command();
 
-    esp_console_cmd_t  applyUpdateCommand;
+    esp_console_cmd_t applyUpdateCommand;
     memset(&applyUpdateCommand, 0, sizeof(applyUpdateCommand));
 
-    applyUpdateCmdArgs.end    = arg_end(1);
+    applyUpdateCmdArgs.end = arg_end(1);
 
     applyUpdateCommand.command = "ApplyUpdateRequest", applyUpdateCommand.help = "Request to OTA update image",
     applyUpdateCommand.func = &ESPApplyUpdateCmdHandler, applyUpdateCommand.argtable = &applyUpdateCmdArgs;
@@ -148,17 +144,11 @@ extern "C" void app_main()
     SetRequestorInstance(&gRequestorCore);
 
     Server * server = &(Server::GetInstance());
-    server->SetCASEClientPool(&gCASEClientPool);
-    server->SetDevicePool(&gDevicePool);
     gRequestorCore.SetServerInstance(server);
     gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
 
-    OTAImageProcessorParams ipParams;
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 
     gRequestorCore.SetBDXDownloader(&gDownloader);
-
 }
-

@@ -54,6 +54,14 @@ static_library("ESP32") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+      "OTARequestorDriverImpl.cpp",
+      "OTARequestorDriverImpl.h",
+    ]
+  }
 
   if (chip_enable_wifi) {
     sources += [
