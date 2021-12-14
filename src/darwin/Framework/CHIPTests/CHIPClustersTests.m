@@ -56,6 +56,15 @@ void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned
     });
 }
 
+void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message)
+{
+    NSLog(@"%@", message);
+    [expectation fulfill];
+}
+
+// Stub for User Prompts for XCTests to run.
+void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) { [expectation fulfill]; }
+
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
@@ -30966,6 +30975,31 @@ uint16_t readAttributeVendorIdDefaultValue;
                   [expectation fulfill];
               }];
 
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterTestLogCommands_000000_WaitForCommissionee
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    WaitForCommissionee(expectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestLogCommands_000001_Log
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Log a simple message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    Log(expectation, queue, @"This is a simple message");
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestLogCommands_000002_UserPrompt
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Do a simple user prompt message"];
+
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    UserPrompt(expectation, queue, @"This is a simple message");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
