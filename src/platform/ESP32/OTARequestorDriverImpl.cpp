@@ -15,24 +15,24 @@
  *    limitations under the License.
  */
 
-#include "ESPOTARequestorDriver.h"
+#include "OTARequestorDriverImpl.h"
 #include "esp_log.h"
 
 #define TAG "OTARequestorDriver"
 
 namespace chip {
 
-bool ESPOTARequestorDriver::CheckImageDownloadAllowed()
+bool OTARequestorDriverImpl::CheckImageDownloadAllowed()
 {
     return true;
 }
 
-void ESPOTARequestorDriver::ImageDownloadComplete()
+void OTARequestorDriverImpl::ImageDownloadComplete()
 {
     ESP_LOGI(TAG, "Image download complete");
 }
 
-UserConsentAction ESPOTARequestorDriver::RequestUserConsent()
+UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
 {
     return ImmediateYes;    
 }

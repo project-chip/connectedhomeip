@@ -98,6 +98,15 @@ static_library("Linux") {
     public_configs += [ ":avahi_client_config" ]
   }
 
+  if (chip_enable_ota_requestor){
+    sources += [
+      "OTAImageProcessorImpl.h",
+      "OTAImageProcessorImpl.cpp",
+      "OTARequestorDriverImpl.h",
+      "OTARequestorDriverImpl.cpp",
+    ]
+  }
+
   if (chip_enable_openthread) {
     sources += [
       "GlibTypeDeleter.h",

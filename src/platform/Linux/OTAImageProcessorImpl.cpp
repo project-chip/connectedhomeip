@@ -18,11 +18,11 @@
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
 
-#include "LinuxOTAImageProcessor.h"
+#include "OTAImageProcessorImpl.h"
 
 namespace chip {
 
-CHIP_ERROR LinuxOTAImageProcessor::PrepareDownload()
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     if (mParams.imageFile.empty())
     {
@@ -34,18 +34,18 @@ CHIP_ERROR LinuxOTAImageProcessor::PrepareDownload()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::Finalize()
+CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::Apply()
+CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::Abort()
+CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     if (mParams.imageFile.empty())
     {
@@ -57,7 +57,7 @@ CHIP_ERROR LinuxOTAImageProcessor::Abort()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::ProcessBlock(ByteSpan & block)
+CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if (!mOfs.is_open() || !mOfs.good())
     {
@@ -80,9 +80,9 @@ CHIP_ERROR LinuxOTAImageProcessor::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-void LinuxOTAImageProcessor::HandlePrepareDownload(intptr_t context)
+void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -107,9 +107,9 @@ void LinuxOTAImageProcessor::HandlePrepareDownload(intptr_t context)
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
-void LinuxOTAImageProcessor::HandleFinalize(intptr_t context)
+void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         return;
@@ -121,9 +121,9 @@ void LinuxOTAImageProcessor::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
 }
 
-void LinuxOTAImageProcessor::HandleAbort(intptr_t context)
+void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         return;
@@ -134,9 +134,9 @@ void LinuxOTAImageProcessor::HandleAbort(intptr_t context)
     imageProcessor->ReleaseBlock();
 }
 
-void LinuxOTAImageProcessor::HandleProcessBlock(intptr_t context)
+void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -161,7 +161,7 @@ void LinuxOTAImageProcessor::HandleProcessBlock(intptr_t context)
     imageProcessor->mDownloader->FetchNextData();
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::SetBlock(ByteSpan & block)
+CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
@@ -189,7 +189,7 @@ CHIP_ERROR LinuxOTAImageProcessor::SetBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR LinuxOTAImageProcessor::ReleaseBlock()
+CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 {
     if (mBlock.data() != nullptr)
     {

@@ -51,7 +51,7 @@ source_set("commands") {
     sources += [ "Dns.cpp" ]
   }
 
-  if (chip_enable_ota_requestor && chip_device_platform != "none") {
+  if (chip_enable_ota_requestor && chip_device_platform != "none" && chip_device_platform != "linux") {
     sources += [ "Ota.cpp" ]
     configs += [ "${chip_root}/src/controller:config" ]
 

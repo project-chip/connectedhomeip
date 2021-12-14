@@ -21,7 +21,7 @@
 
 namespace chip {
 
-class ESPOTARequestorDriver : public OTARequestorDriver
+class OTARequestorDriverImpl : public OTARequestorDriver
 {
     bool CheckImageDownloadAllowed();
     void ImageDownloadComplete();

@@ -42,8 +42,8 @@
 
 #include <lib/support/ErrorStr.h>
 
-#include "ESPOTAImageProcessor.h"
-#include "ESPOTARequestorDriver.h"
+#include "OTAImageProcessorImpl.h"
+#include "OTARequestorDriverImpl.h"
 #include "platform/OTARequestorInterface.h"
 #include <argtable3/argtable3.h>
 #include <esp_console.h>
@@ -61,17 +61,13 @@ struct CmdArgs
 
 namespace {
 const char * TAG = "ota-requester-app";
-constexpr size_t kMaxActiveCaseClients = 2;
-constexpr size_t kMaxActiveDevices     = 8;
 static DeviceCallbacks EchoCallbacks;
 CmdArgs applyUpdateCmdArgs;
 
 OTARequestor gRequestorCore;
-ESPOTARequestorDriver gRequestorUser;
+OTARequestorDriverImpl gRequestorUser;
 BDXDownloader gDownloader;
-ESPOTAImageProcessor gImageProcessor;
-CASEClientPool<kMaxActiveCaseClients> gCASEClientPool;
-OperationalDeviceProxyPool<kMaxActiveDevices> gDevicePool;
+OTAImageProcessorImpl gImageProcessor;
 } // namespace
 
 int ESPApplyUpdateCmdHandler(int argc, char ** argv)
@@ -148,8 +144,6 @@ extern "C" void app_main()
     SetRequestorInstance(&gRequestorCore);
 
     Server * server = &(Server::GetInstance());
-    server->SetCASEClientPool(&gCASEClientPool);
-    server->SetDevicePool(&gDevicePool);
     gRequestorCore.SetServerInstance(server);
     gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
 
@@ -161,4 +155,3 @@ extern "C" void app_main()
     gRequestorCore.SetBDXDownloader(&gDownloader);
 
 }
-

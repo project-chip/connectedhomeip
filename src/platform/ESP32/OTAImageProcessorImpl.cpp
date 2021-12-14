@@ -19,8 +19,8 @@
 #include <platform/ESP32/ESP32Utils.h>
 #include <sys/_stdint.h>
 
-#include "ESPOTAImageProcessor.h"
-#include "core/CHIPError.h"
+#include "OTAImageProcessorImpl.h"
+#include "lib/core/CHIPError.h"
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_ota_ops.h"
@@ -31,31 +31,31 @@ using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
-CHIP_ERROR ESPOTAImageProcessor::PrepareDownload()
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESPOTAImageProcessor::Finalize()
+CHIP_ERROR OTAImageProcessorImpl::Finalize()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleFinalize, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESPOTAImageProcessor::Apply()
+CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESPOTAImageProcessor::Abort()
+CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESPOTAImageProcessor::ProcessBlock(ByteSpan & block)
+CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
@@ -71,9 +71,9 @@ CHIP_ERROR ESPOTAImageProcessor::ProcessBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-void ESPOTAImageProcessor::HandlePrepareDownload(intptr_t context)
+void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<ESPOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -100,9 +100,9 @@ void ESPOTAImageProcessor::HandlePrepareDownload(intptr_t context)
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
-void ESPOTAImageProcessor::HandleFinalize(intptr_t context)
+void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<ESPOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -125,9 +125,9 @@ void ESPOTAImageProcessor::HandleFinalize(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
 }
 
-void ESPOTAImageProcessor::HandleAbort(intptr_t context)
+void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<ESPOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -140,9 +140,9 @@ void ESPOTAImageProcessor::HandleAbort(intptr_t context)
     imageProcessor->ReleaseBlock();
 }
 
-void ESPOTAImageProcessor::HandleProcessBlock(intptr_t context)
+void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<ESPOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
@@ -164,9 +164,9 @@ void ESPOTAImageProcessor::HandleProcessBlock(intptr_t context)
     imageProcessor->mDownloader->FetchNextData();
 }
 
-void ESPOTAImageProcessor::HandleApply(intptr_t context)
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    auto * imageProcessor = reinterpret_cast<ESPOTAImageProcessor *>(context);
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     esp_err_t err = esp_ota_set_boot_partition(imageProcessor->mOTAUpdatePartition);
     if (err != ESP_OK)
     {
@@ -176,7 +176,7 @@ void ESPOTAImageProcessor::HandleApply(intptr_t context)
     ESP_LOGI(TAG, "Applying, Boot partition set offset:0x%x", imageProcessor->mOTAUpdatePartition->address);
 }
 
-CHIP_ERROR ESPOTAImageProcessor::SetBlock(ByteSpan & block)
+CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
     if ((block.data() == nullptr) || block.empty())
     {
@@ -200,7 +200,7 @@ CHIP_ERROR ESPOTAImageProcessor::SetBlock(ByteSpan & block)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ESPOTAImageProcessor::ReleaseBlock()
+CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
 {
     if (mBlock.data() != nullptr)
     {
