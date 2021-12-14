@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,14 +18,15 @@
 
 #pragma once
 
-#include "esp_ota_ops.h"
-#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTADownloader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
 
+#include <fstream>
+
 namespace chip {
 
-class ESPOTAImageProcessor : public OTAImageProcessorInterface
+class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     //////////// OTAImageProcessorInterface Implementation ///////////////
@@ -33,22 +35,29 @@ public:
     CHIP_ERROR Apply() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
-    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
+
+    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
 
 private:
+    //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
-    static void HandleApply(intptr_t context);
 
+    /**
+     * Called to allocate memory for mBlock if necessary and set it to block
+     */
     CHIP_ERROR SetBlock(ByteSpan & block);
+
+    /**
+     * Called to release allocated memory for mBlock
+     */
     CHIP_ERROR ReleaseBlock();
 
-    OTADownloader * mDownloader = nullptr;
+    std::ofstream mOfs;
     MutableByteSpan mBlock;
-    const esp_partition_t * mOTAUpdatePartition = nullptr;
-    esp_ota_handle_t mOTAUpdateHandle;
+    OTADownloader * mDownloader;
 };
 
-}
+} // namespace chip
