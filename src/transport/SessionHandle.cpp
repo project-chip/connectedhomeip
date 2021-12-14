@@ -33,48 +33,22 @@ SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
     {
         if (IsOperationalNodeId(mPeerNodeId))
         {
-            // Currently ending up here after commissioning (good)
             subjectDescriptor.authMode    = AuthMode::kCase;
             subjectDescriptor.subject     = mPeerNodeId;
-            subjectDescriptor.fabricIndex = mFabric; // have fabric here
-            // TODO: add CATs
-            ChipLogDetail(DataManagement, "@@@ #####################################  CASE  %lx  (%u)", subjectDescriptor.subject,
-                          subjectDescriptor.fabricIndex);
+            subjectDescriptor.fabricIndex = mFabric;
+            // TODO(#10243): add CATs
         }
         else if (IsPAKEKeyId(mPeerNodeId))
         {
-            // Should end up here during commissioning (but currently not)
-            subjectDescriptor.authMode    = AuthMode::kPase;
-            subjectDescriptor.subject     = mPeerNodeId;
-            subjectDescriptor.fabricIndex = mFabric; // also could have fabric here
-            ChipLogDetail(DataManagement, "@@@ #####################################  PASE  %lx  (%u)", subjectDescriptor.subject,
-                          subjectDescriptor.fabricIndex);
+            subjectDescriptor.authMode = AuthMode::kPase;
+            subjectDescriptor.subject  = mPeerNodeId;
+            // TODO: there are cases where PASE can have a fabric, need to add that here
         }
         else if (mGroupId.HasValue())
         {
-            // Should end up here during group messaging (how to test?)
             subjectDescriptor.authMode = AuthMode::kGroup;
             subjectDescriptor.subject  = kMinGroupNodeId | mGroupId.Value();
-            ChipLogDetail(DataManagement, "@@@ #####################################  Group  %lx", subjectDescriptor.subject);
         }
-        else if (mPeerNodeId == kUndefinedNodeId)
-        {
-            // Currently ending up here during commissioning (bad, should be above)
-            subjectDescriptor.authMode    = AuthMode::kPase;
-            subjectDescriptor.subject     = kMinPAKEKeyId | mPeerNodeId;
-            subjectDescriptor.fabricIndex = mFabric;
-            ChipLogDetail(DataManagement, "@@@ #####################################  assumed-pase  (%u)",
-                          subjectDescriptor.fabricIndex);
-        }
-        else
-        {
-            // Should never end up here
-            ChipLogDetail(DataManagement, "@@@ #####################################  unknown  %lx", mPeerNodeId);
-        }
-    }
-    else
-    {
-        ChipLogDetail(DataManagement, "@@@ #####################################  not secure");
     }
     return subjectDescriptor;
 }

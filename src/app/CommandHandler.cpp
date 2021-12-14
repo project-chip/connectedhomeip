@@ -255,11 +255,6 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 
     {
         Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
-        // TEMP just checking subject descriptor during development
-        if (mpExchangeCtx != nullptr && mpExchangeCtx->HasSessionHandle())
-        {
-            subjectDescriptor = mpExchangeCtx->GetSessionHandle().GetSubjectDescriptor();
-        }
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
