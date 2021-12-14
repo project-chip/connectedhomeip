@@ -8037,7 +8037,7 @@ public:
 };
 } // namespace StartUp
 namespace ShutDown {
-static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
 static constexpr EventId kEventId             = 0x00000001;
 
 enum class Fields
