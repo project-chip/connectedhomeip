@@ -998,7 +998,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     Attributes::MinLevel::Get(endpoint, &minLevel);
     Attributes::MaxLevel::Get(endpoint, &maxLevel);
 
-    if (Attributes::FeatureMap::Get(Endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
+    uint32_t featureMap;
+    if (Attributes::FeatureMap::Get(endpoint, &featureMap) == EMBER_ZCL_STATUS_SUCCESS &&
         READBITS(featureMap, EMBER_AF_LEVEL_CONTROL_FEATURE_LIGHTING))
     {
         if (minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
