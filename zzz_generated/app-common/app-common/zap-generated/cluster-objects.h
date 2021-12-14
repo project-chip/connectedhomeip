@@ -18999,6 +18999,16 @@ enum class WcSafetyStatus : uint16_t
     kProtection          = 0x800,
 };
 
+// Bitmap for WindowCoveringFeature
+enum class WindowCoveringFeature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
