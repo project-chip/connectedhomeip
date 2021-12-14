@@ -82,12 +82,10 @@ CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, At
 
     switch (aPath.mAttributeId)
     {
-    case LabelList::Id: {
+    case LabelList::Id:
         return ReadLabelList(aPath.mEndpointId, aEncoder);
-    }
-    default: {
+    default:
         break;
-    }
     }
     return CHIP_NO_ERROR;
 }
