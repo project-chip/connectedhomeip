@@ -61,18 +61,18 @@ public:
     ~NetworkCommissioningCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR AddThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR AddWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
+    CHIP_ERROR AddOrUpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        chip::ByteSpan operationalDataset, uint64_t breadcrumb);
+    CHIP_ERROR AddOrUpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb);
+    CHIP_ERROR ConnectNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              chip::ByteSpan networkID, uint64_t breadcrumb);
     CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
+                             chip::ByteSpan networkID, uint64_t breadcrumb);
+    CHIP_ERROR ReorderNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              chip::ByteSpan networkID, uint8_t networkIndex, uint64_t breadcrumb);
     CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                            uint64_t breadcrumb, uint32_t timeoutMs);
+                            uint64_t breadcrumb);
 
     // Cluster Attributes
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

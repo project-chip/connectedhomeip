@@ -63,8 +63,8 @@ public:
 
         mCASESessionCachableArray[i].mSharedSecretLen = sharedSecretLen;
         memcpy(mCASESessionCachableArray[i].mSharedSecret, sTest_SharedSecret, sharedSecretLen);
-        mCASESessionCachableArray[i].mPeerNodeId      = static_cast<uint16_t>(sTest_PeerId + i);
-        mCASESessionCachableArray[i].mPeerCATs.val[0] = (uint32_t) i;
+        mCASESessionCachableArray[i].mPeerNodeId         = static_cast<uint16_t>(sTest_PeerId + i);
+        mCASESessionCachableArray[i].mPeerCATs.values[0] = (uint32_t) i;
         memcpy(mCASESessionCachableArray[i].mResumptionId, sTest_ResumptionId, kCASEResumptionIDSize);
         mCASESessionCachableArray[i].mLocalFabricIndex      = 0;
         mCASESessionCachableArray[i].mSessionSetupTimeStamp = timestamp;
@@ -75,7 +75,7 @@ public:
         return (cachableSession.mSharedSecretLen == mCASESessionCachableArray[index].mSharedSecretLen) &&
             ((ByteSpan(cachableSession.mSharedSecret)).data_equal(ByteSpan(mCASESessionCachableArray[index].mSharedSecret))) &&
             (cachableSession.mPeerNodeId == mCASESessionCachableArray[index].mPeerNodeId) &&
-            cachableSession.mPeerCATs.val[0] == mCASESessionCachableArray[index].mPeerCATs.val[0] &&
+            cachableSession.mPeerCATs.values[0] == mCASESessionCachableArray[index].mPeerCATs.values[0] &&
             ((ResumptionID(cachableSession.mResumptionId))
                  .data_equal(ResumptionID(mCASESessionCachableArray[index].mResumptionId))) &&
             (cachableSession.mLocalFabricIndex == mCASESessionCachableArray[index].mLocalFabricIndex) &&

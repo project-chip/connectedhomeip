@@ -31,23 +31,16 @@
 
 #include <nlunit-test.h>
 
+#include "CHIPAttCert_test_vectors.h"
+
 using namespace chip;
 using namespace chip::Crypto;
 using namespace chip::Credentials;
 
 namespace {
 
-constexpr uint8_t kExpectedDacPublicKey[] = { 0x04, 0x7a, 0x84, 0x58, 0xaf, 0xbb, 0x9b, 0xcd, 0x15, 0xe1, 0x9a, 0xdc, 0xd2,
-                                              0x66, 0xf6, 0x6c, 0x9c, 0x2f, 0x60, 0x7c, 0x74, 0x74, 0x7a, 0x35, 0xf8, 0x0f,
-                                              0x37, 0xe1, 0x18, 0x13, 0x3f, 0x80, 0xf1, 0x76, 0x01, 0x13, 0x27, 0x8f, 0x91,
-                                              0xf1, 0x5a, 0xa0, 0xf7, 0xf8, 0x79, 0x32, 0x09, 0x4f, 0xe6, 0x9f, 0xb7, 0x28,
-                                              0x68, 0xa8, 0x1e, 0x26, 0x97, 0x9b, 0x36, 0x8b, 0x33, 0xb5, 0x54, 0x31, 0x03 };
-
-constexpr uint8_t kExpectedPaiPublicKey[] = { 0x04, 0xca, 0x73, 0xce, 0x46, 0x41, 0xbf, 0x08, 0x3b, 0x4a, 0x33, 0x8d, 0xa0,
-                                              0x43, 0x1a, 0x0a, 0x32, 0x30, 0x7f, 0x66, 0xd1, 0x60, 0x57, 0x4b, 0x66, 0x12,
-                                              0x2f, 0x25, 0x06, 0xcf, 0x6a, 0xd3, 0x70, 0xe3, 0x7f, 0x65, 0xd6, 0x34, 0x7a,
-                                              0xe7, 0x97, 0xa1, 0x97, 0x26, 0x50, 0x50, 0x97, 0x6d, 0x34, 0xac, 0x7b, 0x63,
-                                              0x7b, 0x3b, 0xda, 0x0b, 0x5b, 0xd8, 0x43, 0xed, 0x8e, 0x5d, 0x5e, 0x9b, 0xf2 };
+static const ByteSpan kExpectedDacPublicKey = TestCerts::sTestCert_DAC_FFF1_8000_0004_PublicKey;
+static const ByteSpan kExpectedPaiPublicKey = TestCerts::sTestCert_PAI_FFF1_8000_PublicKey;
 
 } // namespace
 
@@ -80,8 +73,8 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, dac_public_key);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == sizeof(kExpectedDacPublicKey));
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey, sizeof(kExpectedDacPublicKey)));
+    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Make sure PAI is what we expect, by validating public key
     der_cert_span = MutableByteSpan{ der_cert_span };
@@ -92,8 +85,8 @@ static void TestDACProvidersExample_Providers(nlTestSuite * inSuite, void * inCo
     P256PublicKey pai_public_key;
     err = ExtractPubkeyFromX509Cert(der_cert_span, pai_public_key);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pai_public_key.Length() == sizeof(kExpectedPaiPublicKey));
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey, sizeof(kExpectedPaiPublicKey)));
+    NL_TEST_ASSERT(inSuite, pai_public_key.Length() == kExpectedPaiPublicKey.size());
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(pai_public_key.ConstBytes(), kExpectedPaiPublicKey.data(), kExpectedPaiPublicKey.size()));
 
     // Check for CD presence
     uint8_t other_data_buf[256];
@@ -144,8 +137,8 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     P256PublicKey dac_public_key;
     err = ExtractPubkeyFromX509Cert(dac_cert_span, dac_public_key);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == sizeof(kExpectedDacPublicKey));
-    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey, sizeof(kExpectedDacPublicKey)));
+    NL_TEST_ASSERT(inSuite, dac_public_key.Length() == kExpectedDacPublicKey.size());
+    NL_TEST_ASSERT(inSuite, 0 == memcmp(dac_public_key.ConstBytes(), kExpectedDacPublicKey.data(), kExpectedDacPublicKey.size()));
 
     // Verify round trip signature
     err = dac_public_key.ECDSA_validate_hash_signature(&kExampleDigest[0], sizeof(kExampleDigest), da_signature);
@@ -296,52 +289,36 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
 
 static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
 {
-    uint8_t kPaaFff1Start[] = { 0x30, 0x82, 0x01, 0x99, 0x30, 0x82, 0x01, 0x3F, 0xA0, 0x03, 0x02, 0x01, 0x02,
-                                0x02, 0x08, 0x68, 0x38, 0x4F, 0xAB, 0xB9, 0x19, 0xFC, 0xDF, 0x30, 0x0A, 0x06,
-                                0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x1F, 0x31 };
-    uint8_t kPaaFff1Skid[]  = { 0xEF, 0x18, 0xE0, 0xEC, 0xD4, 0x66, 0x04, 0x34, 0xDF, 0x0D,
-                               0xBC, 0x91, 0x1E, 0xD4, 0x52, 0x16, 0x99, 0x66, 0x83, 0x9F };
-
-    uint8_t kPaaFff2Start[] = { 0x30, 0x82, 0x01, 0x9D, 0x30, 0x82, 0x01, 0x42, 0xA0, 0x03, 0x02, 0x01, 0x02,
-                                0x02, 0x08, 0x03, 0x92, 0xA7, 0x65, 0x5A, 0x3E, 0x6C, 0x77, 0x30, 0x0A, 0x06,
-                                0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x1F, 0x31 };
-    uint8_t kPaaFff2Skid[]  = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0x5F, 0xD0, 0xC3, 0xE6,
-                               0x34, 0x52, 0x9F, 0x16, 0x70, 0x46, 0xC4, 0xBC, 0xA5, 0x5C };
+    // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
+    ByteSpan kPaaFFF1BadSkidSpan1{ TestCerts::sTestCert_PAA_FFF1_Cert.data(), TestCerts::sTestCert_PAA_FFF1_Cert.size() - 1 };
 
     // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
-    uint8_t kPaaBadSkid1[] = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0xD0, 0xC3, 0xE6, 0x34,
-                               0x52, 0x9F, 0x16, 0x70, 0x46, 0xC4, 0xBC, 0xA5, 0x5C };
-    ByteSpan kPaaBadSkidSpan1{ kPaaBadSkid1 };
-
-    // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
-    ByteSpan kPaaBadSkidSpan2{ nullptr, sizeof(kPaaFff2Skid) };
+    ByteSpan kPaaFFF1BadSkidSpan2{ nullptr, TestCerts::sTestCert_PAA_FFF1_Cert.size() };
 
     // SKID to trigger CHIP_ERROR_CA_CERT_NOT_FOUND
-    uint8_t kPaaGoodSkidNotPresent[] = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0x5F, 0xD0, 0xC3, 0xE6,
-                                         0x34, 0x52, 0x9F, 0x16, 0x70, 0xFF, 0xFF, 0xBC, 0xA5, 0x5C };
+    uint8_t kPaaGoodSkidNotPresent[] = { 0x6A, 0xFD, 0x22, 0x77, 0x1F, 0x51, 0x71, 0x1F, 0xEC, 0xBF,
+                                         0x16, 0x41, 0x97, 0x67, 0x10, 0xDC, 0xDC, 0x31, 0xA1, 0x71 };
+    ByteSpan kPaaGoodSkidNotPresentSpan{ kPaaGoodSkidNotPresent };
 
     struct TestCase
     {
         ByteSpan skidSpan;
-        ByteSpan startSpan;
+        ByteSpan expectedCertSpan;
         CHIP_ERROR expectedResult;
     };
 
     const TestCase kTestCases[] = {
-        { .skidSpan = ByteSpan{ kPaaFff1Skid }, .startSpan = ByteSpan{ kPaaFff1Start }, .expectedResult = CHIP_NO_ERROR },
-        { .skidSpan = ByteSpan{ kPaaFff2Skid }, .startSpan = ByteSpan{ kPaaFff2Start }, .expectedResult = CHIP_NO_ERROR },
-        { .skidSpan       = ByteSpan{ kPaaFff2Skid },
-          .startSpan      = ByteSpan{ kPaaFff2Start },
-          .expectedResult = CHIP_ERROR_BUFFER_TOO_SMALL },
-        { .skidSpan = kPaaBadSkidSpan1, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_INVALID_ARGUMENT },
-        { .skidSpan = kPaaBadSkidSpan2, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_INVALID_ARGUMENT },
-        { .skidSpan = ByteSpan{ kPaaGoodSkidNotPresent }, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_CA_CERT_NOT_FOUND },
+        { TestCerts::sTestCert_PAA_FFF1_SKID, TestCerts::sTestCert_PAA_FFF1_Cert, CHIP_NO_ERROR },
+        { TestCerts::sTestCert_PAA_NoVID_SKID, TestCerts::sTestCert_PAA_NoVID_Cert, CHIP_NO_ERROR },
+        { TestCerts::sTestCert_PAA_NoVID_SKID, TestCerts::sTestCert_PAA_NoVID_Cert, CHIP_ERROR_BUFFER_TOO_SMALL },
+        { kPaaFFF1BadSkidSpan1, TestCerts::sTestCert_PAA_FFF1_Cert, CHIP_ERROR_INVALID_ARGUMENT },
+        { kPaaFFF1BadSkidSpan2, TestCerts::sTestCert_PAA_FFF1_Cert, CHIP_ERROR_INVALID_ARGUMENT },
+        { kPaaGoodSkidNotPresentSpan, TestCerts::sTestCert_PAA_FFF1_Cert, CHIP_ERROR_CA_CERT_NOT_FOUND },
     };
 
     const AttestationTrustStore * testAttestationTrustStore = GetTestAttestationTrustStore();
     NL_TEST_ASSERT(inSuite, testAttestationTrustStore != nullptr);
 
-    size_t testCaseIdx = 0;
     for (const auto & testCase : kTestCases)
     {
         uint8_t buf[kMaxDERCertLength];
@@ -356,15 +333,11 @@ static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR result = testAttestationTrustStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
-        // In success cases, make sure the start of the cert matches expectation. Not using full certs
-        // to avoid repeating the known constants here.
+        // In success cases, make sure the cert matches expectation.
         if (testCase.expectedResult == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, paaCertSpan.size() > testCase.startSpan.size());
-            paaCertSpan = paaCertSpan.SubSpan(0, testCase.startSpan.size());
-            NL_TEST_ASSERT(inSuite, paaCertSpan.data_equal(testCase.startSpan) == true);
+            NL_TEST_ASSERT(inSuite, paaCertSpan.data_equal(testCase.expectedCertSpan) == true);
         }
-        ++testCaseIdx;
     }
 }
 

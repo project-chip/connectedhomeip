@@ -2361,33 +2361,49 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPNetworkCommissioning : CHIPCluster
 
-- (void)addThreadNetworkWithParams:(CHIPNetworkCommissioningClusterAddThreadNetworkParams *)params
-                 completionHandler:(void (^)(CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler;
-- (void)addWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterAddWiFiNetworkParams *)params
-               completionHandler:(void (^)(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams * _Nullable data,
+- (void)addOrUpdateThreadNetworkWithParams:(CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams *)params
+                         completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler;
+- (void)addOrUpdateWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams *)params
+                       completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler;
+- (void)connectNetworkWithParams:(CHIPNetworkCommissioningClusterConnectNetworkParams *)params
+               completionHandler:(void (^)(CHIPNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable data,
                                      NSError * _Nullable error))completionHandler;
-- (void)disableNetworkWithParams:(CHIPNetworkCommissioningClusterDisableNetworkParams *)params
-               completionHandler:(void (^)(CHIPNetworkCommissioningClusterDisableNetworkResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler;
-- (void)enableNetworkWithParams:(CHIPNetworkCommissioningClusterEnableNetworkParams *)params
-              completionHandler:(void (^)(CHIPNetworkCommissioningClusterEnableNetworkResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler;
 - (void)removeNetworkWithParams:(CHIPNetworkCommissioningClusterRemoveNetworkParams *)params
-              completionHandler:(void (^)(CHIPNetworkCommissioningClusterRemoveNetworkResponseParams * _Nullable data,
+              completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
                                     NSError * _Nullable error))completionHandler;
+- (void)reorderNetworkWithParams:(CHIPNetworkCommissioningClusterReorderNetworkParams *)params
+               completionHandler:(void (^)(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler;
 - (void)scanNetworksWithParams:(CHIPNetworkCommissioningClusterScanNetworksParams *)params
              completionHandler:(void (^)(CHIPNetworkCommissioningClusterScanNetworksResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
-- (void)updateThreadNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateThreadNetworkParams *)params
-                    completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams * _Nullable data,
-                                          NSError * _Nullable error))completionHandler;
-- (void)updateWiFiNetworkWithParams:(CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams *)params
-                  completionHandler:(void (^)(CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
 
-- (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
-                                                            NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeMaxNetworksWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeNetworksWithCompletionHandler:(void (^)(
+                                                       NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeScanMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeConnectMaxTimeSecondsWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeInterfaceEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInterfaceEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeLastNetworkingStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLastNetworkIDWithCompletionHandler:(void (^)(
+                                                            NSData * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLastConnectErrorValueWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -4148,9 +4164,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPThermostat : CHIPCluster
 
 - (void)clearWeeklyScheduleWithCompletionHandler:(StatusCompletion)completionHandler;
-- (void)getRelayStatusLogWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)getRelayStatusLogWithCompletionHandler:(void (^)(CHIPThermostatClusterGetRelayStatusLogResponseParams * _Nullable data,
+                                                   NSError * _Nullable error))completionHandler;
 - (void)getWeeklyScheduleWithParams:(CHIPThermostatClusterGetWeeklyScheduleParams *)params
-                  completionHandler:(StatusCompletion)completionHandler;
+                  completionHandler:(void (^)(CHIPThermostatClusterGetWeeklyScheduleResponseParams * _Nullable data,
+                                        NSError * _Nullable error))completionHandler;
 - (void)setWeeklyScheduleWithParams:(CHIPThermostatClusterSetWeeklyScheduleParams *)params
                   completionHandler:(StatusCompletion)completionHandler;
 - (void)setpointRaiseLowerWithParams:(CHIPThermostatClusterSetpointRaiseLowerParams *)params

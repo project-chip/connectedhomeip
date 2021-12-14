@@ -20,7 +20,9 @@
 
 namespace {
 
+using chip::CATValues;
 using chip::FabricIndex;
+using chip::NodeId;
 using namespace chip::Access;
 
 AccessControl defaultAccessControl;
@@ -115,12 +117,46 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             {
                 NodeId subject = kUndefinedNodeId;
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
-                if (subject == subjectDescriptor.subjects[0])
+                if (IsOperationalNodeId(subject))
                 {
-                    subjectMatched = true;
-                    break;
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
                 }
-                // TODO: check against CATs in subject descriptor
+                else if (IsGroupId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                // TODO: Add the implicit admit for PASE after the spec is updated.
+                else if (IsPAKEKeyId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kPase, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else if (IsCASEAuthTag(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (subjectDescriptor.cats.CheckSubjectAgainstCATs(subject))
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
             }
             if (!subjectMatched)
             {

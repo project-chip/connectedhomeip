@@ -53,7 +53,13 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 266 - FeatureMap, */                                                                                                \
+            /* 266 - Networks, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 278 - LastConnectErrorValue, */                                                                                     \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 282 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
     }
 
@@ -87,13 +93,19 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 266 - FeatureMap, */                                                                                                \
+            /* 266 - Networks, */                                                                                                  \
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
+                                                                                                                                   \
+            /* 278 - LastConnectErrorValue, */                                                                                     \
+            0x00, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
+            /* 282 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (4)
+#define GENERATED_DEFAULTS_COUNT (6)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
@@ -121,7 +133,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 15
+#define GENERATED_ATTRIBUTE_COUNT 25
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -137,8 +149,16 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(266) }, /* FeatureMap */                                   \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* MaxNetworks */                 \
+            { 0x0001, ZAP_TYPE(ARRAY), 12, 0, ZAP_LONG_DEFAULTS_INDEX(266) },                    /* Networks */                    \
+            { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ScanMaxTimeSeconds */          \
+            { 0x0003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ConnectMaxTimeSeconds */       \
+            { 0x0004, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* InterfaceEnabled */            \
+            { 0x0005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* LastNetworkingStatus */        \
+            { 0x0006, ZAP_TYPE(OCTET_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },                      /* LastNetworkID */               \
+            { 0x0007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(278) },                    /* LastConnectErrorValue */       \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(282) },                  /* FeatureMap */                  \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                      /* ClusterRevision */             \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x0001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* fabrics list */          \
@@ -149,6 +169,10 @@
             { 0x0005, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
               ZAP_EMPTY_DEFAULT() },                                        /* CurrentFabricIndex */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                  \
+                                                                                                                                   \
+            /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                       \
+            { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* label list */            \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */       \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -158,7 +182,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 4
+#define GENERATED_CLUSTER_COUNT 5
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
@@ -168,11 +192,14 @@
                 0x0030, ZAP_ATTRIBUTE_INDEX(1), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(7), 2, 6, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+                0x0031, ZAP_ATTRIBUTE_INDEX(7), 10, 60, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(9), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+                0x003E, ZAP_ATTRIBUTE_INDEX(17), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x0040, ZAP_ATTRIBUTE_INDEX(23), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))
@@ -180,7 +207,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 4, 282 },                                                                                          \
+        { ZAP_CLUSTER_INDEX(0), 5, 338 },                                                                                          \
     }
 
 // Largest attribute size is needed for various buffers
@@ -190,7 +217,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (282)
+#define ATTRIBUTE_MAX_SIZE (338)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (1)

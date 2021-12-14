@@ -1817,8 +1817,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.AddWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid,
-                              params.GetWifiCredentials().Value().credentials, breadcrumb, kCommandTimeoutMs);
+        netCom.AddOrUpdateWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid,
+                                      params.GetWifiCredentials().Value().credentials, breadcrumb);
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -1832,8 +1832,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Adding thread network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.AddThreadNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetThreadOperationalDataset().Value(), breadcrumb,
-                                kCommandTimeoutMs);
+        netCom.AddOrUpdateThreadNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetThreadOperationalDataset().Value(),
+                                        breadcrumb);
     }
     break;
     case CommissioningStage::kWifiNetworkEnable: {
@@ -1847,8 +1847,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid, breadcrumb,
-                             kCommandTimeoutMs);
+        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid, breadcrumb);
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {
@@ -1867,7 +1866,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Enabling thread network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(), extendedPanId, breadcrumb, kCommandTimeoutMs);
+        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), extendedPanId, breadcrumb);
     }
     break;
     case CommissioningStage::kFindOperational: {

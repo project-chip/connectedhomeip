@@ -81,6 +81,22 @@ static ::chip::PersistedCounter sDebugEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
+Server::Server() :
+    mCASESessionManager(CASESessionManagerConfig {
+        .sessionInitParams =  {
+            .sessionManager = &mSessions,
+            .exchangeMgr    = &mExchangeMgr,
+            .idAllocator    = &mSessionIDAllocator,
+            .fabricTable    = &mFabrics,
+            .clientPool     = &mCASEClientPool,
+            .imDelegate     = nullptr,
+        },
+        .dnsCache          = nullptr,
+        .devicePool        = &mDevicePool,
+        .dnsResolver       = nullptr,
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+{}
+
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {
     mSecuredServicePort   = secureServicePort;
@@ -214,6 +230,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
+
+    err = mCASESessionManager.Init();
 
 exit:
     if (err != CHIP_NO_ERROR)

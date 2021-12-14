@@ -183,7 +183,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     index = static_cast<uint16_t>(realIndex);
     for (uint16_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
     {
-        if (emAfEndpoints[i].endpoint == id)
+        if (emAfEndpoints[i].endpoint == id && emAfEndpoints[i].endpointType != NULL)
         {
             return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
         }
@@ -775,28 +775,31 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 namespace chip {
 namespace app {
 
-Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context)
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
 {
-    uint16_t count = emberAfEndpointCount();
-    for (uint16_t index = 0; index < count; ++index)
+    EnsureMatchingEndpoint();
+}
+EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
+{
+    ++mEndpointIndex;
+    EnsureMatchingEndpoint();
+    return *this;
+}
+
+void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
+{
+    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
     {
-        if (!emberAfEndpointIndexIsEnabled(index))
+        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
         {
             continue;
         }
 
-        if (!emberAfContainsServerFromIndex(index, clusterId))
+        if (!emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
         {
             continue;
-        }
-
-        if (callback(emberAfEndpointFromIndex(index), context) == Loop::Break)
-        {
-            return Loop::Break;
         }
     }
-
-    return Loop::Finish;
 }
 
 } // namespace app

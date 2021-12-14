@@ -202,6 +202,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     err = sessionManager.PrepareMessage(localToRemoteSession, payloadHeader, std::move(extra_large_buffer), preparedMessage);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_MESSAGE_TOO_LONG);
+
+    sessionManager.Shutdown();
 }
 
 void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
@@ -278,6 +280,8 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    sessionManager.Shutdown();
 }
 
 void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
@@ -392,6 +396,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
+
+    sessionManager.Shutdown();
 }
 
 void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
@@ -459,6 +465,8 @@ void StaleConnectionDropTest(nlTestSuite * inSuite, void * inContext)
                                     CryptoContext::SessionRole::kResponder, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, callback.mOldConnectionDropped);
+
+    sessionManager.Shutdown();
 }
 
 // Test Suite

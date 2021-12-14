@@ -95,6 +95,9 @@ void SessionManager::Shutdown()
 {
     CancelExpiryTimer();
 
+    mSessionReleaseDelegates.ReleaseAll();
+    mSessionRecoveryDelegates.ReleaseAll();
+
     mMessageCounterManager = nullptr;
 
     mState        = State::kNotReady;

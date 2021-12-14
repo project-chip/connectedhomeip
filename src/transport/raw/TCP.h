@@ -276,13 +276,12 @@ public:
             mConnectionsBuffer[i].Init(nullptr);
         }
     }
+    ~TCP() { mPendingPackets.ReleaseAll(); }
 
 private:
     friend class TCPTest;
     TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
-    PoolImpl<PendingPacket, kPendingPacketSize, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode,
-             PendingPacketPoolType::Interface>
-        mPendingPackets;
+    PoolImpl<PendingPacket, kPendingPacketSize, PendingPacketPoolType::Interface> mPendingPackets;
 };
 
 } // namespace Transport

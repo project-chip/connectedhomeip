@@ -1,3 +1,14 @@
+14
+15
+16
+17
+ContentApp's
+18
+19
+20
+21
+22
+
 AAAA
 aabbccddeeff
 aarch
@@ -15,8 +26,8 @@ AdapterAddress
 AdapterName
 adb
 addr
-AddThreadNetwork
-AddWiFiNetwork
+AddOrUpdateThreadNetwork
+AddOrUpdateWiFiNetwork
 adk
 adoc
 AdvAutonomous
@@ -36,7 +47,9 @@ AnnounceOTAProvider
 APIs
 apk
 AppConfig
+AppImpl
 ApplicationBasic
+ApplicationId
 ApplicationIdentifier
 ApplicationLauncher
 ApplyUpdateRequest
@@ -55,6 +68,7 @@ AssertionError
 ASYNC
 att
 attId
+attr
 attributeValue
 attrListName
 attrMask
@@ -123,6 +137,7 @@ cacerts
 CAfile
 cancelled
 capacitive
+CatalogVendorId
 CBB
 cbd
 CCMP
@@ -203,6 +218,8 @@ ConnectivityManagerImpl
 connstring
 conntype
 const
+ContentApp
+ContentAppPlatform
 ContentLaunch
 ContentLauncher
 contrib
@@ -335,7 +352,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
-EnableNetwork
+ConnectNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -864,6 +881,7 @@ ServiceId
 SetDns
 SetImageProcessorDelegate
 SetOtaRequestorDriver
+setpin
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -985,6 +1003,8 @@ TvChannel
 TXD
 txt
 UART
+UDC
+udc
 udhcpc
 UDP
 UDPEndPoint

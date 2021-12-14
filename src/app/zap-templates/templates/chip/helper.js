@@ -21,9 +21,9 @@ const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 
-const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
-const StringHelper                      = require('../../common/StringHelper.js');
-const ChipTypesHelper                   = require('../../common/ChipTypesHelper.js');
+const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
+const StringHelper                 = require('../../common/StringHelper.js');
+const ChipTypesHelper              = require('../../common/ChipTypesHelper.js');
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
 {
@@ -80,13 +80,15 @@ function checkIsChipType(context, name)
 function getCommands(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
-  return clusterSide == 'client' ? Clusters.getClientCommands(clusterName) : Clusters.getServerCommands(clusterName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientCommands(clusterName)
+                                 : ensureClusters(this).getServerCommands(clusterName);
 }
 
 function getResponses(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
-  return clusterSide == 'client' ? Clusters.getClientResponses(clusterName) : Clusters.getServerResponses(clusterName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientResponses(clusterName)
+                                 : ensureClusters(this).getServerResponses(clusterName);
 }
 
 /**
@@ -96,7 +98,7 @@ function getResponses(methodName)
  */
 function chip_server_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getServerClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getServerClusters(), options);
 }
 
 /**
@@ -105,7 +107,7 @@ function chip_server_clusters(options)
  */
 function chip_has_server_clusters(options)
 {
-  return asPromise.call(this, Clusters.getServerClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getServerClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -115,7 +117,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getClientClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getClientClusters(), options);
 }
 
 /**
@@ -124,7 +126,7 @@ function chip_client_clusters(options)
  */
 function chip_has_client_clusters(options)
 {
-  return asPromise.call(this, Clusters.getClientClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getClientClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -134,7 +136,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getClusters(), options);
 }
 
 /**
@@ -143,7 +145,7 @@ function chip_clusters(options)
  */
 function chip_has_clusters(options)
 {
-  return asPromise.call(this, Clusters.getClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -153,13 +155,13 @@ function chip_has_clusters(options)
  */
 function chip_server_global_responses(options)
 {
-  return asBlocks.call(this, getServerGlobalAttributeResponses(), options);
+  return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
 }
 
 async function if_in_global_responses(options)
 {
   const attribute          = this.response.arguments[0];
-  const globalResponses    = await getServerGlobalAttributeResponses();
+  const globalResponses    = await getServerGlobalAttributeResponses(this);
   const responseTypeExists = globalResponses.find(
       // Some fields of item/attribute here may be undefined.
       item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
@@ -175,7 +177,7 @@ async function if_in_global_responses(options)
   }
 }
 
-function getServerGlobalAttributeResponses()
+function getServerGlobalAttributeResponses(context)
 {
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
@@ -195,7 +197,7 @@ function getServerGlobalAttributeResponses()
   };
 
   const filter = attributes => attributes.reduce(reducer, []).sort(sorter);
-  return Clusters.getAttributesByClusterSide('server').then(filter);
+  return ensureClusters(context).getAttributesByClusterSide('server').then(filter);
 }
 
 /**
@@ -305,10 +307,10 @@ function chip_cluster_response_arguments(options)
 function chip_server_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
-  const attributes      = Clusters.getServerAttributes(clusterName);
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, attributes.then(items => items.find(filter)));
+  return attributes.then(items => items.find(filter));
 }
 
 /**
@@ -322,10 +324,10 @@ function chip_server_has_list_attributes(options)
 function chip_client_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
-  const attributes      = Clusters.getClientAttributes(clusterName);
+  const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, attributes.then(items => items.find(filter)));
+  return attributes.then(items => items.find(filter));
 }
 
 /**
@@ -340,7 +342,7 @@ function chip_client_has_list_attributes(options)
 function chip_server_cluster_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_attributes');
-  const attributes      = Clusters.getServerAttributes(clusterName);
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
   return asBlocks.call(this, attributes, options);
 }

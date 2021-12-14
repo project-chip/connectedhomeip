@@ -219,7 +219,7 @@ struct LogStorageResources
     {
         if (mpCounterStorage != nullptr && mCounterKey != nullptr && mCounterEpoch != 0)
         {
-            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) != CHIP_NO_ERROR) ? mpCounterStorage : nullptr;
+            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) == CHIP_NO_ERROR) ? mpCounterStorage : nullptr;
         }
         return nullptr;
     }

@@ -25,6 +25,7 @@
 
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/LabelList.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
@@ -178,6 +179,8 @@ public:
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
+
+    CHIP_ERROR GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList);
 
 private:
     bool mInitialized                   = false;
@@ -419,6 +422,11 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
+}
+
+inline CHIP_ERROR PlatformManager::GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
 }
 
 } // namespace DeviceLayer

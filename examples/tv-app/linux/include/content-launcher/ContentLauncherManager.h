@@ -32,8 +32,9 @@ class ContentLauncherManager
 public:
     CHIP_ERROR Init();
     CHIP_ERROR proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
-    ContentLaunchResponse proxyLaunchContentRequest(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                    std::string data);
+    CHIP_ERROR proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
+    ContentLaunchResponse proxyLaunchContentRequest(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList,
+                                                    bool autoplay, std::string data);
     ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,
                                                 ContentLaunchBrandingInformation brandingInformation);
 };

@@ -88,6 +88,8 @@ template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSys
 class UnauthenticatedSessionTable
 {
 public:
+    ~UnauthenticatedSessionTable() { mEntries.ReleaseAll(); }
+
     /**
      * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
      *
@@ -223,7 +225,7 @@ private:
     }
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
-    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
+    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

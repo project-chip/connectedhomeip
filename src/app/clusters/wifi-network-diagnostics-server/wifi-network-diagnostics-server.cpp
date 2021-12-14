@@ -154,21 +154,17 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     {
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
 
-        ForAllEndpointsWithServerCluster(
-            WiFiNetworkDiagnostics::Id,
-            [](EndpointId endpoint, intptr_t context) -> Loop {
-                // If WiFi Network Diagnostics cluster is implemented on this endpoint
-                Events::Disconnection::Type event{ static_cast<uint16_t>(context) };
-                EventNumber eventNumber;
+        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+        {
+            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            Events::Disconnection::Type event{ reasonCode };
+            EventNumber eventNumber;
 
-                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-                {
-                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
-                }
-
-                return Loop::Continue;
-            },
-            static_cast<intptr_t>(reasonCode));
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record Disconnection event");
+            }
+        }
     }
 
     // Gets called when the Node fails to associate or authenticate an access point.
@@ -178,21 +174,16 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 
         Events::AssociationFailure::Type event{ static_cast<AssociationFailureCause>(associationFailureCause), status };
 
-        ForAllEndpointsWithServerCluster(
-            WiFiNetworkDiagnostics::Id,
-            [](EndpointId endpoint, intptr_t context) -> Loop {
-                // If WiFi Network Diagnostics cluster is implemented on this endpoint
-                Events::AssociationFailure::Type * pEvent = reinterpret_cast<Events::AssociationFailure::Type *>(context);
-                EventNumber eventNumber;
+        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+        {
+            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
 
-                if (CHIP_NO_ERROR != LogEvent(*pEvent, endpoint, eventNumber))
-                {
-                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
-                }
-
-                return Loop::Continue;
-            },
-            reinterpret_cast<intptr_t>(&event));
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record AssociationFailure event");
+            }
+        }
     }
 
     // Gets when the Node’s connection status to a Wi-Fi network has changed.
@@ -200,21 +191,17 @@ class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
     {
         ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
 
-        ForAllEndpointsWithServerCluster(
-            WiFiNetworkDiagnostics::Id,
-            [](EndpointId endpoint, intptr_t context) -> Loop {
-                // If WiFi Network Diagnostics cluster is implemented on this endpoint
-                Events::ConnectionStatus::Type event{ static_cast<WiFiConnectionStatus>(context) };
-                EventNumber eventNumber;
+        Events::ConnectionStatus::Type event{ static_cast<WiFiConnectionStatus>(connectionStatus) };
+        for (auto endpoint : EnabledEndpointsWithServerCluster(WiFiNetworkDiagnostics::Id))
+        {
+            // If WiFi Network Diagnostics cluster is implemented on this endpoint
+            EventNumber eventNumber;
 
-                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-                {
-                    ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
-                }
-
-                return Loop::Continue;
-            },
-            static_cast<intptr_t>(connectionStatus));
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "WiFiDiagnosticsDelegate: Failed to record ConnectionStatus event");
+            }
+        }
     }
 };
 

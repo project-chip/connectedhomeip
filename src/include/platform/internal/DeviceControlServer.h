@@ -39,7 +39,7 @@ public:
     CHIP_ERROR CommissioningComplete();
     CHIP_ERROR SetRegulatoryConfig(uint8_t location, const CharSpan & countryCode, uint64_t breadcrumb);
 
-    CHIP_ERROR EnableNetworkForOperational(ByteSpan networkID);
+    CHIP_ERROR ConnectNetworkForOperational(ByteSpan networkID);
 
     static DeviceControlServer & DeviceControlSvr();
 

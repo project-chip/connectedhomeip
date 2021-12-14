@@ -761,7 +761,7 @@ bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_t subje
     }
 
     // Add VID attribute to the certificate subject DN.
-    if (subjectVID != 0)
+    if (subjectVID != VendorId::NotSpecified)
     {
         char chipAttrStr[5];
 

@@ -27,7 +27,7 @@ tests:
       command: "readAttribute"
       attribute: "location"
       response:
-          value: ""
+          value: "XX"
 
     - label: "Write location"
       command: "writeAttribute"

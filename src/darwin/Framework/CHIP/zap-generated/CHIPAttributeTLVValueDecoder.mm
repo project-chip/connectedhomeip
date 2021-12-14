@@ -4223,8 +4223,19 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::NetworkCommissioning::Id: {
         using namespace Clusters::NetworkCommissioning;
         switch (aPath.mAttributeId) {
-        case Attributes::AttributeList::Id: {
-            using TypeInfo = Attributes::AttributeList::TypeInfo;
+        case Attributes::MaxNetworks::Id: {
+            using TypeInfo = Attributes::MaxNetworks::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::Networks::Id: {
+            using TypeInfo = Attributes::Networks::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -4235,8 +4246,10 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+                CHIPNetworkCommissioningClusterNetworkInfo * newElement_0;
+                newElement_0 = [CHIPNetworkCommissioningClusterNetworkInfo new];
+                newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+                newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named
@@ -4247,6 +4260,72 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
             }
             value = array_0;
+            return value;
+        }
+        case Attributes::ScanMaxTimeSeconds::Id: {
+            using TypeInfo = Attributes::ScanMaxTimeSeconds::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::ConnectMaxTimeSeconds::Id: {
+            using TypeInfo = Attributes::ConnectMaxTimeSeconds::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:cppValue];
+            return value;
+        }
+        case Attributes::InterfaceEnabled::Id: {
+            using TypeInfo = Attributes::InterfaceEnabled::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::LastNetworkingStatus::Id: {
+            using TypeInfo = Attributes::LastNetworkingStatus::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::LastNetworkID::Id: {
+            using TypeInfo = Attributes::LastNetworkID::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSData * _Nonnull value;
+            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            return value;
+        }
+        case Attributes::LastConnectErrorValue::Id: {
+            using TypeInfo = Attributes::LastConnectErrorValue::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::FeatureMap::Id: {
@@ -6750,8 +6829,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
-        case Attributes::Struct::Id: {
-            using TypeInfo = Attributes::Struct::TypeInfo;
+        case Attributes::StructAttr::Id: {
+            using TypeInfo = Attributes::StructAttr::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {

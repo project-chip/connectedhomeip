@@ -226,7 +226,7 @@ class BaseTestHelper:
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
             "NodeLabel": "Test",
-            "Location": "",
+            "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
             "SoftwareVersion": 0,

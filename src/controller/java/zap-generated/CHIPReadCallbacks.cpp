@@ -6892,9 +6892,9 @@ void CHIPModeSelectAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPNetworkCommissioningAttributeListAttributeCallback::CHIPNetworkCommissioningAttributeListAttributeCallback(jobject javaCallback,
-                                                                                                               bool keepAlive) :
-    chip::Callback::Callback<CHIPNetworkCommissioningClusterAttributeListAttributeCallbackType>(CallbackFn, this),
+CHIPNetworkCommissioningNetworksAttributeCallback::CHIPNetworkCommissioningNetworksAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
+    chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -6911,7 +6911,7 @@ CHIPNetworkCommissioningAttributeListAttributeCallback::CHIPNetworkCommissioning
     }
 }
 
-CHIPNetworkCommissioningAttributeListAttributeCallback::~CHIPNetworkCommissioningAttributeListAttributeCallback()
+CHIPNetworkCommissioningNetworksAttributeCallback::~CHIPNetworkCommissioningNetworksAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -6922,8 +6922,10 @@ CHIPNetworkCommissioningAttributeListAttributeCallback::~CHIPNetworkCommissionin
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPNetworkCommissioningAttributeListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
+void CHIPNetworkCommissioningNetworksAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6932,8 +6934,8 @@ void CHIPNetworkCommissioningAttributeListAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPNetworkCommissioningAttributeListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPNetworkCommissioningAttributeListAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPNetworkCommissioningNetworksAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPNetworkCommissioningNetworksAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -6955,28 +6957,55 @@ void CHIPNetworkCommissioningAttributeListAttributeCallback::CallbackFn(
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$NetworkCommissioningCluster$NetworksAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$NetworkCommissioningCluster$NetworksAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>", "([BLjava/lang/Boolean;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find NetworksAttribute constructor"));
+
     auto iter = list.begin();
     while (iter.Next())
     {
-        auto & entry                 = iter.GetValue();
-        bool entryNull               = false;
-        chip::AttributeId entryValue = entry;
+        auto & entry = iter.GetValue();
+        (void) entry;
+        bool networkIDNull     = false;
+        bool networkIDHasValue = true;
 
-        jobject entryObject = nullptr;
-        if (!entryNull)
+        chip::ByteSpan networkIDValue = entry.networkID;
+
+        jbyteArray networkID = nullptr;
+        if (!networkIDNull && networkIDHasValue)
         {
-            jclass entryTypeCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", entryTypeCls);
-            chip::JniClass jniClass(entryTypeCls);
-            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(J)V");
-            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
+            networkID = env->NewByteArray(networkIDValue.size());
+            env->SetByteArrayRegion(networkID, 0, networkIDValue.size(), reinterpret_cast<const jbyte *>(networkIDValue.data()));
         }
 
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+        bool connectedNull     = false;
+        bool connectedHasValue = true;
+
+        bool connectedValue = entry.connected;
+
+        jobject connected = nullptr;
+        if (!connectedNull && connectedHasValue)
+        {
+            jclass connectedEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", connectedEntryCls);
+            chip::JniClass connectedJniClass(connectedEntryCls);
+            jmethodID connectedEntryTypeCtor = env->GetMethodID(connectedEntryCls, "<init>", "(Z)V");
+            connected                        = env->NewObject(connectedEntryCls, connectedEntryTypeCtor, connectedValue);
+        }
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, networkID, connected);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create NetworksAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
     }
-    VerifyOrReturn(
-        iter.GetStatus() == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Error decoding AttributeListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Error decoding NetworksAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);

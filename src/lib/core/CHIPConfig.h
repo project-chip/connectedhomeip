@@ -2571,6 +2571,24 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS
+ *
+ * @brief Number of outgoing CASE sessions can be simutaneously negotiated on an end device.
+ */
+#ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS
+#define CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices an end device can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.

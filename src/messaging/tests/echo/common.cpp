@@ -65,5 +65,6 @@ void ShutdownChip(void)
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
+    (void) chip::DeviceLayer::TCPEndPointManager()->Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }
