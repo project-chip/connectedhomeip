@@ -29,6 +29,5 @@ class QpgBuilder(GnBuilder):
             'chip-qpg-lock-example.out':
                 os.path.join(self.output_dir, 'chip-qpg6105-lock-example.out'),
             'chip-qpg-lock-example.out.map':
-                os.path.join(self.output_dir,
-                             'chip-qpg6100-lock-example.out.map'),
+                os.path.join(self.output_dir, 'chip-qpg6105-lock-example.out.map'),
         }
