@@ -272,7 +272,7 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
         break;
 
     default:
-        res = chip::Protocols::InteractionModel::Status::UnsupportedAttribute;
+        res = emberAfPluginDoorLockOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, value);
         break;
     }
 
@@ -289,6 +289,10 @@ void MatterDoorLockPluginServerInitCallback()
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
+
+// =============================================================================
+// Pre-change callbacks for cluster attributes
+// =============================================================================
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, const char * newLanguage)
@@ -334,6 +338,12 @@ emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId, ui
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId, uint8_t newTime)
+{
+    return chip::Protocols::InteractionModel::Status::InvalidAction;
+}
+
+chip::Protocols::InteractionModel::Status __attribute__((weak))
+emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint8_t * attrValue)
 {
     return chip::Protocols::InteractionModel::Status::InvalidAction;
 }
