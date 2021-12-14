@@ -18,8 +18,8 @@
 
 #include "LockManager.h"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 
 LockManager LockManager::instance;

@@ -35,6 +35,7 @@ public:
 
     static LockManager & Instance();
     static LockManager instance;
+
 private:
     bool mLocked;
 };

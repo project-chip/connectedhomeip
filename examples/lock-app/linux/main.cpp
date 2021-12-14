@@ -41,7 +41,8 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip:
     return LockManager::Instance().Unlock(pinCode);
 }
 
-void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
+                                       uint16_t size, uint8_t * value)
 {
     // TODO: Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
     if (attributePath.mClusterId == DoorLock::Id)
@@ -54,7 +55,6 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 {
     DoorLockServer::Instance().InitServer(endpoint);
 }
-
 
 int main(int argc, char * argv[])
 {

@@ -50,7 +50,6 @@ public:
 
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
-
 };
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
