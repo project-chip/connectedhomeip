@@ -25,4 +25,3 @@ PigweedLoggerMutex logger_mutex;
 
 } // namespace rpc
 } // namespace chip
-

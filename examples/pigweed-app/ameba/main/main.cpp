@@ -55,5 +55,3 @@ extern "C" void ChipTest(void)
 
     xTaskCreate(RunRpcService, "RPC_Task", RPC_TASK_STACK_SIZE / sizeof(StackType_t), nullptr, RPC_TASK_PRIORITY, &sRpcTaskHandle);
 }
-
-
