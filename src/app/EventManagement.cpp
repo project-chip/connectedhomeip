@@ -831,10 +831,8 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     CircularEventBuffer * const eventBuffer = ctx->mpEventBuffer;
     if (eventBuffer->IsFinalDestinationForPriority(imp))
     {
-        ChipLogProgress(
-            EventLogging,
-            "Dropped 1 event from buffer with priority %u due to overflow: event priority_level: %u",
-            static_cast<unsigned>(eventBuffer->GetPriority()), static_cast<unsigned>(imp));
+        ChipLogProgress(EventLogging, "Dropped 1 event from buffer with priority %u due to overflow: event priority_level: %u",
+                        static_cast<unsigned>(eventBuffer->GetPriority()), static_cast<unsigned>(imp));
         if (ctx->mFirstEventNumber == number)
         {
             ctx->mFirstEventNumber++;
