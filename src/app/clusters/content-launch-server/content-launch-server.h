@@ -19,10 +19,17 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
+#include "content-launch-delegate.h"
 
-struct ContentLaunchResponse
-{
-    CHIP_ERROR err;
-    chip::CharSpan data;
-    chip::app::Clusters::ContentLauncher::ContentLaunchStatus status;
-};
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ContentLauncher {
+
+void SetDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace ContentLauncher
+} // namespace Clusters
+} // namespace app
+} // namespace chip

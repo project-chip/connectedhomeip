@@ -38,48 +38,12 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
-CHIP_ERROR ContentLauncherManager::Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
+ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                              const chip::CharSpan & data) {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
+    string dataString(data.data(), data.size());
 
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["CS"] = true;
-    featureMap["UP"] = true;
-    featureMap["WA"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
-{
-    ChipLogProgress(Zcl, "ContentLauncherManager::proxyGetAcceptsHeader ");
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        std::list<string> headerExample = { "image/*", "video/*" };
-
-        for (string entry : headerExample)
-        {
-            ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
-        }
-        return CHIP_NO_ERROR;
-    });
-}
-
-CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
-{
-    ChipLogProgress(Zcl, "ContentLauncherManager::proxyGetSupportedStreamingTypes ");
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
-}
-
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(chip::EndpointId endpointId,
-                                                                        list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                                        string data)
-{
-    ChipLogProgress(Zcl, "ContentLauncherManager::proxyLaunchContentRequest endpoint=%d", endpointId);
-
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
     if (app != NULL)
     {
@@ -94,10 +58,14 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(chip::En
     response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
     return response;
 }
-ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string contentUrl, string displayString,
-                                                                    ContentLaunchBrandingInformation brandingInformation)
-{
-    ChipLogProgress(Zcl, "ContentLauncherManager::proxyLaunchUrlRequest contentUrl=%s ", contentUrl.c_str());
+
+ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                      ContentLaunchBrandingInformation & brandingInformation) {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
+
+    string contentUrlString(contentUrl.data(), contentUrl.size());
+    string displayStringString(displayString.data(), displayString.size());
+    
 
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -107,29 +75,13 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string conte
     return response;
 }
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
-                                                          std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                          const chip::CharSpan & data)
-{
-    string dataString(data.data(), data.size());
-    return ContentLauncherManager().proxyLaunchContentRequest(endpointId, parameterList, autoplay, dataString);
-}
-
-ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation)
-{
-    string contentUrlString(contentUrl.data(), contentUrl.size());
-    string displayStringString(displayString.data(), displayString.size());
-    return ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
-}
-
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
-{
+std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList() {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptsHeaderList");
     return { "example", "example" };
 }
 
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
-{
+uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols() {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
     uint32_t streamingProtocols = 0;
     return streamingProtocols;
 }

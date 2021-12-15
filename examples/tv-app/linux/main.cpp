@@ -52,6 +52,12 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
     return true;
 }
 
+namespace {
+    static ContentLauncherManager contentLauncherManager; 
+    constexpr chip::EndpointId kContentLauncherEndpoint = 1;   
+}
+
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -70,10 +76,6 @@ int main(int argc, char * argv[])
 
     // Init Audio Output Manager
     err = AudioOutputManager().Init();
-    SuccessOrExit(err);
-
-    // Init Content Launcher Manager
-    err = ContentLauncherManager().Init();
     SuccessOrExit(err);
 
     // Init Media Input Manager
@@ -114,4 +116,9 @@ exit:
         return 1;
     }
     return 0;
+}
+
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint) {
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncherManager::SetDelegate");
+    chip::app::Clusters::ContentLauncher::SetDelegate(kContentLauncherEndpoint, &contentLauncherManager);
 }

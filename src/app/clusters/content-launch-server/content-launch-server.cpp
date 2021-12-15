@@ -55,43 +55,90 @@
 using namespace chip;
 using namespace chip::app;
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
-                                                          std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                          const chip::CharSpan & data);
+// -----------------------------------------------------------------------------
+// Delegate Implementation
 
-ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation);
+using chip::app::Clusters::ContentLauncher::Delegate;
 
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList();
+namespace {
 
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols();
+Delegate * gDelegateTable[EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
+    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+}
+
+bool SendStatusIfDelegateNull(EndpointId endpoint)
+{
+    if (GetDelegate(endpoint) == nullptr)
+    {
+        ChipLogError(Zcl, "No ContentLauncher Delegate set for ep:%" PRIu16, endpoint);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ContentLauncher {
+
+void SetDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
+    if (ep != 0xFFFF)
+    {
+        gDelegateTable[ep] = delegate;
+    } else {
+    }
+}
+
+} // namespace ContentLauncher
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
 
 namespace {
 
 class ContentLauncherAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
+    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ContentLauncher::Id)
     {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
 
 CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+    if (SendStatusIfDelegateNull(endpoint))
+    {
+        return CHIP_NO_ERROR;
+    }
+
     switch (aPath.mAttributeId)
     {
     case app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id: {
-        return ReadAcceptsHeaderAttribute(aEncoder);
+        return ReadAcceptsHeaderAttribute(aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
-        return ReadSupportedStreamingProtocols(aEncoder);
+        return ReadSupportedStreamingProtocols(aEncoder, delegate);
     }
     default: {
         break;
@@ -100,11 +147,10 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<std::string> acceptsHeaderList = contentLauncherClusterGetAcceptsHeaderList();
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        std::list<std::string> acceptsHeaderList = contentLauncherClusterGetAcceptsHeaderList();
+    std::list<std::string> acceptsHeaderList = delegate->HandleGetAcceptsHeaderList();
+    return aEncoder.EncodeList([acceptsHeaderList](const auto & encoder) -> CHIP_ERROR {
 
         for (std::string acceptedHeader : acceptsHeaderList)
         {
@@ -115,13 +161,16 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeV
     });
 }
 
-CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    uint32_t streamingProtocols = contentLauncherClusterGetSupportedStreamingProtocols();
+    uint32_t streamingProtocols = delegate->HandleGetSupportedStreamingProtocols();
     return aEncoder.Encode(streamingProtocols);
 }
 
 } // anonymous namespace
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
@@ -129,12 +178,19 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
+    EndpointId endpoint = commandPath.mEndpointId;
 
     auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
     std::list<ContentLaunchParamater> parameterList;
 
-    ContentLaunchResponse resp = contentLauncherClusterLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
+    Delegate * delegate = GetDelegate(endpoint);
+    if (SendStatusIfDelegateNull(endpoint))
+    {
+        return true;
+    }
+
+    ContentLaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
     VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
     response.contentLaunchStatus = resp.status;
@@ -160,12 +216,19 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
+    EndpointId endpoint = commandPath.mEndpointId;
 
     auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
     ContentLaunchBrandingInformation brandingInformation;
 
-    ContentLaunchResponse resp = contentLauncherClusterLaunchUrl(contentUrl, displayString, brandingInformation);
+    Delegate * delegate = GetDelegate(endpoint);
+    if (SendStatusIfDelegateNull(endpoint))
+    {
+        return true;
+    }
+
+    ContentLaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformation);
     VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
     response.contentLaunchStatus = resp.status;
@@ -184,6 +247,7 @@ exit:
 
     return true;
 }
+
 
 // -----------------------------------------------------------------------------
 // Plugin initialization

@@ -45,151 +45,9 @@ using namespace chip;
 
 ContentLauncherManager ContentLauncherManager::sInstance;
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(chip::EndpointId endpointId,
-                                                          std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                          const chip::CharSpan & data)
-{
-    return ContentLauncherMgr().LaunchContent(endpointId, parameterList, autoplay, data);
-}
 
-ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation)
-{
-    return ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
-}
-
-std::list<std::string> contentLauncherClusterGetAcceptsHeaderList()
-{
-    return ContentLauncherMgr().GetAcceptsHeader();
-}
-
-uint32_t contentLauncherClusterGetSupportedStreamingProtocols()
-{
-    return ContentLauncherMgr().mGetSupportedStreamingProtocols();
-}
-
-void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentLauncherManager"));
-
-    mContentLauncherManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mContentLauncherManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ContentLauncherManager"));
-
-    jclass ContentLauncherClass = env->GetObjectClass(managerObject);
-    VerifyOrReturn(ContentLauncherClass != nullptr, ChipLogError(Zcl, "Failed to get ContentLauncherManager Java class"));
-
-    mGetAcceptsHeaderMethod = env->GetMethodID(ContentLauncherClass, "getAcceptsHeader", "()[Ljava/lang/String;");
-    if (mGetAcceptsHeaderMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");
-        env->ExceptionClear();
-    }
-
-    mGetSupportedStreamingProtocols = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()[I");
-    if (mGetSupportedStreamingProtocols == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'getSupportedStreamingProtocols' method");
-        env->ExceptionClear();
-    }
-
-    mLaunchContentMethod = env->GetMethodID(
-        ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
-    if (mLaunchContentMethod == nullptr)
-    {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'launchContent' method");
-        env->ExceptionClear();
-    }
-
-    mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
-                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
-    if (mLaunchUrlMethod == nullptr)
-    {
-        ChipLogError(AppServer, "Failed to access 'launchUrl' method");
-        env->ExceptionClear();
-    }
-}
-
-std::list<std::string> ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    std::list<std::string> acceptedHeadersList;
-
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptsHeader");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetAcceptsHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    {
-        jobjectArray acceptedHeadersArray =
-            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-
-        jint size = env->GetArrayLength(acceptedHeadersArray);
-        for (int i = 0; i < size; i++)
-        {
-
-            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
-            const char * convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
-            std::string acceptedHeader  = std::string(convertedValue, strlen(convertedValue));
-            acceptedHeadersList.push_front(acceptedHeader);
-        }
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ContentLauncherManager::GetAcceptsHeader status error: %s", err.AsString());
-    }
-
-    return acceptedHeadersList;
-}
-
-uint32_t ContentLauncherManager::GetSupportedStreamingProtocols()
-{
-    CHIP_ERROR err                       = CHIP_NO_ERROR;
-    JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
-    uint32_t supportedStreamingProtocols = 0;
-
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
-    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetSupportedStreamingProtocols != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    {
-        jint jSupportedStreamingProtocols =
-            (jint) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocols);
-        supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ContentLauncherManager::GetSupportedStreamingProtocols status error: %s", err.AsString());
-    }
-
-    return supportedStreamingProtocols;
-}
-
-ContentLaunchResponse ContentLauncherManager::LaunchContent(chip::EndpointId endpointId,
-                                                            std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                            const chip::CharSpan & data)
+ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                              const chip::CharSpan & data)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -242,8 +100,8 @@ exit:
     return response;
 }
 
-ContentLaunchResponse ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                        ContentLaunchBrandingInformation & brandingInformation)
+ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                      ContentLaunchBrandingInformation & brandingInformation)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -295,4 +153,125 @@ exit:
     }
 
     return response;
+}
+
+std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    std::list<std::string> acceptedHeadersList;
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptsHeader");
+    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetAcceptsHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        jobjectArray acceptedHeadersArray =
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+
+        jint size = env->GetArrayLength(acceptedHeadersArray);
+        for (int i = 0; i < size; i++)
+        {
+
+            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
+            const char * convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
+            std::string acceptedHeader  = std::string(convertedValue, strlen(convertedValue));
+            acceptedHeadersList.push_front(acceptedHeader);
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetAcceptsHeader status error: %s", err.AsString());
+    }
+
+    return acceptedHeadersList;
+}
+
+uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
+{
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    JNIEnv * env                         = JniReferences::GetInstance().GetEnvForCurrentThread();
+    uint32_t supportedStreamingProtocols = 0;
+
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetSupportedStreamingProtocols");
+    VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetSupportedStreamingProtocolsMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        jint jSupportedStreamingProtocols =
+            env->CallIntMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocolsMethod);
+        supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            err = CHIP_ERROR_INCORRECT_STATE;
+            goto exit;
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ContentLauncherManager::GetSupportedStreamingProtocols status error: %s", err.AsString());
+    }
+
+    return supportedStreamingProtocols;
+}
+
+void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ContentLauncherManager"));
+
+    mContentLauncherManagerObject = env->NewGlobalRef(managerObject);
+    VerifyOrReturn(mContentLauncherManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ContentLauncherManager"));
+
+    jclass ContentLauncherClass = env->GetObjectClass(managerObject);
+    VerifyOrReturn(ContentLauncherClass != nullptr, ChipLogError(Zcl, "Failed to get ContentLauncherManager Java class"));
+
+    mGetAcceptsHeaderMethod = env->GetMethodID(ContentLauncherClass, "getAcceptsHeader", "()[Ljava/lang/String;");
+    if (mGetAcceptsHeaderMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");
+        env->ExceptionClear();
+    }
+
+    mGetSupportedStreamingProtocolsMethod = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()[I");
+    if (mGetSupportedStreamingProtocolsMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access MediaInputManager 'getSupportedStreamingProtocols' method");
+        env->ExceptionClear();
+    }
+
+    mLaunchContentMethod = env->GetMethodID(
+        ContentLauncherClass, "launchContent",
+        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+    if (mLaunchContentMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access MediaInputManager 'launchContent' method");
+        env->ExceptionClear();
+    }
+
+    mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
+                                        "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
+                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+    if (mLaunchUrlMethod == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to access 'launchUrl' method");
+        env->ExceptionClear();
+    }
 }
