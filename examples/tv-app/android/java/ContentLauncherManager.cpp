@@ -46,7 +46,8 @@ using namespace chip;
 ContentLauncherManager ContentLauncherManager::sInstance;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                  const std::list<ContentLaunchParamater> & parameterList, 
+                                                                  bool autoplay,
                                                                   const chip::CharSpan & data)
 {
     ContentLaunchResponse response;
@@ -102,7 +103,7 @@ exit:
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
                                                               const chip::CharSpan & displayString,
-                                                              ContentLaunchBrandingInformation & brandingInformation)
+                                                              const ContentLaunchBrandingInformation & brandingInformation)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -156,23 +157,23 @@ exit:
     return response;
 }
 
-std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList()
+std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     std::list<std::string> acceptedHeadersList;
 
-    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptsHeader");
+    ChipLogProgress(Zcl, "Received ContentLauncherManager::GetAcceptHeader");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetAcceptsHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetAcceptHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
         jobjectArray acceptedHeadersArray =
-            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
+            (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptHeaderMethod);
         if (env->ExceptionCheck())
         {
-            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptHeader");
             env->ExceptionDescribe();
             env->ExceptionClear();
             err = CHIP_ERROR_INCORRECT_STATE;
@@ -193,7 +194,7 @@ std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList()
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "ContentLauncherManager::GetAcceptsHeader status error: %s", err.AsString());
+        ChipLogError(Zcl, "ContentLauncherManager::GetAcceptHeader status error: %s", err.AsString());
     }
 
     return acceptedHeadersList;
@@ -216,7 +217,7 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
         supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
         if (env->ExceptionCheck())
         {
-            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptsHeader");
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptHeader");
             env->ExceptionDescribe();
             env->ExceptionClear();
             err = CHIP_ERROR_INCORRECT_STATE;
@@ -244,8 +245,8 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     jclass ContentLauncherClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(ContentLauncherClass != nullptr, ChipLogError(Zcl, "Failed to get ContentLauncherManager Java class"));
 
-    mGetAcceptsHeaderMethod = env->GetMethodID(ContentLauncherClass, "getAcceptsHeader", "()[Ljava/lang/String;");
-    if (mGetAcceptsHeaderMethod == nullptr)
+    mGetAcceptHeaderMethod = env->GetMethodID(ContentLauncherClass, "getAcceptHeader", "()[Ljava/lang/String;");
+    if (mGetAcceptHeaderMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");
         env->ExceptionClear();
