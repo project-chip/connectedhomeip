@@ -129,7 +129,8 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
 
-    if(isDelegateNull(delegate, endpoint)) {
+    if (isDelegateNull(delegate, endpoint))
+    {
         return CHIP_NO_ERROR;
     }
 
