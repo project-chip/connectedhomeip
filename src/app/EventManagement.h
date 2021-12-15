@@ -350,17 +350,6 @@ public:
 
     /**
      * @brief
-     *   Fetch the first event Number currently stored for a particular priority level
-     *
-     * @param aPriority Priority level
-     *
-     * @return EventNumber First currently stored event Number for that event priority
-     */
-    EventNumber GetFirstEventNumber() { return mFirstEventNumber; }
-
-    uint64_t GetFirstEventTimestamp() { return mFirstEventTimestamp.mValue; }
-    /**
-     * @brief
      *   IsValid returns whether the EventManagement instance is valid
      */
     bool IsValid(void) { return EventManagementStates::Shutdown != mState; };
@@ -489,9 +478,7 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    EventNumber mFirstEventNumber = 0; ///< First event Number stored in the logging subsystem for this priority
     EventNumber mLastEventNumber  = 0; ///< Last event Number vended for this priority
-    Timestamp mFirstEventTimestamp;    ///< The timestamp of the first event in this buffer
     Timestamp mLastEventTimestamp;     ///< The timestamp of the last event in this buffer
 };
 } // namespace app
