@@ -29,7 +29,10 @@
             "label": "Main Build",
             "type": "shell",
             "command": "scripts/build/default.sh",
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "isBackground": false,
             "presentation": {
                 "reveal": "always",
@@ -37,10 +40,7 @@
             },
             "problemMatcher": {
                 "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/default/"
-                ]
+                "fileLocation": ["relative", "${workspaceFolder}/out/default/"]
             }
         },
         {
@@ -55,10 +55,7 @@
             },
             "problemMatcher": {
                 "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/debug/"
-                ]
+                "fileLocation": ["relative", "${workspaceFolder}/out/debug/"]
             }
         },
         {
@@ -81,10 +78,7 @@
             "group": "test",
             "problemMatcher": {
                 "base": "$gcc",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}/out/default/"
-                ]
+                "fileLocation": ["relative", "${workspaceFolder}/out/default/"]
             }
         },
         {
@@ -92,27 +86,21 @@
             "type": "shell",
             "command": "bash scripts/bootstrap.sh",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Clean Output",
             "type": "shell",
             "command": "scripts/helpers/clean.sh",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Clean Tree",
             "type": "shell",
             "command": "scripts/helpers/clean_tree.sh",
             "group": "none",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "problemMatcher": ["$gcc"]
         },
         {
             "label": "Build Minimal MDNS Example",
