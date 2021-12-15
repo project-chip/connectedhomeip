@@ -248,6 +248,9 @@ public:
     /**
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
+     *
+     * Note: In failure cases this will _synchronously_ invoke OnDone on the
+     * WriteClient::Callback before returning.
      */
     CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
 

@@ -106,6 +106,11 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get(), aTimedWriteTimeoutMs));
+
+    // At this point the handle will ensure our callback's OnDone is always
+    // called.
+    callback.release();
+
     if (sessionHandle.IsGroupSession())
     {
         ReturnErrorOnFailure(
@@ -119,7 +124,6 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 
     ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
 
-    callback.release();
     return CHIP_NO_ERROR;
 }
 
