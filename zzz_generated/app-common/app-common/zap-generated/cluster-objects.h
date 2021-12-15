@@ -32462,15 +32462,9 @@ namespace Attributes {
 namespace AcceptHeaderList {
 struct TypeInfo
 {
-<<<<<<< HEAD
-    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
-=======
-    using Type             = DataModel::List<const chip::CharSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::CharSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::CharSpan> &;
->>>>>>> e7c4bbc03 (Zap generate files)
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcceptHeaderList::Id; }

@@ -39,8 +39,8 @@ using namespace std;
 using namespace chip::AppPlatform;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList, bool autoplay,
-                                                                  const chip::CharSpan & data)
+                                                                  const std::list<ContentLaunchParamater> & parameterList,
+                                                                  bool autoplay, const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
     string dataString(data.data(), data.size());
@@ -61,9 +61,9 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
     return response;
 }
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                              const chip::CharSpan & displayString,
-                                                              const std::list<ContentLaunchBrandingInformation> & brandingInformation)
+ContentLaunchResponse
+ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
