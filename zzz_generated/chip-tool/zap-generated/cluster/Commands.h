@@ -13468,7 +13468,7 @@ private:
 | * LaunchURL                                                         |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * AcceptsHeaderList                                                 | 0x0000 |
+| * AcceptHeaderList                                                  | 0x0000 |
 | * SupportedStreamingProtocols                                       | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
@@ -13527,18 +13527,18 @@ private:
 };
 
 /*
- * Attribute AcceptsHeaderList
+ * Attribute AcceptHeaderList
  */
-class ReadContentLauncherAcceptsHeaderList : public ModelCommand
+class ReadContentLauncherAcceptHeaderList : public ModelCommand
 {
 public:
-    ReadContentLauncherAcceptsHeaderList() : ModelCommand("read")
+    ReadContentLauncherAcceptHeaderList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "accepts-header-list");
+        AddArgument("attr-name", "accept-header-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherAcceptsHeaderList() {}
+    ~ReadContentLauncherAcceptHeaderList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13546,29 +13546,29 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo>(
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        OnGeneralAttributeResponse(context, "ContentLauncher.AcceptsHeaderList response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.AcceptHeaderList response", value);
     }
 };
 
-class ReportContentLauncherAcceptsHeaderList : public ModelCommand
+class ReportContentLauncherAcceptHeaderList : public ModelCommand
 {
 public:
-    ReportContentLauncherAcceptsHeaderList() : ModelCommand("report")
+    ReportContentLauncherAcceptHeaderList() : ModelCommand("report")
     {
-        AddArgument("attr-name", "accepts-header-list");
+        AddArgument("attr-name", "accept-header-list");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~ReportContentLauncherAcceptsHeaderList() {}
+    ~ReportContentLauncherAcceptHeaderList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13578,7 +13578,7 @@ public:
         cluster.Associate(device, endpointId);
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
-        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo>(
+        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo>(
             this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -13589,7 +13589,7 @@ public:
 
     static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        LogValue("ContentLauncher.AcceptsHeaderList report", 0, value);
+        LogValue("ContentLauncher.AcceptHeaderList report", 0, value);
     }
 
 private:
@@ -51196,7 +51196,7 @@ void registerClusterContentLauncher(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ContentLauncherLaunchContent>(),                     //
         make_unique<ContentLauncherLaunchURL>(),                         //
-        make_unique<ReadContentLauncherAcceptsHeaderList>(),             //
+        make_unique<ReadContentLauncherAcceptHeaderList>(),              //
         make_unique<ReadContentLauncherSupportedStreamingProtocols>(),   //
         make_unique<WriteContentLauncherSupportedStreamingProtocols>(),  //
         make_unique<ReportContentLauncherSupportedStreamingProtocols>(), //

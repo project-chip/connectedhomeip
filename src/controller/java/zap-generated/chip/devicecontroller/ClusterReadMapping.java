@@ -1673,23 +1673,23 @@ public class ClusterReadMapping {
         "readClusterRevisionAttribute", readColorControlClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("colorControl", readColorControlInteractionInfo);
     Map<String, InteractionInfo> readContentLauncherInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readContentLauncherAcceptsHeaderListCommandParams =
+    Map<String, CommandParameterInfo> readContentLauncherAcceptHeaderListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readContentLauncherAcceptsHeaderListAttributeInteractionInfo =
+    InteractionInfo readContentLauncherAcceptHeaderListAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.ContentLauncherCluster) cluster)
-                  .readAcceptsHeaderListAttribute(
-                      (ChipClusters.ContentLauncherCluster.AcceptsHeaderListAttributeCallback)
+                  .readAcceptHeaderListAttribute(
+                      (ChipClusters.ContentLauncherCluster.AcceptHeaderListAttributeCallback)
                           callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedContentLauncherClusterAcceptsHeaderListAttributeCallback(),
-            readContentLauncherAcceptsHeaderListCommandParams);
+                    .DelegatedContentLauncherClusterAcceptHeaderListAttributeCallback(),
+            readContentLauncherAcceptHeaderListCommandParams);
     readContentLauncherInteractionInfo.put(
-        "readAcceptsHeaderListAttribute",
-        readContentLauncherAcceptsHeaderListAttributeInteractionInfo);
+        "readAcceptHeaderListAttribute",
+        readContentLauncherAcceptHeaderListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readContentLauncherSupportedStreamingProtocolsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo =

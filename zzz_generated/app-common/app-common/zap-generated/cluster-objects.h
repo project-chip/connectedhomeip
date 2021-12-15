@@ -32459,7 +32459,7 @@ public:
 
 namespace Attributes {
 
-namespace AcceptsHeaderList {
+namespace AcceptHeaderList {
 struct TypeInfo
 {
 <<<<<<< HEAD
@@ -32473,10 +32473,10 @@ struct TypeInfo
 >>>>>>> e7c4bbc03 (Zap generate files)
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptHeaderList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcceptsHeaderList
+} // namespace AcceptHeaderList
 namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
@@ -32534,7 +32534,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::AcceptsHeaderList::TypeInfo::DecodableType acceptsHeaderList;
+        Attributes::AcceptHeaderList::TypeInfo::DecodableType acceptHeaderList;
         Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;

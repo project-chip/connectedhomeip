@@ -553,8 +553,8 @@ void ColorControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
     cb->mCall(cb->mContext, list);
 }
 
-void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+void ContentLauncherClusterAcceptHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::CharSpan> list;
     CHIP_ERROR err = Decode(*tlvData, list);
@@ -569,8 +569,8 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
         return;
     }
 
-    Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
-        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherAcceptHeaderListListAttributeCallback> * cb =
+        Callback::Callback<ContentLauncherAcceptHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
