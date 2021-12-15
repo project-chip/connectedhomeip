@@ -1369,7 +1369,7 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1377,11 +1377,11 @@
             },
             {
               "name": "NotifyUpdateApplied",
-              "code": 2,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1412,15 +1412,15 @@
           "commands": [
             {
               "name": "QueryImageResponse",
-              "code": 3,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -8672,14 +8672,6 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "NotifyUpdateApplied",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -8714,16 +8706,8 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "QueryImageResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -13664,7 +13648,7 @@
           ],
           "attributes": [
             {
-              "name": "tv channel list",
+              "name": "channel list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -13679,7 +13663,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tv channel lineup",
+              "name": "channel lineup",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -13694,7 +13678,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current tv channel",
+              "name": "current channel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -14084,7 +14068,7 @@
               "reportableChange": 0
             },
             {
-              "name": "position updated at",
+              "name": "position",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -14099,7 +14083,7 @@
               "reportableChange": 0
             },
             {
-              "name": "position",
+              "name": "playback speed",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -14114,7 +14098,7 @@
               "reportableChange": 0
             },
             {
-              "name": "playback speed",
+              "name": "seek range end",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -14129,7 +14113,7 @@
               "reportableChange": 0
             },
             {
-              "name": "seek range end",
+              "name": "seek range start",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -14491,7 +14475,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14690,7 +14674,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application launcher app",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -14817,7 +14801,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -14832,7 +14816,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -15726,7 +15710,7 @@
               "reportableChange": 0
             },
             {
-              "name": "struct",
+              "name": "struct_attr",
               "code": 37,
               "mfgCode": null,
               "side": "server",

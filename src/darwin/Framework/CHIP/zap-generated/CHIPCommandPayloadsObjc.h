@@ -591,18 +591,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
-- (instancetype)init;
-@end
-
-@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
-- (instancetype)init;
-@end
-
 @interface CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nullable delayedActionTime;
@@ -615,9 +603,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
+- (instancetype)init;
+@end
+
 @interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull action;
 @property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
+- (instancetype)init;
+@end
+
+@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
 - (instancetype)init;
 @end
 

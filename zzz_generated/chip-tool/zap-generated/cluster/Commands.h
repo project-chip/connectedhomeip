@@ -24472,8 +24472,8 @@ private:
 | Cluster OtaSoftwareUpdateProvider                                   | 0x0029 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ApplyUpdateRequest                                                |   0x01 |
-| * NotifyUpdateApplied                                               |   0x02 |
+| * ApplyUpdateRequest                                                |   0x02 |
+| * NotifyUpdateApplied                                               |   0x04 |
 | * QueryImage                                                        |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -24496,7 +24496,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess,
                                                OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
@@ -24521,7 +24521,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);

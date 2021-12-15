@@ -13857,18 +13857,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 /**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
-/**
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
@@ -13876,11 +13864,23 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
     chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
     bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
+ * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
+/**
  * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
                                                                         chip::app::CommandSender * commandObj, uint8_t action,
                                                                         uint32_t delayedActionTime);
+/**
+ * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */

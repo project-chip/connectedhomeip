@@ -1280,7 +1280,7 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1288,11 +1288,11 @@
             },
             {
               "name": "NotifyUpdateApplied",
-              "code": 2,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1323,15 +1323,15 @@
           "commands": [
             {
               "name": "QueryImageResponse",
-              "code": 3,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -1703,7 +1703,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NetworkDisabled",
+              "name": "InterfaceEnabled",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -8164,14 +8164,6 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "NotifyUpdateApplied",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -8206,16 +8198,8 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "QueryImageResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
