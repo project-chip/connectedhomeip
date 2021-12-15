@@ -80,7 +80,7 @@ class K32WBuilder(GnBuilder):
         return args
 
     def generate(self):
-        self._Execute(self.code_root + '/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh')
+        self._Execute([os.path.join(self.code_root, 'third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh'])
 
         super(K32WBuilder, self).generate()
 
