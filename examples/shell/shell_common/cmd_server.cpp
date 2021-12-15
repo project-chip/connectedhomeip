@@ -25,6 +25,8 @@
 #include <lib/support/CodeUtils.h>
 
 #include <app/server/Server.h>
+#include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
 using namespace chip;
@@ -117,6 +119,39 @@ static CHIP_ERROR CmdAppServerExchanges(int argc, char ** argv)
     return CHIP_NO_ERROR;
 }
 
+static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
+{
+    bool server = true;
+
+    for (int i = 0; i < emberAfEndpointCount(); i++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+        uint16_t clusterCount = emberAfClusterCount(endpoint, server);
+
+        streamer_printf(streamer_get(), "Endpoint %d:\r\n", endpoint);
+
+        for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
+        {
+            EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, clusterIndex, server);
+            streamer_printf(streamer_get(), "  - Cluster 0x%04X\r\n", cluster->clusterId);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+static CHIP_ERROR CmdAppServerEndpoints(int argc, char ** argv)
+{
+    for (int i = 0; i < emberAfEndpointCount(); i++)
+    {
+        EndpointId endpoint = emberAfEndpointFromIndex(i);
+
+        streamer_printf(streamer_get(), "Endpoint %d\r\n", endpoint);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 static CHIP_ERROR CmdAppServer(int argc, char ** argv)
 {
     switch (argc)
@@ -151,6 +186,8 @@ void cmd_app_server_init()
         { &CmdAppServerUdcPort, "udcport", "Get/Set commissioning port of server." },
         { &CmdAppServerSessions, "sessions", "Manage active sessions on the server." },
         { &CmdAppServerExchanges, "exchanges", "Manage active exchanges on the server." },
+        { &CmdAppServerClusters, "clusters", "Display clusters on the server." },
+        { &CmdAppServerEndpoints, "endpoints", "Display endpoints on the server." },
     };
 
     std::atexit(CmdAppServerAtExit);
