@@ -7145,7 +7145,7 @@ CHIPDevice * GetConnectedDevice(void)
     params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster colorLoopSetWithParams:params
                   completionHandler:^(NSError * _Nullable err) {
-                      NSLog(@"Color Loop Set Command - Set all Attributs Error: %@", err);
+                      NSLog(@"Color Loop Set Command - Set all Attributes Error: %@", err);
 
                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 

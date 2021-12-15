@@ -820,7 +820,7 @@ public:
                                      size_t Lin_len);
 
     /**
-     * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
+     * @brief Start the Spake2+ process as a prover (i.e. a commissioner).
      *
      * @param my_identity       The prover identity. May be NULL if identities are not established.
      * @param my_identity_len   The prover identity length.

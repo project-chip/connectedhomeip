@@ -85,13 +85,13 @@ Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(M
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
+    // TODO: temporary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
+    // TODO: temporary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
 }
 

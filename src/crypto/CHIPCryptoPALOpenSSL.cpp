@@ -170,7 +170,7 @@ CHIP_ERROR AES_CCM_encrypt(const uint8_t * plaintext, size_t plaintext_length, c
     VerifyOrExit(tag != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(_isValidTagLength(tag_length), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: Remove suport for AES-256 since not in 1.0
+    // TODO: Remove support for AES-256 since not in 1.0
     // Determine crypto type by key length
     type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 
@@ -279,7 +279,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
     VerifyOrExit(iv != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(iv_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // TODO: Remove suport for AES-256 since not in 1.0
+    // TODO: Remove support for AES-256 since not in 1.0
     // Determine crypto type by key length
     type = (key_length == kAES_CCM128_Key_Length) ? EVP_aes_128_ccm() : EVP_aes_256_ccm();
 

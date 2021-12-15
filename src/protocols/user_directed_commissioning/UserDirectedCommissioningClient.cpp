@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicited
  *      initiator (client).
  *
  */

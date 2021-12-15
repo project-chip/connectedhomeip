@@ -34,7 +34,7 @@ void DiscoverCommissionersCommand::Shutdown()
         const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(chipTool, "Discovered Commisioner #%d", commissionerCount);
+            ChipLogProgress(chipTool, "Discovered Commissioner #%d", commissionerCount);
             commissioner->LogDetail();
             commissionerCount++;
         }

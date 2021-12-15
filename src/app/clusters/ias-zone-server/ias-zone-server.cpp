@@ -801,7 +801,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(const MessageSendDestination
     // If a change status change notification command is not received by the
     // client, delay the option specified amount of time and try to resend it.
     // The event handler will perform the retransmit per the preset queue retry
-    // parameteres, and the original send request will handle populating the buffer.
+    // parameters, and the original send request will handle populating the buffer.
     // Do not try to retransmit again if the maximum number of retries attempts
     // is reached, this is however discarded if configured for unlimited retries.
     if ((status == EMBER_DELIVERY_FAILED) &&

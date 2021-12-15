@@ -58,7 +58,7 @@ _DeviceAvailableFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
-# date to allow for truely multiple instances so this is temporary.
+# date to allow for truly multiple instances so this is temporary.
 
 
 def _singleton(cls):

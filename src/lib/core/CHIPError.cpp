@@ -593,8 +593,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION.AsInteger():
         desc = "Unsupported wireless operating location";
         break;
-    case CHIP_ERROR_MDNS_COLLISSION.AsInteger():
-        desc = "mDNS collission";
+    case CHIP_ERROR_MDNS_COLLISION.AsInteger():
+        desc = "mDNS collision";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
         desc = "Malformed Interacton Model Attribute Path";

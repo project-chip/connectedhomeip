@@ -300,7 +300,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used. So most headers will be considerably smaller than this.
  */
@@ -331,8 +331,8 @@
  *      Only socket platforms can override the default value. On LwIP-based platforms, the size is derived from the PBUF size
  *      and overriding the value will result in a compile-time error.
  *
- *      This value should be set large enough to accomodate the usage of PacketBuffer in the system. In particular, for the use
- *      in CHIP, the value should be set to accomodate the desired path MTU (i.e. the largest IP packet that can be sent over
+ *      This value should be set large enough to accommodate the usage of PacketBuffer in the system. In particular, for the use
+ *      in CHIP, the value should be set to accommodate the desired path MTU (i.e. the largest IP packet that can be sent over
  *      the network interface) plus any protocol overhead.
  *
  *      For example, sending an IP packet over the tunnel requires additional overheads that depend on platform's network
