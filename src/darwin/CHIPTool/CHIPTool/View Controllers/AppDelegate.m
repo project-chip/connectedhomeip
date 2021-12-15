@@ -39,7 +39,7 @@
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options
 {
     // custom commissioning flow
-    NSLog(@"%@", url);
+    NSLog(@"Do custom commissioning inbound logic here.");
     return YES;
 }
 @end

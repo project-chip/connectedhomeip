@@ -66,14 +66,11 @@
 @property (strong, nonatomic) UILabel * productID;
 @property (strong, nonatomic) UILabel * serialNumber;
 
-@property (strong, nonatomic) UILabel * titleLabel;
 @property (strong, nonatomic) UIButton * readFromLedgerButton;
 @property (strong, nonatomic) UIButton * redirectButton;
-@property (strong, nonatomic) UILabel * commissioningFlow;
-@property (strong, nonatomic) UILabel * commissioningUrl;
+@property (strong, nonatomic) UILabel * commissioningFlowLabel;
+@property (strong, nonatomic) UILabel * commissioningCustomFlowUrl;
 @property (strong, nonatomic) UIView * deviceModelInfoView;
-@property (strong, nonatomic) NSArray * redirectPayload;
-
 
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
@@ -119,7 +116,7 @@
     [self initializeAllLabels];
 
     // Title
-    _titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
+    UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
 
     // stack view
     UIStackView * stackView = [UIStackView new];
@@ -130,7 +127,7 @@
     [self.view addSubview:stackView];
 
     stackView.translatesAutoresizingMaskIntoConstraints = false;
-    [stackView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
+    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
@@ -147,7 +144,7 @@
     manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [manualEntryView.topAnchor constraintEqualToAnchor:_titleLabel.bottomAnchor constant:30].active = YES;
+    [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
 
     _nfcScanButton = [UIButton new];
     [_nfcScanButton setTitle:@"Scan NFC Tag" forState:UIControlStateNormal];
@@ -296,8 +293,8 @@
     _vendorID = [UILabel new];
     _productID = [UILabel new];
     _serialNumber = [UILabel new];
-    _commissioningFlow = [UILabel new];
-    _commissioningUrl = [UILabel new];
+    _commissioningFlowLabel = [UILabel new];
+    _commissioningCustomFlowUrl = [UILabel new];
 }
 
 - (void)addDetailSubview:(UIView *)superView
@@ -338,7 +335,7 @@
     NSArray<NSString *> * resultLabelTexts =
         @[ @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #", @"Commissioning Flow" ];
     NSArray<UILabel *> * resultLabels =
-        @[ _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber, _commissioningFlow ];
+        @[ _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber, _commissioningFlowLabel ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
@@ -347,7 +344,7 @@
     NSArray<NSString *> * resultLabelTexts =
         @[ @"Vendor ID", @"Product ID", @"Commissioning URL" ];
     NSArray<UILabel *> * resultLabels =
-        @[ _vendorID, _productID, _commissioningUrl ];
+        @[ _vendorID, _productID, _commissioningCustomFlowUrl ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
@@ -768,7 +765,7 @@
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
-    _commissioningFlow.text = [NSString stringWithFormat:@"%lu", payload.commissioningFlow];
+    _commissioningFlowLabel.text = [NSString stringWithFormat:@"%lu", payload.commissioningFlow];
     
     [self updateResultViewUI:_setupPayloadView];
     
@@ -1017,9 +1014,9 @@
     }
     // make API call
     NSLog(@"Making API call...");
-    // [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:_vendorIDDeviceInfo.text productId:_productIDDeviceInfo.text];
+    // [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:_vendorID.text productId:_productID.text];
     // mock the respond for now, since the ledge Url is not determined yet.
-    _commissioningUrl.text = @"https://lijusankar.github.io/commissioning-react-app/";
+    _commissioningCustomFlowUrl.text = @"https://lijusankar.github.io/commissioning-react-app/";
     
     // getting redirecting prepared
     NSLog(@"Updating Url and redirectButton...");
@@ -1060,19 +1057,19 @@
 
 - (void)redirectToUrl
 {
-    _redirectPayload = @[ @{
+    NSArray *redirectPayload = @[ @{
         @"version": _versionLabel.text,
         @"vendorID": _vendorID.text,
         @"productID": _productID.text,
-        @"commissioingFlow": _commissioningFlow.text,
+        @"commissioingFlow": _commissioningFlowLabel.text,
         @"discriminator": _discriminatorLabel.text,
         @"setupPinCode": _setupPinCodeLabel.text,
         @"serialNumber": _serialNumber.text,
         @"rendezvousInformation": _rendezVousInformation.text
     } ];
     NSString * returnUrl = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowReturnUrl"];
-    NSString * base64EncodedString = [self encodeStringTo64:_redirectPayload];
-    NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningUrl.text, base64EncodedString, returnUrl];
+    NSString * base64EncodedString = [self encodeStringTo64:redirectPayload];
+    NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
     NSURL * url = [NSURL URLWithString:urlString];
     NSLog(@"%@", url);
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
