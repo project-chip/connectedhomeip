@@ -34003,8 +34003,8 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute accepts header list\n");
-            err = TestReadAttributeAcceptsHeaderList_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute accept header list\n");
+            err = TestReadAttributeAcceptHeaderList_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute supported streaming protocols\n");
@@ -34036,9 +34036,9 @@ private:
         (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptsHeaderList)
+    static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeaderList)
     {
-        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_1(acceptsHeaderList);
+        (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_1(acceptHeaderList);
     }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
@@ -34061,27 +34061,27 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadAttributeAcceptsHeaderList_1()
+    CHIP_ERROR TestReadAttributeAcceptHeaderList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ContentLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptsHeaderList)
+    void OnSuccessResponse_1(const chip::app::DataModel::DecodableList<chip::CharSpan> & acceptHeaderList)
     {
-        auto iter = acceptsHeaderList.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 0));
-        VerifyOrReturn(CheckValueAsString("acceptsHeaderList[0]", iter.GetValue(), chip::CharSpan("example", 7)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 1));
-        VerifyOrReturn(CheckValueAsString("acceptsHeaderList[1]", iter.GetValue(), chip::CharSpan("example", 7)));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(acceptsHeaderList)>("acceptsHeaderList", iter, 2));
+        auto iter = acceptHeaderList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeaderList)>("acceptHeaderList", iter, 0));
+        VerifyOrReturn(CheckValueAsString("acceptHeaderList[0]", iter.GetValue(), chip::CharSpan("example", 7)));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(acceptHeaderList)>("acceptHeaderList", iter, 1));
+        VerifyOrReturn(CheckValueAsString("acceptHeaderList[1]", iter.GetValue(), chip::CharSpan("example", 7)));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(acceptHeaderList)>("acceptHeaderList", iter, 2));
 
         NextTest();
     }

@@ -1362,7 +1362,7 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "AcceptsHeaderList",
+                    "attributeName": "AcceptHeaderList",
                     "attributeId": 0x00000000,
                     "type": "str",
                     "reportable": True,
