@@ -17,17 +17,18 @@ import os
 from typing import Any, List
 from itertools import combinations
 
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
+from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.k32w import K32WApp, K32WBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
-from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
@@ -334,6 +335,19 @@ def AmebaTargets():
     yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
 
+def K32WTargets():
+    k32w_target = Target('k32w', K32WBuilder)
+
+    targets = [
+        k32w_target.Extend('light', app=K32WApp.LIGHT),
+        k32w_target.Extend('lock', app=K32WApp.LOCK),
+        k32w_target.Extend('shell', app=K32WApp.SHELL),
+    ]
+
+    for target in targets:
+        yield target
+        yield target.Extend('low-power', low_power=True)
+
 
 ALL = []
 
@@ -345,7 +359,8 @@ target_generators = [
     AndroidTargets(),
     MbedTargets(),
     InfineonTargets(),
-    AmebaTargets()
+    AmebaTargets(),
+    K32WTargets(),
 ]
 
 for generator in target_generators:
