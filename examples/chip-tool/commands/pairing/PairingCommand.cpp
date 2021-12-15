@@ -70,16 +70,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
 CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
-    CommissioningParameters commissioningParams;
-    if (mNetworkType == PairingNetworkType::WiFi)
+    switch (mNetworkType)
     {
-        commissioningParams.SetWifiCredentials(Controller::WifiCredentials(mSSID, mPassword));
+    case PairingNetworkType::WiFi:
+        return CommissioningParameters().SetWifiCredentials(Controller::WifiCredentials(mSSID, mPassword));
+    case PairingNetworkType::Thread:
+        return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
+    case PairingNetworkType::Ethernet:
+    case PairingNetworkType::None:
+        return CommissioningParameters();
     }
-    else if (mNetworkType == PairingNetworkType::Thread)
-    {
-        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
-    }
-    return commissioningParams;
+    return CommissioningParameters();
 }
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
