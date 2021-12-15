@@ -374,7 +374,6 @@ void AppTask::InitOnOffClusterState()
     status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, false);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-
         ChipLogError(NotSpecified, "ERR: Init On/Off state  %" PRIx8, status);
     }
 }
