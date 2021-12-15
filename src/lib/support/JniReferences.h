@@ -113,6 +113,11 @@ public:
     jdouble DoubleToPrimitive(jobject boxedObject);
 
     /**
+     * Call a void method with no arguments named "OnSubscriptionEstablished" on the provided jobject.
+     */
+    CHIP_ERROR CallSubscriptionEstablished(jobject javaCallback);
+
+    /**
      * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature
      * ("(I)V"), and value.
      */
