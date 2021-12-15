@@ -1633,28 +1633,35 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Sending Attestation Request to the device.");
         if (!params.HasAttestationNonce())
         {
+            ChipLogError(Controller, "No attestation nonce found");
             CommissioningDelegate::CommissioningReport report(step);
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         SendAttestationRequestCommand(proxy, params.GetAttestationNonce().Value());
         break;
     case CommissioningStage::kSendOpCertSigningRequest:
         if (!params.HasCSRNonce())
         {
+            ChipLogError(Controller, "No CSR nonce found");
             CommissioningDelegate::CommissioningReport report(step);
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
         break;
     case CommissioningStage::kGenerateNOCChain:
         if (!params.HasNOCChainGenerationaParameters())
         {
+            ChipLogError(Controller, "Unable to generate NOC chain parameters");
             CommissioningDelegate::CommissioningReport report(step);
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         if (ProcessOpCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
                          params.GetNOCChainGenerationParameters().Value().signature) != CHIP_NO_ERROR)
         {
+            ChipLogError(Controller, "Unable to process Op CSR");
             // Handle error, and notify session failure to the commissioner application.
             ChipLogError(Controller, "Failed to process the certificate signing request");
             // TODO: Map error status to correct error code
@@ -1664,16 +1671,20 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSendTrustedRootCert:
         if (!params.HasRootCert())
         {
+            ChipLogError(Controller, "No trusted root cert specified");
             CommissioningDelegate::CommissioningReport report(step);
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         SendTrustedRootCertificate(proxy, params.GetRootCert().Value());
         break;
     case CommissioningStage::kSendNOC:
         if (!params.HasNOCerts())
         {
+            ChipLogError(Controller, "No node operational certs specified");
             CommissioningDelegate::CommissioningReport report(step);
             mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            return;
         }
         ChipLogProgress(Controller, "Sending operational certificate chain to the device");
         SendOperationalCertificate(proxy, params.GetNOCerts().Value().noc, params.GetNOCerts().Value().icac);

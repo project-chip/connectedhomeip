@@ -206,6 +206,11 @@ CHIP_ERROR AutoCommissioner::NOCChainGenerated(ByteSpan noc, ByteSpan icac, Byte
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to perform commissioning step %d", static_cast<int>(report.stageCompleted));
+        return err;
+    }
     switch (report.stageCompleted)
     {
     case CommissioningStage::kSendPAICertificateRequest:
