@@ -85,7 +85,7 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         // non-deterministic connection dispatch when multple clients
         // listen on the address with the same degreee of selectivity,
         // e.g. two untargetted-listen CHIP clients, or two
-        //targeted-listen CHIP clients with the same node id.
+        // targeted-listen CHIP clients with the same node id.
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {

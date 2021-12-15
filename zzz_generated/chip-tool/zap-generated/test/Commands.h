@@ -10929,8 +10929,8 @@ public:
             err = TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Color Loop Set Command - Set all Attributs\n");
-            err = TestColorLoopSetCommandSetAllAttributs_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Color Loop Set Command - Set all Attributes\n");
+            err = TestColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Check ColorLoopDirection Value\n");
@@ -11150,7 +11150,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestColorLoopSetCommandSetAllAttributs_3()
+    CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
