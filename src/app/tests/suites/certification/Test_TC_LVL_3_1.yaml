@@ -27,7 +27,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 1
+          constraints:
+              minValue: 0
+              maxValue: 1
 
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
@@ -66,7 +68,7 @@ tests:
       command: "readAttribute"
       attribute: "min level"
       response:
-          value: 1
+          value: 0
 
     - label: "sends a Move down command"
       command: "Move"

@@ -16446,7 +16446,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
 
         NextTest();
     }
@@ -16869,7 +16869,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 1));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
 
         NextTest();
     }
@@ -16889,7 +16889,7 @@ private:
 
     void OnSuccessResponse_2(uint8_t maxLevel)
     {
-        VerifyOrReturn(CheckValue("maxLevel", maxLevel, 255));
+        VerifyOrReturn(CheckValue("maxLevel", maxLevel, 254));
 
         NextTest();
     }
@@ -17316,7 +17316,8 @@ private:
 
     void OnSuccessResponse_4(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 128));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 128));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 129));
 
         NextTest();
     }
@@ -17370,7 +17371,8 @@ private:
 
     void OnSuccessResponse_7(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 64));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 64));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 65));
 
         NextTest();
     }
@@ -17424,7 +17426,8 @@ private:
 
     void OnSuccessResponse_10(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 128));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 128));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 129));
 
         NextTest();
     }

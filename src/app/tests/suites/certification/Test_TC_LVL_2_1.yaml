@@ -27,7 +27,9 @@ tests:
       command: "readAttribute"
       attribute: "current Level"
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 1
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"

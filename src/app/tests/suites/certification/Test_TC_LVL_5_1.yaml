@@ -56,7 +56,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          constraints:
+              minValue: 128
+              maxValue: 129
 
     - label: "Sends a move up command to DUT"
       command: "Move"
@@ -94,7 +96,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 133
+          constraints:
+              minValue: 133
+              maxValue: 134
 
     - label: "Sending off command"
       cluster: "On/Off"
