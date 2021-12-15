@@ -70,7 +70,7 @@ jobs:
                       --target k32w-shell \
                       build \
                       --copy-artifacts-to out/artifacts \
-                 "
+                  "
             - name: Get light size stats
               timeout-minutes: 5
               run: |
