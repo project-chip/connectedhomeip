@@ -53,8 +53,8 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
 }
 
 namespace {
-    static ContentLauncherManager contentLauncherManager; 
-    constexpr chip::EndpointId kContentLauncherEndpoint = 1;   
+    static ContentLauncherManager contentLauncherManager;
+    constexpr chip::EndpointId kContentLauncherEndpoint = 1;
 }
 
 

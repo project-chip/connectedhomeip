@@ -30,7 +30,7 @@
 class ContentLauncherManager: public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
-	
+
 	ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
                                               const chip::CharSpan & data) override;
     ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,

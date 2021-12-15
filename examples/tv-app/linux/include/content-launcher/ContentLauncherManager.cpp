@@ -65,7 +65,7 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSp
 
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
-    
+
 
     // TODO: Insert code here
     ContentLaunchResponse response;
