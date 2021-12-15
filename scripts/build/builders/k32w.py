@@ -53,6 +53,7 @@ class K32WBuilder(GnBuilder):
                  root,
                  runner,
                  app: K32WApp = K32WApp.LIGHT,
+                 release: bool = False,
                  low_power: bool = False):
         super(K32WBuilder, self).__init__(
             root=app.BuildRoot(root),
@@ -60,6 +61,7 @@ class K32WBuilder(GnBuilder):
         self.code_root = root
         self.app = app
         self.low_power = low_power
+        self.release = release
 
     def GnBuildArgs(self):
         args = [
@@ -71,6 +73,10 @@ class K32WBuilder(GnBuilder):
           args.append('chip_with_low_power=1')
         else:
           args.append('chip_with_low_power=0')
+
+        if self.release:
+          args.append('is_debug=false')
+
 
         return args
 

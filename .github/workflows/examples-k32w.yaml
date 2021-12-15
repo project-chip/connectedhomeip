@@ -65,7 +65,7 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
-                      --target k32w-light \
+                      --target k32w-light-release \
                       --target k32w-lock-low-power \
                       --target k32w-shell \
                       build \
@@ -75,8 +75,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w061 light \
-                    out/artifacts/k32w-light/chip-k32w061-light-example \
+                    k32w k32w061+release light \
+                    out/artifacts/k32w-light-release/chip-k32w061-light-example \
                     /tmp/bloat_reports/
             - name: Get lock size stats
               timeout-minutes: 5
