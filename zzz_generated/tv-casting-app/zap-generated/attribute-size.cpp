@@ -158,7 +158,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
         {
-        case 0x0000: // accepts header list
+        case 0x0000: // accept header list
         {
             entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
             if (entryOffset == 0)
@@ -167,22 +167,22 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
 
-            ByteSpan * acceptsHeaderListSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // OCTET_STRING
-            uint16_t acceptsHeaderListRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            ByteSpan * acceptHeaderListSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // OCTET_STRING
+            uint16_t acceptHeaderListRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
             if (CHIP_NO_ERROR !=
-                (write ? WriteByteSpan(dest + entryOffset, acceptsHeaderListRemainingSpace, acceptsHeaderListSpan)
-                       : ReadByteSpan(src + entryOffset, acceptsHeaderListRemainingSpace, acceptsHeaderListSpan)))
+                (write ? WriteByteSpan(dest + entryOffset, acceptHeaderListRemainingSpace, acceptHeaderListSpan)
+                       : ReadByteSpan(src + entryOffset, acceptHeaderListRemainingSpace, acceptHeaderListSpan)))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
                 return 0;
             }
 
-            if (!CanCastTo<uint16_t>(acceptsHeaderListSpan->size()))
+            if (!CanCastTo<uint16_t>(acceptHeaderListSpan->size()))
             {
-                ChipLogError(Zcl, "Span size %zu is too large", acceptsHeaderListSpan->size());
+                ChipLogError(Zcl, "Span size %zu is too large", acceptHeaderListSpan->size());
                 return 0;
             }
-            entryLength = static_cast<uint16_t>(acceptsHeaderListSpan->size());
+            entryLength = static_cast<uint16_t>(acceptHeaderListSpan->size());
             break;
         }
         }
@@ -974,7 +974,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     case 0x050A: // Content Launcher Cluster
         switch (attributeId)
         {
-        case 0x0000: // accepts header list
+        case 0x0000: // accept header list
             // chip::ByteSpan
             return GetByteSpanOffsetFromIndex(buffer, 256, entryCount);
             break;
