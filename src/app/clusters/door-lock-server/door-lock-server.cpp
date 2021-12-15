@@ -234,15 +234,29 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
     switch (attributePath.mAttributeId)
     {
     case chip::app::Clusters::DoorLock::Attributes::Language::Id: {
-        char lang[3 + 1] = { 0 };
-        memcpy(lang, &value[1], value[0]);
-        res = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, lang);
+        if (value[0] <= 3)
+        {
+            char lang[3 + 1] = { 0 };
+            memcpy(lang, &value[1], value[0]);
+            res = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, lang);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
     }
 
     case chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::Id: {
-        uint32_t newRelockTime = *(reinterpret_cast<uint32_t *>(value));
-        res                    = emberAfPluginDoorLockOnAutoRelockTimeChange(attributePath.mEndpointId, newRelockTime);
+        if (size == 4)
+        {
+            uint32_t newRelockTime = *(reinterpret_cast<uint32_t *>(value));
+            res                    = emberAfPluginDoorLockOnAutoRelockTimeChange(attributePath.mEndpointId, newRelockTime);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
     }
 
