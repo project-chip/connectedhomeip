@@ -30,6 +30,9 @@
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <list>
+#include <string>
+
 using namespace chip;
 using namespace chip::Controller;
 using namespace chip::Credentials;
