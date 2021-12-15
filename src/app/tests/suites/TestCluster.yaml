@@ -2354,7 +2354,6 @@ tests:
           constraints:
               notValue: "-9223372036854775806"
 
-
     # Tests for float attribute
 
     - label: "Write attribute NULLABLE_SINGLE medium Value"
