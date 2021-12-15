@@ -66,7 +66,6 @@ class K32WBuilder(GnBuilder):
     def GnBuildArgs(self):
         args = [
           'k32w0_sdk_root="%s"' % os.environ['NXP_K32W061_SDK_ROOT'],
-          'is_debug=false'
         ]
 
         if self.low_power:
