@@ -58,6 +58,7 @@ public:
 
     void HandleGeneralFault(uint32_t EventId);
     void HandleSoftwareFault(uint32_t EventId);
+    void HandleSwitchEvent(uint32_t EventId);
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
