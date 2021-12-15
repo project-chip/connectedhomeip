@@ -46,23 +46,6 @@ tests:
               - name: "groupId"
                 value: 0x1234
 
-    - label: "Add Group 1 - endpoint 2"
-      cluster: "Groups"
-      command: "AddGroup"
-      endpoint: 2
-      arguments:
-          values:
-              - name: "groupId"
-                value: 0x1234
-              - name: "groupName"
-                value: "Group #1"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 0x1234
-
     - label: "Add Group 2 - endpoint 0"
       cluster: "Groups"
       command: "AddGroup"
@@ -122,15 +105,6 @@ tests:
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
-      disabled: true
-      response:
-          value: 1
-
-    - label:
-          "Check on/off attribute value is true after on command for endpoint 2"
-      cluster: "On/Off"
-      command: "readAttribute"
-      attribute: "OnOff"
-      endpoint: 2
+      endpoint: 1
       response:
           value: 1
