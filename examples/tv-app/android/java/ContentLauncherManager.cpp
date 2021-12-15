@@ -46,9 +46,8 @@ using namespace chip;
 ContentLauncherManager ContentLauncherManager::sInstance;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList, 
-                                                                  bool autoplay,
-                                                                  const chip::CharSpan & data)
+                                                                  const std::list<ContentLaunchParamater> & parameterList,
+                                                                  bool autoplay, const chip::CharSpan & data)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -101,9 +100,9 @@ exit:
     return response;
 }
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                              const chip::CharSpan & displayString,
-                                                              const ContentLaunchBrandingInformation & brandingInformation)
+ContentLaunchResponse
+ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
