@@ -188,7 +188,7 @@ void OnTriggerOffWithEffect(OnOffEffect * effect)
 OnOffEffect gEffect = {
     chip::EndpointId{ 1 },
     OnTriggerOffWithEffect,
-    static_cast<uint8_t>(EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF),
+    EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
     static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS),
 };
 

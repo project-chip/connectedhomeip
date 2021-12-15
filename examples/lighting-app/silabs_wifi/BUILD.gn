@@ -98,7 +98,10 @@ efr32_sdk("sdk") {
     "CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR=${setupDiscriminator}",
   ]
   if (chip_enable_pw_rpc) {
-    defines += [ "HAL_VCOM_ENABLE=1" ]
+    defines += [
+      "HAL_VCOM_ENABLE=1",
+      "PW_RPC_ENABLED",
+    ]
   }
   if (use_rs911x) {
      defines += rs911x_defs
@@ -138,7 +141,7 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -175,12 +178,22 @@ efr32_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
   ]
   if (!use_rs911x && !use_wf200) {
-   deps += [
-     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-     "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-     "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-   ]
+    deps += [
+      "${examples_plat_dir}:efr-matter-shell",
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
+      "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
+    ]
+    if (chip_openthread_ftd) {
+     deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+     ]
+    } else {
+     deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+     ]
+    }
   }
 
   if (show_qr_code) {
