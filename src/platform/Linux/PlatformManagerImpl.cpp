@@ -302,6 +302,14 @@ CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
 }
 
 CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(EndpointId endpoint,
+                                       LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
 PlatformManagerImpl::_GetUserLabelList(EndpointId endpoint,
                                        LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {

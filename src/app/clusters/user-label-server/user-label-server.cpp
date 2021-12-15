@@ -45,10 +45,14 @@ public:
     UserLabelAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), UserLabel::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteLabelList(EndpointId endpoint, AttributeValueDecoder & aDecoder);
 };
+
+UserLabelAttrAccess gAttrAccess;
 
 CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -74,7 +78,27 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
     return err;
 }
 
-UserLabelAttrAccess gAttrAccess;
+CHIP_ERROR UserLabelAttrAccess::WriteLabelList(EndpointId endpoint, AttributeValueDecoder & aDecoder)
+{
+    DeviceLayer::LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+    LabelList::TypeInfo::DecodableType decodablelist;
+
+    ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
+
+    uint8_t index = 0;
+    auto iter     = decodablelist.begin();
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+
+        VerifyOrReturnError(index < DeviceLayer::kMaxUserLabels, CHIP_ERROR_BUFFER_TOO_SMALL);
+        labelList.add(entry);
+    }
+
+    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList));
+
+    return iter.GetStatus();
+}
 
 CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -89,6 +113,21 @@ CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, At
     }
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR UserLabelAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+{
+    VerifyOrDie(aPath.mClusterId == UserLabel::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case LabelList::Id:
+        return WriteLabelList(aPath.mEndpointId, aDecoder);
+    default:
+        break;
+    }
+    return CHIP_NO_ERROR;
+}
+
 } // anonymous namespace
 
 void MatterUserLabelPluginServerInitCallback(void)
