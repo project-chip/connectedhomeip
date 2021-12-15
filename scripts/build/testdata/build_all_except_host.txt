@@ -419,6 +419,36 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-light
+
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-light-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-light-release
+
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-lock
+
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-lock-low-power
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1' {out}/k32w-lock-low-power
+
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-lock-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
+
+/ T E S T / B U I L D / R O O T / t h i r d _ p a r t y / n x p / k 3 2 w 0 _ s d k / s d k _ f i x e s / p a t c h _ k 3 2 w _ s d k . s h
+
+# Generating k32w-shell
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-shell
+
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
@@ -985,6 +1015,24 @@ ninja -C {out}/infineon-p6-light
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
+
+# Building k32w-light
+ninja -C {out}/k32w-light
+
+# Building k32w-light-release
+ninja -C {out}/k32w-light-release
+
+# Building k32w-lock
+ninja -C {out}/k32w-lock
+
+# Building k32w-lock-low-power
+ninja -C {out}/k32w-lock-low-power
+
+# Building k32w-lock-low-power-release
+ninja -C {out}/k32w-lock-low-power-release
+
+# Building k32w-shell
+ninja -C {out}/k32w-shell
 
 # Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-debug
 bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug/chip-*'
