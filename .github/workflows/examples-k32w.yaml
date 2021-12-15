@@ -82,7 +82,7 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w061 light \
+                    k32w k32w061 lock \
                     out/artifacts/k32w-lock-low-power/chip-k32w061-lock-example \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
