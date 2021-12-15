@@ -26,6 +26,7 @@
 #include <set>
 
 #include <lib/support/Pool.h>
+#include <lib/support/PoolWrapper.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/SystemConfig.h>
 
@@ -53,7 +54,7 @@ using namespace chip;
 template <typename T, size_t N, ObjectPoolMem P>
 void TestReleaseNull(nlTestSuite * inSuite, void * inContext)
 {
-    MemTypeObjectPool<T, N, P> pool;
+    ObjectPool<T, N, P> pool;
     pool.ReleaseObject(nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == 0);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);
@@ -74,7 +75,7 @@ void TestReleaseNullDynamic(nlTestSuite * inSuite, void * inContext)
 template <typename T, size_t N, ObjectPoolMem P>
 void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
 {
-    MemTypeObjectPool<uint32_t, N, ObjectPoolMem::kStatic> pool;
+    ObjectPool<uint32_t, N, ObjectPoolMem::kStatic> pool;
     uint32_t * obj[N];
 
     NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);
@@ -105,7 +106,7 @@ void TestCreateReleaseObjectStatic(nlTestSuite * inSuite, void * inContext)
     constexpr const size_t kSize = 100;
     TestCreateReleaseObject<uint32_t, kSize, ObjectPoolMem::kStatic>(inSuite, inContext);
 
-    MemTypeObjectPool<uint32_t, kSize, ObjectPoolMem::kStatic> pool;
+    ObjectPool<uint32_t, kSize, ObjectPoolMem::kStatic> pool;
     uint32_t * obj[kSize];
 
     for (size_t i = 0; i < kSize; ++i)
@@ -159,7 +160,7 @@ void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
     std::set<S *> objs1;
 
     constexpr const size_t kSize = 100;
-    MemTypeObjectPool<S, kSize, P> pool;
+    ObjectPool<S, kSize, P> pool;
 
     S * objs2[kSize];
     for (size_t i = 0; i < kSize; ++i)
@@ -223,7 +224,7 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
     S * objArray[kSize];
     std::set<size_t> objIds;
 
-    MemTypeObjectPool<S, kSize, P> pool;
+    ObjectPool<S, kSize, P> pool;
 
     for (size_t i = 0; i < kSize; ++i)
     {
@@ -343,6 +344,69 @@ void TestForEachActiveObjectDynamic(nlTestSuite * inSuite, void * inContext)
 }
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+template <ObjectPoolMem P>
+void TestPoolInterface(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestObject
+    {
+        TestObject(uint32_t * set, size_t id) : mSet(set), mId(id) { *mSet |= (1 << mId); }
+        ~TestObject() { *mSet &= ~(1 << mId); }
+        uint32_t * mSet;
+        size_t mId;
+    };
+    using TestObjectPoolType = PoolInterface<TestObject, uint32_t *, size_t>;
+
+    struct PoolHolder
+    {
+        PoolHolder(TestObjectPoolType & testObjectPool) : mTestObjectPoolInterface(testObjectPool) {}
+        TestObjectPoolType & mTestObjectPoolInterface;
+    };
+
+    constexpr size_t kSize = 10;
+    PoolImpl<TestObject, kSize, P, typename TestObjectPoolType::Interface> testObjectPool;
+    PoolHolder poolHolder(testObjectPool);
+    uint32_t bits = 0;
+
+    TestObject * objs2[kSize];
+    for (size_t i = 0; i < kSize; ++i)
+    {
+        objs2[i] = poolHolder.mTestObjectPoolInterface.CreateObject(&bits, i);
+        NL_TEST_ASSERT(inSuite, objs2[i] != nullptr);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(poolHolder.mTestObjectPoolInterface) == i + 1);
+        NL_TEST_ASSERT(inSuite, bits == (1ul << (i + 1)) - 1);
+    }
+    for (size_t i = 0; i < kSize; ++i)
+    {
+        poolHolder.mTestObjectPoolInterface.ReleaseObject(objs2[i]);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(poolHolder.mTestObjectPoolInterface) == kSize - i - 1);
+    }
+    NL_TEST_ASSERT(inSuite, bits == 0);
+
+    // Verify that ReleaseAll() calls the destructors.
+    for (size_t i = 0; i < kSize; ++i)
+    {
+        objs2[i] = poolHolder.mTestObjectPoolInterface.CreateObject(&bits, i);
+    }
+    NL_TEST_ASSERT(inSuite, bits == (1ul << kSize) - 1);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(poolHolder.mTestObjectPoolInterface) == kSize);
+
+    poolHolder.mTestObjectPoolInterface.ReleaseAll();
+    NL_TEST_ASSERT(inSuite, bits == 0);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(poolHolder.mTestObjectPoolInterface) == 0);
+}
+
+void TestPoolInterfaceStatic(nlTestSuite * inSuite, void * inContext)
+{
+    TestPoolInterface<ObjectPoolMem::kStatic>(inSuite, inContext);
+}
+
+#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+void TestPoolInterfaceDynamic(nlTestSuite * inSuite, void * inContext)
+{
+    TestPoolInterface<ObjectPoolMem::kDynamic>(inSuite, inContext);
+}
+#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -365,11 +429,13 @@ static const nlTest sTests[] = {
     NL_TEST_DEF_FN(TestCreateReleaseObjectStatic),
     NL_TEST_DEF_FN(TestCreateReleaseStructStatic),
     NL_TEST_DEF_FN(TestForEachActiveObjectStatic),
+    NL_TEST_DEF_FN(TestPoolInterfaceStatic),
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     NL_TEST_DEF_FN(TestReleaseNullDynamic),
     NL_TEST_DEF_FN(TestCreateReleaseObjectDynamic),
     NL_TEST_DEF_FN(TestCreateReleaseStructDynamic),
     NL_TEST_DEF_FN(TestForEachActiveObjectDynamic),
+    NL_TEST_DEF_FN(TestPoolInterfaceDynamic),
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
     NL_TEST_SENTINEL()
     // clang-format on
