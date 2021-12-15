@@ -65,16 +65,22 @@ class TestExchangeDelegate : public Messaging::ExchangeDelegate
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+class DummyDelegate : public ReadHandler::Callback
+{
+public:
+    void OnDone(ReadHandler & apHandler) override {}
+};
+
 void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
+    DummyDelegate dummy;
 
-    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
+    err = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     Messaging::ExchangeContext * exchangeCtx = ctx.GetExchangeManager().NewContext(SessionHandle(0, 0, 0, 0), nullptr);
     TestExchangeDelegate delegate;
@@ -101,8 +107,8 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     err = writer.Finalize(&readRequestbuf);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
-    readHandler.OnReadInitialRequest(std::move(readRequestbuf));
+    app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+    readHandler.OnInitialRequest(std::move(readRequestbuf));
     err = InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_NOT_CONNECTED);
 }

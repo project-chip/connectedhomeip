@@ -123,7 +123,8 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
                               uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
-                                  onSubscriptionEstablishedCb = nullptr)
+                                  onSubscriptionEstablishedCb = nullptr,
+                              bool keepPreviousSubscriptions  = false)
 {
     detail::ReportAttributeParams<DecodableAttributeType> params(sessionHandle);
     params.mOnReportCb                  = onReportCb;
@@ -131,6 +132,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
     params.mOnSubscriptionEstablishedCb = onSubscriptionEstablishedCb;
     params.mMinIntervalFloorSeconds     = minIntervalFloorSeconds;
     params.mMaxIntervalCeilingSeconds   = maxIntervalCeilingSeconds;
+    params.mKeepSubscriptions           = keepPreviousSubscriptions;
     params.mReportType                  = app::ReadClient::InteractionType::Subscribe;
     return detail::ReportAttribute(exchangeMgr, endpointId, clusterId, attributeId, std::move(params));
 }
@@ -147,11 +149,12 @@ CHIP_ERROR SubscribeAttribute(
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
     uint16_t aMinIntervalFloorSeconds, uint16_t aMaxIntervalCeilingSeconds,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSubscriptionEstablishedCallbackType
-        onSubscriptionEstablishedCb = nullptr)
+        onSubscriptionEstablishedCb = nullptr,
+    bool keepPreviousSubscriptions  = false)
 {
     return SubscribeAttribute<typename AttributeTypeInfo::DecodableType>(
         exchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(), onReportCb,
-        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+        onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, onSubscriptionEstablishedCb, keepPreviousSubscriptions);
 }
 
 namespace detail {

@@ -60,14 +60,11 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     {
         err = CHIP_NO_ERROR;
     }
-    else if (aStatus.mStatus == Protocols::InteractionModel::Status::ResourceExhausted)
-    {
-        err = CHIP_ERROR_NO_MEMORY;
-    }
     else
     {
-        err = CHIP_ERROR_INCORRECT_STATE;
+        err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED;
     }
+
     return err;
 }
 } // namespace app

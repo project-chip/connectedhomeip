@@ -150,7 +150,8 @@ public:
                          chip::TLV::TLVReader * aData, const chip::app::StatusIB & status) override
     {}
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError,
+                 chip::Protocols::InteractionModel::Status aIMStatus) override
     {
         printf("ReadError with err %" CHIP_ERROR_FORMAT, aError.Format());
     }
@@ -700,7 +701,7 @@ int main(int argc, char * argv[])
     err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager, &gMockDelegate);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP im responder.

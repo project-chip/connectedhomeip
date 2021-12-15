@@ -96,6 +96,11 @@ public:
      */
     CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
 
+    /*
+     * Resets the tracker that tracks the currently serviced read handler.
+     */
+    void ResetReadHandlerTracker() { mCurReadHandlerIdx = 0; }
+
 private:
     friend class TestReportingEngine;
     /**

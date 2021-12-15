@@ -65,7 +65,7 @@ namespace app {
  * handlers
  *
  */
-class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback
+class InteractionModelEngine : public Messaging::ExchangeDelegate, public CommandHandler::Callback, public ReadHandler::Callback
 {
 public:
     /**
@@ -89,7 +89,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr);
 
     void Shutdown();
 
@@ -163,6 +163,7 @@ public:
                              ReadClient::Callback * aCallback);
 
     uint32_t GetNumActiveReadHandlers() const;
+    uint32_t GetNumActiveReadHandlers(ReadHandler::InteractionType type) const;
     uint32_t GetNumActiveReadClients() const;
 
     uint32_t GetNumActiveWriteHandlers() const;
@@ -179,7 +180,6 @@ public:
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
-    uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
@@ -220,12 +220,47 @@ public:
     void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    //
+    // Get direct access to the underlying read handler pool
+    //
+    auto & GetReadHandlerPool() { return mReadHandlers; }
+
+    //
+    // Over-ride the maximal capacity of the underlying read handler pool to mimick
+    // out of memory scenarios in unit-tests.
+    //
+    // If -1 is passed in, no over-ride is instituted and default behavior resumes.
+    //
+    void SetHandlerCapacity(int32_t sz) { mReadHandlerCapacityOverride = sz; }
+
+    //
+    // When testing subscriptions using the high-level APIs in src/controller/ReadInteraction.h,
+    // they don't provide for the ability to shutdown those subscriptions after they've been established.
+    //
+    // So for the purposes of unit tests, add a helper here to shutdown and clean-up all active handlers.
+    //
+    void ShutdownActiveReads()
+    {
+        for (auto & client : mReadClients)
+        {
+            if (!client.IsFree())
+            {
+                client.Shutdown();
+            }
+        }
+
+        mReadHandlers.ReleaseAll();
+    }
+#endif
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
     using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
+    void OnDone(ReadHandler & apReadObj) override;
 
     /**
      * Called when Interaction Model receives a Command Request message.  Errors processing
@@ -279,7 +314,6 @@ private:
     bool HasActiveRead();
 
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
 
     CommandHandlerInterface * mCommandHandlerList = nullptr;
 
@@ -288,12 +322,16 @@ private:
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
-    ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
+    ObjectPool<ReadHandler, CHIP_IM_MAX_NUM_READ_HANDLER> mReadHandlers;
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
     ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
     ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    int mReadHandlerCapacityOverride = -1;
+#endif
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.

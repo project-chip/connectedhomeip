@@ -95,9 +95,9 @@ private:
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus) override
     {
-        mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
+        mOnError(nullptr, aIMStatus, aError);
     }
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
@@ -158,9 +158,9 @@ private:
         }
     }
 
-    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const app::ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus) override
     {
-        mOnError(nullptr, Protocols::InteractionModel::Status::Failure, aError);
+        mOnError(nullptr, aIMStatus, aError);
     }
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }

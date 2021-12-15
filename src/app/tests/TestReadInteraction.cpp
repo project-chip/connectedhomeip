@@ -159,7 +159,7 @@ void GenerateSubscribeResponse(nlTestSuite * apSuite, void * apContext, chip::Sy
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-class MockInteractionModelApp : public chip::app::ReadClient::Callback, public chip::app::InteractionModelDelegate
+class MockInteractionModelApp : public chip::app::ReadClient::Callback
 {
 public:
     void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
@@ -179,34 +179,36 @@ public:
         }
     }
 
-    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError) override { mReadError = true; }
+    void OnError(const chip::app::ReadClient * apReadClient, CHIP_ERROR aError,
+                 chip::Protocols::InteractionModel::Status aIMStatus) override
+    {
+        mReadError = true;
+    }
 
     void OnDone(chip::app::ReadClient * apReadClient) override {}
-
-    CHIP_ERROR SubscriptionEstablished(const chip::app::ReadHandler * apReadHandler) override
-    {
-        mpReadHandler = const_cast<chip::app::ReadHandler *>(apReadHandler);
-        mNumSubscriptions++;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR SubscriptionTerminated(const chip::app::ReadHandler * apReadHandler) override
-    {
-        if (apReadHandler->IsActiveSubscription())
-        {
-            mNumSubscriptions--;
-        }
-        return CHIP_NO_ERROR;
-    }
 
     int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
     bool mReadError                        = false;
-    uint32_t mNumSubscriptions             = 0;
     chip::app::ReadHandler * mpReadHandler = nullptr;
 };
+
+//
+// This dummy callback is used with a bunch of the tests below that don't go through
+// the normal call-path of having the IM engine allocate the ReadHandler object. Instead,
+// the object is allocated on stack for the purposes of a very narrow, tightly-coupled test.
+//
+// The typical callback implementor is the engine, but that would proceed to return the object
+// back to the handler pool (which we obviously don't want in this case). This just no-ops those calls.
+//
+class NullReadHandlerCallback : public chip::app::ReadHandler::Callback
+{
+public:
+    void OnDone(chip::app::ReadHandler & apReadHandlerObj) override {}
+};
+
 } // namespace
 
 namespace chip {
@@ -375,52 +377,56 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
     MockInteractionModelApp delegate;
+    NullReadHandlerCallback nullCallback;
+
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
-    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+    {
+        Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
-    err = readHandler.SendReportData(std::move(reportDatabuf), false);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        err = readHandler.SendReportData(std::move(reportDatabuf), false);
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
-    writer.Init(std::move(readRequestbuf));
-    err = readRequestBuilder.Init(&writer);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        writer.Init(std::move(readRequestbuf));
+        err = readRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathIBs();
-    err = attributePathListBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
-    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    err = writer.Finalize(&readRequestbuf);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+        readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+        NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&readRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readHandler.OnReadInitialRequest(std::move(readRequestbuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        err = readHandler.OnInitialRequest(std::move(readRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
 
-    exchangeCtx->Close();
     engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadClientGenerateAttributePathList(nlTestSuite * apSuite, void * apContext)
@@ -503,50 +509,62 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle reportDatabuf  = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     System::PacketBufferHandle readRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     ReadRequestMessage::Builder readRequestBuilder;
     MockInteractionModelApp delegate;
+    NullReadHandlerCallback nullCallback;
 
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
-    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
+    {
+        Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
+        ReadHandler readHandler(nullCallback, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
-    err = readHandler.SendReportData(std::move(reportDatabuf), false);
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
+        GenerateReportData(apSuite, apContext, reportDatabuf, false /*aNeedInvalidReport*/, false /* aSuppressResponse*/);
+        err = readHandler.SendReportData(std::move(reportDatabuf), false);
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
-    writer.Init(std::move(readRequestbuf));
-    err = readRequestBuilder.Init(&writer);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        writer.Init(std::move(readRequestbuf));
+        err = readRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathIBs();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
-    NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    err = writer.Finalize(&readRequestbuf);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        attributePathListBuilder.EndOfAttributePathIBs();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        readRequestBuilder.IsFabricFiltered(false).EndOfReadRequestMessage();
+        NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&readRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    err = readHandler.OnReadInitialRequest(std::move(readRequestbuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        err = readHandler.OnInitialRequest(std::move(readRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
-    exchangeCtx->Close();
+        //
+        // In the call above to OnInitialRequest, the handler will not actually close out the EC since
+        // it expects the ExchangeManager to do so automatically given it's not calling WillSend() on the EC,
+        // and is not sending a response back.
+        //
+        // Consequently, we have to manually close out the EC here in this test since we're not actually calling
+        // methods on these objects in a manner similar to how it would happen in normal use.
+        //
+        exchangeCtx->Close();
+    }
+
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSuite, void * apContext)
@@ -595,6 +613,8 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     err = readRequestParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSuite, void * apContext)
@@ -647,6 +667,8 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     err = readRequestParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 #endif
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apContext)
@@ -662,7 +684,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -712,6 +734,7 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apContext)
@@ -727,7 +750,7 @@ void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apConte
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -752,6 +775,7 @@ void TestReadInteraction::TestReadWildcard(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 // TestReadChunking will try to read a few large attributes, the report won't fit into the MTU and result in chunking.
@@ -768,7 +792,7 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -797,6 +821,7 @@ void TestReadInteraction::TestReadChunking(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void * apContext)
@@ -812,7 +837,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -862,6 +887,7 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext)
@@ -877,7 +903,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -900,6 +926,7 @@ void TestReadInteraction::TestReadInvalidAttributePathRoundtrip(nlTestSuite * ap
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestProcessSubscribeResponse(nlTestSuite * apSuite, void * apContext)
@@ -919,65 +946,71 @@ void TestReadInteraction::TestProcessSubscribeResponse(nlTestSuite * apSuite, vo
     err = readClient.ProcessSubscribeResponse(std::move(buf));
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     readClient.ShutdownInternal(CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, void * apContext)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TestContext & ctx = *static_cast<TestContext *>(apContext);
-    app::ReadHandler readHandler;
     System::PacketBufferTLVWriter writer;
     System::PacketBufferHandle subscribeRequestbuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     SubscribeRequestMessage::Builder subscribeRequestBuilder;
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     Messaging::ExchangeContext * exchangeCtx = ctx.NewExchangeToAlice(nullptr);
-    readHandler.Init(&ctx.GetExchangeManager(), nullptr, exchangeCtx, chip::app::ReadHandler::InteractionType::Subscribe);
 
-    writer.Init(std::move(subscribeRequestbuf));
-    err = subscribeRequestBuilder.Init(&writer);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    {
+        ReadHandler readHandler(*engine, exchangeCtx, chip::app::ReadHandler::InteractionType::Read);
 
-    subscribeRequestBuilder.KeepSubscriptions(true);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        writer.Init(std::move(subscribeRequestbuf));
+        err = subscribeRequestBuilder.Init(&writer);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        subscribeRequestBuilder.KeepSubscriptions(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        subscribeRequestBuilder.MinIntervalFloorSeconds(2);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
-    NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
+        AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
-    err = attributePathBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
+        NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathListBuilder.EndOfAttributePathIBs();
-    err = attributePathListBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        err = attributePathBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.IsProxy(true);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        attributePathListBuilder.EndOfAttributePathIBs();
+        err = attributePathListBuilder.GetError();
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        subscribeRequestBuilder.IsProxy(true);
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    err = writer.Finalize(&subscribeRequestbuf);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+        subscribeRequestBuilder.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    exchangeCtx->Close();
+        NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+        err = writer.Finalize(&subscribeRequestbuf);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+
+        err = readHandler.ProcessSubscribeRequest(std::move(subscribeRequestbuf));
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    }
+
     engine->Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * apContext)
@@ -991,7 +1024,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -1033,10 +1066,15 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
     engine->GetReportingEngine().Run();
+
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers() == 1);
+    NL_TEST_ASSERT(apSuite, engine->GetReadHandlerPool().At(0) != nullptr);
+    delegate.mpReadHandler = engine->GetReadHandlerPool().At(0);
+
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
-    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
 
     GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
     NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
@@ -1150,7 +1188,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 2);
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 2);
+
     // Test report with 1 path modification for 2 subscription
     delegate.mpReadHandler->mHoldReport = false;
     delegate.mGotReport                 = false;
@@ -1215,6 +1254,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * apContext)
@@ -1230,7 +1270,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -1255,7 +1295,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
 
-    for (int i = 0; i < 20 && delegate.mNumSubscriptions == 0; i++)
+    for (int i = 0; i < 20 && delegate.mNumAttributeResponse < 70; i++)
     {
         // 20 is a magic number, we assume the initial reports will take no more than 10 chunks.
         engine->GetReportingEngine().Run();
@@ -1266,7 +1306,10 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     // And attribute 3/2/4 is a list with 6 elements and list chunking is applied to it, thus we should receive ( 29 + 6 ) * 2 =
     // 70 attribute data in total.
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 70);
-    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
+    NL_TEST_ASSERT(apSuite, engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+
+    NL_TEST_ASSERT(apSuite, engine->GetReadHandlerPool().At(0) != nullptr);
+    delegate.mpReadHandler = engine->GetReadHandlerPool().At(0);
 
     // Set a concrete path dirty
     {
@@ -1314,6 +1357,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     }
 
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 // Verify that subscription can be shut down just after receiving SUBSCRIBE RESPONSE,
@@ -1327,7 +1371,7 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
 
     // Initialize Interaction Model Engine
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
-    NL_TEST_ASSERT(apSuite, engine.Init(&ctx.GetExchangeManager(), &delegate) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, engine.Init(&ctx.GetExchangeManager()) == CHIP_NO_ERROR);
 
     // Subscribe to the attribute
     AttributePathParams attributePathParams;
@@ -1348,7 +1392,11 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
     engine.GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-    NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
+    NL_TEST_ASSERT(apSuite, engine.GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe) == 1);
+
+    NL_TEST_ASSERT(apSuite, engine.GetReadHandlerPool().At(0) != nullptr);
+    delegate.mpReadHandler = engine.GetReadHandlerPool().At(0);
+
     NL_TEST_ASSERT(apSuite, delegate.mpReadHandler != nullptr);
 
     // Shutdown the subscription
@@ -1361,6 +1409,8 @@ void TestReadInteraction::TestSubscribeEarlyShutdown(nlTestSuite * apSuite, void
     // Cleanup
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
     engine.Shutdown();
+
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext)
@@ -1376,7 +1426,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -1399,10 +1449,16 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
     delegate.mNumAttributeResponse = 0;
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+
+    NL_TEST_ASSERT(apSuite, engine->GetReadHandlerPool().At(0) != nullptr);
+    delegate.mpReadHandler = engine->GetReadHandlerPool().At(0);
+
     delegate.mpReadHandler->mHoldReport = false;
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
+
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, void * apContext)
@@ -1418,7 +1474,7 @@ void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, voi
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(apSuite, !delegate.mGotEventResponse);
 
@@ -1438,7 +1494,9 @@ void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, voi
 
     err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
+
     engine->Shutdown();
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
 } // namespace app

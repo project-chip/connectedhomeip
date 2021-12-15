@@ -30,6 +30,8 @@
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
+#include <app/MessageDef/AttributePathIBs.h>
+#include <app/MessageDef/EventPathIBs.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -43,6 +45,15 @@
 
 namespace chip {
 namespace app {
+
+//
+// Forward declare the Engine (which is in a different namespace) to be able to use
+// it as a friend class below.
+//
+namespace reporting {
+class Engine;
+}
+
 /**
  *  @class ReadHandler
  *
@@ -55,38 +66,41 @@ class ReadHandler : public Messaging::ExchangeDelegate
 public:
     using SubjectDescriptor = Access::SubjectDescriptor;
 
-    enum class ShutdownOptions
-    {
-        KeepCurrentExchange,
-        AbortCurrentExchange,
-    };
-
     enum class InteractionType : uint8_t
     {
         Read,
         Subscribe,
     };
 
-    /**
-     *  Initialize the ReadHandler. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
-     *          kState_NotInitialized.
-     *  @retval #CHIP_NO_ERROR On success.
-     *
-     */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /*
+         * Method that signals to a registered callback that this object
+         * has completed doing useful work and is now safe for release/destruction.
+         */
+        virtual void OnDone(ReadHandler & apReadHandlerObj) = 0;
+    };
 
     /**
-     *  Shut down the ReadHandler. This terminates this instance
-     *  of the object and releases all held resources.
+     *
+     *  Constructor.
+     *
+     *  The callback passed in has to outlive this handler object.
      *
      */
-    void Shutdown(ShutdownOptions aOptions = ShutdownOptions::KeepCurrentExchange);
+    ReadHandler(Callback & apCallback, Messaging::ExchangeContext * apExchangeContext, InteractionType aInteractionType);
+
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    ~ReadHandler();
+
     /**
      *  Process a read/subscribe request.  Parts of the processing may end up being asynchronous, but the ReadHandler
      *  guarantees that it will call Shutdown on itself when processing is done (including if OnReadInitialRequest
@@ -96,7 +110,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR OnReadInitialRequest(System::PacketBufferHandle && aPayload);
+    CHIP_ERROR OnInitialRequest(System::PacketBufferHandle && aPayload);
 
     /**
      *  Send ReportData to initiator
@@ -110,11 +124,15 @@ public:
      */
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
-    bool IsFree() const { return mState == HandlerState::Uninitialized; }
+    /**
+     *  Checks if the initiator of the provided exchange matches the subscriber that
+     *  created this subscription.
+     */
+    bool IsFromSubscriber(Messaging::ExchangeContext & apExchangeContext);
+
     bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
-    virtual ~ReadHandler() = default;
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
@@ -160,14 +178,34 @@ public:
 
 private:
     friend class TestReadInteraction;
+    friend class chip::app::reporting::Engine;
+
     enum class HandlerState
     {
-        Uninitialized = 0,      ///< The handler has not been initialized
-        Initialized,            ///< The handler has been initialized and is ready
+        Idle,                   ///< The handler has been initialized and is ready
         GeneratingReports,      ///< The handler has received either a Read or Subscribe request and is the process of generating a
                                 ///< report.
         AwaitingReportResponse, ///< The handler has sent the report to the client and is awaiting a status response.
+        AwaitingDestruction,    ///< The object has completed its work and is awaiting destruction by the application.
     };
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above.
+     *
+     * This will eventually call Close() to drive the process of eventually releasing this object (unless called from the
+     * destructor).
+     *
+     * This is only called by a very narrow set of external objects as needed.
+     */
+    void Abort(bool aCalledFromDestructor = false);
+
+    /**
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange and finally, signal to a registerd callback that it's
+     * safe to release this object.
+     */
+    void Close();
 
     static void OnUnblockHoldReportCallback(System::Layer * apSystemLayer, void * apAppState);
     static void OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -194,7 +232,7 @@ private:
     bool mSuppressResponse = false;
 
     // Current Handler state
-    HandlerState mState                      = HandlerState::Uninitialized;
+    HandlerState mState                      = HandlerState::Idle;
     ClusterInfo * mpAttributeClusterInfoList = nullptr;
     ClusterInfo * mpEventClusterInfoList     = nullptr;
 
@@ -205,7 +243,7 @@ private:
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
     EventNumber mLastScheduledEventNumber      = 0;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    Callback & mCallback;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions

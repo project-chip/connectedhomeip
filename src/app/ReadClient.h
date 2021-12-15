@@ -125,6 +125,8 @@ public:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
          * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR_IM_STATUS_CODE_RECEIVED: A StatusResponse containing an IM status code was received from the server. The
+         * actual IM status code is embedded in the 'aStatus' argument.
          * - CHIP_ERROR*: All other cases.
          *
          * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
@@ -133,7 +135,7 @@ public:
          * @param[in] apReadClient The read client object that initiated the attribute read transaction.
          * @param[in] aError       A system error code that conveys the overall error code.
          */
-        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
+        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aStatus) {}
 
         /**
          * OnDone will be called when ReadClient has finished all work and is reserved for future ReadClient ownership change.
@@ -276,7 +278,8 @@ private:
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
-    void ShutdownInternal(CHIP_ERROR aError);
+    void ShutdownInternal(CHIP_ERROR aError,
+                          Protocols::InteractionModel::Status aIMStatus = Protocols::InteractionModel::Status::Failure);
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;

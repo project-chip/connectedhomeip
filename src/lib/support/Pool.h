@@ -153,6 +153,8 @@ struct HeapObjectList : HeapObjectListNode
 
     HeapObjectListNode * FindNode(void * object) const;
 
+    HeapObjectListNode * At(size_t index);
+
     Loop ForEachNode(void * context, Loop lambda(void * context, void * object));
 
     size_t mIterationDepth;
@@ -221,6 +223,8 @@ public:
     }
 
     void ReleaseAll() { ForEachActiveObjectInner(this, ReleaseObject); }
+
+    T * At(size_t index) { return static_cast<T *>(internal::StaticAllocatorBitmap::At(index)); }
 
     /**
      * @brief
@@ -291,6 +295,13 @@ public:
         return nullptr;
     }
 
+    /*
+     * This method exists purely to line-up with the static allocator version.
+     * Consequently, return a nonsensically large number to normalize comparison
+     * operations that act on this value.
+     */
+    size_t Capacity() const { return SIZE_MAX; }
+
     void ReleaseObject(T * object)
     {
         if (object != nullptr)
@@ -307,6 +318,28 @@ public:
     }
 
     void ReleaseAll() { mObjects.ForEachNode(this, ReleaseObject); }
+
+    /*
+     * Returns the item at a given position. If the position is invalid, a nullptr shall be returned.
+     */
+    T * At(size_t index)
+    {
+        T * obj  = nullptr;
+        size_t i = 0;
+
+        ForEachActiveObject([&obj, &i, index](T * objPtr) {
+            if (i == index)
+            {
+                obj = objPtr;
+                return Loop::Break;
+            }
+
+            i++;
+            return Loop::Continue;
+        });
+
+        return obj;
+    }
 
     /**
      * @brief

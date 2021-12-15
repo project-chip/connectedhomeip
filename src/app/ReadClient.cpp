@@ -59,14 +59,15 @@ void ReadClient::Shutdown()
     ShutdownInternal(CHIP_NO_ERROR);
 }
 
-void ReadClient::ShutdownInternal(CHIP_ERROR aError)
+void ReadClient::ShutdownInternal(CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus)
 {
     if (mpCallback != nullptr)
     {
         if (aError != CHIP_NO_ERROR)
         {
-            mpCallback->OnError(this, aError);
+            mpCallback->OnError(this, aError, aIMStatus);
         }
+
         mpCallback->OnDone(this);
         mpCallback = nullptr;
     }
@@ -248,9 +249,12 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
 CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                          System::PacketBufferHandle && aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                    = CHIP_NO_ERROR;
+    Protocols::InteractionModel::Status imErrorStatus = Protocols::InteractionModel::Status::Failure;
+
     VerifyOrExit(!IsFree(), err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
     {
         err = ProcessReportData(std::move(aPayload));
@@ -269,9 +273,14 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
     {
         StatusIB status;
+
         VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+
         err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
-        SuccessOrExit(err);
+        if (err == CHIP_ERROR_IM_STATUS_CODE_RECEIVED)
+        {
+            imErrorStatus = status.mStatus;
+        }
     }
     else
     {
@@ -281,8 +290,9 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 exit:
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
-        ShutdownInternal(err);
+        ShutdownInternal(err, imErrorStatus);
     }
+
     return err;
 }
 

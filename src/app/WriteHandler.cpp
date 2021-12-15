@@ -29,9 +29,8 @@ namespace app {
 
 using namespace Protocols::InteractionModel;
 
-CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
+CHIP_ERROR WriteHandler::Init()
 {
-    IgnoreUnusedVariable(apDelegate);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);

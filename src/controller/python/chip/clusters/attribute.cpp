@@ -108,9 +108,7 @@ public:
             CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag, *apData);
             if (err != CHIP_NO_ERROR)
             {
-                app::StatusIB status;
-                status.mStatus = Protocols::InteractionModel::Status::Failure;
-                this->OnError(apReadClient, err);
+                this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
                 return;
             }
             size = writer.GetLengthWritten();
@@ -143,7 +141,7 @@ public:
             err = writer.CopyElement(TLV::AnonymousTag, *apData);
             if (err != CHIP_NO_ERROR)
             {
-                this->OnError(apReadClient, err);
+                this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
                 return;
             }
             size = writer.GetLengthWritten();
@@ -151,7 +149,7 @@ public:
         else
         {
             err = CHIP_ERROR_INCORRECT_STATE;
-            this->OnError(apReadClient, err);
+            this->OnError(apReadClient, err, Protocols::InteractionModel::Status::Failure);
         }
 
         gOnReadEventDataCallback(mAppContext, aEventHeader.mPath.mEndpointId, aEventHeader.mPath.mClusterId,
@@ -159,7 +157,7 @@ public:
                                  aEventHeader.mTimestamp.mValue, to_underlying(aEventHeader.mTimestamp.mType), buffer, size);
     }
 
-    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) override
+    void OnError(const ReadClient * apReadClient, CHIP_ERROR aError, Protocols::InteractionModel::Status aIMStatus) override
     {
         gOnReadErrorCallback(mAppContext, aError.AsInteger());
     }
@@ -329,6 +327,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
+
+        VerifyOrExit(readClient != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         if (isSubscription)
         {

@@ -52,7 +52,7 @@ public:
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(InteractionModelDelegate * apDelegate);
+    CHIP_ERROR Init();
 
     /**
      *  Process a write request.  Parts of the processing may end up being asynchronous, but the WriteHandler

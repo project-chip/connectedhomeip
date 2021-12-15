@@ -283,7 +283,7 @@ void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apCont
 
             chip::app::InteractionModelDelegate IMdelegate;
             System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-            err                            = writeHandler.Init(&IMdelegate);
+            err                            = writeHandler.Init();
 
             GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
@@ -336,7 +336,7 @@ void TestWriteInteraction::TestWriteRoundtripWithClusterObjects(nlTestSuite * ap
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClientHandle writeClient;
@@ -404,7 +404,7 @@ void TestWriteInteraction::TestWriteRoundtrip(nlTestSuite * apSuite, void * apCo
 
     TestWriteClientCallback callback;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
-    err           = engine->Init(&ctx.GetExchangeManager(), nullptr);
+    err           = engine->Init(&ctx.GetExchangeManager());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     app::WriteClientHandle writeClient;

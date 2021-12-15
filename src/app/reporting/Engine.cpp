@@ -410,12 +410,22 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        apReadHandler->Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
+        //
+        // WillSendMessage() was called on this EC well before it got here (since there was an intention to generate reports, which
+        // occurs asynchronously. Consequently, if any error occurs, it's on us to close down the exchange.
+        //
+        apReadHandler->Abort();
     }
     else if (apReadHandler->IsReadType() && !hasMoreChunks)
     {
-        apReadHandler->Shutdown();
+        //
+        // In the case of successful report generation and we're on the last chunk of a read, we don't expect
+        // any further activity on this exchange. The EC layer will automatically close our EC, so shutdown the ReadHandler
+        // gracefully.
+        //
+        apReadHandler->Close();
     }
+
     return err;
 }
 
@@ -449,12 +459,14 @@ void Engine::Run()
     uint32_t numReadHandled = 0;
 
     InteractionModelEngine * imEngine = InteractionModelEngine::GetInstance();
-    ReadHandler * readHandler         = imEngine->mReadHandlers + mCurReadHandlerIdx;
 
     mRunScheduled = false;
 
-    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < CHIP_IM_MAX_NUM_READ_HANDLER))
+    while ((mNumReportsInFlight < CHIP_IM_MAX_REPORTS_IN_FLIGHT) && (numReadHandled < imEngine->mReadHandlers.Allocated()))
     {
+        ReadHandler * readHandler = imEngine->mReadHandlers.At(mCurReadHandlerIdx % imEngine->mReadHandlers.Allocated());
+        VerifyOrDie(readHandler != nullptr);
+
         if (readHandler->IsReportable())
         {
             CHIP_ERROR err = BuildAndSendSingleReportData(readHandler);
@@ -463,21 +475,33 @@ void Engine::Run()
                 return;
             }
         }
+
         numReadHandled++;
-        mCurReadHandlerIdx = (mCurReadHandlerIdx + 1) % CHIP_IM_MAX_NUM_READ_HANDLER;
-        readHandler        = imEngine->mReadHandlers + mCurReadHandlerIdx;
+        mCurReadHandlerIdx++;
+    }
+
+    //
+    // If our tracker has exceeded the bounds of the handler list, reset it back to 0.
+    // This isn't strictly necessary, but does make it easier to debug issues in this code if they
+    // do arise.
+    //
+    if (mCurReadHandlerIdx >= imEngine->mReadHandlers.Allocated())
+    {
+        mCurReadHandlerIdx = 0;
     }
 
     bool allReadClean = true;
-    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
-    {
-        UpdateReadHandlerDirty(handler);
-        if (handler.IsDirty())
+
+    imEngine->mReadHandlers.ForEachActiveObject([this, &allReadClean](ReadHandler * handler) {
+        UpdateReadHandlerDirty(*handler);
+        if (handler->IsDirty())
         {
             allReadClean = false;
-            break;
+            return Loop::Break;
         }
-    }
+
+        return Loop::Continue;
+    });
 
     if (allReadClean)
     {
@@ -487,29 +511,32 @@ void Engine::Run()
 
 CHIP_ERROR Engine::SetDirty(ClusterInfo & aClusterInfo)
 {
-    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
-    {
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aClusterInfo](ReadHandler * handler) {
         // We call SetDirty for both read interactions and subscribe interactions, since we may sent inconsistent attribute data
         // between two chunks. SetDirty will be ignored automatically by read handlers which is waiting for response to last message
         // chunk for read interactions.
-        if (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse())
+        if (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse())
         {
-            for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
+            for (auto clusterInfo = handler->GetAttributeClusterInfolist(); clusterInfo != nullptr;
                  clusterInfo      = clusterInfo->mpNext)
             {
                 if (aClusterInfo.IsAttributePathSupersetOf(*clusterInfo) || clusterInfo->IsAttributePathSupersetOf(aClusterInfo))
                 {
-                    handler.SetDirty();
+                    handler->SetDirty();
                     break;
                 }
             }
         }
-    }
+
+        return Loop::Continue;
+    });
+
     if (!InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(mpGlobalDirtySet, aClusterInfo) &&
         InteractionModelEngine::GetInstance()->IsOverlappedAttributePath(aClusterInfo))
     {
         ReturnLogErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpGlobalDirtySet, aClusterInfo));
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -562,18 +589,18 @@ void Engine::OnReportConfirm()
 
 CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
 {
-    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
-    {
-        for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+    InteractionModelEngine::GetInstance()->mReadHandlers.ForEachActiveObject([&aPath](ReadHandler * handler) {
+        for (auto clusterInfo = handler->GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
         {
             if (clusterInfo->IsEventPathSupersetOf(aPath))
             {
-                ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
-                                InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
-                handler.UnblockUrgentEventDelivery();
+                handler->UnblockUrgentEventDelivery();
             }
         }
-    }
+
+        return Loop::Continue;
+    });
+
     return ScheduleRun();
 }
 

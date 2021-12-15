@@ -17,9 +17,7 @@ namespace Controller {
  *
  * TODO:(#8967) Implementation of CommandSender::Callback should be removed after switching to ClusterObjects.
  */
-class DeviceControllerInteractionModelDelegate : public chip::app::CommandSender::Callback,
-                                                 public chip::app::WriteClient::Callback,
-                                                 public chip::app::InteractionModelDelegate
+class DeviceControllerInteractionModelDelegate : public chip::app::CommandSender::Callback, public chip::app::WriteClient::Callback
 {
 public:
     DeviceControllerInteractionModelDelegate() {}

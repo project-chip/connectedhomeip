@@ -37,15 +37,13 @@ InteractionModelEngine * InteractionModelEngine::GetInstance()
     return &sInteractionModelEngine;
 }
 
-CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate)
+CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeMgr)
 {
     mpExchangeMgr = apExchangeMgr;
-    mpDelegate    = apDelegate;
 
     ReturnErrorOnFailure(mpExchangeMgr->RegisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id, this));
 
     mReportingEngine.Init();
-
     for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
     {
         mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
@@ -94,13 +92,7 @@ void InteractionModelEngine::Shutdown()
         }
     }
 
-    for (auto & readHandler : mReadHandlers)
-    {
-        if (!readHandler.IsFree())
-        {
-            readHandler.Shutdown();
-        }
-    }
+    mReadHandlers.ReleaseAll();
 
     for (auto & writeClient : mWriteClients)
     {
@@ -116,13 +108,6 @@ void InteractionModelEngine::Shutdown()
     }
 
     mReportingEngine.Shutdown();
-
-    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
-    {
-        mClusterInfoPool[index].mpNext = nullptr;
-    }
-
-    mpNextAvailableClusterInfo = nullptr;
 
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
@@ -166,17 +151,30 @@ uint32_t InteractionModelEngine::GetNumActiveReadClients() const
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
 {
-    uint32_t numActive = 0;
+    return static_cast<uint32_t>(mReadHandlers.Allocated());
+}
 
-    for (auto & readHandler : mReadHandlers)
-    {
-        if (!readHandler.IsFree())
+uint32_t InteractionModelEngine::GetNumActiveReadHandlers(ReadHandler::InteractionType aType) const
+{
+    uint32_t count                 = 0;
+    InteractionModelEngine * _this = const_cast<InteractionModelEngine *>(this);
+
+    //
+    // NOTE: We cannot mark ForEachActiveObject as const, so explicitly const_cast our this pointer to permit us to poke a hole
+    // in the const-ness for this brief bit of truly const work.
+    //
+    _this->mReadHandlers.ForEachActiveObject([aType, &count](ReadHandler * handler) {
+        ReadHandler::InteractionType handlerType =
+            handler->IsReadType() ? ReadHandler::InteractionType::Read : ReadHandler::InteractionType::Subscribe;
+        if (aType == handlerType)
         {
-            numActive++;
+            count++;
         }
-    }
 
-    return numActive;
+        return Loop::Continue;
+    });
+
+    return count;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
@@ -266,6 +264,18 @@ void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
     mCommandHandlerObjs.ReleaseObject(&apCommandObj);
 }
 
+void InteractionModelEngine::OnDone(ReadHandler & apReadObj)
+{
+    mReadHandlers.ReleaseObject(&apReadObj);
+
+    //
+    // Deleting an item can shift down the contents of the underlying pool storage,
+    // rendering any tracker using positional indexes invalid. Let's reset it and
+    // have it start from index 0.
+    //
+    mReportingEngine.ResetReadHandlerTracker();
+}
+
 CHIP_ERROR InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext,
                                                           const PayloadHeader & aPayloadHeader,
                                                           System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
@@ -292,45 +302,77 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
 {
     ChipLogDetail(InteractionModel, "Received %s request",
                   aInteractionType == ReadHandler::InteractionType::Subscribe ? "Subscribe" : "Read");
+    bool keepExistingSubscriptions = true;
+    ReadHandler * handler;
+    size_t handlerPoolCapacity;
 
-    for (auto & readHandler : mReadHandlers)
+    //
+    // Let's first figure out if the client has requested we keep any existing
+    // subscriptions from that source.
+    //
     {
-        if (!readHandler.IsFree() && readHandler.IsSubscriptionType() &&
-            readHandler.GetInitiatorNodeId() == apExchangeContext->GetSessionHandle().GetPeerNodeId() &&
-            readHandler.GetAccessingFabricIndex() == apExchangeContext->GetSessionHandle().GetFabricIndex())
-        {
-            bool keepSubscriptions = true;
-            System::PacketBufferTLVReader reader;
-            reader.Init(aPayload.Retain());
-            ReturnErrorOnFailure(reader.Next());
-            SubscribeRequestMessage::Parser subscribeRequestParser;
-            ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
-            CHIP_ERROR err = subscribeRequestParser.GetKeepSubscriptions(&keepSubscriptions);
-            if (err == CHIP_NO_ERROR && !keepSubscriptions)
-            {
-                readHandler.Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
-            }
-        }
+        System::PacketBufferTLVReader reader;
+
+        reader.Init(aPayload.Retain());
+        ReturnErrorOnFailure(reader.Next());
+
+        SubscribeRequestMessage::Parser subscribeRequestParser;
+        ReturnErrorOnFailure(subscribeRequestParser.Init(reader));
+
+        subscribeRequestParser.GetKeepSubscriptions(&keepExistingSubscriptions);
     }
 
+    //
+    // Walk through all existing subscriptions and shutdown those whose subscriber matches
+    // that which just came in.
+    //
+    if (!keepExistingSubscriptions)
+    {
+        mReadHandlers.ForEachActiveObject([this, apExchangeContext](ReadHandler * handler) {
+            if (handler->IsFromSubscriber(*apExchangeContext))
+            {
+                ChipLogProgress(InteractionModel, "Deleting previous subscription from NodeId: %" PRIx64 ", FabricId: %" PRIu8,
+                                apExchangeContext->GetSessionHandle().GetPeerNodeId(),
+                                apExchangeContext->GetSessionHandle().GetFabricIndex());
+                mReadHandlers.ReleaseObject(handler);
+            }
+
+            return Loop::Continue;
+        });
+    }
+
+    handlerPoolCapacity = mReadHandlers.Capacity();
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if (mReadHandlerCapacityOverride != -1)
+    {
+        handlerPoolCapacity = (size_t) mReadHandlerCapacityOverride;
+    }
+#endif
+
     // Reserve the last ReadHandler for ReadInteraction
-    if (aInteractionType == ReadHandler::InteractionType::Subscribe &&
-        ((CHIP_IM_MAX_NUM_READ_HANDLER - GetNumActiveReadHandlers()) == 1) && !HasActiveRead())
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe && ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 1) &&
+        !HasActiveRead())
     {
         ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
         aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
         return CHIP_NO_ERROR;
     }
 
-    for (auto & readHandler : mReadHandlers)
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    if ((handlerPoolCapacity - GetNumActiveReadHandlers()) == 0)
     {
-        if (readHandler.IsFree())
-        {
-            ReturnErrorOnFailure(readHandler.Init(mpExchangeMgr, mpDelegate, apExchangeContext, aInteractionType));
-            ReturnErrorOnFailure(readHandler.OnReadInitialRequest(std::move(aPayload)));
-            aStatus = Protocols::InteractionModel::Status::Success;
-            return CHIP_NO_ERROR;
-        }
+        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+        return CHIP_NO_ERROR;
+    }
+#endif
+
+    handler = mReadHandlers.CreateObject(*this, apExchangeContext, aInteractionType);
+    if (handler)
+    {
+        handler->OnInitialRequest(std::move(aPayload));
+        aStatus = Protocols::InteractionModel::Status::Success;
+        return CHIP_NO_ERROR;
     }
 
     ChipLogProgress(InteractionModel, "no resource for %s interaction",
@@ -351,7 +393,7 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
     {
         if (writeHandler.IsFree())
         {
-            VerifyOrReturnError(writeHandler.Init(mpDelegate) == CHIP_NO_ERROR, Status::Busy);
+            VerifyOrReturnError(writeHandler.Init() == CHIP_NO_ERROR, Status::Busy);
             return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }
     }
@@ -493,11 +535,6 @@ uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * co
     return static_cast<uint16_t>(apWriteClient - mWriteClients);
 }
 
-uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const
-{
-    return static_cast<uint16_t>(apReadHandler - mReadHandlers);
-}
-
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
     ClusterInfo * lastClusterInfo = aClusterInfo;
@@ -555,22 +592,22 @@ bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttrib
 
 bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)
 {
-    for (auto & handler : mReadHandlers)
-    {
-        if (handler.IsSubscriptionType() && (handler.IsGeneratingReports() || handler.IsAwaitingReportResponse()))
+    return (mReadHandlers.ForEachActiveObject([&aAttributePath](ReadHandler * handler) {
+        if (handler->IsSubscriptionType() && (handler->IsGeneratingReports() || handler->IsAwaitingReportResponse()))
         {
-            for (auto clusterInfo = handler.GetAttributeClusterInfolist(); clusterInfo != nullptr;
+            for (auto clusterInfo = handler->GetAttributeClusterInfolist(); clusterInfo != nullptr;
                  clusterInfo      = clusterInfo->mpNext)
             {
                 if (clusterInfo->IsAttributePathSupersetOf(aAttributePath) ||
                     aAttributePath.IsAttributePathSupersetOf(*clusterInfo))
                 {
-                    return true;
+                    return Loop::Break;
                 }
             }
         }
-    }
-    return false;
+
+        return Loop::Continue;
+    }) == Loop::Break);
 }
 
 void InteractionModelEngine::DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
@@ -738,15 +775,14 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
 
 bool InteractionModelEngine::HasActiveRead()
 {
-    for (auto & readHandler : mReadHandlers)
-    {
-        if (!readHandler.IsFree() && readHandler.IsReadType())
+    return ((mReadHandlers.ForEachActiveObject([](ReadHandler * handler) {
+        if (handler->IsReadType())
         {
-            return true;
+            return Loop::Break;
         }
-    }
 
-    return false;
+        return Loop::Continue;
+    }) == Loop::Break));
 }
 
 } // namespace app

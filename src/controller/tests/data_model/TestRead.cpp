@@ -131,6 +131,9 @@ public:
     static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
     static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
     static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext);
+    static void TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -303,6 +306,190 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestReadHandler_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                       = ctx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&apSuite](const app::ConcreteAttributePath * attributePath, Protocols::InteractionModel::Status aIMStatus,
+                                  CHIP_ERROR aError) {
+        //
+        // We shouldn't be encountering any failures in this test.
+        //
+        NL_TEST_ASSERT(apSuite, false);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls]() { numSubscriptionEstablishedCalls++; };
+
+    //
+    // Try to issue parallel subscriptions that will exceed the value for CHIP_IM_MAX_NUM_READ_HANDLER.
+    // If heap allocation is correctly setup, this should result in it successfully servicing more than the number
+    // present in that define.
+    //
+    for (int i = 0; i < (CHIP_IM_MAX_NUM_READ_HANDLER + 1); i++)
+    {
+        NL_TEST_ASSERT(apSuite,
+                       chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                           &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                           onSubscriptionEstablishedCb, true) == CHIP_NO_ERROR);
+    }
+
+    //
+    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
+    // reports.
+    //
+    for (int i = 0; i < 10 && (numSubscriptionEstablishedCalls != (CHIP_IM_MAX_NUM_READ_HANDLER + 1)); i++)
+    {
+        ctx.DrainAndServiceIO();
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+    }
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
+    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == (CHIP_IM_MAX_NUM_READ_HANDLER + 1));
+
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    //
+    // TODO: Figure out why I cannot enable this line below.
+    //
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                        = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                       = ctx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls                 = 0;
+    uint32_t numFailureCalls                 = 0;
+    uint32_t numSubscriptionEstablishedCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath,
+                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        numFailureCalls++;
+
+        NL_TEST_ASSERT(apSuite, aIMStatus == Protocols::InteractionModel::Status::ResourceExhausted);
+        NL_TEST_ASSERT(apSuite, attributePath == nullptr);
+    };
+
+    auto onSubscriptionEstablishedCb = [&numSubscriptionEstablishedCalls]() { numSubscriptionEstablishedCalls++; };
+
+    //
+    // Artifically limit the capacity to 2 ReadHandlers. This will also validate reservation of handlers for Reads,
+    // since the second subscription below should fail correctly.
+    //
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(2);
+
+    NL_TEST_ASSERT(apSuite,
+                   chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                       onSubscriptionEstablishedCb, true) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(apSuite,
+                   chip::Controller::SubscribeAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 0, 10,
+                       onSubscriptionEstablishedCb, true) == CHIP_NO_ERROR);
+
+    //
+    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
+    // reports.
+    //
+    for (int i = 0; i < 10; i++)
+    {
+        ctx.DrainAndServiceIO();
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+    }
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == 1);
+    NL_TEST_ASSERT(apSuite, numSubscriptionEstablishedCalls == 1);
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 1);
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    //
+    // TODO: Figure out why I cannot enable this line below.
+    //
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx        = *static_cast<TestContext *>(apContext);
+    auto sessionHandle       = ctx.GetSessionBobToAlice();
+    uint32_t numSuccessCalls = 0;
+    uint32_t numFailureCalls = 0;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&numSuccessCalls](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        numSuccessCalls++;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&apSuite, &numFailureCalls](const app::ConcreteAttributePath * attributePath,
+                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        numFailureCalls++;
+
+        NL_TEST_ASSERT(apSuite, aIMStatus == Protocols::InteractionModel::Status::ResourceExhausted);
+        NL_TEST_ASSERT(apSuite, attributePath == nullptr);
+    };
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(0);
+
+    NL_TEST_ASSERT(apSuite,
+                   chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+                       &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb) == CHIP_NO_ERROR);
+
+    //
+    // It may take a couple of service calls since we may hit the limit of CHIP_IM_MAX_REPORTS_IN_FLIGHT
+    // reports.
+    //
+    for (int i = 0; i < 10; i++)
+    {
+        ctx.DrainAndServiceIO();
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+    }
+
+    app::InteractionModelEngine::GetInstance()->SetHandlerCapacity(-1);
+    app::InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+
+    NL_TEST_ASSERT(apSuite, numSuccessCalls == 0);
+    NL_TEST_ASSERT(apSuite, numFailureCalls == 1);
+
+    //
+    // TODO: Figure out why I cannot enable this line below.
+    //
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
@@ -310,6 +497,9 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestReadEventResponse", TestReadInteraction::TestReadEventResponse),
     NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
     NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
+    NL_TEST_DEF("TestReadHandler_MultipleSubscriptions", TestReadInteraction::TestReadHandler_MultipleSubscriptions),
+    NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleSubscriptions", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleSubscriptions),
+    NL_TEST_DEF("TestReadHandlerResourceExhaustion_MultipleReads", TestReadInteraction::TestReadHandlerResourceExhaustion_MultipleReads),
     NL_TEST_SENTINEL()
 };
 // clang-format on
