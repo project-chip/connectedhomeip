@@ -9093,7 +9093,9 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum in URI Record Type Definition RTD URI);
+    Log(expectation, queue,
+        @"Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC Forum in URI "
+        @"Record Type Definition RTD URI");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -9102,7 +9104,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Scan the DUTs QR code using a QR code reader);
+    Log(expectation, queue, @"Scan the DUTs QR code using a QR code reader");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_6_000001_Log
@@ -9111,9 +9113,8 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     Log(expectation, queue,
-        Verify the QR code gets scanned successfully and the QR code must be of sufficient size
-            and contrast respective to surface material as to be readable with standard readers such as smartphones in normal
-                lighting conditions);
+        @"Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+        @"surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_6_000002_Log
@@ -9121,7 +9122,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step 2 verificaiton"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Verify QR code version is 1 or higher);
+    Log(expectation, queue, @"Verify QR code version is 1 or higher");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -9130,7 +9131,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Verify manual pairing code is printed on the device or in additional provided materials);
+    Log(expectation, queue, @"Verify manual pairing code is printed on the device or in additional provided materials");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_7_000001_Log
@@ -9139,8 +9140,8 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     Log(expectation, queue,
-        Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically producing a typeface
-            height of 2.1 mm);
+        @"Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically producing a "
+        @"typeface height of 2.1 mm");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -9149,7 +9150,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Step 1"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Scan the device QR code using DUT);
+    Log(expectation, queue, @"Scan the device QR code using DUT");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_8_000001_Log
@@ -9158,7 +9159,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     Log(expectation, queue,
-        Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network);
+        @"Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
@@ -9167,7 +9168,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    Log(expectation, queue, Verify that the manual pairing code is printed on the device or in additional provided materials);
+    Log(expectation, queue, @"Verify that the manual pairing code is printed on the device or in additional provided materials");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_9_000001_Log
@@ -9176,7 +9177,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     Log(expectation, queue,
-        Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT);
+        @"Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_DD_1_9_000002_Log
@@ -9185,7 +9186,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     dispatch_queue_t queue = dispatch_get_main_queue();
     Log(expectation, queue,
-        Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network);
+        @"Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
