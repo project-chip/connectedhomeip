@@ -12,7 +12,8 @@
  *    distributed under the License is distributed on an "AS IS" BASIS,
  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *    See the License for the specific language governing permissions and
- *    limitations under the License. */
+ *    limitations under the License.
+ */
 
 /****************************************************************************
  * @file
@@ -177,14 +178,14 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
         }
     }
 
+    if (success)
+    {
+        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked) == EMBER_ZCL_STATUS_SUCCESS;
+    }
+
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
-    // Should be called after reponse sent (indicating command complete) since
-    // the attribute Set call in SetLockState will error out if the command is
-    // still pending
-    if (success)
-        return DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked) == EMBER_ZCL_STATUS_SUCCESS;
-    return success;
+    return true;
 }
 
 bool emberAfDoorLockClusterUnlockDoorCallback(
@@ -223,14 +224,14 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
         }
     }
 
+    if (success)
+    {
+        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked) == EMBER_ZCL_STATUS_SUCCESS;
+    }
+
     emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
-    // Should be called after reponse sent (indicating command complete) since
-    // the attribute Set call in SetLockState will error out if the command is
-    // still pending
-    if (success)
-        return DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked) == EMBER_ZCL_STATUS_SUCCESS;
-    return success;
+    return true;
 }
 
 bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandObj,
