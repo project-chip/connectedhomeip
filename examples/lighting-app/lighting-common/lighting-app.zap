@@ -3613,6 +3613,26 @@
           ]
         },
         {
+          "name": "Switch",
+          "code": 59,
+          "mfgCode": null,
+          "define": "SWITCH_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "Switch",
+          "code": 59,
+          "mfgCode": null,
+          "define": "SWITCH_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": []
+        },
+        {
           "name": "AdministratorCommissioning",
           "code": 60,
           "mfgCode": null,

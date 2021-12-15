@@ -118,6 +118,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
+               ${APP_CLUSTERS}/switch-server/switch-server.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
                ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
                ${APP_CLUSTERS}/thermostat-user-interface-configuration-server/thermostat-user-interface-configuration-server.cpp
