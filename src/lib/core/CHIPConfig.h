@@ -2516,15 +2516,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
- *
- * @brief Defines the object pool for allocating attribute path for subscription in device controller.
- */
-#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
-#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
-#endif
-
-/**
  * @def CHIP_CONFIG_LAMBDA_EVENT_SIZE
  *
  * @brief The maximum size of the lambda which can be post into system event queue.

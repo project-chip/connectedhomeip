@@ -79,15 +79,5 @@ void ClusterBase::Dissociate()
     mDevice = nullptr;
 }
 
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback,
-                                                  app::TLVDataFilter tlvDataFilter)
-{
-    VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(tlvDataFilter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback, tlvDataFilter);
-
-    return CHIP_NO_ERROR;
-}
-
 } // namespace Controller
 } // namespace chip

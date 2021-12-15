@@ -45,7 +45,6 @@ executable("chip-tool") {
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
     "commands/payload/SetupPayloadParseCommand.cpp",
-    "commands/reporting/ReportingCommand.cpp",
     "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
     "main.cpp",
