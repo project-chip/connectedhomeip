@@ -34,79 +34,6 @@ List the Server CLI commands.
 Done
 ```
 
-### start
-
-Start the App Server on the Node. This also starts the commissioning window
-as is done with the all-clusters-app.
-
-```bash
-> server start
-...
-[1639549415.105682][1468836:1468841] CHIP:SVR: Server Listening...
-Done
-```
-
-### stop
-
-Stops the App Server, closes all related sockets, and frees resources.
-
-```bash
-> server stop
-Done
-```
-
-### port
-
-Display the current operational port for the server node.
-
-```bash
-> server port
-5540
-Done
-```
-
-### port \<udp_port\>
-
-Sets the operational port to the given value.  NOTE: server must be restarted to take effect.
-
--   udp_port: new value to set operational port to
-
-```bash
-> server port 5541
-Done
-```
-
-### udcport
-
-Display the current commissioning port for the server node.
-
-```bash
-> server udcport
-5550
-Done
-```
-
-### udcport \<udp_port\>
-
-Sets the commissioning port to the given value.  NOTE: server must be restarted to take effect.
-
--   udp_port: new value to set commissioning port to
-
-```bash
-> server udcport 5551
-Done
-```
-
-### sessions
-
-Displays active session handles.
-
-```bash
-> server sessions
-session id=0x0002 peerSessionId=0x0012 peerNodeId=0x000000000001b669 fabricIdx=1
-Done
-```
-
 ### clusters
 
 Displays all clusters in endpoint hierarchy.
@@ -200,5 +127,78 @@ Displays all endpoints in device hierarchy.
 Endpoint 0
 Endpoint 1
 Endpoint 2
+Done
+```
+
+### port
+
+Display the current operational port for the server node.
+
+```bash
+> server port
+5540
+Done
+```
+
+### port \<udp_port\>
+
+Sets the operational port to the given value.  NOTE: server must be restarted to take effect.
+
+-   udp_port: new value to set operational port to
+
+```bash
+> server port 5541
+Done
+```
+
+### sessions
+
+Displays active session handles.
+
+```bash
+> server sessions
+session id=0x0002 peerSessionId=0x0012 peerNodeId=0x000000000001b669 fabricIdx=1
+Done
+```
+
+### start
+
+Start the App Server on the Node. This also starts the commissioning window
+as is done with the all-clusters-app.
+
+```bash
+> server start
+...
+[1639549415.105682][1468836:1468841] CHIP:SVR: Server Listening...
+Done
+```
+
+### stop
+
+Stops the App Server, closes all related sockets, and frees resources.
+
+```bash
+> server stop
+Done
+```
+
+### udcport
+
+Display the current commissioning port for the server node.
+
+```bash
+> server udcport
+5550
+Done
+```
+
+### udcport \<udp_port\>
+
+Sets the commissioning port to the given value.  NOTE: server must be restarted to take effect.
+
+-   udp_port: new value to set commissioning port to
+
+```bash
+> server udcport 5551
 Done
 ```
