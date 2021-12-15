@@ -335,6 +335,7 @@ def AmebaTargets():
     yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
 
+
 def K32WTargets():
     target = Target('k32w', K32WBuilder)
 
@@ -346,6 +347,7 @@ def K32WTargets():
     yield target.Extend('lock', app=K32WApp.LOCK)
     yield target.Extend('lock-low-power', app=K32WApp.LOCK, low_power=True)
     yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
+
 
 ALL = []
 

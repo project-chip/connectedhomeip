@@ -17,6 +17,7 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class K32WApp(Enum):
     LIGHT = auto()
     LOCK = auto()
@@ -41,7 +42,6 @@ class K32WApp(Enum):
             return 'chip-k32w061-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
-
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'nxp', 'k32w', 'k32w0')
@@ -76,7 +76,6 @@ class K32WBuilder(GnBuilder):
         if self.release:
           args.append('is_debug=false')
 
-
         return args
 
     def generate(self):
@@ -86,9 +85,9 @@ class K32WBuilder(GnBuilder):
 
 
     def build_outputs(self):
-        items = {}
+        items={}
         for extension in ["", ".map", ".hex"]:
-            name = '%s%s' % (self.app.AppNamePrefix(), extension)
-            items[name] = os.path.join(self.output_dir, name)
+            name='%s%s' % (self.app.AppNamePrefix(), extension)
+            items[name]=os.path.join(self.output_dir, name)
 
         return items
