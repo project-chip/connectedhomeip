@@ -126,7 +126,7 @@ ContentLauncherAttrAccess gContentLauncherAttrAccess;
 
 CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(SendStatusIfDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);

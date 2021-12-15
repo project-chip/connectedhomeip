@@ -100,9 +100,9 @@ exit:
     return response;
 }
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                              const chip::CharSpan & displayString,
-                                                              const std::list<ContentLaunchBrandingInformation> & brandingInformation)
+ContentLaunchResponse
+ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
