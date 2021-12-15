@@ -555,7 +555,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         header.mTimestamp = mEventTimestamp;
         ReturnErrorOnFailure(data.DecodeEventHeader(header));
         mEventTimestamp = header.mTimestamp;
-
+        mEventMin       = header.mEventNumber + 1;
         ReturnErrorOnFailure(data.GetData(&dataReader));
 
         mpCallback->OnEventData(this, header, &dataReader, nullptr);
@@ -681,16 +681,17 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
         if (aReadPrepareParams.mEventNumber != 0)
         {
-            // EventNumber is optional
-            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-            SuccessOrExit(err = request.GetError());
-            EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
-            SuccessOrExit(err = eventFilters.GetError());
-            eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
-            SuccessOrExit(err = eventFilter.GetError());
-            eventFilters.EndOfEventFilters();
-            SuccessOrExit(err = eventFilters.GetError());
+            mEventMin = aReadPrepareParams.mEventNumber;
         }
+
+        EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
+        SuccessOrExit(err = request.GetError());
+        EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+        SuccessOrExit(err = eventFilters.GetError());
+        eventFilter.EventMin(mEventMin).EndOfEventFilterIB();
+        SuccessOrExit(err = eventFilter.GetError());
+        eventFilters.EndOfEventFilters();
+        SuccessOrExit(err = eventFilters.GetError());
     }
 
     request.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
