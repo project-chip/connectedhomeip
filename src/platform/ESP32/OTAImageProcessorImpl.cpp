@@ -20,11 +20,11 @@
 #include <sys/_stdint.h>
 
 #include "OTAImageProcessorImpl.h"
-#include "lib/core/CHIPError.h"
-#include "esp_log.h"
 #include "esp_err.h"
+#include "esp_log.h"
 #include "esp_ota_ops.h"
 #include "esp_system.h"
+#include "lib/core/CHIPError.h"
 
 #define TAG "OTAImageProcessor"
 using namespace ::chip::DeviceLayer::Internal;
@@ -90,8 +90,8 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "OTA partition not found");
         return;
     }
-    esp_err_t err = esp_ota_begin(imageProcessor->mOTAUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES,
-                                 &(imageProcessor->mOTAUpdateHandle));
+    esp_err_t err =
+        esp_ota_begin(imageProcessor->mOTAUpdatePartition, OTA_WITH_SEQUENTIAL_WRITES, &(imageProcessor->mOTAUpdateHandle));
     if (err != ESP_OK)
     {
         imageProcessor->mDownloader->OnPreparedForDownload(ESP32Utils::MapError(err));
@@ -153,8 +153,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
-    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, imageProcessor->mBlock.data(),
-                                  imageProcessor->mBlock.size());
+    esp_err_t err = esp_ota_write(imageProcessor->mOTAUpdateHandle, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_write failed (%s)", esp_err_to_name(err));
@@ -167,7 +166,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
-    esp_err_t err = esp_ota_set_boot_partition(imageProcessor->mOTAUpdatePartition);
+    esp_err_t err         = esp_ota_set_boot_partition(imageProcessor->mOTAUpdatePartition);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "esp_ota_set_boot_partition failed (%s)!", esp_err_to_name(err));
@@ -209,4 +208,4 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
 }
-}
+} // namespace chip

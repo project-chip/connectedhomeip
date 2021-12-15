@@ -27,4 +27,4 @@ class OTARequestorDriverImpl : public OTARequestorDriver
     void ImageDownloadComplete();
     virtual UserConsentAction RequestUserConsent();
 };
-}
+} // namespace chip

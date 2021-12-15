@@ -51,4 +51,4 @@ private:
     esp_ota_handle_t mOTAUpdateHandle;
 };
 
-}
+} // namespace chip

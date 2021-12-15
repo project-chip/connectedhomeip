@@ -28,9 +28,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "nvs_flash.h"
-#include <app/server/Server.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
+#include <app/server/Server.h>
 
 #include <cmath>
 #include <cstdio>
@@ -89,10 +89,10 @@ void ESPInitConsole(void)
 
     esp_console_register_help_command();
 
-    esp_console_cmd_t  applyUpdateCommand;
+    esp_console_cmd_t applyUpdateCommand;
     memset(&applyUpdateCommand, 0, sizeof(applyUpdateCommand));
 
-    applyUpdateCmdArgs.end    = arg_end(1);
+    applyUpdateCmdArgs.end = arg_end(1);
 
     applyUpdateCommand.command = "ApplyUpdateRequest", applyUpdateCommand.help = "Request to OTA update image",
     applyUpdateCommand.func = &ESPApplyUpdateCmdHandler, applyUpdateCommand.argtable = &applyUpdateCmdArgs;
@@ -153,5 +153,4 @@ extern "C" void app_main()
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
 
     gRequestorCore.SetBDXDownloader(&gDownloader);
-
 }

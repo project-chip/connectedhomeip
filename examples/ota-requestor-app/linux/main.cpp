@@ -22,10 +22,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceLayer.h>
 
-#include "platform/Linux/OTAImageProcessorImpl.h"
-#include "platform/Linux/OTARequestorDriverImpl.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Linux/OTAImageProcessorImpl.h"
+#include "platform/Linux/OTARequestorDriverImpl.h"
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -33,11 +33,11 @@ using chip::CharSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
-using chip::OTAImageProcessorImpl;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
+using chip::OTAImageProcessorImpl;
 using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::PeerId;

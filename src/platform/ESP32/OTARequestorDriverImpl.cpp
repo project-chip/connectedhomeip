@@ -37,4 +37,4 @@ UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
     return ImmediateYes;
 }
 
-}
+} // namespace chip
