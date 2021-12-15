@@ -68,9 +68,9 @@ class K32WBuilder(GnBuilder):
         ]
 
         if self.low_power:
-          args.append('chip_with_lowe_power=1')
+          args.append('chip_with_low_power=1')
         else:
-          args.append('chip_with_lowe_power=0')
+          args.append('chip_with_low_power=0')
 
         return args
 
