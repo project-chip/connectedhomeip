@@ -77,6 +77,44 @@ using namespace ::chip::DeviceLayer;
 #define UNUSED_PARAMETER(a) (a = a)
 
 volatile int apperror_cnt;
+
+#include "platform/bootloader/api/application_properties.h"
+
+#define APP_PROPERTIES_VERSION 1
+#define APP_PROPERTIES_ID { 0 }
+
+__attribute__((used)) ApplicationProperties_t sl_app_properties = {
+    /// @brief Magic value indicating that this is an ApplicationProperties_t
+    /// Must equal @ref APPLICATION_PROPERTIES_MAGIC
+    .magic = APPLICATION_PROPERTIES_MAGIC,
+
+    /// Version number of this struct
+    .structVersion = APPLICATION_PROPERTIES_VERSION,
+
+    /// Type of signature this application is signed with
+    .signatureType = APPLICATION_SIGNATURE_NONE,
+
+    /// Location of the signature. Typically a pointer to the end of application
+    .signatureLocation = 0,
+
+    /// Information about the application
+    .app = {
+
+      /// Bitfield representing type of application
+      /// e.g. @ref APPLICATION_TYPE_BLUETOOTH_APP
+      .type = APPLICATION_TYPE_ZIGBEE,
+
+      /// Version number for this application
+      .version = APP_PROPERTIES_VERSION,
+
+      /// Capabilities of this application
+      .capabilities = 0,
+
+      /// Unique ID (e.g. UUID/GUID) for the product this application is built for
+      .productId = APP_PROPERTIES_ID,
+    },
+};
+
 // ================================================================================
 // App Error
 //=================================================================================
@@ -120,11 +158,25 @@ int main(void)
     MemMonitoring::startHeapMonitoring();
 #endif
 
+    sl_app_properties.structVersion = 1;// APPLICATION_PROPERTIES_VERSION;
+    sl_app_properties.signatureType = APPLICATION_SIGNATURE_NONE;
+    sl_app_properties.signatureLocation = 0;
+
+    sl_app_properties.app.type = APPLICATION_TYPE_ZIGBEE;
+    sl_app_properties.app.version = 0;
+    sl_app_properties.app.capabilities = 0;
+    sl_app_properties.app.productId [0] =  sl_app_properties.app.productId [1] = sl_app_properties.app.productId [2] =  sl_app_properties.app.productId [3] = 0;
+    sl_app_properties.app.productId [4] =  sl_app_properties.app.productId [5] = sl_app_properties.app.productId [6] =  sl_app_properties.app.productId [7] = 0;
+    sl_app_properties.app.productId [8] =  sl_app_properties.app.productId [9] = sl_app_properties.app.productId [10] =  sl_app_properties.app.productId [11] = 0;
+    sl_app_properties.app.productId [12] = sl_app_properties.app.productId [13] = sl_app_properties.app.productId [14] =  sl_app_properties.app.productId [15] = 0;
+
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lighting-example starting");
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
+
+
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();

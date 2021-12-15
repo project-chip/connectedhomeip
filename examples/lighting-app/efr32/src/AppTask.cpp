@@ -547,12 +547,12 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     // Action initiated, update the light led
     if (aAction == LightingManager::ON_ACTION)
     {
-        EFR32_LOG("Turning light ON")
+        EFR32_LOG("LISS !!! Turning light ON")
         sLightLED.Set(true);
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
-        EFR32_LOG("Turning light OFF")
+        EFR32_LOG(" LISS !!! Turning light OFF")
         sLightLED.Set(false);
     }
 

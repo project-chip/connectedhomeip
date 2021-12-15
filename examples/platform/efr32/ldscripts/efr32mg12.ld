@@ -95,6 +95,8 @@ SECTIONS
     __Vectors_Size = __Vectors_End - __Vectors;
     __end__ = .;
 
+    KEEP(*(.application_properties))
+
     *(.text*)
 
     KEEP(*(.init))

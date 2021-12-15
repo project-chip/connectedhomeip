@@ -157,5 +157,6 @@
     "files.trimFinalNewlines": true,
     "C_Cpp.default.cppStandard": "gnu++14",
     "C_Cpp.default.cStandard": "gnu11",
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "git.ignoreLimitWarning": true
 }
