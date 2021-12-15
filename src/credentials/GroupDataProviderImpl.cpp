@@ -758,20 +758,32 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     bool found = group.Find(mStorage, fabric, info.group_id);
     VerifyOrReturnError(!found || (group.index == index), CHIP_ERROR_DUPLICATE_KEY_ID);
 
-    found          = group.Get(mStorage, fabric, index);
-    group.group_id = info.group_id;
+    found                = group.Get(mStorage, fabric, index);
+    const bool new_group = (group.group_id != info.group_id);
+    group.group_id       = info.group_id;
     group.SetName(info.name);
 
     if (found)
     {
-        // Update existing group
-        return group.Save(mStorage);
+        // Update existing entry
+        if (new_group)
+        {
+            // New group, clear endpoints
+            RemoveEndpoints(fabric_index, group.group_id);
+        }
+        ReturnErrorOnFailure(group.Save(mStorage));
+        if (new_group)
+        {
+            GroupAdded(fabric_index, group);
+        }
+        return CHIP_NO_ERROR;
     }
 
     // Insert last
     VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
 
-    group.next = 0;
+    group.group_id = info.group_id;
+    group.next     = 0;
     ReturnErrorOnFailure(group.Save(mStorage));
 
     if (group.first)
@@ -789,7 +801,9 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
     }
     // Update fabric
     fabric.group_count++;
-    return fabric.Save(mStorage);
+    ReturnErrorOnFailure(fabric.Save(mStorage));
+    GroupAdded(fabric_index, group);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)
@@ -850,7 +864,12 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupInfoAt(chip::FabricIndex fabric_ind
         fabric.group_count--;
     }
     // Update fabric info
-    return fabric.Save(mStorage);
+    ReturnErrorOnFailure(fabric.Save(mStorage));
+    if (mListener)
+    {
+        mListener->OnGroupRemoved(fabric_index, group);
+    }
+    return CHIP_NO_ERROR;
 }
 
 bool GroupDataProviderImpl::HasEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id)
@@ -893,7 +912,9 @@ CHIP_ERROR GroupDataProviderImpl::AddEndpoint(chip::FabricIndex fabric_index, ch
         // Update fabric
         fabric.first_group = group.id;
         fabric.group_count++;
-        return fabric.Save(mStorage);
+        ReturnErrorOnFailure(fabric.Save(mStorage));
+        GroupAdded(fabric_index, group);
+        return CHIP_NO_ERROR;
     }
 
     // Existing group
@@ -1149,6 +1170,32 @@ void GroupDataProviderImpl::EndpointIteratorImpl::Release()
     mProvider.mEndpointIterators.ReleaseObject(this);
 }
 
+CHIP_ERROR GroupDataProviderImpl::RemoveEndpoints(chip::FabricIndex fabric_index, chip::GroupId group_id)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
+    FabricData fabric(fabric_index);
+    GroupData group;
+
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+    VerifyOrReturnError(group.Find(mStorage, fabric, group_id), CHIP_ERROR_KEY_NOT_FOUND);
+
+    EndpointData endpoint(fabric_index, group.id, group.first_endpoint);
+    size_t endpoint_index = 0;
+    while (endpoint_index < group.endpoint_count)
+    {
+        ReturnErrorOnFailure(endpoint.Load(mStorage));
+        endpoint.Delete(mStorage);
+        endpoint.id = endpoint.next;
+        endpoint_index++;
+    }
+    group.first_endpoint = kInvalidEndpointId;
+    group.endpoint_count = 0;
+    ReturnErrorOnFailure(group.Save(mStorage));
+
+    return CHIP_NO_ERROR;
+}
+
 //
 // Group-Key map
 //
@@ -1250,7 +1297,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
     return fabric.Save(mStorage);
 }
 
-GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKey(chip::FabricIndex fabric_index)
+GroupDataProvider::GroupKeyIterator * GroupDataProviderImpl::IterateGroupKeys(chip::FabricIndex fabric_index)
 {
     VerifyOrReturnError(mInitialized, nullptr);
     return mGroupKeyIterators.CreateObject(*this, fabric_index);
