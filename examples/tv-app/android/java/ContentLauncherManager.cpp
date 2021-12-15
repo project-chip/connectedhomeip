@@ -47,8 +47,7 @@ ContentLauncherManager ContentLauncherManager::sInstance;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
                                                                   const std::list<ContentLaunchParamater> & parameterList,
-                                                                  bool autoplay,
-                                                                  const chip::CharSpan & data)
+                                                                  bool autoplay, const chip::CharSpan & data)
 {
     ContentLaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;

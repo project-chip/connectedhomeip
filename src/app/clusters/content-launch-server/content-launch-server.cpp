@@ -181,8 +181,8 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & autoplay      = commandData.autoPlay;
-    auto & data          = commandData.data;
+    auto & autoplay = commandData.autoPlay;
+    auto & data     = commandData.data;
     // TODO: Decode the paramater and pass it to delegate
     // auto searchIterator = commandData.search.begin();
     std::list<ContentLaunchParamater> parameterList;
@@ -221,13 +221,11 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
-
-    auto & contentUrl                = commandData.contentURL;
-    auto & displayString             = commandData.displayString;
+    auto & contentUrl    = commandData.contentURL;
+    auto & displayString = commandData.displayString;
     // TODO: Decode the paramater and pass it to delegate
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
     std::list<ContentLaunchBrandingInformation> brandingInformationList;
-
 
     Delegate * delegate = GetDelegate(endpoint);
     if (SendStatusIfDelegateNull(delegate, endpoint))
