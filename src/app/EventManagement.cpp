@@ -322,7 +322,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
     }
     else
     {
-        requiredSize      = writer.GetLengthWritten();
+        requiredSize = writer.GetLengthWritten();
     }
     return err;
 }
