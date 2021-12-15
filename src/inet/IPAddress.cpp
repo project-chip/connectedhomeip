@@ -119,7 +119,6 @@ ip4_addr_t IPAddress::ToIPv4() const
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 ip_addr_t IPAddress::ToLwIPAddr(void) const
 {
     ip_addr_t ret;
@@ -173,7 +172,6 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 
     return ret;
 }
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
 ip6_addr_t IPAddress::ToIPv6() const
 {

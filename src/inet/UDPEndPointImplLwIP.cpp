@@ -39,6 +39,8 @@
 #include <lwip/tcpip.h>
 #include <lwip/udp.h>
 
+static_assert(LWIP_VERSION_MAJOR > 1, "CHIP requires LwIP 2.0 or later");
+
 #if !defined(RAW_FLAGS_MULTICAST_LOOP) || !defined(UDP_FLAGS_MULTICAST_LOOP) || !defined(raw_clear_flags) ||                       \
     !defined(raw_set_flags) || !defined(udp_clear_flags) || !defined(udp_set_flags)
 #define HAVE_LWIP_MULTICAST_LOOP 0
@@ -72,7 +74,6 @@ CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddr
     // Bind the PCB to the specified address/port.
     if (res == CHIP_NO_ERROR)
     {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = address.ToLwIPAddr();
 
         // TODO: IPAddress ANY has only one constant state, however addressType
@@ -88,22 +89,6 @@ CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddr
         }
 
         res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-        if (addressType == IPAddressType::kIPv6)
-        {
-            ip6_addr_t ipv6Addr = address.ToIPv6();
-            res                 = chip::System::MapErrorLwIP(udp_bind_ip6(mUDP, &ipv6Addr, port));
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else if (addressType == IPAddressType::kIPv4)
-        {
-            ip4_addr_t ipv4Addr = address.ToIPv4();
-            res                 = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipv4Addr, port));
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-        else
-            res = INET_ERROR_WRONG_ADDRESS_TYPE;
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
     }
 
     if (res == CHIP_NO_ERROR)
@@ -172,18 +157,7 @@ CHIP_ERROR UDPEndPointImplLwIP::ListenImpl()
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     udp_recv(mUDP, LwIPReceiveUDPMessage, this);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    if (PCB_ISIPV6(mUDP))
-    {
-        udp_recv_ip6(mUDP, LwIPReceiveUDPMessage, this);
-    }
-    else
-    {
-        udp_recv(mUDP, LwIPReceiveUDPMessage, this);
-    }
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -228,8 +202,6 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
     const uint16_t & destPort  = pktInfo->DestPort;
     const InterfaceId & intfId = pktInfo->Interface;
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-
     ip_addr_t lwipSrcAddr  = srcAddr.ToLwIPAddr();
     ip_addr_t lwipDestAddr = destAddr.ToLwIPAddr();
 
@@ -252,60 +224,6 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
     }
 
     ip_addr_copy(mUDP->local_ip, boundAddr);
-
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-
-    ipX_addr_t boundAddr;
-    ipX_addr_copy(boundAddr, mUDP->local_ip);
-
-    if (PCB_ISIPV6(mUDP))
-    {
-        ip6_addr_t lwipSrcAddr  = srcAddr.ToIPv6();
-        ip6_addr_t lwipDestAddr = destAddr.ToIPv6();
-
-        if (!ip6_addr_isany(&lwipSrcAddr))
-        {
-            ipX_addr_copy(mUDP->local_ip, *ip6_2_ipX(&lwipSrcAddr));
-        }
-
-        if (intfId.IsPresent())
-        {
-            lwipErr =
-                udp_sendto_if_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
-        }
-        else
-        {
-            lwipErr = udp_sendto_ip6(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
-        }
-    }
-
-#if INET_CONFIG_ENABLE_IPV4
-
-    else
-    {
-        ip4_addr_t lwipSrcAddr  = srcAddr.ToIPv4();
-        ip4_addr_t lwipDestAddr = destAddr.ToIPv4();
-        ipX_addr_t boundAddr;
-
-        if (!ip_addr_isany(&lwipSrcAddr))
-        {
-            ipX_addr_copy(mUDP->local_ip, *ip_2_ipX(&lwipSrcAddr));
-        }
-
-        if (intfId.IsPresent())
-        {
-            lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
-        }
-        else
-        {
-            lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
-        }
-    }
-
-    ipX_addr_copy(mUDP->local_ip, boundAddr);
-
-#endif // INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
@@ -375,20 +293,12 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
         // Allocate a PCB of the appropriate type.
         if (addrType == IPAddressType::kIPv6)
         {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
             mUDP = udp_new_ip_type(IPADDR_TYPE_V6);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-            mUDP = udp_new_ip6();
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (addrType == IPAddressType::kIPv4)
         {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
             mUDP = udp_new_ip_type(IPADDR_TYPE_V4);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-            mUDP = udp_new();
-#endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
         }
 #endif // INET_CONFIG_ENABLE_IPV4
         else
@@ -413,7 +323,6 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
         IPAddressType pcbAddrType;
 
         // Get the address type of the existing PCB.
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         switch (static_cast<lwip_ip_addr_type>(IP_GET_TYPE(&mUDP->local_ip)))
         {
         case IPADDR_TYPE_V6:
@@ -427,13 +336,6 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
         default:
             return INET_ERROR_WRONG_ADDRESS_TYPE;
         }
-#else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-#if INET_CONFIG_ENABLE_IPV4
-        pcbAddrType = PCB_ISIPV6(mUDP) ? IPAddressType::kIPv6 : IPAddressType::kIPv4;
-#else  // !INET_CONFIG_ENABLE_IPV4
-        pcbAddrType = IPAddressType::kIPv6;
-#endif // !INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
 
         // Fail if the existing PCB is not the correct type.
         VerifyOrReturnError(addrType == pcbAddrType, INET_ERROR_WRONG_ADDRESS_TYPE);
@@ -442,12 +344,8 @@ CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
     return CHIP_NO_ERROR;
 }
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
                                                 u16_t port)
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
@@ -474,27 +372,11 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != nullptr)
     {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         pktInfo->SrcAddress  = IPAddress(*addr);
         pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-#else // LWIP_VERSION_MAJOR <= 1
-        if (PCB_ISIPV6(pcb))
-        {
-            pktInfo->SrcAddress  = IPAddress(*(ip6_addr_t *) addr);
-            pktInfo->DestAddress = IPAddress(*ip6_current_dest_addr());
-        }
-#if INET_CONFIG_ENABLE_IPV4
-        else
-        {
-            pktInfo->SrcAddress  = IPAddress(*addr);
-            pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-        }
-#endif // INET_CONFIG_ENABLE_IPV4
-#endif // LWIP_VERSION_MAJOR <= 1
-
-        pktInfo->Interface = InterfaceId(ip_current_netif());
-        pktInfo->SrcPort   = port;
-        pktInfo->DestPort  = pcb->local_port;
+        pktInfo->Interface   = InterfaceId(ip_current_netif());
+        pktInfo->SrcPort     = port;
+        pktInfo->DestPort    = pcb->local_port;
     }
 
     ep->Retain();
@@ -579,7 +461,7 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
 {
     struct netif * lRetval = nullptr;
 
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#if defined(NETIF_FOREACH)
     NETIF_FOREACH(lRetval)
     {
         if (lRetval == aInterfaceId.GetPlatformInterface())
@@ -587,10 +469,10 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
             break;
         }
     }
-#else  // LWIP_VERSION_MAJOR < 2 || !defined(NETIF_FOREACH)
+#else  // defined(NETIF_FOREACH)
     for (lRetval = netif_list; lRetval != nullptr && lRetval != aInterfaceId.GetPlatformInterface(); lRetval = lRetval->next)
         ;
-#endif // LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#endif // defined(NETIF_FOREACH)
 
     return (lRetval);
 }
