@@ -23,7 +23,6 @@
 #include "commands/payload/Commands.h"
 
 #include <zap-generated/cluster/Commands.h>
-#include <zap-generated/reporting/Commands.h>
 #include <zap-generated/test/Commands.h>
 
 // ================================================================================
@@ -35,7 +34,6 @@ int main(int argc, char * argv[])
     registerCommandsDiscover(commands);
     registerCommandsPayload(commands);
     registerCommandsPairing(commands);
-    registerCommandsReporting(commands);
     registerCommandsTests(commands);
     registerClusters(commands);
 

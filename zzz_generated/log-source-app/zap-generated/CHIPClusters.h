@@ -35,8 +35,6 @@ class DLL_EXPORT DiagnosticLogsCluster : public ClusterBase
 public:
     DiagnosticLogsCluster() : ClusterBase(app::Clusters::DiagnosticLogs::Id) {}
     ~DiagnosticLogsCluster() {}
-
-    // Cluster Attributes
 };
 
 } // namespace Controller
