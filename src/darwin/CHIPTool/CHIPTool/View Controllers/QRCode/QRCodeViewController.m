@@ -67,8 +67,6 @@
 @property (strong, nonatomic) UILabel * serialNumber;
 
 @property (strong, nonatomic) UILabel * titleLabel;
-@property (strong, nonatomic) UILabel * vendorIDDeviceInfoLabel;
-@property (strong, nonatomic) UILabel * productIDDeviceInfoLabel;
 @property (strong, nonatomic) UIButton * readFromLedgerButton;
 @property (strong, nonatomic) UIButton * redirectButton;
 @property (strong, nonatomic) UILabel * commissioningFlow;
@@ -186,7 +184,6 @@
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
-    [self addDetailSubview:_setupPayloadView];
     
     _deviceModelInfoView = [UIView new];
     [self.view addSubview:_deviceModelInfoView];
@@ -196,7 +193,18 @@
     [_deviceModelInfoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_deviceModelInfoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_deviceModelInfoView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
-    [self addDetailSubview:_deviceModelInfoView];
+    
+    // manual entry field
+    _manualCodeLabel = [UILabel new];
+    _manualCodeLabel.text = @"00000000000000000000";
+    _manualCodeLabel.textColor = UIColor.systemBlueColor;
+    _manualCodeLabel.font = [UIFont systemFontOfSize:17];
+    _manualCodeLabel.textAlignment = NSTextAlignmentRight;
+    [_setupPayloadView addSubview:_manualCodeLabel];
+
+    _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
+    [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
 
     // activity indicator
     _activityIndicator = [UIActivityIndicatorView new];
@@ -264,7 +272,7 @@
     // Redirect Custom Flow button
     _redirectButton = [UIButton new];
     [_redirectButton setTitle:@"Redirect" forState:UIControlStateNormal];
-    [_redirectButton addTarget:self action:@selector(redirect:) forControlEvents:UIControlEventTouchUpInside];
+    [_redirectButton addTarget:self action:@selector(redirectToUrl:) forControlEvents:UIControlEventTouchUpInside];
     _redirectButton.backgroundColor = UIColor.systemBlueColor;
     _redirectButton.titleLabel.font = [UIFont systemFontOfSize:17];
     _redirectButton.titleLabel.textColor = [UIColor whiteColor];
@@ -290,8 +298,6 @@
     _serialNumber = [UILabel new];
     _commissioningFlow = [UILabel new];
     _commissioningUrl = [UILabel new];
-    _vendorIDDeviceInfoLabel = [UILabel new];
-    _productIDDeviceInfoLabel = [UILabel new];
 }
 
 - (void)addDetailSubview:(UIView *)superView
@@ -320,18 +326,7 @@
     [parserResultsView.bottomAnchor constraintEqualToAnchor:resultsScrollView.bottomAnchor].active = YES;
     
     if (superView == _setupPayloadView) {
-        // manual entry field
-        _manualCodeLabel = [UILabel new];
-        _manualCodeLabel.text = @"00000000000000000000";
-        _manualCodeLabel.textColor = UIColor.systemBlueColor;
-        _manualCodeLabel.font = [UIFont systemFontOfSize:17];
-        _manualCodeLabel.textAlignment = NSTextAlignmentRight;
-        [_setupPayloadView addSubview:_manualCodeLabel];
-
-        _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
-        [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
-        [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
-        
+        [superView addSubview:_manualCodeLabel];
         [self addResultsUIToStackView:parserResultsView];
     } else if (superView == _deviceModelInfoView) {
         [self addDeviceInfoUIToStackView:parserResultsView];
@@ -352,7 +347,7 @@
     NSArray<NSString *> * resultLabelTexts =
         @[ @"Vendor ID", @"Product ID", @"Commissioning URL" ];
     NSArray<UILabel *> * resultLabels =
-        @[ _vendorIDDeviceInfoLabel, _productIDDeviceInfoLabel, _commissioningUrl ];
+        @[ _vendorID, _productID, _commissioningUrl ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
@@ -364,11 +359,20 @@
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
         UILabel * result = [resultLabels objectAtIndex:i];
-        result.text = @"N/A";
+        if (!result.text) result.text = @"N/A";
         UIStackView * labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
         labelStackView.translatesAutoresizingMaskIntoConstraints = false;
         [stackView addArrangedSubview:labelStackView];
     }
+}
+
+- (void)updateResultViewUI:(UIView *)superView
+{
+    NSArray *viewsToRemove = [superView subviews];
+    for (UIView *v in viewsToRemove) {
+        [v removeFromSuperview];
+    }
+    [self addDetailSubview:superView];
 }
 
 // MARK: UIViewController methods
@@ -513,6 +517,9 @@
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
     _errorLabel.hidden = YES;
+    _deviceModelInfoView.hidden = YES;
+    _redirectButton.hidden = YES;
+    _readFromLedgerButton.hidden = YES;
 }
 
 - (void)manualCodeEnteredStartState
@@ -761,9 +768,9 @@
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
-    _vendorIDDeviceInfoLabel.text = [NSString stringWithFormat:@"%@", payload.vendorID];
-    _productIDDeviceInfoLabel.text = [NSString stringWithFormat:@"%@", payload.productID];
     _commissioningFlow.text = [NSString stringWithFormat:@"%lu", payload.commissioningFlow];
+    
+    [self updateResultViewUI:_setupPayloadView];
     
     if (payload.commissioningFlow == kCommissioningFlowCustom) {
         _readFromLedgerButton.hidden = NO;
@@ -992,7 +999,8 @@
     _setupPayloadView.hidden = YES;
     _activityIndicator.hidden = NO;
     [_activityIndicator startAnimating];
-    
+
+    [self updateResultViewUI:_deviceModelInfoView];
     [self updateLedgerFields];
 }
 
@@ -1000,7 +1008,7 @@
 {
     // check vendor Id and product Id
     NSLog(@"Validating Vender Id and Product Id...");
-    if ([_vendorIDDeviceInfoLabel.text isEqual:@"N/A"] || [_productIDDeviceInfoLabel.text isEqual:@"N/A"] ) {
+    if ([_vendorID.text isEqual:@"N/A"] || [_productID.text isEqual:@"N/A"] ) {
         NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.customflow"
                                                      code:1
                                                  userInfo:@{ NSLocalizedDescriptionKey : @"Vendor ID or Product Id is invalid." }];
@@ -1044,7 +1052,7 @@
 }
 
 // redirect
-- (IBAction)redirect:(id)sender
+- (IBAction)redirectToUrl:(id)sender
 {
     NSLog(@"Clicked redirect...");
     [self redirectToUrl];
