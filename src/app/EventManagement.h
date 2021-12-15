@@ -478,8 +478,8 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    EventNumber mLastEventNumber  = 0; ///< Last event Number vended for this priority
-    Timestamp mLastEventTimestamp;     ///< The timestamp of the last event in this buffer
+    EventNumber mLastEventNumber = 0; ///< Last event Number vended for this priority
+    Timestamp mLastEventTimestamp;    ///< The timestamp of the last event in this buffer
 };
 } // namespace app
 } // namespace chip
