@@ -231,7 +231,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init();
+    err    = mCASESessionManager.Init();
     mState = ServerState::Enabled;
 
 exit:
@@ -248,7 +248,8 @@ exit:
 
 void Server::Shutdown()
 {
-    if (mState == ServerState::Disabled) return;
+    if (mState == ServerState::Disabled)
+        return;
 
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();

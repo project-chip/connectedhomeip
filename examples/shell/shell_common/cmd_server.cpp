@@ -34,11 +34,13 @@ using namespace chip::Shell;
 using namespace chip::Credentials;
 using namespace chip::ArgParser;
 
-bool lowPowerClusterSleep() { return true; }
-
+bool lowPowerClusterSleep()
+{
+    return true;
+}
 
 static chip::Shell::Engine sShellServerSubcommands;
-static uint16_t sServerPortOperational = CHIP_PORT;
+static uint16_t sServerPortOperational   = CHIP_PORT;
 static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
 
 static CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
@@ -73,7 +75,8 @@ static CHIP_ERROR CmdAppServerPort(int argc, char ** argv)
     else
     {
         bool success = ParseInt(argv[0], sServerPortOperational);
-        if (!success) return CHIP_ERROR_INVALID_ARGUMENT;
+        if (!success)
+            return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return CHIP_NO_ERROR;
@@ -88,20 +91,18 @@ static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
     else
     {
         bool success = ParseInt(argv[0], sServerPortCommissioning);
-        if (!success) return CHIP_ERROR_INVALID_ARGUMENT;
+        if (!success)
+            return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     return CHIP_NO_ERROR;
 }
 
-static bool PrintServerSession(void *context, SessionHandle &session)
+static bool PrintServerSession(void * context, SessionHandle & session)
 {
-    streamer_printf(streamer_get(),
-        "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
-        session.GetLocalSessionId().Value(),
-        session.GetPeerSessionId().Value(),
-        session.GetPeerNodeId(),
-        session.GetFabricIndex());
+    streamer_printf(streamer_get(), "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
+                    session.GetLocalSessionId().Value(), session.GetPeerSessionId().Value(), session.GetPeerNodeId(),
+                    session.GetFabricIndex());
     return true;
 }
 
@@ -114,7 +115,7 @@ static CHIP_ERROR CmdAppServerSessions(int argc, char ** argv)
 
 static CHIP_ERROR CmdAppServerExchanges(int argc, char ** argv)
 {
-    //Messaging::ExchangeManager * exchangeMgr = &Server::GetInstance().GetExchangeManager();
+    // Messaging::ExchangeManager * exchangeMgr = &Server::GetInstance().GetExchangeManager();
 
     return CHIP_NO_ERROR;
 }
@@ -125,7 +126,7 @@ static CHIP_ERROR CmdAppServerClusters(int argc, char ** argv)
 
     for (int i = 0; i < emberAfEndpointCount(); i++)
     {
-        EndpointId endpoint = emberAfEndpointFromIndex(i);
+        EndpointId endpoint   = emberAfEndpointFromIndex(i);
         uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
         streamer_printf(streamer_get(), "Endpoint %d:\r\n", endpoint);
@@ -159,8 +160,7 @@ static CHIP_ERROR CmdAppServer(int argc, char ** argv)
     case 0:
         return CmdAppServerHelp(argc, argv);
     case 1:
-        if ((strcmp(argv[0], "help") == 0) ||
-            (strcmp(argv[0], "-h") == 0))
+        if ((strcmp(argv[0], "help") == 0) || (strcmp(argv[0], "-h") == 0))
         {
             return CmdAppServerHelp(argc, argv);
         }
@@ -176,7 +176,7 @@ static void CmdAppServerAtExit()
 void cmd_app_server_init()
 {
     static const shell_command_t sServerComand = { &CmdAppServer, "server",
-                                                   "Manage the ZCL application server. Usage: server [help|start|stop]"};
+                                                   "Manage the ZCL application server. Usage: server [help|start|stop]" };
 
     static const shell_command_t sServerSubCommands[] = {
         { &CmdAppServerHelp, "help", "Usage: server <subcommand>" },
