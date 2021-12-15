@@ -199,10 +199,10 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     {
         ContentLaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
-    
+
         response.contentLaunchStatus = resp.status;
         response.data                = resp.data;
-    
+
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
