@@ -328,22 +328,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+            // Post event for demonstration purposes
+            sAppTask.PostEvents();
+
             // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
                 if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
-
-                    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
-                    {
-                        PumpConfigurationAndControl::Events::SupplyVoltageLow::Type event;
-                        EventNumber eventNumber;
-                        ChipLogError(Zcl, "PCC Event!");
-                        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
-                        {
-                            ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
-                        }
-                    }
+                    PLAT_LOG("Enabled BLE Advertisements");
                 }
                 else
                 {
@@ -481,5 +474,22 @@ void AppTask::UpdateClusterState()
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
+    }
+}
+
+void AppTask::PostEvents()
+{
+    // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
+    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
+    {
+        PumpConfigurationAndControl::Events::GeneralFault::Type event;
+        EventNumber eventNumber;
+
+        ChipLogProgress(NotSpecified, "AppTask: Post PCC GeneralFault event");
+
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+        }
     }
 }
