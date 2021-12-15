@@ -34,7 +34,7 @@ void OTARequestorDriverImpl::ImageDownloadComplete()
 
 UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
 {
-    return ImmediateYes;    
+    return ImmediateYes;
 }
 
 }
