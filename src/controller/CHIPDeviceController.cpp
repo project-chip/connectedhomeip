@@ -1870,11 +1870,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        PeerId peerId = PeerId().SetCompressedFabricId(GetCompressedFabricId()).SetNodeId(proxy->GetDeviceId());
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-        ChipLogProgress(Controller, "Finding node on operational network");
-        mDNSResolver.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
-#endif
+        UpdateDevice(proxy->GetDeviceId());
     }
     break;
     case CommissioningStage::kSendComplete: {

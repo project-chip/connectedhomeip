@@ -251,7 +251,7 @@ class ChipDeviceController(object):
     def SetThreadOperationalDataset(self, threadOperationalDataset):
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
-                threadOperationalDataset)
+                threadOperationalDataset, len(threadOperationalDataset))
         )
 
     def ResolveNode(self, nodeid):
@@ -699,7 +699,7 @@ class ChipDeviceController(object):
                 c_void_p, c_char_p, c_uint32, c_uint64]
 
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
-                c_char_p]
+                c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
