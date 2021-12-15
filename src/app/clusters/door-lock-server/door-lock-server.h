@@ -26,6 +26,7 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
@@ -41,6 +42,8 @@ using namespace chip::app::Clusters;
 
 static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE    = 10;
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
+
+static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5;
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -66,19 +69,23 @@ public:
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
 
-    bool CreateUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creatorFabricIdx,
+    EmberAfStatus CreateUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
                     const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                     const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                    const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+                    const Nullable<DoorLock::DlCredentialRule> & credentialRule,
+                    const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
-    bool ModifyUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex modifierFabricIndex,
+    EmberAfStatus ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
                     const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                     const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                    const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+                    const Nullable<DoorLock::DlCredentialRule> & credentialRule,
+                    const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
     EmberAfStatus ClearUser(chip::EndpointId endpointId, uint16_t userIndex);
 
 private:
+    chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
+
     static DoorLockServer instance;
 };
 
@@ -92,6 +99,8 @@ struct EmberAfPluginDoorLockCredentialInfo
 struct EmberAfPluginDoorLockUserInfo
 {
     char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
+    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
+    size_t totalCredentials;
     uint32_t userUniqueId;
     DoorLock::DlUserStatus userStatus;
     DoorLock::DlUserType userType;
@@ -215,7 +224,7 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                  DoorLock::DlCredentialRule credentialRule);
+                                  DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
                                         EmberAfPluginDoorLockCredentialInfo & credential);
