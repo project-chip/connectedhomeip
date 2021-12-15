@@ -625,7 +625,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 182
+#define GENERATED_ATTRIBUTE_COUNT 201
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -898,7 +898,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 19
+#define GENERATED_CLUSTER_COUNT 20
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x001D, ZAP_ATTRIBUTE_INDEX(0), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Descriptor (server) */  \
@@ -963,7 +963,7 @@
                 0x002F, ZAP_ATTRIBUTE_INDEX(173), 9, 133, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Power Source (server) */                                                                   \
             { 0x0101,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(180),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(182),                                                                                            \
               19,                                                                                                                  \
               29,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),                                             \
@@ -975,7 +975,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 16, 1070 }, { ZAP_CLUSTER_INDEX(16), 3, 146 },                                                     \
+        { ZAP_CLUSTER_INDEX(0), 16, 1070 }, { ZAP_CLUSTER_INDEX(16), 4, 175 },                                                     \
     }
 
 // Largest attribute size is needed for various buffers
@@ -985,7 +985,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (246)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1216)
+#define ATTRIBUTE_MAX_SIZE (1245)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -1006,7 +1006,7 @@
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0, 0                                                                                                                       \
+        22, 10                                                                                                                     \
     }
 
 // Array of device versions

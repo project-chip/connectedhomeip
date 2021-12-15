@@ -6415,6 +6415,7 @@ public:
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 struct DecodableType
@@ -6444,6 +6445,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
