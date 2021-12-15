@@ -17,19 +17,12 @@
             "mbed-trace.fea-ipv6": false
         },
         "CY8CPROTO_062_4343W": {
-            "target.network-default-interface-type": "WIFI",
-            "target.macros_add": [
-                "MXCRYPTO_DISABLED",
-                "NL_ASSERT_LOG=NL_ASSERT_LOG_DEFAULT",
-                "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
-                "WHD_PRINT_DISABLE"
-            ],
-            "mcuboot.primary-slot-address": "0x10020000",
+            "target.components_remove": [ "WHD" ],
+            "mcuboot.primary-slot-address": "0x10022000",
             "mcuboot.slot-size": "0xC0000",
-            "mcuboot.scratch-address": "0x100E0000",
-            "mcuboot.scratch-size": "0x20000",
-            "mcuboot.max-img-sectors": "0x180",
-            "mcuboot.read-granularity": 512
+            "mcuboot.scratch-address": "0x100E2000",
+            "mcuboot.scratch-size": "0x1000",
+            "mcuboot.max-img-sectors": "0x600"
         }
     }
 }
