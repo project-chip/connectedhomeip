@@ -402,12 +402,14 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mPort          = sdCtx->port;
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
-    service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
+    chip::Inet::IPAddress ip;
+    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
+    service.mAddress.SetValue(ip);
     Platform::CopyString(service.mName, sdCtx->name);
     Platform::CopyString(service.mHostName, hostname);
     service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
-    sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
+    sdCtx->callback(sdCtx->context, &service, status);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 

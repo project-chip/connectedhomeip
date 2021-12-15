@@ -748,10 +748,8 @@ CHIP_ERROR TCPEndPointImplSockets::BindSrcAddrFromIntf(IPAddressType addrType, I
     bool ipAddrFound = false;
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
     {
-        const IPAddress curAddr     = addrIter.GetAddress();
-        const InterfaceId curIntfId = addrIter.GetInterfaceId();
-
-        if (curIntfId == intfId)
+        IPAddress curAddr;
+        if ((addrIter.GetInterfaceId() == intfId) && (addrIter.GetAddress(curAddr) == CHIP_NO_ERROR))
         {
             // Search for an IPv4 address on the TargetInterface
 
