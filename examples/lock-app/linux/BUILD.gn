@@ -17,8 +17,8 @@ import("//build_overrides/chip.gni")
 
 executable("chip-lock-app") {
   sources = [
-    "src/LockManager.cpp",
     "main.cpp",
+    "src/LockManager.cpp",
   ]
 
   deps = [
@@ -27,9 +27,10 @@ executable("chip-lock-app") {
     "${chip_root}/src/lib",
   ]
 
-  include_dirs =
-      [ "${chip_root}/examples/lock-app/lock-common/include",
-        "include" ]
+  include_dirs = [
+    "${chip_root}/examples/lock-app/lock-common/include",
+    "include",
+  ]
 
   cflags = [ "-Wconversion" ]
 
