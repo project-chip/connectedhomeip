@@ -485,11 +485,11 @@ void AppTask::PostEvents()
         PumpConfigurationAndControl::Events::GeneralFault::Type event;
         EventNumber eventNumber;
 
-        ChipLogProgress(NotSpecified, "AppTask: Post PCC GeneralFault event");
-
+        ChipLogProgress(Zcl, "AppTask: Post PCC GeneralFault event");
+        // Using default priority for the event
         if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
         {
-            ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
         }
     }
 }
