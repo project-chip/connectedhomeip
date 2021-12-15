@@ -48,7 +48,7 @@ traces should go:
 For example:
 
 ```
-out/with_trace/chip-tool --trace_file trace.log pairing <pairing_args>
+out/with_trace/chip-tool pairing <pairing_args> --trace_file trace.log
 ```
 
 ## Using the Client to commission a device
