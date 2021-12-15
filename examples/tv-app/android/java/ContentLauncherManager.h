@@ -31,11 +31,11 @@ class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Dele
 public:
     void InitializeWithObjects(jobject managerObject);
 
-    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList,
+    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<ContentLaunchParamater> & parameterList,
                                               bool autoplay, const chip::CharSpan & data) override;
     ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                          ContentLaunchBrandingInformation & brandingInformation) override;
-    std::list<std::string> HandleGetAcceptsHeaderList() override;
+                                          const std::list<ContentLaunchBrandingInformation> & brandingInformation) override;
+    std::list<std::string> HandleGetAcceptHeaderList() override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
@@ -43,7 +43,7 @@ private:
 
     static ContentLauncherManager sInstance;
     jobject mContentLauncherManagerObject           = nullptr;
-    jmethodID mGetAcceptsHeaderMethod               = nullptr;
+    jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;

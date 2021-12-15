@@ -44,13 +44,13 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList,
+    virtual ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<ContentLaunchParamater> & parameterList,
                                                       bool autoplay, const chip::CharSpan & data) = 0;
 
     virtual ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                  ContentLaunchBrandingInformation & brandingInformation) = 0;
+                                                  const std::list<ContentLaunchBrandingInformation> & brandingInformation) = 0;
 
-    virtual std::list<std::string> HandleGetAcceptsHeaderList() = 0;
+    virtual std::list<std::string> HandleGetAcceptHeaderList() = 0;
 
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
 
