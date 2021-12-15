@@ -88,44 +88,6 @@ public:
      */
     bool IsFinalDestinationForPriority(PriorityLevel aPriority) const;
 
-    /**
-     * @brief
-     *   Allocate a new event Number based on the event priority, and advance the counter
-     *   if we have one.
-     *
-     * @return EventNumber Event Number for this priority.
-     */
-    EventNumber VendEventNumber();
-
-    /**
-     * @brief
-     *   Remove the number of event
-     *
-     *   @param[in]   aNumEvents   the number of the event.
-     */
-    void RemoveEvent(EventNumber aNumEvents);
-
-    /**
-     * @brief
-     *   Given a timestamp of an event, compute the delta time to store in the log
-     *
-     * @param aEventTimestamp The event timestamp.
-     *
-     */
-    void UpdateFirstLastEventTime(Timestamp aEventTimestamp);
-
-    void InitCounter(MonotonicallyIncreasingCounter * apEventNumberCounter)
-    {
-        if (apEventNumberCounter == nullptr)
-        {
-            mNonPersistedCounter.Init(1);
-            mpEventNumberCounter = &(mNonPersistedCounter);
-            return;
-        }
-        mpEventNumberCounter = apEventNumberCounter;
-        mFirstEventNumber    = mpEventNumberCounter->GetValue();
-    }
-
     PriorityLevel GetPriority() { return mPriority; }
 
     CircularEventBuffer * GetPreviousCircularEventBuffer() { return mpPrev; }
@@ -133,14 +95,6 @@ public:
 
     void SetRequiredSpaceforEvicted(size_t aRequiredSpace) { mRequiredSpaceForEvicted = aRequiredSpace; }
     size_t GetRequiredSpaceforEvicted() { return mRequiredSpaceForEvicted; }
-
-    EventNumber GetFirstEventNumber() { return mFirstEventNumber; }
-    EventNumber GetLastEventNumber() { return mLastEventNumber; }
-
-    uint64_t GetFirstEventTimestamp() { return mFirstEventTimestamp.mValue; }
-    void SetFirstEventTimestamp(uint64_t aValue) { mLastEventTimestamp.mValue = aValue; }
-
-    uint64_t GetLastEventTimestamp() { return mLastEventTimestamp.mValue; }
 
     virtual ~CircularEventBuffer() = default;
 
@@ -158,10 +112,6 @@ private:
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
     size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber   = 0; ///< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber    = 0; ///< Last event Number vended for this priority
-    Timestamp mFirstEventTimestamp;      ///< The timestamp of the first event in this buffer
-    Timestamp mLastEventTimestamp;       ///< The timestamp of the last event in this buffer
 };
 
 class CircularEventReader;
@@ -207,22 +157,8 @@ struct LogStorageResources
         nullptr; // Buffer to be used as a storage at the particular priority level and shared with more important events.
                  // Must not be nullptr.  Must be large enough to accommodate the largest event emitted by the system.
     uint32_t mBufferSize = 0; ///< The size, in bytes, of the `mBuffer`.
-    Platform::PersistedStorage::Key * mCounterKey =
-        nullptr;                // Name of the key naming persistent counter for events of this priority.  When NULL, the persistent
-                                // counters will not be used for this priority level.
-    uint32_t mCounterEpoch = 0; // The interval used in incrementing persistent counters.  When 0, the persistent counters will not
-                                // be used for this priority level.
-    PersistedCounter * mpCounterStorage = nullptr; // application provided storage for persistent counter for this priority level.
     PriorityLevel mPriority =
         PriorityLevel::Invalid; // Log priority level associated with the resources provided in this structure.
-    PersistedCounter * InitializeCounter() const
-    {
-        if (mpCounterStorage != nullptr && mCounterKey != nullptr && mCounterEpoch != 0)
-        {
-            return (mpCounterStorage->Init(*mCounterKey, mCounterEpoch) == CHIP_NO_ERROR) ? mpCounterStorage : nullptr;
-        }
-        return nullptr;
-    }
 };
 
 /**
@@ -259,7 +195,11 @@ public:
      *
      */
     void Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers, CircularEventBuffer * apCircularEventBuffer,
-              const LogStorageResources * const apLogStorageResources);
+              const LogStorageResources * const apLogStorageResources, Platform::PersistedStorage::Key * apCounterKey,
+              uint32_t aCounterEpoch, PersistedCounter * apPersistedCounter);
+
+    void InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
+                           PersistedCounter * apPersistedCounter);
 
     static EventManagement & GetInstance();
 
@@ -285,7 +225,9 @@ public:
      */
     static void CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                       CircularEventBuffer * apCircularEventBuffer,
-                                      const LogStorageResources * const apLogStorageResources);
+                                      const LogStorageResources * const apLogStorageResources,
+                                      Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
+                                      PersistedCounter * apPersistedCounter);
 
     static void DestroyEventManagement();
 
@@ -367,19 +309,17 @@ public:
      *   A function to retrieve events of specified priority since a specified event ID.
      *
      * Given a TLV::TLVWriter, an priority type, and an event ID, the
-     * function will fetch events of specified priority since the
-     * specified event.  The function will continue fetching events until
+     * function will fetch events since the
+     * specified event number.  The function will continue fetching events until
      * it runs out of space in the TLV::TLVWriter or in the log. The function
-     * will terminate the event writing on event boundary.
+     * will terminate the event writing on event boundary. The function would filter out event based upon interested path
+     * specified by read/subscribe request.
      *
      * @param[in] aWriter     The writer to use for event storage
      * @param[in] apClusterInfolist the interested cluster info list with event path inside
-     * @param[in] aPriority The priority of events to be fetched
      *
-     * @param[in,out] aEventNumber On input, the Event number immediately
-     *                         prior to the one we're fetching.  On
-     *                         completion, the event number of the last event
-     *                         fetched.
+     * @param[in,out] aEventMin On input, the Event number is the one we're fetching.  On
+     *                         completion, the event number of the next one we plan to fetch.
      *
      * @param[out] aEventCount The number of fetched event
      * @retval #CHIP_END_OF_TLV             The function has reached the end of the
@@ -395,8 +335,8 @@ public:
      *                                       available.
      *
      */
-    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                EventNumber & aEventNumber, size_t & aEventCount);
+    CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
+                                size_t & aEventCount);
 
     /**
      * @brief
@@ -406,7 +346,7 @@ public:
      *
      * @return EventNumber most recently vended event Number for that event priority
      */
-    EventNumber GetLastEventNumber(PriorityLevel aPriority);
+    EventNumber GetLastEventNumber() { return mLastEventNumber; }
 
     /**
      * @brief
@@ -416,8 +356,9 @@ public:
      *
      * @return EventNumber First currently stored event Number for that event priority
      */
-    EventNumber GetFirstEventNumber(PriorityLevel aPriority);
+    EventNumber GetFirstEventNumber() { return mFirstEventNumber; }
 
+    uint64_t GetFirstEventTimestamp() { return mFirstEventTimestamp.mValue; }
     /**
      * @brief
      *   IsValid returns whether the EventManagement instance is valid
@@ -427,9 +368,10 @@ public:
     /**
      *  Logger would save last logged event number for each logger buffer into schedule event number array
      */
-    void SetScheduledEventEndpoint(EventNumber * aEventEndpoints);
+    void SetScheduledEventNumber(EventNumber & aEventNumber);
 
 private:
+    void VendEventNumber();
     CHIP_ERROR CalculateEventSize(EventLoggingDelegate * apDelegate, const EventOptions * apOptions, uint32_t & requiredSize);
     /**
      * @brief Helper function for writing event header and data according to event
@@ -540,6 +482,17 @@ private:
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     System::Mutex mAccessLock;
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
+
+    // The counter we're going to actually use.
+    MonotonicallyIncreasingCounter * mpEventNumberCounter = nullptr;
+
+    // The backup counter to use if no counter is provided for us.
+    MonotonicallyIncreasingCounter mNonPersistedCounter;
+
+    EventNumber mFirstEventNumber = 0; ///< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber  = 0; ///< Last event Number vended for this priority
+    Timestamp mFirstEventTimestamp;    ///< The timestamp of the first event in this buffer
+    Timestamp mLastEventTimestamp;     ///< The timestamp of the last event in this buffer
 };
 } // namespace app
 } // namespace chip
