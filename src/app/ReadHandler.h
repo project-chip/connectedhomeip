@@ -118,17 +118,13 @@ public:
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    EventNumber * GetVendedEventNumberList() { return mSelfProcessedEvents; }
+    EventNumber GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
     // with snapshotted last event number. if current priority  is in the end, no valid
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
-
-    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
-    // is larger than current self vended event number
-    void MoveToNextScheduledDirtyPriority();
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
@@ -181,6 +177,7 @@ private:
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
     CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -203,13 +200,12 @@ private:
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 
-    // The event number of the last processed event for each priority level
-    EventNumber mSelfProcessedEvents[kNumPriorityLevel] = { 0 };
+    EventNumber mEventMin = 0;
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber[kNumPriorityLevel] = { 0 };
-    Messaging::ExchangeManager * mpExchangeMgr               = nullptr;
-    InteractionModelDelegate * mpDelegate                    = nullptr;
+    EventNumber mLastScheduledEventNumber      = 0;
+    Messaging::ExchangeManager * mpExchangeMgr = nullptr;
+    InteractionModelDelegate * mpDelegate      = nullptr;
 
     // Tracks whether we're in the initial phase of receiving priming
     // reports, which is always true for reads and true for subscriptions

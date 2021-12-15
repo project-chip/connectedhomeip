@@ -112,7 +112,6 @@ private:
                                    AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
-    EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,

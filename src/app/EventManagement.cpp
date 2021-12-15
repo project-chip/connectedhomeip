@@ -62,7 +62,9 @@ EventManagement & EventManagement::GetInstance(void)
 struct ReclaimEventCtx
 {
     CircularEventBuffer * mpEventBuffer = nullptr;
-    size_t mSpaceNeededForMovedEvent    = 0;
+    EventNumber mFirstEventNumber       = 0;
+    Timestamp mFirstEventTimestamp;
+    size_t mSpaceNeededForMovedEvent = 0;
 };
 
 /**
@@ -92,14 +94,40 @@ struct EventEnvelopeContext
 #else
     Timestamp mDeltaTime = Timestamp::Epoch(System::Clock::kZero);
 #endif
-    PriorityLevel mPriority = PriorityLevel::First;
-    ClusterId mClusterId    = 0;
-    EndpointId mEndpointId  = 0;
-    EventId mEventId        = 0;
+    PriorityLevel mPriority  = PriorityLevel::First;
+    ClusterId mClusterId     = 0;
+    EndpointId mEndpointId   = 0;
+    EventId mEventId         = 0;
+    EventNumber mEventNumber = 0;
 };
 
+void EventManagement::InitializeCounter(Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
+                                        PersistedCounter * apPersistedCounter)
+{
+    PersistedCounter * eventNumberCounter = nullptr;
+    if (apPersistedCounter != nullptr && apCounterKey != nullptr && aCounterEpoch != 0)
+    {
+        eventNumberCounter =
+            (apPersistedCounter->Init(*apCounterKey, aCounterEpoch) == CHIP_NO_ERROR) ? apPersistedCounter : nullptr;
+    }
+
+    if (eventNumberCounter == nullptr)
+    {
+        mNonPersistedCounter.Init(0);
+        mpEventNumberCounter = &(mNonPersistedCounter);
+    }
+    else
+    {
+        mpEventNumberCounter = eventNumberCounter;
+    }
+    mFirstEventNumber = mpEventNumberCounter->GetValue();
+    mLastEventNumber  = mFirstEventNumber;
+}
+
 void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
-                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources)
+                           CircularEventBuffer * apCircularEventBuffer, const LogStorageResources * const apLogStorageResources,
+                           Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
+                           PersistedCounter * apPersistedCounter)
 {
     CircularEventBuffer * current = nullptr;
     CircularEventBuffer * prev    = nullptr;
@@ -130,8 +158,9 @@ void EventManagement::Init(Messaging::ExchangeManager * apExchangeManager, uint3
 
         current->mProcessEvictedElement = AlwaysFail;
         current->mAppData               = nullptr;
-        current->InitCounter(apLogStorageResources[bufferIndex].InitializeCounter());
     }
+
+    InitializeCounter(apCounterKey, aCounterEpoch, apPersistedCounter);
 
     mpEventBuffer = apCircularEventBuffer;
     mState        = EventManagementStates::Idle;
@@ -190,6 +219,8 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
     size_t requiredSpace              = aRequiredSpace;
     CircularEventBuffer * eventBuffer = mpEventBuffer;
     ReclaimEventCtx ctx;
+    ctx.mFirstEventNumber    = mFirstEventNumber;
+    ctx.mFirstEventTimestamp = mFirstEventTimestamp;
 
     // check whether we actually need to do anything, exit if we don't
     VerifyOrExit(requiredSpace > eventBuffer->AvailableDataLength(), err = CHIP_NO_ERROR);
@@ -251,6 +282,12 @@ CHIP_ERROR EventManagement::EnsureSpaceInCircularBuffer(size_t aRequiredSpace)
                 VerifyOrExit(eventBuffer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
                 requiredSpace = ctx.mSpaceNeededForMovedEvent;
             }
+
+            if (ctx.mFirstEventNumber > mFirstEventNumber)
+            {
+                mFirstEventNumber    = ctx.mFirstEventNumber;
+                mFirstEventTimestamp = ctx.mFirstEventTimestamp;
+            }
         }
         else
         {
@@ -277,8 +314,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
-    EventLoadOutContext ctxt =
-        EventLoadOutContext(writer, apOptions->mPriority, GetPriorityBuffer(apOptions->mPriority)->GetLastEventNumber());
+    EventLoadOutContext ctxt       = EventLoadOutContext(writer, apOptions->mPriority, GetLastEventNumber());
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(kMaxEventSizeReserve);
     if (buf.IsNull())
     {
@@ -286,8 +322,8 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
     }
     writer.Init(std::move(buf));
 
-    ctxt.mCurrentEventNumber = GetPriorityBuffer(apOptions->mPriority)->GetLastEventNumber();
-    ctxt.mCurrentTime.mValue = GetPriorityBuffer(apOptions->mPriority)->GetLastEventTimestamp();
+    ctxt.mCurrentEventNumber = mLastEventNumber;
+    ctxt.mCurrentTime        = mLastEventTimestamp;
 
     TLVWriter checkpoint = ctxt.mWriter;
     err                  = ConstructEvent(&ctxt, apDelegate, apOptions);
@@ -330,7 +366,7 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
         .IsUrgent(false)
         .EndOfEventPathIB();
     ReturnErrorOnFailure(eventPathBuilder.GetError());
-    eventDataIBBuilder.Priority(chip::to_underlying(apContext->mPriority));
+    eventDataIBBuilder.EventNumber(apContext->mCurrentEventNumber).Priority(chip::to_underlying(apContext->mPriority));
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
     deltatime = apOptions->mTimestamp.mValue - apContext->mCurrentTime.mValue;
@@ -358,10 +394,13 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
 void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
                                             CircularEventBuffer * apCircularEventBuffer,
-                                            const LogStorageResources * const apLogStorageResources)
+                                            const LogStorageResources * const apLogStorageResources,
+                                            Platform::PersistedStorage::Key * apCounterKey, uint32_t aCounterEpoch,
+                                            PersistedCounter * apPersistedCounter)
 {
 
-    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources);
+    sInstance.Init(apExchangeManager, aNumBuffers, apCircularEventBuffer, apLogStorageResources, apCounterKey, aCounterEpoch,
+                   apPersistedCounter);
 }
 
 /**
@@ -375,34 +414,6 @@ void EventManagement::DestroyEventManagement()
     sInstance.mState        = EventManagementStates::Shutdown;
     sInstance.mpEventBuffer = nullptr;
     sInstance.mpExchangeMgr = nullptr;
-}
-
-EventNumber CircularEventBuffer::VendEventNumber()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // Assign event Number to the buffer's counter's value.
-    mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
-
-    // Now advance the counter.
-    err = mpEventNumberCounter->Advance();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(EventLogging, "%s Advance() for priority %u failed with %" CHIP_ERROR_FORMAT, __FUNCTION__,
-                     static_cast<unsigned>(mPriority), err.Format());
-    }
-
-    return mLastEventNumber;
-}
-
-EventNumber EventManagement::GetLastEventNumber(PriorityLevel aPriority)
-{
-    return GetPriorityBuffer(aPriority)->GetLastEventNumber();
-}
-
-EventNumber EventManagement::GetFirstEventNumber(PriorityLevel aPriority)
-{
-    return GetPriorityBuffer(aPriority)->GetFirstEventNumber();
 }
 
 CircularEventBuffer * EventManagement::GetPriorityBuffer(PriorityLevel aPriority) const
@@ -457,13 +468,21 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
     {
         err = ctx->mpWriter->CopyElement(reader);
     }
-
-    if (aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPath)))
-    {
-        err =
-            ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)), ctx->mpContext->mCurrentEventNumber);
-    }
     return err;
+}
+
+void EventManagement::VendEventNumber()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    // Now advance the counter.
+    err = mpEventNumberCounter->Advance();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(EventLogging, "%s Advance() failed with %" CHIP_ERROR_FORMAT, __FUNCTION__, err.Format());
+    }
+
+    // Assign event Number to the buffer's counter's value.
+    mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
 }
 
 CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
@@ -490,8 +509,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     aEventNumber                   = 0;
     CircularEventBuffer checkpoint = *mpEventBuffer;
     CircularEventBuffer * buffer   = nullptr;
-    EventLoadOutContext ctxt =
-        EventLoadOutContext(writer, aEventOptions.mPriority, GetPriorityBuffer(aEventOptions.mPriority)->GetLastEventNumber());
+    EventLoadOutContext ctxt       = EventLoadOutContext(writer, aEventOptions.mPriority, mLastEventNumber);
     EventOptions opts;
 #if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     Timestamp timestamp;
@@ -507,23 +525,22 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
-    // check whether the entry is to be logged or discarded silently
-    VerifyOrExit(aEventOptions.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY, /* no-op */);
 
     opts.mPriority = aEventOptions.mPriority;
     // Create all event specific data
     // Timestamp; encoded as a delta time
 
-    if (GetPriorityBuffer(aEventOptions.mPriority)->GetFirstEventTimestamp() == 0)
+    if (mFirstEventTimestamp.mValue == 0)
     {
-        GetPriorityBuffer(aEventOptions.mPriority)->UpdateFirstLastEventTime(opts.mTimestamp);
+        mFirstEventTimestamp = timestamp;
+        mLastEventTimestamp  = timestamp;
     }
 
     opts.mUrgent = aEventOptions.mUrgent;
     opts.mPath   = aEventOptions.mPath;
 
-    ctxt.mCurrentEventNumber = GetPriorityBuffer(opts.mPriority)->GetLastEventNumber();
-    ctxt.mCurrentTime.mValue = GetPriorityBuffer(opts.mPriority)->GetLastEventTimestamp();
+    ctxt.mCurrentEventNumber = mLastEventNumber;
+    ctxt.mCurrentTime.mValue = mLastEventTimestamp.mValue;
 
     err = CalculateEventSize(apDelegate, &opts, requestSize);
     SuccessOrExit(err);
@@ -562,10 +579,9 @@ exit:
     }
     else if (opts.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY)
     {
-        CircularEventBuffer * currentBuffer = GetPriorityBuffer(opts.mPriority);
-        aEventNumber                        = currentBuffer->VendEventNumber();
-        currentBuffer->UpdateFirstLastEventTime(opts.mTimestamp);
-
+        aEventNumber = mLastEventNumber;
+        VendEventNumber();
+        mLastEventTimestamp = timestamp;
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
                       "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u, endpoint id:  0x%" PRIx16
@@ -656,18 +672,13 @@ CHIP_ERROR EventManagement::EventIterator(const TLVReader & aReader, size_t aDep
     }
     ReturnErrorOnFailure(err);
 
-    if (event.mPriority == apEventLoadOutContext->mPriority)
+    apEventLoadOutContext->mCurrentTime.mValue += event.mDeltaTime.mValue;
+    apEventLoadOutContext->mCurrentEventNumber = event.mEventNumber;
+    if (IsInterestedEventPaths(apEventLoadOutContext, event))
     {
-        apEventLoadOutContext->mCurrentTime.mValue += event.mDeltaTime.mValue;
-        // If the retrieved event has the same priority as the one set by FetchEventSince, we need to use mSamePriorityEvent to
-        // increase the event number after encoding the current event number.  Then this updated event number will be used by
-        // FetchEventSince for next use
-        apEventLoadOutContext->mSamePriorityEvent = true;
-        if (IsInterestedEventPaths(apEventLoadOutContext, event))
-        {
-            return CHIP_EVENT_ID_FOUND;
-        }
+        return CHIP_EVENT_ID_FOUND;
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -696,40 +707,27 @@ CHIP_ERROR EventManagement::CopyEventsSince(const TLVReader & aReader, size_t aD
         loadOutContext->mFirst               = false;
         loadOutContext->mEventCount++;
     }
-    if (loadOutContext->mSamePriorityEvent)
-    {
-        // Update to next Event Number
-        loadOutContext->mCurrentEventNumber++;
-        loadOutContext->mSamePriorityEvent = false;
-    }
-
     return err;
 }
 
-CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
-                                             EventNumber & aEventNumber, size_t & aEventCount)
+CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * apClusterInfolist, EventNumber & aEventMin,
+                                             size_t & aEventCount)
 {
     // TODO: Add particular set of event Paths in FetchEventsSince so that we can filter the interested paths
     CHIP_ERROR err     = CHIP_NO_ERROR;
     const bool recurse = false;
     TLVReader reader;
     CircularEventBufferWrapper bufWrapper;
-    EventLoadOutContext context(aWriter, aPriority, aEventNumber);
+    EventLoadOutContext context(aWriter, PriorityLevel::Invalid, aEventMin);
 
-    CircularEventBuffer * buf = mpEventBuffer;
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    while (!buf->IsFinalDestinationForPriority(aPriority))
-    {
-        buf = buf->GetNextCircularEventBuffer();
-    }
-
     context.mpInterestedEventPaths = apClusterInfolist;
-    context.mCurrentTime.mValue    = buf->GetFirstEventTimestamp();
-    context.mCurrentEventNumber    = buf->GetFirstEventNumber();
-    err                            = GetEventReader(reader, aPriority, &bufWrapper);
+    context.mCurrentTime.mValue    = GetFirstEventTimestamp();
+    context.mCurrentEventNumber    = GetFirstEventNumber();
+    err                            = GetEventReader(reader, PriorityLevel::Critical, &bufWrapper);
     SuccessOrExit(err);
 
     err = TLV::Utilities::Iterate(reader, CopyEventsSince, &context, recurse);
@@ -739,7 +737,7 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     }
 
 exit:
-    aEventNumber = context.mCurrentEventNumber;
+    aEventMin = context.mCurrentEventNumber + 1;
     aEventCount += context.mEventCount;
     return err;
 }
@@ -779,6 +777,11 @@ CHIP_ERROR EventManagement::FetchEventParameters(const TLVReader & aReader, size
         ReturnErrorOnFailure(reader.Get(extPriority));
         envelope->mPriority = static_cast<PriorityLevel>(extPriority);
         envelope->mFieldsToRead |= 1 << to_underlying(EventDataIB::Tag::kPriority);
+    }
+
+    if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)))
+    {
+        ReturnErrorOnFailure(reader.Get(envelope->mEventNumber));
     }
 
     if (reader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)))
@@ -821,21 +824,24 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
 
     ReturnErrorOnFailure(aReader.ExitContainer(containerType1));
     ReturnErrorOnFailure(aReader.ExitContainer(containerType));
-    const PriorityLevel imp = static_cast<PriorityLevel>(context.mPriority);
+    const PriorityLevel imp  = static_cast<PriorityLevel>(context.mPriority);
+    const EventNumber number = context.mEventNumber;
 
     ReclaimEventCtx * const ctx             = static_cast<ReclaimEventCtx *>(apAppData);
     CircularEventBuffer * const eventBuffer = ctx->mpEventBuffer;
     if (eventBuffer->IsFinalDestinationForPriority(imp))
     {
-        // event is getting dropped.  Increase the event number and first timestamp.
-        EventNumber numEventsToDrop = 1;
-        eventBuffer->RemoveEvent(numEventsToDrop);
-        eventBuffer->SetFirstEventTimestamp(eventBuffer->GetFirstEventTimestamp() + context.mDeltaTime.mValue);
         ChipLogProgress(
             EventLogging,
-            "Dropped events from buffer with priority %u due to overflow: { event priority_level: %u, count: 0x" ChipLogFormatX64
-            " };",
-            static_cast<unsigned>(eventBuffer->GetPriority()), static_cast<unsigned>(imp), ChipLogValueX64(numEventsToDrop));
+            "Dropped 1 event from buffer with priority %u due to overflow: event priority_level: %u",
+            static_cast<unsigned>(eventBuffer->GetPriority()), static_cast<unsigned>(imp));
+        if (ctx->mFirstEventNumber == number)
+        {
+            ctx->mFirstEventNumber++;
+            ctx->mFirstEventTimestamp.mValue = ctx->mFirstEventTimestamp.mValue + context.mDeltaTime.mValue;
+            ChipLogProgress(EventLogging, "Update mFirstEventNumber with 0x" ChipLogFormatX64,
+                            ChipLogValueX64(ctx->mFirstEventNumber));
+        }
         ctx->mSpaceNeededForMovedEvent = 0;
         return CHIP_NO_ERROR;
     }
@@ -845,61 +851,28 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     return CHIP_END_OF_TLV;
 }
 
-void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)
+void EventManagement::SetScheduledEventNumber(EventNumber & aEventNumber)
 {
-    CircularEventBuffer * eventBuffer = mpEventBuffer;
-
 #if !CHIP_SYSTEM_CONFIG_NO_LOCKING
     ScopedLock lock(sInstance);
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
 
-    while (eventBuffer != nullptr)
-    {
-        if (eventBuffer->GetPriority() >= PriorityLevel::First && (eventBuffer->GetPriority() <= PriorityLevel::Last))
-        {
-            apEventEndpoints[static_cast<uint8_t>(eventBuffer->GetPriority())] = eventBuffer->GetLastEventNumber();
-        }
-        eventBuffer = eventBuffer->GetNextCircularEventBuffer();
-    }
+    aEventNumber = mLastEventNumber;
 }
 
 void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, CircularEventBuffer * apPrev,
                                CircularEventBuffer * apNext, PriorityLevel aPriorityLevel)
 {
     CHIPCircularTLVBuffer::Init(apBuffer, aBufferLength);
-    mpPrev            = apPrev;
-    mpNext            = apNext;
-    mPriority         = aPriorityLevel;
-    mFirstEventNumber = 1;
-    mLastEventNumber  = 0;
-#if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-    mFirstEventTimestamp = Timestamp::Epoch(System::Clock::kZero);
-    mLastEventTimestamp  = Timestamp::Epoch(System::Clock::kZero);
-#else
-    mFirstEventTimestamp = Timestamp::System(System::Clock::kZero);
-    mLastEventTimestamp  = Timestamp::System(System::Clock::kZero);
-#endif
+    mpPrev               = apPrev;
+    mpNext               = apNext;
+    mPriority            = aPriorityLevel;
     mpEventNumberCounter = nullptr;
 }
 
 bool CircularEventBuffer::IsFinalDestinationForPriority(PriorityLevel aPriority) const
 {
     return !((mpNext != nullptr) && (mpNext->mPriority <= aPriority));
-}
-
-void CircularEventBuffer::UpdateFirstLastEventTime(Timestamp aEventTimestamp)
-{
-    if (mFirstEventTimestamp.mValue == 0)
-    {
-        mFirstEventTimestamp = aEventTimestamp;
-        mLastEventTimestamp  = aEventTimestamp;
-    }
-    mLastEventTimestamp = aEventTimestamp;
-}
-
-void CircularEventBuffer::RemoveEvent(EventNumber aNumEvents)
-{
-    mFirstEventNumber = mFirstEventNumber + aNumEvents;
 }
 
 void CircularEventReader::Init(CircularEventBufferWrapper * apBufWrapper)
