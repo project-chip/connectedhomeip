@@ -26,7 +26,7 @@ limitations under the License.
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPTS_HEADER" type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="false">accepts header list</attribute>
+    <attribute side="server" code="0x0000" define="CONTENT_LAUNCHER_ACCEPT_HEADER" type="ARRAY" entryType="CHAR_STRING" length="254" writable="false" optional="false">accept header list</attribute>
     <attribute side="server" code="0x0001" define="CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS" type="BITMAP32" writable="true" optional="false">supported streaming protocols</attribute>
 
     <command source="client" code="0x00" name="LaunchContent" optional="false">

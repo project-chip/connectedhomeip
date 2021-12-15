@@ -39,7 +39,7 @@ using namespace std;
 using namespace chip::AppPlatform;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                  const std::list<ContentLaunchParamater> & parameterList, bool autoplay,
                                                                   const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
@@ -63,7 +63,7 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
                                                               const chip::CharSpan & displayString,
-                                                              ContentLaunchBrandingInformation & brandingInformation)
+                                                              const std::list<ContentLaunchBrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -78,9 +78,9 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSp
     return response;
 }
 
-std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList()
+std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
 {
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptsHeaderList");
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
     return { "example", "example" };
 }
 

@@ -23,9 +23,9 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Read attribute accepts header list"
+    - label: "Read attribute accept header list"
       command: "readAttribute"
-      attribute: "accepts header list"
+      attribute: "accept header list"
       response:
           value: ["example", "example"]
 
