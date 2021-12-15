@@ -1,0 +1,609 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Door Lock Cluster Tests
+
+config:
+  cluster: "Door Lock"
+  endpoint: 1
+
+tests:
+  - label: "Wait for the commissioned device to be retrieved"
+    cluster: "DelayCommands"
+    command: "WaitForCommissionee"
+
+  - label: "Read available user slot and verify response fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: null
+        - name: "lastModifiedFabricIndex"
+          value: null
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Get number of supported users and verify default value"
+    command: "readAttribute"
+    attribute: "NumberOfTotalUsersSupported"
+    response:
+      saveAs: NumberOfTotalUsersSupported
+      value: 10
+
+  - label: "Read fails for user with index 0"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 0
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Read fails for user with index greater than Number Of Users Supported"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported + 1
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Create new user with default parameters"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: ""
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Set user at the occupied index fails with appropriate response"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+    response:
+      # So far there's no way to verify cluster-specific error codes so we're just checking generic failure here
+      error: 0x01
+
+  - label: "Modify existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "test_user"
+        - name: "userUniqueId"
+          value: 0x12345678
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: 1
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "test_user"
+        - name: "userUniqueId"
+          value: 0x12345678
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 1
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Add another user with non-default fields"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: 2
+        - name: "userName"
+          value: "test_user2"
+        - name: "userUniqueId"
+          value: 0xC0FFEE
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 1
+        - name: "credentialRule"
+          value: 2
+
+  - label: "Read the new user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 2
+    response:
+      values:
+        - name: "userIndex"
+          value: 2
+        - name: "userName"
+          value: "test_user2"
+        - name: "userUniqueId"
+          value: 0xC0FFEE
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 1
+        - name: "credentialRule"
+          value: 2
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 3
+
+  - label: "Create user in the last slot"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported
+        - name: "userName"
+          value: "last_user"
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the last user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported
+    response:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported
+        - name: "userName"
+          value: "last_user"
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: null
+
+  - label: "User creation in the 0 slot fails"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: 0
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+    response:
+      error: INVALID_COMMAND
+
+  - label: "User creation in the out-of-bounds slot fails"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported + 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Clear first user"
+    command: "ClearUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+
+  - label: "Read cleared user and verify it is available"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: null
+        - name: "lastModifiedFabricIndex"
+          value: null
+        - name: "nextUserIndex"
+          value: 3 # Slot 2 is still occupied
+
+  - label: "Create new user in the cleared slot"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the user in the previously cleared slot and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: ""
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 3 # Slot 2 is still occupied
+
+  - label: "Clear user with index 0"
+    command: "ClearUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 0
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Clear user with out-of-bounds index"
+    command: "ClearUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported + 1
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Clear all users"
+    command: "ClearUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 0xFFFE
+
+  - label: "Read first cleared user and verify it is available"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 2
+    response:
+      values:
+        - name: "userIndex"
+          value: 2
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: null
+        - name: "lastModifiedFabricIndex"
+          value: null
+        - name: "nextUserIndex"
+          value: 3
+
+  - label: "Read last cleared user and verify it is available"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported
+    response:
+      values:
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: null
+        - name: "lastModifiedFabricIndex"
+          value: null
+        - name: "nextUserIndex"
+          value: null
+
+  - label: "Create new PIN credential and user"
+    command: "SetCredential"
+    arguments:
+      values:
+          - name: "operationType"
+            value: 0
+          - name: "credential"
+            value: { CredentialType: 1, CredentialIndex: 1 }
+          - name: "credentialData"
+            value: "000000"
+          - name: "userIndex"
+            value: null
+          - name: "userStatus"
+            value: null
+          - name: "userType"
+            value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: 1
+        - name: "nextCredentialIndex"
+          value: 2
+
+  - label: "Verify created user"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: ""
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: [ { CredentialType: 1, CredentialIndex: 1 } ]
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Create new RFID credential and add it to existing user"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 2 }
+        - name: "credentialData"
+          value: "rfid_data"
+        - name: "userIndex"
+          value: 1
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 3
+
+  - label: "Verify modified user"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: ""
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: [ { CredentialType: 1, CredentialIndex: 1 }, { CredentialType: 2, CredentialIndex: 2 } ]
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
