@@ -313,7 +313,7 @@ void Realloc(nlTestSuite * inSuite, void * inContext)
     FillKnownPattern(p1, 16, 33);
     p2 = allocator.HeapRealloc(p1, 32); // resize, does not fit. This frees p1
     NL_TEST_ASSERT(inSuite, p2 != nullptr);
-    NL_TEST_ASSERT(inSuite, p2 != p1); // new reallocation occured
+    NL_TEST_ASSERT(inSuite, p2 != p1); // new reallocation occurred
     NL_TEST_ASSERT(inSuite, IsKnownPattern(p2, 16, 33));
 
     void * p3 = allocator.HeapAlloc(48); // insufficient heap for this

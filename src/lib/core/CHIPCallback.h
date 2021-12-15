@@ -118,7 +118,7 @@ public:
     void * mContext;
 
     /**
-     * where to call when the event of interest has occured
+     * where to call when the event of interest has occurred
      */
     T mCall;
 

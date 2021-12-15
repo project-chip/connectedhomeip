@@ -254,7 +254,7 @@ CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2I
                                        uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
-    // Return early on error here, as we have not initalized any state yet
+    // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(salt.data() == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

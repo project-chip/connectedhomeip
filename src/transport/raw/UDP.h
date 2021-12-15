@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the CHIP Connection object that maintains a UDP connection.
- *      It binds to any avaiable local addr and port and begins listening.
+ *      It binds to any available local addr and port and begins listening.
  *
  */
 

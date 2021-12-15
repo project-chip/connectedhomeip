@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Echo unsolicitied
+ *      This file defines objects for a CHIP Echo unsolicited
  *      initaitor (client) and responder (server).
  *
  */

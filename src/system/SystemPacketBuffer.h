@@ -124,7 +124,7 @@ struct pbuf
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
  *      simple pool case, the size of the data buffer is PacketBuffer::kBlockSize.
  *
- *      PacketBuffer objects may be chained to accomodate larger payloads.  Chaining, however, is not transparent, and users of the
+ *      PacketBuffer objects may be chained to accommodate larger payloads.  Chaining, however, is not transparent, and users of the
  *      class must explicitly decide to support chaining.  Examples of classes written with chaining support are as follows:
  *
  *          @ref chip::chipTLVReader
@@ -615,7 +615,7 @@ public:
      * @brief The PacketBufferHandle's ownership is transferred to the caller.
      *
      * @note This should only be used in low-level code. The caller owns one counted reference to the \c PacketBuffer
-     *       and is reponsible for managing it safely.
+     *       and is responsible for managing it safely.
      *
      * @note The ref-qualifier `&&` requires the caller to use `std::move` to emphasize that ownership is
      *       moved out of this handle.
@@ -778,7 +778,7 @@ class PacketBufferWriterBase : public Writer
 {
 public:
     /**
-     * Constructs a BufferWriter that writes into a packet buffer, using all avaiable space.
+     * Constructs a BufferWriter that writes into a packet buffer, using all available space.
      *
      *  @param[in]  aPacket  A handle to PacketBuffer, to be used as backing store for the BufferWriter.
      */

@@ -123,7 +123,7 @@ constexpr size_t MaxKeyLen(TxtKeyUse use)
             max = sizeof(info.keyStr) > max ? sizeof(info.keyStr) : max;
         }
     }
-    // minus 1 becuase sizeof includes the null terminator.
+    // minus 1 because sizeof includes the null terminator.
     return max - 1;
 }
 constexpr size_t TotalKeyLen(TxtKeyUse use)
@@ -149,7 +149,7 @@ constexpr size_t MaxValueLen(TxtKeyUse use)
             max = info.valMaxSize > max ? info.valMaxSize : max;
         }
     }
-    // minus 1 becuase sizeof includes the null terminator.
+    // minus 1 because sizeof includes the null terminator.
     return max - 1;
 }
 constexpr size_t TotalValueLen(TxtKeyUse use)

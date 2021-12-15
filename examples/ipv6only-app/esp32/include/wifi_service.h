@@ -40,7 +40,7 @@ public:
     // Initalize the wifi station
     pw::Status Init();
 
-    // Blocks the calling thread until wifi connection is completed succesfully.
+    // Blocks the calling thread until wifi connection is completed successfully.
     // NOTE: Currently only supports blocking a single thread.
     void BlockUntilWifiConnected() { xSemaphoreTake(wifi_connected_semaphore_, portMAX_DELAY); }
 

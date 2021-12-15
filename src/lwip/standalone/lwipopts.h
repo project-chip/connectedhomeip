@@ -87,7 +87,7 @@
 /**
  * PBUF_POOL_SIZE: the number of buffers in the pbuf pool.
  *
- * This is just a default designed to be overriden by the FreeRTOS.mk makefile
+ * This is just a default designed to be overridden by the FreeRTOS.mk makefile
  * To perform this override, define the makefile variable LWIP_NUM_PACKET_BUFFERS_IN_POOL
  */
 #ifndef PBUF_POOL_SIZE
@@ -135,7 +135,7 @@
 
 /**
  * PBUF_POOL_BUFSIZE: the size of each pbuf in the pbuf pool. The default is
- * designed to accomodate single full size link-layer frame in one pbuf, including
+ * designed to accommodate single full size link-layer frame in one pbuf, including
  * the link-layer header and any link-layer encapsulation header, and the pbuf
  * structure itself.
  */
@@ -151,7 +151,7 @@
 
 /**
  * ETH_PAD_SIZE: the header space required preceeding the of each pbuf in the pbuf pool. The default is
- * designed to accomodate single full size TCP frame in one pbuf, including
+ * designed to accommodate single full size TCP frame in one pbuf, including
  * TCP_MSS, IP header, and link header.
  *
  * This is zero since the role has been taken over by SUB_ETHERNET_HEADER_SPACE as ETH_PAD_SIZE was not always obeyed
@@ -356,7 +356,7 @@
 #endif
 
 /**
- * LWIP_IPV6_ROUTE_TABLE_SUPPORT==1: Enable support for a routing table and refering these during forwarding.
+ * LWIP_IPV6_ROUTE_TABLE_SUPPORT==1: Enable support for a routing table and referring these during forwarding.
  */
 #ifndef LWIP_IPV6_ROUTE_TABLE_SUPPORT
 #define LWIP_IPV6_ROUTE_TABLE_SUPPORT 1

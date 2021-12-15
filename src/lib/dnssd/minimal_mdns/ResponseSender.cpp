@@ -228,7 +228,7 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
         mResponseBuilder.AddRecord(mSendState.GetResourceType(), record);
         if (!mResponseBuilder.Ok())
         {
-            // Very much unexpected: single record addtion should fit (our records should not be that big).
+            // Very much unexpected: single record addition should fit (our records should not be that big).
             ChipLogError(Discovery, "Failed to add single record to mDNS response.");
             mSendState.SetError(CHIP_ERROR_INTERNAL);
         }

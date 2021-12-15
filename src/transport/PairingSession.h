@@ -72,7 +72,7 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param session     Referene to the secure session that will be
+     * @param session     Reference to the secure session that will be
      *                    initialized once pairing is complete
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation

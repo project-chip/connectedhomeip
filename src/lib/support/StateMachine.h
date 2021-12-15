@@ -221,7 +221,7 @@ public:
             mCurrentState.LogTransition(oldState.GetName());
             // It is impermissible to dispatch events from Exit() or
             // LogTransition(), or from the transitions table when a transition
-            // has also been returned.  Verify that this hasn't occured.
+            // has also been returned.  Verify that this hasn't occurred.
             VerifyOrDie(prev == mSequence);
             mCurrentState.Enter();
         }
