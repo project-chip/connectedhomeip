@@ -28,14 +28,14 @@ namespace chip {
 
 using namespace Messaging;
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader,
                                                                 System::PacketBufferHandle && message,
                                                                 EncryptedPacketBufferHandle & preparedMessage)
 {
     return mSessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage);
 }
 
-CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(SessionHandle session,
+CHIP_ERROR SessionEstablishmentExchangeDispatch::SendPreparedMessage(const SessionHandle & session,
                                                                      const EncryptedPacketBufferHandle & preparedMessage) const
 {
     return mSessionManager->SendPreparedMessage(session, preparedMessage);

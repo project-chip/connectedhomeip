@@ -106,7 +106,7 @@ void SessionManager::Shutdown()
     mCB           = nullptr;
 }
 
-CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHeader & payloadHeader,
+CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
     PacketHeader packetHeader;
@@ -189,7 +189,8 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, const EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHandle,
+                                               const EncryptedPacketBufferHandle & preparedMessage)
 {
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!preparedMessage.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -265,7 +266,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
     }
 }
 
-void SessionManager::ExpirePairing(SessionHandle sessionHandle)
+void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
 {
     SecureSession * session = GetSecureSession(sessionHandle);
     if (session != nullptr)
@@ -632,7 +633,7 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
-SecureSession * SessionManager::GetSecureSession(SessionHandle session)
+SecureSession * SessionManager::GetSecureSession(const SessionHandle & session)
 {
     if (session.mLocalSessionId.HasValue())
     {

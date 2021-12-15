@@ -67,7 +67,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & session);
 
     /**
      *  Shutdown the EchoClient. This terminates this instance

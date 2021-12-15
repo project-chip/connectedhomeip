@@ -290,7 +290,7 @@ void OperationalDeviceProxy::DeferCloseCASESession()
     mSystemLayer->ScheduleWork(CloseCASESessionTask, this);
 }
 
-void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
+void OperationalDeviceProxy::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
