@@ -75,7 +75,7 @@ static_library("Darwin") {
   ]
 
   public_configs = [ ":darwin_config" ]
-  
+
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
