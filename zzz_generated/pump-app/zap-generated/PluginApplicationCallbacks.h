@@ -26,7 +26,6 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
-    MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterFlowMeasurementPluginClientInitCallback();                                                                               \
     MatterFlowMeasurementPluginServerInitCallback();                                                                               \
@@ -43,5 +42,4 @@
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
-    MatterUserLabelPluginServerInitCallback();                                                                                     \
-    MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
+    MatterUserLabelPluginServerInitCallback();
