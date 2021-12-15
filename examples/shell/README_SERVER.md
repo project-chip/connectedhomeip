@@ -142,7 +142,8 @@ Done
 
 ### port \<udp_port\>
 
-Sets the operational port to the given value.  NOTE: server must be restarted to take effect.
+Sets the operational port to the given value. NOTE: server must be restarted to
+take effect.
 
 -   udp_port: new value to set operational port to
 
@@ -163,8 +164,8 @@ Done
 
 ### start
 
-Start the App Server on the Node. This also starts the commissioning window
-as is done with the all-clusters-app.
+Start the App Server on the Node. This also starts the commissioning window as
+is done with the all-clusters-app.
 
 ```bash
 > server start
@@ -194,7 +195,8 @@ Done
 
 ### udcport \<udp_port\>
 
-Sets the commissioning port to the given value.  NOTE: server must be restarted to take effect.
+Sets the commissioning port to the given value. NOTE: server must be restarted
+to take effect.
 
 -   udp_port: new value to set commissioning port to
 
