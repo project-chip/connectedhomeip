@@ -30205,17 +30205,10 @@ namespace Attributes {
 namespace ChannelList {
 struct TypeInfo
 {
-<<<<<<< HEAD
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &;
-=======
-    using Type             = DataModel::List<const Structs::ChannelInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::ChannelInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::ChannelInfo::DecodableType> &;
->>>>>>> 5e91ccb80 (Zap regen)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
@@ -30225,15 +30218,9 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-<<<<<<< HEAD
-    using Type             = chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::Type;
-    using DecodableType    = chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::DecodableType &;
-=======
-    using Type             = Structs::ChannelLineupInfo::Type;
-    using DecodableType    = Structs::ChannelLineupInfo::DecodableType;
-    using DecodableArgType = const Structs::ChannelLineupInfo::DecodableType &;
->>>>>>> 5e91ccb80 (Zap regen)
+    using Type             = chip::app::Clusters::Channel::Structs::ChannelLineupInfo::Type;
+    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
@@ -30243,15 +30230,9 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-<<<<<<< HEAD
-    using Type             = chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type;
-    using DecodableType    = chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType &;
-=======
-    using Type             = Structs::ChannelInfo::Type;
-    using DecodableType    = Structs::ChannelInfo::DecodableType;
-    using DecodableArgType = const Structs::ChannelInfo::DecodableType &;
->>>>>>> 5e91ccb80 (Zap regen)
+    using Type             = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
+    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
