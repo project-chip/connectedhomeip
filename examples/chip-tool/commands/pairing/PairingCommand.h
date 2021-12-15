@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <controller/CommissioningDelegate.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -46,7 +47,6 @@ enum class PairingNetworkType
 
 class PairingCommand : public CHIPCommand,
                        public chip::Controller::DevicePairingDelegate,
-                       public chip::Controller::DeviceAddressUpdateDelegate,
                        public chip::Controller::DeviceDiscoveryDelegate
 {
 public:
@@ -54,10 +54,7 @@ public:
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
         CHIPCommand(commandName),
         mPairingMode(mode), mNetworkType(networkType),
-        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() },
-        mOnAddOrUpdateThreadNetworkCallback(OnAddNetworkResponse, this),
-        mOnAddOrUpdateWiFiNetworkCallback(OnAddNetworkResponse, this), mOnConnectNetworkCallback(OnConnectNetworkResponse, this),
-        mOnFailureCallback(OnDefaultFailureResponse, this)
+        mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
 
@@ -145,14 +142,6 @@ public:
     /////////// DeviceDiscoveryDelegate Interface /////////
     void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
-    /////////// DeviceAddressUpdateDelegate Interface /////////
-    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
-
-    /////////// Network Commissioning Callbacks /////////
-    static void OnDefaultFailureResponse(void * context, uint8_t status);
-    static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
-    static void OnConnectNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText, int32_t errorValue);
-
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
     CHIP_ERROR Pair(NodeId remoteId, PeerAddress address);
@@ -161,15 +150,7 @@ private:
     CHIP_ERROR PairWithManualCode(NodeId remoteId);
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR Unpair(NodeId remoteId);
-
-    CHIP_ERROR SetupNetwork();
-    CHIP_ERROR AddNetwork(PairingNetworkType networkType);
-    CHIP_ERROR AddOrUpdateThreadNetwork();
-    CHIP_ERROR AddOrUpdateWiFiNetwork();
-    CHIP_ERROR ConnectNetwork();
-    CHIP_ERROR UpdateNetworkAddress();
-
-    chip::ByteSpan GetThreadNetworkId();
+    chip::Controller::CommissioningParameters GetCommissioningParameters();
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -180,18 +161,12 @@ private:
     uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
     chip::ByteSpan mOperationalDataset;
-    uint8_t mExtendedPanId[chip::Thread::kSizeExtendedPanId];
     chip::ByteSpan mSSID;
     chip::ByteSpan mPassword;
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
 
-    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddOrUpdateThreadNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddOrUpdateWiFiNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterConnectNetworkResponseCallback> mOnConnectNetworkCallback;
-    chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback;
     chip::CommissioneeDeviceProxy * mDevice;
-    chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
 };

@@ -182,10 +182,17 @@ class ChipDeviceController(object):
 
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def CloseBLEConnection(self):
         return self._ChipStack.Call(
@@ -234,6 +241,18 @@ class ChipDeviceController(object):
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
+
+    def SetWifiCredentials(self, ssid, credentials):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(
+                ssid, credentials)
+        )
+
+    def SetThreadOperationalDataset(self, threadOperationalDataset):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
+                threadOperationalDataset, len(threadOperationalDataset))
+        )
 
     def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
@@ -678,6 +697,14 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
+
+            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
+                c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
+                c_char_p, c_char_p]
+            self._dmLib.pychip_DeviceController_SetWifiCredentials.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]
