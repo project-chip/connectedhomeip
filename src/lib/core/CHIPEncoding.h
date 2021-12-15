@@ -192,7 +192,7 @@ inline void Write8(uint8_t *& p, uint8_t v)
  *  </ul>
  *
  *  On little endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */
@@ -562,7 +562,7 @@ inline void Write64(uint8_t *& p, uint64_t v)
  *  </ul>
  *
  *  On big endian host systems no actual byte reordering will
- *  occur. On other systems, byte reordering is peformed as
+ *  occur. On other systems, byte reordering is performed as
  *  appropriate.
  *
  */

@@ -66,7 +66,7 @@ void CASEClient::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void CASEClient::OnSessionEstablished()
 {
-    // On successfull CASE connection, the local session ID will be used for the derived secure session.
+    // On successful CASE connection, the local session ID will be used for the derived secure session.
     if (mConnectionSuccessCallback)
     {
         mConnectionSuccessCallback(mConectionContext, this);

@@ -1450,7 +1450,7 @@ public:
     CHIP_ERROR Put(Tag tag, bool v)
     {
         /*
-         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a seperate
+         * In TLV, boolean values are encoded as standalone tags without actual values, so we have a separate
          * PutBoolean method.
          */
         return PutBoolean(tag, v);

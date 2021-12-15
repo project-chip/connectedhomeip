@@ -71,7 +71,7 @@ int main()
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Memory initalization failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Memory initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -79,7 +79,7 @@ int main()
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Chip stack initalization failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Chip stack initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }

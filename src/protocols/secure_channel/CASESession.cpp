@@ -214,7 +214,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // Return early on error here, as we have not initalized any state yet
+    // Return early on error here, as we have not initialized any state yet
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorCodeIf(fabric == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 

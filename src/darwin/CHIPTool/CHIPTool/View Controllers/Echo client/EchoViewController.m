@@ -118,7 +118,7 @@
 
                 [cluster mfgSpecificPingWithCompletionHandler:^(NSError * _Nullable error) {
                     NSString * resultString = (error == nil) ? @"MfgSpecificPing command: success!"
-                                                             : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                                                             : [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code];
                     [self updateResult:resultString];
                 }];
             } else {

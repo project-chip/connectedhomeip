@@ -439,8 +439,8 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
         ChipLogProgress(DeviceLayer, "Avahi group established");
         break;
     case AVAHI_ENTRY_GROUP_COLLISION:
-        ChipLogError(DeviceLayer, "Avahi group collission");
-        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISSION);
+        ChipLogError(DeviceLayer, "Avahi group collision");
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISION);
         break;
     case AVAHI_ENTRY_GROUP_FAILURE:
         ChipLogError(DeviceLayer, "Avahi group internal failure %s",

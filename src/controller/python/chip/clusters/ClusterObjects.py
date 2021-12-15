@@ -140,7 +140,7 @@ class ClusterObjectDescriptor:
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
             if not descriptor:
-                # We do not have enough infomation for this field.
+                # We do not have enough information for this field.
                 ret[tag] = value
                 continue
 

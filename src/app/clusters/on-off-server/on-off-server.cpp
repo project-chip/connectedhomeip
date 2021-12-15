@@ -179,7 +179,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 
 #ifdef EMBER_AF_PLUGIN_SCENES
     // the scene has been changed (the value of on/off has changed) so
-    // the current scene as descibed in the attribute table is invalid,
+    // the current scene as described in the attribute table is invalid,
     // so mark it as invalid (just writes the valid/invalid attribute)
     if (emberAfContainsServer(endpoint, Scenes::Id))
     {

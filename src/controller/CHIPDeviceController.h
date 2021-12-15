@@ -200,7 +200,7 @@ public:
      *  grab the CHIP stack lock.
      *
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
-     *  ensure this happend before calling this method.
+     *  ensure this happened before calling this method.
      */
     virtual CHIP_ERROR Shutdown();
 
@@ -697,22 +697,22 @@ private:
      */
     CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
     /* This function sends the operational credentials to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
                                           const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
        */
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 

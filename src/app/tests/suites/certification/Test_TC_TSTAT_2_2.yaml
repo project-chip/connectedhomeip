@@ -54,7 +54,7 @@ tests:
       response:
           value: 2000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
@@ -65,7 +65,7 @@ tests:
       arguments:
           value: 30
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
@@ -125,7 +125,7 @@ tests:
       response:
           value: 2100
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
@@ -136,7 +136,7 @@ tests:
       arguments:
           value: 1002
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
@@ -196,7 +196,7 @@ tests:
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
@@ -207,7 +207,7 @@ tests:
       arguments:
           value: 650
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
@@ -267,7 +267,7 @@ tests:
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
@@ -278,7 +278,7 @@ tests:
       arguments:
           value: 500
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
@@ -338,7 +338,7 @@ tests:
       response:
           value: 2000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
@@ -349,7 +349,7 @@ tests:
       arguments:
           value: 1000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       disabled: true
@@ -408,7 +408,7 @@ tests:
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
@@ -419,7 +419,7 @@ tests:
       arguments:
           value: 1000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       disabled: true
