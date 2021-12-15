@@ -46,7 +46,7 @@ using namespace chip;
 ContentLauncherManager ContentLauncherManager::sInstance;
 
 ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList, 
+                                                                  const std::list<ContentLaunchParamater> & parameterList,
                                                                   bool autoplay,
                                                                   const chip::CharSpan & data)
 {
