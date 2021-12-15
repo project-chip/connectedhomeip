@@ -144,8 +144,30 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
+    ScheduleWork(HandleDeviceRebooted, 0);
 exit:
     return err;
+}
+
+void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
+{
+
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (generalDiagnosticsDelegate != nullptr)
+    {
+        generalDiagnosticsDelegate->OnDeviceRebooted();
+    }
+
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint16_t softwareVersion;
+
+        ConfigurationMgr().GetSoftwareVersion(softwareVersion);
+        platformManagerDelegate->OnStartUp(softwareVersion);
+    }
 }
 
 } // namespace DeviceLayer
