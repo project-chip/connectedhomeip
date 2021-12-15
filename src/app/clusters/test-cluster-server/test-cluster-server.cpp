@@ -186,6 +186,13 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDeco
 
     ReturnErrorOnFailure(aDecoder.Decode(list));
 
+    size_t size;
+    ReturnErrorOnFailure(list.ComputeSize(&size));
+
+    // We never change our length, so fail out attempts to change it.  This
+    // should really return one of the spec errors!
+    VerifyOrReturnError(size == kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
+
     uint8_t index = 0;
     auto iter     = list.begin();
     while (iter.Next())

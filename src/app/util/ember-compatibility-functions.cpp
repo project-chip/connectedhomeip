@@ -867,6 +867,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 
         if (valueDecoder.TriedDecode())
         {
+            MatterReportingAttributeChangeCallback(aPath);
             return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
     }
@@ -918,4 +919,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // has completed. This ensures that we can 'gather up' multiple attribute changes that have occurred in the same execution
     // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+}
+
+void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
+{
+    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }
