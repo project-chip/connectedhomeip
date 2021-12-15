@@ -34,11 +34,11 @@ class K32WApp(Enum):
 
     def AppNamePrefix(self):
         if self == K32WApp.LIGHT:
-            return 'chip-k32w-lighting-example'
+            return 'chip-k32w061-light-example'
         elif self == K32WApp.LOCK:
-            return 'chip-k32w-lock-example'
+            return 'chip-k32w061-lock-example'
         elif self == K32WApp.SHELL:
-            return 'chip-k32w-shell'
+            return 'chip-k32w061-shell-example'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -82,8 +82,8 @@ class K32WBuilder(GnBuilder):
 
     def build_outputs(self):
         items = {}
-        for extension in ["out", "out.map"]:
-            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
+        for extension in ["", ".map", ".hex"]:
+            name = '%s%s' % (self.app.AppNamePrefix(), extension)
             items[name] = os.path.join(self.output_dir, name)
 
         return items

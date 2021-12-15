@@ -336,18 +336,13 @@ def AmebaTargets():
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
 
 def K32WTargets():
-    k32w_target = Target('k32w', K32WBuilder)
+    target = Target('k32w', K32WBuilder)
 
-    targets = [
-        k32w_target.Extend('light', app=K32WApp.LIGHT),
-        k32w_target.Extend('lock', app=K32WApp.LOCK),
-        k32w_target.Extend('shell', app=K32WApp.SHELL),
-    ]
+    yield target.Extend('light', app=K32WApp.LIGHT)
+    yield target.Extend('shell', app=K32WApp.SHELL)
 
-    for target in targets:
-        yield target
-        yield target.Extend('low-power', low_power=True)
-
+    yield target.Extend('lock', app=K32WApp.LOCK)
+    yield target.Extend('lock-low-power', app=K32WApp.LOCK, low_power=True)
 
 ALL = []
 
