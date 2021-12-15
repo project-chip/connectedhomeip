@@ -1936,8 +1936,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ContentLauncher::Id: {
         using namespace Clusters::ContentLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::AcceptsHeaderList::Id: {
-            using TypeInfo = Attributes::AcceptsHeaderList::TypeInfo;
+        case Attributes::AcceptHeaderList::Id: {
+            using TypeInfo = Attributes::AcceptHeaderList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
