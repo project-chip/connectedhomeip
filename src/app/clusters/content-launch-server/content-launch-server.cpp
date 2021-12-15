@@ -70,9 +70,9 @@ Delegate * GetDelegate(EndpointId endpoint)
     return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
-bool SendStatusIfDelegateNull(EndpointId endpoint)
+bool SendStatusIfDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
-    if (GetDelegate(endpoint) == nullptr)
+    if (delegate == nullptr)
     {
         ChipLogError(Zcl, "No ContentLauncher Delegate set for ep:%" PRIu16, endpoint);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUP_COMMAND);
@@ -119,7 +119,7 @@ public:
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
     CHIP_ERROR ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
@@ -129,15 +129,15 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 {
     EndpointId endpoint = aPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(delegate, endpoint))
     {
         return CHIP_NO_ERROR;
     }
 
     switch (aPath.mAttributeId)
     {
-    case app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id: {
-        return ReadAcceptsHeaderAttribute(aEncoder, delegate);
+    case app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::Id: {
+        return ReadAcceptHeaderAttribute(aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
         return ReadSupportedStreamingProtocols(aEncoder, delegate);
@@ -149,13 +149,13 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<std::string> acceptsHeaderList = delegate->HandleGetAcceptsHeaderList();
-    return aEncoder.EncodeList([acceptsHeaderList](const auto & encoder) -> CHIP_ERROR {
-        for (std::string acceptedHeader : acceptsHeaderList)
+    std::list<std::string> acceptHeaderList = delegate->HandleGetAcceptHeaderList();
+    return aEncoder.EncodeList([acceptHeaderList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & acceptedHeader : acceptHeaderList)
         {
-            CharSpan span(acceptedHeader.c_str(), strlen(acceptedHeader.c_str()));
+            CharSpan span(acceptedHeader.c_str(), acceptedHeader.length());
             ReturnErrorOnFailure(encoder.Encode(span));
         }
         return CHIP_NO_ERROR;
@@ -181,12 +181,14 @@ bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & autoplay = commandData.autoPlay;
-    auto & data     = commandData.data;
+    auto & autoplay      = commandData.autoPlay;
+    auto & data          = commandData.data;
+    // TODO: Decode the paramater and pass it to delegate
+    // auto searchIterator = commandData.search.begin();
     std::list<ContentLaunchParamater> parameterList;
 
     Delegate * delegate = GetDelegate(endpoint);
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(delegate, endpoint))
     {
         return true;
     }
@@ -219,17 +221,21 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & contentUrl    = commandData.contentURL;
-    auto & displayString = commandData.displayString;
-    ContentLaunchBrandingInformation brandingInformation;
+
+    auto & contentUrl                = commandData.contentURL;
+    auto & displayString             = commandData.displayString;
+    // TODO: Decode the paramater and pass it to delegate
+    // auto brandingInformationIterator = commandData.brandingInformation.begin();
+    std::list<ContentLaunchBrandingInformation> brandingInformationList;
+
 
     Delegate * delegate = GetDelegate(endpoint);
-    if (SendStatusIfDelegateNull(endpoint))
+    if (SendStatusIfDelegateNull(delegate, endpoint))
     {
         return true;
     }
 
-    ContentLaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformation);
+    ContentLaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
     VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
     response.contentLaunchStatus = resp.status;
