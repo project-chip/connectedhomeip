@@ -61,7 +61,7 @@ public:
 
 ChannelInfoAttrAccess gChannelAttrAccess;
 
-/** @brief Tv Channel  Cluster Init
+/** @brief Channel  Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
  * application an opportunity to take care of cluster initialization procedures.

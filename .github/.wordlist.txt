@@ -150,6 +150,7 @@ CFLAGS
 cgit
 cgroup
 changeset
+Channel
 characterised
 CharString
 checkmark
@@ -999,7 +1000,6 @@ ttyACM
 ttyACMx
 ttymxc
 ttyUSB
-TvChannel
 TXD
 txt
 UART

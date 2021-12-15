@@ -1021,6 +1021,12 @@ public:
     static void
     CallbackFn(void * context,
                const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPChannelChannelListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
 
 private:
     jobject javaCallbackRef;
@@ -1045,6 +1051,12 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPChannelAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
 
 private:
     jobject javaCallbackRef;
@@ -3148,71 +3160,6 @@ private:
     bool keepAlive;
 };
 
-<<<<<<< HEAD
-class CHIPTvChannelChannelListAttributeCallback
-    : public chip::Callback::Callback<CHIPTvChannelClusterChannelListAttributeCallbackType>
-{
-public:
-    CHIPTvChannelChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPTvChannelChannelListAttributeCallback();
-
-    static void maybeDestroy(CHIPTvChannelChannelListAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPTvChannelChannelListAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTvChannelChannelListAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-class CHIPTvChannelAttributeListAttributeCallback
-    : public chip::Callback::Callback<CHIPTvChannelClusterAttributeListAttributeCallbackType>
-{
-public:
-    CHIPTvChannelAttributeListAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPTvChannelAttributeListAttributeCallback();
-
-    static void maybeDestroy(CHIPTvChannelAttributeListAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPTvChannelAttributeListAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPTvChannelAttributeListAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-=======
->>>>>>> f97b37a6b (Zap regen)
 class CHIPTargetNavigatorTargetNavigatorListAttributeCallback
     : public chip::Callback::Callback<CHIPTargetNavigatorClusterTargetNavigatorListAttributeCallbackType>
 {
