@@ -97,7 +97,15 @@ private:
     }
 
     CHIP_ERROR _StartChipTimer(System::Clock::Timeout duration) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint, LabelList<kMaxFixedLabels> & labelList)
+
+    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint,
+                                  LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
+                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }

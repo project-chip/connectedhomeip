@@ -2388,3 +2388,849 @@ tests:
           values:
               - name: "arg1"
                 value: 1
+
+    # Tests for subscription to a complex attribute
+    - label: "Subscribe to list attribute"
+      command: "subscribeAttribute"
+      attribute: "list_int8u"
+      minInterval: 2
+      maxInterval: 10
+      response:
+          value: [1, 2, 3, 4]
+
+    - label: "Write subscribed-to list attribute"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [5, 6, 7, 8]
+
+    - label: "Check for list attribute report"
+      command: "waitForReport"
+      attribute: "list_int8u"
+      response:
+          value: [5, 6, 7, 8]
+
+    # Tests for range-checking on the server.
+    - label: "Read range-restricted unsigned 8-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 70 # That's the default.
+
+    - label: "Write min value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 19
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 101
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 70
+
+    - label:
+          "Write min valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 20
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 20
+
+    - label:
+          "Write max valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 100
+
+    - label:
+          "Write middle valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 50
+
+    - label: "Read range-restricted unsigned 16-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 200 # That's the default.
+
+    - label: "Write min value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 99
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 1001
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 65535
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 200
+
+    - label:
+          "Write min valid value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 100
+
+    - label:
+          "Write max valid value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 1000
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 1000
+
+    - label:
+          "Write middle valid value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 500
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 500
+
+    - label: "Read range-restricted signed 8-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 0 # ZAP won't allow setting a negative default!
+
+    - label: "Write min value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -128
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -41
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 51
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 0
+
+    - label: "Write min valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -40
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: -40
+
+    - label: "Write max valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 50
+
+    - label:
+          "Write middle valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 6
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 6
+
+    - label: "Read range-restricted signed 16-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 0 # ZAP won't allow setting a negative default!
+
+    - label: "Write min value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -32768
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -151
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 201
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 0
+
+    - label: "Write min valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -150
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: -150
+
+    - label: "Write max valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 200
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 200
+
+    - label:
+          "Write middle valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 7
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 7
+
+    # Tests for range-checking for nullable attributes on the server.
+    - label: "Read nullable range-restricted unsigned 8-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 70 # That's the default.
+
+    - label:
+          "Write min value to a nullable range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 19
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 101
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 254
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 70
+
+    - label:
+          "Write min valid value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 20
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 20
+
+    - label:
+          "Write max valid value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 100
+
+    - label:
+          "Write middle valid value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 50
+
+    - label:
+          "Write null value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted unsigned 16-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 200 # That's the default.
+
+    - label:
+          "Write min value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 99
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 1001
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 65534
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value has
+          not changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 200
+
+    - label:
+          "Write min valid value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 100
+
+    - label:
+          "Write max valid value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 1000
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 1000
+
+    - label:
+          "Write middle valid value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 500
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 500
+
+    - label:
+          "Write null value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is
+          null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted signed 8-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 0 # ZAP won't allow setting a negative default!
+
+    - label:
+          "Write min value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted signed
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -41
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted signed
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 51
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 0
+
+    - label:
+          "Write min valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -40
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at min
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: -40
+
+    - label:
+          "Write max valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at max
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 50
+
+    - label:
+          "Write middle valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 6
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at mid
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 6
+
+    - label:
+          "Write null value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at
+          null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted signed 16-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 0 # ZAP won't allow setting a negative default!
+
+    - label:
+          "Write min value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted signed
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -151
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted signed
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 201
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 0
+
+    - label:
+          "Write min valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -150
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: -150
+
+    - label:
+          "Write max valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 200
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 200
+
+    - label:
+          "Write middle valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 7
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 7
+
+    - label:
+          "Write null value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: null

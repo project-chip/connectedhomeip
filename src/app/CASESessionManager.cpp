@@ -17,6 +17,7 @@
  */
 
 #include <app/CASESessionManager.h>
+#include <platform/CHIPDeviceLayer.h>
 
 namespace chip {
 

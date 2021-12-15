@@ -235,14 +235,14 @@ with network credentials.
     > `zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [arguments]`
 
     ```
-    chip-device-ctrl > zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0 timeoutMs=3000
+    chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0
     ```
 
 3. Enable Thread interface on the device by executing the following command with
    `networkID` equal to Extended PAN Id of the Thread network:
 
     ```
-    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:4fe76e9a8b5edaf5 breadcrumb=0 timeoutMs=3000
+    chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:4fe76e9a8b5edaf5 breadcrumb=0
     ```
 
 #### Commissioning a Wi-Fi device
@@ -252,13 +252,13 @@ with network credentials.
    command:
 
     ```
-    chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0 timeoutMs=1000
+    chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0
     ```
 
 2. Enable the Wi-Fi interface on the device by executing the following command:
 
     ```
-    chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0 timeoutMs=1000
+    chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0
     ```
 
 ### Step 6: Close Bluetooth LE connection.

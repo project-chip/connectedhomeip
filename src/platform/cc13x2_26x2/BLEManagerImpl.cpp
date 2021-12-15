@@ -664,12 +664,12 @@ CHIP_ERROR BLEManagerImpl::CreateEventHandler(void)
     BaseType_t xReturned;
 
     /* Create the task, storing the handle. */
-    xReturned = xTaskCreate(EventHandler,            /* Function that implements the task. */
-                            "ble_hndlr",             /* Text name for the task. */
-                            4096 / sizeof(uint32_t), /* Stack size in words, not bytes. */
-                            this,                    /* Parameter passed into the task. */
-                            ICALL_TASK_PRIORITIES,   /* Keep priority the same as ICALL until init is complete */
-                            NULL);                   /* Used to pass out the created task's handle. */
+    xReturned = xTaskCreate(EventHandler,                        /* Function that implements the task. */
+                            "ble_hndlr",                         /* Text name for the task. */
+                            BLEMANAGER_EVENT_HANDLER_STACK_SIZE, /* Stack size in words, not bytes. */
+                            this,                                /* Parameter passed into the task. */
+                            ICALL_TASK_PRIORITIES,               /* Keep priority the same as ICALL until init is complete */
+                            NULL);                               /* Used to pass out the created task's handle. */
 
     if (xReturned == errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY)
     {

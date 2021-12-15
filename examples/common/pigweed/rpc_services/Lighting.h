@@ -28,7 +28,7 @@
 namespace chip {
 namespace rpc {
 
-class Lighting : public generated::Lighting<Lighting>
+class Lighting : public pw_rpc::nanopb::Lighting::Service<Lighting>
 {
 public:
     Lighting(bool support_level = true, bool support_color = true) : mSupportLevel(support_level), mSupportColor(support_color) {}

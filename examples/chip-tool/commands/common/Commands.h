@@ -31,7 +31,7 @@ public:
     int Run(int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand();
+    CHIP_ERROR RunCommand(int argc, char ** argv);
 
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);

@@ -19,6 +19,7 @@
 #include "CHIPCommand.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <core/CHIPBuildConfig.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -26,6 +27,10 @@
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
@@ -35,6 +40,8 @@ constexpr chip::FabricId kIdentityGammaFabricId = 3;
 
 CHIP_ERROR CHIPCommand::Run()
 {
+    StartTracing();
+
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
@@ -62,7 +69,31 @@ CHIP_ERROR CHIPCommand::Run()
     //
     ReturnLogErrorOnFailure(ShutdownCommissioner(GetIdentity()));
 
+    StopTracing();
     return CHIP_NO_ERROR;
+}
+
+void CHIPCommand::StartTracing()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::InitTrace();
+
+    if (mTraceFile.HasValue())
+    {
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
+    }
+    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    {
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+    }
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+}
+
+void CHIPCommand::StopTracing()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }
 
 void CHIPCommand::SetIdentity(const char * identity)

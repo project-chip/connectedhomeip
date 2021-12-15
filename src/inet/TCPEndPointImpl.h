@@ -34,7 +34,7 @@
 namespace chip {
 namespace Inet {
 
-using TCPEndPointManagerImpl = EndPointManagerImplPool<TCPEndPointImpl, INET_CONFIG_NUM_TCP_ENDPOINTS>;
+using TCPEndPointManagerImpl = EndPointManagerImplPool<TCPEndPointImpl>;
 
 } // namespace Inet
 } // namespace chip

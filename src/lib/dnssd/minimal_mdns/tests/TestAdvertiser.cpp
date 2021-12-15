@@ -558,6 +558,7 @@ int TestAdvertiser(void)
     mdnsAdvertiser.Init(context.GetUDPEndPointManager());
     nlTestRunner(&theSuite, &server);
     server.Shutdown();
+    context.Shutdown();
     return nlTestRunnerStats(&theSuite);
 }
 

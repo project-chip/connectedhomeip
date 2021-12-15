@@ -202,7 +202,7 @@ class ClusterObjectTests:
         logger.info(
             f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
         logger.info(
-            f"Test Cluster - Struct: {res[1][Clusters.TestCluster].struct}")
+            f"Test Cluster - Struct: {res[1][Clusters.TestCluster].structAttr}")
         logger.info(f"Test Cluster: {res[1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")

@@ -112,7 +112,7 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ListNullablesAndOptionalsStruct::Id: {
         return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return ReadStructAttribute(aEncoder);
     }
     case ListLongOctetString::Id: {
@@ -145,7 +145,7 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case ListNullablesAndOptionalsStruct::Id: {
         return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return WriteStructAttribute(aDecoder);
     }
     case NullableStruct::Id: {
@@ -185,6 +185,13 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDeco
     ListInt8u::TypeInfo::DecodableType list;
 
     ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    size_t size;
+    ReturnErrorOnFailure(list.ComputeSize(&size));
+
+    // We never change our length, so fail out attempts to change it.  This
+    // should really return one of the spec errors!
+    VerifyOrReturnError(size == kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t index = 0;
     auto iter     = list.begin();

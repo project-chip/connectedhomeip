@@ -44,21 +44,17 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         ChipLogProgress(Zcl, "PlatformMgrDelegate: OnStartUp");
 
-        ForAllEndpointsWithServerCluster(
-            Basic::Id,
-            [](EndpointId endpoint, intptr_t context) -> Loop {
-                // If Basic cluster is implemented on this endpoint
-                Events::StartUp::Type event{ static_cast<uint32_t>(context) };
-                EventNumber eventNumber;
+        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        {
+            // If Basic cluster is implemented on this endpoint
+            Events::StartUp::Type event{ softwareVersion };
+            EventNumber eventNumber;
 
-                if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
-                {
-                    ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event");
-                }
-
-                return Loop::Continue;
-            },
-            static_cast<intptr_t>(softwareVersion));
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
+            {
+                ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record StartUp event");
+            }
+        }
     }
 
     // Gets called by the current Node prior to any orderly shutdown sequence on a best-effort basis.
@@ -66,18 +62,17 @@ class PlatformMgrDelegate : public DeviceLayer::PlatformManagerDelegate
     {
         ChipLogProgress(Zcl, "PlatformMgrDelegate: OnShutDown");
 
-        ForAllEndpointsWithServerCluster(Basic::Id, [](EndpointId endpoint, intptr_t context) -> Loop {
+        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        {
             // If Basic cluster is implemented on this endpoint
             Events::ShutDown::Type event;
             EventNumber eventNumber;
 
-            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber, EventOptions::Type::kUrgent))
             {
                 ChipLogError(Zcl, "PlatformMgrDelegate: Failed to record ShutDown event");
             }
-
-            return Loop::Continue;
-        });
+        }
     }
 };
 

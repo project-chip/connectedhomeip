@@ -718,6 +718,24 @@ public class ClusterWriteMapping {
         "writeOnModeAttribute", writeModeSelectOnModeAttributeInteractionInfo);
     writeAttributeMap.put("modeSelect", writeModeSelectInteractionInfo);
     Map<String, InteractionInfo> writeNetworkCommissioningInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeNetworkCommissioningInterfaceEnabledCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo networkCommissioninginterfaceEnabledCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeNetworkCommissioningInterfaceEnabledCommandParams.put(
+        "value", networkCommissioninginterfaceEnabledCommandParameterInfo);
+    InteractionInfo writeNetworkCommissioningInterfaceEnabledAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.NetworkCommissioningCluster) cluster)
+                  .writeInterfaceEnabledAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeNetworkCommissioningInterfaceEnabledCommandParams);
+    writeNetworkCommissioningInteractionInfo.put(
+        "writeInterfaceEnabledAttribute",
+        writeNetworkCommissioningInterfaceEnabledAttributeInteractionInfo);
     writeAttributeMap.put("networkCommissioning", writeNetworkCommissioningInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateProviderInteractionInfo =
         new LinkedHashMap<>();
@@ -2349,6 +2367,8 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeThreadNetworkDiagnosticsInteractionInfo =
         new LinkedHashMap<>();
     writeAttributeMap.put("threadNetworkDiagnostics", writeThreadNetworkDiagnosticsInteractionInfo);
+    Map<String, InteractionInfo> writeUserLabelInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("userLabel", writeUserLabelInteractionInfo);
     Map<String, InteractionInfo> writeWakeOnLanInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("wakeOnLan", writeWakeOnLanInteractionInfo);
     Map<String, InteractionInfo> writeWiFiNetworkDiagnosticsInteractionInfo = new LinkedHashMap<>();

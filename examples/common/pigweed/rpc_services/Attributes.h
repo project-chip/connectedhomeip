@@ -29,7 +29,7 @@ namespace chip {
 namespace rpc {
 
 // Implementation class for chip.rpc.Attributes.
-class Attributes : public generated::Attributes<Attributes>
+class Attributes : public pw_rpc::nanopb::Attributes::Service<Attributes>
 {
 public:
     ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)

@@ -2683,50 +2683,46 @@ class ChipClusters:
             "clusterName": "NetworkCommissioning",
             "clusterId": 0x00000031,
             "commands": {
-            0x00000006: {
-                    "commandId": 0x00000006,
-                    "commandName": "AddThreadNetwork",
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "AddOrUpdateThreadNetwork",
                     "args": {
                         "operationalDataset": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "AddWiFiNetwork",
+                    "commandName": "AddOrUpdateWiFiNetwork",
                     "args": {
                         "ssid": "bytes",
                         "credentials": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000E: {
-                    "commandId": 0x0000000E,
-                    "commandName": "DisableNetwork",
+            0x00000006: {
+                    "commandId": 0x00000006,
+                    "commandName": "ConnectNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "EnableNetwork",
-                    "args": {
-                        "networkID": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x0000000A: {
-                    "commandId": 0x0000000A,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "RemoveNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
+                    },
+                },
+            0x00000008: {
+                    "commandId": 0x00000008,
+                    "commandName": "ReorderNetwork",
+                    "args": {
+                        "networkID": "bytes",
+                        "networkIndex": "int",
+                        "breadcrumb": "int",
                     },
                 },
             0x00000000: {
@@ -2735,33 +2731,49 @@ class ChipClusters:
                     "args": {
                         "ssid": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000008: {
-                    "commandId": 0x00000008,
-                    "commandName": "UpdateThreadNetwork",
-                    "args": {
-                        "operationalDataset": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "UpdateWiFiNetwork",
-                    "args": {
-                        "ssid": "bytes",
-                        "credentials": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
             "attributes": {
-                0x0000FFFB: {
-                    "attributeName": "AttributeList",
-                    "attributeId": 0x0000FFFB,
+                0x00000000: {
+                    "attributeName": "MaxNetworks",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "Networks",
+                    "attributeId": 0x00000001,
+                    "type": "",
+                },
+                0x00000002: {
+                    "attributeName": "ScanMaxTimeSeconds",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "ConnectMaxTimeSeconds",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "InterfaceEnabled",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
+                    "writable": True,
+                },
+                0x00000005: {
+                    "attributeName": "LastNetworkingStatus",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "LastNetworkID",
+                    "attributeId": 0x00000006,
+                    "type": "bytes",
+                },
+                0x00000007: {
+                    "attributeName": "LastConnectErrorValue",
+                    "attributeId": 0x00000007,
                     "type": "int",
                 },
                 0x0000FFFC: {
@@ -2782,16 +2794,16 @@ class ChipClusters:
             "clusterName": "OtaSoftwareUpdateProvider",
             "clusterId": 0x00000029,
             "commands": {
-            0x00000001: {
-                    "commandId": 0x00000001,
+            0x00000002: {
+                    "commandId": 0x00000002,
                     "commandName": "ApplyUpdateRequest",
                     "args": {
                         "updateToken": "bytes",
                         "newVersion": "int",
                     },
                 },
-            0x00000002: {
-                    "commandId": 0x00000002,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "NotifyUpdateApplied",
                     "args": {
                         "updateToken": "bytes",
@@ -4259,7 +4271,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000025: {
-                    "attributeName": "Struct",
+                    "attributeName": "StructAttr",
                     "attributeId": 0x00000025,
                     "type": "",
                     "reportable": True,
@@ -5177,6 +5189,24 @@ class ChipClusters:
                 },
             },
     }
+    _USER_LABEL_CLUSTER_INFO = {
+            "clusterName": "UserLabel",
+            "clusterId": 0x00000041,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "LabelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                },
+            },
+    }
     _WAKE_ON_LAN_CLUSTER_INFO = {
             "clusterName": "WakeOnLan",
             "clusterId": 0x00000503,
@@ -5550,6 +5580,7 @@ class ChipClusters:
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
@@ -5612,6 +5643,7 @@ class ChipClusters:
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,

@@ -39,6 +39,16 @@ void WaitForMs(XCTestExpectation * expectation, dispatch_queue_t queue, unsigned
     });
 }
 
+void Log(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message){
+    NSLog(@"%@", message);
+    [expectation fulfill];
+}
+
+// Stub for User Prompts for XCTests to run.
+void UserPrompt(XCTestExpectation * expectation, dispatch_queue_t queue, NSString * message) {
+    [expectation fulfill];
+}
+
 void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue)
 {
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];

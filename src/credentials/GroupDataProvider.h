@@ -198,6 +198,7 @@ public:
     // By id
     virtual CHIP_ERROR SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)                   = 0;
     virtual CHIP_ERROR GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info) = 0;
+    virtual CHIP_ERROR RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id)                = 0;
     // By index
     virtual CHIP_ERROR SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info) = 0;
     virtual CHIP_ERROR GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)       = 0;

@@ -56,20 +56,20 @@ public:
 class GlobalUnencryptedMessageCounter : public MessageCounter
 {
 public:
-    GlobalUnencryptedMessageCounter() : value(0) {}
+    GlobalUnencryptedMessageCounter() : mValue(0) {}
 
     void Init();
 
     Type GetType() override { return GlobalUnencrypted; }
-    uint32_t Value() override { return value; }
+    uint32_t Value() override { return mValue; }
     CHIP_ERROR Advance() override
     {
-        ++value;
+        ++mValue;
         return CHIP_NO_ERROR;
     }
 
 private:
-    uint32_t value;
+    uint32_t mValue;
 };
 
 class GlobalEncryptedMessageCounter : public MessageCounter
@@ -88,18 +88,18 @@ private:
 #else
     struct FakePersistedCounter
     {
-        FakePersistedCounter() : value(0) {}
+        FakePersistedCounter() : mValue(0) {}
         CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch) { return CHIP_NO_ERROR; }
 
-        uint32_t GetValue() { return value; }
+        uint32_t GetValue() { return mValue; }
         CHIP_ERROR Advance()
         {
-            ++value;
+            ++mValue;
             return CHIP_NO_ERROR;
         }
 
     private:
-        uint32_t value;
+        uint32_t mValue;
     } persisted;
 #endif
 };
@@ -107,25 +107,26 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialValue                 = 1;         ///< Used for initializing peer counter
+    static constexpr uint32_t kInitialSyncValue             = 0;         ///< Used for initializing peer counter
     static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFF; ///< 28-bit mask
 
     /**
-     * Initialize a local message counter with random value between [0, 2^28-1]. This increases the difficulty of traffic analysis
-     * attacks by making it harder to determine how long a particular session has been open.
+     * Initialize a local message counter with random value between [1, 2^28]. This increases the difficulty of traffic analysis
+     * attacks by making it harder to determine how long a particular session has been open. The initial counter is always 1 or
+     * higher to guarantee first message is always greater than initial peer counter set to 0.
      */
-    LocalSessionMessageCounter() { value = Crypto::GetRandU32() & kMessageCounterRandomInitMask; }
+    LocalSessionMessageCounter() { mValue = (Crypto::GetRandU32() & kMessageCounterRandomInitMask) + 1; }
 
     Type GetType() override { return Session; }
-    uint32_t Value() override { return value; }
+    uint32_t Value() override { return mValue; }
     CHIP_ERROR Advance() override
     {
-        ++value;
+        ++mValue;
         return CHIP_NO_ERROR;
     }
 
 private:
-    uint32_t value;
+    uint32_t mValue;
 };
 
 } // namespace chip
