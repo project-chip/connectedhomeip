@@ -38168,7 +38168,7 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterContentLauncherReadAttributeAcceptsHeaderListWithCompletionHandler
+- (void)testSendClusterContentLauncherReadAttributeAcceptHeaderListWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
 
@@ -38182,10 +38182,10 @@ ResponseHandler test_TestSubscribe_OnOff_OnOff_Reported = nil;
     XCTAssertNotNil(cluster);
 
     XCTestExpectation * expectation =
-        [self expectationWithDescription:@"ContentLauncherReadAttributeAcceptsHeaderListWithCompletionHandler"];
+        [self expectationWithDescription:@"ContentLauncherReadAttributeAcceptHeaderListWithCompletionHandler"];
 
-    [cluster readAttributeAcceptsHeaderListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"ContentLauncher AcceptsHeaderList Error: %@", err);
+    [cluster readAttributeAcceptHeaderListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"ContentLauncher AcceptHeaderList Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

@@ -5063,33 +5063,33 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)readAttributeAcceptsHeaderListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                NSError * _Nullable error))completionHandler
+- (void)readAttributeAcceptHeaderListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
 {
-    new CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge(
+    new CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo;
-            auto successFn = Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = ContentLauncher::Attributes::AcceptHeaderList::TypeInfo;
+            auto successFn = Callback<ContentLauncherAcceptHeaderListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)subscribeAttributeAcceptsHeaderListWithMinInterval:(uint16_t)minInterval
-                                               maxInterval:(uint16_t)maxInterval
-                                   subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                             reportHandler:
-                                                 (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeAcceptHeaderListWithMinInterval:(uint16_t)minInterval
+                                              maxInterval:(uint16_t)maxInterval
+                                  subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                            reportHandler:
+                                                (void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge(
+    new CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo;
-            auto successFn = Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(success);
+            using TypeInfo = ContentLauncher::Attributes::AcceptHeaderList::TypeInfo;
+            auto successFn = Callback<ContentLauncherAcceptHeaderListListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval,
-                CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

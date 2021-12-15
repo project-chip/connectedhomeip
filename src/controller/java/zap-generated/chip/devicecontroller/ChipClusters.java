@@ -3285,7 +3285,7 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface AcceptsHeaderListAttributeCallback {
+    public interface AcceptHeaderListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
       void onError(Exception ex);
@@ -3301,8 +3301,8 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readAcceptsHeaderListAttribute(AcceptsHeaderListAttributeCallback callback) {
-      readAcceptsHeaderListAttribute(chipClusterPtr, callback);
+    public void readAcceptHeaderListAttribute(AcceptHeaderListAttributeCallback callback) {
+      readAcceptHeaderListAttribute(chipClusterPtr, callback);
     }
 
     public void readSupportedStreamingProtocolsAttribute(LongAttributeCallback callback) {
@@ -3333,8 +3333,8 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readAcceptsHeaderListAttribute(
-        long chipClusterPtr, AcceptsHeaderListAttributeCallback callback);
+    private native void readAcceptHeaderListAttribute(
+        long chipClusterPtr, AcceptHeaderListAttributeCallback callback);
 
     private native void readSupportedStreamingProtocolsAttribute(
         long chipClusterPtr, LongAttributeCallback callback);

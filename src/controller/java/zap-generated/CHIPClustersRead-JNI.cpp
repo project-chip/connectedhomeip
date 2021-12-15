@@ -4362,15 +4362,15 @@ JNI_METHOD(void, ColorControlCluster, readClusterRevisionAttribute)(JNIEnv * env
     onFailure.release();
 }
 
-JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
+JNI_METHOD(void, ContentLauncherCluster, readAcceptHeaderListAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo;
-    std::unique_ptr<CHIPContentLauncherAcceptsHeaderListAttributeCallback,
-                    void (*)(CHIPContentLauncherAcceptsHeaderListAttributeCallback *)>
-        onSuccess(chip::Platform::New<CHIPContentLauncherAcceptsHeaderListAttributeCallback>(callback, false),
-                  chip::Platform::Delete<CHIPContentLauncherAcceptsHeaderListAttributeCallback>);
+    using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo;
+    std::unique_ptr<CHIPContentLauncherAcceptHeaderListAttributeCallback,
+                    void (*)(CHIPContentLauncherAcceptHeaderListAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPContentLauncherAcceptHeaderListAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPContentLauncherAcceptHeaderListAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -4388,7 +4388,7 @@ JNI_METHOD(void, ContentLauncherCluster, readAcceptsHeaderListAttribute)
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPContentLauncherClusterAcceptsHeaderListAttributeCallbackType>::FromCancelable(
+    auto successFn = chip::Callback::Callback<CHIPContentLauncherClusterAcceptHeaderListAttributeCallbackType>::FromCancelable(
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
     err            = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
