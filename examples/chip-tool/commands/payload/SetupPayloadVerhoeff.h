@@ -21,15 +21,29 @@
 #include "../common/Command.h"
 #include <setup_payload/SetupPayload.h>
 
-class SetupPayloadParseCommand : public Command
+class SetupPayloadVerhoeffVerify : public Command
 {
 public:
-    SetupPayloadParseCommand() : Command("parse-setup-payload") { AddArgument("payload", &mCode); }
+    SetupPayloadVerhoeffVerify() : Command("verhoeff-verify")
+    {
+        AddArgument("payload", &mSetupCode);
+        AddArgument("position", 0, UINT8_MAX, &mPos);
+    }
     CHIP_ERROR Run() override;
-    static bool IsQRCode(std::string codeString);
 
 private:
-    char * mCode;
-    CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
-    CHIP_ERROR Print(chip::SetupPayload payload);
+    char * mSetupCode;
+    uint8_t mPos;
+    bool Verify(std::string codeString);
+};
+
+class SetupPayloadVerhoeffGenerate : public Command
+{
+public:
+    SetupPayloadVerhoeffGenerate() : Command("verhoeff-generate") { AddArgument("payload", &mSetupCode); }
+    CHIP_ERROR Run() override;
+
+private:
+    char * mSetupCode;
+    CHIP_ERROR GenerateChar(std::string codeString, char & generatedChar);
 };
