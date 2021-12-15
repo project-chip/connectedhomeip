@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
  */
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -171,14 +171,6 @@ void AppPlatform::SetupAppPlatform()
     mFirstDynamicEndpointId = static_cast<chip::EndpointId>(
         static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(emberAfFixedEndpointCount() - 1))) + 1);
     mCurrentEndpointId = mFirstDynamicEndpointId;
-
-    {
-        for (int i = 0; i < emberAfFixedEndpointCount(); i++)
-        {
-            ChipLogProgress(DeviceLayer, "endpoint index=%d, id=%d", i,
-                            static_cast<chip::EndpointId>(static_cast<int>(emberAfEndpointFromIndex(static_cast<uint16_t>(i)))));
-        }
-    }
 
     if (mCurrentEndpointId < emberAfFixedEndpointCount())
     {

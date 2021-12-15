@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
  */
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -46,9 +46,9 @@ namespace AppPlatform {
 EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer,
                                               uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d",
-                    GetApplicationBasic()->GetApplicationName(), static_cast<uint16_t>(clusterId),
-                    static_cast<uint16_t>(attributeId));
+    ChipLogProgress(DeviceLayer,
+                    "Read Attribute for device %s cluster " ChipLogFormatClusterId " attribute=" ChipLogFormatAttributeId,
+                    GetApplicationBasic()->GetApplicationName(), clusterId, attributeId);
 
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
     {
