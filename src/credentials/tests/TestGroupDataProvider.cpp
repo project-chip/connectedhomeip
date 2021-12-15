@@ -156,7 +156,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
     // Get Group Info
 
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kUndefinedFabricIndex, 0, group));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 999, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 999, group));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 2, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo2_3);
@@ -178,7 +178,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
 
     // Remaining entries shift up
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 2, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric2, 2, group));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo2_3);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 0, group));
@@ -187,7 +187,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, group == kGroupInfo1_2);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric1, 0, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo1_1);
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 3, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 3, group));
 
     // Overwrite with new group
 
@@ -221,7 +221,7 @@ void TestGroupInfo(nlTestSuite * apSuite, void * apContext)
     // Override
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->SetGroupInfo(kFabric2, kGroupInfo3_2));
     // Not found
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupInfo(kFabric2, kGroup5, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfo(kFabric2, kGroup5, group));
     // Existing
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfo(kFabric2, kGroup2, group));
     NL_TEST_ASSERT(apSuite, group == kGroupInfo3_2);
@@ -337,11 +337,11 @@ void TestEndpoints(nlTestSuite * apSuite, void * apContext)
 
     // Remove
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveEndpoint(kFabric1, kGroup1, kEndpointId4));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveEndpoint(kFabric1, kGroup1, kEndpointId4));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveEndpoint(kFabric1, kGroup1, kEndpointId0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveEndpoint(kFabric1, kGroup2, kEndpointId3));
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveEndpoint(kFabric2, kGroup5, kEndpointId0));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveEndpoint(kFabric2, kGroup5, kEndpointId0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveEndpoint(kFabric2, kGroup2, kEndpointId1));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveEndpoint(kFabric2, kGroup3, kEndpointId2));
 
@@ -489,7 +489,7 @@ void TestGroupKey(nlTestSuite * apSuite, void * apContext)
     // Get Group Info
 
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupKeyAt(kUndefinedFabricIndex, 0, pair));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 999, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 999, pair));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric1, 3, pair));
     NL_TEST_ASSERT(apSuite, pair == kGroup1Keyset3);
@@ -514,7 +514,7 @@ void TestGroupKey(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupKeyAt(kFabric1, 2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveGroupKeyAt(kFabric2, 0));
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 3, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric1, 3, pair));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric1, 2, pair));
     NL_TEST_ASSERT(apSuite, pair == kGroup1Keyset3);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric1, 1, pair));
@@ -522,7 +522,7 @@ void TestGroupKey(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric1, 0, pair));
     NL_TEST_ASSERT(apSuite, pair == kGroup1Keyset0);
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 3, pair));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupKeyAt(kFabric2, 3, pair));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 2, pair));
     NL_TEST_ASSERT(apSuite, pair == kGroup2Keyset3);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupKeyAt(kFabric2, 1, pair));
@@ -655,14 +655,14 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
 
     // Remove Keysets
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveKeySet(kFabric1, 0xffff));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveKeySet(kFabric1, 0xffff));
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId1)); // First
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId3)); // Last
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric2, kKeysetId2)); // Middle
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
     NL_TEST_ASSERT(apSuite, keyset == kKeySet0);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
@@ -670,7 +670,7 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
 
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId3, keyset));
     NL_TEST_ASSERT(apSuite, keyset == kKeySet3);
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
     NL_TEST_ASSERT(apSuite, keyset == kKeySet1);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
@@ -678,23 +678,23 @@ void TestKeySets(nlTestSuite * apSuite, void * apContext)
 
     // Remove all
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveKeySet(kFabric1, kKeysetId3));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveKeySet(kFabric1, kKeysetId1));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveKeySet(kFabric1, kKeysetId3));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveKeySet(kFabric1, kKeysetId1));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId0));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric1, kKeysetId2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric2, kKeysetId3));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->RemoveKeySet(kFabric2, kKeysetId2));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->RemoveKeySet(kFabric2, kKeysetId2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric2, kKeysetId1));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->RemoveKeySet(kFabric2, kKeysetId0));
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId3, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId3, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId0, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, kKeysetId2, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId3, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId2, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId1, keyset));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric2, kKeysetId0, keyset));
 }
 
 void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
@@ -890,9 +890,9 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
 
     // Group Info
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kFabric1, 0, group));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kFabric1, 1, group));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetGroupInfoAt(kFabric1, 2, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 0, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 1, group));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetGroupInfoAt(kFabric1, 2, group));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 0, group));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 1, group));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == provider->GetGroupInfoAt(kFabric2, 2, group));
@@ -917,9 +917,9 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite,
                    0 == memcmp(kKeySet0.epoch_keys, keys.epoch_keys, sizeof(kKeySet0.epoch_keys[0]) * kKeySet0.num_keys_used));
 
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetKeySet(kFabric1, 202, keys));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetKeySet(kFabric1, 404, keys));
-    NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_FABRIC_ID == provider->GetKeySet(kFabric1, 606, keys));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 202, keys));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 404, keys));
+    NL_TEST_ASSERT(apSuite, CHIP_ERROR_NOT_FOUND == provider->GetKeySet(kFabric1, 606, keys));
 }
 
 } // namespace TestGroups
