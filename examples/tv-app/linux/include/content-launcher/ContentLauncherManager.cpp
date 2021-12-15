@@ -38,12 +38,14 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                              const chip::CharSpan & data) {
+ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                  std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                                  const chip::CharSpan & data)
+{
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
     string dataString(data.data(), data.size());
 
-    #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
     if (app != NULL)
     {
@@ -59,13 +61,14 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
     return response;
 }
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation) {
+ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
+                                                              const chip::CharSpan & displayString,
+                                                              ContentLaunchBrandingInformation & brandingInformation)
+{
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
-
 
     // TODO: Insert code here
     ContentLaunchResponse response;
@@ -75,12 +78,14 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSp
     return response;
 }
 
-std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList() {
+std::list<std::string> ContentLauncherManager::HandleGetAcceptsHeaderList()
+{
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptsHeaderList");
     return { "example", "example" };
 }
 
-uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols() {
+uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
+{
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
     uint32_t streamingProtocols = 0;
     return streamingProtocols;

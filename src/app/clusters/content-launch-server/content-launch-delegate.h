@@ -18,9 +18,9 @@
 
 #pragma once
 
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
-#include <app-common/zap-generated/af-structs.h>
 
 #include <app/util/af.h>
 #include <lib/core/Optional.h>
@@ -33,7 +33,6 @@ struct ContentLaunchResponse
     chip::app::Clusters::ContentLauncher::ContentLaunchStatus status;
 };
 
-
 namespace chip {
 namespace app {
 namespace Clusters {
@@ -45,12 +44,11 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                              const chip::CharSpan & data) = 0;
+    virtual ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList,
+                                                      bool autoplay, const chip::CharSpan & data) = 0;
 
-    virtual ContentLaunchResponse
-    HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation) = 0;
+    virtual ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                  ContentLaunchBrandingInformation & brandingInformation) = 0;
 
     virtual std::list<std::string> HandleGetAcceptsHeaderList() = 0;
 

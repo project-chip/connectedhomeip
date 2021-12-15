@@ -27,14 +27,13 @@
 #include <string>
 #include <vector>
 
-class ContentLauncherManager: public chip::app::Clusters::ContentLauncher::Delegate
+class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
-
-	ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                              const chip::CharSpan & data) override;
+    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList,
+                                              bool autoplay, const chip::CharSpan & data) override;
     ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation) override;
+                                          ContentLaunchBrandingInformation & brandingInformation) override;
     std::list<std::string> HandleGetAcceptsHeaderList() override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 };

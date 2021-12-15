@@ -93,7 +93,9 @@ void SetDelegate(EndpointId endpoint, Delegate * delegate)
     if (ep != 0xFFFF)
     {
         gDelegateTable[ep] = delegate;
-    } else {
+    }
+    else
+    {
     }
 }
 
@@ -101,7 +103,6 @@ void SetDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 // -----------------------------------------------------------------------------
 // Attribute Accessor Implementation
@@ -111,7 +112,8 @@ namespace {
 class ContentLauncherAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ContentLauncher::Id)
+    ContentLauncherAttrAccess() :
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ContentLauncher::Id)
     {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
@@ -151,7 +153,6 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptsHeaderAttribute(app::AttributeV
 {
     std::list<std::string> acceptsHeaderList = delegate->HandleGetAcceptsHeaderList();
     return aEncoder.EncodeList([acceptsHeaderList](const auto & encoder) -> CHIP_ERROR {
-
         for (std::string acceptedHeader : acceptsHeaderList)
         {
             CharSpan span(acceptedHeader.c_str(), strlen(acceptedHeader.c_str()));
@@ -247,7 +248,6 @@ exit:
 
     return true;
 }
-
 
 // -----------------------------------------------------------------------------
 // Plugin initialization
