@@ -31,6 +31,7 @@ APP=lock-app
 TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
 PROFILE=release
+BOOTLOADER=false
 
 for i in "$@"; do
     case $i in
@@ -52,6 +53,10 @@ for i in "$@"; do
             ;;
         -c=* | --command=*)
             COMMAND="${i#*=}"
+            shift
+            ;;
+        -B=* | --bootloader=*)
+            BOOTLOADER="${i#*=}"
             shift
             ;;
         *)
@@ -93,46 +98,11 @@ source "$CHIP_ROOT"/scripts/activate.sh
 # Build directory setup
 BUILD_DIRECTORY="$APP"/mbed/build-"$TARGET_BOARD"/"$PROFILE"/
 
-if [[ "$APP" == "bootloader" ]]; then
-    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
+# Set bootloader root directory
+BOOTLOADER_ROOT_DIRECTORY="$CHIP_ROOT"/examples/platform/mbed/bootloader
 
-    cd platform/mbed/bootloader
-    BUILD_DIRECTORY=build-"$TARGET_BOARD"/"$PROFILE"/
-
-    # Set Mbed OS path
-    MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
-
-    # Set Mbed MCU boot path
-    MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
-
-    # Install mcuboot requirements (silently)
-    pip install -q -r "$MBED_MCU_BOOT_PATH"/scripts/requirements.txt ||
-        fail "Unable to install mcuboot requirements" "Please take a look at "$MBED_MCU_BOOT_PATH"/scripts/requirements.txt"
-
-    # Run mcuboot setup script
-    python "$MBED_MCU_BOOT_PATH"/scripts/setup.py install ||
-        fail "MCUboot setup script failed"
-
-    # Create the signing keys
-    # shellcheck disable=SC2015
-    "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py keygen -k signing-keys.pem -t rsa-2048 &&
-        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py getpub -k signing-keys.pem >signing_keys.c ||
-        fail "Unable to create the signing keys"
-
-    ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed mcuboot
-
-    # Generate config file for selected target, toolchain and hardware
-    mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
-
-    # Remove old artifacts to force linking
-    rm -rf "$BUILD_DIRECTORY/chip-"*
-
-    # Build application
-    cmake -S . -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
-    cmake --build "$BUILD_DIRECTORY"
-
-    exit
-fi
+# Set bootloader build directory
+BOOTLOADER_BUILD_DIRECTORY="$BOOTLOADER_ROOT_DIRECTORY"/build-"$TARGET_BOARD"/"$PROFILE"/
 
 if [[ "$COMMAND" == *"build"* ]]; then
     echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
@@ -143,6 +113,50 @@ if [[ "$COMMAND" == *"build"* ]]; then
     # Set Mbed OS posix socket submodule path
     MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
+    if [[ "$APP" == "bootloader" || $BOOTLOADER == true ]]; then
+        # Set Mbed MCU boot path
+        MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
+
+        cd "$BOOTLOADER_ROOT_DIRECTORY"
+
+        # Install mcuboot requirements (silently)
+        pip install -q -r "$MBED_MCU_BOOT_PATH"/scripts/requirements.txt
+
+        # Run mcuboot setup script
+        python "$MBED_MCU_BOOT_PATH"/scripts/setup.py install
+
+        # Create the signing keys is not exist
+        if [ ! -f signing-keys.pem ] || [ ! -f signing_keys.c ]; then
+            "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py keygen -k signing-keys.pem -t rsa-2048 &&
+                "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py getpub -k signing-keys.pem >signing_keys.c
+        fi
+
+        ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed mcuboot
+
+        # Generate config file for selected target, toolchain and hardware
+        mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -o "$BOOTLOADER_BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
+
+        # Remove old artifacts to force linking
+        rm -rf "$BOOTLOADER_BUILD_DIRECTORY/chip-"*
+
+        # Build application
+        cmake -S . -B "$BOOTLOADER_BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
+        cmake --build "$BOOTLOADER_BUILD_DIRECTORY"
+
+        if [[ "$APP" == "bootloader" ]]; then
+            exit
+        fi
+
+        cd "$CHIP_ROOT"/examples
+    fi
+
+    # Set Mbed OS posix socket submodule path
+    MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
+
+    if [[ $BOOTLOADER == true ]]; then
+        ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed "$APP"/mbed/mcuboot
+    fi
+
     # Generate config file for selected target, toolchain and hardware
     mbed-tools configure -t "$TOOLCHAIN" -m "$TARGET_BOARD" -p "$APP"/mbed/ -o "$BUILD_DIRECTORY" --mbed-os-path "$MBED_OS_PATH"
 
@@ -150,8 +164,18 @@ if [[ "$COMMAND" == *"build"* ]]; then
     rm -rf "$BUILD_DIRECTORY/chip-"*
 
     # Build application
-    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH"
+    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
     cmake --build "$BUILD_DIRECTORY"
+
+    if [[ $BOOTLOADER == true ]]; then
+        # Signed the primary application
+        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$BOOTLOADER_ROOT_DIRECTORY"/signing-keys.pem \
+            --align 8 -v "0.1.0" --header-size 4096 --pad-header -S 0xC0000 \
+            "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
+
+        # Create the factory firmware (bootlaoder + signed primary application)
+        hexmerge.py -o "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex --no-start-addr "$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
+    fi
 fi
 
 if [[ "$COMMAND" == *"flash"* ]]; then
@@ -161,6 +185,16 @@ if [[ "$COMMAND" == *"flash"* ]]; then
     # Flash scripts path setup
     MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
 
+    if [[ "$APP" == "bootloader" ]]; then
+        APP_PATH="$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.elf
+    else
+        if [[ $BOOTLOADER ]]; then
+            APP_PATH="$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-boot.elf
+        else
+            APP_PATH="$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.elf
+        fi
+    fi
+
     # Flash application
-    "$OPENOCD_PATH"/bin/openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $BUILD_DIRECTORY/chip-mbed-$APP-example.elf verify reset exit"
+    "$OPENOCD_PATH"/bin/openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $APP_PATH verify reset exit"
 fi
