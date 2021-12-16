@@ -19,6 +19,8 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/esp32_unit_tests.cmake)
+
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
 )
@@ -29,64 +31,27 @@ project(test-driver)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
-SET(VALID_TESTS
-    # libBleLayerTests.a
-    libASN1Tests.a
-    libCoreTests.a
-    libInetLayerTests.a
-    libRetransmitTests.a
-    libSystemLayerTests.a
-    libChipCryptoTests.a # TODO: "-lChipCertTestVectors"
-)
-
-foreach (TEST_LIB IN LISTS VALID_TESTS) 
-    string(REGEX REPLACE "lib(.*)\\.a" "\\1" NAME ${TEST_LIB})
-
-    SET(ELF_NAME "test${NAME}.elf")
-
-    add_executable(${ELF_NAME} dummy.c)
-
-    target_link_directories(${ELF_NAME} PUBLIC 
-        ${CMAKE_CURRENT_BINARY_DIR}/esp-idf/chip/lib
-    )
-
-    target_link_libraries(${ELF_NAME} PUBLIC
-        idf::main 
-        -Wl,--whole-archive ${TEST_LIB} -Wl,--no-whole-archive
-        ChipCertTestVectors # TODO: only useful for CryptoTests
-        nlunit-test
-        nlfaultinjection
-    )
-    idf_build_executable(${ELF_NAME})
-endforeach()
-
-
+# TODO: libAppTests depends on MessagingTestHelpers, which depends on
+# NetworkTestHelpers.  That sort of depends on InetTestHelpers or
+# equivalent (to provide gSystemLayer, gInet, InitNetwork(),
+# ShutdownNetwork()) but there's only a POSIX implementation of that
+# last, which does not compile on ESP32.  Need to figure out how to
+# make that work.  See comments below for the transport layer tests,
+# which have the same issue.
+#
+# libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
 # 
-# add_executable(two.elf main_app.cpp)
-# target_link_libraries(two.elf chip)
-# idf_build_executable(two.elf)
+# TODO: ble tests do not compile using CMake (library is not auto-built)
+# libBleLayerTests.a
+
+esp32_unit_test(NAME testASN1 LIBRARY ASN1Tests)
+esp32_unit_test(NAME testChipCrypto LIBRARY ChipCryptoTests EXTRA_LIBRARIES -lChipCertTestVectors)
+esp32_unit_test(NAME testCore LIBRARY CoreTests)
+esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
+esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
+esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
 
 
-# TODO:
-#  - CXX depending on some lib*.a
-#  - multiple outputs/apps?
-
-#   # TODO: libAppTests depends on MessagingTestHelpers, which depends on
-#   # NetworkTestHelpers.  That sort of depends on InetTestHelpers or
-#   # equivalent (to provide gSystemLayer, gInet, InitNetwork(),
-#   # ShutdownNetwork()) but there's only a POSIX implementation of that
-#   # last, which does not compile on ESP32.  Need to figure out how to
-#   # make that work.  See comments below for the transport layer tests,
-#   # which have the same issue.
-#   # run_suite libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
-#   
-#   run_suite libASN1Tests.a
-#   run_suite libBleLayerTests.a
-#   run_suite libCoreTests.a
-#   run_suite libInetLayerTests.a
-#   run_suite libRetransmitTests.a
-#   run_suite libSystemLayerTests.a
-#   run_suite libChipCryptoTests.a "-lChipCertTestVectors"
 
 # FIXME: elfbuilder ?
 #    mkdir -p build/chip/
