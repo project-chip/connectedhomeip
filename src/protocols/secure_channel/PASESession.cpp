@@ -392,10 +392,10 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     // Update commissioning hash with the pbkdf2 param request that's being sent.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ req->Start(), req->DataLength() }));
 
-    mNextExpectedMsg = MsgType::PBKDFParamResponse;
-
     ReturnErrorOnFailure(
         mExchangeCtxt->SendMessage(MsgType::PBKDFParamRequest, std::move(req), SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mNextExpectedMsg = MsgType::PBKDFParamResponse;
 
     ChipLogDetail(SecureChannel, "Sent PBKDF param request");
 
@@ -512,11 +512,11 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
     size_t sizeof_point = sizeof(mPoint);
     ReturnErrorOnFailure(mSpake2p.ComputeL(mPoint, &sizeof_point, mPASEVerifier.mL, kSpake2p_WS_Length));
 
-    mNextExpectedMsg = MsgType::PASE_Pake1;
-
     ReturnErrorOnFailure(
         mExchangeCtxt->SendMessage(MsgType::PBKDFParamResponse, std::move(resp), SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent PBKDF param response");
+
+    mNextExpectedMsg = MsgType::PASE_Pake1;
 
     return CHIP_NO_ERROR;
 }
@@ -636,11 +636,11 @@ CHIP_ERROR PASESession::SendMsg1()
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg));
 
-    mNextExpectedMsg = MsgType::PASE_Pake2;
-
     ReturnErrorOnFailure(
         mExchangeCtxt->SendMessage(MsgType::PASE_Pake1, std::move(msg), SendFlags(SendMessageFlags::kExpectResponse)));
     ChipLogDetail(SecureChannel, "Sent spake2p msg1");
+
+    mNextExpectedMsg = MsgType::PASE_Pake2;
 
     return CHIP_NO_ERROR;
 }
@@ -697,10 +697,10 @@ CHIP_ERROR PASESession::HandleMsg1_and_SendMsg2(System::PacketBufferHandle && ms
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg2));
 
-        mNextExpectedMsg = MsgType::PASE_Pake3;
-
         err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake2, std::move(msg2), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
+
+        mNextExpectedMsg = MsgType::PASE_Pake3;
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg2");
@@ -772,10 +772,10 @@ CHIP_ERROR PASESession::HandleMsg2_and_SendMsg3(System::PacketBufferHandle && ms
         SuccessOrExit(err = tlvWriter.EndContainer(outerContainerType));
         SuccessOrExit(err = tlvWriter.Finalize(&msg3));
 
-        mNextExpectedMsg = MsgType::StatusReport;
-
         err = mExchangeCtxt->SendMessage(MsgType::PASE_Pake3, std::move(msg3), SendFlags(SendMessageFlags::kExpectResponse));
         SuccessOrExit(err);
+
+        mNextExpectedMsg = MsgType::StatusReport;
     }
 
     ChipLogDetail(SecureChannel, "Sent spake2p msg3");
