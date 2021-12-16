@@ -26,6 +26,7 @@
 
 #include "OperationalDeviceProxy.h"
 
+#include "CASEClient.h"
 #include "CommandSender.h"
 #include "ReadPrepareParams.h"
 
@@ -35,13 +36,15 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <system/SystemLayer.h>
 
 using namespace chip::Callback;
 
 namespace chip {
 
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                           Dnssd::ResolverProxy * resolver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -52,7 +55,8 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        err = Dnssd::Resolver::Instance().ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
+        VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        err = resolver->ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 
@@ -80,7 +84,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
-        onFailure->mCall(onFailure->mContext, mPeerId.GetNodeId(), err);
+        onFailure->mCall(onFailure->mContext, mPeerId, err);
     }
 
     return err;
@@ -98,7 +102,10 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by CASE session protocol messages that include MRP parameters.
-    mCASESession.SetMRPConfig(mMRPConfig);
+    if (mCASEClient)
+    {
+        mCASEClient->SetMRPIntervals(mMRPConfig);
+    }
 
     if (mState == State::NeedsAddress)
     {
@@ -111,7 +118,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     }
     else
     {
-        if (!mSecureSession.HasValue())
+        if (!mSecureSession)
         {
             // Nothing needs to be done here.  It's not an error to not have a
             // secureSession.  For one thing, we could have gotten an different
@@ -120,7 +127,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
             return CHIP_NO_ERROR;
         }
 
-        Transport::SecureSession * secureSession = mInitParams.sessionManager->GetSecureSession(mSecureSession.Value());
+        Transport::SecureSession * secureSession = mInitParams.sessionManager->GetSecureSession(mSecureSession.Get());
         if (secureSession != nullptr)
         {
             secureSession->SetPeerAddress(addr);
@@ -144,21 +151,12 @@ bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port)
 
 CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
 {
-    // Create a UnauthenticatedSession for CASE pairing.
-    // Don't use mSecureSession here, because mSecureSession is for encrypted communication.
-    Optional<SessionHandle> session = mInitParams.sessionManager->CreateUnauthenticatedSession(mDeviceAddress, mMRPConfig);
-    VerifyOrReturnError(session.HasValue(), CHIP_ERROR_NO_MEMORY);
-
-    Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
-    VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
-
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mInitParams.sessionManager));
-
-    uint16_t keyID = 0;
-    ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
-
-    ReturnErrorOnFailure(
-        mCASESession.EstablishSession(mDeviceAddress, mInitParams.fabricInfo, mPeerId.GetNodeId(), keyID, exchange, this));
+    mCASEClient = mInitParams.clientPool->Allocate(CASEClientInitParams{
+        mInitParams.sessionManager, mInitParams.exchangeMgr, mInitParams.idAllocator, mFabricInfo, mInitParams.mrpLocalConfig });
+    ReturnErrorCodeIf(mCASEClient == nullptr, CHIP_ERROR_NO_MEMORY);
+    CHIP_ERROR err =
+        mCASEClient->EstablishSession(mPeerId, mDeviceAddress, mMRPConfig, HandleCASEConnected, HandleCASEConnectionFailure, this);
+    ReturnErrorOnFailure(err);
 
     mState = State::Connecting;
 
@@ -207,78 +205,102 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
         cb->Cancel();
         if (executeCallback)
         {
-            cb->mCall(cb->mContext, mPeerId.GetNodeId(), error);
+            cb->mCall(cb->mContext, mPeerId, error);
         }
     }
 }
 
-void OperationalDeviceProxy::OnSessionEstablishmentError(CHIP_ERROR error)
+void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error)
 {
-    VerifyOrReturn(mState != State::Uninitialized && mState != State::NeedsAddress,
-                   ChipLogError(Controller, "OnSessionEstablishmentError was called while the device was not initialized"));
+    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
+    VerifyOrReturn(device->mState != State::Uninitialized && device->mState != State::NeedsAddress,
+                   ChipLogError(Controller, "HandleCASEConnectionFailure was called while the device was not initialized"));
+    VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnectionFailure for unknown CASEClient"));
 
-    mState = State::Initialized;
-    mInitParams.idAllocator->Free(mCASESession.GetLocalSessionId());
+    device->mState = State::Initialized;
 
-    DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
-    DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
+    device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
+    device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
+    device->DeferCloseCASESession();
 }
 
-void OperationalDeviceProxy::OnSessionEstablished()
+void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
 {
-    VerifyOrReturn(mState != State::Uninitialized,
-                   ChipLogError(Controller, "OnSessionEstablished was called while the device was not initialized"));
+    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
+    VerifyOrReturn(device->mState != State::Uninitialized,
+                   ChipLogError(Controller, "HandleCASEConnected was called while the device was not initialized"));
+    VerifyOrReturn(client == device->mCASEClient, ChipLogError(Controller, "HandleCASEConnected for unknown CASEClient"));
 
-    CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), &mCASESession,
-        CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());
+    CHIP_ERROR err = client->DeriveSecureSessionHandle(device->mSecureSession);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "Failed in setting up CASE secure channel: err %s", ErrorStr(err));
-        OnSessionEstablishmentError(err);
-        return;
+        device->HandleCASEConnectionFailure(context, client, err);
     }
-    mSecureSession.SetValue(SessionHandle(mPeerId.GetNodeId(), mCASESession.GetLocalSessionId(), mCASESession.GetPeerSessionId(),
-                                          mInitParams.fabricInfo->GetFabricIndex()));
+    else
+    {
+        device->mState = State::SecureConnected;
 
-    mState = State::SecureConnected;
-
-    DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
-    DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
+        device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
+        device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
+        device->DeferCloseCASESession();
+    }
 }
 
 CHIP_ERROR OperationalDeviceProxy::Disconnect()
 {
     ReturnErrorCodeIf(mState != State::SecureConnected, CHIP_ERROR_INCORRECT_STATE);
-    if (mSecureSession.HasValue())
+    if (mSecureSession)
     {
-        mInitParams.sessionManager->ExpirePairing(mSecureSession.Value());
+        mInitParams.sessionManager->ExpirePairing(mSecureSession.Get());
     }
     mState = State::Initialized;
-    mCASESession.Clear();
+    if (mCASEClient)
+    {
+        mInitParams.clientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
+    }
     return CHIP_NO_ERROR;
 }
 
 void OperationalDeviceProxy::Clear()
 {
-    mCASESession.Clear();
+    if (mCASEClient)
+    {
+        mInitParams.clientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
+    }
 
     mState      = State::Uninitialized;
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
+void OperationalDeviceProxy::CloseCASESessionTask(System::Layer * layer, void * context)
 {
-    VerifyOrReturn(mSecureSession.HasValue() && mSecureSession.Value() == session,
+    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
+    if (device->mCASEClient)
+    {
+        device->mInitParams.clientPool->Release(device->mCASEClient);
+        device->mCASEClient = nullptr;
+    }
+}
+
+void OperationalDeviceProxy::DeferCloseCASESession()
+{
+    // Defer the release for the pending Ack to be sent
+    mSystemLayer->ScheduleWork(CloseCASESessionTask, this);
+}
+
+void OperationalDeviceProxy::OnSessionReleased(const SessionHandle & session)
+{
+    VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = State::Initialized;
-    mSecureSession.ClearValue();
+    mSecureSession.Release();
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
 {
-    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mInitParams.fabricInfo->GetFabricIndex(),
-                                                                             GetDeviceId());
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
 }
 
 OperationalDeviceProxy::~OperationalDeviceProxy() {}

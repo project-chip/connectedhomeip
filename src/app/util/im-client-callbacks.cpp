@@ -20,11 +20,9 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
-#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
@@ -32,7 +30,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
-using namespace ::chip::app::List;
 
 void LogStatus(uint8_t status)
 {
@@ -279,7 +276,7 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
 // Singleton instance of the callbacks manager
 static app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus status)
+bool IMDefaultResponseCallback(const app::CommandSender * commandObj, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
     ChipLogProgress(Zcl, "  Transaction: %p", commandObj);
@@ -360,125 +357,6 @@ bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::P
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
         cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
-    }
-
-    return true;
-}
-
-bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ConcreteAttributePath * aPath,
-                                            TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
-{
-    ChipLogProgress(Zcl, "ReadAttributesResponse:");
-    if (aPath != nullptr)
-    {
-        ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mClusterId));
-    }
-
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    app::TLVDataFilter tlvFilter             = nullptr;
-    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (apReadClient->IsSubscriptionType())
-    {
-        if (aPath != nullptr)
-        {
-            err = gCallbacks.GetReportCallback(apReadClient->GetPeerNodeId(), aPath->mEndpointId, aPath->mClusterId,
-                                               aPath->mAttributeId, &onSuccessCallback, &tlvFilter);
-        }
-    }
-    else
-    {
-        err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apReadClient), 0, &onSuccessCallback, &onFailureCallback,
-                                             &tlvFilter);
-    }
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr && !apReadClient->IsSubscriptionType())
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-
-        if (tlvFilter == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing TLV Data Filter", __FUNCTION__);
-        }
-        return true;
-    }
-
-    if (aPath != nullptr)
-    {
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mAttributeId));
-    }
-    LogIMStatus(status);
-
-    if (status == Protocols::InteractionModel::Status::Success && apData != nullptr)
-    {
-        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", apData->GetType());
-        tlvFilter(apData, onSuccessCallback, onFailureCallback);
-    }
-    else if (onFailureCallback != nullptr)
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        // TODO: Should change failure callbacks to accept uint16 status code.
-        cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
-    }
-
-    return true;
-}
-
-bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
-{
-    auto subscriptionId = apSubscribeClient->GetSubscriptionId();
-    ChipLogProgress(Zcl, "SubscribeResponse:");
-    if (subscriptionId.HasValue())
-    {
-        ChipLogProgress(Zcl, "  SubscriptionId:        0x%" PRIx64, subscriptionId.Value());
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "  SubscriptionId:        <missing>");
-    }
-    LogStatus(status);
-
-    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apSubscribeClient), 0, &onSuccessCallback, &onFailureCallback);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-        return true;
-    }
-
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultSuccessCallback> * cb =
-            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-        cb->mCall(cb->mContext);
-    }
-    else
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
     }
 
     return true;

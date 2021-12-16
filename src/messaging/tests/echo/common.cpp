@@ -49,7 +49,7 @@ void InitializeChip(void)
     SuccessOrExit(err);
 
     // Initialize TCP.
-    err = chip::DeviceLayer::InetLayer().InitTCP(chip::DeviceLayer::TCPEndPointManager());
+    err = chip::DeviceLayer::TCPEndPointManager()->Init(chip::DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
 exit:
@@ -65,5 +65,6 @@ void ShutdownChip(void)
     gMessageCounterManager.Shutdown();
     gExchangeManager.Shutdown();
     gSessionManager.Shutdown();
+    (void) chip::DeviceLayer::TCPEndPointManager()->Shutdown();
     chip::DeviceLayer::PlatformMgr().Shutdown();
 }

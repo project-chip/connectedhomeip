@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -39,6 +38,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
@@ -128,12 +128,11 @@ CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
-    memset(&cachableSession, 0, sizeof(cachableSession));
     cachableSession.mSharedSecretLen = LittleEndian::HostSwap16(static_cast<uint16_t>(mSharedSecret.Length()));
     cachableSession.mPeerNodeId      = LittleEndian::HostSwap64(peerNodeId);
     for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        cachableSession.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
+        cachableSession.mPeerCATs.values[i] = LittleEndian::HostSwap32(GetPeerCATs().values[i]);
     }
     // TODO: Get the fabric index
     cachableSession.mLocalFabricIndex      = 0;
@@ -153,10 +152,10 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     memcpy(mSharedSecret, cachableSession.mSharedSecret, length);
 
     SetPeerNodeId(LittleEndian::HostSwap64(cachableSession.mPeerNodeId));
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        peerCATs.val[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.val[i]);
+        peerCATs.values[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.values[i]);
     }
     SetPeerCATs(peerCATs);
     SetSessionTimeStamp(LittleEndian::HostSwap64(cachableSession.mSessionSetupTimeStamp));
@@ -193,12 +192,14 @@ CHIP_ERROR CASESession::Init(uint16_t localSessionId, SessionEstablishmentDelega
 }
 
 CHIP_ERROR
-CASESession::ListenForSessionEstablishment(uint16_t localSessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate)
+CASESession::ListenForSessionEstablishment(uint16_t localSessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+                                           Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     VerifyOrReturnError(fabrics != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(Init(localSessionId, delegate));
 
-    mFabricsTable = fabrics;
+    mFabricsTable   = fabrics;
+    mLocalMRPConfig = mrpConfig;
 
     mCASESessionEstablished = false;
 
@@ -209,7 +210,7 @@ CASESession::ListenForSessionEstablishment(uint16_t localSessionId, FabricTable 
 
 CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
                                          uint16_t localSessionId, ExchangeContext * exchangeCtxt,
-                                         SessionEstablishmentDelegate * delegate)
+                                         SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -227,9 +228,10 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     // been initialized
     SuccessOrExit(err);
 
-    mFabricInfo = fabric;
+    mFabricInfo     = fabric;
+    mLocalMRPConfig = mrpConfig;
 
-    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
+    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
     SetPeerAddress(peerAddress);
     SetPeerNodeId(peerNodeId);
 
@@ -287,12 +289,12 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
                                                   sizeof(uint16_t),            // initiatorSessionId,
                                                   kSHA256_Hash_Length,         // destinationId
                                                   kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                  /* TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                                     sizeof(uint16)_t), // initiatorMRPParams */
+                                                  mrpParamsSize,               // initiatorMRPParams
                                                   kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
@@ -327,6 +329,12 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ReturnErrorOnFailure(
         tlvWriter.PutBytes(TLV::ContextTag(4), mEphemeralKey.Pubkey(), static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
+
+    if (mLocalMRPConfig.HasValue())
+    {
+        ChipLogDetail(SecureChannel, "Including MRP parameters");
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+    }
 
     // If CASE session was previously established using the current state information, let's fill in the session resumption
     // information in the the Sigma1 request. It'll speed up the session establishment process if the peer can resume the old
@@ -451,8 +459,9 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
-    size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                                                                    sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t max_sigma2_resume_data_len =
+        TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -478,7 +487,11 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), GetLocalSessionId()));
 
-    // TODO: Add support for optional MRP parameters
+    if (mLocalMRPConfig.HasValue())
+    {
+        ChipLogDetail(SecureChannel, "Including MRP parameters");
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(4), mLocalMRPConfig.Value(), tlvWriter));
+    }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
@@ -589,8 +602,9 @@ CHIP_ERROR CASESession::SendSigma2()
                                          CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
+                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, mrpParamsSize);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -606,6 +620,11 @@ CHIP_ERROR CASESession::SendSigma2()
         tlvWriterMsg2.PutBytes(TLV::ContextTag(3), mEphemeralKey.Pubkey(), static_cast<uint32_t>(mEphemeralKey.Pubkey().Length())));
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(4), msg_R2_Encrypted.Get(),
                                                 static_cast<uint32_t>(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES)));
+    if (mLocalMRPConfig.HasValue())
+    {
+        ChipLogDetail(SecureChannel, "Including MRP parameters");
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriterMsg2));
+    }
     ReturnErrorOnFailure(tlvWriterMsg2.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.Finalize(&msg_R2));
 
@@ -660,6 +679,11 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     SuccessOrExit(err = tlvReader.Next());
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(responderSessionId));
+
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(4), tlvReader));
+    }
 
     ChipLogDetail(SecureChannel, "Peer assigned session session ID %d", responderSessionId);
     SetPeerSessionId(responderSessionId);
@@ -826,9 +850,17 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId, static_cast<uint32_t>(sizeof(mResumptionId))));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
-    SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
-    SetPeerCATs(peerCATs);
+    {
+        CATValues peerCATs;
+        SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
+        SetPeerCATs(peerCATs);
+    }
+
+    // Retrieve responderMRPParams if present
+    if (tlvReader.Next() != CHIP_END_OF_TLV)
+    {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(TLV::ContextTag(5), tlvReader));
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1088,9 +1120,11 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
-    SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
-    SetPeerCATs(peerCATs);
+    {
+        CATValues peerCATs;
+        SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
+        SetPeerCATs(peerCATs);
+    }
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 
@@ -1354,7 +1388,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     CHIP_ERROR err = tlvReader.Next();
     if (err == CHIP_NO_ERROR && tlvReader.GetTag() == ContextTag(kInitiatorMRPParamsTag))
     {
-        // We don't handle this yet; just move on.
+        ReturnErrorOnFailure(DecodeMRPParametersIfPresent(TLV::ContextTag(kInitiatorMRPParamsTag), tlvReader));
         err = tlvReader.Next();
     }
 
@@ -1420,7 +1454,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     else
     {
         mExchangeCtxt = ec;
-        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout);
+        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);

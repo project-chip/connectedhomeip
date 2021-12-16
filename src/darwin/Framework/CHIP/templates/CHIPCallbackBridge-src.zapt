@@ -52,4 +52,11 @@
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
 
+{{#zcl_clusters}}
+{{#zcl_enums}}
+{{#>CHIPCallbackBridge type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/CHIPCallbackBridge}}
+{{/zcl_enums}}
+{{/zcl_clusters}}
+
 {{/if}}

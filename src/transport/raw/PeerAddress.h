@@ -111,19 +111,12 @@ public:
 
     bool operator!=(const PeerAddress & other) const { return !(*this == other); }
 
-    /// Maximum size of an Inet address ToString format, that can hold both IPV6 and IPV4 addresses.
-#ifdef INET6_ADDRSTRLEN
-    static constexpr size_t kInetMaxAddrLen = INET6_ADDRSTRLEN;
-#else
-    static constexpr size_t kInetMaxAddrLen = INET_ADDRSTRLEN;
-#endif
-
     /// Maximum size of the string outputes by ToString. Format is of the form:
     /// "UDP:<ip>:<port>"
     static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
         + 1                                      // splitter :
         + 2                                      // brackets around address
-        + kInetMaxAddrLen                        // address
+        + Inet::IPAddress::kMaxStringLength      // address
         + 1                                      // splitter %
         + Inet::InterfaceId::kMaxIfNameLength    // interface
         + 1                                      // splitter :
@@ -138,7 +131,7 @@ public:
 
     void ToString(char * buf, size_t bufSize) const
     {
-        char ip_addr[kInetMaxAddrLen];
+        char ip_addr[Inet::IPAddress::kMaxStringLength];
 
         char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
         if (mInterface.IsPresent())

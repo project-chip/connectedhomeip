@@ -297,8 +297,6 @@ void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
-void MatterFixedLabelPluginServerInitCallback() {}
-void MatterSwitchPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
@@ -319,7 +317,6 @@ void MatterPollControlPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterLocalizationUnitPluginServerInitCallback() {}
 void MatterLocalizationTimeFormatPluginServerInitCallback() {}
-void MatterUserLabelPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
@@ -782,15 +779,15 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
 {
     uint8_t frameControl;
 
-    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
-    {
-        // If the compatibility can handle this response
-        return EMBER_SUCCESS;
-    }
-
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
     {
+        return EMBER_SUCCESS;
+    }
+
+    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    {
+        // If the compatibility can handle this response
         return EMBER_SUCCESS;
     }
 

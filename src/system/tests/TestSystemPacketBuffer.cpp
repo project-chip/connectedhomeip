@@ -48,11 +48,11 @@
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
-#define PBUF_TYPE(pbuf) (pbuf)->type_internal
-#else
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #define PBUF_TYPE(pbuf) (pbuf)->type
-#endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_TYPE(pbuf) (pbuf)->type_internal
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::Encoding::PacketBufferWriter;

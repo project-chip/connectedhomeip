@@ -32,6 +32,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
+#include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/DataModelTypes.h>
@@ -54,18 +55,6 @@ static constexpr uint32_t kMaxDERCertLength  = 600;
 
 // The decode buffer is used to reconstruct TBS section of X.509 certificate, which doesn't include signature.
 static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Crypto::kMax_ECDSA_Signature_Length_Der;
-
-// Muximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
-static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
-static constexpr CASEAuthTag kUndefinedCAT           = 0;
-
-struct CATValues
-{
-    CASEAuthTag val[kMaxSubjectCATAttributeCount];
-
-    size_t size() const { return ArraySize(val); }
-};
-static constexpr CATValues kUndefinedCATs = { { Credentials::kUndefinedCAT } };
 
 /** Data Element Tags for the CHIP Certificate
  */

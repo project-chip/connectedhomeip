@@ -67,9 +67,9 @@ constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the defaul
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
 
-#define FEATURE_MAP_OVERIDE FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
+#define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
 
-void emberAfThermostatClusterServerInitCallback()
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {
     // TODO
     // Get from the "real thermostat"
@@ -104,43 +104,40 @@ MatterThermostatClusterServerPreAttributeChangedCallback(const app::ConcreteAttr
     int16_t AbsMaxCoolSetpointLimit;
     int16_t MinCoolSetpointLimit;
     int16_t MaxCoolSetpointLimit;
-    int8_t DeadBand         = 0;
-    int16_t DeadBandTemp    = 0;
-    uint32_t FeatureMap     = 0;
-    bool AutoSupported      = false;
-    bool HeatSupported      = false;
-    bool CoolSupported      = false;
-    bool OccupancySupported = false;
+    int8_t DeadBand      = 0;
+    int16_t DeadBandTemp = 0;
     int16_t OccupiedCoolingSetpoint;
     int16_t OccupiedHeatingSetpoint;
     int16_t UnoccupiedCoolingSetpoint;
     int16_t UnoccupiedHeatingSetpoint;
+    uint32_t OurFeatureMap;
+    bool AutoSupported      = false;
+    bool HeatSupported      = false;
+    bool CoolSupported      = false;
+    bool OccupancySupported = false;
 
-// TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
-#ifndef FEATURE_MAP_OVERIDE
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
-#else
-    FeatureMap = FEATURE_MAP_OVERIDE;
-#endif
+    if (FeatureMap::Get(endpoint, &OurFeatureMap) != EMBER_ZCL_STATUS_SUCCESS)
+        OurFeatureMap = FEATURE_MAP_DEFAULT;
 
-    if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
-    {
+    if (OurFeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
         AutoSupported = true;
-        if (MinSetpointDeadBand::Get(endpoint, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
-        {
-            DeadBand = kDefaultDeadBand;
-        }
-        DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
-    }
-    if (FeatureMap & 1 << 0)
+
+    if (OurFeatureMap & 1 << 0)
         HeatSupported = true;
 
-    if (FeatureMap & 1 << 1)
+    if (OurFeatureMap & 1 << 1)
         CoolSupported = true;
 
-    if (FeatureMap & 1 << 2)
-        OccupancySupported = true;
+    if (OurFeatureMap & 1 << 2)
+
+        if (AutoSupported)
+        {
+            if (MinSetpointDeadBand::Get(endpoint, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
+            {
+                DeadBand = kDefaultDeadBand;
+            }
+            DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
+        }
 
     if (AbsMinCoolSetpointLimit::Get(endpoint, &AbsMinCoolSetpointLimit) != EMBER_ZCL_STATUS_SUCCESS)
         AbsMinCoolSetpointLimit = kDefaultAbsMinCoolSetpointLimit;
@@ -550,33 +547,31 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
     EmberAfStatus status                     = EMBER_ZCL_STATUS_FAILURE;
     EmberAfStatus WriteCoolingSetpointStatus = EMBER_ZCL_STATUS_FAILURE;
     EmberAfStatus WriteHeatingSetpointStatus = EMBER_ZCL_STATUS_FAILURE;
-    bool AutoSupported                       = false;
-    bool HeatSupported                       = false;
-    bool CoolSupported                       = false;
     int16_t DeadBandTemp                     = 0;
     int8_t DeadBand                          = 0;
-    uint32_t FeatureMap                      = 0;
+    uint32_t OurFeatureMap;
+    bool AutoSupported = false;
+    bool HeatSupported = false;
+    bool CoolSupported = false;
 
-    // TODO re-enable reading reaturemap once https://github.com/project-chip/connectedhomeip/pull/9725 is merged
-#ifndef FEATURE_MAP_OVERIDE
-    emberAfReadServerAttribute(endpoint, Thermostat::Id, chip::app::Clusters::Globals::Attributes::Ids::FeatureMap,
-                               (uint8_t *) &FeatureMap, sizeof(FeatureMap));
-#else
-    FeatureMap = FEATURE_MAP_OVERIDE;
-#endif
+    if (FeatureMap::Get(aEndpointId, &OurFeatureMap) != EMBER_ZCL_STATUS_SUCCESS)
+        OurFeatureMap = FEATURE_MAP_DEFAULT;
 
-    if (FeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
-    {
+    if (OurFeatureMap & 1 << 5) // Bit 5 is Auto Mode supported
         AutoSupported = true;
+
+    if (OurFeatureMap & 1 << 0)
+        HeatSupported = true;
+
+    if (OurFeatureMap & 1 << 1)
+        CoolSupported = true;
+
+    if (AutoSupported)
+    {
         if (MinSetpointDeadBand::Get(aEndpointId, &DeadBand) != EMBER_ZCL_STATUS_SUCCESS)
             DeadBand = kDefaultDeadBand;
         DeadBandTemp = static_cast<int16_t>(DeadBand * 10);
     }
-    if (FeatureMap & 1 << 0)
-        HeatSupported = true;
-
-    if (FeatureMap & 1 << 1)
-        CoolSupported = true;
 
     switch (mode)
     {

@@ -182,10 +182,17 @@ class ChipDeviceController(object):
 
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
+        self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
                 self.devCtrl, discriminator, setupPinCode, nodeid)
         )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
 
     def CloseBLEConnection(self):
         return self._ChipStack.Call(
@@ -234,6 +241,18 @@ class ChipDeviceController(object):
             # Error 50 is a timeout
             return False
         return self._ChipStack.commissioningEventRes == 0
+
+    def SetWifiCredentials(self, ssid, credentials):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(
+                ssid, credentials)
+        )
+
+    def SetThreadOperationalDataset(self, threadOperationalDataset):
+        return self._ChipStack.Call(
+            lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
+                threadOperationalDataset, len(threadOperationalDataset))
+        )
 
     def ResolveNode(self, nodeid):
         return self._ChipStack.CallAsync(
@@ -443,7 +462,7 @@ class ChipDeviceController(object):
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
         typing.Tuple[int, typing.Type[ClusterObjects.ClusterAttributeDescriptor]]
-    ]], reportInterval: typing.Tuple[int, int] = None):
+    ]], returnClusterObject: bool = False, reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of attributes from a target node
 
@@ -456,12 +475,15 @@ class ChipDeviceController(object):
             Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
             '*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
 
-        The cluster and attributes specified above are to be selected from the generated cluster objects.
+            The cluster and attributes specified above are to be selected from the generated cluster objects.
 
-        e.g.
-            ReadAttribute(1, [ 1 ] ) -- case 4 above.
-            ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
-            ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+            e.g.
+                ReadAttribute(1, [ 1 ] ) -- case 4 above.
+                ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
+                ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
+
+        returnClusterObject: This returns the data as consolidated cluster objects, with all attributes for a cluster inside
+                             a single cluster-wide cluster object.
 
         reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
             When not provided, a read request will be sent.
@@ -480,7 +502,6 @@ class ChipDeviceController(object):
                 # Wildcard
                 pass
             elif type(v) is not tuple:
-                print(type(v))
                 if type(v) is int:
                     endpoint = v
                 elif issubclass(v, ClusterObjects.Cluster):
@@ -501,7 +522,7 @@ class ChipDeviceController(object):
             attrs.append(ClusterAttribute.AttributePath(
                 EndpointId=endpoint, Cluster=cluster, Attribute=attribute))
         res = self._ChipStack.Call(
-            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
+            lambda: ClusterAttribute.ReadAttributes(future, eventLoop, device, self, attrs, returnClusterObject, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
         return await future
@@ -512,11 +533,11 @@ class ChipDeviceController(object):
         # Wildcard endpoint, Cluster id present
         typing.Tuple[typing.Type[ClusterObjects.Cluster]],
         # Wildcard endpoint, Cluster + Event present
-        typing.Tuple[typing.Type[ClusterObjects.ClusterEventDescriptor]],
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEvent]],
         # Wildcard event id
         typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
         # Concrete path
-        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEventDescriptor]]
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEvent]]
     ]], reportInterval: typing.Tuple[int, int] = None):
         '''
         Read a list of events from a target node
@@ -559,7 +580,7 @@ class ChipDeviceController(object):
                     endpoint = v
                 elif issubclass(v, ClusterObjects.Cluster):
                     cluster = v
-                elif issubclass(v, ClusterObjects.ClusterEventDescriptor):
+                elif issubclass(v, ClusterObjects.ClusterEvent):
                     event = v
                 else:
                     raise ValueError("Unsupported Event Path")
@@ -568,7 +589,7 @@ class ChipDeviceController(object):
                 endpoint = v[0]
                 if issubclass(v[1], ClusterObjects.Cluster):
                     cluster = v[1]
-                elif issubclass(v[1], ClusterAttribute.ClusterEventDescriptor):
+                elif issubclass(v[1], ClusterAttribute.ClusterEvent):
                     event = v[1]
                 else:
                     raise ValueError("Unsupported Attribute Path")
@@ -597,16 +618,19 @@ class ChipDeviceController(object):
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         req = None
+        clusterType = eval(f"GeneratedObjects.{cluster}")
+
         try:
-            req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
+            attributeType = eval(
+                f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except:
             raise UnknownAttribute(cluster, attribute)
 
         result = asyncio.run(self.ReadAttribute(
-            nodeid, [(endpoint, req)]))['Attributes']
+            nodeid, [(endpoint, attributeType)]))
         path = ClusterAttribute.AttributePath(
-            EndpointId=endpoint, Attribute=req)
-        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[path].Data.value)
+            EndpointId=endpoint, Attribute=attributeType)
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[endpoint][clusterType][attributeType])
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
@@ -624,7 +648,7 @@ class ChipDeviceController(object):
             req = eval(f"GeneratedObjects.{cluster}.Attributes.{attribute}")
         except:
             raise UnknownAttribute(cluster, attribute)
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], reportInterval=(minInterval, maxInterval)))
+        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], False, reportInterval=(minInterval, maxInterval)))
 
     def ZCLShutdownSubscription(self, subscriptionId: int):
         res = self._ChipStack.Call(
@@ -673,6 +697,14 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
+
+            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.argtypes = [
+                c_char_p, c_uint32]
+            self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
+                c_char_p, c_char_p]
+            self._dmLib.pychip_DeviceController_SetWifiCredentials.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]

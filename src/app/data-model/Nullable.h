@@ -41,6 +41,9 @@ struct Nullable : protected Optional<T>
     // Optional.
     using Optional<T>::Value;
 
+    // Some consumers need an easy way to determine our underlying type.
+    using UnderlyingType = T;
+
     constexpr void SetNull() { Optional<T>::ClearValue(); }
     constexpr bool IsNull() const { return !Optional<T>::HasValue(); }
 

@@ -27,10 +27,10 @@ public interface ContentLaunchManager {
    * @return The list of content types supported by the Video Player or Content App in the form of
    *     entries in the HTTP "Accept" request header.
    */
-  String[] getAcceptsHeader();
+  String[] getAcceptHeader();
 
   /** @return The list information about supported streaming protocols in STREAMING_TYPE_XXX. */
-  int[] getSupportedStreamingTypes();
+  int[] getSupportedStreamingProtocols();
 
   /**
    * Launch the specified content with optional search criteria.

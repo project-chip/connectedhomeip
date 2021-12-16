@@ -108,6 +108,9 @@ private:
     Transport::PeerAddress mBobAddress;
     SecurePairingUsingTestSecret mPairingAliceToBob;
     SecurePairingUsingTestSecret mPairingBobToAlice;
+    SessionHolder mSessionAliceToBob;
+    SessionHolder mSessionBobToAlice;
+    SessionHolder mSessionBobToFriends;
     FabricIndex mSrcFabricIndex  = 0;
     FabricIndex mDestFabricIndex = 0;
 };

@@ -23,7 +23,6 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
 #include <app/util/ContentAppPlatform.h>
 #include <cstdio>
 #include <inttypes.h>
@@ -45,7 +44,7 @@ using namespace chip::AppPlatform;
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength, int32_t index)
+                                                   uint8_t * buffer, uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -64,7 +63,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer, int32_t index)
+                                                    uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -232,6 +231,16 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
     if (mContentAppFactory != NULL)
     {
         return mContentAppFactory->LoadContentAppByVendorId(vendorId);
+    }
+    return NULL;
+}
+
+ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApp application)
+{
+    ChipLogProgress(DeviceLayer, "GetLoadContentAppByAppId()");
+    if (mContentAppFactory != NULL)
+    {
+        return mContentAppFactory->LoadContentAppByAppId(application);
     }
     return NULL;
 }

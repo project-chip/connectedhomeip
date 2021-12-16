@@ -31,7 +31,7 @@ namespace {
 class MockResolver : public Resolver
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override { return InitStatus; }
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override { return InitStatus; }
     void Shutdown() override {}
     void SetResolverDelegate(ResolverDelegate *) override {}
     CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override
@@ -180,9 +180,26 @@ const nlTest sTests[] =
 
 } // namespace
 
+int TestCommissionableNodeController_Setup(void * inContext)
+{
+    if (CHIP_NO_ERROR != chip::Platform::MemoryInit())
+    {
+        return FAILURE;
+    }
+
+    return SUCCESS;
+}
+
+int TestCommissionableNodeController_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestCommissionableNodeController()
 {
-    nlTestSuite theSuite = { "CommissionableNodeController", &sTests[0], NULL, NULL };
+    nlTestSuite theSuite = { "CommissionableNodeController", &sTests[0], TestCommissionableNodeController_Setup,
+                             TestCommissionableNodeController_Teardown };
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }

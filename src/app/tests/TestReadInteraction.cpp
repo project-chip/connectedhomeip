@@ -48,7 +48,6 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::NodeId kTestNodeId              = 1;
 chip::ClusterId kTestClusterId        = 6;
 chip::ClusterId kInvalidTestClusterId = 7;
 chip::EndpointId kTestEndpointId      = 1;
@@ -68,13 +67,13 @@ public:
         auto * ctx = static_cast<TestContext *>(context);
 
         chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources);
+                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
 
         return SUCCESS;
     }
@@ -95,9 +94,11 @@ class TestEventGenerator : public chip::app::EventLoggingDelegate
 public:
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        err            = aWriter.Put(kTestEventTag, mStatus);
-        return err;
+        chip::TLV::TLVType dataContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
+                                                    chip::TLV::kTLVType_Structure, dataContainerType));
+        ReturnErrorOnFailure(aWriter.Put(kTestEventTag, mStatus));
+        return aWriter.EndContainer(dataContainerType);
     }
 
     void SetStatus(int32_t aStatus) { mStatus = aStatus; }
@@ -110,16 +111,14 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = fa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
-    chip::app::EventSchema schema1 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdDebug,
-                                       chip::app::PriorityLevel::Info };
-    chip::app::EventSchema schema2 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdCritical,
-                                       chip::app::PriorityLevel::Critical };
     chip::app::EventOptions options1;
-    chip::app::EventOptions options2;
-    TestEventGenerator testEventGenerator;
+    options1.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdDebug };
+    options1.mPriority = chip::app::PriorityLevel::Info;
 
-    options1.mpEventSchema = &schema1;
-    options2.mpEventSchema = &schema2;
+    chip::app::EventOptions options2;
+    options2.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdCritical };
+    options2.mPriority = chip::app::PriorityLevel::Critical;
+    TestEventGenerator testEventGenerator;
     if (aIsUrgent)
     {
         options2.mUrgent = chip::app::EventOptions::Type::kUrgent;
@@ -166,18 +165,7 @@ public:
     void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
                      chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
     {
-        static int numDataElementIndex = 0;
-
-        if (numDataElementIndex == 0)
-        {
-            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical);
-        }
-        else if (numDataElementIndex == 1)
-        {
-            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Info);
-        }
-
-        ++numDataElementIndex;
+        ++mNumDataElementIndex;
         mGotEventResponse = true;
     }
 
@@ -211,6 +199,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
@@ -222,29 +211,32 @@ public:
 
 namespace chip {
 namespace app {
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     if (aPath.mClusterId >= Test::kMockEndpointMin)
     {
-        return Test::ReadSingleMockClusterData(aAccessingFabricIndex, aPath, aAttributeReports, apEncoderState);
+        return Test::ReadSingleMockClusterData(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState);
     }
 
     if (!(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId))
     {
-        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-        AttributeDataIB::Builder attributeData;
-        AttributePathIB::Builder attributePath;
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
         ChipLogDetail(DataManagement, "TEST Cluster %" PRIx32 ", Field %" PRIx32 " is dirty", aPath.mClusterId, aPath.mAttributeId);
 
-        AttributeStatusIB::Builder attributeStatus;
-        attributeStatus = attributeReport.CreateAttributeStatus();
-        attributePath   = attributeStatus.CreatePath();
+        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+        ReturnErrorOnFailure(attributeReport.GetError());
+        AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
+        ReturnErrorOnFailure(attributeStatus.GetError());
+
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
-        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+        ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+        ReturnErrorOnFailure(errorStatus.GetError());
         attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
@@ -294,20 +286,20 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     err = reportDataMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributeReportIBs::Builder attributeReportIBsBuilder = reportDataMessageBuilder.CreateAttributeReportIBs();
+    AttributeReportIBs::Builder & attributeReportIBsBuilder = reportDataMessageBuilder.CreateAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeReportIB::Builder attributeReportIBBuilder = attributeReportIBsBuilder.CreateAttributeReport();
+    AttributeReportIB::Builder & attributeReportIBBuilder = attributeReportIBsBuilder.CreateAttributeReport();
     NL_TEST_ASSERT(apSuite, attributeReportIBsBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeDataIB::Builder attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
     NL_TEST_ASSERT(apSuite, attributeReportIBBuilder.GetError() == CHIP_NO_ERROR);
 
     attributeDataIBBuilder.DataVersion(2);
     err = attributeDataIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
     if (aNeedInvalidReport)
@@ -369,7 +361,7 @@ void TestReadInteraction::TestReadClient(nlTestSuite * apSuite, void * apContext
     err = readClient.Init(&ctx.GetExchangeManager(), &delegate, chip::app::ReadClient::InteractionType::Read);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequest(readPrepareParams);
+    err = readClient.SendRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, false /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
@@ -404,10 +396,10 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
@@ -496,7 +488,7 @@ void TestReadInteraction::TestReadClientInvalidReport(nlTestSuite * apSuite, voi
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
-    err = readClient.SendReadRequest(readPrepareParams);
+    err = readClient.SendRequest(readPrepareParams);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     GenerateReportData(apSuite, apContext, buf, true /*aNeedInvalidReport*/, true /* aSuppressResponse*/);
@@ -533,10 +525,10 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     err = readRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
@@ -693,14 +685,28 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
+    readPrepareParams.mEventNumber                 = 1;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mNumDataElementIndex == 1);
+    NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
+    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
+    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
+    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
+    delegate.mGotEventResponse     = false;
+    delegate.mNumAttributeResponse = 0;
+    delegate.mGotReport            = false;
+    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, !delegate.mReadError);
+
     // By now we should have closed all exchanges and sent all pending acks, so
     // there should be no queued-up things in the retransmit table.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
@@ -944,10 +950,10 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
@@ -1027,6 +1033,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     delegate.mGotReport = false;
     engine->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
@@ -1122,7 +1129,8 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 0);
 
-    // Test multiple subscriptipn
+    // Test multiple subscription
+    delegate.mGotEventResponse     = false;
     delegate.mNumAttributeResponse = 0;
     delegate.mGotReport            = false;
     ReadPrepareParams readPrepareParams1(ctx.GetSessionBobToAlice());
@@ -1191,34 +1199,11 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     readPrepareParams3.mMinIntervalFloorSeconds                  = 2;
     readPrepareParams3.mMaxIntervalCeilingSeconds                = 5;
 
-    printf("\nSend 4th subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
+    printf("\nSend 4th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
 
     ReadClient readClient3;
     readClient3.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
-    err = readClient3.SendSubscribeRequest(readPrepareParams3);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    engine->GetReportingEngine().Run();
-    NL_TEST_ASSERT(apSuite, delegate.mGotReport);
-    NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 1);
-    NL_TEST_ASSERT(apSuite, !delegate.mReadError);
-
-    delegate.mNumAttributeResponse = 0;
-    delegate.mGotReport            = false;
-    ReadPrepareParams readPrepareParams4(ctx.GetSessionBobToAlice());
-    chip::app::AttributePathParams attributePathParams4[1];
-    readPrepareParams4.mpAttributePathParamsList                 = attributePathParams4;
-    readPrepareParams4.mpAttributePathParamsList[0].mEndpointId  = kTestEndpointId;
-    readPrepareParams4.mpAttributePathParamsList[0].mClusterId   = kTestClusterId;
-    readPrepareParams4.mpAttributePathParamsList[0].mAttributeId = 1;
-    readPrepareParams4.mAttributePathParamsListSize              = 1;
-    readPrepareParams4.mMinIntervalFloorSeconds                  = 2;
-    readPrepareParams4.mMaxIntervalCeilingSeconds                = 5;
-
-    printf("\nSend 5th subscribe request message to Node: %" PRIu64 ",  resource exhausted\n", chip::kTestDeviceNodeId);
-
-    ReadClient readClient4;
-    readClient4.Init(&ctx.GetExchangeManager(), &delegate, ReadClient::InteractionType::Subscribe);
-    err = readClient4.SendSubscribeRequest(readPrepareParams4);
+    err = readClient3.SendRequest(readPrepareParams3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     engine->GetReportingEngine().Run();
     NL_TEST_ASSERT(apSuite, !delegate.mGotReport);
@@ -1447,7 +1432,7 @@ void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, voi
     readPrepareParams.mAttributePathParamsListSize = 1;
 
     readPrepareParams.mSessionHandle             = ctx.GetSessionBobToAlice();
-    readPrepareParams.mMinIntervalFloorSeconds   = 5;
+    readPrepareParams.mMinIntervalFloorSeconds   = 6;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 

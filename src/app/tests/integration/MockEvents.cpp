@@ -110,9 +110,11 @@ void LivenessEventGenerator::Generate(void)
 
 CHIP_ERROR LivenessEventGenerator::WriteEvent(chip::TLV::TLVWriter & aWriter)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = aWriter.Put(kLivenessDeviceStatus, mStatus);
-    return err;
+    chip::TLV::TLVType dataContainerType;
+    ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
+                                                chip::TLV::kTLVType_Structure, dataContainerType));
+    ReturnErrorOnFailure(aWriter.Put(kLivenessDeviceStatus, mStatus));
+    return aWriter.EndContainer(dataContainerType);
 }
 
 chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip::EndpointId aEndpointId,
@@ -121,10 +123,10 @@ chip::EventNumber LivenessEventGenerator::LogLiveness(chip::NodeId aNodeId, chip
 {
     chip::app::EventManagement & logManager = chip::app::EventManagement::GetInstance();
     chip::EventNumber number                = 0;
-    chip::app::EventSchema schema           = { aNodeId, aEndpointId, kTestClusterId, aEventId, aPriorityLevel };
     chip::app::EventOptions options;
-    mStatus               = static_cast<int32_t>(aStatus);
-    options.mpEventSchema = &schema;
+    options.mPath     = { aEndpointId, kTestClusterId, aEventId };
+    options.mPriority = aPriorityLevel;
+    mStatus           = static_cast<int32_t>(aStatus);
     logManager.LogEvent(this, options, number);
     return number;
 }

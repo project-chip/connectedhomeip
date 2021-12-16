@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -228,6 +229,20 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         fabricListChanged();
+
+        // The Leave event SHOULD be emitted by a Node prior to permanently
+        // leaving the Fabric.
+        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        {
+            // If Basic cluster is implemented on this endpoint
+            Basic::Events::Leave::Type event;
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            }
+        }
     }
 
     // Gets called when a fabric is loaded into the FabricTable from KVS store.
@@ -362,13 +377,12 @@ FabricInfo gFabricBeingCommissioned;
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
                            CharSpan debug_text)
 {
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
-                                         Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), OperationalCredentials::Id, Commands::NOCResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
 
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
+    ReturnErrorOnFailure(commandObj->PrepareCommand(path));
     writer = commandObj->GetCommandDataIBTLVWriter();
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
     if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)

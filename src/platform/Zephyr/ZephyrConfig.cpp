@@ -71,6 +71,11 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+
+// Keys stored in the counters namespace
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason  = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");
+
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = {

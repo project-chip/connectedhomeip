@@ -159,24 +159,6 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
  */
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
-namespace chip {
-namespace app {
-
-using EndpointCallback = Loop (*)(EndpointId endpoint, intptr_t context);
-
-/**
- * @brief calls user-supplied function for every endpoint that has the given
- * server cluster, until either the function returns Loop::Break or we run out
- * of endpoints.
- *
- * Returns Loop::Break if the callee did, or Loop::Finished if we ran out of
- * endpoints.
- */
-Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context = 0);
-
-} // namespace app
-} // namespace chip
-
 /**
  * @brief Returns true if endpoint contains cluster client.
  *
@@ -589,30 +571,6 @@ uint8_t emberAfStringLength(const uint8_t * buffer);
 uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
- * @brief Function that copies (part of) a ZCL typed list into a buffer. The index parameter
- * may indicate a specific member of the list, or the list length, or the whole list if it
- * is equal to -1.
- *
- * Individual elements may be accessed by an index of type 16-bit unsigned integer.
- * Elements are numbered from 1 upwards. The element with index 0 is always of type
- * uint16, and holds the number of elements contained in the list, which may be zero.
- * If the zeroth element contains 0xffff, the list is a non value and is considered
- * undefined.
- *
- * When writing, dest points to the list to write to, src points to the value to write, and index is the index to write at.
- *
- * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read
- * from.
- *
- * When reading or writing if the index leads to read or write outside of the
- * allocated size for the list, this function will return 0.
- *
- * @return The number of bytes copied
- */
-uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
-                         int32_t index);
-
-/*
  * @brief Function that determines the size of a zigbee Cluster Library
  * attribute value (where the attribute could be non-string, string, or long
  * string). For strings, the size includes the length of the string plus the
@@ -620,15 +578,6 @@ uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * a
  */
 uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
                                    const uint8_t * buffer);
-
-/*
- * @brief Function that determines the size of a zigbee Cluster Library
- * attribute List[T] where T could be of any type.
- * The size is expressed in bytes, and includes the used length consumed
- * by list entries plus the 2 bytes used to represent the number of actual
- * entries in the list.
- */
-uint16_t emberAfAttributeValueListSize(chip::ClusterId clusterId, chip::AttributeId attributeId, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -1856,3 +1805,39 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+
+namespace chip {
+namespace app {
+
+class EnabledEndpointsWithServerCluster
+{
+public:
+    EnabledEndpointsWithServerCluster(ClusterId clusterId);
+
+    // Instead of having a separate Iterator class, optimize for codesize by
+    // just reusing ourselves as our own iterator.  We could do a bit better
+    // here with C++17 and using a different type for the end iterator, but this
+    // is the best I've found with C++14 so far.
+    //
+    // This does mean that you can only iterate a given
+    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
+    // in practice.
+    EnabledEndpointsWithServerCluster & begin() { return *this; }
+    const EnabledEndpointsWithServerCluster & end() const { return *this; }
+
+    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
+
+    EnabledEndpointsWithServerCluster & operator++();
+
+    EndpointId operator*() const { return emberAfEndpointFromIndex(mEndpointIndex); }
+
+private:
+    void EnsureMatchingEndpoint();
+
+    uint16_t mEndpointIndex = 0;
+    uint16_t mEndpointCount = emberAfEndpointCount();
+    ClusterId mClusterId;
+};
+
+} // namespace app
+} // namespace chip

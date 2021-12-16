@@ -528,35 +528,35 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf addWiFiNetwork:networkSSID.text password:networkPassword.text];
+                                                 [strongSelf addOrUpdateWiFiNetwork:networkSSID.text password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
+- (void)addOrUpdateWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                __auto_type * params = [[CHIPNetworkCommissioningClusterAddWiFiNetworkParams alloc] init];
+                __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
                 params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
                 params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
                 params.breadcrumb = @(0);
-                params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
                 [self->_cluster
-                    addWiFiNetworkWithParams:params
-                           completionHandler:^(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams * _Nullable response,
-                               NSError * _Nullable error) {
-                               // TODO: addWiFiNetworkWithParams
-                               // returns status in its response,
-                               // not via the NSError!
-                               [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                           }];
+                    addOrUpdateWiFiNetworkWithParams:params
+                                   completionHandler:^(
+                                       CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkResponseParams * _Nullable response,
+                                       NSError * _Nullable error) {
+                                       // TODO: addOrUpdateWiFiNetworkWithParams
+                                       // returns status in its response,
+                                       // not via the NSError!
+                                       [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                                   }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -567,28 +567,28 @@
     }
 }
 
-- (void)addThreadNetwork:(NSData *)threadDataSet
+- (void)addOrUpdateThreadNetwork:(NSData *)threadDataSet
 {
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
                                                                        endpoint:0
                                                                           queue:dispatch_get_main_queue()];
-                __auto_type * params = [[CHIPNetworkCommissioningClusterAddThreadNetworkParams alloc] init];
+                __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
                 params.operationalDataset = threadDataSet;
                 params.breadcrumb = @(0);
-                params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
                 [self->_cluster
-                    addThreadNetworkWithParams:params
-                             completionHandler:^(CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams * _Nullable response,
-                                 NSError * _Nullable error) {
-                                 // TODO: addThreadNetworkWithParams
-                                 // returns status in its response,
-                                 // not via the NSError!
-                                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                             }];
+                    addOrUpdateThreadNetworkWithParams:params
+                                     completionHandler:^(
+                                         CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkResponseParams * _Nullable response,
+                                         NSError * _Nullable error) {
+                                         // TODO: addOrUpdateThreadNetworkWithParams
+                                         // returns status in its response,
+                                         // not via the NSError!
+                                         [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                                     }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -606,7 +606,7 @@
         return;
     }
 
-    __auto_type * params = [[CHIPNetworkCommissioningClusterEnableNetworkParams alloc] init];
+    __auto_type * params = [[CHIPNetworkCommissioningClusterConnectNetworkParams alloc] init];
     if (isWiFi) {
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
@@ -615,19 +615,18 @@
         params.networkID = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
     }
     params.breadcrumb = @(0);
-    params.timeoutMs = @(3000);
 
     __weak typeof(self) weakSelf = self;
-    [_cluster enableNetworkWithParams:params
-                    completionHandler:^(
-                        CHIPNetworkCommissioningClusterEnableNetworkResponseParams * _Nullable response, NSError * _Nullable err) {
-                        // TODO: enableNetworkWithParams returns status in its
-                        // response, not via the NSError!
-                        [weakSelf onEnableNetworkResponse:err];
-                    }];
+    [_cluster connectNetworkWithParams:params
+                     completionHandler:^(CHIPNetworkCommissioningClusterConnectNetworkResponseParams * _Nullable response,
+                         NSError * _Nullable err) {
+                         // TODO: connectNetworkWithParams returns status in its
+                         // response, not via the NSError!
+                         [weakSelf onConnectNetworkResponse:err];
+                     }];
 }
 
-- (void)onEnableNetworkResponse:(NSError *)error
+- (void)onConnectNetworkResponse:(NSError *)error
 {
     if (error != nil) {
         NSLog(@"Error enabling network: %@", error);

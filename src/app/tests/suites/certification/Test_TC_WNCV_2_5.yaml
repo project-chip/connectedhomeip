@@ -26,12 +26,14 @@ tests:
     - label: "Reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: A_ENDPRODUCTTYPE
       response:
           value: 0
 
     - label: "Reads EndProductType attribute constraints from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: A_ENDPRODUCTTYPE
       response:
           constraints:
               type: enum8

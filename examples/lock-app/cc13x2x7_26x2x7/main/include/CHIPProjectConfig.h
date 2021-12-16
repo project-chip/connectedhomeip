@@ -50,13 +50,6 @@
 #endif // BUILD_RELEASE
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * 0x235A: Chip's Vendor Id.

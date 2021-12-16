@@ -46,6 +46,10 @@ declare_args() {
   chip_enable_openthread =
       chip_device_platform == "linux" || chip_device_platform == "qpg" ||
       chip_device_platform == "cc13x2_26x2" || chip_device_platform == "k32w0"
+}
+
+declare_args() {
+  chip_openthread_ftd = chip_enable_openthread
 
   # Enable wifi support.
   chip_enable_wifi =

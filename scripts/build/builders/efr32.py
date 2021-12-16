@@ -118,19 +118,17 @@ class Efr32Builder(GnBuilder):
         return args
 
     def build_outputs(self):
-        items = {
-            '%s.out' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir, '%s.out' %
-                             self.app.AppNamePrefix()),
-            '%s.out.map' % self.app.AppNamePrefix():
-                os.path.join(self.output_dir,
-                             '%s.out.map' % self.app.AppNamePrefix()),
-        }
+        items = {}
+        for extension in ["out", "out.map", "hex"]:
+            name = '%s.%s' % (self.app.AppNamePrefix(), extension)
+            items[name] = os.path.join(self.output_dir, name)
 
         if self.app == Efr32App.UNIT_TEST:
             # Include test runner python wheels
-            items["chip_nl_test_runner_wheels"] = os.path.join(
-                self.output_dir, 'chip_nl_test_runner_wheels')
+            for root, dirs, files in os.walk(os.path.join(self.output_dir, 'chip_nl_test_runner_wheels')):
+                for file in files:
+                    items["chip_nl_test_runner_wheels/" +
+                          file] = os.path.join(root, file)
 
         # Figure out flash bundle files and build accordingly
         with open(os.path.join(self.output_dir, self.app.FlashBundleName())) as f:

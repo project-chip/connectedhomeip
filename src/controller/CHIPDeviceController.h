@@ -28,14 +28,18 @@
 
 #pragma once
 
+#include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/AbstractDnssdDiscoveryController.h>
+#include <controller/AutoCommissioner.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <controller/CommissioningDelegate.h>
 #include <controller/OperationalCredentialsDelegate.h>
 #include <controller/SetUpCodePairer.h>
 #include <credentials/DeviceAttestationVerifier.h>
@@ -70,6 +74,7 @@
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #endif
 
 namespace chip {
@@ -110,26 +115,6 @@ struct ControllerInitParams
 
     FabricIndex fabricIndex = kMinValidFabricIndex;
     FabricId fabricId       = kUndefinedFabricId;
-};
-
-enum CommissioningStage : uint8_t
-{
-    kError,
-    kSecurePairing,
-    kArmFailsafe,
-    // kConfigTime,  // NOT YET IMPLEMENTED
-    // kConfigTimeZone,  // NOT YET IMPLEMENTED
-    // kConfigDST,  // NOT YET IMPLEMENTED
-    kConfigRegulatory,
-    kDeviceAttestation,
-    kCheckCertificates,
-    kConfigACL,
-    kNetworkSetup,
-    kScanNetworks, // optional stage if network setup fails (not yet implemented)
-    kNetworkEnable,
-    kFindOperational,
-    kSendComplete,
-    kCleanup,
 };
 
 class DLL_EXPORT DevicePairingDelegate
@@ -236,7 +221,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(deviceId, onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
     /**
@@ -250,7 +235,7 @@ public:
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(deviceId);
+        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
     }
 
     /**
@@ -352,12 +337,15 @@ protected:
     CASESessionManager * mCASESessionManager = nullptr;
 
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
+    CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mDevicePool;
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
     PeerId mLocalId    = PeerId();
     FabricId mFabricId = kUndefinedFabricId;
+    FabricInfo * mFabricInfo;
 
     PersistentStorageDelegate * mStorageDelegate = nullptr;
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -384,8 +372,10 @@ protected:
 
     uint16_t mVendorId;
 
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
+
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
@@ -408,6 +398,8 @@ private:
     static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
+
+    PeerId GetPeerIdWithCommissioningWindowOpen() { return mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen); }
 
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
@@ -433,7 +425,6 @@ private:
  *   will be stored.
  */
 class DLL_EXPORT DeviceCommissioner : public DeviceController,
-                                      public SessionCreationDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
                                       public Protocols::UserDirectedCommissioning::InstanceNameResolver,
                                       public Protocols::UserDirectedCommissioning::UserConfirmationProvider,
@@ -492,9 +483,14 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] rendezvousParams      The Rendezvous connection parameters
-     * @param[in] commssioningParams    The commissioning parameters (uses defualt if not supplied)
      */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    /**
+     * @overload
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commissioningParams    The commissioning parameters (uses default if not supplied)
+     */
     CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
                           CommissioningParameters & commissioningParams);
 
@@ -514,7 +510,7 @@ public:
      *   OnPairingComplete will be called with an error.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] params                The Rendezvous connection parameters
      */
     CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
 
@@ -564,7 +560,10 @@ public:
 
     void RendezvousCleanup(CHIP_ERROR status);
 
-    void AdvanceCommissioningStage(CHIP_ERROR err);
+    void PerformCommissioningStep(DeviceProxy * device, CommissioningStage step, CommissioningParameters & params,
+                                  CommissioningDelegate * delegate);
+
+    void CommissioningStageComplete(CHIP_ERROR err);
 
 #if CONFIG_NETWORK_LAYER_BLE
     /**
@@ -652,7 +651,6 @@ private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
-    OperationalDeviceProxy * mDeviceOperational        = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
@@ -685,10 +683,8 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// SessionCreationDelegate Implementation ///////////////
-    void OnNewSession(SessionHandle session) override;
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
@@ -751,7 +747,7 @@ private:
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac);
@@ -783,7 +779,7 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-    CommissioneeDeviceProxy * FindCommissioneeDevice(SessionHandle session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
@@ -791,7 +787,6 @@ private:
     Callback::Callback<BasicSuccessCallback> mSuccess;
     Callback::Callback<BasicFailureCallback> mFailure;
 
-    CommissioningStage GetNextCommissioningStage();
     static CHIP_ERROR ConvertFromNodeOperationalCertStatus(uint8_t err);
 
     Callback::Callback<OperationalCredentialsClusterCertificateChainResponseCallback> mCertificateChainResponseCallback;
@@ -810,6 +805,8 @@ private:
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
+    AutoCommissioner mAutoCommissioner;
+    CommissioningDelegate * mCommissioningDelegate = nullptr;
 };
 
 } // namespace Controller

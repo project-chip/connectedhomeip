@@ -44,7 +44,7 @@ namespace Controller {
  */
 template <typename RequestObjectT>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
@@ -91,19 +91,19 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle se
 
 template <typename RequestObjectT>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
                      uint16_t timedInvokeTimeoutMs)
 {
     return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
-                                timedInvokeTimeoutMs);
+                                MakeOptional(timedInvokeTimeoutMs));
 }
 
 template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)

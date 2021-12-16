@@ -17,12 +17,15 @@
 
 #pragma once
 
-#include <app/OperationalDeviceProxy.h>
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
+#include <lib/core/CHIPConfig.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -66,6 +69,8 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
+    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
     SessionIDAllocator & GetSessionIDAllocator() { return mSessionIDAllocator; }
@@ -73,13 +78,6 @@ public:
     SessionManager & GetSecureSessionManager() { return mSessions; }
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
-
-    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
-
-    void SetOperationalDeviceProxy(chip::OperationalDeviceProxy * operationalDeviceProxy)
-    {
-        mOperationalDeviceProxy = operationalDeviceProxy;
-    }
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
@@ -92,7 +90,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage) {}
+    Server();
 
     static Server sServer;
 
@@ -139,6 +137,11 @@ private:
     ServerTransportMgr mTransports;
     SessionManager mSessions;
     CASEServer mCASEServer;
+
+    CASESessionManager mCASESessionManager;
+    CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
+    OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
+
     Messaging::ExchangeManager mExchangeMgr;
     FabricTable mFabrics;
     SessionIDAllocator mSessionIDAllocator;
@@ -156,8 +159,6 @@ private:
     // (https://github.com/project-chip/connectedhomeip/issues/12174)
     TestPersistentStorageDelegate mGroupsStorage;
     Credentials::GroupDataProviderImpl mGroupsProvider;
-
-    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

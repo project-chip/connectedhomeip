@@ -29,6 +29,8 @@
 #include <lib/support/SafeInt.h>
 #include <transport/SecureMessageCodec.h>
 
+#include "transport/TraceMessage.h"
+
 namespace chip {
 
 using System::PacketBuffer;
@@ -59,6 +61,8 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
 
     uint8_t * data    = msgBuf->Start();
     uint16_t totalLen = msgBuf->TotalLength();
+
+    CHIP_TRACE_MESSAGE(payloadHeader, packetHeader, data, totalLen);
 
     MessageAuthenticationCode mac;
     ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));

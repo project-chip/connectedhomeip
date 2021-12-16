@@ -231,9 +231,9 @@ combination with JLinkRTTClient as follows:
 
       connect -ble 3840 73141520 1234
 
-      zcl NetworkCommissioning AddThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
+      zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000000000000300000b35060004001fffe00208dead00beef00cafe0708fddead00beef000005108e11d8ea8ffaa875713699f59e8807e0030a4f70656e5468726561640102c2980410edc641eb63b100b87e90a9980959befc0c0402a0fff8 breadcrumb=0 timeoutMs=1000
 
-      zcl NetworkCommissioning EnableNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
+      zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:dead00beef00cafe breadcrumb=0 timeoutMs=1000
 
       close-ble
 

@@ -64,9 +64,8 @@ public:
         kCASE      = 2,
     };
 
-    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, Credentials::CATValues peerCATs,
-                  uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config,
-                  System::Clock::Timestamp currentTime) :
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config, System::Clock::Timestamp currentTime) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
         mFabric(fabric), mMRPConfig(config)
@@ -85,7 +84,7 @@ public:
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -117,7 +116,7 @@ public:
 private:
     const Type mSecureSessionType;
     const NodeId mPeerNodeId;
-    const Credentials::CATValues mPeerCATs;
+    const CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
     const FabricIndex mFabric;

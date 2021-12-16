@@ -32,15 +32,15 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
+bool accountLoginClusterLogout();
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, EndpointId endpoint);
 
 void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, AccountLogin::Id,
-                                         Commands::GetSetupPINResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), AccountLogin::Id, Commands::GetSetupPINResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(0), responseSetupPin));
     SuccessOrExit(err = command->FinishCommand());
@@ -75,6 +75,19 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
     if (!isLoggedIn)
     {
         ChipLogError(Zcl, "User is not authorized.");
+    }
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::Logout::DecodableType & commandData)
+{
+    bool isLoggedOut     = accountLoginClusterLogout();
+    EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+    if (!isLoggedOut)
+    {
+        ChipLogError(Zcl, "User is not logged out.");
     }
     emberAfSendImmediateDefaultResponse(status);
     return true;

@@ -500,21 +500,9 @@ static constexpr CommandId Id = 0x0000000B;
 namespace Basic {
 namespace Commands {
 
-namespace StartUp {
-static constexpr CommandId Id = 0x00000000;
-} // namespace StartUp
-
 namespace MfgSpecificPing {
 static constexpr CommandId Id = 0x10020000;
 } // namespace MfgSpecificPing
-
-namespace ShutDown {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ShutDown
-
-namespace Leave {
-static constexpr CommandId Id = 0x00000002;
-} // namespace Leave
 
 } // namespace Commands
 } // namespace Basic
@@ -526,21 +514,21 @@ namespace QueryImage {
 static constexpr CommandId Id = 0x00000000;
 } // namespace QueryImage
 
-namespace ApplyUpdateRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ApplyUpdateRequest
-
-namespace NotifyUpdateApplied {
-static constexpr CommandId Id = 0x00000002;
-} // namespace NotifyUpdateApplied
-
 namespace QueryImageResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000001;
 } // namespace QueryImageResponse
 
+namespace ApplyUpdateRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ApplyUpdateRequest
+
 namespace ApplyUpdateResponse {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace ApplyUpdateResponse
+
+namespace NotifyUpdateApplied {
+static constexpr CommandId Id = 0x00000004;
+} // namespace NotifyUpdateApplied
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
@@ -596,61 +584,33 @@ namespace ScanNetworksResponse {
 static constexpr CommandId Id = 0x00000001;
 } // namespace ScanNetworksResponse
 
-namespace AddWiFiNetwork {
+namespace AddOrUpdateWiFiNetwork {
 static constexpr CommandId Id = 0x00000002;
-} // namespace AddWiFiNetwork
+} // namespace AddOrUpdateWiFiNetwork
 
-namespace AddWiFiNetworkResponse {
+namespace AddOrUpdateThreadNetwork {
 static constexpr CommandId Id = 0x00000003;
-} // namespace AddWiFiNetworkResponse
-
-namespace UpdateWiFiNetwork {
-static constexpr CommandId Id = 0x00000004;
-} // namespace UpdateWiFiNetwork
-
-namespace UpdateWiFiNetworkResponse {
-static constexpr CommandId Id = 0x00000005;
-} // namespace UpdateWiFiNetworkResponse
-
-namespace AddThreadNetwork {
-static constexpr CommandId Id = 0x00000006;
-} // namespace AddThreadNetwork
-
-namespace AddThreadNetworkResponse {
-static constexpr CommandId Id = 0x00000007;
-} // namespace AddThreadNetworkResponse
-
-namespace UpdateThreadNetwork {
-static constexpr CommandId Id = 0x00000008;
-} // namespace UpdateThreadNetwork
-
-namespace UpdateThreadNetworkResponse {
-static constexpr CommandId Id = 0x00000009;
-} // namespace UpdateThreadNetworkResponse
+} // namespace AddOrUpdateThreadNetwork
 
 namespace RemoveNetwork {
-static constexpr CommandId Id = 0x0000000A;
+static constexpr CommandId Id = 0x00000004;
 } // namespace RemoveNetwork
 
-namespace RemoveNetworkResponse {
-static constexpr CommandId Id = 0x0000000B;
-} // namespace RemoveNetworkResponse
+namespace NetworkConfigResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace NetworkConfigResponse
 
-namespace EnableNetwork {
-static constexpr CommandId Id = 0x0000000C;
-} // namespace EnableNetwork
+namespace ConnectNetwork {
+static constexpr CommandId Id = 0x00000006;
+} // namespace ConnectNetwork
 
-namespace EnableNetworkResponse {
-static constexpr CommandId Id = 0x0000000D;
-} // namespace EnableNetworkResponse
+namespace ConnectNetworkResponse {
+static constexpr CommandId Id = 0x00000007;
+} // namespace ConnectNetworkResponse
 
-namespace DisableNetwork {
-static constexpr CommandId Id = 0x0000000E;
-} // namespace DisableNetwork
-
-namespace DisableNetworkResponse {
-static constexpr CommandId Id = 0x0000000F;
-} // namespace DisableNetworkResponse
+namespace ReorderNetwork {
+static constexpr CommandId Id = 0x00000008;
+} // namespace ReorderNetwork
 
 } // namespace Commands
 } // namespace NetworkCommissioning
@@ -1054,17 +1014,17 @@ namespace SetpointRaiseLower {
 static constexpr CommandId Id = 0x00000000;
 } // namespace SetpointRaiseLower
 
-namespace CurrentWeeklySchedule {
+namespace GetWeeklyScheduleResponse {
 static constexpr CommandId Id = 0x00000000;
-} // namespace CurrentWeeklySchedule
+} // namespace GetWeeklyScheduleResponse
 
 namespace SetWeeklySchedule {
 static constexpr CommandId Id = 0x00000001;
 } // namespace SetWeeklySchedule
 
-namespace RelayStatusLog {
+namespace GetRelayStatusLogResponse {
 static constexpr CommandId Id = 0x00000001;
-} // namespace RelayStatusLog
+} // namespace GetRelayStatusLogResponse
 
 namespace GetWeeklySchedule {
 static constexpr CommandId Id = 0x00000002;
@@ -1293,7 +1253,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace IasWd
 
-namespace TvChannel {
+namespace Channel {
 namespace Commands {
 
 namespace ChangeChannel {
@@ -1313,7 +1273,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace SkipChannel
 
 } // namespace Commands
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Commands {
@@ -1516,6 +1476,22 @@ namespace LaunchAppResponse {
 static constexpr CommandId Id = 0x00000000;
 } // namespace LaunchAppResponse
 
+namespace StopApp {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StopApp
+
+namespace StopAppResponse {
+static constexpr CommandId Id = 0x00000001;
+} // namespace StopAppResponse
+
+namespace HideApp {
+static constexpr CommandId Id = 0x00000002;
+} // namespace HideApp
+
+namespace HideAppResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace HideAppResponse
+
 } // namespace Commands
 } // namespace ApplicationLauncher
 
@@ -1543,6 +1519,10 @@ static constexpr CommandId Id = 0x00000000;
 namespace Login {
 static constexpr CommandId Id = 0x00000001;
 } // namespace Login
+
+namespace Logout {
+static constexpr CommandId Id = 0x00000002;
+} // namespace Logout
 
 } // namespace Commands
 } // namespace AccountLogin
@@ -1634,6 +1614,10 @@ namespace TestListInt8UArgumentRequest {
 static constexpr CommandId Id = 0x0000000A;
 } // namespace TestListInt8UArgumentRequest
 
+namespace TestEmitTestEventResponse {
+static constexpr CommandId Id = 0x0000000A;
+} // namespace TestEmitTestEventResponse
+
 namespace TestNestedStructListArgumentRequest {
 static constexpr CommandId Id = 0x0000000B;
 } // namespace TestNestedStructListArgumentRequest
@@ -1669,6 +1653,10 @@ static constexpr CommandId Id = 0x00000012;
 namespace TestSimpleOptionalArgumentRequest {
 static constexpr CommandId Id = 0x00000013;
 } // namespace TestSimpleOptionalArgumentRequest
+
+namespace TestEmitTestEventRequest {
+static constexpr CommandId Id = 0x00000014;
+} // namespace TestEmitTestEventRequest
 
 } // namespace Commands
 } // namespace TestCluster

@@ -19,10 +19,10 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
+#include "channel/ChannelManager.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "tv-channel/TvChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -36,7 +36,7 @@
 using namespace chip;
 
 namespace {
-template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(app::AttributeValueEncoder &)>
+template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(uint16_t, app::AttributeValueEncoder &)>
 class TvAttrAccess : public app::AttributeAccessInterface
 {
 public:
@@ -46,7 +46,7 @@ public:
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {
-            return (Manager().*Getter)(aEncoder);
+            return (Manager().*Getter)(aPath.mEndpointId, aEncoder);
         }
 
         return CHIP_NO_ERROR;
@@ -108,13 +108,12 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
-             &TvChannelManager::proxyGetTvChannelList>
-    gTvChannelAttrAccess;
+TvAttrAccess<ChannelManager, app::Clusters::Channel::Attributes::ChannelList::TypeInfo, &ChannelManager::proxyGetChannelList>
+    gChannelAttrAccess;
 
 } // anonymous namespace
 
-/** @brief Tv Channel  Cluster Init
+/** @brief Channel  Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
  * application an opportunity to take care of cluster initialization procedures.
@@ -123,12 +122,12 @@ TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelLi
  * @param endpoint   Ver.: always
  *
  */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     static bool attrAccessRegistered = false;
     if (!attrAccessRegistered)
     {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
+        registerAttributeAccessOverride(&gChannelAttrAccess);
         attrAccessRegistered = true;
     }
 }
@@ -183,53 +182,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
     if (!attrAccessRegistered)
     {
         registerAttributeAccessOverride(&gAudioOutputAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
-class ContentLauncherAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
-    {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
-        {
-            return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
-        {
-            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-ContentLauncherAttrAccess gContentLauncherAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Content Launch Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
         attrAccessRegistered = true;
     }
 }

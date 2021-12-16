@@ -733,15 +733,15 @@ void ConnectivityManagerImpl::OnStationIPv4AddressLost(void)
 
 void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
 {
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
+#if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
     uint8_t * ipv6_0 = LwIP_GetIPv6_linklocal(&xnetif[0]);
     uint8_t * ipv6_1 = LwIP_GetIPv6_global(&xnetif[0]);
 #endif
-#endif
+#endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if CHIP_PROGRESS_LOGGING
     {
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
+#if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
         ChipLogProgress(DeviceLayer,
                         "\n\r\tLink-local IPV6 => %02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x:%02x%02x",
@@ -752,7 +752,7 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(void)
                         ipv6_1[0], ipv6_1[1], ipv6_1[2], ipv6_1[3], ipv6_1[4], ipv6_1[5], ipv6_1[6], ipv6_1[7], ipv6_1[8],
                         ipv6_1[9], ipv6_1[10], ipv6_1[11], ipv6_1[12], ipv6_1[13], ipv6_1[14], ipv6_1[15]);
 #endif
-#endif
+#endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
     }
 #endif // CHIP_PROGRESS_LOGGING
 
@@ -782,14 +782,14 @@ void ConnectivityManagerImpl::DHCPProcessThread(void * param)
     PlatformMgr().LockChipStack();
     sInstance.OnStationIPv4AddressAvailable();
     PlatformMgr().UnlockChipStack();
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1
+#if LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
 #if LWIP_IPV6
     LwIP_DHCP6(0, DHCP6_START);
     PlatformMgr().LockChipStack();
     sInstance.OnIPv6AddressAvailable();
     PlatformMgr().UnlockChipStack();
 #endif
-#endif
+#endif // LWIP_VERSION_MAJOR > 2 || LWIP_VERSION_MINOR > 0
     vTaskDelete(NULL);
 }
 

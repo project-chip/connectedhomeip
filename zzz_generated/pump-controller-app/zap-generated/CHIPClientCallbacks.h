@@ -21,7 +21,6 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>

@@ -65,7 +65,7 @@ void CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callbac
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
     {{#chip_cluster_response_arguments}}
-    {{>decode_value source=(concat "dataResponse." (asLowerCamelCase name)) target=(asSymbol label)}}
+    {{>decode_value source=(concat "dataResponse." (asLowerCamelCase name)) target=(asSymbol label) cluster=parent.parent.name}}
     {{/chip_cluster_response_arguments}}
 
     env->CallVoidMethod(javaCallbackRef, javaMethod{{#chip_cluster_response_arguments}}, {{asSymbol label}}{{/chip_cluster_response_arguments}});

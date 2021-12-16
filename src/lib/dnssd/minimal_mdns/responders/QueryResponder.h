@@ -21,7 +21,7 @@
 #include "ReplyFilter.h"
 #include "Responder.h"
 
-#include <inet/InetLayer.h>
+#include <system/SystemClock.h>
 
 namespace mdns {
 namespace Minimal {

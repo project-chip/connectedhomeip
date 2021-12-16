@@ -39,6 +39,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPApplicationLauncherClusterHideAppResponseCallback
+    : public Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterHideAppResponseCallback(jobject javaCallback);
+
+    ~CHIPApplicationLauncherClusterHideAppResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPApplicationLauncherClusterLaunchAppResponseCallback
     : public Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
@@ -49,6 +64,36 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPApplicationLauncherClusterStopAppResponseCallback
+    : public Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+{
+public:
+    CHIPApplicationLauncherClusterStopAppResponseCallback(jobject javaCallback);
+
+    ~CHIPApplicationLauncherClusterStopAppResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPChannelClusterChangeChannelResponseCallback
+    : public Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>
+{
+public:
+    CHIPChannelClusterChangeChannelResponseCallback(jobject javaCallback);
+
+    ~CHIPChannelClusterChangeChannelResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -99,102 +144,44 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetHolidayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+class CHIPDoorLockClusterGetCredentialStatusResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterGetCredentialStatusResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetHolidayScheduleResponseCallback();
+    ~CHIPDoorLockClusterGetCredentialStatusResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
+                           const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetLogRecordResponseCallbackType>
+class CHIPDoorLockClusterGetUserResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetUserResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetLogRecordResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterGetUserResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetLogRecordResponseCallback();
+    ~CHIPDoorLockClusterGetUserResponseCallback();
 
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data);
+    static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetPINCodeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetPINCodeResponseCallbackType>
+class CHIPDoorLockClusterSetCredentialResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetPINCodeResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterSetCredentialResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetPINCodeResponseCallback();
-
-    static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetRFIDCodeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetRFIDCodeResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetRFIDCodeResponseCallback();
+    ~CHIPDoorLockClusterSetCredentialResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetUserTypeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetUserTypeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserTypeResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetUserTypeResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetYearDayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetYearDayScheduleResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetYearDayScheduleResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+                           const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -494,77 +481,31 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterConnectNetworkResponseCallback
+    : public Callback::Callback<CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback(jobject javaCallback);
+    CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(jobject javaCallback);
 
-    ~CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback();
+    ~CHIPNetworkCommissioningClusterConnectNetworkResponseCallback();
 
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data);
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>
+class CHIPNetworkCommissioningClusterNetworkConfigResponseCallback
+    : public Callback::Callback<CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackType>
 {
 public:
-    CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback(jobject javaCallback);
+    CHIPNetworkCommissioningClusterNetworkConfigResponseCallback(jobject javaCallback);
 
-    ~CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterDisableNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterDisableNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterDisableNetworkResponseCallback();
+    ~CHIPNetworkCommissioningClusterNetworkConfigResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterEnableNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterEnableNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterEnableNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data);
+                           const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -580,38 +521,6 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback();
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback
-    : public Callback::Callback<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>
-{
-public:
-    CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback(jobject javaCallback);
-
-    ~CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback();
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -792,21 +701,6 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPTvChannelClusterChangeChannelResponseCallback
-    : public Callback::Callback<CHIPTvChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    CHIPTvChannelClusterChangeChannelResponseCallback(jobject javaCallback);
-
-    ~CHIPTvChannelClusterChangeChannelResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
 class CHIPTargetNavigatorClusterNavigateTargetResponseCallback
     : public Callback::Callback<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>
 {
@@ -920,6 +814,36 @@ public:
 
     static void CallbackFn(void * context,
                            const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPThermostatClusterGetRelayStatusLogResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetRelayStatusLogResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetRelayStatusLogResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPThermostatClusterGetWeeklyScheduleResponseCallback
+    : public Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>
+{
+public:
+    CHIPThermostatClusterGetWeeklyScheduleResponseCallback(jobject javaCallback);
+
+    ~CHIPThermostatClusterGetWeeklyScheduleResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

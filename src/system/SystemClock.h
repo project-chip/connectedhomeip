@@ -303,6 +303,36 @@ inline void SetSystemClockForTesting(Clock::ClockBase * clock)
     Clock::Internal::gClockBase = clock;
 }
 
+// Provide a mock implementation for use by unit tests.
+class MockClock : public ClockImpl
+{
+public:
+    Microseconds64 GetMonotonicMicroseconds64() override { return mSystemTime; }
+    Milliseconds64 GetMonotonicMilliseconds64() override { return std::chrono::duration_cast<Milliseconds64>(mSystemTime); }
+    CHIP_ERROR GetClock_RealTime(Microseconds64 & aCurTime) override
+    {
+        aCurTime = mRealTime;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR GetClock_RealTimeMS(Milliseconds64 & aCurTime) override
+    {
+        aCurTime = std::chrono::duration_cast<Milliseconds64>(mRealTime);
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) override
+    {
+        mRealTime = aNewCurTime;
+        return CHIP_NO_ERROR;
+    }
+
+    void SetMonotonic(Milliseconds64 timestamp) { mSystemTime = timestamp; }
+    void AdvanceMonotonic(Milliseconds64 increment) { mSystemTime += increment; }
+    void AdvanceRealTime(Milliseconds64 increment) { mRealTime += increment; }
+
+    Microseconds64 mSystemTime = Clock::kZero;
+    Microseconds64 mRealTime   = Clock::kZero;
+};
+
 } // namespace Internal
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS || CHIP_SYSTEM_CONFIG_USE_SOCKETS

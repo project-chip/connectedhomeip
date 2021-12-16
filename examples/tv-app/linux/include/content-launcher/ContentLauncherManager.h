@@ -20,21 +20,20 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app/AttributeAccessInterface.h>
-#include <app/clusters/content-launch-server/content-launch-server.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
 
 #include <lib/core/CHIPError.h>
 #include <list>
 #include <string>
 #include <vector>
 
-class ContentLauncherManager
+class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
-    ContentLaunchResponse proxyLaunchContentRequest(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                    std::string data);
-    ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,
-                                                ContentLaunchBrandingInformation brandingInformation);
+    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<ContentLaunchParamater> & parameterList,
+                                              bool autoplay, const chip::CharSpan & data) override;
+    ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                          const std::list<ContentLaunchBrandingInformation> & brandingInformation) override;
+    std::list<std::string> HandleGetAcceptHeaderList() override;
+    uint32_t HandleGetSupportedStreamingProtocols() override;
 };

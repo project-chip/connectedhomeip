@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
@@ -141,7 +142,8 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback,
+                              const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional);
 
     /**
      *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
@@ -274,6 +276,8 @@ private:
                          TLV::TLVReader & apPayload) override;
     bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
+    bool HasActiveRead();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
@@ -282,8 +286,7 @@ private:
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
-    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mTimedHandlers;
+    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
@@ -326,19 +329,20 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
- *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @param[in]    aAttributeReport      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

@@ -502,7 +502,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    long f = static_cast<long>(flag);
+    jlong f = static_cast<jlong>(flag);
 
     VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnLogError(mHasFlagMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
@@ -525,7 +525,7 @@ CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 CHIP_ERROR BLEManagerImpl::SetFlag(BLEManagerImpl::Flags flag, bool isSet)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    long jFlag      = static_cast<long>(flag);
+    jlong jFlag     = static_cast<jlong>(flag);
     jboolean jIsSet = static_cast<jboolean>(isSet);
 
     VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);

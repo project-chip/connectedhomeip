@@ -37,7 +37,7 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.28
+            image: connectedhomeip/chip-build-mbed-os:0.5.33
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -119,6 +119,6 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/bloat_reports/

@@ -43,18 +43,18 @@ tests:
                   },
               ]
 
+    - label: "Read current media input"
+      command: "readAttribute"
+      attribute: "current media input"
+      response:
+          value: 0
+
     - label: "Select Input Command"
       command: "SelectInput"
       arguments:
           values:
               - name: "index"
                 value: 1
-
-    - label: "Read current input list"
-      command: "readAttribute"
-      attribute: "current media input"
-      response:
-          value: 1
 
     - label: "Hide Input Status Command"
       command: "HideInputStatus"

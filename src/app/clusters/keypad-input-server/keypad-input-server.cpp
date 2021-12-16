@@ -38,13 +38,12 @@ EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode 
 
 static void sendResponse(app::CommandHandler * command, EmberAfKeypadInputStatus keypadInputStatus)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, KeypadInput::Id,
-                                         KeypadInput::Commands::SendKeyResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), KeypadInput::Id, KeypadInput::Commands::SendKeyResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
 
     VerifyOrExit(command != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), keypadInputStatus));
     SuccessOrExit(err = command->FinishCommand());

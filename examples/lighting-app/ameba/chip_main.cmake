@@ -13,24 +13,6 @@ include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 list(
     APPEND ${list_chip_main_sources}
 
-    #chip app
-    ${chip_dir}/src/app/Command.cpp
-    ${chip_dir}/src/app/CommandHandler.cpp
-    ${chip_dir}/src/app/InteractionModelEngine.cpp
-    ${chip_dir}/src/app/CommandSender.cpp
-    ${chip_dir}/src/app/decoder.cpp
-    ${chip_dir}/src/app/encoder-common.cpp
-    ${chip_dir}/src/app/EventManagement.cpp
-    ${chip_dir}/src/app/ReadClient.cpp
-    ${chip_dir}/src/app/ReadHandler.cpp
-    ${chip_dir}/src/app/TimedHandler.cpp
-    ${chip_dir}/src/app/WriteClient.cpp
-    ${chip_dir}/src/app/WriteHandler.cpp
-    ${chip_dir}/src/app/util/CHIPDeviceCallbacksMgr.cpp
-    ${chip_dir}/src/app/util/esi-management.cpp
-    ${chip_dir}/src/app/reporting/Engine.cpp
-
-    ${chip_dir}/zzz_generated/lighting-app/zap-generated/attribute-size.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/CHIPClientCallbacks.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/callback-stub.cpp
     ${chip_dir}/zzz_generated/lighting-app/zap-generated/IMClusterCommandHandler.cpp

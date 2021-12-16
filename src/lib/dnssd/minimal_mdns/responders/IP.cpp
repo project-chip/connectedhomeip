@@ -23,19 +23,13 @@ namespace Minimal {
 
 void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate)
 {
+    chip::Inet::IPAddress addr;
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        if (it.GetInterfaceId() != source->Interface)
+        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
         {
-            continue;
+            delegate->AddResponse(IPResourceRecord(GetQName(), addr));
         }
-
-        chip::Inet::IPAddress addr = it.GetAddress();
-        if (!addr.IsIPv4())
-        {
-            continue;
-        }
-        delegate->AddResponse(IPResourceRecord(GetQName(), addr));
     }
 }
 
@@ -48,13 +42,11 @@ void IPv6Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
             continue;
         }
 
-        chip::Inet::IPAddress addr = it.GetAddress();
-        if (!addr.IsIPv6())
+        chip::Inet::IPAddress addr;
+        if ((it.GetInterfaceId() == source->Interface) && (it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv6())
         {
-            continue;
+            delegate->AddResponse(IPResourceRecord(GetQName(), addr));
         }
-
-        delegate->AddResponse(IPResourceRecord(GetQName(), addr));
     }
 }
 

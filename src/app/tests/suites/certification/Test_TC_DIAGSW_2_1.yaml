@@ -24,6 +24,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "SoftwareFault"
+      PICS: E_SOFTWAREFAULT
       response:
           constraints:
               value: 0

@@ -22,21 +22,38 @@
 
 #pragma once
 
-#include "BDXDownloader.h"
-#include "OTARequestorDriver.h"
-#include "OTARequestorInterface.h"
 #include <app/CASESessionManager.h>
+#include <app/server/Server.h>
+#include <platform/OTARequestorDriver.h>
+#include <platform/OTARequestorInterface.h>
 #include <protocols/bdx/BdxMessages.h>
+
+#include "BDXDownloader.h"
+
+namespace chip {
 
 // This class implements all of the core logic of the OTA Requestor
 class OTARequestor : public OTARequestorInterface
 {
 public:
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kStartBDX,
+        kApplyUpdate,
+    };
+
+    OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+
     // Application interface declarations -- start
 
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
-    void TriggerImmediateQuery();
+    OTATriggerResult TriggerImmediateQuery() override;
+
+    // Send ApplyImage
+    void ApplyUpdate() override;
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -46,44 +63,69 @@ public:
     // The BDXDownloader instance should already have the ImageProcessingDelegate set.
     void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
 
-    // Application directs the Requestor to abort any processing related to
-    // the image update
+    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
+    // as the QueryImageResponse content) is preserved
     void AbortImageUpdate();
+
+    // Application directs the Requestor to abort the download in progress. All the Requestor state is
+    // cleared, UploadState is reset to Idle
+    void AbortAndResetState();
+
+    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
+    // FALSE otherwise
+    void OnUserConsent(bool result);
+
+    /* Commented out until the API is supported
+    // Application directs the Requestor to download the image using the suppiled parameter and without
+    // issuing QueryImage
+    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters){ return kTriggerSuccessful;}
+    */
 
     // Application interface declarations -- end
 
-    // Virtual functions from OTARequestorInterface start
+    // Virtual functions from OTARequestorInterface -- start
+
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
+        app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
     // Virtual functions from OTARequestorInterface -- end
-    void ConnectToProvider();
-
-    void mOnConnected(void * context, chip::DeviceProxy * deviceProxy);
-    void mOnQueryImageResponse(
-        void * context,
-        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
-
-    // When the Requestor is used as a test tool (Tesm Mode) the Provider parameters may be supplied explicitly
-    void TestModeSetProviderParameters(chip::NodeId NodeId, chip::FabricIndex FabIndex)
+    /**
+     * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
+     * BDX transfers
+     */
+    void SetServerInstance(Server * server)
     {
-        mProviderNodeId      = NodeId;
-        mProviderFabricIndex = FabIndex;
+        mServer             = server;
+        mCASESessionManager = server->GetCASESessionManager();
     }
 
-    // Temporary until IP address resolution is implemented in the Exchange Layer
-    void SetIpAddress(chip::Inet::IPAddress IpAddress) { mIpAddress = IpAddress; }
+    /**
+     * Called to establish a session to mProviderNodeId on mProviderFabricIndex. This must be called from the same externally
+     * synchronized context as any other Matter stack method.
+     *
+     * @param onConnectedAction  The action to take once session to provider has been established
+     */
+    void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    /**
+     * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
+     * explicitly.
+     */
+    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) override
+    {
+        mProviderNodeId      = nodeId;
+        mProviderFabricIndex = fabIndex;
+        mProviderEndpointId  = endpointId;
+    }
 
 private:
-    // Enums
-    // Various cases for when OnConnected callback could be called
-    enum OnConnectedState
-    {
-        kQueryImage = 0,
-        kStartBDX,
-    };
+    struct QueryImageRequest;
+    using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
+    using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+
+    static constexpr size_t kMaxUpdateTokenLen = 32;
 
     // TODO: the application should define this, along with initializing the BDXDownloader
 
@@ -152,21 +194,55 @@ private:
         chip::BDXDownloader * mDownloader;
     };
 
-    // Variables
-    // TODO: align on variable naming standard
-    OTARequestorDriver * mOtaRequestorDriver;
-    chip::NodeId mProviderNodeId;
-    chip::FabricIndex mProviderFabricIndex;
-    uint32_t mOtaStartDelayMs                      = 0;
-    chip::CASESessionManager * mCASESessionManager = nullptr;
-    OnConnectedState onConnectedState              = kQueryImage;
-    chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-    chip::BDXDownloader * mBdxDownloader; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;           // TODO: ideally this is held by the application
+    /**
+     * Create a QueryImage request using values from the Basic cluster attributes
+     */
+    CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & request);
 
-    // TODO: Temporary until IP address resolution is implemented in the Exchange layer
-    chip::Inet::IPAddress mIpAddress;
+    /**
+     * Verify all required fields are present in the QueryImageResponse
+     */
+    bool ValidateQueryImageResponse(const QueryImageResponseDecodableType & response) const;
 
-    // Functions
-    CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
+    /**
+     * Create a ApplyUpdate request using values obtained from QueryImageResponse
+     */
+    CHIP_ERROR BuildApplyUpdateRequest(app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type & args);
+
+    /**
+     * Session connection callbacks
+     */
+    static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
+    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    /**
+     * QueryImage callbacks
+     */
+    static void OnQueryImageResponse(void * context, const QueryImageResponseDecodableType & response);
+    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+
+    /**
+     * ApplyUpdate callbacks
+     */
+    static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
+    static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+
+    OTARequestorDriver * mOtaRequestorDriver  = nullptr;
+    NodeId mProviderNodeId                    = kUndefinedNodeId;
+    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
+    EndpointId mProviderEndpointId            = kRootEndpointId;
+    uint32_t mOtaStartDelayMs                 = 0;
+    CASESessionManager * mCASESessionManager  = nullptr;
+    OnConnectedAction mOnConnectedAction      = kQueryImage;
+    Messaging::ExchangeContext * mExchangeCtx = nullptr;
+    BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
+    ByteSpan mUpdateToken;
+    uint32_t mUpdateVersion = 0;
+    Server * mServer        = nullptr;
 };
+
+} // namespace chip

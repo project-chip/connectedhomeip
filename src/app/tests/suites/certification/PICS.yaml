@@ -29,3 +29,196 @@ PICS:
 
     - label: "Does the device support Intermediate CA Certificate"
       id: DM_ICACERT
+
+      # Basic Inputcluster
+    - label: "Does the device implement the PresentValue attribute?"
+      id: A_PRESENTVALUE
+
+    - label: "Does the device implement the OutOfService attribute?"
+      id: A_OUTOFSERVICE
+
+    - label: "Does the device implement the StatusFlags attribute?"
+      id: A_STATUSFLAGS
+
+    - label: "Can PresentValue be changed by manual operation at the DUT?"
+      id: MANUAL_OPERATE
+
+    - label: "Can an OutOfService be triggered?"
+      id: MANUAL_OUTOFSERVICE
+
+    - label: "Can an Alarm be triggered?"
+      id: MANUAL_ALARM
+
+    - label: "Can a Fault be triggered?"
+      id: MANUAL_FAULT
+
+      # Color Control cluster
+    - label: "Does the device implement receiving the ColorLoopSet command?"
+      id: CR_COLORLOOPSET
+
+    - label: "Does the device implement the COLORLOOPACTIVE attribute?"
+      id: A_COLORLOOPACTIVE
+
+    - label: "Does the device implement the COLORLOOPDIRECTION attribute?"
+      id: A_COLORLOOPDIRECTION
+
+    - label: "Does the device implement the COLORLOOPTIME attribute?"
+      id: A_COLORLOOPTIME
+
+    - label:
+          "Does the device implement the COLORLOOPSTARTENHANCEDHUE attribute?"
+      id: A_COLORLOOPSTARTENHANCEDHUE
+
+    - label:
+          "Does the device implement the COLORLOOPSTOREDENHANCEDHUE attribute?"
+      id: A_COLORLOOPSTOREDENHANCEDHUE
+
+    - label: "Does the device implement the ENHANCEDCURRENTHUE attribute?"
+      id: A_ENHANCEDCURRENTHUE
+
+    - label:
+          "Does the device implement receiving the EnhancedMovetoHue command?"
+      id: CR_ENHANCEDMOVETOHUE
+
+      # Relative Humidity cluster
+    - label: "Does the device implement the MeasuredValue attribute?"
+      id: A_RELATIVEHUMIDITY
+
+    - label: "Does the device implement the MinMeasuredValue attribute?"
+      id: A_RELATIVEHUMIDITY_MIN
+
+    - label: "Does the device implement the MaxMeasuredValue attribute?"
+      id: A_RELATIVEHUMIDITY_MAX
+
+    - label: "Does the device implement the Tolerance attribute?"
+      id: A_RELATIVEHUMIDITY_TOLERANCE
+
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device?"
+      id: MANUAL_RELATIVEHUMIDITY_CHANGE
+
+      # Temperature Measurement cluster
+    - label: "Does the device implement the MeasuredValue attribute"
+      id: A_TEMPERATURE
+
+    - label:
+          "Can the MeasuredValue attribute changed by physical control at the
+          device"
+      id: MANUAL_TEMPERATURE_CHANGE
+
+      # Thermostat User Configuration cluster
+    - label: "Does the device implement the TemperatureDisplayMode attribute"
+      id: A_TEMPERATURE_DISPLAY_MODE
+
+    - label: "Does the device implement the KeypadLockout attribute"
+      id: A_KEYPAD_LOCKOUT
+
+    - label:
+          "Does the device implement the ScheduleProgrammingVisibility attribute"
+      id: A_SCHEDULE_PROGRAMMING_VISIBILITY
+
+      # Software Diagnostics cluster
+    - label: "Does the device implement the SoftwareFault event?"
+      id: E_SOFTWAREFAULT
+
+    - label: "Does the device implement the ThreadMetrics attribute"
+      id: A_THREADMETRICS
+
+    - label: "Does the device implement the CurrentHeapUsed attribute"
+      id: A_CURRENTHEAPUSED
+
+    - label: "Does the device implement the CurrentHeapHighWaterMark attribute"
+      id: A_CURRENTHEAPHIGHWATERMARK
+
+    - label: "Does the device implement the ResetWaterMarks command?"
+      id: CR_RESETWATERMARKS
+
+      # Pump Configuration and Control cluster
+    - label: "Does the device implement the attribute OperationMode"
+      id: A_OPERATIONMODE
+
+    - label: "Does the device implement the attribute ControlMode"
+      id: A_CONTROLMODE
+
+    - label: "Does the device implement the attribute EffectiveOperationMode"
+      id: A_EFFECTIVEOPERATIONMODE
+
+    - label: "Does the device implement the attribute EffectiveControlMode"
+      id: A_EFFECTIVECONTROLMODE
+
+      # Thermostat cluster
+    - label: "Does the device implement the OccupiedCoolingSetpoint attribute"
+      id: A_OCCUPIEDCOOLINGSETPOINT
+
+    - label: "Does the device implement the OccupiedHeatingSetpoint attribute"
+      id: A_OCCUPIEDHEATINGSETPOINT
+
+    - label: "Does the device implement the MinHeatSetpointLimit attribute"
+      id: A_MINHEATSETPOINTLIMIT
+
+    - label: "Does the device implement the MaxHeatSetpointLimit attribute"
+      id: A_MAXHEATSETPOINTLIMIT
+
+    - label: "Does the device implement the MinCoolSetpointLimit attribute"
+      id: A_MINCOOLSETPOINTLIMIT
+
+    - label: "Does the device implement the MaxCoolSetpointLimit attribute"
+      id: A_MAXCOOLSETPOINTLIMIT
+
+    - label:
+          "Does the device implement the ControlSequenceOfOperation attribute"
+      id: A_CONTROLSEQUENCEOFOPERATION
+
+    - label:
+          "Does the device implement receiving the SetpointRaiseLower command?"
+      id: CR_SetpointRaiseLower
+
+      # Occupency sensing cluster
+    - label: "Does the device implement the Occupancy attribute?"
+      id: A_OCCUPANCY
+
+    - label:
+          "Can the Occupancy attribute changed by physical control at the
+          device?"
+      id: MANUAL_OCCUPANCY_CHANGE
+
+      # Window covering cluster
+    - label: "Does the device implement the Type"
+      id: A_TYPE
+
+    - label: "Does the device implement the ConfigStatus"
+      id: A_CONFIGSTATUS
+
+    - label: "Does the device implement the EndProductType"
+      id: A_ENDPRODUCTTYPE
+
+      # On/Off Cluster
+    - label: "Does the device implement the OnOff attribute?"
+      id: A_ONOFF
+
+    - label: "Does the device implement the GlobalSceneControl attribute?"
+      id: A_GLOBALSCENECONTROL
+
+    - label: "Does the device implement the OnTime attribute?"
+      id: A_ONTIME
+
+    - label: "Does the device implement the OffWaitTime attribute?"
+      id: A_OFFWAITTIME
+
+    - label: "Does the device implement receiving the Off command?"
+      id: CR_OFF
+
+    - label: "Does the device implement sending the On command?"
+      id: CR_ON
+
+    - label: "Does the device implement receiving the OffWithEffect command?"
+      id: CR_OFFWITHEFFECT
+
+    - label:
+          "Does the device implement receiving the OnWithRecallGlobalScene
+          command?"
+      id: CR_ONWITHRECALL
+
+    - label: "Does the device implement receiving the OnWithTimedOff command?"
+      id: CR_ONWITHTIMEOFF

@@ -146,8 +146,9 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
-                                                          &DeviceLayer::InetLayer(), &err);
+    wrapper =
+        AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
+                                                    DeviceLayer::TCPEndPointManager(), DeviceLayer::UDPEndPointManager(), &err);
     SuccessOrExit(err);
 
     // Create and start the IO thread. Must be called after Controller()->Init

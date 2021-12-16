@@ -221,7 +221,7 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 
-    Dnssd::Resolver::Instance().Init(&DeviceLayer::InetLayer());
+    Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
     Dnssd::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);

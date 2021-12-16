@@ -154,9 +154,9 @@ void CASE_SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     FabricTable fabrics;
 
     NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kCASE);
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     peerCATs = pairing.GetPeerCATs();
-    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kUndefinedCATs, sizeof(Credentials::CATValues)) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kUndefinedCATs, sizeof(CATValues)) == 0);
 
     NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(0, nullptr, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite, pairing.ListenForSessionEstablishment(0, nullptr, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
@@ -484,8 +484,9 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
         bool resumptionRequested;                                                                                                  \
         ByteSpan resumptionId;                                                                                                     \
         ByteSpan initiatorResumeMIC;                                                                                               \
-        err = CASESession::ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,             \
-                                       resumptionRequested, resumptionId, initiatorResumeMIC);                                     \
+        CASESession session;                                                                                                       \
+        err = session.ParseSigma1(reader, initiatorRandom, initiatorSessionId, destinationId, initiatorEphPubKey,                  \
+                                  resumptionRequested, resumptionId, initiatorResumeMIC);                                          \
         NL_TEST_ASSERT(inSuite, (err == CHIP_NO_ERROR) == params::expectSuccess);                                                  \
         if (params::expectSuccess)                                                                                                 \
         {                                                                                                                          \

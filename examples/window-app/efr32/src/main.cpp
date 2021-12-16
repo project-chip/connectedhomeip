@@ -46,6 +46,10 @@
 #include <Rpc.h>
 #endif
 
+#ifdef ENABLE_CHIP_SHELL
+#include "matter_shell.h"
+#endif
+
 using namespace ::chip::DeviceLayer;
 
 // ================================================================================
@@ -139,6 +143,10 @@ int main(void)
         appError(err);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+#ifdef ENABLE_CHIP_SHELL
+    chip::startShellTask();
+#endif
 
     WindowApp & app = WindowApp::Instance();
 

@@ -35,6 +35,7 @@
     MatterBooleanStatePluginClientInitCallback();                                                                                  \
     MatterBridgedActionsPluginClientInitCallback();                                                                                \
     MatterBridgedDeviceBasicPluginClientInitCallback();                                                                            \
+    MatterChannelPluginClientInitCallback();                                                                                       \
     MatterColorControlPluginClientInitCallback();                                                                                  \
     MatterContentLauncherPluginClientInitCallback();                                                                               \
     MatterDescriptorPluginClientInitCallback();                                                                                    \
@@ -71,13 +72,13 @@
     MatterScenesPluginClientInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginClientInitCallback();                                                                           \
     MatterSwitchPluginClientInitCallback();                                                                                        \
-    MatterTvChannelPluginClientInitCallback();                                                                                     \
     MatterTargetNavigatorPluginClientInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTestClusterPluginClientInitCallback();                                                                                   \
     MatterThermostatPluginClientInitCallback();                                                                                    \
     MatterThermostatUserInterfaceConfigurationPluginClientInitCallback();                                                          \
     MatterThreadNetworkDiagnosticsPluginClientInitCallback();                                                                      \
+    MatterUserLabelPluginClientInitCallback();                                                                                     \
     MatterWakeOnLanPluginClientInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginClientInitCallback();                                                                        \
     MatterWindowCoveringPluginClientInitCallback();

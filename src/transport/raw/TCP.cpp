@@ -80,7 +80,6 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    VerifyOrDieWithMsg(params.GetEndPointManager() != nullptr, Inet, "TCP not initialized");
     err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
 #else
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;

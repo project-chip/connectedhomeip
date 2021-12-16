@@ -36,6 +36,8 @@ namespace DeviceLayer {
 class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::ZephyrConfig>
 {
 public:
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     // This returns an instance of this class.
     static ConfigurationManagerImpl & GetDefaultInstance();
 

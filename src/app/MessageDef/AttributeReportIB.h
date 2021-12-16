@@ -91,6 +91,7 @@ public:
      */
     AttributeDataIB::Builder & CreateAttributeData();
 
+    AttributeDataIB::Builder & GetAttributeData() { return mAttributeData; }
     /**
      *  @brief Initialize a StatusIB::Builder for writing into the TLV stream
      *

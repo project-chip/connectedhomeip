@@ -27,7 +27,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/server/Dnssd.h>
 #include <app/util/basic-types.h>
 #include <app/util/util.h>

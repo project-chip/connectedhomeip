@@ -41,6 +41,7 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -65,12 +66,12 @@ using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr           = nullptr;
-    SessionManager * sessionManager             = nullptr;
-    Messaging::ExchangeManager * exchangeMgr    = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    SessionIDAllocator * idAllocator            = nullptr;
+    DeviceTransportMgr * transportMgr                             = nullptr;
+    SessionManager * sessionManager                               = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                      = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    PersistentStorageDelegate * storageDelegate                   = nullptr;
+    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -119,12 +120,12 @@ public:
      */
     void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
-        mSessionManager = params.sessionManager;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mFabricIndex    = fabric;
-        mIDAllocator    = params.idAllocator;
-        mpIMDelegate    = params.imDelegate;
+        mSessionManager     = params.sessionManager;
+        mExchangeMgr        = params.exchangeMgr;
+        mUDPEndPointManager = params.udpEndPointManager;
+        mFabricIndex        = fabric;
+        mIDAllocator        = params.idAllocator;
+        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -157,21 +158,13 @@ public:
 
     /**
      * @brief
-     *   Called when a new pairing is being established
-     *
-     * @param session A handle to the secure session
-     */
-    void OnNewConnection(SessionHandle session);
-
-    /**
-     * @brief
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -211,9 +204,10 @@ public:
 
     NodeId GetDeviceId() const override { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
@@ -289,7 +283,7 @@ private:
      */
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Inet::InetLayer * mInetLayer = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
@@ -304,7 +298,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolder mSecureSession;
 
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 

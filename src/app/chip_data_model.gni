@@ -100,7 +100,6 @@ template("chip_data_model") {
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/af-main-common.cpp",
-      "${_app_root}/util/attribute-list-byte-span.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
@@ -132,12 +131,7 @@ template("chip_data_model") {
 
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/door-lock-server-core.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-logging.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-schedule.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-user.cpp",
-        ]
+        sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
       } else if (cluster == "network-commissioning") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
@@ -160,10 +154,7 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [
-        "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
-        "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
-      ]
+      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
 
       if (chip_controller) {
         sources += [
@@ -185,10 +176,8 @@ template("chip_data_model") {
       }
 
       if (_use_tests_apis) {
-        sources += [
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
-        ]
+        sources +=
+            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 

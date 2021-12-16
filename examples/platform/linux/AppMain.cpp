@@ -222,8 +222,8 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
 
     factoryParams.fabricStorage = &gFabricStorage;
-    // use a different listen port for the commissioner.
-    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort;
+    // use a different listen port for the commissioner than the default used by chip-tool.
+    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     params.storageDelegate                = &gServerStorage;
     params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;

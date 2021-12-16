@@ -132,8 +132,9 @@ void CommissioningWindowManager::OnSessionEstablishmentStarted()
 void CommissioningWindowManager::OnSessionEstablished()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleSessionEstablishmentTimeout, this);
+    SessionHolder sessionHolder;
     CHIP_ERROR err = mServer->GetSecureSessionManager().NewPairing(
-        Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
+        sessionHolder, Optional<Transport::PeerAddress>::Value(mPairingSession.GetPeerAddress()), mPairingSession.GetPeerNodeId(),
         &mPairingSession, CryptoContext::SessionRole::kResponder, 0);
     if (err != CHIP_NO_ERROR)
     {
@@ -176,8 +177,9 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     if (mUseECM)
     {
         ReturnErrorOnFailure(SetTemporaryDiscriminator(mECMDiscriminator));
-        ReturnErrorOnFailure(mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength),
-                                                            mECMPasscodeID, keyID, this));
+        ReturnErrorOnFailure(
+            mPairingSession.WaitForPairing(mECMPASEVerifier, mECMIterations, ByteSpan(mECMSalt, mECMSaltLength), mECMPasscodeID,
+                                           keyID, Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
 
         // reset all advertising, indicating we are in commissioningMode
         app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledEnhanced);
@@ -189,7 +191,8 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
 
         ReturnErrorOnFailure(mPairingSession.WaitForPairing(
             pinCode, kSpake2p_Iteration_Count,
-            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID, this));
+            ByteSpan(reinterpret_cast<const uint8_t *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt)), keyID,
+            Optional<ReliableMessageProtocolConfig>::Value(gDefaultMRPConfig), this));
 
         // reset all advertising, indicating we are in commissioningMode
         app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kEnabledBasic);
@@ -259,7 +262,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
 
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
-    if (mCommissioningWindowOpen)
+    if (mWindowStatus != app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
@@ -276,7 +279,15 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     {
         mAppDelegate->OnPairingWindowOpened();
     }
-    mCommissioningWindowOpen = true;
+
+    if (mUseECM)
+    {
+        mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
+    }
+    else
+    {
+        mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
@@ -292,7 +303,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mPairingSession.Clear();
 
-    mCommissioningWindowOpen = false;
+    mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);

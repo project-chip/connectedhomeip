@@ -19,7 +19,6 @@
 
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/PoolWrapper.h>
@@ -166,7 +165,8 @@ public:
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
     /// non-loopback interfaces.
-    CHIP_ERROR Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port);
+    CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
+                      uint16_t port);
 
     /// Send the specified packet to a destination IP address over the specified address
     virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
@@ -228,7 +228,7 @@ private:
 
 // The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.
 template <size_t kCount>
-class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, chip::OnObjectPoolDestruction::Die,
+class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, chip::ObjectPoolMem::kStatic,
                                       ServerBase::EndpointInfoPoolType::Interface>,
                public ServerBase
 {

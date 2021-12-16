@@ -19,6 +19,8 @@
 #include "BDXDownloader.h"
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/BufferReader.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h> /* TODO:(#12520) remove */

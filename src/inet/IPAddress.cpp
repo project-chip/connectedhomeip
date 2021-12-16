@@ -119,7 +119,6 @@ ip4_addr_t IPAddress::ToIPv4() const
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 ip_addr_t IPAddress::ToLwIPAddr(void) const
 {
     ip_addr_t ret;
@@ -173,7 +172,6 @@ lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)
 
     return ret;
 }
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
 ip6_addr_t IPAddress::ToIPv6() const
 {
@@ -220,15 +218,21 @@ struct in6_addr IPAddress::ToIPv6() const
     return ipAddr;
 }
 
-IPAddress IPAddress::FromSockAddr(const SockAddr & sockaddr)
+CHIP_ERROR IPAddress::GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress)
 {
 #if INET_CONFIG_ENABLE_IPV4
     if (sockaddr.any.sa_family == AF_INET)
-        return FromSockAddr(sockaddr.in);
+    {
+        outIPAddress = FromSockAddr(sockaddr.in);
+        return CHIP_NO_ERROR;
+    }
 #endif // INET_CONFIG_ENABLE_IPV4
     if (sockaddr.any.sa_family == AF_INET6)
-        return FromSockAddr(sockaddr.in6);
-    return Any;
+    {
+        outIPAddress = FromSockAddr(sockaddr.in6);
+        return CHIP_NO_ERROR;
+    }
+    return INET_ERROR_WRONG_ADDRESS_TYPE;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK

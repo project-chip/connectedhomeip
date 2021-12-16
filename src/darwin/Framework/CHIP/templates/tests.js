@@ -170,9 +170,9 @@ function getTests()
     'TestBasicInformation',
     'TestGroupsCluster',
     'TestIdentifyCluster',
+    'TestLogCommands',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
-    'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [

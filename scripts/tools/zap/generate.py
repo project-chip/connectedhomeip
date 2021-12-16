@@ -146,23 +146,6 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
-def runPythonPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        pyOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".py", outputs))
-
-        if not pyOutputs:
-            return
-        args = ['autopep8', '--in-place']
-        args.extend(pyOutputs)
-        subprocess.check_call(args)
-    except Exception as err:
-        print('autopep8 error:', err)
-
-
 def main():
     checkPythonVersion()
 
@@ -172,7 +155,6 @@ def main():
     prettifiers = [
         runClangPrettifier,
         runJavaPrettifier,
-        runPythonPrettifier,
     ]
 
     for prettifier in prettifiers:

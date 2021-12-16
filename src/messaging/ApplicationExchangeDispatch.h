@@ -45,9 +45,9 @@ public:
         return ExchangeMessageDispatch::Init();
     }
 
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
+    CHIP_ERROR PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override;
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & message) const override;
+    CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & message) const override;
 
     SessionManager * GetSessionManager() const { return mSessionManager; }
 

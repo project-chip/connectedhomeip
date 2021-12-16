@@ -52,6 +52,10 @@
 #include "Rpc.h"
 #endif
 
+#ifdef ENABLE_CHIP_SHELL
+#include "matter_shell.h"
+#endif
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
@@ -173,6 +177,10 @@ int main(void)
         EFR32_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
+
+#ifdef ENABLE_CHIP_SHELL
+    chip::startShellTask();
+#endif
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();

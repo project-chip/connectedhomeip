@@ -39,9 +39,17 @@ public:
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
+    using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
+    CHIPCommand(const char * commandName) : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        AddArgument("trace_file", &mTraceFile);
+        AddArgument("trace_log", 0, 1, &mTraceLog);
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -100,4 +108,12 @@ private:
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ true };
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+    void StartTracing();
+    void StopTracing();
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::Optional<char *> mTraceFile;
+    chip::Optional<bool> mTraceLog;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 };

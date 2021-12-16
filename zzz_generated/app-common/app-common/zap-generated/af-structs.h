@@ -84,6 +84,14 @@ typedef struct _DoubleNestedStructList
     /* TYPE WARNING: array array defaults to */ uint8_t * a;
 } DoubleNestedStructList;
 
+// Struct for ContentLaunchDimension
+typedef struct _ContentLaunchDimension
+{
+    double width;
+    double height;
+    uint8_t metric;
+} ContentLaunchDimension;
+
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
@@ -94,10 +102,43 @@ typedef struct _ContentLaunchAdditionalInfo
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
-    uint8_t Type;
-    chip::CharSpan Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    uint8_t type;
+    chip::CharSpan value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
 } ContentLaunchParamater;
+
+// Struct for ContentLaunchStyleInformation
+typedef struct _ContentLaunchStyleInformation
+{
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
+    ContentLaunchDimension size;
+} ContentLaunchStyleInformation;
+
+// Struct for ContentLaunchBrandingInformation
+typedef struct _ContentLaunchBrandingInformation
+{
+    chip::CharSpan providerName;
+    ContentLaunchStyleInformation background;
+    ContentLaunchStyleInformation logo;
+    ContentLaunchStyleInformation progressBar;
+    ContentLaunchStyleInformation splash;
+    ContentLaunchStyleInformation waterMark;
+} ContentLaunchBrandingInformation;
+
+// Struct for ApplicationLauncherApp
+typedef struct _ApplicationLauncherApp
+{
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+} ApplicationLauncherApp;
+
+// Struct for ApplicationLauncherEndpoint
+typedef struct _ApplicationLauncherEndpoint
+{
+    ApplicationLauncherApp application;
+    chip::CharSpan endpoint;
+} ApplicationLauncherEndpoint;
 
 // Struct for Target
 typedef struct _Target
@@ -128,12 +169,12 @@ typedef struct _ActionStruct
     uint8_t Status;
 } ActionStruct;
 
-// Struct for ApplicationLauncherApp
-typedef struct _ApplicationLauncherApp
+// Struct for ApplicationBasicApp
+typedef struct _ApplicationBasicApp
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} ApplicationLauncherApp;
+} ApplicationBasicApp;
 
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
@@ -163,32 +204,24 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
 
-// Struct for ContentLaunchBrandingInformation
-typedef struct _ContentLaunchBrandingInformation
+// Struct for ChannelInfo
+typedef struct _ChannelInfo
 {
-    chip::CharSpan providerName;
-    uint8_t background;
-    uint8_t logo;
-    uint8_t progressBar;
-    uint8_t splash;
-    uint8_t waterMark;
-} ContentLaunchBrandingInformation;
+    uint16_t majorNumber;
+    uint16_t minorNumber;
+    chip::CharSpan name;
+    chip::CharSpan callSign;
+    chip::CharSpan affiliateCallSign;
+} ChannelInfo;
 
-// Struct for ContentLaunchDimension
-typedef struct _ContentLaunchDimension
+// Struct for ChannelLineupInfo
+typedef struct _ChannelLineupInfo
 {
-    chip::CharSpan width;
-    chip::CharSpan height;
-    uint8_t metric;
-} ContentLaunchDimension;
-
-// Struct for ContentLaunchStyleInformation
-typedef struct _ContentLaunchStyleInformation
-{
-    chip::CharSpan imageUrl;
-    chip::CharSpan color;
-    uint8_t size;
-} ContentLaunchStyleInformation;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
+    uint8_t lineupInfoType;
+} ChannelLineupInfo;
 
 // Struct for DeviceType
 typedef struct _DeviceType
@@ -320,6 +353,13 @@ typedef struct _NeighborTable
     bool IsChild;
 } NeighborTable;
 
+// Struct for NetworkInfo
+typedef struct _NetworkInfo
+{
+    chip::ByteSpan NetworkID;
+    bool Connected;
+} NetworkInfo;
+
 // Struct for NetworkInterfaceType
 typedef struct _NetworkInterfaceType
 {
@@ -450,7 +490,14 @@ typedef struct _TestListStructOctet
 // Struct for ThreadInterfaceScanResult
 typedef struct _ThreadInterfaceScanResult
 {
-    chip::ByteSpan DiscoveryResponse;
+    uint64_t PanId;
+    uint64_t ExtendedPanId;
+    chip::CharSpan NetworkName;
+    uint16_t Channel;
+    uint8_t Version;
+    uint64_t ExtendedAddress;
+    int8_t RSSI;
+    uint8_t LQI;
 } ThreadInterfaceScanResult;
 
 // Struct for ThreadMetrics
@@ -474,25 +521,6 @@ typedef struct _TransferredPhase
     uint16_t maxActivationDelay;
 } TransferredPhase;
 
-// Struct for TvChannelInfo
-typedef struct _TvChannelInfo
-{
-    uint16_t majorNumber;
-    uint16_t minorNumber;
-    chip::CharSpan name;
-    chip::CharSpan callSign;
-    chip::CharSpan affiliateCallSign;
-} TvChannelInfo;
-
-// Struct for TvChannelLineupInfo
-typedef struct _TvChannelLineupInfo
-{
-    chip::CharSpan operatorName;
-    chip::CharSpan lineupName;
-    chip::CharSpan postalCode;
-    uint8_t lineupInfoType;
-} TvChannelLineupInfo;
-
 // Struct for WiFiInterfaceScanResult
 typedef struct _WiFiInterfaceScanResult
 {
@@ -500,7 +528,8 @@ typedef struct _WiFiInterfaceScanResult
     chip::ByteSpan SSID;
     chip::ByteSpan BSSID;
     uint8_t Channel;
-    uint32_t FrequencyBand;
+    uint32_t WiFiBand;
+    int8_t RSSI;
 } WiFiInterfaceScanResult;
 
 // Struct for WiredFaultChangeType
