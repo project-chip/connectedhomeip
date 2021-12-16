@@ -185,6 +185,21 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateRequestorClusterProviderLocation
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _providerNodeID = @(0);
+
+        _endpoint = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPGeneralCommissioningClusterBasicCommissioningInfoType
 - (instancetype)init
 {

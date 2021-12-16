@@ -7200,26 +7200,76 @@ public class ChipClusters {
 
     public void announceOtaProvider(
         DefaultClusterCallback callback,
-        Long providerLocation,
+        Long providerNodeId,
         Integer vendorId,
         Integer announcementReason,
-        Optional<byte[]> metadataForNode) {
+        Optional<byte[]> metadataForNode,
+        Integer endpoint) {
       announceOtaProvider(
           chipClusterPtr,
           callback,
-          providerLocation,
+          providerNodeId,
           vendorId,
           announcementReason,
-          metadataForNode);
+          metadataForNode,
+          endpoint);
     }
 
     private native void announceOtaProvider(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Long providerLocation,
+        Long providerNodeId,
         Integer vendorId,
         Integer announcementReason,
-        Optional<byte[]> metadataForNode);
+        Optional<byte[]> metadataForNode,
+        Integer endpoint);
+
+    public static class DefaultOtaProvidersAttribute {
+      public Integer fabricIndex;
+      public Long providerNodeID;
+      public Integer endpoint;
+
+      public DefaultOtaProvidersAttribute(
+          Integer fabricIndex, Long providerNodeID, Integer endpoint) {
+        this.fabricIndex = fabricIndex;
+        this.providerNodeID = providerNodeID;
+        this.endpoint = endpoint;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("long providerNodeID: ");
+        output.append(this.providerNodeID);
+        output.append("\n");
+
+        output.append("int endpoint: ");
+        output.append(this.endpoint);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface DefaultOtaProvidersAttributeCallback {
+      void onSuccess(List<DefaultOtaProvidersAttribute> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface UpdateStateProgressAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
 
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
@@ -7229,17 +7279,8 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
-    public void readDefaultOtaProviderAttribute(OctetStringAttributeCallback callback) {
-      readDefaultOtaProviderAttribute(chipClusterPtr, callback);
-    }
-
-    public void writeDefaultOtaProviderAttribute(DefaultClusterCallback callback, byte[] value) {
-      writeDefaultOtaProviderAttribute(chipClusterPtr, callback, value);
-    }
-
-    public void subscribeDefaultOtaProviderAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeDefaultOtaProviderAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    public void readDefaultOtaProvidersAttribute(DefaultOtaProvidersAttributeCallback callback) {
+      readDefaultOtaProvidersAttribute(chipClusterPtr, callback);
     }
 
     public void readUpdatePossibleAttribute(BooleanAttributeCallback callback) {
@@ -7249,6 +7290,24 @@ public class ChipClusters {
     public void subscribeUpdatePossibleAttribute(
         BooleanAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeUpdatePossibleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUpdateStateAttribute(IntegerAttributeCallback callback) {
+      readUpdateStateAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUpdateStateAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUpdateStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void readUpdateStateProgressAttribute(UpdateStateProgressAttributeCallback callback) {
+      readUpdateStateProgressAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeUpdateStateProgressAttribute(
+        UpdateStateProgressAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeUpdateStateProgressAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
     public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
@@ -7264,23 +7323,29 @@ public class ChipClusters {
       subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    private native void readDefaultOtaProviderAttribute(
-        long chipClusterPtr, OctetStringAttributeCallback callback);
-
-    private native void writeDefaultOtaProviderAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, byte[] value);
-
-    private native void subscribeDefaultOtaProviderAttribute(
-        long chipClusterPtr,
-        OctetStringAttributeCallback callback,
-        int minInterval,
-        int maxInterval);
+    private native void readDefaultOtaProvidersAttribute(
+        long chipClusterPtr, DefaultOtaProvidersAttributeCallback callback);
 
     private native void readUpdatePossibleAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void subscribeUpdatePossibleAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUpdateStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeUpdateStateAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+
+    private native void readUpdateStateProgressAttribute(
+        long chipClusterPtr, UpdateStateProgressAttributeCallback callback);
+
+    private native void subscribeUpdateStateProgressAttribute(
+        long chipClusterPtr,
+        UpdateStateProgressAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readAttributeListAttribute(
         long chipClusterPtr, AttributeListAttributeCallback callback);
