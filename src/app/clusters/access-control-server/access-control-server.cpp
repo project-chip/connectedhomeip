@@ -243,66 +243,72 @@ struct AccessControlEntryCodec
                 break;
             }
             case to_underlying(Fields::kSubjects): {
-                TLV::TLVType subjectsContainer;
-                VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                ReturnErrorOnFailure(aReader.EnterContainer(subjectsContainer));
-                while ((err = aReader.Next()) == CHIP_NO_ERROR)
+                if (aReader.GetType() != TLV::kTLVType_Null)
                 {
-                    NodeId subject = kUndefinedNodeId;
-                    ReturnErrorOnFailure(DataModel::Decode(aReader, subject));
-                    ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
+                    TLV::TLVType subjectsContainer;
+                    VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+                    ReturnErrorOnFailure(aReader.EnterContainer(subjectsContainer));
+                    while ((err = aReader.Next()) == CHIP_NO_ERROR)
+                    {
+                        NodeId subject = kUndefinedNodeId;
+                        ReturnErrorOnFailure(DataModel::Decode(aReader, subject));
+                        ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
+                    }
+                    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+                    ReturnErrorOnFailure(aReader.ExitContainer(subjectsContainer));
                 }
-                VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                ReturnErrorOnFailure(aReader.ExitContainer(subjectsContainer));
                 break;
             }
             case to_underlying(Fields::kTargets): {
-                TLV::TLVType targetsContainer;
-                VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                ReturnErrorOnFailure(aReader.EnterContainer(targetsContainer));
-                while ((err = aReader.Next()) == CHIP_NO_ERROR)
+                if (aReader.GetType() != TLV::kTLVType_Null)
                 {
-                    AccessControl::Entry::Target target;
-                    TLV::TLVType targetContainer;
-                    VerifyOrReturnError(TLV::kTLVType_Structure == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                    ReturnErrorOnFailure(aReader.EnterContainer(targetContainer));
-                    using TargetFields = AccessControlCluster::Structs::Target::Fields;
+                    TLV::TLVType targetsContainer;
+                    VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+                    ReturnErrorOnFailure(aReader.EnterContainer(targetsContainer));
                     while ((err = aReader.Next()) == CHIP_NO_ERROR)
                     {
-                        VerifyOrReturnError(TLV::IsContextTag(aReader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-                        switch (TLV::TagNumFromTag(aReader.GetTag()))
+                        AccessControl::Entry::Target target;
+                        TLV::TLVType targetContainer;
+                        VerifyOrReturnError(TLV::kTLVType_Structure == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+                        ReturnErrorOnFailure(aReader.EnterContainer(targetContainer));
+                        using TargetFields = AccessControlCluster::Structs::Target::Fields;
+                        while ((err = aReader.Next()) == CHIP_NO_ERROR)
                         {
-                        case to_underlying(TargetFields::kCluster):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
+                            VerifyOrReturnError(TLV::IsContextTag(aReader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+                            switch (TLV::TagNumFromTag(aReader.GetTag()))
                             {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.cluster));
-                                target.flags |= target.kCluster;
+                            case to_underlying(TargetFields::kCluster):
+                                if (aReader.GetType() != TLV::kTLVType_Null)
+                                {
+                                    ReturnErrorOnFailure(DataModel::Decode(aReader, target.cluster));
+                                    target.flags |= target.kCluster;
+                                }
+                                break;
+                            case to_underlying(TargetFields::kEndpoint):
+                                if (aReader.GetType() != TLV::kTLVType_Null)
+                                {
+                                    ReturnErrorOnFailure(DataModel::Decode(aReader, target.endpoint));
+                                    target.flags |= target.kEndpoint;
+                                }
+                                break;
+                            case to_underlying(TargetFields::kDeviceType):
+                                if (aReader.GetType() != TLV::kTLVType_Null)
+                                {
+                                    ReturnErrorOnFailure(DataModel::Decode(aReader, target.deviceType));
+                                    target.flags |= target.kDeviceType;
+                                }
+                                break;
+                            default:
+                                break;
                             }
-                            break;
-                        case to_underlying(TargetFields::kEndpoint):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
-                            {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.endpoint));
-                                target.flags |= target.kEndpoint;
-                            }
-                            break;
-                        case to_underlying(TargetFields::kDeviceType):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
-                            {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.deviceType));
-                                target.flags |= target.kDeviceType;
-                            }
-                            break;
-                        default:
-                            break;
                         }
+                        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+                        ReturnErrorOnFailure(aReader.ExitContainer(targetContainer));
+                        ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
                     }
                     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                    ReturnErrorOnFailure(aReader.ExitContainer(targetContainer));
-                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+                    ReturnErrorOnFailure(aReader.ExitContainer(targetsContainer));
                 }
-                VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                ReturnErrorOnFailure(aReader.ExitContainer(targetsContainer));
                 break;
             }
             default:
