@@ -432,16 +432,24 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
-    {
-        mRunScheduled = true;
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->ScheduleWork(Run,
-                                                                                                                             this);
-    }
-    else
+    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    SessionManager * sessionManager = exchangeManager->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
+    mRunScheduled = true;
+    return CHIP_NO_ERROR;
 }
 
 void Engine::Run()
