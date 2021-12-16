@@ -37,6 +37,11 @@ group("mbed") {
   if (chip_build_pw_rpc_lib) {
     deps += [ "//lib/pw_rpc" ]
   }
+
+  if (chip_enable_ota_requestor) {
+    deps += [ "${chip_root}/examples/ota-requestor-app/ota-requestor-common" ]
+    
+  }
 }
 
 group("default") {
