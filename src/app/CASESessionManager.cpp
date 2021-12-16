@@ -26,8 +26,6 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 {
     Dnssd::ResolvedNodeData resolutionData;
 
-    // PeerId peerId = fabric->GetPeerIdForNode(nodeId);
-
     bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
     OperationalDeviceProxy * session = FindExistingSession(peerId);
