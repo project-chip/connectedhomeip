@@ -788,7 +788,7 @@ bool emberAfDoorLockClusterSetCredentialCallback(
         }
 
         // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
-        if (existingCredential.inUse)
+        if (DlCredentialStatus::kAvailable != existingCredential.status)
         {
             emberAfDoorLockClusterPrintln(
                 "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
@@ -799,6 +799,8 @@ bool emberAfDoorLockClusterSetCredentialCallback(
         }
 
         // TODO: Check credential size
+
+        // TODO: Check if credential exists with the same data
 
         DlCredential credential{ to_underlying(credentialType), credentialIndex };
         // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
@@ -831,7 +833,8 @@ bool emberAfDoorLockClusterSetCredentialCallback(
                 return true;
             }
 
-            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, credentialType, credentialData))
+            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, DlCredentialStatus::kOccupied,
+                                                    credentialType, credentialData))
             {
                 emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: app error "
                                               "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,dataLength=%zu]",
@@ -1227,7 +1230,7 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, Emb
 }
 
 #if DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION
-static EmberAfPluginDoorLockUserInfo gs_users[100];
+static EmberAfPluginDoorLockUserInfo gs_users[10];
 
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
@@ -1258,21 +1261,44 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
     return true;
 }
 
-static EmberAfPluginDoorLockCredentialInfo gs_credentials[100];
+static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
+
+struct CredentialInfo
+{
+    DlCredentialStatus status;
+    DoorLock::DlCredentialType credentialType;
+    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
+    size_t credentialDataSize;
+};
+
+static CredentialInfo gs_credentials[10];
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
                                         EmberAfPluginDoorLockCredentialInfo & credential)
 {
-    credential = gs_credentials[credentialIndex];
+    auto & credentialInStorage = gs_credentials[credentialIndex];
+
+    credential.status = credentialInStorage.status;
+    if (DlCredentialStatus::kAvailable != credential.status)
+    {
+        credential.credentialType = credentialInStorage.credentialType;
+        credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+    }
     return true;
 }
 
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                         DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    gs_credentials[credentialIndex].inUse          = true;
-    gs_credentials[credentialIndex].credentialType = credentialType;
-    gs_credentials[credentialIndex].credentialData = credentialData;
+    auto & credentialInStorage = gs_credentials[credentialIndex];
+
+    if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
+    {
+        return false;
+    }
+    credentialInStorage.status = credentialStatus;
+    credentialInStorage.credentialType = credentialType;
+    std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
 
     return true;
 }
