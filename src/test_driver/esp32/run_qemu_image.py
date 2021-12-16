@@ -118,9 +118,9 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
                     raise Exception("CHIP test status is NOT 0: %s" % line)
 
             if verbose:
-               print("========== TEST OUTPUT BEGIN ============")
-               print(output)
-               print("========== TEST OUTPUT END   ============")
+                print("========== TEST OUTPUT BEGIN ============")
+                print(output)
+                print("========== TEST OUTPUT END   ============")
 
             logging.info("Image %s PASSED", path)
         except:
