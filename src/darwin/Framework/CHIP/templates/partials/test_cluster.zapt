@@ -136,7 +136,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {
           {{> actualValue}}
           if (actualValue != nil) {
-            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}});
           }
         }
         {{/if}}
@@ -144,7 +144,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {
           {{> actualValue}}
           if (actualValue != nil) {
-            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}});
           }
         }
         {{/if}}
@@ -152,7 +152,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {
           {{> actualValue}}
           if (actualValue != nil) {
-            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
           }
         }
         {{/if}}
