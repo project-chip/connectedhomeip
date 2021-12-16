@@ -44,17 +44,13 @@ static_library("mbed") {
 
   if (chip_enable_openthread && chip_mdns == "platform") {
     sources += [ "../OpenThread/DnssdImpl.cpp" ]
-    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    public_deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
   }
 
   if (chip_enable_ota_requestor) {
     sources += [
-      "${chip_root}/src/app/clusters/ota-requestor/ClusterInterface.cpp",
-      "MbedOTADownloader.cpp",
-      "MbedOTAImageProcessor.cpp",
-      "MbedOTARequestor.cpp",
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h"
     ]
-
-    include_dirs = [ "${chip_root}/zzz_generated/ota-requestor-app" ]
   }
 }

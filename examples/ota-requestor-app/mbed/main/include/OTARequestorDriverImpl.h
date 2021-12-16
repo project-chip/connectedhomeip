@@ -24,9 +24,11 @@
 
 #pragma once
 
-#include "app/clusters/ota-requestor/OTARequestorDriver.h"
+#include <OTARequestorDriver.h>
 
-class MbedOTARequestorDriver : public OTARequestorDriver
+namespace chip {
+
+class OTARequestorDriverImpl : public OTARequestorDriver
 {
 public:
     // A call into the application logic to give it a chance to allow or stop the Requestor
@@ -34,6 +36,15 @@ public:
     // to proceed, returning FALSE will abort the download process.
     bool CheckImageDownloadAllowed();
 
+    // Application is directed to complete user consent: either return ImmediateYes/ImmediateNo
+    // without blocking or return Requested and call OTARequestor::OnUserConsent() later.
+    UserConsentAction RequestUserConsent();
+
     // Notify the application that the download is complete and the image can be applied
     void ImageDownloadComplete();
+
+    // Notify application of a change in the UpdateState attribute
+    void NotifyUpdateStateChange(chip::UpdateStateEnum state);
 };
+
+} // namespace chip

@@ -16,11 +16,22 @@
  *    limitations under the License.
  */
 
-#include <MbedOTARequestorDriver.h>
+#include "OTARequestorDriverImpl.h"
 
-bool MbedOTARequestorDriver::CheckImageDownloadAllowed()
+namespace chip {
+
+bool OTARequestorDriverImpl::CheckImageDownloadAllowed()
 {
     return true;
 }
 
-void MbedOTARequestorDriver::ImageDownloadComplete() {}
+UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
+{
+    return ImmediateYes;
+}
+
+void OTARequestorDriverImpl::ImageDownloadComplete() {}
+
+void OTARequestorDriverImpl::NotifyUpdateStateChange(chip::UpdateStateEnum state) {}
+
+} // namespace chip

@@ -31,10 +31,10 @@
 #include "events/EventQueue.h"
 
 #ifdef CHIP_OTA_REQUESTOR
-#include "MbedOTARequestorDriver.h"
-#include <MbedOTADownloader.h>
-#include <MbedOTAImageProcessor.h>
-#include <MbedOTARequestor.h>
+#include "OTARequestorDriverImpl.h"
+#include <BDXDownloader.h>
+#include <OTAImageProcessorImpl.h>
+#include <OTARequestor.h>
 #endif // CHIP_OTA_REQUESTOR
 
 static bool sIsWiFiStationProvisioned = false;
@@ -92,30 +92,6 @@ int AppTask::Init()
         }
     }
 
-#ifdef CHIP_OTA_REQUESTOR
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    // Initialize the instance of the main Requestor Class
-    MbedOTARequestor * requestorCore = new MbedOTARequestor(OnAnnounceProviderCallback, OnProviderResponseCallback);
-    SetRequestorInstance(requestorCore);
-
-    // Initialize an instance of the Requestor Driver
-    MbedOTARequestorDriver * requestorUser = new MbedOTARequestorDriver;
-
-    // Connect the Requestor and Requestor Driver objects
-    requestorCore->SetOtaRequestorDriver(requestorUser);
-
-    // Initialize  the Downloader object
-    MbedOTADownloader * downloaderCore = new MbedOTADownloader(OnDownloadCompletedCallback);
-    SetDownloaderInstance(downloaderCore);
-
-    // Initialize the Image Processor object
-    MbedOTAImageProcessor * downloaderUser = new MbedOTAImageProcessor;
-
-    // Connect the Downloader and Image Processor objects
-    downloaderCore->SetImageProcessorDelegate(downloaderUser);
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
-#endif // CHIP_OTA_REQUESTOR
-
     ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
@@ -131,6 +107,57 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+#ifdef CHIP_OTA_REQUESTOR
+    // Initialize the instance of the main Requestor Class
+    OTARequestor * requestor = new OTARequestor();
+    if (requestor == nullptr)
+    {
+        ChipLogError(NotSpecified, "Create OTA Requestor core failed");
+        return EXIT_FAILURE;
+    }
+    SetRequestorInstance(requestor);
+
+    Server * server = &(Server::GetInstance());
+    if (server == nullptr)
+    {
+        ChipLogError(NotSpecified, "Get server instance failed");
+        return EXIT_FAILURE;
+    }
+    requestor->SetServerInstance(server);
+
+    // Initialize an instance of the Requestor Driver
+    OTARequestorDriverImpl * requestorDriver = new OTARequestorDriverImpl;
+    if (requestorDriver == nullptr)
+    {
+        ChipLogError(NotSpecified, "Create OTA Requestor driver failed");
+        return EXIT_FAILURE;
+    }
+
+    // Connect the Requestor and Requestor Driver objects
+    requestor->SetOtaRequestorDriver(requestorDriver);
+
+    // Initialize  the Downloader object
+    BDXDownloader * downloader = new BDXDownloader();
+    if (downloader == nullptr)
+    {
+        ChipLogError(NotSpecified, "Create OTA Downloader failed");
+        return EXIT_FAILURE;
+    }
+
+    // Initialize the Image Processor object
+    OTAImageProcessorImpl * imageProcessor = new OTAImageProcessorImpl;
+    if (imageProcessor == nullptr)
+    {
+        ChipLogError(NotSpecified, "Create OTA Image Processor failed");
+        return EXIT_FAILURE;
+    }
+
+    imageProcessor->SetOTADownloader(downloader);
+    downloader->SetImageProcessorDelegate(imageProcessor);
+
+    requestor->SetBDXDownloader(downloader);
+#endif // CHIP_OTA_REQUESTOR
 
     return 0;
 }
@@ -216,60 +243,60 @@ void AppTask::DispatchEvent(const AppEvent * aEvent)
     }
 }
 
-#ifdef CHIP_OTA_REQUESTOR
-void AppTask::OnOtaEventHandler(AppEvent * aEvent)
-{
-    switch (aEvent->Type)
-    {
-    case AppEvent::kEventType_ota_provider_announce: {
-        ChipLogProgress(NotSpecified, "OTA provider announce event");
-        MbedOTARequestor * requestor = static_cast<MbedOTARequestor *>(GetRequestorInstance());
-        requestor->ConnectProvider();
-        break;
-    }
+// #ifdef CHIP_OTA_REQUESTOR
+// void AppTask::OnOtaEventHandler(AppEvent * aEvent)
+// {
+//     switch (aEvent->Type)
+//     {
+//     case AppEvent::kEventType_ota_provider_announce: {
+//         ChipLogProgress(NotSpecified, "OTA provider announce event");
+//         MbedOTARequestor * requestor = static_cast<MbedOTARequestor *>(GetRequestorInstance());
+//         requestor->ConnectProvider();
+//         break;
+//     }
 
-    case AppEvent::kEventType_ota_provider_response: {
-        ChipLogProgress(NotSpecified, "OTA provider response event");
-        MbedOTADownloader * downloader = static_cast<MbedOTADownloader *>(GetDownloaderInstance());
-        downloader->SetDownloadImageInfo(aEvent->OTAProviderResponseEvent.imageDatails->updateFileName);
-        downloader->BeginPrepareDownload();
-        break;
-    }
-    case AppEvent::kEventType_ota_download_completed:
-        ChipLogProgress(NotSpecified, "OTA download completed event");
-        ChipLogProgress(NotSpecified, "Download %.*s image size %ukB",
-                        static_cast<int>(aEvent->OTADownloadCompletedEvent.imageInfo->imageName.size()),
-                        aEvent->OTADownloadCompletedEvent.imageInfo->imageName.data(),
-                        (static_cast<unsigned>(aEvent->OTADownloadCompletedEvent.imageInfo->imageSize) / 1024u));
-        break;
-    default:
-        ChipLogError(NotSpecified, "OTA event unknown");
-    }
-}
+//     case AppEvent::kEventType_ota_provider_response: {
+//         ChipLogProgress(NotSpecified, "OTA provider response event");
+//         MbedOTADownloader * downloader = static_cast<MbedOTADownloader *>(GetDownloaderInstance());
+//         downloader->SetDownloadImageInfo(aEvent->OTAProviderResponseEvent.imageDatails->updateFileName);
+//         downloader->BeginPrepareDownload();
+//         break;
+//     }
+//     case AppEvent::kEventType_ota_download_completed:
+//         ChipLogProgress(NotSpecified, "OTA download completed event");
+//         ChipLogProgress(NotSpecified, "Download %.*s image size %ukB",
+//                         static_cast<int>(aEvent->OTADownloadCompletedEvent.imageInfo->imageName.size()),
+//                         aEvent->OTADownloadCompletedEvent.imageInfo->imageName.data(),
+//                         (static_cast<unsigned>(aEvent->OTADownloadCompletedEvent.imageInfo->imageSize) / 1024u));
+//         break;
+//     default:
+//         ChipLogError(NotSpecified, "OTA event unknown");
+//     }
+// }
 
-void AppTask::OnAnnounceProviderCallback()
-{
-    AppEvent ota_announce_provider_event;
-    ota_announce_provider_event.Type    = AppEvent::kEventType_ota_provider_announce;
-    ota_announce_provider_event.Handler = OnOtaEventHandler;
-    sAppTask.PostEvent(&ota_announce_provider_event);
-}
+// void AppTask::OnAnnounceProviderCallback()
+// {
+//     AppEvent ota_announce_provider_event;
+//     ota_announce_provider_event.Type    = AppEvent::kEventType_ota_provider_announce;
+//     ota_announce_provider_event.Handler = OnOtaEventHandler;
+//     sAppTask.PostEvent(&ota_announce_provider_event);
+// }
 
-void AppTask::OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails)
-{
-    AppEvent ota_provider_response_event;
-    ota_provider_response_event.Type                                  = AppEvent::kEventType_ota_provider_response;
-    ota_provider_response_event.Handler                               = OnOtaEventHandler;
-    ota_provider_response_event.OTAProviderResponseEvent.imageDatails = updateDetails;
-    sAppTask.PostEvent(&ota_provider_response_event);
-}
+// void AppTask::OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails)
+// {
+//     AppEvent ota_provider_response_event;
+//     ota_provider_response_event.Type                                  = AppEvent::kEventType_ota_provider_response;
+//     ota_provider_response_event.Handler                               = OnOtaEventHandler;
+//     ota_provider_response_event.OTAProviderResponseEvent.imageDatails = updateDetails;
+//     sAppTask.PostEvent(&ota_provider_response_event);
+// }
 
-void AppTask::OnDownloadCompletedCallback(MbedOTADownloader::ImageInfo * imageInfo)
-{
-    AppEvent ota_download_completed_event;
-    ota_download_completed_event.Type                                = AppEvent::kEventType_ota_download_completed;
-    ota_download_completed_event.Handler                             = OnOtaEventHandler;
-    ota_download_completed_event.OTADownloadCompletedEvent.imageInfo = imageInfo;
-    sAppTask.PostEvent(&ota_download_completed_event);
-}
-#endif
+// void AppTask::OnDownloadCompletedCallback(MbedOTADownloader::ImageInfo * imageInfo)
+// {
+//     AppEvent ota_download_completed_event;
+//     ota_download_completed_event.Type                                = AppEvent::kEventType_ota_download_completed;
+//     ota_download_completed_event.Handler                             = OnOtaEventHandler;
+//     ota_download_completed_event.OTADownloadCompletedEvent.imageInfo = imageInfo;
+//     sAppTask.PostEvent(&ota_download_completed_event);
+// }
+// #endif

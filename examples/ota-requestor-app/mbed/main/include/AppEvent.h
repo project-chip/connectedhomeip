@@ -21,11 +21,6 @@
 
 #include <cstdint>
 
-#ifdef CHIP_OTA_REQUESTOR
-#include <platform/mbed/MbedOTADownloader.h>
-#include <platform/mbed/MbedOTARequestor.h>
-#endif // CHIP_OTA_REQUESTOR
-
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
 
@@ -41,21 +36,6 @@ struct AppEvent
     };
 
     uint16_t Type;
-
-#ifdef CHIP_OTA_REQUESTOR
-    union
-    {
-        struct
-        {
-            MbedOTARequestor::OTAUpdateDetails * imageDatails;
-        } OTAProviderResponseEvent;
-
-        struct
-        {
-            chip::MbedOTADownloader::ImageInfo * imageInfo;
-        } OTADownloadCompletedEvent;
-    };
-#endif // CHIP_OTA_REQUESTOR
 
     EventHandler Handler;
 };
