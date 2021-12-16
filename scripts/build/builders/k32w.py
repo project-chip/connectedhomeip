@@ -65,29 +65,29 @@ class K32WBuilder(GnBuilder):
 
     def GnBuildArgs(self):
         args = [
-          'k32w0_sdk_root="%s"' % os.environ['NXP_K32W061_SDK_ROOT'],
+            'k32w0_sdk_root="%s"' % os.environ['NXP_K32W061_SDK_ROOT'],
         ]
 
         if self.low_power:
-          args.append('chip_with_low_power=1')
+            args.append('chip_with_low_power=1')
         else:
-          args.append('chip_with_low_power=0')
+            args.append('chip_with_low_power=0')
 
         if self.release:
-          args.append('is_debug=false')
+            args.append('is_debug=false')
 
         return args
 
     def generate(self):
-        self._Execute([os.path.join(self.code_root, 'third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh')])
+        self._Execute([os.path.join(
+            self.code_root, 'third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh')])
 
         super(K32WBuilder, self).generate()
 
-
     def build_outputs(self):
-        items={}
+        items = {}
         for extension in ["", ".map", ".hex"]:
-            name='%s%s' % (self.app.AppNamePrefix(), extension)
-            items[name]=os.path.join(self.output_dir, name)
+            name = '%s%s' % (self.app.AppNamePrefix(), extension)
+            items[name] = os.path.join(self.output_dir, name)
 
         return items
