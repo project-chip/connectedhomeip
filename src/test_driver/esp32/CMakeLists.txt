@@ -31,24 +31,36 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
 SET(VALID_TESTS
     libASN1Tests.a
+    # libBleLayerTests.a
+    libCoreTests.a
+    libInetLayerTests.a
+    libRetransmitTests.a
+    libSystemLayerTests.a
+    # TODO: how do I do this ?
+    # libChipCryptoTests.a "-lChipCertTestVectors"
 )
 
+foreach (TEST_LIB IN LISTS VALID_TESTS) 
+    string(REGEX REPLACE "lib(.*)\\.a" "\\1" NAME ${TEST_LIB})
 
-add_executable(testASN1Tests.elf dummy.c)
+    SET(ELF_NAME "test${NAME}.elf")
 
-target_link_directories(testASN1Tests.elf PUBLIC 
-    ${CMAKE_CURRENT_BINARY_DIR}/esp-idf/chip/lib
-    ${CMAKE_CURRENT_BINARY_DIR}/foobar
-)
+    add_executable(${ELF_NAME} dummy.c)
 
-target_link_libraries(testASN1Tests.elf PUBLIC
-    idf::main 
+    target_link_directories(${ELF_NAME} PUBLIC 
+        ${CMAKE_CURRENT_BINARY_DIR}/esp-idf/chip/lib
+    )
 
-    -Wl,--whole-archive libASN1Tests.a -Wl,--no-whole-archive
-    nlunit-test
-    nlfaultinjection
-)
-idf_build_executable(testASN1Tests.elf)
+    target_link_libraries(${ELF_NAME} PUBLIC
+        idf::main 
+        -Wl,--whole-archive ${TEST_LIB} -Wl,--no-whole-archive
+        nlunit-test
+        nlfaultinjection
+    )
+    idf_build_executable(${ELF_NAME})
+endforeach()
+
+
 # 
 # add_executable(two.elf main_app.cpp)
 # target_link_libraries(two.elf chip)
