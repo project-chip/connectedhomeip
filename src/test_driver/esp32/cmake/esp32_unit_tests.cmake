@@ -63,6 +63,10 @@ macro(esp32_unit_test)
     ###################### Image executable in QEMU #################
 
 
+    # A runnable image is a 4MB file with:
+    #   bootloader at 0x1000
+    #   partition table at 0x8000
+    #   image at 0x10000
     add_custom_command(
       OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img_timestamp"
 
@@ -70,9 +74,6 @@ macro(esp32_unit_test)
       COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/bootloader/bootloader.bin bs=1 seek=4096 of=${UNIT_TEST_NAME}.img conv=notrunc
       COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/partition_table/partition-table.bin bs=1 seek=32768 of=${UNIT_TEST_NAME}.img conv=notrunc
       COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.bin bs=1 seek=65536 of=${UNIT_TEST_NAME}.img conv=notrunc
-
-      # $ dd if=build/partition_table/partition-table.bin bs=1 seek=$((0x8000)) of=flash.bin conv=notrunc
-      # $ dd if=build/hello-world.bin bs=1 seek=$((0x10000)) of=flash.bin conv=notrunc
 
       COMMAND ${CMAKE_COMMAND} -E echo "Generated ${UNIT_TEST_NAME}.img"
       COMMAND ${CMAKE_COMMAND} -E md5sum "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img" > "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img_timestamp"
