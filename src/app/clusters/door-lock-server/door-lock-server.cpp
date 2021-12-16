@@ -259,18 +259,6 @@ DoorLockServer::CreateUser(chip::app::CommandHandler * commandObj, const chip::a
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus DoorLockServer::ClearUser(chip::EndpointId endpointId, uint16_t userIndex)
-{
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, 0, 0, "", 0, DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser,
-                                      DlCredentialRule::kSingle, nullptr, 0))
-    {
-        return EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    // TODO: Send LockUserChange event
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
-
 EmberAfStatus
 DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                            uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
@@ -322,6 +310,41 @@ DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::a
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
+    if (!credentials.IsNull())
+    {
+        // appclusters: spec defines up to 5 credentials per user
+        if (user.totalCredentials + 1 > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
+        {
+            emberAfDoorLockClusterPrintln("[ModifyUser] Unable to append credentials to user: too many credentials "
+                                          "[endpointId=%d,userIndex=%d,userTotalCredentials=%zu]",
+                                          endpointId, userIndex, user.totalCredentials);
+            return EMBER_ZCL_STATUS_INVALID_COMMAND;
+        }
+
+        auto appendCredential = true;
+        for (size_t i = 0; i < user.totalCredentials; ++i)
+        {
+            // appclusters, 5.2.4.41.1: It should not be possible to assign multiple credentials of the same type to a user
+            if (user.credentials[i].CredentialType == credentials.Value().CredentialType)
+            {
+                // TODO: return 'occupied' response
+                return EMBER_ZCL_STATUS_INVALID_COMMAND;
+            }
+            // Credential type was modified -- replace it in the user structure
+            if (user.credentials[i].CredentialIndex == credentials.Value().CredentialIndex)
+            {
+                user.credentials[i].CredentialType = credentials.Value().CredentialType;
+                appendCredential                   = false;
+                break;
+            }
+        }
+
+        if (appendCredential)
+        {
+            user.credentials[user.totalCredentials++] = credentials.Value();
+        }
+    }
+
     char newUserName[DOOR_LOCK_USER_NAME_BUFFER_SIZE] = { 0 };
     if (!userName.IsNull())
     {
@@ -342,8 +365,6 @@ DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::a
                                           endpointId, userIndex, user.totalCredentials);
             return EMBER_ZCL_STATUS_INVALID_COMMAND;
         }
-
-        user.credentials[user.totalCredentials++] = credentials.Value();
     }
 
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIndex, newUserName, newUserUniqueId,
@@ -401,6 +422,434 @@ chip::FabricIndex DoorLockServer::getFabricIndex(const chip::app::CommandHandler
         return kUndefinedFabricIndex;
     }
     return commandObj->GetAccessingFabricIndex();
+}
+
+void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
+{
+    // TODO: Make sure that USR feature is enabled prior to executing command
+
+    auto & userIndex = commandData.userIndex;
+    emberAfDoorLockClusterPrintln("[SetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
+
+    auto & operationType  = commandData.operationType;
+    auto & userName       = commandData.userName;
+    auto & userUniqueId   = commandData.userUniqueId;
+    auto & userStatus     = commandData.userStatus;
+    auto & userType       = commandData.userType;
+    auto & credentialRule = commandData.credentialRule;
+
+    if (!UserIndexValid(commandPath.mEndpointId, userIndex))
+    {
+        emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [userIndex=%d]", userIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    // appclusters, 5.2.4.34: UserName has maximum DOOR_LOCK_MAX_USER_NAME_SIZE (10) characters excluding NUL terminator in it.
+    if (!userName.IsNull() && userName.Value().size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%zu]",
+            commandPath.mEndpointId, userIndex, userName.Value().size());
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    switch (operationType)
+    {
+    case DlDataOperationType::kAdd:
+        status = CreateUser(commandObj, commandPath, userIndex, userName, userUniqueId, userStatus, userType, credentialRule);
+        break;
+    case DlDataOperationType::kModify:
+        status = ModifyUser(commandObj, commandPath, userIndex, userName, userUniqueId, userStatus, userType, credentialRule);
+        break;
+    case DlDataOperationType::kClear:
+        // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
+        break;
+    }
+
+    emberAfSendImmediateDefaultResponse(status);
+}
+
+void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                           const Commands::GetUser::DecodableType & commandData)
+{
+    auto & userIndex = commandData.userIndex;
+
+    emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
+
+    uint16_t maxNumberOfUsers = 0;
+    if (!UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
+    {
+        emberAfDoorLockClusterPrintln("[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
+                                      maxNumberOfUsers);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    EmberAfPluginDoorLockUserInfo user;
+    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
+    {
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetUserResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
+        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
+
+        using ResponseFields = Commands::GetUserResponse::Fields;
+
+        // appclusters, 5.2.4.36: we should not add user-specific field if the user status is set to Available
+        if (DlUserStatus::kAvailable != user.userStatus)
+        {
+            emberAfDoorLockClusterPrintln(
+                "Found user in storage: "
+                "[userIndex=%d,userName=\"%s\",userStatus=%hhu,userType=%hhu,credentialRule=%hhu,createdBy=%hhu,modifiedBy=%hhu]",
+                userIndex, user.userName, user.userStatus, user.userType, user.credentialRule, user.createdBy, user.lastModifiedBy);
+
+            chip::CharSpan userName(user.userName, strlen(user.userName));
+            SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), userName));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueId)), user.userUniqueId));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
+            if (user.totalCredentials > 0)
+            {
+                TLV::TLVType credentialsContainer;
+                SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
+                                                           TLV::kTLVType_Array, credentialsContainer));
+                for (size_t i = 0; i < user.totalCredentials; ++i)
+                {
+                    DoorLock::Structs::DlCredential::Type credential;
+                    credential.credentialIndex = user.credentials[i].CredentialIndex;
+                    credential.credentialType  = static_cast<DlCredentialType>(user.credentials[i].CredentialType);
+                    SuccessOrExit(err = credential.Encode(*writer, TLV::AnonymousTag));
+                }
+                SuccessOrExit(err = writer->EndContainer(credentialsContainer));
+            }
+            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
+            SuccessOrExit(
+                err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)), user.lastModifiedBy));
+        }
+        else
+        {
+            emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
+        }
+
+        // appclusters, 5.2.4.36.1: We need to add next available user after userIndex if any.
+        for (uint16_t i = userIndex + 1; i < maxNumberOfUsers; ++i)
+        {
+            VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, i, user), err = CHIP_ERROR_INTERNAL);
+            if (DlUserStatus::kAvailable == user.userStatus)
+            {
+                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), i));
+                break;
+            }
+        }
+        SuccessOrExit(err = commandObj->FinishCommand());
+    }
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
+                     userIndex, err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+}
+
+void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::ClearUser::DecodableType & commandData)
+{
+    auto & userIndex = commandData.userIndex;
+    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
+
+    uint16_t maxNumberOfUsers = 0;
+    if (!UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers) && userIndex != 0xFFFE)
+    {
+        emberAfDoorLockClusterPrintln("[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]",
+                                      userIndex, maxNumberOfUsers);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    if (0xFFFE != userIndex)
+    {
+        auto status = clearUser(commandPath.mEndpointId, userIndex);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", userIndex,
+                         status);
+        }
+        emberAfSendImmediateDefaultResponse(status);
+        return;
+    }
+
+    emberAfDoorLockClusterPrintln("[ClearUser] Removing all users from storage");
+    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    {
+        auto status = clearUser(commandPath.mEndpointId, i);
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", i, status);
+
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return;
+        }
+    }
+    emberAfDoorLockClusterPrintln("[ClearUser] Removed all users from storage [users=%d]", maxNumberOfUsers);
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, uint16_t userIndex)
+{
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, 0, 0, "", 0, DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser,
+                                      DlCredentialRule::kSingle, nullptr, 0))
+    {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    // TODO: Send LockUserChange event
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * commandObj,
+                                                 const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::SetCredential::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[SetCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    auto & operationType   = commandData.operationType;
+    auto & credentialType  = commandData.credential.credentialType;
+    auto & credentialIndex = commandData.credential.credentialIndex;
+    auto & credentialData  = commandData.credentialData;
+    auto & userIndex       = commandData.userIndex;
+    auto & userStatus      = commandData.userStatus;
+    auto & userType        = commandData.userType;
+
+    switch (operationType)
+    {
+    case DlDataOperationType::kAdd: {
+        EmberAfPluginDoorLockCredentialInfo existingCredential;
+        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, existingCredential))
+        {
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
+                commandPath.mEndpointId, credentialIndex);
+
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return;
+        }
+
+        // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
+        if (DlCredentialStatus::kAvailable != existingCredential.status)
+        {
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
+                commandPath.mEndpointId, credentialIndex);
+
+            sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
+            return;
+        }
+
+        // TODO: Check credential size
+
+        // TODO: Check if credential exists with the same data
+
+        DlCredential credential{ to_underlying(credentialType), credentialIndex };
+        // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
+        if (userIndex.IsNull())
+        {
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] UserIndex is not set, creating new user [endpointId=%d,credentialIndex=%d]",
+                commandPath.mEndpointId, credentialIndex);
+            uint16_t availableUserIndex = 0;
+            if (!findUnoccupiedUserSlot(commandPath.mEndpointId, availableUserIndex))
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to create new user for credential: no available user slots "
+                                              "[endpointId=%d,credentialIndex=%d]",
+                                              commandPath.mEndpointId, credentialIndex);
+
+                sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
+                return;
+            }
+
+            auto status = DoorLockServer::Instance().CreateUser(commandObj, commandPath, availableUserIndex, Nullable<CharSpan>(),
+                                                                Nullable<uint32_t>(), userStatus, userType,
+                                                                Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
+            if (EMBER_ZCL_STATUS_SUCCESS != status)
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to create new user for credential: internal error "
+                                              "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
+                                              commandPath.mEndpointId, credential.CredentialIndex, availableUserIndex, status);
+
+                sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
+                return;
+            }
+
+            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, DlCredentialStatus::kOccupied,
+                                                    credentialType, credentialData))
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: app error "
+                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,dataLength=%zu]",
+                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
+
+                // TODO: Use appropriate status code
+                sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
+                return;
+            }
+
+            emberAfDoorLockClusterPrintln("[SetCredential] Credential and user were created "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,dataLength=%zu,userIndex=%d]",
+                                          commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size(),
+                                          availableUserIndex);
+
+            sendSetCredentialResponse(commandObj, DlStatus::kSuccess, Nullable<uint16_t>(availableUserIndex),
+                                      Nullable<uint16_t>(credentialIndex + 1));
+            return;
+        }
+
+        // TODO: Check if userIndex in bounds
+
+        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex.Value(), user))
+        {
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d,userIndex=%d]",
+                commandPath.mEndpointId, credentialIndex, userIndex.Value());
+
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
+            return;
+        }
+
+        // Not in the spec, but common sense: I don't think we need to modify the credential if user slot is not occupied
+        if (user.userStatus == DlUserStatus::kAvailable)
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user clot is empty "
+                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
+                                          commandPath.mEndpointId, credentialIndex, userIndex.Value());
+
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, Nullable<uint16_t>(), Nullable<uint16_t>());
+            return;
+        }
+
+        // appclusters, 5.2.4.40: If user already contains the credential of the same type we should return INVALID_COMMAND
+        // TODO: Check if credentials of the same type are already associated with user (maybe inside ModifyUser)
+
+        // Modify the existing user
+        auto status = DoorLockServer::Instance().ModifyUser(commandObj, commandPath, userIndex.Value(), Nullable<CharSpan>(),
+                                                            Nullable<uint32_t>(), userStatus, userType,
+                                                            Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
+        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to a user: internal error "
+                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
+                                          commandPath.mEndpointId, credential.CredentialIndex, userIndex.Value(), status);
+
+            // TODO: Use proper status codes
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
+            return;
+        }
+
+        sendSetCredentialResponse(commandObj, DlStatus::kSuccess, Nullable<uint16_t>(), Nullable<uint16_t>(credentialIndex + 1));
+        return;
+    }
+    case DlDataOperationType::kModify:
+        // TODO: Modify the credential if possible
+        break;
+    case DlDataOperationType::kClear:
+        // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler * commandObj,
+                                                       const app::ConcreteCommandPath & commandPath,
+                                                       const Commands::GetCredentialStatus::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    // TODO: Implement getting the credential status
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+void DoorLockServer::ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj,
+                                                   const app::ConcreteCommandPath & commandPath,
+                                                   const Commands::ClearCredential::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("[ClearCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
+
+    // TODO: Implement clearing the credential
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
+bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex)
+{
+    uint16_t maxNumberOfUsers;
+    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
+        return false;
+    }
+
+    userIndex = 0;
+    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    {
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
+        {
+            ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [status:%d,userIndex=%d]", status, i);
+            return false;
+        }
+
+        if (DlUserStatus::kAvailable == user.userStatus)
+        {
+            userIndex = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+CHIP_ERROR DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status,
+                                                     const Nullable<uint16_t> & userIndex,
+                                                     const Nullable<uint16_t> & nextCredentialIndex)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::SetCredentialResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
+    SuccessOrExit(err = commandObj->PrepareCommand(path));
+    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kStatus)), status));
+
+    if (!userIndex.IsNull())
+    {
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kUserIndex)),
+                                        userIndex.Value()));
+    }
+
+    if (!nextCredentialIndex.IsNull())
+    {
+        SuccessOrExit(err =
+                          writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kNextCredentialIndex)),
+                                      nextCredentialIndex.Value()));
+    }
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+exit:
+    return err;
 }
 
 // =============================================================================
@@ -514,54 +963,7 @@ bool emberAfDoorLockClusterSetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
-    // TODO: Make sure that USR feature is enabled prior to executing command
-
-    auto & userIndex = commandData.userIndex;
-    emberAfDoorLockClusterPrintln("[SetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
-
-    auto & operationType  = commandData.operationType;
-    auto & userName       = commandData.userName;
-    auto & userUniqueId   = commandData.userUniqueId;
-    auto & userStatus     = commandData.userStatus;
-    auto & userType       = commandData.userType;
-    auto & credentialRule = commandData.credentialRule;
-
-    if (!DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex))
-    {
-        emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [userIndex=%d]", userIndex);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
-    }
-
-    // appclusters, 5.2.4.34: UserName has maximum DOOR_LOCK_MAX_USER_NAME_SIZE (10) characters excluding NUL terminator in it.
-    if (!userName.IsNull() && userName.Value().size() > DOOR_LOCK_MAX_USER_NAME_SIZE)
-    {
-        emberAfDoorLockClusterPrintln(
-            "[SetUser] Unable to set user: userName too long [endpointId=%d,userIndex=%d,userNameSize=%zu]",
-            commandPath.mEndpointId, userIndex, userName.Value().size());
-
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
-    }
-
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    switch (operationType)
-    {
-    case DlDataOperationType::kAdd:
-        status = DoorLockServer::Instance().CreateUser(commandObj, commandPath, userIndex, userName, userUniqueId, userStatus,
-                                                       userType, credentialRule);
-        break;
-    case DlDataOperationType::kModify:
-        status = DoorLockServer::Instance().ModifyUser(commandObj, commandPath, userIndex, userName, userUniqueId, userStatus,
-                                                       userType, credentialRule);
-        break;
-    case DlDataOperationType::kClear:
-        // appclusters, 5.2.4.34: SetUser command allow only kAdd/kModify, we should respond with INVALID_COMMAND if we got kClear
-        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
-        break;
-    }
-
-    emberAfSendImmediateDefaultResponse(status);
+    DoorLockServer::Instance().SetUserCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -569,89 +971,7 @@ bool emberAfDoorLockClusterGetUserCallback(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData)
 {
-    auto & userIndex = commandData.userIndex;
-
-    emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
-
-    uint16_t maxNumberOfUsers = 0;
-    if (!DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
-    {
-        emberAfDoorLockClusterPrintln("[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
-                                      maxNumberOfUsers);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
-    }
-
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    EmberAfPluginDoorLockUserInfo user;
-    VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
-    {
-        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetUserResponse::Id };
-        TLV::TLVWriter * writer       = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(path));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
-
-        using ResponseFields = Commands::GetUserResponse::Fields;
-
-        // appclusters, 5.2.4.36: we should not add user-specific field if the user status is set to Available
-        if (DlUserStatus::kAvailable != user.userStatus)
-        {
-            emberAfDoorLockClusterPrintln(
-                "Found user in storage: "
-                "[userIndex=%d,userName=\"%s\",userStatus=%hhu,userType=%hhu,credentialRule=%hhu,createdBy=%hhu,modifiedBy=%hhu]",
-                userIndex, user.userName, user.userStatus, user.userType, user.credentialRule, user.createdBy, user.lastModifiedBy);
-
-            chip::CharSpan userName(user.userName, strlen(user.userName));
-            SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), userName));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueId)), user.userUniqueId));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCreatorFabricIndex)), user.createdBy));
-            SuccessOrExit(
-                err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kLastModifiedFabricIndex)), user.lastModifiedBy));
-
-            if (user.totalCredentials > 0)
-            {
-                TLV::TLVType credentialsContainer;
-                SuccessOrExit(err = writer->StartContainer(TLV::ContextTag(to_underlying(ResponseFields::kCredentials)),
-                                                           TLV::kTLVType_Array, credentialsContainer));
-                for (size_t i = 0; i < user.totalCredentials; ++i)
-                {
-                    DoorLock::Structs::DlCredential::Type credential;
-                    credential.credentialIndex = user.credentials[i].CredentialIndex;
-                    credential.credentialType  = static_cast<DlCredentialType>(user.credentials[i].CredentialType);
-                    SuccessOrExit(err = credential.Encode(*writer, TLV::AnonymousTag));
-                }
-                SuccessOrExit(err = writer->EndContainer(credentialsContainer));
-            }
-        }
-        else
-        {
-            emberAfDoorLockClusterPrintln("[GetUser] User not found [userIndex=%d]", userIndex);
-        }
-
-        // appclusters, 5.2.4.36.1: We need to add next available user after userIndex if any.
-        for (uint16_t i = userIndex + 1; i < maxNumberOfUsers; ++i)
-        {
-            VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, i, user), err = CHIP_ERROR_INTERNAL);
-            if (DlUserStatus::kAvailable == user.userStatus)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), i));
-                break;
-            }
-        }
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-
-exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(Zcl, "[GetUser] Command processing failed [endpointId=%d,userIndex=%d,err=\"%s\"]", commandPath.mEndpointId,
-                     userIndex, err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-    }
+    DoorLockServer::Instance().GetUserCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -659,258 +979,15 @@ bool emberAfDoorLockClusterClearUserCallback(chip::app::CommandHandler * command
                                              const chip::app::ConcreteCommandPath & commandPath,
                                              const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
-    auto & userIndex = commandData.userIndex;
-    emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
-
-    uint16_t maxNumberOfUsers = 0;
-    if (!DoorLockServer::Instance().UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers) && userIndex != 0xFFFE)
-    {
-        emberAfDoorLockClusterPrintln("[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]",
-                                      userIndex, maxNumberOfUsers);
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
-    }
-
-    if (0xFFFE != userIndex)
-    {
-        auto status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, userIndex);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", userIndex,
-                         status);
-        }
-        emberAfSendImmediateDefaultResponse(status);
-        return true;
-    }
-
-    emberAfDoorLockClusterPrintln("[ClearUser] Removing all users from storage");
-    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
-    {
-        auto status = DoorLockServer::Instance().ClearUser(commandPath.mEndpointId, i);
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            ChipLogError(Zcl, "[ClearUser] App reported failure when resetting the user [userIndex=%d,status=0x%x]", i, status);
-
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-            return true;
-        }
-    }
-    emberAfDoorLockClusterPrintln("[ClearUser] Removed all users from storage [users=%d]", maxNumberOfUsers);
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().ClearUserCommandHandler(commandObj, commandPath, commandData);
     return true;
-}
-
-static CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status,
-                                            const Nullable<uint16_t> & userIndex, const Nullable<uint16_t> & nextCredentialIndex)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::SetCredentialResponse::Id };
-    TLV::TLVWriter * writer       = nullptr;
-    SuccessOrExit(err = commandObj->PrepareCommand(path));
-    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kStatus)), status));
-
-    if (!userIndex.IsNull())
-    {
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kUserIndex)),
-                                        userIndex.Value()));
-    }
-
-    if (!nextCredentialIndex.IsNull())
-    {
-        SuccessOrExit(err =
-                          writer->Put(TLV::ContextTag(to_underlying(Commands::SetCredentialResponse::Fields::kNextCredentialIndex)),
-                                      nextCredentialIndex.Value()));
-    }
-    SuccessOrExit(err = commandObj->FinishCommand());
-
-exit:
-    return err;
-}
-
-bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex)
-{
-    uint16_t maxNumberOfUsers;
-    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
-    if (EMBER_ZCL_STATUS_SUCCESS != status)
-    {
-        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
-        return false;
-    }
-
-    userIndex = 0;
-    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
-    {
-        EmberAfPluginDoorLockUserInfo user;
-        if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
-        {
-            ChipLogError(Zcl, "Unable to get user to check if slot is occupied: app error [status:%d,userIndex=%d]", status, i);
-            return false;
-        }
-
-        if (DlUserStatus::kAvailable == user.userStatus)
-        {
-            userIndex = i;
-            return true;
-        }
-    }
-    return false;
 }
 
 bool emberAfDoorLockClusterSetCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[SetCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
-
-    auto & operationType   = commandData.operationType;
-    auto & credentialType  = commandData.credential.credentialType;
-    auto & credentialIndex = commandData.credential.credentialIndex;
-    auto & credentialData  = commandData.credentialData;
-    auto & userIndex       = commandData.userIndex;
-    auto & userStatus      = commandData.userStatus;
-    auto & userType        = commandData.userType;
-
-    switch (operationType)
-    {
-    case DlDataOperationType::kAdd: {
-        EmberAfPluginDoorLockCredentialInfo existingCredential;
-        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, existingCredential))
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
-
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-            return true;
-        }
-
-        // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
-        if (DlCredentialStatus::kAvailable != existingCredential.status)
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
-
-            sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
-            return true;
-        }
-
-        // TODO: Check credential size
-
-        // TODO: Check if credential exists with the same data
-
-        DlCredential credential{ to_underlying(credentialType), credentialIndex };
-        // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
-        if (userIndex.IsNull())
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] UserIndex is not set, creating new user [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
-            uint16_t availableUserIndex = 0;
-            if (!findUnoccupiedUserSlot(commandPath.mEndpointId, availableUserIndex))
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Unable to create new user for credential: no available user slots "
-                                              "[endpointId=%d,credentialIndex=%d]",
-                                              commandPath.mEndpointId, credentialIndex);
-
-                sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
-                return true;
-            }
-
-            auto status = DoorLockServer::Instance().CreateUser(commandObj, commandPath, availableUserIndex, Nullable<CharSpan>(),
-                                                                Nullable<uint32_t>(), userStatus, userType,
-                                                                Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
-            if (EMBER_ZCL_STATUS_SUCCESS != status)
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Unable to create new user for credential: internal error "
-                                              "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
-                                              commandPath.mEndpointId, credential.CredentialIndex, availableUserIndex, status);
-
-                sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
-                return true;
-            }
-
-            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, DlCredentialStatus::kOccupied,
-                                                    credentialType, credentialData))
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: app error "
-                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,dataLength=%zu]",
-                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
-
-                // TODO: Use appropriate status code
-                sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
-                return true;
-            }
-
-            emberAfDoorLockClusterPrintln("[SetCredential] Credential and user were created "
-                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,dataLength=%zu,userIndex=%d]",
-                                          commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size(),
-                                          availableUserIndex);
-
-            sendSetCredentialResponse(commandObj, DlStatus::kSuccess, Nullable<uint16_t>(availableUserIndex),
-                                      Nullable<uint16_t>(credentialIndex + 1));
-            return true;
-        }
-
-        // TODO: Check if userIndex in bounds
-
-        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
-        EmberAfPluginDoorLockUserInfo user;
-        if (!emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex.Value(), user))
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d,userIndex=%d]",
-                commandPath.mEndpointId, credentialIndex, userIndex.Value());
-
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
-            return true;
-        }
-
-        // Not in the spec, but common sense: I don't think we need to modify the credential if user slot is not occupied
-        if (user.userStatus == DlUserStatus::kAvailable)
-        {
-            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to user: user clot is empty "
-                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
-                                          commandPath.mEndpointId, credentialIndex, userIndex.Value());
-
-            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, Nullable<uint16_t>(), Nullable<uint16_t>());
-            return true;
-        }
-
-        // appclusters, 5.2.4.40: If user already contains the credential of the same type we should return INVALID_COMMAND
-        // TODO: Check if credentials of the same type are already associated with user (maybe inside ModifyUser)
-
-        // Modify the existing user
-        auto status = DoorLockServer::Instance().ModifyUser(commandObj, commandPath, userIndex.Value(), Nullable<CharSpan>(),
-                                                            Nullable<uint32_t>(), userStatus, userType,
-                                                            Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
-        {
-            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to a user: internal error "
-                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
-                                          commandPath.mEndpointId, credential.CredentialIndex, userIndex.Value(), status);
-
-            // TODO: Use proper status codes
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
-            return true;
-        }
-
-        sendSetCredentialResponse(commandObj, DlStatus::kSuccess, Nullable<uint16_t>(), Nullable<uint16_t>(credentialIndex + 1));
-        return true;
-    }
-    case DlDataOperationType::kModify:
-        // TODO: Modify the credential if possible
-        break;
-    case DlDataOperationType::kClear:
-        // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
-        return true;
-    }
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().SetCredentialCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -918,10 +995,7 @@ bool emberAfDoorLockClusterGetCredentialStatusCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
-
-    // TODO: Implement getting the credential status
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().GetCredentialStatusCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -929,10 +1003,7 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("[ClearCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
-
-    // TODO: Implement clearing the credential
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    DoorLockServer::Instance().ClearCredentialCommandHandler(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -1296,7 +1367,7 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
     {
         return false;
     }
-    credentialInStorage.status = credentialStatus;
+    credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
 
