@@ -135,19 +135,25 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#if expectedConstraints.minValue}}
         {
           {{> actualValue}}
-          XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+          if (actualValue != nil) {
+            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+          }
         }
         {{/if}}
         {{#if expectedConstraints.maxValue}}
         {
           {{> actualValue}}
-          XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+          if (actualValue != nil) {
+            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+          }
         }
         {{/if}}
         {{#if expectedConstraints.notValue}}
         {
           {{> actualValue}}
-          XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+          if (actualValue != nil) {
+            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+          }
         }
         {{/if}}
         {{/if}}

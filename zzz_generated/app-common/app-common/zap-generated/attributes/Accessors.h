@@ -5185,7 +5185,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace WakeOnLan
 
-namespace TvChannel {
+namespace Channel {
 namespace Attributes {
 
 namespace FeatureMap {
@@ -5199,7 +5199,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Attributes {

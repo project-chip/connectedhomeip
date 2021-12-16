@@ -23,9 +23,9 @@
 #include <string>
 #include <vector>
 
-class TvChannelManager
+class ChannelManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTvChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

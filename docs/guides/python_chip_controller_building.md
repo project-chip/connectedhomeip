@@ -516,7 +516,7 @@ RelativeHumidityMeasurement
 Scenes
 SoftwareDiagnostics
 Switch
-TvChannel
+Channel
 TargetNavigator
 TemperatureMeasurement
 TestCluster

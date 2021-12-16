@@ -105,31 +105,4 @@ private:
 #endif // CONFIG_NETWORK_LAYER_BLE
 };
 
-class CommissioningParameters
-{
-public:
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
-    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
-    const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
-
-    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
-    CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
-    {
-        mCSRNonce.SetValue(csrNonce);
-        return *this;
-    }
-
-    // The lifetime of the buffer attestationNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
-    CommissioningParameters & SetAttestationNonce(ByteSpan attestationNonce)
-    {
-        mAttestationNonce.SetValue(attestationNonce);
-        return *this;
-    }
-
-private:
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
-    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
-};
-
 } // namespace chip

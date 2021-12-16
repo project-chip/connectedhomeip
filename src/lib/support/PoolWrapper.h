@@ -53,11 +53,11 @@ protected:
     virtual Loop ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
 };
 
-template <class T, size_t N, typename Interface>
+template <class T, size_t N, ObjectPoolMem M, typename Interface>
 class PoolProxy;
 
-template <class T, size_t N, typename U, typename... ConstructorArguments>
-class PoolProxy<T, N, std::tuple<U, ConstructorArguments...>> : public PoolInterface<U, ConstructorArguments...>
+template <class T, size_t N, ObjectPoolMem M, typename U, typename... ConstructorArguments>
+class PoolProxy<T, N, M, std::tuple<U, ConstructorArguments...>> : public PoolInterface<U, ConstructorArguments...>
 {
 public:
     static_assert(std::is_base_of<U, T>::value, "Interface type is not derived from Pool type");
@@ -83,7 +83,7 @@ protected:
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });
     }
 
-    virtual BitMapObjectPool<T, N> & Impl() = 0;
+    virtual ObjectPool<T, N, M> & Impl() = 0;
 };
 
 /*
@@ -92,23 +92,24 @@ protected:
  *
  *  @tparam T          a subclass of element to be allocated.
  *  @tparam N          a positive integer max number of elements the pool provides.
+ *  @tparam M          an ObjectPoolMem constant selecting static vs heap allocation.
  *  @tparam Interfaces a list of parameters which defines PoolInterface's. each interface is defined by a
  *                     std::tuple<U, ConstructorArguments...>. The PoolImpl is derived from every
  *                     PoolInterface<U, ConstructorArguments...>, the PoolImpl can be converted to the interface type
  *                     and passed around
  */
-template <class T, size_t N, typename... Interfaces>
-class PoolImpl : public PoolProxy<T, N, Interfaces>...
+template <class T, size_t N, ObjectPoolMem M, typename... Interfaces>
+class PoolImpl : public PoolProxy<T, N, M, Interfaces>...
 {
 public:
     PoolImpl() {}
     virtual ~PoolImpl() override {}
 
 protected:
-    virtual BitMapObjectPool<T, N> & Impl() override { return mImpl; }
+    virtual ObjectPool<T, N, M> & Impl() override { return mImpl; }
 
 private:
-    BitMapObjectPool<T, N> mImpl;
+    ObjectPool<T, N, M> mImpl;
 };
 
 } // namespace chip

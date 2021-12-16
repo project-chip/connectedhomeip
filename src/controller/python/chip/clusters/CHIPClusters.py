@@ -781,6 +781,53 @@ class ChipClusters:
                 },
             },
     }
+    _CHANNEL_CLUSTER_INFO = {
+            "clusterName": "Channel",
+            "clusterId": 0x00000504,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "ChangeChannel",
+                    "args": {
+                        "match": "str",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "ChangeChannelByNumber",
+                    "args": {
+                        "majorNumber": "int",
+                        "minorNumber": "int",
+                    },
+                },
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "SkipChannel",
+                    "args": {
+                        "count": "int",
+                    },
+                },
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "ChannelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
     _COLOR_CONTROL_CLUSTER_INFO = {
             "clusterName": "ColorControl",
             "clusterId": 0x00000300,
@@ -1362,9 +1409,9 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "AcceptsHeaderList",
+                    "attributeName": "AcceptHeaderList",
                     "attributeId": 0x00000000,
-                    "type": "bytes",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000001: {
@@ -2794,16 +2841,16 @@ class ChipClusters:
             "clusterName": "OtaSoftwareUpdateProvider",
             "clusterId": 0x00000029,
             "commands": {
-            0x00000001: {
-                    "commandId": 0x00000001,
+            0x00000002: {
+                    "commandId": 0x00000002,
                     "commandName": "ApplyUpdateRequest",
                     "args": {
                         "updateToken": "bytes",
                         "newVersion": "int",
                     },
                 },
-            0x00000002: {
-                    "commandId": 0x00000002,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "NotifyUpdateApplied",
                     "args": {
                         "updateToken": "bytes",
@@ -3718,53 +3765,6 @@ class ChipClusters:
                     "attributeId": 0x0000FFFC,
                     "type": "int",
                     "reportable": True,
-                },
-                0x0000FFFD: {
-                    "attributeName": "ClusterRevision",
-                    "attributeId": 0x0000FFFD,
-                    "type": "int",
-                    "reportable": True,
-                },
-            },
-    }
-    _TV_CHANNEL_CLUSTER_INFO = {
-            "clusterName": "TvChannel",
-            "clusterId": 0x00000504,
-            "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "ChangeChannel",
-                    "args": {
-                        "match": "str",
-                    },
-                },
-            0x00000001: {
-                    "commandId": 0x00000001,
-                    "commandName": "ChangeChannelByNumber",
-                    "args": {
-                        "majorNumber": "int",
-                        "minorNumber": "int",
-                    },
-                },
-            0x00000002: {
-                    "commandId": 0x00000002,
-                    "commandName": "SkipChannel",
-                    "args": {
-                        "count": "int",
-                    },
-                },
-            },
-            "attributes": {
-                0x00000000: {
-                    "attributeName": "ChannelList",
-                    "attributeId": 0x00000000,
-                    "type": "",
-                    "reportable": True,
-                },
-                0x0000FFFB: {
-                    "attributeName": "AttributeList",
-                    "attributeId": 0x0000FFFB,
-                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -5537,6 +5537,7 @@ class ChipClusters:
     0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
     0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
     0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+    0x00000504: _CHANNEL_CLUSTER_INFO,
     0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
     0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
     0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
@@ -5573,7 +5574,6 @@ class ChipClusters:
     0x00000005: _SCENES_CLUSTER_INFO,
     0x00000034: _SOFTWARE_DIAGNOSTICS_CLUSTER_INFO,
     0x0000003B: _SWITCH_CLUSTER_INFO,
-    0x00000504: _TV_CHANNEL_CLUSTER_INFO,
     0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
     0x00000402: _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
     0x0000050F: _TEST_CLUSTER_CLUSTER_INFO,
@@ -5600,6 +5600,7 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "Channel": _CHANNEL_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
@@ -5636,7 +5637,6 @@ class ChipClusters:
         "Scenes": _SCENES_CLUSTER_INFO,
         "SoftwareDiagnostics": _SOFTWARE_DIAGNOSTICS_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
-        "TvChannel": _TV_CHANNEL_CLUSTER_INFO,
         "TargetNavigator": _TARGET_NAVIGATOR_CLUSTER_INFO,
         "TemperatureMeasurement": _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
         "TestCluster": _TEST_CLUSTER_CLUSTER_INFO,

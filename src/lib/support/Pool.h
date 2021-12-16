@@ -336,33 +336,28 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
-#if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <typename T, unsigned int N>
-using ObjectPool = HeapObjectPool<T>;
-#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <typename T, unsigned int N>
-using ObjectPool = BitMapObjectPool<T, N>;
-#endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-
 enum class ObjectPoolMem
 {
     kStatic,
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    kDynamic
+    kDynamic,
+    kDefault = kDynamic
+#else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
+    kDefault = kStatic
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
-template <typename T, size_t N, ObjectPoolMem P>
-class MemTypeObjectPool;
+template <typename T, size_t N, ObjectPoolMem P = ObjectPoolMem::kDefault>
+class ObjectPool;
 
 template <typename T, size_t N>
-class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+class ObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
 {
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <typename T, size_t N>
-class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+class ObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
 {
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

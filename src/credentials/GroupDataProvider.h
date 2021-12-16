@@ -142,6 +142,27 @@ public:
     };
 
     /**
+     *  Interface to listen for changes in the Group info.
+     */
+    class GroupListener
+    {
+    public:
+        virtual ~GroupListener() = default;
+        /**
+         *  Callback invoked when a new group is added.
+         *
+         *  @param[in] new_group  GroupInfo structure of the new group.
+         */
+        virtual void OnGroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group) = 0;
+        /**
+         *  Callback invoked when an existing group is removed.
+         *
+         *  @param[in] removed_state  GroupInfo structure of the removed group.
+         */
+        virtual void OnGroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+    };
+
+    /**
      * Template used to iterate the stored group data
      */
     template <typename T>
@@ -198,6 +219,7 @@ public:
     // By id
     virtual CHIP_ERROR SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)                   = 0;
     virtual CHIP_ERROR GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info) = 0;
+    virtual CHIP_ERROR RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id)                = 0;
     // By index
     virtual CHIP_ERROR SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info) = 0;
     virtual CHIP_ERROR GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)       = 0;
@@ -210,16 +232,16 @@ public:
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
     virtual GroupInfoIterator * IterateGroupInfo(chip::FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -232,14 +254,15 @@ public:
     virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
     virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
     virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
+
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the keyset mappings during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) = 0;
+    virtual GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
@@ -250,8 +273,8 @@ public:
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, chip::KeysetId keyset_id)             = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the key sets table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -262,6 +285,20 @@ public:
 
     // General
     virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+
+    // Listener
+    void SetListener(GroupListener * listener) { mListener = listener; };
+    void RemoveListener() { mListener = nullptr; };
+
+protected:
+    void GroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupAdded(fabric_index, new_group);
+        }
+    }
+    GroupListener * mListener = nullptr;
 };
 
 /**

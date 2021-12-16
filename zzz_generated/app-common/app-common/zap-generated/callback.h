@@ -837,13 +837,13 @@ void emberAfIasWdClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief TV Channel Cluster Init
+/** @brief Channel Cluster Init
  *
  * Cluster Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTvChannelClusterInitCallback(chip::EndpointId endpoint);
+void emberAfChannelClusterInitCallback(chip::EndpointId endpoint);
 
 /** @brief Target Navigator Cluster Init
  *
@@ -11376,42 +11376,42 @@ void emberAfWakeOnLanClusterServerTickCallback(chip::EndpointId endpoint);
 void emberAfWakeOnLanClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
-// TV Channel Cluster
+// Channel Cluster
 //
 
-/** @brief TV Channel Cluster Server Init
+/** @brief Channel Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTvChannelClusterServerInitCallback(chip::EndpointId endpoint);
+void emberAfChannelClusterServerInitCallback(chip::EndpointId endpoint);
 
-/** @brief TV Channel Cluster Client Init
+/** @brief Channel Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint    Endpoint that is being initialized
  */
-void emberAfTvChannelClusterClientInitCallback(chip::EndpointId endpoint);
+void emberAfChannelClusterClientInitCallback(chip::EndpointId endpoint);
 
-/** @brief TV Channel Cluster Server Attribute Changed
+/** @brief Channel Cluster Server Attribute Changed
  *
  * Server Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterTvChannelClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterChannelClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief TV Channel Cluster Client Attribute Changed
+/** @brief Channel Cluster Client Attribute Changed
  *
  * Client Attribute Changed
  *
  * @param attributePath Concrete attribute path that changed
  */
-void MatterTvChannelClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+void MatterChannelClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
 
-/** @brief TV Channel Cluster Server Message Sent
+/** @brief Channel Cluster Server Message Sent
  *
  * Server Message Sent
  *
@@ -11421,10 +11421,10 @@ void MatterTvChannelClusterClientAttributeChangedCallback(const chip::app::Concr
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTvChannelClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfChannelClusterServerMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief TV Channel Cluster Client Message Sent
+/** @brief Channel Cluster Client Message Sent
  *
  * Client Message Sent
  *
@@ -11434,10 +11434,10 @@ void emberAfTvChannelClusterServerMessageSentCallback(const chip::MessageSendDes
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAfTvChannelClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfChannelClusterClientMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
+                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 
-/** @brief TV Channel Cluster Server Pre Attribute Changed
+/** @brief Channel Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
  *
@@ -11447,10 +11447,10 @@ void emberAfTvChannelClusterClientMessageSentCallback(const chip::MessageSendDes
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTvChannelClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterChannelClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief TV Channel Cluster Client Pre Attribute Changed
+/** @brief Channel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
  *
@@ -11460,24 +11460,24 @@ MatterTvChannelClusterServerPreAttributeChangedCallback(const chip::app::Concret
  * @param value         Attribute value
  */
 chip::Protocols::InteractionModel::Status
-MatterTvChannelClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
-                                                        EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+MatterChannelClusterClientPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                      EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
 
-/** @brief TV Channel Cluster Server Tick
+/** @brief Channel Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTvChannelClusterServerTickCallback(chip::EndpointId endpoint);
+void emberAfChannelClusterServerTickCallback(chip::EndpointId endpoint);
 
-/** @brief TV Channel Cluster Client Tick
+/** @brief Channel Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint  Endpoint that is being served
  */
-void emberAfTvChannelClusterClientTickCallback(chip::EndpointId endpoint);
+void emberAfChannelClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Target Navigator Cluster
@@ -13857,18 +13857,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData);
 /**
- * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
-/**
- * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
- */
-bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
-/**
  * @brief OTA Software Update Provider Cluster QueryImageResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
@@ -13876,11 +13864,23 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageResponseCallback(
     chip::CharSpan imageURI, uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
     bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
 /**
+ * @brief OTA Software Update Provider Cluster ApplyUpdateRequest Command callback (from client)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData);
+/**
  * @brief OTA Software Update Provider Cluster ApplyUpdateResponse Command callback (from server)
  */
 bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(chip::EndpointId endpoint,
                                                                         chip::app::CommandSender * commandObj, uint8_t action,
                                                                         uint32_t delayedActionTime);
+/**
+ * @brief OTA Software Update Provider Cluster NotifyUpdateApplied Command callback (from client)
+ */
+bool emberAfOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData);
 /**
  * @brief OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
  */
@@ -14769,29 +14769,29 @@ bool emberAfIasWdClusterStartWarningCallback(chip::app::CommandHandler * command
 bool emberAfIasWdClusterSquawkCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::IasWd::Commands::Squawk::DecodableType & commandData);
 /**
- * @brief TV Channel Cluster ChangeChannel Command callback (from client)
+ * @brief Channel Cluster ChangeChannel Command callback (from client)
  */
-bool emberAfTvChannelClusterChangeChannelCallback(
+bool emberAfChannelClusterChangeChannelCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannel::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::ChangeChannel::DecodableType & commandData);
 /**
- * @brief TV Channel Cluster ChangeChannelResponse Command callback (from server)
+ * @brief Channel Cluster ChangeChannelResponse Command callback (from server)
  */
-bool emberAfTvChannelClusterChangeChannelResponseCallback(
+bool emberAfChannelClusterChangeChannelResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType);
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType);
 /**
- * @brief TV Channel Cluster ChangeChannelByNumber Command callback (from client)
+ * @brief Channel Cluster ChangeChannelByNumber Command callback (from client)
  */
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(
+bool emberAfChannelClusterChangeChannelByNumberCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::DecodableType & commandData);
 /**
- * @brief TV Channel Cluster SkipChannel Command callback (from client)
+ * @brief Channel Cluster SkipChannel Command callback (from client)
  */
-bool emberAfTvChannelClusterSkipChannelCallback(
+bool emberAfChannelClusterSkipChannelCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TvChannel::Commands::SkipChannel::DecodableType & commandData);
+    const chip::app::Clusters::Channel::Commands::SkipChannel::DecodableType & commandData);
 /**
  * @brief Target Navigator Cluster NavigateTarget Command callback (from client)
  */

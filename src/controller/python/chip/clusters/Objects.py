@@ -6570,43 +6570,9 @@ class OtaSoftwareUpdateProvider(Cluster):
             metadataForProvider: 'typing.Optional[bytes]' = None
 
         @dataclass
-        class ApplyUpdateRequest(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="newVersion", Tag=1, Type=uint),
-                    ])
-
-            updateToken: 'bytes' = b""
-            newVersion: 'uint' = 0
-
-        @dataclass
-        class NotifyUpdateApplied(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0002
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
-                            ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=1, Type=uint),
-                    ])
-
-            updateToken: 'bytes' = b""
-            softwareVersion: 'uint' = 0
-
-        @dataclass
         class QueryImageResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0003
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -6633,9 +6599,26 @@ class OtaSoftwareUpdateProvider(Cluster):
             metadataForRequestor: 'typing.Optional[bytes]' = None
 
         @dataclass
+        class ApplyUpdateRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0029
+            command_id: typing.ClassVar[int] = 0x0002
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="newVersion", Tag=1, Type=uint),
+                    ])
+
+            updateToken: 'bytes' = b""
+            newVersion: 'uint' = 0
+
+        @dataclass
         class ApplyUpdateResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0029
-            command_id: typing.ClassVar[int] = 0x0004
+            command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -6648,6 +6631,23 @@ class OtaSoftwareUpdateProvider(Cluster):
 
             action: 'OtaSoftwareUpdateProvider.Enums.OTAApplyUpdateAction' = 0
             delayedActionTime: 'uint' = 0
+
+        @dataclass
+        class NotifyUpdateApplied(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0029
+            command_id: typing.ClassVar[int] = 0x0004
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="updateToken", Tag=0, Type=bytes),
+                            ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=1, Type=uint),
+                    ])
+
+            updateToken: 'bytes' = b""
+            softwareVersion: 'uint' = 0
 
 
     class Attributes:
@@ -27224,40 +27224,40 @@ class WakeOnLan(Cluster):
 
 
 @dataclass
-class TvChannel(Cluster):
+class Channel(Cluster):
     id: typing.ClassVar[int] = 0x0504
 
     @ChipUtility.classproperty
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.List[TvChannel.Structs.TvChannelInfo]),
-                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=TvChannel.Structs.TvChannelLineupInfo),
-                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=TvChannel.Structs.TvChannelInfo),
+                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.List[Channel.Structs.ChannelInfo]),
+                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=Channel.Structs.ChannelLineupInfo),
+                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=Channel.Structs.ChannelInfo),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    channelList: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
-    channelLineup: 'TvChannel.Structs.TvChannelLineupInfo' = None
-    currentChannel: 'TvChannel.Structs.TvChannelInfo' = None
+    channelList: 'typing.List[Channel.Structs.ChannelInfo]' = None
+    channelLineup: 'Channel.Structs.ChannelLineupInfo' = None
+    currentChannel: 'Channel.Structs.ChannelInfo' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
 
     class Enums:
-        class TvChannelErrorType(IntEnum):
+        class ChannelErrorType(IntEnum):
             kMultipleMatches = 0x00
             kNoMatches = 0x01
 
-        class TvChannelLineupInfoType(IntEnum):
+        class ChannelLineupInfoType(IntEnum):
             kMso = 0x00
 
 
     class Structs:
         @dataclass
-        class TvChannelInfo(ClusterObject):
+        class ChannelInfo(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -27276,7 +27276,7 @@ class TvChannel(Cluster):
             affiliateCallSign: 'str' = ""
 
         @dataclass
-        class TvChannelLineupInfo(ClusterObject):
+        class ChannelLineupInfo(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -27284,13 +27284,13 @@ class TvChannel(Cluster):
                             ClusterObjectFieldDescriptor(Label="operatorName", Tag=1, Type=str),
                             ClusterObjectFieldDescriptor(Label="lineupName", Tag=2, Type=str),
                             ClusterObjectFieldDescriptor(Label="postalCode", Tag=3, Type=str),
-                            ClusterObjectFieldDescriptor(Label="lineupInfoType", Tag=4, Type=TvChannel.Enums.TvChannelLineupInfoType),
+                            ClusterObjectFieldDescriptor(Label="lineupInfoType", Tag=4, Type=Channel.Enums.ChannelLineupInfoType),
                     ])
 
             operatorName: 'str' = ""
             lineupName: 'str' = ""
             postalCode: 'str' = ""
-            lineupInfoType: 'TvChannel.Enums.TvChannelLineupInfoType' = 0
+            lineupInfoType: 'Channel.Enums.ChannelLineupInfoType' = 0
 
 
 
@@ -27320,12 +27320,12 @@ class TvChannel(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=TvChannel.Structs.TvChannelInfo),
-                            ClusterObjectFieldDescriptor(Label="errorType", Tag=1, Type=TvChannel.Enums.TvChannelErrorType),
+                            ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=Channel.Structs.ChannelInfo),
+                            ClusterObjectFieldDescriptor(Label="errorType", Tag=1, Type=Channel.Enums.ChannelErrorType),
                     ])
 
-            channelMatch: 'TvChannel.Structs.TvChannelInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelInfo())
-            errorType: 'TvChannel.Enums.TvChannelErrorType' = 0
+            channelMatch: 'Channel.Structs.ChannelInfo' = field(default_factory=lambda: Channel.Structs.ChannelInfo())
+            errorType: 'Channel.Enums.ChannelErrorType' = 0
 
         @dataclass
         class ChangeChannelByNumber(ClusterCommand):
@@ -27373,9 +27373,9 @@ class TvChannel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[TvChannel.Structs.TvChannelInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.List[Channel.Structs.ChannelInfo])
 
-            value: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(default_factory=lambda: [])
+            value: 'typing.List[Channel.Structs.ChannelInfo]' = field(default_factory=lambda: [])
 
         @dataclass
         class ChannelLineup(ClusterAttributeDescriptor):
@@ -27389,9 +27389,9 @@ class TvChannel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TvChannel.Structs.TvChannelLineupInfo)
+                return ClusterObjectFieldDescriptor(Type=Channel.Structs.ChannelLineupInfo)
 
-            value: 'TvChannel.Structs.TvChannelLineupInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelLineupInfo())
+            value: 'Channel.Structs.ChannelLineupInfo' = field(default_factory=lambda: Channel.Structs.ChannelLineupInfo())
 
         @dataclass
         class CurrentChannel(ClusterAttributeDescriptor):
@@ -27405,9 +27405,9 @@ class TvChannel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=TvChannel.Structs.TvChannelInfo)
+                return ClusterObjectFieldDescriptor(Type=Channel.Structs.ChannelInfo)
 
-            value: 'TvChannel.Structs.TvChannelInfo' = field(default_factory=lambda: TvChannel.Structs.TvChannelInfo())
+            value: 'Channel.Structs.ChannelInfo' = field(default_factory=lambda: Channel.Structs.ChannelInfo())
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -28653,14 +28653,14 @@ class ContentLauncher(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="acceptsHeaderList", Tag=0x00000000, Type=typing.List[bytes]),
+                ClusterObjectFieldDescriptor(Label="acceptHeaderList", Tag=0x00000000, Type=typing.List[str]),
                 ClusterObjectFieldDescriptor(Label="supportedStreamingProtocols", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    acceptsHeaderList: 'typing.List[bytes]' = None
+    acceptHeaderList: 'typing.List[str]' = None
     supportedStreamingProtocols: 'uint' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
@@ -28850,7 +28850,7 @@ class ContentLauncher(Cluster):
 
     class Attributes:
         @dataclass
-        class AcceptsHeaderList(ClusterAttributeDescriptor):
+        class AcceptHeaderList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x050A
@@ -28861,9 +28861,9 @@ class ContentLauncher(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
+                return ClusterObjectFieldDescriptor(Type=typing.List[str])
 
-            value: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            value: 'typing.List[str]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedStreamingProtocols(ClusterAttributeDescriptor):

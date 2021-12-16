@@ -1265,7 +1265,7 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1273,11 +1273,11 @@
             },
             {
               "name": "NotifyUpdateApplied",
-              "code": 2,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1308,15 +1308,15 @@
           "commands": [
             {
               "name": "QueryImageResponse",
-              "code": 3,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -6945,10 +6945,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -6996,10 +6996,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "server",
           "enabled": 1,
           "commands": [
@@ -7491,7 +7491,7 @@
           ],
           "attributes": [
             {
-              "name": "accepts header list",
+              "name": "accept header list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -9209,7 +9209,7 @@
           ],
           "attributes": [
             {
-              "name": "accepts header list",
+              "name": "accept header list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -9384,21 +9384,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "allowed vendor list",
-              "code": 7,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x01",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -9697,7 +9682,7 @@
           ],
           "attributes": [
             {
-              "name": "accepts header list",
+              "name": "accept header list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -9863,21 +9848,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "allowed vendor list",
-              "code": 7,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x01",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -10140,21 +10110,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "allowed vendor list",
-              "code": 7,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x01",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

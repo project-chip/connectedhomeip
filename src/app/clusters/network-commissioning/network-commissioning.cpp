@@ -28,7 +28,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/internal/DeviceControlServer.h>
+#include <platform/DeviceControlServer.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 
@@ -281,7 +281,7 @@ void OnConnectNetworkCommandCallbackInternal(app::CommandHandler * apCommandHand
 exit:
     if (err == NetworkCommissioningStatus::kSuccess)
     {
-        DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(networkID);
+        DeviceLayer::DeviceControlServer::DeviceControlSvr().ConnectNetworkForOperational(networkID);
     }
     response.networkingStatus = err;
     apCommandHandler->AddResponseData(commandPath, response);

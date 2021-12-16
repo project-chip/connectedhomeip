@@ -217,8 +217,8 @@ void __attribute__((weak)) MatterIasWdPluginClientInitCallback() {}
 void MatterIasWdPluginServerInitCallback();
 void __attribute__((weak)) MatterWakeOnLanPluginClientInitCallback() {}
 void MatterWakeOnLanPluginServerInitCallback();
-void __attribute__((weak)) MatterTvChannelPluginClientInitCallback() {}
-void MatterTvChannelPluginServerInitCallback();
+void __attribute__((weak)) MatterChannelPluginClientInitCallback() {}
+void MatterChannelPluginServerInitCallback();
 void __attribute__((weak)) MatterTargetNavigatorPluginClientInitCallback() {}
 void MatterTargetNavigatorPluginServerInitCallback();
 void __attribute__((weak)) MatterMediaPlaybackPluginClientInitCallback() {}

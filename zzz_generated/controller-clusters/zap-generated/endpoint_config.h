@@ -271,7 +271,7 @@
             /* Endpoint: 1, Cluster: Wake on LAN (client) */                                                                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
-            /* Endpoint: 1, Cluster: TV Channel (client) */                                                                        \
+            /* Endpoint: 1, Cluster: Channel (client) */                                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Target Navigator (client) */                                                                  \
@@ -450,7 +450,7 @@
             }, /* Endpoint: 1, Cluster: Wake on LAN (client) */                                                                    \
             {                                                                                                                      \
                 0x0504, ZAP_ATTRIBUTE_INDEX(51), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: TV Channel (client) */                                                                     \
+            }, /* Endpoint: 1, Cluster: Channel (client) */                                                                        \
             {                                                                                                                      \
                 0x0505, ZAP_ATTRIBUTE_INDEX(52), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Target Navigator (client) */                                                               \

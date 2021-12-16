@@ -52,6 +52,7 @@
 #include <app/server/Dnssd.h>
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/CommissioningDelegate.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -87,6 +88,10 @@ chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer sOperationalCredentialsIssuer;
 chip::SimpleFabricStorage sFabricStorage;
+chip::Platform::ScopedMemoryBuffer<uint8_t> sSsidBuf;
+chip::Platform::ScopedMemoryBuffer<uint8_t> sCredsBuf;
+chip::Platform::ScopedMemoryBuffer<uint8_t> sThreadBuf;
+chip::Controller::CommissioningParameters sCommissioningParameters;
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -111,6 +116,8 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
                                                           uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                          uint32_t setupPINCode, chip::NodeId nodeid);
+ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
+ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * ssid, const char * credentials);
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * peerAddrStr, uint32_t setupPINCode,
@@ -316,7 +323,8 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
                      chip::RendezvousParameters()
                          .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
                          .SetSetupPINCode(setupPINCode)
-                         .SetDiscriminator(discriminator))
+                         .SetDiscriminator(discriminator),
+                     sCommissioningParameters)
         .AsInteger();
 }
 
@@ -331,7 +339,31 @@ ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::Devic
     // TODO: IP rendezvous should use TCP connection.
     addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
     params.SetPeerAddress(addr).SetDiscriminator(0);
-    return devCtrl->PairDevice(nodeid, params).AsInteger();
+    return devCtrl->PairDevice(nodeid, params, sCommissioningParameters).AsInteger();
+}
+
+ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size)
+{
+    ReturnErrorCodeIf(!sThreadBuf.Alloc(size), CHIP_ERROR_NO_MEMORY.AsInteger());
+    memcpy(sThreadBuf.Get(), threadOperationalDataset, size);
+    sCommissioningParameters.SetThreadOperationalDataset(ByteSpan(sThreadBuf.Get(), size));
+    return CHIP_NO_ERROR.AsInteger();
+}
+ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * ssid, const char * credentials)
+{
+    size_t ssidSize = strlen(ssid);
+    ReturnErrorCodeIf(!sSsidBuf.Alloc(ssidSize), CHIP_ERROR_NO_MEMORY.AsInteger());
+    memcpy(sSsidBuf.Get(), ssid, ssidSize);
+
+    size_t credsSize = strlen(credentials);
+    ReturnErrorCodeIf(!sCredsBuf.Alloc(credsSize), CHIP_ERROR_NO_MEMORY.AsInteger());
+    memcpy(sCredsBuf.Get(), credentials, credsSize);
+
+    sCommissioningParameters.SetWifiCredentials(
+        chip::Controller::WifiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
+    char tmp[128];
+    chip::Platform::CopyString(tmp, sCommissioningParameters.GetWifiCredentials().Value().ssid);
+    return CHIP_NO_ERROR.AsInteger();
 }
 
 void CloseSessionCallback(DeviceProxy * device, ChipError::StorageType err)

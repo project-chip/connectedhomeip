@@ -591,18 +591,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
-- (instancetype)init;
-@end
-
-@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
-- (instancetype)init;
-@end
-
 @interface CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nullable delayedActionTime;
@@ -615,9 +603,21 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
+- (instancetype)init;
+@end
+
 @interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull action;
 @property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
+- (instancetype)init;
+@end
+
+@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
 - (instancetype)init;
 @end
 
@@ -1503,24 +1503,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelParams : NSObject
+@interface CHIPChannelClusterChangeChannelParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull match;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelResponseParams : NSObject
-@property (strong, nonatomic) CHIPTvChannelClusterTvChannelInfo * _Nonnull channelMatch;
+@interface CHIPChannelClusterChangeChannelResponseParams : NSObject
+@property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
 @property (strong, nonatomic) NSNumber * _Nonnull errorType;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelByNumberParams : NSObject
+@interface CHIPChannelClusterChangeChannelByNumberParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterSkipChannelParams : NSObject
+@interface CHIPChannelClusterSkipChannelParams : NSObject
 @property (strong, nonatomic, getter=getCount) NSNumber * _Nonnull count;
 - (instancetype)init;
 @end

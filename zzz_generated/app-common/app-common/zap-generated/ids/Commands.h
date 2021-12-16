@@ -514,21 +514,21 @@ namespace QueryImage {
 static constexpr CommandId Id = 0x00000000;
 } // namespace QueryImage
 
-namespace ApplyUpdateRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ApplyUpdateRequest
-
-namespace NotifyUpdateApplied {
-static constexpr CommandId Id = 0x00000002;
-} // namespace NotifyUpdateApplied
-
 namespace QueryImageResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000001;
 } // namespace QueryImageResponse
 
+namespace ApplyUpdateRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ApplyUpdateRequest
+
 namespace ApplyUpdateResponse {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace ApplyUpdateResponse
+
+namespace NotifyUpdateApplied {
+static constexpr CommandId Id = 0x00000004;
+} // namespace NotifyUpdateApplied
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
@@ -1253,7 +1253,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace IasWd
 
-namespace TvChannel {
+namespace Channel {
 namespace Commands {
 
 namespace ChangeChannel {
@@ -1273,7 +1273,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace SkipChannel
 
 } // namespace Commands
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Commands {
