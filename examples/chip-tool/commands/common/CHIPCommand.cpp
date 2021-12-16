@@ -55,7 +55,9 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerIndex());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    ReturnLogErrorOnFailure(InitializeCommissioner(GetIdentity(), CurrentCommissionerIndex()));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -67,7 +69,9 @@ CHIP_ERROR CHIPCommand::Run()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(GetIdentity()));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
 
     StopTracing();
     return CHIP_NO_ERROR;
@@ -190,6 +194,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
     commissionerParams.storageDelegate                = &mCommissionerStorage;
+    commissionerParams.fabricIndex                    = static_cast<chip::FabricIndex>(fabricId);
     commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
     commissionerParams.ephemeralKeypair               = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
