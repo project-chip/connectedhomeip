@@ -69,6 +69,25 @@ public:
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
 
+    void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
+
+    void GetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData);
+
+    void ClearUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                 const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData);
+
+    void SetCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                     const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData);
+
+    void GetCredentialStatusCommandHandler(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData);
+
+    void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                       const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
+
     EmberAfStatus CreateUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
@@ -81,10 +100,12 @@ public:
                              const Nullable<DoorLock::DlCredentialRule> & credentialRule,
                              const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
-    EmberAfStatus ClearUser(chip::EndpointId endpointId, uint16_t userIndex);
-
 private:
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
+    EmberAfStatus clearUser(chip::EndpointId endpointId, uint16_t userIndex);
+    bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
+    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status,
+                                         const Nullable<uint16_t> & userIndex, const Nullable<uint16_t> & nextCredentialIndex);
 
     static DoorLockServer instance;
 };
