@@ -55,15 +55,13 @@ using namespace chip::Messaging;
 using namespace chip::Protocols;
 using namespace chip::System::Clock::Literals;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = Test::LoopbackMessagingContext<>;
 
 TestContext sContext;
 
 const char PAYLOAD[] = "Hello!";
 
-TransportMgrBase gTransportMgr;
-Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
+auto & gLoopback = sContext.GetLoopback();
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -533,9 +531,11 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuite, void * inContext)
 {
     // Making this static to reduce stack usage, as some platforms have limits on stack size.
-    static TestContext ctx;
+    static Test::MessagingContext ctx;
 
-    CHIP_ERROR err = ctx.Init(&gTransportMgr, &gIOContext);
+    TestContext & inctx = *static_cast<TestContext *>(inContext);
+
+    CHIP_ERROR err = ctx.InitFromExisting(inctx);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     chip::System::PacketBufferHandle buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
@@ -598,16 +598,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ctx.Shutdown();
-
-    // This test didn't use the global test context because the session establishment messages
-    // do not carry encryption key IDs (as the messages are not encrypted), or node IDs (as these
-    // are not assigned yet). A temporary context is created with default values for these
-    // parameters.
-    // Let's reset the state of transport manager so that other tests are not impacted
-    // as those could be using the global test context.
-    TestContext & inctx = *static_cast<TestContext *>(inContext);
-    gTransportMgr.SetSessionManager(&inctx.GetSecureSessionManager());
+    ctx.ShutdownAndRestoreExisting(inctx);
 }
 
 void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
@@ -1390,48 +1381,15 @@ const nlTest sTests[] =
 
     NL_TEST_SENTINEL()
 };
-// clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
-
-// clang-format off
 nlTestSuite sSuite =
 {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    Initialize,
-    Finalize
+    TestContext::Initialize,
+    TestContext::Finalize
 };
 // clang-format on
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportMgr.Init(&gLoopback) == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    gTransportMgr.SetSessionManager(&ctx->GetSecureSessionManager());
-    return SUCCESS;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 

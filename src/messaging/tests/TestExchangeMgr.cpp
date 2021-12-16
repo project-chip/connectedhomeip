@@ -49,7 +49,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = chip::Test::LoopbackMessagingContext<Test::LoopbackTransport>;
+using TestContext = Test::LoopbackMessagingContext<>;
 
 enum : uint8_t
 {
