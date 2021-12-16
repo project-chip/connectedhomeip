@@ -66,8 +66,8 @@ jobs:
                   scripts/run_in_build_env.sh "\
                       ./scripts/build/build_examples.py \
                       --target k32w-light-release \
-                      --target k32w-lock-low-power \
-                      --target k32w-shell \
+                      --target k32w-lock-low-power-release \
+                      --target k32w-shell-release \
                       build \
                       --copy-artifacts-to out/artifacts \
                   "
@@ -82,8 +82,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    k32w k32w061 lock \
-                    out/artifacts/k32w-lock-low-power/chip-k32w061-lock-example \
+                    k32w k32w061+release lock \
+                    out/artifacts/k32w-lock-low-power-release/chip-k32w061-lock-example \
                     /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2

@@ -431,23 +431,18 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-# Generating k32w-lock
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-lock
-
-{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
-
-# Generating k32w-lock-low-power
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1' {out}/k32w-lock-low-power
-
-{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
-
 # Generating k32w-lock-low-power-release
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
 
 {root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 
-# Generating k32w-shell
-gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-shell
+# Generating k32w-lock-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-shell-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
@@ -1022,17 +1017,14 @@ ninja -C {out}/k32w-light
 # Building k32w-light-release
 ninja -C {out}/k32w-light-release
 
-# Building k32w-lock
-ninja -C {out}/k32w-lock
-
-# Building k32w-lock-low-power
-ninja -C {out}/k32w-lock-low-power
-
 # Building k32w-lock-low-power-release
 ninja -C {out}/k32w-lock-low-power-release
 
-# Building k32w-shell
-ninja -C {out}/k32w-shell
+# Building k32w-lock-release
+ninja -C {out}/k32w-lock-release
+
+# Building k32w-shell-release
+ninja -C {out}/k32w-shell-release
 
 # Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-debug
 bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug/chip-*'
