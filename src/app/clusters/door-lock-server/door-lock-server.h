@@ -69,17 +69,17 @@ public:
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
 
-    EmberAfStatus CreateUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
-                    const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                    const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                    const Nullable<DoorLock::DlCredentialRule> & credentialRule,
-                    const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
+    EmberAfStatus CreateUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                             const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
+                             const Nullable<DoorLock::DlCredentialRule> & credentialRule,
+                             const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
-    EmberAfStatus ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
-                    const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                    const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                    const Nullable<DoorLock::DlCredentialRule> & credentialRule,
-                    const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
+    EmberAfStatus ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+                             const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
+                             const Nullable<DoorLock::DlCredentialRule> & credentialRule,
+                             const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
     EmberAfStatus ClearUser(chip::EndpointId endpointId, uint16_t userIndex);
 
@@ -89,9 +89,15 @@ private:
     static DoorLockServer instance;
 };
 
+enum class DlCredentialStatus : uint8_t
+{
+    kAvailable = 0x00,
+    kOccupied  = 0x01,
+};
+
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    bool inUse;
+    DlCredentialStatus status;
     DoorLock::DlCredentialType credentialType;
     chip::ByteSpan credentialData;
 };
@@ -224,9 +230,10 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                  DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials);
+                                  DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials,
+                                  size_t totalCredentials);
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
                                         EmberAfPluginDoorLockCredentialInfo & credential);
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                         DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData);
