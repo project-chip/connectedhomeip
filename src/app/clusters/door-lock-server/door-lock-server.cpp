@@ -917,6 +917,16 @@ DoorLock::DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endp
     return DlStatus::kInvalidField;
 }
 
+bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLock::DoorLockFeature feature)
+{
+    uint32_t featureMap = 0;
+    if (EMBER_ZCL_STATUS_SUCCESS != Attributes::FeatureMap::Get(endpointId, &featureMap))
+    {
+        return false;
+    }
+    return (featureMap & to_underlying(feature)) != 0;
+}
+
 // =============================================================================
 // Cluster commands callbacks
 // =============================================================================
