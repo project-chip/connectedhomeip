@@ -18,7 +18,6 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/../../../examples/common/cmake/idf_flashing.cmake)
 
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
@@ -29,6 +28,53 @@ project(test-driver)
 # C++17 is required for RPC build.
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
+
+SET(VALID_TESTS
+    libASN1Tests.a
+)
+
+
+add_executable(testASN1Tests.elf dummy.c)
+
+target_link_directories(testASN1Tests.elf PUBLIC 
+    ${CMAKE_CURRENT_BINARY_DIR}/esp-idf/chip/lib
+    ${CMAKE_CURRENT_BINARY_DIR}/foobar
+)
+
+target_link_libraries(testASN1Tests.elf PUBLIC
+    idf::main 
+
+    -Wl,--whole-archive libASN1Tests.a -Wl,--no-whole-archive
+    nlunit-test
+    nlfaultinjection
+)
+idf_build_executable(testASN1Tests.elf)
+# 
+# add_executable(two.elf main_app.cpp)
+# target_link_libraries(two.elf chip)
+# idf_build_executable(two.elf)
+
+
+# TODO:
+#  - CXX depending on some lib*.a
+#  - multiple outputs/apps?
+
+#   # TODO: libAppTests depends on MessagingTestHelpers, which depends on
+#   # NetworkTestHelpers.  That sort of depends on InetTestHelpers or
+#   # equivalent (to provide gSystemLayer, gInet, InitNetwork(),
+#   # ShutdownNetwork()) but there's only a POSIX implementation of that
+#   # last, which does not compile on ESP32.  Need to figure out how to
+#   # make that work.  See comments below for the transport layer tests,
+#   # which have the same issue.
+#   # run_suite libAppTests.a -lMessagingTestHelpers -lNetworkTestHelpers
+#   
+#   run_suite libASN1Tests.a
+#   run_suite libBleLayerTests.a
+#   run_suite libCoreTests.a
+#   run_suite libInetLayerTests.a
+#   run_suite libRetransmitTests.a
+#   run_suite libSystemLayerTests.a
+#   run_suite libChipCryptoTests.a "-lChipCertTestVectors"
 
 # FIXME: elfbuilder ?
 #    mkdir -p build/chip/
@@ -44,4 +90,3 @@ idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 #    ln -sf $(PROJECT_PATH)/build/bootloader/bootloader.bin $(PROJECT_PATH)/build/chip/bootloader.bin
 #    ln -sf $(PROJECT_PATH)/idf.sh $(PROJECT_PATH)/build/chip/env.sh
 
-flashing_script()

@@ -20,8 +20,14 @@
 set(PRIV_INCLUDE_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}/include"
 )
+
 set(SRC_DIRS_LIST
                       "${CMAKE_CURRENT_LIST_DIR}"
+)
+
+set(EXTRA_COMPONENT_DIRS
+    "${CMAKE_CURRENT_LIST_DIR}/../third_party/connectedhomeip/config/esp32/components"
+    "${IDF_PATH}/examples/common_components"
 )
 
 if (CONFIG_OPENTHREAD_ENABLED)
