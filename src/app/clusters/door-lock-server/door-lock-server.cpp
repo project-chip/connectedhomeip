@@ -314,53 +314,53 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, const char * newLanguage)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnAutoRelockTimeChange(chip::EndpointId EndpointId, uint32_t newTime)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnSoundVolumeChange(chip::EndpointId EndpointId, uint8_t newVolume)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnOperatingModeChange(chip::EndpointId EndpointId, uint8_t newMode)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnEnableOneTouchLockingChange(chip::EndpointId EndpointId, bool enable)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(chip::EndpointId EndpointId, bool enable)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnWrongCodeEntryLimitChange(chip::EndpointId EndpointId, uint8_t newLimit)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId EndpointId, uint8_t newTime)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
 emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint8_t * attrValue)
 {
-    return chip::Protocols::InteractionModel::Status::InvalidAction;
+    return chip::Protocols::InteractionModel::Status::Success;
 }
