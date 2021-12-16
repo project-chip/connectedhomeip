@@ -17,17 +17,18 @@ import os
 from typing import Any, List
 from itertools import combinations
 
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
+from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.k32w import K32WApp, K32WBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
-from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
@@ -335,6 +336,21 @@ def AmebaTargets():
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
 
 
+def K32WTargets():
+    target = Target('k32w', K32WBuilder)
+
+    # This is for testing only  in case debug builds are to be fixed
+    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
+    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
+    #    gen/include/lwip/lwip_buildconfig.h
+    yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
+
+    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
+    yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
+    yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
+    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
+
+
 ALL = []
 
 target_generators = [
@@ -345,7 +361,8 @@ target_generators = [
     AndroidTargets(),
     MbedTargets(),
     InfineonTargets(),
-    AmebaTargets()
+    AmebaTargets(),
+    K32WTargets(),
 ]
 
 for generator in target_generators:

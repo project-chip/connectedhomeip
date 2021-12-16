@@ -73,6 +73,11 @@ esp32-m5stack-all-clusters-rpc-ipv6only
 infineon-p6-all-clusters
 infineon-p6-light
 infineon-p6-lock
+k32w-light (NOGLOB: Debug builds broken due to LWIP_DEBUG redefition)
+k32w-light-release
+k32w-lock-low-power-release (NOGLOB: Only on demand build)
+k32w-lock-release
+k32w-shell-release
 mbed-CY8CPROTO_062_4343W-all-clusters-debug (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-develop (NOGLOB: Compile only for debugging purpose - https://os.mbed.com/docs/mbed-os/latest/program-setup/build-profiles-and-rules.html)
 mbed-CY8CPROTO_062_4343W-all-clusters-release
