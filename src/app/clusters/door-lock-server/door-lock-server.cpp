@@ -259,11 +259,12 @@ DoorLockServer::CreateUser(chip::app::CommandHandler * commandObj, const chip::a
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus
-DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                           uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                           const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                           const Nullable<DoorLock::DlCredentialRule> & credentialRule, const Nullable<DlCredential> & credentials)
+EmberAfStatus DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                         uint16_t userIndex, const Nullable<chip::CharSpan> & userName,
+                                         const Nullable<uint32_t> & userUniqueId,
+                                         const Nullable<DoorLock::DlUserStatus> & userStatus,
+                                         const Nullable<DoorLock::DlUserType> & userType,
+                                         const Nullable<DoorLock::DlCredentialRule> & credentialRule)
 {
     auto endpointId = commandPath.mEndpointId;
 
@@ -280,7 +281,6 @@ DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::a
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
     {
         ChipLogError(Zcl, "[ModifyUser] Unable to get the user from app [endpointId=%d,userIndex=%d]", endpointId, userIndex);
-        ;
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
@@ -310,41 +310,6 @@ DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::a
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
-    if (!credentials.IsNull())
-    {
-        // appclusters: spec defines up to 5 credentials per user
-        if (user.totalCredentials + 1 > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
-        {
-            emberAfDoorLockClusterPrintln("[ModifyUser] Unable to append credentials to user: too many credentials "
-                                          "[endpointId=%d,userIndex=%d,userTotalCredentials=%zu]",
-                                          endpointId, userIndex, user.totalCredentials);
-            return EMBER_ZCL_STATUS_INVALID_COMMAND;
-        }
-
-        auto appendCredential = true;
-        for (size_t i = 0; i < user.totalCredentials; ++i)
-        {
-            // appclusters, 5.2.4.41.1: It should not be possible to assign multiple credentials of the same type to a user
-            if (user.credentials[i].CredentialType == credentials.Value().CredentialType)
-            {
-                // TODO: return 'occupied' response
-                return EMBER_ZCL_STATUS_INVALID_COMMAND;
-            }
-            // Credential type was modified -- replace it in the user structure
-            if (user.credentials[i].CredentialIndex == credentials.Value().CredentialIndex)
-            {
-                user.credentials[i].CredentialType = credentials.Value().CredentialType;
-                appendCredential                   = false;
-                break;
-            }
-        }
-
-        if (appendCredential)
-        {
-            user.credentials[user.totalCredentials++] = credentials.Value();
-        }
-    }
-
     char newUserName[DOOR_LOCK_USER_NAME_BUFFER_SIZE] = { 0 };
     if (!userName.IsNull())
     {
@@ -356,50 +321,38 @@ DoorLockServer::ModifyUser(chip::app::CommandHandler * commandObj, const chip::a
     auto newUserType       = userType.IsNull() ? user.userType : userType.Value();
     auto newCredentialRule = credentialRule.IsNull() ? user.credentialRule : credentialRule.Value();
 
-    if (!credentials.IsNull())
-    {
-        if (user.totalCredentials + 1 > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
-        {
-            emberAfDoorLockClusterPrintln("[ModifyUser] Unable to append credentials to user: too many credentials "
-                                          "[endpointId=%d,userIndex=%d,userTotalCredentials=%zu]",
-                                          endpointId, userIndex, user.totalCredentials);
-            return EMBER_ZCL_STATUS_INVALID_COMMAND;
-        }
-    }
-
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, modifierFabricIndex, newUserName, newUserUniqueId,
                                       newUserStatus, newUserType, newCredentialRule, user.credentials, user.totalCredentials))
     {
         ChipLogError(Zcl,
                      "[ModifyUser] Unable to modify the user: app error "
                      "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%hhu,userType=%"
-                     "hhu,credentialRule=%hhu,totalCredentials=%zu]",
+                     "hhu,credentialRule=%hhu]",
                      endpointId, modifierFabricIndex, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType,
-                     newCredentialRule, user.totalCredentials);
+                     newCredentialRule);
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    emberAfDoorLockClusterPrintln(
-        "[ModifyUser] User modified "
-        "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%hhu,userType=%"
-        "hhu,credentialRule=%hhu,totalCredentials=%zu]",
-        endpointId, modifierFabricIndex, userIndex, newUserName, newUserUniqueId, newUserStatus, newUserType, newCredentialRule,
-        user.totalCredentials);
+    emberAfDoorLockClusterPrintln("[ModifyUser] User modified "
+                                  "[endpointId=%d,modifierFabric=%d,userIndex=%d,userName=\"%s\",userUniqueId=0x%x,userStatus=%hhu,"
+                                  "userType=%hhu,credentialRule=%hhu]",
+                                  endpointId, modifierFabricIndex, userIndex, newUserName, newUserUniqueId, newUserStatus,
+                                  newUserType, newCredentialRule);
 
     // TODO: Send LockUserChange event
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool DoorLockServer::UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex)
+bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIndex)
 {
     uint16_t maxNumberOfUsers;
-    return UserIndexValid(endpointId, userIndex, maxNumberOfUsers);
+    return userIndexValid(endpointId, userIndex, maxNumberOfUsers);
 }
 
-bool DoorLockServer::UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUsers)
+bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser)
 {
-    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
+    EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUser);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
         ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status:%d]", status);
@@ -407,7 +360,7 @@ bool DoorLockServer::UserIndexValid(chip::EndpointId endpointId, uint16_t userIn
     }
 
     // appclusters, 5.2.4.34-37: user index changes from 1 to maxNumberOfUsers
-    if (0 == userIndex || userIndex > maxNumberOfUsers)
+    if (0 == userIndex || userIndex > maxNumberOfUser)
     {
         return false;
     }
@@ -440,7 +393,7 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
     auto & userType       = commandData.userType;
     auto & credentialRule = commandData.credentialRule;
 
-    if (!UserIndexValid(commandPath.mEndpointId, userIndex))
+    if (!userIndexValid(commandPath.mEndpointId, userIndex))
     {
         emberAfDoorLockClusterPrintln("[SetUser] User index out of bounds [userIndex=%d]", userIndex);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -484,7 +437,7 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
     emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     uint16_t maxNumberOfUsers = 0;
-    if (!UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
+    if (!userIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
     {
         emberAfDoorLockClusterPrintln("[GetUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]", userIndex,
                                       maxNumberOfUsers);
@@ -542,14 +495,11 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
         }
 
         // appclusters, 5.2.4.36.1: We need to add next available user after userIndex if any.
-        for (uint16_t i = userIndex + 1; i < maxNumberOfUsers; ++i)
+        uint16_t nextAvailableUserIndex = 0;
+        if (findUnoccupiedUserSlot(commandPath.mEndpointId, userIndex + 1, nextAvailableUserIndex))
         {
-            VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, i, user), err = CHIP_ERROR_INTERNAL);
-            if (DlUserStatus::kAvailable == user.userStatus)
-            {
-                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), i));
-                break;
-            }
+            SuccessOrExit(err =
+                              writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextUserIndex)), nextAvailableUserIndex));
         }
         SuccessOrExit(err = commandObj->FinishCommand());
     }
@@ -570,7 +520,7 @@ void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * command
     emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
     uint16_t maxNumberOfUsers = 0;
-    if (!UserIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers) && userIndex != 0xFFFE)
+    if (!userIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers) && userIndex != 0xFFFE)
     {
         emberAfDoorLockClusterPrintln("[ClearUser] User index out of bounds [userIndex=%d,numberOfTotalUsersSupported=%d]",
                                       userIndex, maxNumberOfUsers);
@@ -643,7 +593,7 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
                 "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, credentialIndex);
 
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
             return;
         }
 
@@ -654,6 +604,7 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
                 "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, credentialIndex);
 
+            // TODO: Find next available slot
             sendSetCredentialResponse(commandObj, DlStatus::kOccupied, Nullable<uint16_t>(), Nullable<uint16_t>());
             return;
         }
@@ -716,6 +667,16 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         }
 
         // TODO: Check if userIndex in bounds
+        if (!userIndexValid(commandPath.mEndpointId, userIndex.Value()))
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to add new credential to user: user out of bounds "
+                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
+                                          commandPath.mEndpointId, credentialIndex, userIndex.Value());
+
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, Nullable<uint16_t>(),
+                                      Nullable<uint16_t>(credentialIndex));
+            return;
+        }
 
         // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
         EmberAfPluginDoorLockUserInfo user;
@@ -725,7 +686,7 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
                 "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d,userIndex=%d]",
                 commandPath.mEndpointId, credentialIndex, userIndex.Value());
 
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>(credentialIndex));
             return;
         }
 
@@ -736,25 +697,19 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
                                           "[endpointId=%d,credentialIndex=%d,userIndex=%d]",
                                           commandPath.mEndpointId, credentialIndex, userIndex.Value());
 
-            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, Nullable<uint16_t>(), Nullable<uint16_t>());
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, Nullable<uint16_t>(),
+                                      Nullable<uint16_t>(credentialIndex));
             return;
         }
 
-        // appclusters, 5.2.4.40: If user already contains the credential of the same type we should return INVALID_COMMAND
-        // TODO: Check if credentials of the same type are already associated with user (maybe inside ModifyUser)
-
-        // Modify the existing user
-        auto status = DoorLockServer::Instance().ModifyUser(commandObj, commandPath, userIndex.Value(), Nullable<CharSpan>(),
-                                                            Nullable<uint32_t>(), userStatus, userType,
-                                                            Nullable<DlCredentialRule>(), Nullable<DlCredential>(credential));
-        if (EMBER_ZCL_STATUS_SUCCESS != status)
+        // Add new credential to the user
+        auto status = addCredentialToUser(commandPath.mEndpointId, userIndex.Value(), credential);
+        if (DlStatus::kSuccess != status)
         {
             emberAfDoorLockClusterPrintln("[SetCredential] Unable to add credential to a user: internal error "
-                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%d]",
+                                          "[endpointId=%d,credentialIndex=%d,userIndex=%d,status=%hhu]",
                                           commandPath.mEndpointId, credential.CredentialIndex, userIndex.Value(), status);
-
-            // TODO: Use proper status codes
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, Nullable<uint16_t>(), Nullable<uint16_t>());
+            sendSetCredentialResponse(commandObj, status, Nullable<uint16_t>(), Nullable<uint16_t>(credentialIndex));
             return;
         }
 
@@ -795,6 +750,11 @@ void DoorLockServer::ClearCredentialCommandHandler(chip::app::CommandHandler * c
 
 bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex)
 {
+    return findUnoccupiedUserSlot(endpointId, 1, userIndex);
+}
+
+bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex)
+{
     uint16_t maxNumberOfUsers;
     EmberAfStatus status = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
     if (EMBER_ZCL_STATUS_SUCCESS != status)
@@ -804,7 +764,7 @@ bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_
     }
 
     userIndex = 0;
-    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    for (uint16_t i = startIndex; i <= maxNumberOfUsers; ++i)
     {
         EmberAfPluginDoorLockUserInfo user;
         if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
@@ -850,6 +810,111 @@ CHIP_ERROR DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler *
 
 exit:
     return err;
+}
+
+DoorLock::DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, uint16_t userIndex,
+                                                       const DlCredential & credential)
+{
+    // We should get the user by that index first
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        emberAfDoorLockClusterPrintln("[AddCredentialToUser] Unable to get the user from app [endpointId=%d,userIndex=%d]",
+                                      endpointId, userIndex);
+        return DlStatus::kFailure;
+    }
+
+    for (size_t i = 0; i < user.totalCredentials; ++i)
+    {
+        // appclusters, 5.2.4.40: If user already contains the credential of the same type we should return INVALID_COMMAND
+        if (user.credentials[i].CredentialType == credential.CredentialType)
+        {
+            emberAfDoorLockClusterPrintln(
+                "[AddCredentialToUser] Unable to add credential to user: credential with this type already exists "
+                "[endpointId=%d,userIndex=%d,credentialType=%d]",
+                endpointId, userIndex, credential.CredentialType);
+            return DlStatus::kOccupied;
+        }
+
+        // appclusters, 5.2.4.40: user should not be already associated with given credentialIndex
+        if (user.credentials[i].CredentialIndex == credential.CredentialIndex)
+        {
+            emberAfDoorLockClusterPrintln(
+                "[AddCredentialToUser] Unable to add credential to user: credential with this index is already associated "
+                "with user [endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d]",
+                endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
+            return DlStatus::kInvalidField;
+        }
+    }
+
+    // appclusters: spec defines up to 5 credentials per user
+    if (user.totalCredentials + 1 > DOOR_LOCK_MAX_CREDENTIALS_PER_USER)
+    {
+        emberAfDoorLockClusterPrintln("[AddCredentialToUser] Unable to add credentials to user: too many credentials "
+                                      "[endpointId=%d,userIndex=%d,userTotalCredentials=%zu]",
+                                      endpointId, userIndex, user.totalCredentials);
+        return DlStatus::kInvalidField;
+    }
+
+    user.credentials[user.totalCredentials++] = credential;
+
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, user.lastModifiedBy, user.userName, user.userUniqueId,
+                                      user.userStatus, user.userType, user.credentialRule, user.credentials, user.totalCredentials))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[AddCredentialToUser] Unable to add credential to user: credential with this index is already associated "
+            "with user [endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%zu]",
+            endpointId, userIndex, credential.CredentialType, credential.CredentialIndex, user.totalCredentials);
+        return DlStatus::kFailure;
+    }
+
+    emberAfDoorLockClusterPrintln("[AddCredentialToUser] Credential added to user "
+                                  "[endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d,userTotalCredentials=%zu]",
+                                  endpointId, userIndex, credential.CredentialType, credential.CredentialIndex,
+                                  user.totalCredentials);
+
+    // TODO: send lock user change event
+
+    return DlStatus::kSuccess;
+}
+
+DoorLock::DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, uint16_t userIndex,
+                                                           const DlCredential & credential)
+{
+    // We should get the user by that index first
+    EmberAfPluginDoorLockUserInfo user;
+    if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
+    {
+        emberAfDoorLockClusterPrintln("[ModifyUserCredential] Unable to get the user from app [endpointId=%d,userIndex=%d]",
+                                      endpointId, userIndex);
+        return DlStatus::kFailure;
+    }
+
+    for (size_t i = 0; i < user.totalCredentials; ++i)
+    {
+        // appclusters, 5.2.4.40: user should already be associated with given credentialIndex
+        if (user.credentials[i].CredentialIndex == credential.CredentialIndex)
+        {
+            user.credentials[i] = credential;
+
+            emberAfDoorLockClusterPrintln(
+                "[ModifyUserCredential] Unable to add credential to user: credential with this index is already associated "
+                "with user [endpointId=%d,userIndex=%d,credentialType=%d,credentialIndex=%d]",
+                endpointId, userIndex, credential.CredentialType, credential.CredentialIndex);
+
+            // TODO: send lock user change event
+
+            return DlStatus::kSuccess;
+        }
+    }
+
+    // appclusters, 5.2.4.40: if user is not associated with credential index we should return INVALID_COMMAND
+    emberAfDoorLockClusterPrintln(
+        "[ModifyUserCredential] Unable to modify user credential: user is not associated with credential index "
+        "[endpointId=%d,userIndex=%d,credentialIndex=%d]",
+        endpointId, userIndex, credential.CredentialIndex);
+
+    return DlStatus::kInvalidField;
 }
 
 // =============================================================================

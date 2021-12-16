@@ -607,3 +607,78 @@ tests:
           value: 1
         - name: "nextUserIndex"
           value: 2
+
+  - label: "Create new PIN credential and try to add it to existing user"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "123465"
+        - name: "userIndex"
+          value: 1
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x03
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 3
+
+  - label: "Create new credential and try to add it to 0 user"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "123465"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 3
+
+  - label: "Create new credential and try to add it to out-of-bounds user"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "123465"
+        - name: "userIndex"
+          value: NumberOfTotalUsersSupported + 1
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 3

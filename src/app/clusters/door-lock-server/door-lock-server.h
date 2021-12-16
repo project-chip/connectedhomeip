@@ -66,9 +66,6 @@ public:
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
 
-    bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
-    bool UserIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
-
     void SetUserCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData);
 
@@ -97,15 +94,26 @@ public:
     EmberAfStatus ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                             const Nullable<DoorLock::DlCredentialRule> & credentialRule,
-                             const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
+                             const Nullable<DoorLock::DlCredentialRule> & credentialRule);
 
 private:
+    bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
+    bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
+
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     EmberAfStatus clearUser(chip::EndpointId endpointId, uint16_t userIndex);
+
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
+    bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
+
+    DoorLock::DlStatus createNewCredentialAndUser(chip::EndpointId endpointId);
+    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId);
+
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status,
                                          const Nullable<uint16_t> & userIndex, const Nullable<uint16_t> & nextCredentialIndex);
+
+    DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
+    DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
 
     static DoorLockServer instance;
 };
