@@ -54,9 +54,19 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build ESP32 QEMU and Run Tests
-              timeout-minutes: 35
-              run: scripts/tests/esp32_qemu_tests.sh /tmp/test_logs
+            - name: Build ESP32 QEMU test images
+              timeout-minutes: 20
+              run: |
+                  scripts/run_in_build_env.sh "         \
+                      ./scripts/build/build_examples.py \
+                      --target esp32-qemu-tests         \
+                      build                             \
+                  "
+            - name: Run all tests
+              timeout-minutes: 30
+              run: |
+                  src/test_driver/esp32/run_qemu_image.py \
+                    --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
