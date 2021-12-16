@@ -766,7 +766,12 @@ void AdvertiserMinMdns::AdvertiseRecords()
             continue;
         }
 
-        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), interfaceAddress.GetAddress()))
+        Inet::IPAddress ipAddress;
+        if (interfaceAddress.GetAddress(ipAddress) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), ipAddress))
         {
             continue;
         }
@@ -774,8 +779,8 @@ void AdvertiserMinMdns::AdvertiseRecords()
         chip::Inet::IPPacketInfo packetInfo;
 
         packetInfo.Clear();
-        packetInfo.SrcAddress = interfaceAddress.GetAddress();
-        if (interfaceAddress.GetAddress().IsIPv4())
+        packetInfo.SrcAddress = ipAddress;
+        if (ipAddress.IsIPv4())
         {
             BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
         }
