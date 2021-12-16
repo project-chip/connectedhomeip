@@ -50,20 +50,3 @@ esp32_unit_test(NAME testCore LIBRARY CoreTests)
 esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
 esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
 esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
-
-
-
-# FIXME: elfbuilder ?
-#    mkdir -p build/chip/
-#    echo "#!/bin/sh" > build/chip/esp32_elf_builder.sh
-#    echo set -e >> build/chip/esp32_elf_builder.sh
-#    echo set -x >> build/chip/esp32_elf_builder.sh
-#    echo $(CXX) $(CXXFLAGS) $(CPPFLAGS) -L$(PROJECT_PATH)/build/chip/lib -Wl,--whole-archive '$$1' -Wl,--no-whole-archive \
-#         -lnlunit-test $(LDFLAGS) -lnlfaultinjection '$$2' -o $(PROJECT_PATH)/build/chip-tests.elf -Wl,-Map=$(APP_MAP) >> build/chip/esp32_elf_builder.sh
-#    echo $(ESPTOOLPY) elf2image $(ESPTOOL_FLASH_OPTIONS) $(ESPTOOL_ELF2IMAGE_OPTIONS) \
-#         -o $(PROJECT_PATH)/build/chip/chip-tests.bin $(PROJECT_PATH)/build/chip-tests.elf >> build/chip/esp32_elf_builder.sh
-#    ln -sf $(PROJECT_PATH)/build/partitions.bin $(PROJECT_PATH)/build/chip/partitions.bin
-#    mkdir -p build/chip/bootloader
-#    ln -sf $(PROJECT_PATH)/build/bootloader/bootloader.bin $(PROJECT_PATH)/build/chip/bootloader.bin
-#    ln -sf $(PROJECT_PATH)/idf.sh $(PROJECT_PATH)/build/chip/env.sh
-
