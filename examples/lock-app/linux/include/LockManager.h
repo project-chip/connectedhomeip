@@ -28,10 +28,7 @@
 class LockManager
 {
 public:
-    LockManager() : mLocked(false)
-    {
-
-    }
+    LockManager() : mLocked(false) {}
 
     bool Lock(chip::Optional<chip::ByteSpan> pin);
     bool Unlock(chip::Optional<chip::ByteSpan> pin);
