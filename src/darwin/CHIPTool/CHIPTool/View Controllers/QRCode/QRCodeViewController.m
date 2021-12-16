@@ -1015,9 +1015,33 @@
     }
     // make API call
     NSLog(@"Making API call...");
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:self->_vendorID.text productId:self->_productID.text];
-    });
+    [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:self->_vendorID.text productId:self->_productID.text];
+}
+
+- (void)getRequest:(NSString *)url
+                  vendorId:(NSString *)vendorId
+                 productId:(NSString *)productId
+{
+    [_activityIndicator startAnimating];
+    _activityIndicator.hidden = NO;
+    NSString *targetUrl = [NSString stringWithFormat:@"%@/%@/%@", url, vendorId, productId];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    [request setHTTPMethod:@"GET"];
+    [request setURL:[NSURL URLWithString:targetUrl]];
+
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:
+      ^(NSData * _Nullable data,
+        NSURLResponse * _Nullable response,
+        NSError * _Nullable error) {
+            NSString *myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSLog(@"Data received: %@", myString);
+            self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            [self getRequestCallback];
+    }] resume];
+}
+
+- (void)getRequestCallback
+{
     BOOL commissioningCustomFlowUseMockFlag = (BOOL)[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
     // use mock respond if useMockFlag is TRUE
     if (commissioningCustomFlowUseMockFlag) {
@@ -1039,37 +1063,13 @@
             }
           };
     }
-    // mock the respond for now, since the ledge Url is not determined yet.
-    _commissioningCustomFlowUrl.text = [[_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
-
-    // getting redirecting prepared
-    NSLog(@"Updating Url and redirectButton...");
-    
-    
-    
-    [_activityIndicator stopAnimating];
-    _activityIndicator.hidden = YES;
-    _deviceModelInfoView.hidden = NO;
-    _redirectButton.hidden = NO;
-}
-
-- (void)getRequest:(NSString *)url
-                  vendorId:(NSString *)vendorId
-                 productId:(NSString *)productId
-{
-    NSString *targetUrl = [NSString stringWithFormat:@"%@/%@/%@", url, vendorId, productId];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
-    [request setHTTPMethod:@"GET"];
-    [request setURL:[NSURL URLWithString:targetUrl]];
-
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:
-      ^(NSData * _Nullable data,
-        NSURLResponse * _Nullable response,
-        NSError * _Nullable error) {
-            NSString *myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            NSLog(@"Data received: %@", myString);
-            self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-    }] resume];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_commissioningCustomFlowUrl.text = [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
+        [self->_activityIndicator stopAnimating];
+        self->_activityIndicator.hidden = YES;
+        self->_deviceModelInfoView.hidden = NO;
+        self->_redirectButton.hidden = NO;
+    });
 }
 
 // redirect
