@@ -80,7 +80,7 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
 
 CHIP_ERROR UserLabelAttrAccess::WriteLabelList(EndpointId endpoint, AttributeValueDecoder & aDecoder)
 {
-    DeviceLayer::LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
+    DeviceLayer::LabelList<Structs::LabelStruct::Type, DeviceLayer::kMaxUserLabels> labelList;
     LabelList::TypeInfo::DecodableType decodablelist;
 
     ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
