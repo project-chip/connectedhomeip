@@ -134,16 +134,16 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
+    CHIP_ERROR PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                               EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
      *   Send a prepared message to a currently connected peer.
      */
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
+    CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & preparedMessage);
 
-    Transport::SecureSession * GetSecureSession(SessionHandle session);
+    Transport::SecureSession * GetSecureSession(const SessionHandle & session);
 
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
@@ -190,7 +190,7 @@ public:
     CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
                           PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
 
-    void ExpirePairing(SessionHandle session);
+    void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
 

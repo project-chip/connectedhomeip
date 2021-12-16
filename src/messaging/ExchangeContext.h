@@ -63,7 +63,8 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -226,7 +227,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify the exchange that its connection has expired.

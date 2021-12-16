@@ -268,7 +268,7 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
     mCASESessionManager->ReleaseSession(remoteDeviceId);
 }
 
-void DeviceController::OnSessionReleased(SessionHandle session)
+void DeviceController::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
     mCASESessionManager->OnSessionReleased(session);
@@ -684,7 +684,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnSessionReleased(SessionHandle session)
+void DeviceCommissioner::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
 
@@ -694,7 +694,7 @@ void DeviceCommissioner::OnSessionReleased(SessionHandle session)
     device->OnSessionReleased(session);
 }
 
-CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(SessionHandle session)
+CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const SessionHandle & session)
 {
     CommissioneeDeviceProxy * foundDevice = nullptr;
     mCommissioneeDevicePool.ForEachActiveObject([&](auto * deviceProxy) {

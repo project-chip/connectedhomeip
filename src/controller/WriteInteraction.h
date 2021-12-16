@@ -95,8 +95,8 @@ private:
  * with a small number of instantiations (one per type).
  */
 template <typename AttrType>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                          const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId, ClusterId clusterId,
+                          AttributeId attributeId, const AttrType & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
@@ -124,7 +124,7 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 }
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
@@ -134,7 +134,7 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 }
 
 template <typename AttributeInfo>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, uint16_t aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
@@ -144,7 +144,7 @@ CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpoint
 }
 
 template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
-CHIP_ERROR WriteAttribute(SessionHandle sessionHandle, chip::EndpointId endpointId,
+CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                           const typename AttributeInfo::Type & requestData, WriteCallback::OnSuccessCallbackType onSuccessCb,
                           WriteCallback::OnErrorCallbackType onErrorCb, WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {

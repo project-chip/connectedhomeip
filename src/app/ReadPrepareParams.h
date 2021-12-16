@@ -40,7 +40,7 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds             = 0;
     bool mKeepSubscriptions                         = true;
 
-    ReadPrepareParams(SessionHandle sessionHandle) : mSessionHandle(sessionHandle) {}
+    ReadPrepareParams(const SessionHandle & sessionHandle) : mSessionHandle(sessionHandle) {}
     ReadPrepareParams(ReadPrepareParams && other) : mSessionHandle(other.mSessionHandle)
     {
         mKeepSubscriptions                 = other.mKeepSubscriptions;

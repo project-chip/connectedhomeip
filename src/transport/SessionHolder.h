@@ -33,7 +33,7 @@ class SessionHolder : public SessionReleaseDelegate
 {
 public:
     SessionHolder() {}
-    SessionHolder(SessionHandle session) : mSession(session) {}
+    SessionHolder(const SessionHandle & session) : mSession(session) {}
     ~SessionHolder() { Release(); }
 
     SessionHolder(const SessionHolder &);
@@ -41,7 +41,7 @@ public:
     SessionHolder(SessionHolder && that);
     SessionHolder operator=(SessionHolder && that);
 
-    void Grab(SessionHandle sessionHandle)
+    void Grab(const SessionHandle & sessionHandle)
     {
         Release();
         mSession.SetValue(sessionHandle);
@@ -51,13 +51,13 @@ public:
 
     // TODO: call this function when the underlying session is released
     // Implement SessionReleaseDelegate
-    void OnSessionReleased(SessionHandle session) override { Release(); }
+    void OnSessionReleased(const SessionHandle & session) override { Release(); }
 
     // Check whether the SessionHolder contains a session matching given session
     bool Contains(const SessionHandle & session) const { return mSession.HasValue() && mSession.Value() == session; }
 
     operator bool() const { return mSession.HasValue(); }
-    SessionHandle Get() const { return mSession.Value(); }
+    const SessionHandle & Get() const { return mSession.Value(); }
     Optional<SessionHandle> ToOptional() const { return mSession; }
 
 private:

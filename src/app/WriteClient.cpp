@@ -211,7 +211,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -385,7 +385,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClientHandle::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 
