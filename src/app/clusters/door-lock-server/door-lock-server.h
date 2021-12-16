@@ -43,7 +43,7 @@ class DoorLockServer
     bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newDoorState);
 
     bool SetLanguage(chip::EndpointId endpointId, const char * newLanguage);
-    bool SetAutoRelockTime(chip::EndpointId, uint32_t newAutoRelockTimeSec);
+    bool SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec);
     bool SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoundVolume);
 
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
