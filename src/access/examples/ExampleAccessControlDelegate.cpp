@@ -1117,22 +1117,22 @@ private:
     {
         Constants()
         {
-            encodedAuthPase = 1;
-            encodedAuthCase = 2;
-            encodedAuthGroup = 3;
-            encodedPrivilegeView = 4;
-            encodedPrivilegeProxyView = 5;
-            encodedPrivilegeOperate = 6;
-            encodedPrivilegeManage = 7;
+            encodedAuthPase            = 1;
+            encodedAuthCase            = 2;
+            encodedAuthGroup           = 3;
+            encodedPrivilegeView       = 4;
+            encodedPrivilegeProxyView  = 5;
+            encodedPrivilegeOperate    = 6;
+            encodedPrivilegeManage     = 7;
             encodedPrivilegeAdminister = 8;
-            fabricIndexTag = chip::TLV::ContextTag(1);
-            privilegeTag = chip::TLV::ContextTag(2);
-            authModeTag = chip::TLV::ContextTag(3);
-            subjectsTag = chip::TLV::ContextTag(4);
-            targetsTag = chip::TLV::ContextTag(5);
-            targetClusterTag = chip::TLV::ContextTag(6);
-            targetEndpointTag = chip::TLV::ContextTag(7);
-            targetDeviceTypeTag = chip::TLV::ContextTag(8);
+            fabricIndexTag             = chip::TLV::ContextTag(1);
+            privilegeTag               = chip::TLV::ContextTag(2);
+            authModeTag                = chip::TLV::ContextTag(3);
+            subjectsTag                = chip::TLV::ContextTag(4);
+            targetsTag                 = chip::TLV::ContextTag(5);
+            targetClusterTag           = chip::TLV::ContextTag(6);
+            targetEndpointTag          = chip::TLV::ContextTag(7);
+            targetDeviceTypeTag        = chip::TLV::ContextTag(8);
         }
     };
 
@@ -1174,7 +1174,7 @@ private:
         for (size_t i = 0; i < entryCount; ++i)
         {
             uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
-            uint16_t bufferSize = static_cast<uint16_t>(sizeof(buffer));
+            uint16_t bufferSize                          = static_cast<uint16_t>(sizeof(buffer));
             ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlEntry(i), entryBuffer, bufferSize));
             chip::TLV::TLVReader entryReader;
             entryReader.Init(entryBuffer, bufferSize);
@@ -1213,7 +1213,8 @@ private:
             ReturnErrorOnFailure(ReadEntry(i, codec.entry, nullptr));
             ReturnErrorOnFailure(codec.Encode(entryWriter, chip::TLV::AnonymousTag));
             ReturnErrorOnFailure(entryWriter.Finalize());
-            ReturnErrorOnFailure(mStorageDelegate->SyncSetKeyValue(key.AccessControlEntry(i), entryBuffer, static_cast<uint16_t>(entryWriter.GetLengthWritten())));
+            ReturnErrorOnFailure(mStorageDelegate->SyncSetKeyValue(key.AccessControlEntry(i), entryBuffer,
+                                                                   static_cast<uint16_t>(entryWriter.GetLengthWritten())));
         }
 
         return mStorageDelegate->SyncSetKeyValue(key.AccessControlList(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));

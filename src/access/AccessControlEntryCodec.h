@@ -50,7 +50,8 @@ template <typename T>
 class AccessControlEntryCodec
 {
 public:
-    static_assert(std::is_base_of<AccessControlEntryCodecConstants, T>::value, "T must inherit from AccessControlEntryCodecConstants");
+    static_assert(std::is_base_of<AccessControlEntryCodecConstants, T>::value,
+                  "T must inherit from AccessControlEntryCodecConstants");
 
     AccessControlEntryCodec() : mConstants(T()) {}
 
@@ -328,5 +329,5 @@ private:
     const AccessControlEntryCodecConstants mConstants;
 };
 
-}  // namespace Access
-}  // namespace chip
+} // namespace Access
+} // namespace chip
