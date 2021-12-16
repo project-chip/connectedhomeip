@@ -355,9 +355,9 @@ public:
     bool IsValid(void) { return EventManagementStates::Shutdown != mState; };
 
     /**
-     *  Logger would save last logged event number for each logger buffer into schedule event number array
+     *  Logger would save last logged event number and initial written event bytes number into schedule event number array
      */
-    void SetScheduledEventNumber(EventNumber & aEventNumber);
+    void SetScheduledEventInfo(EventNumber & aEventNumber, uint32_t & aInitialWrittenEventBytes);
 
 private:
     void VendEventNumber();

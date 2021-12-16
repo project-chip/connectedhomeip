@@ -157,6 +157,7 @@ public:
 
     const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
     void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
 
 private:
     friend class TestReadInteraction;
@@ -226,6 +227,7 @@ private:
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
     bool mHoldSync                                           = false;
+    uint32_t mLastWrittenEventsBytes                         = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
