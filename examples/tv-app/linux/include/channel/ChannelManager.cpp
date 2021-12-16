@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TvChannelManager.h"
+#include "ChannelManager.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
@@ -30,7 +30,7 @@
 
 using namespace chip;
 
-CHIP_ERROR TvChannelManager::Init()
+CHIP_ERROR ChannelManager::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Store feature map once it is supported
@@ -43,7 +43,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::proxyGetChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here
@@ -54,7 +54,7 @@ CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::EndpointId mEndpointId,
 
         for (int i = 0; i < maximumVectorSize; ++i)
         {
-            chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
+            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
             channelInfo.affiliateCallSign = CharSpan(affiliateCallSign, sizeof(affiliateCallSign) - 1);
             channelInfo.callSign          = CharSpan(callSign, sizeof(callSign) - 1);
             channelInfo.name              = CharSpan(name, sizeof(name) - 1);
@@ -66,18 +66,18 @@ CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::EndpointId mEndpointId,
     });
 }
 
-TvChannelInfo tvChannelClusterChangeChannel(std::string match)
+ChannelInfo ChannelClusterChangeChannel(std::string match)
 {
     // TODO: Insert code here
-    TvChannelInfo channel = {};
+    ChannelInfo channel = {};
     return channel;
 }
-bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
+bool ChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
 {
     // TODO: Insert code here
     return true;
 }
-bool tvChannelClusterSkipChannel(uint16_t count)
+bool ChannelClusterSkipChannel(uint16_t count)
 {
     // TODO: Insert code here
     return true;

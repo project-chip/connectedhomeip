@@ -1361,14 +1361,14 @@
 // Server attributes
 #define ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID (0x0000)
 
-// Attribute ids for cluster: TV Channel
+// Attribute ids for cluster: Channel
 
 // Client attributes
 
 // Server attributes
-#define ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
-#define ZCL_TV_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
-#define ZCL_TV_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
+#define ZCL_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
+#define ZCL_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Target Navigator
 
@@ -1416,7 +1416,7 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID (0x0000)
+#define ZCL_CONTENT_LAUNCHER_ACCEPT_HEADER_ATTRIBUTE_ID (0x0000)
 #define ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Audio Output

@@ -78,7 +78,9 @@ target_sources(app PRIVATE
                ${GEN_DIR}/lighting-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
 
 chip_configure_data_model(app
     INCLUDE_CLIENT_CALLBACKS

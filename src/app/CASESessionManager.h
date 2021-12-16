@@ -106,7 +106,7 @@ public:
     CHIP_ERROR GetPeerAddress(FabricInfo * fabric, NodeId nodeId, Transport::PeerAddress & addr);
 
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;
@@ -114,7 +114,7 @@ public:
     void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override {}
 
 private:
-    OperationalDeviceProxy * FindSession(SessionHandle session);
+    OperationalDeviceProxy * FindSession(const SessionHandle & session);
     void ReleaseSession(OperationalDeviceProxy * device);
 
     CASESessionManagerConfig mConfig;

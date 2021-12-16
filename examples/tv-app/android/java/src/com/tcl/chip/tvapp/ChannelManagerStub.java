@@ -19,36 +19,34 @@ package com.tcl.chip.tvapp;
 
 import android.util.Log;
 
-public class TvChannelManagerStub implements TvChannelManager {
+public class ChannelManagerStub implements ChannelManager {
   private static final String TAG = "ChannelManagerStub";
 
   @Override
-  public TvChannelInfo[] getChannelList() {
-    TvChannelInfo tvChannelInfo1 =
-        new TvChannelInfo(1, 1, "HDMI1", "callSign1", "affiliateCallSign1");
-    TvChannelInfo tvChannelInfo2 =
-        new TvChannelInfo(2, 2, "HDMI2", "callSign2", "affiliateCallSign2");
-    Log.d(TAG, "getTVChannelList");
-    return new TvChannelInfo[] {tvChannelInfo1, tvChannelInfo2};
+  public ChannelInfo[] getChannelList() {
+    ChannelInfo ChannelInfo1 = new ChannelInfo(1, 1, "HDMI1", "callSign1", "affiliateCallSign1");
+    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 2, "HDMI2", "callSign2", "affiliateCallSign2");
+    Log.d(TAG, "getChannelList");
+    return new ChannelInfo[] {ChannelInfo1, ChannelInfo2};
   }
 
   @Override
-  public TvChannelLineupInfo getLineup() {
-    TvChannelLineupInfo lineupInfo = new TvChannelLineupInfo("operator", "lineup", "postalCode");
-    Log.d(TAG, "getTVChannelLineup: " + lineupInfo);
+  public ChannelLineupInfo getLineup() {
+    ChannelLineupInfo lineupInfo = new ChannelLineupInfo("operator", "lineup", "postalCode");
+    Log.d(TAG, "getChannelLineup: " + lineupInfo);
     return lineupInfo;
   }
 
   @Override
-  public TvChannelInfo getCurrentChannel() {
-    Log.d(TAG, "getCurrentTVChannel: ");
-    return new TvChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+  public ChannelInfo getCurrentChannel() {
+    Log.d(TAG, "getCurrentChannel: ");
+    return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
   }
 
   @Override
-  public TvChannelInfo changeChannel(String match) {
+  public ChannelInfo changeChannel(String match) {
     Log.d(TAG, "changeChannel: " + match);
-    return new TvChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+    return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
   }
 
   @Override

@@ -2760,6 +2760,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+ *
+ * @brief The number of bytes written to the event logging system that
+ *   will trigger Report Delivery.
+ *
+ * The configuration captures the number of bytes written to the event
+ * logging subsystem needed to trigger a report. For example, if an application wants to offload all DEBUG events
+ * reliably, the threshold should be set to less than the size of the
+ * DEBUG buffer (plus a slop factor to account for events generated
+ * during the scheduling and event offload).  Similarly, if the
+ * application does not want to drop INFO events, the threshold should
+ * be set to the sum of DEBUG and INFO buffers (with the same
+ * correction).
+ *
+ */
+#ifndef CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+#define CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD 512
+#endif /* CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD */
+
+/**
  * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
  *
  * @brief Enable Interaction model Event support in server

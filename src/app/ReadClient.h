@@ -291,6 +291,7 @@ private:
     FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
     Timestamp mEventTimestamp;
+    EventNumber mEventMin = 0;
 };
 
 }; // namespace app

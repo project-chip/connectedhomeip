@@ -115,6 +115,13 @@ public:
     ~BridgedDeviceBasicClusterTest() {}
 };
 
+class DLL_EXPORT ChannelClusterTest : public ChannelCluster
+{
+public:
+    ChannelClusterTest() : ChannelCluster() {}
+    ~ChannelClusterTest() {}
+};
+
 class DLL_EXPORT ColorControlClusterTest : public ColorControlCluster
 {
 public:
@@ -365,13 +372,6 @@ class DLL_EXPORT SwitchClusterTest : public SwitchCluster
 public:
     SwitchClusterTest() : SwitchCluster() {}
     ~SwitchClusterTest() {}
-};
-
-class DLL_EXPORT TvChannelClusterTest : public TvChannelCluster
-{
-public:
-    TvChannelClusterTest() : TvChannelCluster() {}
-    ~TvChannelClusterTest() {}
 };
 
 class DLL_EXPORT TargetNavigatorClusterTest : public TargetNavigatorCluster

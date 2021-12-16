@@ -248,7 +248,7 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
     ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
@@ -312,7 +312,8 @@ ExchangeContext::~ExchangeContext()
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return

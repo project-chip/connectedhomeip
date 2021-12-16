@@ -112,7 +112,7 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(FabricInfo * fabric, NodeId nodeId
     return CHIP_NO_ERROR;
 }
 
-void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
+void CASESessionManager::OnSessionReleased(const SessionHandle & sessionHandle)
 {
     OperationalDeviceProxy * session = FindSession(sessionHandle);
     VerifyOrReturn(session != nullptr, ChipLogDetail(Controller, "OnSessionReleased was called for unknown device, ignoring it."));
@@ -120,7 +120,7 @@ void CASESessionManager::OnSessionReleased(SessionHandle sessionHandle)
     session->OnSessionReleased(sessionHandle);
 }
 
-OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)
+OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
 {
     return mConfig.devicePool->FindDevice(session);
 }

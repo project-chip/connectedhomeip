@@ -35,6 +35,7 @@
     MatterBooleanStatePluginServerInitCallback();                                                                                  \
     MatterBridgedActionsPluginServerInitCallback();                                                                                \
     MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
+    MatterChannelPluginServerInitCallback();                                                                                       \
     MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
@@ -72,7 +73,6 @@
     MatterScenesPluginServerInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \
-    MatterTvChannelPluginServerInitCallback();                                                                                     \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterTestClusterPluginServerInitCallback();                                                                                   \

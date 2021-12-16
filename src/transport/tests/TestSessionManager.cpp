@@ -62,7 +62,7 @@ const char LARGE_PAYLOAD[kMaxAppMessageLen + 1] = "test message";
 class TestSessMgrCallback : public SessionReleaseDelegate, public SessionMessageDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SessionHandle session,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override
     {
@@ -84,7 +84,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnSessionReleased(SessionHandle session) override { mOldConnectionDropped = true; }
+    void OnSessionReleased(const SessionHandle & session) override { mOldConnectionDropped = true; }
 
     bool mOldConnectionDropped = false;
 

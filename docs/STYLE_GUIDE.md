@@ -75,7 +75,7 @@ $ git clone https://github.com/project-chip/connectedhomeip.git
 
 ### Terminal prompts
 
-If you need use a full terminal prompt with username and hostname, use the
+If you need to use a full terminal prompt with username and hostname, use the
 format of `root@{hostname}{special-characters}#`.
 
 For example, when logged into a Docker container, you might have a prompt like

@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -17,15 +17,15 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <platform/OTARequestorDriver.h>
 
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
+namespace chip {
 
-class TvChannelManager
+class OTARequestorDriverImpl : public OTARequestorDriver
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTvChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
+    bool CheckImageDownloadAllowed() override;
+    void ImageDownloadComplete() override;
+    UserConsentAction RequestUserConsent() override;
 };
+} // namespace chip

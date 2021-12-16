@@ -33,7 +33,7 @@ public:
 
     virtual void Release(OperationalDeviceProxy * device) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(SessionHandle session) = 0;
+    virtual OperationalDeviceProxy * FindDevice(const SessionHandle & session) = 0;
 
     virtual OperationalDeviceProxy * FindDevice(NodeId id) = 0;
 
@@ -59,7 +59,7 @@ public:
 
     void Release(OperationalDeviceProxy * device) override { mDevicePool.ReleaseObject(device); }
 
-    OperationalDeviceProxy * FindDevice(SessionHandle session) override
+    OperationalDeviceProxy * FindDevice(const SessionHandle & session) override
     {
         OperationalDeviceProxy * foundDevice = nullptr;
         mDevicePool.ForEachActiveObject([&](auto * activeDevice) {

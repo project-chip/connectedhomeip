@@ -23,7 +23,7 @@
 
 namespace chip {
 
-class LinuxOTARequestorDriver : public OTARequestorDriver
+class OTARequestorDriverImpl : public OTARequestorDriver
 {
 
     // Virtual functions from OTARequestorDriver -- start

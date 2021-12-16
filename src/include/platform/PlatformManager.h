@@ -46,8 +46,6 @@ class ThreadStackManagerImpl;
 class TimeSyncManager;
 
 namespace Internal {
-class FabricProvisioningServer;
-class ServiceProvisioningServer;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -199,8 +197,6 @@ private:
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
-    friend class Internal::FabricProvisioningServer;
-    friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;

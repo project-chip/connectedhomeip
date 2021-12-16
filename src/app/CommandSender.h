@@ -213,7 +213,7 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     friend class TestCommandInteraction;

@@ -48,19 +48,12 @@ public:
 
     // Application interface declarations -- start
 
-    // Return value for various trigger-type APIs
-    enum OTATriggerResult
-    {
-        kTriggerSuccessful = 0,
-        kNoProviderKnown   = 1
-    };
-
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
-    OTATriggerResult TriggerImmediateQuery();
+    OTATriggerResult TriggerImmediateQuery() override;
 
     // Send ApplyImage
-    void ApplyUpdate();
+    void ApplyUpdate() override;
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -95,7 +88,7 @@ public:
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
         app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
     // Virtual functions from OTARequestorInterface -- end
     /**
@@ -120,7 +113,7 @@ public:
      * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
      * explicitly.
      */
-    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId)
+    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) override
     {
         mProviderNodeId      = nodeId;
         mProviderFabricIndex = fabIndex;

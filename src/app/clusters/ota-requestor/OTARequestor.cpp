@@ -334,7 +334,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     }
 }
 
-OTARequestor::OTATriggerResult OTARequestor::TriggerImmediateQuery()
+OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 {
 
     if (mProviderNodeId != kUndefinedNodeId)

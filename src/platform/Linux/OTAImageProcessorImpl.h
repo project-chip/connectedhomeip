@@ -26,7 +26,7 @@
 
 namespace chip {
 
-class LinuxOTAImageProcessor : public OTAImageProcessorInterface
+class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     //////////// OTAImageProcessorInterface Implementation ///////////////

@@ -375,7 +375,7 @@ protected:
     ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
@@ -682,7 +682,7 @@ private:
     void OnSessionEstablishmentTimeout();
 
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
@@ -777,7 +777,7 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-    CommissioneeDeviceProxy * FindCommissioneeDevice(SessionHandle session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 

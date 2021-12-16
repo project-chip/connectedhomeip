@@ -1253,7 +1253,7 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace IasWd
 
-namespace TvChannel {
+namespace Channel {
 namespace Commands {
 
 namespace ChangeChannel {
@@ -1273,7 +1273,7 @@ static constexpr CommandId Id = 0x00000002;
 } // namespace SkipChannel
 
 } // namespace Commands
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Commands {

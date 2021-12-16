@@ -17,16 +17,16 @@
  */
 package com.tcl.chip.tvapp;
 
-public class TvChannelInfo {
+public class ChannelInfo {
   public int majorNumber;
   public int minorNumber;
   public String name;
   public String callSign;
   public String affiliateCallSign;
 
-  public TvChannelInfo() {}
+  public ChannelInfo() {}
 
-  public TvChannelInfo(
+  public ChannelInfo(
       int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
     this.majorNumber = majorNumber;
     this.minorNumber = minorNumber;
@@ -37,7 +37,7 @@ public class TvChannelInfo {
 
   @Override
   public String toString() {
-    return "TvChannelInfo{"
+    return "ChannelInfo{"
         + "majorNumber="
         + majorNumber
         + ", minorNumber="

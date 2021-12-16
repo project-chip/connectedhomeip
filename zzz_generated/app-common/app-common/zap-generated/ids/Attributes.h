@@ -4785,7 +4785,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace WakeOnLan
 
-namespace TvChannel {
+namespace Channel {
 namespace Attributes {
 
 namespace ChannelList {
@@ -4813,7 +4813,7 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Attributes {
@@ -4952,9 +4952,9 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace ContentLauncher {
 namespace Attributes {
 
-namespace AcceptsHeaderList {
+namespace AcceptHeaderList {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace AcceptsHeaderList
+} // namespace AcceptHeaderList
 
 namespace SupportedStreamingProtocols {
 static constexpr AttributeId Id = 0x00000001;

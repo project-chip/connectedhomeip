@@ -67,13 +67,13 @@ public:
         auto * ctx = static_cast<TestContext *>(context);
 
         chip::app::LogStorageResources logStorageResources[] = {
-            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
-            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
-            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+            { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+            { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+            { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
         };
 
         chip::app::EventManagement::CreateEventManagement(&ctx->GetExchangeManager(), ArraySize(logStorageResources),
-                                                          gCircularEventBuffer, logStorageResources);
+                                                          gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
 
         return SUCCESS;
     }
@@ -165,18 +165,7 @@ public:
     void OnEventData(const chip::app::ReadClient * apReadClient, const chip::app::EventHeader & aEventHeader,
                      chip::TLV::TLVReader * apData, const chip::app::StatusIB * apStatus) override
     {
-        static int numDataElementIndex = 0;
-
-        if (numDataElementIndex == 0)
-        {
-            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical);
-        }
-        else if (numDataElementIndex == 1)
-        {
-            VerifyOrReturn(aEventHeader.mPriorityLevel == chip::app::PriorityLevel::Info);
-        }
-
-        ++numDataElementIndex;
+        ++mNumDataElementIndex;
         mGotEventResponse = true;
     }
 
@@ -210,6 +199,7 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
     bool mGotReport                        = false;
@@ -695,11 +685,12 @@ void TestReadInteraction::TestReadRoundtrip(nlTestSuite * apSuite, void * apCont
     readPrepareParams.mEventPathParamsListSize     = 1;
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
-
+    readPrepareParams.mEventNumber                 = 1;
     err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &delegate);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    NL_TEST_ASSERT(apSuite, delegate.mNumDataElementIndex == 1);
     NL_TEST_ASSERT(apSuite, delegate.mGotEventResponse);
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mGotReport);

@@ -586,39 +586,37 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;
-        bool isAttributeSigned            = emberAfIsTypeSigned(metadata->attributeType);
         uint16_t dataLen                  = emberAfAttributeSize(metadata);
+        const uint8_t * minBytes;
+        const uint8_t * maxBytes;
         if (dataLen <= 2)
         {
-            int8_t minR, maxR;
-            uint8_t * minI = (uint8_t *) &(minv.defaultValue);
-            uint8_t * maxI = (uint8_t *) &(maxv.defaultValue);
+            minBytes = reinterpret_cast<const uint8_t *>(&(minv.defaultValue));
+            maxBytes = reinterpret_cast<const uint8_t *>(&(maxv.defaultValue));
 // On big endian cpu with length 1 only the second byte counts
 #if (BIGENDIAN_CPU)
             if (dataLen == 1)
             {
-                minI++;
-                maxI++;
+                minBytes++;
+                maxBytes++;
             }
 #endif // BIGENDIAN_CPU
-            minR = emberAfCompareValues(minI, data, dataLen, isAttributeSigned);
-            maxR = emberAfCompareValues(maxI, data, dataLen, isAttributeSigned);
-            if (((minR == 1) || (maxR == -1)) &&
-                // null value is always in-range for a nullable attribute.
-                (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
-            {
-                return EMBER_ZCL_STATUS_INVALID_VALUE;
-            }
         }
         else
         {
-            if (((emberAfCompareValues(minv.ptrToDefaultValue, data, dataLen, isAttributeSigned) == 1) ||
-                 (emberAfCompareValues(maxv.ptrToDefaultValue, data, dataLen, isAttributeSigned) == -1)) &&
-                // null value is always in-range for a nullable attribute.
-                (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
-            {
-                return EMBER_ZCL_STATUS_INVALID_VALUE;
-            }
+            minBytes = minv.ptrToDefaultValue;
+            maxBytes = maxv.ptrToDefaultValue;
+        }
+
+        bool isAttributeSigned = emberAfIsTypeSigned(metadata->attributeType);
+        bool isOutOfRange      = emberAfCompareValues(minBytes, data, dataLen, isAttributeSigned) == 1 ||
+            emberAfCompareValues(maxBytes, data, dataLen, isAttributeSigned) == -1;
+
+        if (isOutOfRange &&
+            // null value is always in-range for a nullable attribute.
+            (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
+        {
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
         }
     }
 

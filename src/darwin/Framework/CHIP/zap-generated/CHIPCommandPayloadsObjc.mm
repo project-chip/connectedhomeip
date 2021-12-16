@@ -3189,7 +3189,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelParams
+@implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3200,12 +3200,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponseParams
+@implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _channelMatch = [CHIPTvChannelClusterTvChannelInfo new];
+        _channelMatch = [CHIPChannelClusterChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3213,7 +3213,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberParams
+@implementation CHIPChannelClusterChangeChannelByNumberParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3226,7 +3226,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterSkipChannelParams
+@implementation CHIPChannelClusterSkipChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
