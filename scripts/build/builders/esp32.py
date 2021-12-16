@@ -66,12 +66,15 @@ class Esp32App(Enum):
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'chip-temperature-measurement-app'
         elif self == Esp32App.TESTS:
-            return 'FIXME_FIXME_FIXME'
+            return None
         else:
             raise Exception('Unknown app type: %r' % self)
 
     @property
     def FlashBundleName(self):
+        if not self.AppNamePrefix:
+            return None
+
         return self.AppNamePrefix + '.flashbundle.txt'
 
     def IsCompatible(self, board: Esp32Board):
@@ -185,6 +188,16 @@ class Esp32Builder(Builder):
         self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
     def build_outputs(self):
+        if self.app == Esp32App.TESTS:
+            # Include the runnable image names as artifacts
+            result = dict()
+            with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
+                for name in f.readlines():
+                    name = name.strip()
+                    result[name] = os.path.join(self.output_dir, name)
+
+            return result
+
         return {
             self.app.AppNamePrefix + '.elf':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
@@ -193,6 +206,9 @@ class Esp32Builder(Builder):
         }
 
     def flashbundle(self):
+        if not self.app.FlashBundleName:
+            return {}
+
         with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
             return {
                 l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
