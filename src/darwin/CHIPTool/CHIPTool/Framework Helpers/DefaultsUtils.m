@@ -103,7 +103,7 @@ BOOL CHIPIsDevicePaired(uint64_t deviceId)
 
     NSError * error;
     bool paired = [controller isDevicePaired:deviceId error:&error];
-    if (error.code != CHIPSuccess) {
+    if (error != nil) {
         NSLog(@"Error retrieving device info for deviceId %llu", deviceId);
         paired = NO;
     }

@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
-    CHIPSuccess                       = 0,
     CHIPErrorCodeUndefinedError       = 1,
     CHIPErrorCodeInvalidStringLength  = 2,
     CHIPErrorCodeInvalidIntegerValue  = 3,
