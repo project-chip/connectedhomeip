@@ -30,14 +30,13 @@ idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
 SET(VALID_TESTS
-    libASN1Tests.a
     # libBleLayerTests.a
+    libASN1Tests.a
     libCoreTests.a
     libInetLayerTests.a
     libRetransmitTests.a
     libSystemLayerTests.a
-    # TODO: how do I do this ?
-    # libChipCryptoTests.a "-lChipCertTestVectors"
+    libChipCryptoTests.a # TODO: "-lChipCertTestVectors"
 )
 
 foreach (TEST_LIB IN LISTS VALID_TESTS) 
@@ -54,6 +53,7 @@ foreach (TEST_LIB IN LISTS VALID_TESTS)
     target_link_libraries(${ELF_NAME} PUBLIC
         idf::main 
         -Wl,--whole-archive ${TEST_LIB} -Wl,--no-whole-archive
+        ChipCertTestVectors # TODO: only useful for CryptoTests
         nlunit-test
         nlfaultinjection
     )
