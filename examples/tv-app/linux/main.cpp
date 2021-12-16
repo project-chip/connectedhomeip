@@ -30,12 +30,12 @@
 
 #include "include/application-launcher/ApplicationLauncherManager.h"
 #include "include/audio-output/AudioOutputManager.h"
+#include "include/channel/ChannelManager.h"
 #include "include/content-launcher/ContentLauncherManager.h"
 #include "include/keypad-input/KeypadInputManager.h"
 #include "include/media-input/MediaInputManager.h"
 #include "include/media-playback/MediaPlaybackManager.h"
 #include "include/target-navigator/TargetNavigatorManager.h"
-#include "include/tv-channel/TvChannelManager.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <lib/shell/Engine.h>
@@ -89,8 +89,8 @@ int main(int argc, char * argv[])
     err = TargetNavigatorManager().Init();
     SuccessOrExit(err);
 
-    // Init Tv Channel Manager
-    err = TvChannelManager().Init();
+    // Init Channel Manager
+    err = ChannelManager().Init();
     SuccessOrExit(err);
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);

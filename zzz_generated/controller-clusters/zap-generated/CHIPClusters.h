@@ -192,6 +192,20 @@ public:
     ~BridgedDeviceBasicCluster() {}
 };
 
+class DLL_EXPORT ChannelCluster : public ClusterBase
+{
+public:
+    ChannelCluster() : ClusterBase(app::Clusters::Channel::Id) {}
+    ~ChannelCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             chip::CharSpan match);
+    CHIP_ERROR ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint16_t majorNumber, uint16_t minorNumber);
+    CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
+};
+
 class DLL_EXPORT ColorControlCluster : public ClusterBase
 {
 public:
@@ -670,20 +684,6 @@ class DLL_EXPORT SwitchCluster : public ClusterBase
 public:
     SwitchCluster() : ClusterBase(app::Clusters::Switch::Id) {}
     ~SwitchCluster() {}
-};
-
-class DLL_EXPORT TvChannelCluster : public ClusterBase
-{
-public:
-    TvChannelCluster() : ClusterBase(app::Clusters::TvChannel::Id) {}
-    ~TvChannelCluster() {}
-
-    // Cluster Commands
-    CHIP_ERROR ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::CharSpan match);
-    CHIP_ERROR ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t majorNumber, uint16_t minorNumber);
-    CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase

@@ -39,6 +39,8 @@ typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterStopAppResponseCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType &);
+typedef void (*CHIPChannelClusterChangeChannelResponseCallbackType)(
+    void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType &);
 typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
@@ -121,8 +123,6 @@ typedef void (*CHIPScenesClusterStoreSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &);
 typedef void (*CHIPScenesClusterViewSceneResponseCallbackType)(
     void *, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &);
-typedef void (*CHIPTvChannelClusterChangeChannelResponseCallbackType)(
-    void *, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType &);
 typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
@@ -451,13 +451,12 @@ typedef void (*NullableIasAceClusterIasAcePanelStatusAttributeCallback)(
 typedef void (*IasAceClusterIasZoneTypeAttributeCallback)(void *, chip::app::Clusters::IasAce::IasZoneType);
 typedef void (*NullableIasAceClusterIasZoneTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasZoneType> &);
-typedef void (*TvChannelClusterTvChannelErrorTypeAttributeCallback)(void *, chip::app::Clusters::TvChannel::TvChannelErrorType);
-typedef void (*NullableTvChannelClusterTvChannelErrorTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TvChannel::TvChannelErrorType> &);
-typedef void (*TvChannelClusterTvChannelLineupInfoTypeAttributeCallback)(void *,
-                                                                         chip::app::Clusters::TvChannel::TvChannelLineupInfoType);
-typedef void (*NullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::TvChannel::TvChannelLineupInfoType> &);
+typedef void (*ChannelClusterChannelErrorTypeAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelErrorType);
+typedef void (*NullableChannelClusterChannelErrorTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelErrorType> &);
+typedef void (*ChannelClusterChannelLineupInfoTypeAttributeCallback)(void *, chip::app::Clusters::Channel::ChannelLineupInfoType);
+typedef void (*NullableChannelClusterChannelLineupInfoTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelLineupInfoType> &);
 typedef void (*TargetNavigatorClusterNavigateTargetStatusAttributeCallback)(
     void *, chip::app::Clusters::TargetNavigator::NavigateTargetStatus);
 typedef void (*NullableTargetNavigatorClusterNavigateTargetStatusAttributeCallback)(
@@ -1785,6 +1784,60 @@ public:
                                                                                CHIPActionBlock action,
                                                                                SubscriptionEstablishedHandler establishedHandler) :
         CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelChannelListListAttributeCallback>
+{
+public:
+    CHIPChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value);
+};
+
+class CHIPChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPChannelChannelListListAttributeCallbackBridge
+{
+public:
+    CHIPChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPChannelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>
+{
+public:
+    CHIPChannelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
+};
+
+class CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge : public CHIPChannelAttributeListListAttributeCallbackBridge
+{
+public:
+    CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action,
+                                                                    SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -3384,61 +3437,6 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>
-{
-public:
-    CHIPTvChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
-};
-
-class CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge : public CHIPTvChannelChannelListListAttributeCallbackBridge
-{
-public:
-    CHIPTvChannelChannelListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                    CHIPActionBlock action,
-                                                                    SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelChannelListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
-class CHIPTvChannelAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelAttributeListListAttributeCallback>
-{
-public:
-    CHIPTvChannelAttributeListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelAttributeListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
-};
-
-class CHIPTvChannelAttributeListListAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelAttributeListListAttributeCallbackBridge
-{
-public:
-    CHIPTvChannelAttributeListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                      CHIPActionBlock action,
-                                                                      SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelAttributeListListAttributeCallbackBridge(queue, handler, action, true),
-        mEstablishedHandler(establishedHandler)
-    {}
-
-    static void OnSubscriptionEstablished(void * context);
-
-private:
-    SubscriptionEstablishedHandler mEstablishedHandler;
-};
-
 class CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge
     : public CHIPCallbackBridge<TargetNavigatorTargetNavigatorListListAttributeCallback>
 {
@@ -4109,6 +4107,18 @@ public:
                             const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
 };
 
+class CHIPChannelClusterChangeChannelResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>
+{
+public:
+    CHIPChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
+};
+
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
     : public CHIPCallbackBridge<CHIPContentLauncherClusterLaunchContentResponseCallbackType>
 {
@@ -4616,18 +4626,6 @@ public:
         CHIPCallbackBridge<CHIPScenesClusterViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
-};
-
-class CHIPTvChannelClusterChangeChannelResponseCallbackBridge
-    : public CHIPCallbackBridge<CHIPTvChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    CHIPTvChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<CHIPTvChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context,
-                            const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data);
 };
 
 class CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge
@@ -9958,25 +9956,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<TvChannelClusterTvChannelErrorTypeAttributeCallback>
+class CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelClusterChannelErrorTypeAttributeCallback>
 {
 public:
-    CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelClusterTvChannelErrorTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                              CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelClusterChannelErrorTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TvChannel::TvChannelErrorType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::Channel::ChannelErrorType value);
 };
 
-class CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge
+class CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge
+    : public CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge
 {
 public:
-    CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                              CHIPActionBlock action,
-                                                                              SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge(queue, handler, action, true),
+    CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action,
+                                                                          SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -9986,27 +9984,27 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableTvChannelClusterTvChannelErrorTypeAttributeCallback>
+class CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableChannelClusterChannelErrorTypeAttributeCallback>
 {
 public:
-    CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableTvChannelClusterTvChannelErrorTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+    CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                      CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableChannelClusterChannelErrorTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::TvChannel::TvChannelErrorType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelErrorType> & value);
 };
 
-class CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge
+class CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge
 {
 public:
-    CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackSubscriptionBridge(
+    CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableTvChannelClusterTvChannelErrorTypeAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10016,26 +10014,25 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<TvChannelClusterTvChannelLineupInfoTypeAttributeCallback>
+class CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<ChannelClusterChannelLineupInfoTypeAttributeCallback>
 {
 public:
-    CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelClusterTvChannelLineupInfoTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+    CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ChannelClusterChannelLineupInfoTypeAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::app::Clusters::TvChannel::TvChannelLineupInfoType value);
+    static void OnSuccessFn(void * context, chip::app::Clusters::Channel::ChannelLineupInfoType value);
 };
 
-class CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackSubscriptionBridge
-    : public CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge
+class CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge
+    : public CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge
 {
 public:
-    CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackSubscriptionBridge(
-        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge(queue, handler, action, true),
+    CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action,
+                                                                               SubscriptionEstablishedHandler establishedHandler) :
+        CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -10045,27 +10042,27 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallback>
+class CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableChannelClusterChannelLineupInfoTypeAttributeCallback>
 {
 public:
-    CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
+    CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                           CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableChannelClusterChannelLineupInfoTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
     static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::Clusters::TvChannel::TvChannelLineupInfoType> & value);
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelLineupInfoType> & value);
 };
 
-class CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackSubscriptionBridge
-    : public CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge
+class CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge
 {
 public:
-    CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackSubscriptionBridge(
+    CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge(
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
-        CHIPNullableTvChannelClusterTvChannelLineupInfoTypeAttributeCallbackBridge(queue, handler, action, true),
+        CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

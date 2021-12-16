@@ -140,6 +140,8 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
+    Map<String, InteractionInfo> writeChannelInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("channel", writeChannelInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -933,8 +935,6 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("softwareDiagnostics", writeSoftwareDiagnosticsInteractionInfo);
     Map<String, InteractionInfo> writeSwitchInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("switch", writeSwitchInteractionInfo);
-    Map<String, InteractionInfo> writeTvChannelInteractionInfo = new LinkedHashMap<>();
-    writeAttributeMap.put("tvChannel", writeTvChannelInteractionInfo);
     Map<String, InteractionInfo> writeTargetNavigatorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("targetNavigator", writeTargetNavigatorInteractionInfo);
     Map<String, InteractionInfo> writeTemperatureMeasurementInteractionInfo = new LinkedHashMap<>();

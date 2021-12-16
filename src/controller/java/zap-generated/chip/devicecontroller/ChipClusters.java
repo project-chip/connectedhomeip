@@ -1889,6 +1889,144 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class ChannelCluster extends BaseChipCluster {
+    public ChannelCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("1284");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public void changeChannel(ChangeChannelResponseCallback callback, String match) {
+      changeChannel(chipClusterPtr, callback, match);
+    }
+
+    public void changeChannelByNumber(
+        DefaultClusterCallback callback, Integer majorNumber, Integer minorNumber) {
+      changeChannelByNumber(chipClusterPtr, callback, majorNumber, minorNumber);
+    }
+
+    public void skipChannel(DefaultClusterCallback callback, Integer count) {
+      skipChannel(chipClusterPtr, callback, count);
+    }
+
+    private native void changeChannel(
+        long chipClusterPtr, ChangeChannelResponseCallback Callback, String match);
+
+    private native void changeChannelByNumber(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer majorNumber,
+        Integer minorNumber);
+
+    private native void skipChannel(
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer count);
+
+    public interface ChangeChannelResponseCallback {
+      void onSuccess( // channelMatch: Struct ChannelInfo
+          // Conversion from this type to Java is not properly implemented yet
+          Integer errorType);
+
+      void onError(Exception error);
+    }
+
+    public static class ChannelListAttribute {
+      public Integer majorNumber;
+      public Integer minorNumber;
+      public String name;
+      public String callSign;
+      public String affiliateCallSign;
+
+      public ChannelListAttribute(
+          Integer majorNumber,
+          Integer minorNumber,
+          String name,
+          String callSign,
+          String affiliateCallSign) {
+        this.majorNumber = majorNumber;
+        this.minorNumber = minorNumber;
+        this.name = name;
+        this.callSign = callSign;
+        this.affiliateCallSign = affiliateCallSign;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int majorNumber: ");
+        output.append(this.majorNumber);
+        output.append("\n");
+
+        output.append("int minorNumber: ");
+        output.append(this.minorNumber);
+        output.append("\n");
+
+        output.append("String name: ");
+        output.append(this.name);
+        output.append("\n");
+
+        output.append("String callSign: ");
+        output.append(this.callSign);
+        output.append("\n");
+
+        output.append("String affiliateCallSign: ");
+        output.append(this.affiliateCallSign);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface ChannelListAttributeCallback {
+      void onSuccess(List<ChannelListAttribute> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public interface AttributeListAttributeCallback {
+      void onSuccess(List<Object> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readChannelListAttribute(ChannelListAttributeCallback callback) {
+      readChannelListAttribute(chipClusterPtr, callback);
+    }
+
+    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
+      readAttributeListAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    public void subscribeClusterRevisionAttribute(
+        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    private native void readChannelListAttribute(
+        long chipClusterPtr, ChannelListAttributeCallback callback);
+
+    private native void readAttributeListAttribute(
+        long chipClusterPtr, AttributeListAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void subscribeClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+  }
+
   public static class ColorControlCluster extends BaseChipCluster {
     public ColorControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
@@ -9147,144 +9285,6 @@ public class ChipClusters {
 
     private native void subscribeFeatureMapAttribute(
         long chipClusterPtr, LongAttributeCallback callback, int minInterval, int maxInterval);
-
-    private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
-  }
-
-  public static class TvChannelCluster extends BaseChipCluster {
-    public TvChannelCluster(long devicePtr, int endpointId) {
-      super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1284");
-    }
-
-    @Override
-    public native long initWithDevice(long devicePtr, int endpointId);
-
-    public void changeChannel(ChangeChannelResponseCallback callback, String match) {
-      changeChannel(chipClusterPtr, callback, match);
-    }
-
-    public void changeChannelByNumber(
-        DefaultClusterCallback callback, Integer majorNumber, Integer minorNumber) {
-      changeChannelByNumber(chipClusterPtr, callback, majorNumber, minorNumber);
-    }
-
-    public void skipChannel(DefaultClusterCallback callback, Integer count) {
-      skipChannel(chipClusterPtr, callback, count);
-    }
-
-    private native void changeChannel(
-        long chipClusterPtr, ChangeChannelResponseCallback Callback, String match);
-
-    private native void changeChannelByNumber(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer majorNumber,
-        Integer minorNumber);
-
-    private native void skipChannel(
-        long chipClusterPtr, DefaultClusterCallback Callback, Integer count);
-
-    public interface ChangeChannelResponseCallback {
-      void onSuccess( // channelMatch: Struct TvChannelInfo
-          // Conversion from this type to Java is not properly implemented yet
-          Integer errorType);
-
-      void onError(Exception error);
-    }
-
-    public static class ChannelListAttribute {
-      public Integer majorNumber;
-      public Integer minorNumber;
-      public String name;
-      public String callSign;
-      public String affiliateCallSign;
-
-      public ChannelListAttribute(
-          Integer majorNumber,
-          Integer minorNumber,
-          String name,
-          String callSign,
-          String affiliateCallSign) {
-        this.majorNumber = majorNumber;
-        this.minorNumber = minorNumber;
-        this.name = name;
-        this.callSign = callSign;
-        this.affiliateCallSign = affiliateCallSign;
-      }
-
-      @Override
-      public String toString() {
-        StringBuilder output = new StringBuilder("");
-        output.append("int majorNumber: ");
-        output.append(this.majorNumber);
-        output.append("\n");
-
-        output.append("int minorNumber: ");
-        output.append(this.minorNumber);
-        output.append("\n");
-
-        output.append("String name: ");
-        output.append(this.name);
-        output.append("\n");
-
-        output.append("String callSign: ");
-        output.append(this.callSign);
-        output.append("\n");
-
-        output.append("String affiliateCallSign: ");
-        output.append(this.affiliateCallSign);
-        output.append("\n");
-
-        return output.toString();
-      }
-    }
-
-    public interface ChannelListAttributeCallback {
-      void onSuccess(List<ChannelListAttribute> valueList);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
-    public interface AttributeListAttributeCallback {
-      void onSuccess(List<Object> valueList);
-
-      void onError(Exception ex);
-
-      default void onSubscriptionEstablished() {}
-    }
-
-    public void readChannelListAttribute(ChannelListAttributeCallback callback) {
-      readChannelListAttribute(chipClusterPtr, callback);
-    }
-
-    public void readAttributeListAttribute(AttributeListAttributeCallback callback) {
-      readAttributeListAttribute(chipClusterPtr, callback);
-    }
-
-    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      readClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeClusterRevisionAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
-      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    private native void readChannelListAttribute(
-        long chipClusterPtr, ChannelListAttributeCallback callback);
-
-    private native void readAttributeListAttribute(
-        long chipClusterPtr, AttributeListAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

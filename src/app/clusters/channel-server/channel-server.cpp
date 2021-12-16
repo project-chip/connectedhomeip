@@ -46,14 +46,14 @@
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::TvChannel;
+using namespace chip::app::Clusters::Channel;
 
-::TvChannelInfo tvChannelClusterChangeChannel(std::string match);
-bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
-bool tvChannelClusterSkipChannel(uint16_t count);
+::ChannelInfo ChannelClusterChangeChannel(std::string match);
+bool ChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumber);
+bool ChannelClusterSkipChannel(uint16_t count);
 
-bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                  const Commands::ChangeChannel::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::ChangeChannel::DecodableType & commandData)
 {
     Commands::ChangeChannelResponse::Type response;
     response.channelMatch.majorNumber       = 1;
@@ -61,7 +61,7 @@ bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command,
     response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
     response.channelMatch.callSign          = chip::CharSpan("callSign", strlen("callSign"));
     response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
-    response.errorType                      = (TvChannelErrorType) 0;
+    response.errorType                      = (ChannelErrorType) 0;
 
     CHIP_ERROR err = command->AddResponseData(commandPath, response);
     if (err != CHIP_NO_ERROR)
@@ -71,28 +71,27 @@ bool emberAfTvChannelClusterChangeChannelCallback(app::CommandHandler * command,
     return true;
 }
 
-bool emberAfTvChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command,
-                                                          const app::ConcreteCommandPath & commandPath,
-                                                          const Commands::ChangeChannelByNumber::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelByNumberCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                        const Commands::ChangeChannelByNumber::DecodableType & commandData)
 {
     auto & majorNumber = commandData.majorNumber;
     auto & minorNumber = commandData.minorNumber;
 
-    bool success         = tvChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
+    bool success         = ChannelClusterChangeChannelByNumber(majorNumber, minorNumber);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-bool emberAfTvChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::SkipChannel::DecodableType & commandData)
+bool emberAfChannelClusterSkipChannelCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::SkipChannel::DecodableType & commandData)
 {
     auto & count = commandData.count;
 
-    bool success         = tvChannelClusterSkipChannel(count);
+    bool success         = ChannelClusterSkipChannel(count);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-void MatterTvChannelPluginServerInitCallback() {}
+void MatterChannelPluginServerInitCallback() {}

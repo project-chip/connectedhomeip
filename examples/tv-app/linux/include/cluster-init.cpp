@@ -19,10 +19,10 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
+#include "channel/ChannelManager.h"
 #include "content-launcher/ContentLauncherManager.h"
 #include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "tv-channel/TvChannelManager.h"
 #include "wake-on-lan/WakeOnLanManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -108,13 +108,12 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo,
-             &TvChannelManager::proxyGetTvChannelList>
-    gTvChannelAttrAccess;
+TvAttrAccess<ChannelManager, app::Clusters::Channel::Attributes::ChannelList::TypeInfo, &ChannelManager::proxyGetChannelList>
+    gChannelAttrAccess;
 
 } // anonymous namespace
 
-/** @brief Tv Channel  Cluster Init
+/** @brief Channel  Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
  * application an opportunity to take care of cluster initialization procedures.
@@ -123,12 +122,12 @@ TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::ChannelList
  * @param endpoint   Ver.: always
  *
  */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     static bool attrAccessRegistered = false;
     if (!attrAccessRegistered)
     {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
+        registerAttributeAccessOverride(&gChannelAttrAccess);
         attrAccessRegistered = true;
     }
 }

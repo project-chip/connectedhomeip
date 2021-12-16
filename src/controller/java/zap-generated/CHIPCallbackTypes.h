@@ -185,6 +185,15 @@ typedef void (*CHIPBridgedDeviceBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPBridgedDeviceBasicClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPChannelClusterChangeChannelResponseCallbackType)(
+    void *, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType &);
+
+typedef void (*CHIPChannelClusterChannelListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo::DecodableType &);
+typedef void (*CHIPChannelClusterAttributeListAttributeCallbackType)(
+    void *, const chip::app::Clusters::Channel::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPChannelClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::Channel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPColorControlClusterCurrentHueAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo::DecodableArgType);
@@ -909,15 +918,6 @@ typedef void (*CHIPSwitchClusterFeatureMapAttributeCallbackType)(
     void *, chip::app::Clusters::Switch::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPSwitchClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::Switch::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
-typedef void (*CHIPTvChannelClusterChangeChannelResponseCallbackType)(
-    void *, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType &);
-
-typedef void (*CHIPTvChannelClusterChannelListAttributeCallbackType)(
-    void *, const chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo::DecodableType &);
-typedef void (*CHIPTvChannelClusterAttributeListAttributeCallbackType)(
-    void *, const chip::app::Clusters::TvChannel::Attributes::AttributeList::TypeInfo::DecodableType &);
-typedef void (*CHIPTvChannelClusterClusterRevisionAttributeCallbackType)(
-    void *, chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
 
