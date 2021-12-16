@@ -21,22 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
-    CHIPErrorCodeUndefinedError       = 1,
-    CHIPErrorCodeInvalidStringLength  = 2,
-    CHIPErrorCodeInvalidIntegerValue  = 3,
-    CHIPErrorCodeInvalidArgument      = 4,
-    CHIPErrorCodeInvalidMessageLength = 5,
-    CHIPErrorCodeInvalidState         = 6,
-    CHIPErrorCodeWrongAddressType     = 7,
-    CHIPErrorCodeIntegrityCheckFailed = 8,
-    CHIPErrorCodeDuplicateExists      = 9,
-    CHIPErrorCodeUnsupportedEndpoint  = 0x7F,
-    CHIPErrorCodeUnsupportedCommand   = 0x81,
-    CHIPErrorCodeInvalidCommand       = 0x85,
-    CHIPErrorCodeUnsupportedAttribute = 0x86,
-    CHIPErrorCodeConstraintError      = 0x87,
-    CHIPErrorCodeUnsupportedWrite     = 0x88,
-    CHIPErrorCodeUnsupportedCluster   = 0xC3,
+    CHIPErrorCodeUndefinedError = 1,          CHIPErrorCodeInvalidStringLength = 2,   CHIPErrorCodeInvalidIntegerValue = 3,
+    CHIPErrorCodeInvalidArgument = 4,         CHIPErrorCodeInvalidMessageLength = 5,  CHIPErrorCodeInvalidState = 6,
+    CHIPErrorCodeWrongAddressType = 7,        CHIPErrorCodeIntegrityCheckFailed = 8,  CHIPErrorCodeDuplicateExists = 9,
+    CHIPErrorCodeUnsupportedEndpoint = 0x7F,  CHIPErrorCodeUnsupportedCommand = 0x81, CHIPErrorCodeInvalidCommand = 0x85,
+    CHIPErrorCodeUnsupportedAttribute = 0x86, CHIPErrorCodeConstraintError = 0x87,    CHIPErrorCodeUnsupportedWrite = 0x88,
+    CHIPErrorCodeUnsupportedCluster = 0xC3,
 };
 
 NS_ASSUME_NONNULL_END
