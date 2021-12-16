@@ -265,7 +265,7 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
 {
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "ReleaseOperationalDevice was called in incorrect state"));
-    mCASESessionManager->ReleaseSession(remoteDeviceId);
+    mCASESessionManager->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
 
 void DeviceController::OnSessionReleased(const SessionHandle & session)
@@ -352,7 +352,7 @@ CHIP_ERROR DeviceController::GetPeerAddressAndPort(PeerId peerId, Inet::IPAddres
 {
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
     Transport::PeerAddress peerAddr;
-    ReturnErrorOnFailure(mCASESessionManager->GetPeerAddress(mFabricInfo, peerId.GetNodeId(), peerAddr));
+    ReturnErrorOnFailure(mCASESessionManager->GetPeerAddress(peerId, peerAddr));
     addr = peerAddr.GetIPAddress();
     port = peerAddr.GetPort();
     return CHIP_NO_ERROR;
@@ -379,7 +379,7 @@ void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
     controller->mSetupPayload.vendorID = value;
 
     OperationalDeviceProxy * device =
-        controller->mCASESessionManager->FindExistingSession(controller->mDeviceWithCommissioningWindowOpen);
+        controller->mCASESessionManager->FindExistingSession(controller->GetPeerIdWithCommissioningWindowOpen());
     if (device == nullptr)
     {
         ChipLogError(Controller, "Could not find device for opening commissioning window");
@@ -476,7 +476,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
 
     if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
     {
-        OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
+        OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(GetPeerIdWithCommissioningWindowOpen());
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
         constexpr EndpointId kBasicClusterEndpoint = 0;
@@ -495,7 +495,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     ChipLogProgress(Controller, "OpenCommissioningWindow for device ID %" PRIu64, mDeviceWithCommissioningWindowOpen);
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
-    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
+    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(GetPeerIdWithCommissioningWindowOpen());
     VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     constexpr EndpointId kAdministratorCommissioningClusterEndpoint = 0;
@@ -1645,8 +1645,7 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     mDNSCache.Insert(nodeData);
 
-    mCASESessionManager->FindOrEstablishSession(mFabricInfo, nodeData.mPeerId.GetNodeId(), &mOnDeviceConnectedCallback,
-                                                &mOnDeviceConnectionFailureCallback);
+    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnNodeIdResolved(nodeData);
 }
 
@@ -1688,7 +1687,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
     }
 }
 
-void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     ChipLogProgress(Controller, "Device connection failed. Error %s", ErrorStr(error));
@@ -1696,7 +1695,7 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, NodeId devi
                    ChipLogProgress(Controller, "Device connection failure callback with null context. Ignoring"));
     VerifyOrReturn(commissioner->mPairingDelegate != nullptr,
                    ChipLogProgress(Controller, "Device connection failure callback with null pairing delegate. Ignoring"));
-    commissioner->mPairingDelegate->OnCommissioningComplete(deviceId, error);
+    commissioner->mPairingDelegate->OnCommissioningComplete(peerId.GetNodeId(), error);
 }
 
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,

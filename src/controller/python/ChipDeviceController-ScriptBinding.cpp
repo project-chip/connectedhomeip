@@ -596,7 +596,7 @@ struct GetDeviceCallbacks
         delete self;
     }
 
-    static void OnConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+    static void OnConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(nullptr, error.AsInteger());

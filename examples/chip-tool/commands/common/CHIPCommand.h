@@ -39,6 +39,7 @@ public:
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
+    using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
     CHIPCommand(const char * commandName) : Command(commandName)
