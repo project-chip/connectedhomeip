@@ -75,17 +75,26 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
     EndpointId remoteEndpoint = commandData.endpointId;
     EndpointId localEndpoint  = commandPath.mEndpointId;
     FabricIndex fabricIndex   = commandObj->GetAccessingFabricIndex();
+    EmberBindingTableEntry bindingEntry;
 
     ChipLogDetail(Zcl, "RX: BindCallback");
 
-    if (groupId && nodeId)
+    if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0))
     {
         ChipLogError(Zcl, "Binding: Invalid request");
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         return true;
     }
 
-    EmberBindingTableEntry bindingEntry(fabricIndex, nodeId, groupId, localEndpoint, remoteEndpoint, clusterId);
+    if (groupId)
+    {
+        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, remoteEndpoint, clusterId);
+    }
+    else
+    {
+        bindingEntry = EmberBindingTableEntry::ForNode(fabricIndex, nodeId, localEndpoint, remoteEndpoint, clusterId);
+    }
+
     uint8_t bindingIndex;
     if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_NOT_FOUND)
     {
@@ -99,8 +108,11 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
         return true;
     }
 
-    if (BindingManager::GetInstance().CreateBinding(fabricIndex, nodeId, localEndpoint, clusterId) != CHIP_NO_ERROR)
+    CHIP_ERROR err = BindingManager::GetInstance().CreateBinding(fabricIndex, nodeId, localEndpoint, clusterId);
+    if (err != CHIP_NO_ERROR)
     {
+        ChipLogError(Zcl, "Binding: Failed to add binding for device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+                     err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         return true;
     }
@@ -133,17 +145,25 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
     EndpointId remoteEndpoint = commandData.endpointId;
     EndpointId localEndpoint  = commandPath.mEndpointId;
     FabricIndex fabricIndex   = commandObj->GetAccessingFabricIndex();
+    EmberBindingTableEntry bindingEntry;
 
     ChipLogDetail(Zcl, "RX: UnbindCallback");
 
-    if (groupId && nodeId)
+    if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0))
     {
         ChipLogError(Zcl, "Binding: Invalid request");
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
         return true;
     }
+    if (groupId)
+    {
+        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, remoteEndpoint, clusterId);
+    }
+    else
+    {
+        bindingEntry = EmberBindingTableEntry::ForNode(fabricIndex, nodeId, localEndpoint, remoteEndpoint, clusterId);
+    }
 
-    EmberBindingTableEntry bindingEntry(fabricIndex, nodeId, groupId, localEndpoint, remoteEndpoint, clusterId);
     uint8_t bindingIndex;
     if (getBindingIndex(bindingEntry, &bindingIndex) != EMBER_SUCCESS)
     {
@@ -156,6 +176,8 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
         CHIP_ERROR err = BindingManager::GetInstance().DisconnectDevice(fabricIndex, nodeId);
         if (err != CHIP_NO_ERROR)
         {
+            ChipLogError(Zcl, "Binding: Failed to disconnect device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
+                         err.AsString());
             emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         }
     }
@@ -175,7 +197,12 @@ void MatterBindingClusterServerAttributeChangedCallback(const chip::app::Concret
         if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING &&
             entry.local == attributePath.mEndpointId && entry.clusterId == attributePath.mClusterId)
         {
-            BindingManager::GetInstance().NotifyBoundClusterChanged(entry.local, entry.clusterId);
+            CHIP_ERROR error = BindingManager::GetInstance().NotifyBoundClusterChanged(entry.local, entry.clusterId);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "Failed to notify bound cluster %" PRIu32 " on endpoint %u: %s", entry.clusterId, entry.local,
+                             error.AsString());
+            }
         }
     }
 }

@@ -23,9 +23,32 @@
 
 namespace chip {
 
+/**
+ * Application callback function when a cluster associated with a bound peer changes.
+ *
+ * The connection is managed by the stack and peer_device is guaranteed to be available.
+ * The application shall decide the content to be sent to the peer.
+ *
+ * E.g. The application will send on/off commands to peer for the OnOff cluster.
+ *
+ */
 using BoundDeviceChangedHandler = void (*)(EndpointId localEndpoint, EndpointId remoteEndpoint, ClusterId clusterId,
                                            OperationalDeviceProxy * peer_device);
 
+/**
+ *
+ * The BindingManager class manages the CASEConnection and attribute writes to bound peers.
+ *
+ * The binding cluster will tell the device about the peer to connect to and the cluster to watch.
+ * A CASE connection will be triggered when:
+ *  - The binding cluster adds an entry to the binding table.
+ *  - A watched cluster changes but we cannot find an active connection to the peer.
+ *
+ * The class uses an LRU mechanism to choose the connection to eliminate when there is no space for a new connection.
+ * The BindingManager class will not actively re-establish connection and will connect on-demand (when binding cluster
+ * or watched cluster is changed).
+ *
+ */
 class BindingManager
 {
 public:
@@ -37,10 +60,22 @@ public:
 
     void SetAppServer(Server * appServer) { mAppServer = appServer; }
 
+    /*
+     * Adds a binding entry. Can be called for adding a new cluster to a node already connected.
+     *
+     */
     CHIP_ERROR CreateBinding(FabricIndex fabric, NodeId node, EndpointId localEndpoint, ClusterId cluster);
 
+    /*
+     * Totally disconnect a device. Call this function only when no binding table entry is associated with the node.
+     *
+     */
     CHIP_ERROR DisconnectDevice(FabricIndex fabric, NodeId node);
 
+    /*
+     * Notify a cluster change to **all** bound devices associated with the cluster.
+     *
+     */
     CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster);
 
     static BindingManager & GetInstance() { return sBindingManager; }
@@ -59,12 +94,15 @@ private:
     class PendingClusterEntry
     {
     public:
-        PeerId mPeerId;
+        PendingClusterEntry(PeerId peerId) : mPeerId(peerId) {}
 
-        ClusterPath mPendingClusters[kMaxPendingClusters];
-        uint8_t mNumPendingClusters = 0;
+        PeerId GetPeerId() { return mPeerId; }
 
-        System::Clock::Timestamp mLastUpdateTime;
+        System::Clock::Timestamp GetLastUpdateTime() { return mLastUpdateTime; }
+        void Touch() { mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp(); }
+
+        ClusterPath * begin() { return &mPendingClusters[0]; }
+        ClusterPath * end() { return &mPendingClusters[mNumPendingClusters]; }
 
         void AddPendingCluster(EndpointId endpoint, ClusterId cluster)
         {
@@ -81,7 +119,12 @@ private:
         }
 
     private:
-        uint8_t mNextToOverride = 0;
+        uint8_t mNumPendingClusters = 0;
+        uint8_t mNextToOverride     = 0;
+
+        PeerId mPeerId;
+        ClusterPath mPendingClusters[kMaxPendingClusters];
+        System::Clock::Timestamp mLastUpdateTime;
     };
 
     class PendingClusterMap
@@ -108,8 +151,8 @@ private:
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
     void HandleDeviceConnected(OperationalDeviceProxy * device);
 
-    static void HandleDeviceConnectionFailure(void * context, NodeId nodeId, CHIP_ERROR error);
-    void HandleDeviceConnectionFailure(NodeId nodeId, CHIP_ERROR error);
+    static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
 
     void SyncPendingClustersToPeer(OperationalDeviceProxy * device, PendingClusterEntry * pendingClusters);
 

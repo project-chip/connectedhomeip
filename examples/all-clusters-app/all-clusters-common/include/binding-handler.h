@@ -17,6 +17,6 @@
 
 #pragma once
 
-#include "app/clusters/bindings/BindingManager.h"
+#include "lib/core/CHIPError.h"
 
 CHIP_ERROR InitBindingHandlers();

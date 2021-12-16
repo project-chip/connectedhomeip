@@ -497,22 +497,34 @@ struct EmberBindingTableEntry
 {
     EmberBindingTableEntry() = default;
 
-    EmberBindingTableEntry(chip::FabricIndex fabric, chip::NodeId node, chip::GroupId group, chip::EndpointId localEndpoint,
-                           chip::EndpointId remoteEndpoint, chip::ClusterId cluster) :
-        fabricIndex(fabric),
-        local(localEndpoint), clusterId(cluster), remote(remoteEndpoint)
+    static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
+                                          chip::EndpointId remoteEndpoint, chip::ClusterId cluster)
     {
-        if (group)
-        {
-            type    = EMBER_MULTICAST_BINDING;
-            groupId = group;
-            remote  = 0;
-        }
-        else
-        {
-            type   = EMBER_UNICAST_BINDING;
-            nodeId = node;
-        }
+        EmberBindingTableEntry entry = {
+            .type         = EMBER_UNICAST_BINDING,
+            .fabricIndex  = fabric,
+            .local        = localEndpoint,
+            .clusterId    = cluster,
+            .remote       = remoteEndpoint,
+            .nodeId       = node,
+            .networkIndex = 0,
+        };
+        return entry;
+    }
+
+    static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
+                                           chip::EndpointId remoteEndpoint, chip::ClusterId cluster)
+    {
+        EmberBindingTableEntry entry = {
+            .type         = EMBER_MULTICAST_BINDING,
+            .fabricIndex  = fabric,
+            .local        = localEndpoint,
+            .clusterId    = cluster,
+            .remote       = remoteEndpoint,
+            .groupId      = group,
+            .networkIndex = 0,
+        };
+        return entry;
     }
 
     /** The type of binding. */

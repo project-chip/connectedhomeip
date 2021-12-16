@@ -24,16 +24,18 @@ BindingManager BindingManager::sBindingManager;
 
 CHIP_ERROR BindingManager::CreateBinding(FabricIndex fabric, NodeId node, EndpointId localEndpoint, ClusterId cluster)
 {
-    ReturnErrorCodeIf(mAppServer == nullptr, CHIP_ERROR_INCORRECT_STATE);
-
+    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return EnqueueClusterAndConnect(fabric, node, localEndpoint, cluster);
 }
 
 CHIP_ERROR BindingManager::EnqueueClusterAndConnect(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster)
 {
+    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(fabric);
-    PeerId peer             = fabricInfo->GetPeerIdForNode(node);
-    CHIP_ERROR error        = mPendingClusterMap.AddPendingCluster(peer, endpoint, cluster);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
+    PeerId peer      = fabricInfo->GetPeerIdForNode(node);
+    CHIP_ERROR error = mPendingClusterMap.AddPendingCluster(peer, endpoint, cluster);
     // We shouldn't fail to create the PendingClusterEntry after Binding Table size check
     if (error != CHIP_NO_ERROR)
     {
@@ -41,18 +43,17 @@ CHIP_ERROR BindingManager::EnqueueClusterAndConnect(FabricIndex fabric, NodeId n
         return error;
     }
 
-    error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(fabricInfo, node, &mOnConnectedCallback,
-                                                                        &mOnConnectionFailureCallback);
+    error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (error == CHIP_ERROR_NO_MEMORY)
     {
         // Release the least recently used entry
         PendingClusterEntry * entry = mPendingClusterMap.FindLRUEntry();
         if (entry != nullptr)
         {
-            mAppServer->GetCASESessionManager()->ReleaseSession(entry->mPeerId.GetNodeId());
+            mAppServer->GetCASESessionManager()->ReleaseSession(entry->GetPeerId());
             mPendingClusterMap.RemoveEntry(entry);
             // Now retry
-            error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(fabricInfo, node, &mOnConnectedCallback,
+            error = mAppServer->GetCASESessionManager()->FindOrEstablishSession(peer, &mOnConnectedCallback,
                                                                                 &mOnConnectionFailureCallback);
         }
     }
@@ -68,7 +69,7 @@ void BindingManager::HandleDeviceConnected(void * context, OperationalDeviceProx
 void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
 {
     mPendingClusterMap.ForEachActiveObject([&](PendingClusterEntry * entry) -> Loop {
-        if (entry->mPeerId == device->GetPeerId())
+        if (entry->GetPeerId() == device->GetPeerId())
         {
             SyncPendingClustersToPeer(device, entry);
         }
@@ -79,10 +80,10 @@ void BindingManager::HandleDeviceConnected(OperationalDeviceProxy * device)
 
 void BindingManager::SyncPendingClustersToPeer(OperationalDeviceProxy * device, PendingClusterEntry * pendingClusters)
 {
-    for (uint8_t i = 0; i < pendingClusters->mNumPendingClusters; i++)
+    for (const ClusterPath & path : *pendingClusters)
     {
-        ClusterId cluster   = pendingClusters->mPendingClusters[i].cluster;
-        EndpointId endpoint = pendingClusters->mPendingClusters[i].endpoint;
+        ClusterId cluster   = path.cluster;
+        EndpointId endpoint = path.endpoint;
         for (uint8_t j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
         {
             EmberBindingTableEntry entry;
@@ -96,42 +97,50 @@ void BindingManager::SyncPendingClustersToPeer(OperationalDeviceProxy * device, 
     mPendingClusterMap.RemoveEntry(pendingClusters);
 }
 
-void BindingManager::HandleDeviceConnectionFailure(void * context, NodeId nodeId, CHIP_ERROR error)
+void BindingManager::HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
 {
     BindingManager * manager = static_cast<BindingManager *>(context);
-    manager->HandleDeviceConnectionFailure(nodeId, error);
+    manager->HandleDeviceConnectionFailure(peerId, error);
 }
 
-void BindingManager::HandleDeviceConnectionFailure(NodeId nodeId, CHIP_ERROR error)
+void BindingManager::HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error)
 {
     // Simply release the entry, the connection will be re-established on need.
-    ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(nodeId));
-    mAppServer->GetCASESessionManager()->ReleaseSession(nodeId);
+    ChipLogError(AppServer, "Failed to establish connection to node 0x" ChipLogFormatX64, ChipLogValueX64(peerId.GetNodeId()));
+    mAppServer->GetCASESessionManager()->ReleaseSession(peerId);
 }
 
 CHIP_ERROR BindingManager::DisconnectDevice(FabricIndex fabric, NodeId node)
 {
-    FabricInfo * fabricInfo     = mAppServer->GetFabricTable().FindFabricWithIndex(fabric);
-    PendingClusterEntry * entry = mPendingClusterMap.FindEntry(fabricInfo->GetPeerIdForNode(node));
+    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(fabric);
+    VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
+    PeerId peer                 = fabricInfo->GetPeerIdForNode(node);
+    PendingClusterEntry * entry = mPendingClusterMap.FindEntry(peer);
 
     VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NOT_FOUND);
 
-    mAppServer->GetCASESessionManager()->ReleaseSession(node);
+    mAppServer->GetCASESessionManager()->ReleaseSession(peer);
     mPendingClusterMap.RemoveEntry(entry);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster)
 {
+    VerifyOrReturnError(mAppServer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
         EmberBindingTableEntry entry;
-        CHIP_ERROR error = CHIP_NO_ERROR;
 
         if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING && entry.local == endpoint &&
             entry.clusterId == cluster)
         {
-            OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(entry.nodeId);
+            FabricInfo * fabricInfo = mAppServer->GetFabricTable().FindFabricWithIndex(entry.fabricIndex);
+            VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
+            PeerId peer                         = fabricInfo->GetPeerIdForNode(entry.nodeId);
+            OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(peer);
             if (peerDevice != nullptr && mBoundDeviceChangedHandler)
             {
                 // We already have an active connection
@@ -140,7 +149,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             else
             {
                 // Enqueue pending cluster and establish connection
-                error = EnqueueClusterAndConnect(entry.fabricIndex, entry.nodeId, entry.local, entry.clusterId);
+                ReturnErrorOnFailure(EnqueueClusterAndConnect(entry.fabricIndex, entry.nodeId, entry.local, entry.clusterId));
             }
         }
     }
@@ -151,7 +160,7 @@ BindingManager::PendingClusterEntry * BindingManager::PendingClusterMap::FindLRU
 {
     PendingClusterEntry * lruEntry = nullptr;
     mPendingClusterMap.ForEachActiveObject([&](PendingClusterEntry * entry) {
-        if (lruEntry == nullptr || lruEntry->mLastUpdateTime > entry->mLastUpdateTime)
+        if (lruEntry == nullptr || lruEntry->GetLastUpdateTime() > entry->GetLastUpdateTime())
         {
             lruEntry = entry;
         }
@@ -164,7 +173,7 @@ BindingManager::PendingClusterEntry * BindingManager::PendingClusterMap::FindEnt
 {
     PendingClusterEntry * foundEntry = nullptr;
     mPendingClusterMap.ForEachActiveObject([&](PendingClusterEntry * entry) {
-        if (entry->mPeerId == peerId)
+        if (entry->GetPeerId() == peerId)
         {
             foundEntry = entry;
             return Loop::Break;
@@ -180,12 +189,11 @@ CHIP_ERROR BindingManager::PendingClusterMap::AddPendingCluster(PeerId peer, End
 
     if (entry == nullptr)
     {
-        entry = mPendingClusterMap.CreateObject();
+        entry = mPendingClusterMap.CreateObject(peer);
         VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NO_MEMORY);
-        entry->mPeerId = peer;
     }
     entry->AddPendingCluster(endpoint, cluster);
-    entry->mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp();
+    entry->Touch();
     return CHIP_NO_ERROR;
 }
 
