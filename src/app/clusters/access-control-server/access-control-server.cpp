@@ -42,20 +42,20 @@ struct Constants : public AccessControlEntryCodecConstants
 {
     Constants()
     {
-        encodedAuthPase = static_cast<uint32_t>(AccessControlCluster::AuthMode::kPase);
-        encodedAuthCase = static_cast<uint32_t>(AccessControlCluster::AuthMode::kCase);
-        encodedAuthGroup = static_cast<uint32_t>(AccessControlCluster::AuthMode::kGroup);
-        encodedPrivilegeView = static_cast<uint32_t>(AccessControlCluster::Privilege::kView);
-        encodedPrivilegeProxyView = static_cast<uint32_t>(AccessControlCluster::Privilege::kProxyView);
-        encodedPrivilegeOperate = static_cast<uint32_t>(AccessControlCluster::Privilege::kOperate);
-        encodedPrivilegeManage = static_cast<uint32_t>(AccessControlCluster::Privilege::kManage);
+        encodedAuthPase            = static_cast<uint32_t>(AccessControlCluster::AuthMode::kPase);
+        encodedAuthCase            = static_cast<uint32_t>(AccessControlCluster::AuthMode::kCase);
+        encodedAuthGroup           = static_cast<uint32_t>(AccessControlCluster::AuthMode::kGroup);
+        encodedPrivilegeView       = static_cast<uint32_t>(AccessControlCluster::Privilege::kView);
+        encodedPrivilegeProxyView  = static_cast<uint32_t>(AccessControlCluster::Privilege::kProxyView);
+        encodedPrivilegeOperate    = static_cast<uint32_t>(AccessControlCluster::Privilege::kOperate);
+        encodedPrivilegeManage     = static_cast<uint32_t>(AccessControlCluster::Privilege::kManage);
         encodedPrivilegeAdminister = static_cast<uint32_t>(AccessControlCluster::Privilege::kAdminister);
-        fabricIndexTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kFabricIndex));
-        privilegeTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kPrivilege));
-        authModeTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kAuthMode));
-        subjectsTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kSubjects));
-        targetsTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kTargets));
-        targetClusterTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::Target::Fields::kCluster));
+        fabricIndexTag    = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kFabricIndex));
+        privilegeTag      = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kPrivilege));
+        authModeTag       = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kAuthMode));
+        subjectsTag       = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kSubjects));
+        targetsTag        = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::AccessControlEntry::Fields::kTargets));
+        targetClusterTag  = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::Target::Fields::kCluster));
         targetEndpointTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::Target::Fields::kEndpoint));
         targetDeviceTypeTag = TLV::ContextTag(to_underlying(AccessControlCluster::Structs::Target::Fields::kDeviceType));
     }
