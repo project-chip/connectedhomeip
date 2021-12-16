@@ -18,24 +18,24 @@ limitations under the License.
   <domain name="CHIP"/>
   <cluster>
     <domain>Media</domain>
-    <name>TV Channel</name>
+    <name>Channel</name>
     <code>0x0504</code>
-    <define>TV_CHANNEL_CLUSTER</define>
+    <define>CHANNEL_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
-    <description>This cluster provides an interface for controlling the current TV Channel on a device.</description>
-    <attribute side="server" code="0x0000" define="TV_CHANNEL_LIST" type="ARRAY" entryType="TvChannelInfo" length="254" writable="false" optional="false">channel list</attribute>
-    <attribute side="server" code="0x0001" define="TV_CHANNEL_LINEUP" type="TvChannelLineupInfo" writable="true" optional="false">channel lineup</attribute>
-    <attribute side="server" code="0x0002" define="TV_CHANNEL_CURRENT_CHANNEL" type="TvChannelInfo" writable="true" optional="false">current channel</attribute>
+    <description>This cluster provides an interface for controlling the current Channel on a device.</description>
+    <attribute side="server" code="0x0000" define="CHANNEL_LIST" type="ARRAY" entryType="ChannelInfo" length="254" writable="false" optional="false">channel list</attribute>
+    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="ChannelLineupInfo" writable="true" optional="false">channel lineup</attribute>
+    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo" writable="true" optional="false">current channel</attribute>
 
     <command source="client" code="0x00" name="ChangeChannel" optional="false">
-      <description>Change the channel on the TV to the channel case-insensitive exact matching the value passed as an argument. </description>
+      <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
       <arg name="match" type="CHAR_STRING"/>
     </command>
 
     <command source="client" code="0x01" name="ChangeChannelByNumber" optional="false">
-      <description>Change the channel on the TV to the channel with the given Number in the ChannelList attribute.</description>
+      <description>Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.</description>
       <arg name="majorNumber" type="INT16U"/>
       <arg name="minorNumber" type="INT16U"/>
     </command>
@@ -47,13 +47,13 @@ limitations under the License.
 
     <command source="server" code="0x00" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
-      <arg name="channelMatch" type="TvChannelInfo"/>
-      <arg name="errorType" type="TvChannelErrorType"/>
+      <arg name="channelMatch" type="ChannelInfo"/>
+      <arg name="errorType" type="ChannelErrorType"/>
     </command>
 
   </cluster>
 
-  <struct name="TvChannelInfo">
+  <struct name="ChannelInfo">
     <cluster code="0x0504"/>
     <item name="majorNumber" type="INT16U"/>
     <item name="minorNumber" type="INT16U"/>
@@ -62,20 +62,20 @@ limitations under the License.
     <item name="affiliateCallSign" type="CHAR_STRING" length="32"/>
   </struct>
 
-  <struct name="TvChannelLineupInfo">
+  <struct name="ChannelLineupInfo">
     <cluster code="0x0504"/>
     <item name="operatorName" type="CHAR_STRING"/>
     <item name="lineupName" type="CHAR_STRING"/>
     <item name="postalCode" type="CHAR_STRING"/>
-    <item name="lineupInfoType" type="TvChannelLineupInfoType"/>
+    <item name="lineupInfoType" type="ChannelLineupInfoType"/>
   </struct>
 
-  <enum name="TvChannelLineupInfoType" type="ENUM8">
+  <enum name="ChannelLineupInfoType" type="ENUM8">
     <cluster code="0x0504"/>
     <item name="Mso" value="0x00"/>
   </enum>
 
-  <enum name="TvChannelErrorType" type="ENUM8">
+  <enum name="ChannelErrorType" type="ENUM8">
     <cluster code="0x0504"/>
     <item name="MultipleMatches" value="0x00"/>
     <item name="NoMatches" value="0x01"/>

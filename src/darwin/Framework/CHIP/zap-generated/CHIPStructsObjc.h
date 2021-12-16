@@ -283,7 +283,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterTvChannelInfo : NSObject
+@interface CHIPChannelClusterChannelInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
 @property (strong, nonatomic) NSString * _Nonnull name;
@@ -292,7 +292,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterTvChannelLineupInfo : NSObject
+@interface CHIPChannelClusterChannelLineupInfo : NSObject
 @property (strong, nonatomic) NSString * _Nonnull operatorName;
 @property (strong, nonatomic) NSString * _Nonnull lineupName;
 @property (strong, nonatomic) NSString * _Nonnull postalCode;

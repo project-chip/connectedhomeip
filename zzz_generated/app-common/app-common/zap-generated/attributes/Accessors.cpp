@@ -27733,7 +27733,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 } // namespace Attributes
 } // namespace WakeOnLan
 
-namespace TvChannel {
+namespace Channel {
 namespace Attributes {
 
 namespace FeatureMap {
@@ -27742,7 +27742,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
     NumericAttributeTraits<uint32_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TvChannel::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Channel::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27760,7 +27760,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     NumericAttributeTraits<uint32_t>::StorageType storageValue;
     NumericAttributeTraits<uint32_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TvChannel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
 }
 
 } // namespace FeatureMap
@@ -27771,7 +27771,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
     NumericAttributeTraits<uint16_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::TvChannel::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::Channel::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -27789,13 +27789,13 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     NumericAttributeTraits<uint16_t>::StorageType storageValue;
     NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::TvChannel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::Channel::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Attributes {

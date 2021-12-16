@@ -570,7 +570,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterTvChannelInfo
+@implementation CHIPChannelClusterChannelInfo
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -589,7 +589,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterTvChannelLineupInfo
+@implementation CHIPChannelClusterChannelLineupInfo
 - (instancetype)init
 {
     if (self = [super init]) {

@@ -15,6 +15,10 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
 	/*
 	* In some default configurations within the nRF Connect SDK,
 	* e.g. on nRF52840, the chosen zephyr,entropy node is &cryptocell.

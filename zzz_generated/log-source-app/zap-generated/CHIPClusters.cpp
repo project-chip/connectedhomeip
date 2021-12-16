@@ -35,7 +35,6 @@ namespace Controller {
 // TODO(#4503): Commands should take group id as an argument.
 
 // DiagnosticLogs Cluster Commands
-// DiagnosticLogs Cluster Attributes
 
 } // namespace Controller
 } // namespace chip

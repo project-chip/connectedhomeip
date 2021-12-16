@@ -62,7 +62,7 @@ public:
     CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) override;
     CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info) override;
     CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index) override;
-    GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) override;
+    GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) override;
 
     //
     // Key Sets
@@ -147,6 +147,7 @@ private:
         size_t mCount             = 0;
         size_t mTotal             = 0;
     };
+    CHIP_ERROR RemoveEndpoints(chip::FabricIndex fabric_index, chip::GroupId group_id);
 
     chip::PersistentStorageDelegate & mStorage;
     bool mInitialized = false;

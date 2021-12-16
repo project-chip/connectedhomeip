@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TvChannelManager.h"
+#include "ChannelManager.h"
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
@@ -34,34 +34,34 @@
 
 using namespace chip;
 
-TvChannelManager TvChannelManager::sInstance;
+ChannelManager ChannelManager::sInstance;
 
 class ChannelInfoAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    ChannelInfoAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::TvChannel::Id) {}
+    ChannelInfoAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::Channel::Id) {}
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
-        if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::ChannelList::Id)
+        if (aPath.mAttributeId == app::Clusters::Channel::Attributes::ChannelList::Id)
         {
-            return TvChannelMgr().getTvChannelList(aEncoder);
+            return ChannelMgr().getChannelList(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::ChannelLineup::Id)
+        else if (aPath.mAttributeId == app::Clusters::Channel::Attributes::ChannelLineup::Id)
         {
-            return TvChannelMgr().getTvChannelLineup(aEncoder);
+            return ChannelMgr().getChannelLineup(aEncoder);
         }
-        else if (aPath.mAttributeId == app::Clusters::TvChannel::Attributes::CurrentChannel::Id)
+        else if (aPath.mAttributeId == app::Clusters::Channel::Attributes::CurrentChannel::Id)
         {
-            return TvChannelMgr().getCurrentTvChannel(aEncoder);
+            return ChannelMgr().getCurrentChannel(aEncoder);
         }
 
         return CHIP_NO_ERROR;
     }
 };
 
-ChannelInfoAttrAccess gTvChannelAttrAccess;
+ChannelInfoAttrAccess gChannelAttrAccess;
 
-/** @brief Tv Channel  Cluster Init
+/** @brief Channel  Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
  * application an opportunity to take care of cluster initialization procedures.
@@ -70,102 +70,101 @@ ChannelInfoAttrAccess gTvChannelAttrAccess;
  * @param endpoint   Ver.: always
  *
  */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     static bool attrAccessRegistered = false;
     if (!attrAccessRegistered)
     {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
+        registerAttributeAccessOverride(&gChannelAttrAccess);
         attrAccessRegistered = true;
     }
 }
 
-TvChannelInfo tvChannelClusterChangeChannel(std::string match)
+ChannelInfo ChannelClusterChangeChannel(std::string match)
 {
-    return TvChannelMgr().ChangeChannelByMatch(match);
+    return ChannelMgr().ChangeChannelByMatch(match);
 }
 
-bool tvChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
+bool ChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
 {
-    return TvChannelMgr().changeChannelByNumber(majorNumber, minorNumber);
+    return ChannelMgr().changeChannelByNumber(majorNumber, minorNumber);
 }
 
-bool tvChannelClusterSkipChannel(uint16_t count)
+bool ChannelClusterSkipChannel(uint16_t count)
 {
-    return TvChannelMgr().skipChannnel(count);
+    return ChannelMgr().skipChannnel(count);
 }
 
-void TvChannelManager::InitializeWithObjects(jobject managerObject)
+void ChannelManager::InitializeWithObjects(jobject managerObject)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for TvChannelManager"));
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Failed to GetEnvForCurrentThread for ChannelManager"));
 
-    mTvChannelManagerObject = env->NewGlobalRef(managerObject);
-    VerifyOrReturn(mTvChannelManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef TvChannelManager"));
+    mChannelManagerObject = env->NewGlobalRef(managerObject);
+    VerifyOrReturn(mChannelManagerObject != nullptr, ChipLogError(Zcl, "Failed to NewGlobalRef ChannelManager"));
 
-    jclass managerClass = env->GetObjectClass(mTvChannelManagerObject);
-    VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get TvChannelManager Java class"));
+    jclass managerClass = env->GetObjectClass(mChannelManagerObject);
+    VerifyOrReturn(managerClass != nullptr, ChipLogError(Zcl, "Failed to get ChannelManager Java class"));
 
-    mGetChannelListMethod = env->GetMethodID(managerClass, "getChannelList", "()[Lcom/tcl/chip/tvapp/TvChannelInfo;");
+    mGetChannelListMethod = env->GetMethodID(managerClass, "getChannelList", "()[Lcom/tcl/chip/tvapp/ChannelInfo;");
     if (mGetChannelListMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'getChannelList' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'getChannelList' method");
         env->ExceptionClear();
     }
 
-    mGetLineupMethod = env->GetMethodID(managerClass, "getLineup", "()Lcom/tcl/chip/tvapp/TvChannelLineupInfo;");
+    mGetLineupMethod = env->GetMethodID(managerClass, "getLineup", "()Lcom/tcl/chip/tvapp/ChannelLineupInfo;");
     if (mGetLineupMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'getLineup' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'getLineup' method");
         env->ExceptionClear();
     }
 
-    mGetCurrentChannelMethod = env->GetMethodID(managerClass, "getCurrentChannel", "()Lcom/tcl/chip/tvapp/TvChannelInfo;");
+    mGetCurrentChannelMethod = env->GetMethodID(managerClass, "getCurrentChannel", "()Lcom/tcl/chip/tvapp/ChannelInfo;");
     if (mGetCurrentChannelMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'getCurrentChannel' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'getCurrentChannel' method");
         env->ExceptionClear();
     }
 
-    mChangeChannelMethod =
-        env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/tcl/chip/tvapp/TvChannelInfo;");
+    mChangeChannelMethod = env->GetMethodID(managerClass, "changeChannel", "(Ljava/lang/String;)Lcom/tcl/chip/tvapp/ChannelInfo;");
     if (mChangeChannelMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'changeChannel' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannel' method");
         env->ExceptionClear();
     }
 
     mchangeChannelByNumberMethod = env->GetMethodID(managerClass, "changeChannelByNumber", "(II)Z");
     if (mchangeChannelByNumberMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'changeChannelByNumber' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannelByNumber' method");
         env->ExceptionClear();
     }
 
     mskipChannelMethod = env->GetMethodID(managerClass, "skipChannel", "(I)Z");
     if (mskipChannelMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access TvChannelManager 'skipChannel' method");
+        ChipLogError(Zcl, "Failed to access ChannelManager 'skipChannel' method");
         env->ExceptionClear();
     }
 }
 
-CHIP_ERROR TvChannelManager::getTvChannelList(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::getChannelList(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received TvChannelManager::getTvChannelList");
-    VerifyOrExit(mTvChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Zcl, "Received ChannelManager::getChannelList");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     return aEncoder.EncodeList([env, this](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mTvChannelManagerObject, mGetChannelListMethod);
+        jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mChannelManagerObject, mGetChannelListMethod);
         jint length                  = env->GetArrayLength(channelInfoList);
         for (jint i = 0; i < length; i++)
         {
-            chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
+            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
             jobject channelObject = env->GetObjectArrayElement(channelInfoList, i);
             jclass channelClass   = env->GetObjectClass(channelObject);
 
@@ -207,26 +206,26 @@ CHIP_ERROR TvChannelManager::getTvChannelList(chip::app::AttributeValueEncoder &
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "TvChannelManager::getTVChannelList status error: %s", err.AsString());
+        ChipLogError(Zcl, "ChannelManager::getChannelList status error: %s", err.AsString());
     }
 
     return err;
 }
 
-CHIP_ERROR TvChannelManager::getTvChannelLineup(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received TvChannelManager::getTvChannelLineup");
-    VerifyOrExit(mTvChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Zcl, "Received ChannelManager::getChannelLineup");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        chip::app::Clusters::TvChannel::Structs::TvChannelLineupInfo::Type channelLineupInfo;
+        chip::app::Clusters::Channel::Structs::ChannelLineupInfo::Type channelLineupInfo;
 
-        jobject channelLineupObject = env->CallObjectMethod(mTvChannelManagerObject, mGetLineupMethod);
+        jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
         jclass channelLineupClazz   = env->GetObjectClass(channelLineupObject);
 
         jfieldID operatorNameFild = env->GetFieldID(channelLineupClazz, "operatorName", "Ljava/lang/String;");
@@ -255,7 +254,7 @@ CHIP_ERROR TvChannelManager::getTvChannelLineup(chip::app::AttributeValueEncoder
 
         jfieldID lineupInfoTypeFild      = env->GetFieldID(channelLineupClazz, "lineupInfoType", "I");
         jint jlineupInfoType             = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
-        channelLineupInfo.lineupInfoType = static_cast<app::Clusters::TvChannel::TvChannelLineupInfoType>(jlineupInfoType);
+        channelLineupInfo.lineupInfoType = static_cast<app::Clusters::Channel::ChannelLineupInfoType>(jlineupInfoType);
 
         ReturnErrorOnFailure(aEncoder.Encode(channelLineupInfo));
 
@@ -265,25 +264,25 @@ CHIP_ERROR TvChannelManager::getTvChannelLineup(chip::app::AttributeValueEncoder
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "TvChannelManager::getTvChannelLineup status error: %s", err.AsString());
+        ChipLogError(Zcl, "ChannelManager::getChannelLineup status error: %s", err.AsString());
     }
 
     return err;
 }
 
-CHIP_ERROR TvChannelManager::getCurrentTvChannel(chip::app::AttributeValueEncoder & aEncoder)
+CHIP_ERROR ChannelManager::getCurrentChannel(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ChipLogProgress(Zcl, "Received TvChannelManager::getCurrentTvChannel");
-    VerifyOrExit(mTvChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    ChipLogProgress(Zcl, "Received ChannelManager::getCurrentChannel");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        chip::app::Clusters::TvChannel::Structs::TvChannelInfo::Type channelInfo;
+        chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
 
-        jobject channelInfoObject = env->CallObjectMethod(mTvChannelManagerObject, mGetCurrentChannelMethod);
+        jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
         jclass channelClass       = env->GetObjectClass(channelInfoObject);
 
         jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
@@ -325,29 +324,29 @@ CHIP_ERROR TvChannelManager::getCurrentTvChannel(chip::app::AttributeValueEncode
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "TvChannelManager::getTVChannel status error: %s", err.AsString());
+        ChipLogError(Zcl, "ChannelManager::getChannel status error: %s", err.AsString());
     }
 
     return err;
 }
 
-TvChannelInfo TvChannelManager::ChangeChannelByMatch(std::string name)
+ChannelInfo ChannelManager::ChangeChannelByMatch(std::string name)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    TvChannelInfo channelInfo{ 0, 0 };
+    ChannelInfo channelInfo{ 0, 0 };
 
-    ChipLogProgress(Zcl, "Received TvChannelManager::ChangeChannelByMatch name %s", name.c_str());
-    VerifyOrExit(mTvChannelManagerObject != nullptr, ChipLogError(Zcl, "mTvChannelManagerObject null"));
+    ChipLogProgress(Zcl, "Received ChannelManager::ChangeChannelByMatch name %s", name.c_str());
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     {
         UtfString jniname(env, name.c_str());
         env->ExceptionClear();
-        jobject channelObject = env->CallObjectMethod(mTvChannelManagerObject, mChangeChannelMethod, jniname.jniValue());
+        jobject channelObject = env->CallObjectMethod(mChannelManagerObject, mChangeChannelMethod, jniname.jniValue());
         if (env->ExceptionCheck())
         {
-            ChipLogError(DeviceLayer, "Java exception in TvChannelManager::ChangeChannelByMatch");
+            ChipLogError(DeviceLayer, "Java exception in ChannelManager::ChangeChannelByMatch");
             env->ExceptionDescribe();
             env->ExceptionClear();
             return channelInfo;
@@ -391,24 +390,24 @@ exit:
     return channelInfo;
 }
 
-bool TvChannelManager::changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
+bool ChannelManager::changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received TvChannelManager::tvChannelClusterChangeChannelByNumber majorNumber %d, minorNumber %d",
-                    majorNumber, minorNumber);
-    VerifyOrExit(mTvChannelManagerObject != nullptr, ChipLogError(Zcl, "mTvChannelManagerObject null"));
+    ChipLogProgress(Zcl, "Received ChannelManager::ChannelClusterChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
+                    minorNumber);
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mchangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mchangeChannelByNumberMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
-    ret = env->CallBooleanMethod(mTvChannelManagerObject, mchangeChannelByNumberMethod, static_cast<jint>(majorNumber),
+    ret = env->CallBooleanMethod(mChannelManagerObject, mchangeChannelByNumberMethod, static_cast<jint>(majorNumber),
                                  static_cast<jint>(minorNumber));
     if (env->ExceptionCheck())
     {
-        ChipLogError(DeviceLayer, "Java exception in TvChannelManager::changeChannelByNumber");
+        ChipLogError(DeviceLayer, "Java exception in ChannelManager::changeChannelByNumber");
         env->ExceptionDescribe();
         env->ExceptionClear();
         return false;
@@ -418,22 +417,22 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool TvChannelManager::skipChannnel(uint16_t count)
+bool ChannelManager::skipChannnel(uint16_t count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received TvChannelManager::skipChannnel count %d", count);
-    VerifyOrExit(mTvChannelManagerObject != nullptr, ChipLogError(Zcl, "mTvChannelManagerObject null"));
+    ChipLogProgress(Zcl, "Received ChannelManager::skipChannnel count %d", count);
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
     VerifyOrExit(mskipChannelMethod != nullptr, ChipLogError(Zcl, "mskipChannelMethod null"));
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     env->ExceptionClear();
 
-    ret = env->CallBooleanMethod(mTvChannelManagerObject, mskipChannelMethod, static_cast<jint>(count));
+    ret = env->CallBooleanMethod(mChannelManagerObject, mskipChannelMethod, static_cast<jint>(count));
     if (env->ExceptionCheck())
     {
-        ChipLogError(DeviceLayer, "Java exception in TvChannelManager::SkipChannel");
+        ChipLogError(DeviceLayer, "Java exception in ChannelManager::SkipChannel");
         env->ExceptionDescribe();
         env->ExceptionClear();
         return false;

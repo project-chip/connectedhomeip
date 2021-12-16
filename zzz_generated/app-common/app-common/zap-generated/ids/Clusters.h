@@ -322,9 +322,9 @@ static constexpr ClusterId Id = 0x00000502;
 namespace WakeOnLan {
 static constexpr ClusterId Id = 0x00000503;
 } // namespace WakeOnLan
-namespace TvChannel {
+namespace Channel {
 static constexpr ClusterId Id = 0x00000504;
-} // namespace TvChannel
+} // namespace Channel
 namespace TargetNavigator {
 static constexpr ClusterId Id = 0x00000505;
 } // namespace TargetNavigator
