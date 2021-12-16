@@ -189,48 +189,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 
 namespace {
 
-class ContentLauncherAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
-    {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
-        {
-            return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-ContentLauncherAttrAccess gContentLauncherAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Content Launch Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
 TvAttrAccess<MediaInputManager, app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo,
              &MediaInputManager::proxyGetInputList>
     gMediaInputAttrAccess;

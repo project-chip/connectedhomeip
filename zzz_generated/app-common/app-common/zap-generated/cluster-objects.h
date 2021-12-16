@@ -32153,6 +32153,13 @@ enum class ContentLaunchStatus : uint8_t
 using ContentLaunchStatus             = EmberAfContentLaunchStatus;
 #endif
 
+// Bitmap for SupportedStreamingProtocol
+enum class SupportedStreamingProtocol : uint32_t
+{
+    kDash = 0x1,
+    kHls  = 0x2,
+};
+
 namespace Structs {
 namespace ContentLaunchDimension {
 enum class Fields
@@ -32452,18 +32459,18 @@ public:
 
 namespace Attributes {
 
-namespace AcceptsHeaderList {
+namespace AcceptHeaderList {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptHeaderList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcceptsHeaderList
+} // namespace AcceptHeaderList
 namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
@@ -32521,7 +32528,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::AcceptsHeaderList::TypeInfo::DecodableType acceptsHeaderList;
+        Attributes::AcceptHeaderList::TypeInfo::DecodableType acceptHeaderList;
         Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;

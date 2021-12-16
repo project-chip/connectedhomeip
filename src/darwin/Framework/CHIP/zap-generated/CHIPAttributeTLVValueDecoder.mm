@@ -1936,8 +1936,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::ContentLauncher::Id: {
         using namespace Clusters::ContentLauncher;
         switch (aPath.mAttributeId) {
-        case Attributes::AcceptsHeaderList::Id: {
-            using TypeInfo = Attributes::AcceptsHeaderList::TypeInfo;
+        case Attributes::AcceptHeaderList::Id: {
+            using TypeInfo = Attributes::AcceptHeaderList::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -1948,8 +1948,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                NSData * newElement_0;
-                newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+                NSString * newElement_0;
+                newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named

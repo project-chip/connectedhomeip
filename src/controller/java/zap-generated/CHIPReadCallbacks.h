@@ -1032,28 +1032,28 @@ private:
     bool keepAlive;
 };
 
-class CHIPContentLauncherAcceptsHeaderListAttributeCallback
-    : public chip::Callback::Callback<CHIPContentLauncherClusterAcceptsHeaderListAttributeCallbackType>
+class CHIPContentLauncherAcceptHeaderListAttributeCallback
+    : public chip::Callback::Callback<CHIPContentLauncherClusterAcceptHeaderListAttributeCallbackType>
 {
 public:
-    CHIPContentLauncherAcceptsHeaderListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPContentLauncherAcceptHeaderListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPContentLauncherAcceptsHeaderListAttributeCallback();
+    ~CHIPContentLauncherAcceptHeaderListAttributeCallback();
 
-    static void maybeDestroy(CHIPContentLauncherAcceptsHeaderListAttributeCallback * callback)
+    static void maybeDestroy(CHIPContentLauncherAcceptHeaderListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPContentLauncherAcceptsHeaderListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPContentLauncherAcceptHeaderListAttributeCallback>(callback);
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPContentLauncherAcceptsHeaderListAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPContentLauncherAcceptHeaderListAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

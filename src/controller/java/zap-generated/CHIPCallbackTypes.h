@@ -299,8 +299,8 @@ typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
 typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType &);
 
-typedef void (*CHIPContentLauncherClusterAcceptsHeaderListAttributeCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo::DecodableType &);
+typedef void (*CHIPContentLauncherClusterAcceptHeaderListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo::DecodableType &);
 typedef void (*CHIPContentLauncherClusterSupportedStreamingProtocolsAttributeCallbackType)(
     void *, chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType);
 typedef void (*CHIPContentLauncherClusterAttributeListAttributeCallbackType)(

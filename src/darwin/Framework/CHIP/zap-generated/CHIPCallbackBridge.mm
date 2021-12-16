@@ -1610,16 +1610,16 @@ void CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSub
     }
 }
 
-void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+void CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        NSData * newElement_0;
-        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        NSString * newElement_0;
+        newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -1633,9 +1633,9 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

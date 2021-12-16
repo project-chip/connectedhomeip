@@ -227,11 +227,11 @@ void ColorControlClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * 
                                                          chip::Callback::Cancelable * onFailureCallback);
 typedef void (*ColorControlAttributeListListAttributeCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                chip::Callback::Cancelable * onSuccessCallback,
-                                                                chip::Callback::Cancelable * onFailureCallback);
-typedef void (*ContentLauncherAcceptsHeaderListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
+void ContentLauncherClusterAcceptHeaderListListAttributeFilter(chip::TLV::TLVReader * data,
+                                                               chip::Callback::Cancelable * onSuccessCallback,
+                                                               chip::Callback::Cancelable * onFailureCallback);
+typedef void (*ContentLauncherAcceptHeaderListListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & data);
 void ContentLauncherClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);

@@ -889,8 +889,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedContentLauncherClusterAcceptsHeaderListAttributeCallback
-      implements ChipClusters.ContentLauncherCluster.AcceptsHeaderListAttributeCallback,
+  public static class DelegatedContentLauncherClusterAcceptHeaderListAttributeCallback
+      implements ChipClusters.ContentLauncherCluster.AcceptHeaderListAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -903,7 +903,7 @@ public class ClusterInfoMapping {
     public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo("valueList", "List<byte[]>");
+          new CommandResponseInfo("valueList", "List<String>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
