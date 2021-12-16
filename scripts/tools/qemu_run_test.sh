@@ -22,6 +22,7 @@
 
 set -e
 set -x
+set -v
 
 die() {
     echo "${me:?}: *** ERROR: " "${*}"
@@ -37,13 +38,18 @@ EXTRA_COMPILE_ARGUMENTS="$*" # generally -lFooHelperLibrary
 
 # shellcheck source=/dev/null
 source "$BUILD_DIR"/env.sh
+
+echo "@@@@@@@@@@@@@@@@@@@@@ BASH SCRIUPT FOR  EXECUTION"
 bash "$BUILD_DIR"/esp32_elf_builder.sh "$BUILD_DIR/lib/$QEMU_TEST_TARGET" "$EXTRA_COMPILE_ARGUMENTS"
 
 flash_image_file=$(mktemp)
 log_file=$(mktemp)
 trap '{ rm -f $flash_image_file $log_file; }' EXIT
 
+echo "@@@@@@@@@@@@@@@@@@@@@ IMAGE FLASHING"
 "$SRC_DIR"/scripts/tools/build_esp32_flash_image.sh "$BUILD_DIR"/chip-tests.bin "$flash_image_file"
+
+echo "@@@@@@@@@@@@@@@@@@@@@ QEMU TEST RUN"
 "$SRC_DIR"/scripts/tools/esp32_qemu_run.sh "$flash_image_file" | tee "$log_file"
 
 # If the logs contain failure message

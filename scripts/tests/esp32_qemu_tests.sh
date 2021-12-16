@@ -23,6 +23,7 @@
 set -e
 set -o pipefail
 set -x
+set -v
 
 here=$(cd "$(dirname "$0")" && pwd)
 chip_dir="$here"/../..
@@ -34,6 +35,7 @@ fi
 
 # shellcheck source=/dev/null
 source "$chip_dir"/src/test_driver/esp32/idf.sh
+echo "!!!!!!!!!!!!!!!!!!!!!!! QEMU SETUP"
 "$chip_dir"/src/test_driver/esp32/qemu_setup.sh
 
 if [ $? -ne 0 ]; then
@@ -42,6 +44,7 @@ if [ $? -ne 0 ]; then
 fi
 
 really_run_suite() {
+    echo "!!!!!!!!!!!!!!!!!!!!!!! ACTUAL RUNNING THE TEST (in an awkward way)"
     idf scripts/tools/qemu_run_test.sh src/test_driver/esp32/build/chip "$@"
 }
 

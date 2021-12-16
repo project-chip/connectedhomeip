@@ -82,7 +82,7 @@ class Esp32App(Enum):
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS
         else:
-            return board == Esp32Board.DevKitC
+            return (board == Esp32Board.DevKitC) and (self  != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
