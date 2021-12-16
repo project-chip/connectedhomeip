@@ -96,6 +96,20 @@ public:
                              const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
                              const Nullable<DoorLock::DlCredentialRule> & credentialRule);
 
+    bool HasFeature(chip::EndpointId endpointId, DoorLock::DoorLockFeature feature);
+
+    inline bool SupportsPIN(chip::EndpointId endpointId)
+    {
+        return HasFeature(endpointId, DoorLock::DoorLockFeature::kPINCredentials);
+    }
+
+    inline bool SupportsUSR(chip::EndpointId endpointId)
+    {
+        // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
+        // TODO: Add missing functions to check if RID, FGP or FACE are supported
+        return HasFeature(endpointId, DoorLock::DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
+    }
+
 private:
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
