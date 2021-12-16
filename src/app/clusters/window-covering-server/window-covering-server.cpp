@@ -59,7 +59,7 @@ using namespace chip::app::Clusters::WindowCovering;
 #define WC_PERCENT100THS_MIN 0
 #define WC_PERCENT100THS_MAX 10000
 
-static bool HasFeature(chip::EndpointId endpoint, WindowCoveringFeature feature)
+static bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
     uint32_t FeatureMap = 0;
     if (EMBER_ZCL_STATUS_SUCCESS ==
@@ -71,6 +71,16 @@ static bool HasFeature(chip::EndpointId endpoint, WindowCoveringFeature feature)
     }
 
     return false;
+}
+
+static inline bool HasFeaturePaLift(chip::EndpointId endpoint)
+{
+    return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
+}
+
+static inline bool HasFeaturePaTilt(chip::EndpointId endpoint)
+{
+    return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
 static uint16_t ValueToPercent100ths(uint16_t openLimit, uint16_t closedLimit, uint16_t value)
@@ -422,11 +432,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
-    if (HasFeature(endpoint, WindowCoveringFeature::kLift))
+    if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, 0);
     }
-    if (HasFeature(endpoint, WindowCoveringFeature::kTilt))
+    if (HasFeature(endpoint, WcFeature::kTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, 0);
     }
@@ -443,11 +453,11 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     EndpointId endpoint = commandPath.mEndpointId;
 
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
-    if (HasFeature(endpoint, WindowCoveringFeature::kLift))
+    if (HasFeature(endpoint, WcFeature::kLift))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
     }
-    if (HasFeature(endpoint, WindowCoveringFeature::kTilt))
+    if (HasFeature(endpoint, WcFeature::kTilt))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
     }
@@ -463,18 +473,18 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
                                                const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
-    uint16_t current          = 0;
+    app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
 
-    if (HasFeature(endpoint, WindowCoveringFeature::kLift) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift))
+    if (HasFeaturePaLift(endpoint))
     {
-        (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
+        (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
         (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
     }
 
-    if (HasFeature(endpoint, WindowCoveringFeature::kTilt) && HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt))
+    if (HasFeaturePaTilt(endpoint))
     {
-        (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
+        (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
     }
 
@@ -492,8 +502,8 @@ bool emberAfWindowCoveringClusterGoToLiftValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    bool hasLift         = HasFeature(endpoint, WindowCoveringFeature::kLift);
-    bool isPositionAware = HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift);
+    bool hasLift         = HasFeature(endpoint, WcFeature::kLift);
+    bool isPositionAware = HasFeature(endpoint, WcFeature::kPositionAwareLift);
 
     emberAfWindowCoveringClusterPrint("GoToLiftValue Value command received");
     if (hasLift && isPositionAware)
@@ -521,11 +531,8 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    bool hasLift         = HasFeature(endpoint, WindowCoveringFeature::kLift);
-    bool isPositionAware = HasFeature(endpoint, WindowCoveringFeature::kPositionAwareLift);
-
     emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
-    if (hasLift && isPositionAware)
+    if (HasFeaturePaLift(endpoint))
     {
         Attributes::TargetPositionLiftPercent100ths::Set(
             endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
@@ -533,7 +540,7 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA=%u or LF=%u", isPositionAware, hasLift);
+        emberAfWindowCoveringClusterPrint("Err Device is not LF_PA");
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
     }
     return true;
@@ -550,8 +557,8 @@ bool emberAfWindowCoveringClusterGoToTiltValueCallback(app::CommandHandler * com
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    bool hasTilt         = HasFeature(endpoint, WindowCoveringFeature::kTilt);
-    bool isPositionAware = HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt);
+    bool hasTilt         = HasFeature(endpoint, WcFeature::kTilt);
+    bool isPositionAware = HasFeature(endpoint, WcFeature::kPositionAwareTilt);
 
     emberAfWindowCoveringClusterPrint("GoToTiltValue command received");
     if (hasTilt && isPositionAware)
@@ -579,11 +586,8 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
 
     EndpointId endpoint = commandPath.mEndpointId;
 
-    bool hasTilt         = HasFeature(endpoint, WindowCoveringFeature::kTilt);
-    bool isPositionAware = HasFeature(endpoint, WindowCoveringFeature::kPositionAwareTilt);
-
     emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
-    if (hasTilt && isPositionAware)
+    if (HasFeaturePaTilt(endpoint))
     {
         Attributes::TargetPositionTiltPercent100ths::Set(
             endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
@@ -591,7 +595,7 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     }
     else
     {
-        emberAfWindowCoveringClusterPrint("Err Device is not PA=%u or TL=%u", isPositionAware, hasTilt);
+        emberAfWindowCoveringClusterPrint("Err Device is not TL_PA");
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_ACTION_DENIED);
     }
     return true;

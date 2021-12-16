@@ -19003,6 +19003,16 @@ enum class WcConfigStatus : uint8_t
     kTiltEncoderControlled     = 0x40,
 };
 
+// Bitmap for WcFeature
+enum class WcFeature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for WcMode
 enum class WcMode : uint8_t
 {
@@ -19035,16 +19045,6 @@ enum class WcSafetyStatus : uint16_t
     kHardwareFailure     = 0x200,
     kManualOperation     = 0x400,
     kProtection          = 0x800,
-};
-
-// Bitmap for WindowCoveringFeature
-enum class WindowCoveringFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
 };
 
 namespace Commands {
@@ -19349,9 +19349,9 @@ struct TypeInfo
 namespace CurrentPositionLift {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
@@ -19361,9 +19361,9 @@ struct TypeInfo
 namespace CurrentPositionTilt {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
@@ -19409,9 +19409,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercentage {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent>;
-    using DecodableType    = DataModel::Nullable<chip::Percent>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
@@ -19421,9 +19421,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercentage {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent>;
-    using DecodableType    = DataModel::Nullable<chip::Percent>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
@@ -19445,9 +19445,9 @@ struct TypeInfo
 namespace TargetPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableType    = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent100ths> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
@@ -19457,9 +19457,9 @@ struct TypeInfo
 namespace TargetPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableType    = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent100ths> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
@@ -19481,9 +19481,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableType    = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent100ths> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
@@ -19493,9 +19493,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableType    = DataModel::Nullable<chip::Percent100ths>;
-    using DecodableArgType = const DataModel::Nullable<chip::Percent100ths> &;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
@@ -19639,12 +19639,7 @@ struct TypeInfo
         Attributes::InstalledClosedLimitLift::TypeInfo::DecodableType installedClosedLimitLift;
         Attributes::InstalledOpenLimitTilt::TypeInfo::DecodableType installedOpenLimitTilt;
         Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt;
-        Attributes::VelocityLift::TypeInfo::DecodableType velocityLift;
-        Attributes::AccelerationTimeLift::TypeInfo::DecodableType accelerationTimeLift;
-        Attributes::DecelerationTimeLift::TypeInfo::DecodableType decelerationTimeLift;
         Attributes::Mode::TypeInfo::DecodableType mode;
-        Attributes::IntermediateSetpointsLift::TypeInfo::DecodableType intermediateSetpointsLift;
-        Attributes::IntermediateSetpointsTilt::TypeInfo::DecodableType intermediateSetpointsTilt;
         Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
