@@ -91,10 +91,10 @@ public:
 
     /**
      * @brief
-     *  Schedule the urgent event delivery
+     *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
 
 private:
     friend class TestReportingEngine;
@@ -130,6 +130,10 @@ private:
      *
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
+
+    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+    CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
+    void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
