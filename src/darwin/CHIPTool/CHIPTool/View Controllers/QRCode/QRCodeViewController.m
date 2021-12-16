@@ -71,6 +71,7 @@
 @property (strong, nonatomic) UILabel * commissioningFlowLabel;
 @property (strong, nonatomic) UILabel * commissioningCustomFlowUrl;
 @property (strong, nonatomic) UIView * deviceModelInfoView;
+@property (strong, nonatomic) NSDictionary * ledgerRespond;
 
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
@@ -1014,10 +1015,33 @@
     }
     // make API call
     NSLog(@"Making API call...");
-    // [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:_vendorID.text productId:_productID.text];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:self->_vendorID.text productId:self->_productID.text];
+    });
+    BOOL commissioningCustomFlowUseMockFlag = (BOOL)[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
+    // use mock respond if useMockFlag is TRUE
+    if (commissioningCustomFlowUseMockFlag) {
+        NSLog(@"Using mock respond");
+        _ledgerRespond = @{
+            @"height": @"mockHeight",
+            @"result": @{
+              @"vid": @1,
+              @"pid": @1,
+              @"cid": @1,
+              @"name": @"mockName",
+              @"owner": @"mockOwner",
+              @"description": @"mockDescription",
+              @"sku": @"mockSku",
+              @"firmware_version": @"mockFirmware",
+              @"hardware_version": @"mockHardware",
+              @"tis_or_trp_testing_completed": @TRUE,
+              @"CommissioningCustomFlowUrl": @"https://lijusankar.github.io/commissioning-react-app/"
+            }
+          };
+    }
     // mock the respond for now, since the ledge Url is not determined yet.
-    _commissioningCustomFlowUrl.text = @"https://lijusankar.github.io/commissioning-react-app/";
-    
+    _commissioningCustomFlowUrl.text = [[_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
+
     // getting redirecting prepared
     NSLog(@"Updating Url and redirectButton...");
     
@@ -1042,9 +1066,9 @@
       ^(NSData * _Nullable data,
         NSURLResponse * _Nullable response,
         NSError * _Nullable error) {
-
-          NSString *myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-          NSLog(@"Data received: %@", myString);
+            NSString *myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            NSLog(@"Data received: %@", myString);
+            self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
     }] resume];
 }
 
