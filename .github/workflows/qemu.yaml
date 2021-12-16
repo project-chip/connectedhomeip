@@ -59,7 +59,6 @@ jobs:
               run: |
                   scripts/run_in_build_env.sh "         \
                       ./scripts/build/build_examples.py \
-                      --verbose                         \
                       --target esp32-qemu-tests         \
                       build                             \
                   "
@@ -67,6 +66,7 @@ jobs:
               timeout-minutes: 30
               run: |
                   src/test_driver/esp32/run_qemu_image.py \
+                     -verbose                             \
                     --file-image-list ./out/esp32-qemu-tests/test_images.txt
             - name: Uploading Logs
               uses: actions/upload-artifact@v2
