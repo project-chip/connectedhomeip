@@ -38,7 +38,6 @@
     MatterPressureMeasurementPluginClientInitCallback();                                                                           \
     MatterPressureMeasurementPluginServerInitCallback();                                                                           \
     MatterPumpConfigurationAndControlPluginServerInitCallback();                                                                   \
-    MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
