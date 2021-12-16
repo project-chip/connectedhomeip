@@ -57,7 +57,12 @@ __LOG_LEVELS__ = {
     default=os.environ.get('QEMU_ESP32', 'qemu-system-xtensa'),
     help='QEMU binary to run (generally path to qemu-system-xtensa)'
 )
-def main(log_level, no_log_timestamps, image, file_image_list, qemu):
+@click.option(
+    '--verbose',
+    default=False,
+    is_flag=True,
+    help='More verbose output')
+def main(log_level, no_log_timestamps, image, file_image_list, qemu, verbose):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -112,6 +117,10 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu):
                 if 'CHIP test status: ' in line and 'CHIP test status: 0' not in line:
                     raise Exception("CHIP test status is NOT 0: %s" % line)
 
+            if verbose:
+               print("========== TEST OUTPUT BEGIN ============")
+               print(output)
+               print("========== TEST OUTPUT END   ============")
 
             logging.info("Image %s PASSED", path)
         except:
