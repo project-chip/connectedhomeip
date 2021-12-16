@@ -22,7 +22,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/af.h>
 
 using namespace std;
@@ -67,9 +67,20 @@ string AccountLoginManager::proxySetupPinRequest(string requestTempAccountIdenti
     return "tempPin123";
 }
 
+bool AccountLoginManager::proxyLogout()
+{
+    // TODO: Insert your code here to send logout request
+    return true;
+}
+
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin)
 {
     return AccountLoginManager().GetInstance().isUserLoggedIn(requestTempAccountIdentifier, requestSetupPin);
+}
+
+bool accountLoginClusterLogout()
+{
+    return AccountLoginManager().GetInstance().proxyLogout();
 }
 
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, chip::EndpointId endpoint)

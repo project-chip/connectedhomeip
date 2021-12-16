@@ -26,6 +26,7 @@
 
 #include <platform/Ameba/AmebaConfig.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -79,7 +80,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified);
         SuccessOrExit(err);
     }
 

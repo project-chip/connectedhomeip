@@ -32,7 +32,7 @@ namespace Echo {
 // The Echo message timeout value in milliseconds.
 constexpr System::Clock::Timeout kEchoMessageTimeout = System::Clock::Milliseconds32(800);
 
-CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SessionHandle session)
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & session)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)

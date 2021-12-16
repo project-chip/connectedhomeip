@@ -76,7 +76,9 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * This callback will be called when receiving event data received in the Read and Subscribe interactions
-         * only one of the apData and apStatus will be non-null.
+         *
+         * Only one of the apData and apStatus will be non-null.
+         *
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
          * @param[in] apData: A TLVReader positioned right on the payload of the event.
@@ -110,15 +112,15 @@ public:
         /**
          * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
          *
-         * The ReadClient object MUST continue to exist after this call is completed. The application shall wait until it
-         * receives an OnDone call before it shuts down the object.
+         * The ReadClient object MUST continue to exist after this call is completed. The application shall not shut down the
+         * object until after this call has returned, and shall not delete the object until OnDone is called.
          *
          * @param[in] apReadClient The read client object that initiated the read transaction.
          */
         virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
 
         /**
-         * OnError will be called when an error occurs *after* a successful call to SendReadRequest(). The following
+         * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -135,14 +137,15 @@ public:
 
         /**
          * OnDone will be called when ReadClient has finished all work and is reserved for future ReadClient ownership change.
-         * (#10366) Users may use this function to release their own objects related to this write interaction.
+         * (#10366) Users may use this function to release their own objects related to this read or subscribe interaction.
          *
          * This function will:
-         *      - Always be called exactly *once* for a given WriteClient instance.
+         *      - Always be called exactly *once* for a given ReadClient instance.
          *      - Be called even in error circumstances.
-         *      - Only be called after a successful call to SendWriteRequest as been made.
+         *      - Only be called after a successful call to SendRequest has been
+         *        made, when the read completes or the subscription is shut down.
          *
-         * @param[in] apReadClient The read client object of the terminated read transaction.
+         * @param[in] apReadClient The read client object of the terminated read or subscribe interaction.
          */
         virtual void OnDone(ReadClient * apReadClient) = 0;
     };
@@ -156,33 +159,28 @@ public:
      *  Shut down the Client. This terminates this instance of the object and releases
      *  all held resources.  The object must not be used after Shutdown() is called.
      *
-     *  SDK consumer can choose when to shut down the ReadClient.
-     *  The ReadClient will automatically shut itself down when it receives a
+     *  SDK consumer can choose when to shut down the ReadClient.  The
+     *  ReadClient will automatically shut itself down when it receives a read
      *  response or the response times out.  So manual shutdown is only needed
      *  to shut down a ReadClient before one of those two things has happened,
-     *  (e.g. if SendReadRequest returned failure).
+     *  (e.g. if SendRequest returned failure) or if this ReadClient represents
+     *  a subscription.
      */
     void Shutdown();
 
     /**
-     *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
-     *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
+     *  Send a request.  There can be one request outstanding on a given ReadClient.
+     *  If SendRequest returns success, no more SendRequest calls can happen on this ReadClient
+     *  until the corresponding OnDone call has happened.
+     *
+     *  This will send either a Read Request or a Subscribe Request depending on
+     *  the InteractionType this read client was initialized with.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
+    CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
-    /**
-     *  Send a subscribe Request.  There can be one Subscribe Request outstanding on a given ReadClient.
-     *  If SendSubscribeRequest returns success, no more subscribe Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
-     *
-     *  @retval #others fail to send subscribe request
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
 
     auto GetSubscriptionId() const
@@ -203,7 +201,7 @@ private:
     enum class ClientState : uint8_t
     {
         Uninitialized = 0,         ///< The client has not been initialized
-        Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
+        Initialized,               ///< The client has been initialized and is ready for a SendRequest
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
@@ -271,23 +269,9 @@ private:
     CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 
-    /**
-     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object and
-     * decode the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
-     *
-     * @param [in] aEventHeader  The header of the event being validated.
-     * @param [in] aEvent        The event data.
-     * @param [in] aReader       The tlv reader.
-     */
-    template <typename EventDataT>
-    CHIP_ERROR DecodeEvent(const EventHeader & aEventHeader, const EventDataT & aEvent, TLV::TLVReader & aReader)
-    {
-        VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
-                                (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        return DataModel::Decode(aReader, aEvent);
-    }
-
+    // Specialized request-sending functions.
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
     /**
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
@@ -307,6 +291,7 @@ private:
     FabricIndex mFabricIndex                   = kUndefinedFabricIndex;
     InteractionType mInteractionType           = InteractionType::Read;
     Timestamp mEventTimestamp;
+    EventNumber mEventMin = 0;
 };
 
 }; // namespace app

@@ -24,6 +24,7 @@
 
 #include <lib/support/ObjectLifeCycle.h>
 #include <system/SystemLayer.h>
+#include <system/SystemTimer.h>
 
 namespace chip {
 namespace System {
@@ -32,7 +33,7 @@ class LayerImplLwIP : public LayerLwIP
 {
 public:
     LayerImplLwIP();
-    ~LayerImplLwIP() = default;
+    ~LayerImplLwIP() { VerifyOrDie(mLayerState.Destroy()); }
 
     // Layer overrides.
     CHIP_ERROR Init() override;
@@ -51,7 +52,8 @@ private:
 
     CHIP_ERROR StartPlatformTimer(System::Clock::Timeout aDelay);
 
-    Timer::MutexedList mTimerList;
+    TimerPool<TimerList::Node> mTimerPool;
+    TimerList mTimerList;
     bool mHandlingTimerComplete; // true while handling any timer completion
     ObjectLifeCycle mLayerState;
 };

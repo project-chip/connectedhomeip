@@ -30,6 +30,7 @@ tests:
       optional: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
+      PICS: A_THREADMETRICS
       response:
           constraints:
               value: 0
@@ -45,6 +46,7 @@ tests:
     - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
+      PICS: A_CURRENTHEAPUSED
       optional: true
       response:
           constraints:
@@ -54,6 +56,7 @@ tests:
           "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
+      PICS: A_CURRENTHEAPHIGHWATERMARK
       optional: true
       response:
           constraints:

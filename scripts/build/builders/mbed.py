@@ -15,9 +15,7 @@
 import logging
 import os
 import platform
-import glob
 import shlex
-import pathlib
 
 from enum import Enum, auto
 from .builder import Builder

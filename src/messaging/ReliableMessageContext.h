@@ -26,7 +26,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <inet/InetLayer.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
+
 #include <lib/core/CHIPError.h>
 #include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>

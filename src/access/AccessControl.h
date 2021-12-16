@@ -44,7 +44,7 @@ public:
             static constexpr Flags kCluster    = 1 << 0;
             static constexpr Flags kEndpoint   = 1 << 1;
             static constexpr Flags kDeviceType = 1 << 2;
-            Flags flags;
+            Flags flags                        = 0;
             ClusterId cluster;
             EndpointId endpoint;
             DeviceTypeId deviceType;
@@ -88,6 +88,19 @@ public:
         };
 
         Entry() = default;
+
+        Entry(Entry && other) : mDelegate(other.mDelegate) { other.mDelegate = &mDefaultDelegate; }
+
+        Entry & operator=(Entry && other)
+        {
+            if (this != &other)
+            {
+                mDelegate->Release();
+                mDelegate       = other.mDelegate;
+                other.mDelegate = &mDefaultDelegate;
+            }
+            return *this;
+        }
 
         Entry(const Entry &) = delete;
         Entry & operator=(const Entry &) = delete;
@@ -292,8 +305,11 @@ public:
         virtual CHIP_ERROR Finish() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
         // Capabilities
-        virtual CHIP_ERROR GetMaxEntries(int & value) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
+        virtual CHIP_ERROR GetMaxEntryCount(size_t & value) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
         // TODO: more capabilities
+
+        // Actualities
+        virtual CHIP_ERROR GetEntryCount(size_t & value) const { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
         // Preparation
         virtual CHIP_ERROR PrepareEntry(Entry & entry) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -352,7 +368,10 @@ public:
     CHIP_ERROR Finish();
 
     // Capabilities
-    CHIP_ERROR GetMaxEntries(int & value) const { return mDelegate.GetMaxEntries(value); }
+    CHIP_ERROR GetMaxEntryCount(size_t & value) const { return mDelegate.GetMaxEntryCount(value); }
+
+    // Actualities
+    CHIP_ERROR GetEntryCount(size_t & value) const { return mDelegate.GetEntryCount(value); }
 
     /**
      * Prepares an entry.

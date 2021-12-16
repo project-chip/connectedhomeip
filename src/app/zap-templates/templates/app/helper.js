@@ -30,6 +30,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
 const kGlobalAttributes = [
+  0xfffb, // AttributeList
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
 ];
@@ -96,15 +97,16 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic',
-  'Identify',
+  'Color Control',
   'Groups',
-  'Scenes',
+  'IAS Zone',
+  'Identify',
+  'Level Control',
   'Occupancy Sensing',
   'On/Off',
-  'Level Control',
-  'Color Control',
-  'IAS Zone',
   'Pump Configuration and Control',
+  'Scenes',
+  'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
@@ -516,6 +518,86 @@ function zapTypeToPythonClusterObjectType(type, options)
   return _zapTypeToPythonClusterObjectType.call(this, type, options)
 }
 
+async function _getPythonFieldDefault(type, options)
+{
+  async function fn(pkgId)
+  {
+    const ns          = options.hash.ns;
+    const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+    if (await typeChecker('isEnum')) {
+      return '0';
+    }
+
+    if (await typeChecker('isBitmap')) {
+      return '0';
+    }
+
+    if (await typeChecker('isStruct')) {
+      return 'field(default_factory=lambda: ' + ns + '.Structs.' + type + '())';
+    }
+
+    if (StringHelper.isCharString(type)) {
+      return '""';
+    }
+
+    if (StringHelper.isOctetString(type)) {
+      return 'b""';
+    }
+
+    if ([ 'single', 'double' ].includes(type.toLowerCase())) {
+      return '0.0';
+    }
+
+    if (type.toLowerCase() == 'boolean') {
+      return 'False'
+    }
+
+    // #10748: asUnderlyingZclType will emit wrong types for int{48|56|64}(u), so we process all int values here.
+    if (type.toLowerCase().match(/^int\d+$/)) {
+      return '0'
+    }
+
+    if (type.toLowerCase().match(/^int\d+u$/)) {
+      return '0'
+    }
+
+    resolvedType = await zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
+    {
+      basicType = ChipTypesHelper.asBasicType(resolvedType);
+      if (basicType.match(/^int\d+_t$/)) {
+        return '0'
+      }
+      if (basicType.match(/^uint\d+_t$/)) {
+        return '0'
+      }
+    }
+  }
+
+  let promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this));
+  if ((this.isList || this.isArray || this.entryType) && !options.hash.forceNotList) {
+    promise = promise.then(typeStr => `field(default_factory=lambda: [])`);
+  }
+
+  const isNull     = (this.isNullable && !options.hash.forceNotNullable);
+  const isOptional = (this.isOptional && !options.hash.forceNotOptional);
+
+  if (isNull && isOptional) {
+    promise = promise.then(typeStr => `None`);
+  } else if (isNull) {
+    promise = promise.then(typeStr => `NullValue`);
+  } else if (isOptional) {
+    promise = promise.then(typeStr => `None`);
+  }
+
+  return templateUtil.templatePromise(this.global, promise)
+}
+
+function getPythonFieldDefault(type, options)
+{
+  return _getPythonFieldDefault.call(this, type, options)
+}
+
 async function getResponseCommandName(responseRef, options)
 {
   let pkgId = await templateUtil.ensureZclPackageId(this);
@@ -571,13 +653,11 @@ function isWeaklyTypedEnum(label)
     "MediaPlaybackState",
     "MediaPlaybackStatus",
     "MoveMode",
-    "NetworkCommissioningError",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
     "OTAAnnouncementReason",
     "OTAApplyUpdateAction",
     "OTADownloadProtocol",
-    "OTAQueryStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
@@ -620,3 +700,4 @@ exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectTyp
 exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
+exports.getPythonFieldDefault               = getPythonFieldDefault;

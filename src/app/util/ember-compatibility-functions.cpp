@@ -21,8 +21,8 @@
  *          when calling ember callbacks.
  */
 
+#include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
-#include <app/Command.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/Engine.h>
@@ -52,6 +52,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Compatibility;
+using namespace chip::Access;
 
 namespace chip {
 namespace app {
@@ -64,7 +65,7 @@ constexpr size_t kAttributeReadBufferSize = (ATTRIBUTE_LARGEST >= 8 ? ATTRIBUTE_
 EmberAfClusterCommand imCompatibilityEmberAfCluster;
 EmberApsFrame imCompatibilityEmberApsFrame;
 EmberAfInterpanHeader imCompatibilityInterpanHeader;
-Command * currentCommandObject;
+CommandHandler * currentCommandObject;
 
 // BasicType maps the type to basic int(8|16|32|64)(s|u) types.
 EmberAfAttributeType BaseType(EmberAfAttributeType type)
@@ -137,7 +138,7 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
 
 } // namespace
 
-void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandPath)
+void SetupEmberAfCommandSender(CommandSender * command, const ConcreteCommandPath & commandPath)
 {
     Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
 
@@ -146,6 +147,34 @@ void SetupEmberAfObjects(Command * command, const ConcreteCommandPath & commandP
     imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
     imCompatibilityEmberApsFrame.sequence =
         (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
+
+    if (commandExchangeCtx->IsGroupExchangeContext())
+    {
+        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
+    }
+
+    imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
+    imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
+    imCompatibilityEmberAfCluster.interPanHeader = &imCompatibilityInterpanHeader;
+    imCompatibilityEmberAfCluster.source         = commandExchangeCtx;
+
+    emAfCurrentCommand = &imCompatibilityEmberAfCluster;
+}
+
+void SetupEmberAfCommandHandler(CommandHandler * command, const ConcreteCommandPath & commandPath)
+{
+    Messaging::ExchangeContext * commandExchangeCtx = command->GetExchangeContext();
+
+    imCompatibilityEmberApsFrame.clusterId           = commandPath.mClusterId;
+    imCompatibilityEmberApsFrame.destinationEndpoint = commandPath.mEndpointId;
+    imCompatibilityEmberApsFrame.sourceEndpoint      = 1; // source endpoint is fixed to 1 for now.
+    imCompatibilityEmberApsFrame.sequence =
+        (commandExchangeCtx != nullptr ? static_cast<uint8_t>(commandExchangeCtx->GetExchangeId() & 0xFF) : 0);
+
+    if (commandExchangeCtx->IsGroupExchangeContext())
+    {
+        imCompatibilityEmberAfCluster.type = EMBER_INCOMING_MULTICAST;
+    }
 
     imCompatibilityEmberAfCluster.commandId      = commandPath.mCommandId;
     imCompatibilityEmberAfCluster.apsFrame       = &imCompatibilityEmberApsFrame;
@@ -226,14 +255,18 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     {
         aAttributeReport.Rollback(*aReportCheckpoint);
     }
-    AttributeStatusIB::Builder attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder attributePathIBBuilder     = attributeStatusIBBuilder.CreatePath();
+    AttributeStatusIB::Builder & attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(aAttributeReport.GetError());
+    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
     statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
     ReturnErrorOnFailure(statusIBBuilder.GetError());
 
@@ -241,73 +274,173 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     return aAttributeReport.EndOfAttributeReportIB().GetError();
 }
 
+// This reader should never actually be registered; we do manual dispatch to it
+// for the one attribute it handles.
+class MandatoryGlobalAttributeReader : public AttributeAccessInterface
+{
+public:
+    MandatoryGlobalAttributeReader(const EmberAfCluster * aCluster) :
+        AttributeAccessInterface(MakeOptional(kInvalidEndpointId), kInvalidClusterId), mCluster(aCluster)
+    {}
+
+protected:
+    const EmberAfCluster * mCluster;
+};
+
+class AttributeListReader : public MandatoryGlobalAttributeReader
+{
+public:
+    AttributeListReader(const EmberAfCluster * aCluster) : MandatoryGlobalAttributeReader(aCluster) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+};
+
+CHIP_ERROR AttributeListReader::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    // The id of AttributeList is not in the attribute metadata.
+    // TODO: This does not play nicely with wildcard reads.  Need to fix ZAP to
+    // put it in the metadata, or fix wildcard expansion to add it.
+    return aEncoder.EncodeList([this](const auto & encoder) {
+        constexpr AttributeId ourId = Clusters::Globals::Attributes::AttributeList::Id;
+        const size_t count          = mCluster->attributeCount;
+        bool addedOurId             = false;
+        for (size_t i = 0; i < count; ++i)
+        {
+            AttributeId id = mCluster->attributes[i].attributeId;
+            if (!addedOurId && id > ourId)
+            {
+                ReturnErrorOnFailure(encoder.Encode(ourId));
+                addedOurId = true;
+            }
+            ReturnErrorOnFailure(encoder.Encode(id));
+        }
+        if (!addedOurId)
+        {
+            ReturnErrorOnFailure(encoder.Encode(ourId));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+// Helper function for trying to read an attribute value via an
+// AttributeAccessInterface.  On failure, the read has failed.  On success, the
+// aTriedEncode outparam is set to whether the AttributeAccessInterface tried to encode a value.
+CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+                                  AttributeReportIBs::Builder & aAttributeReports,
+                                  AttributeValueEncoder::AttributeEncodeState * aEncoderState,
+                                  AttributeAccessInterface * aAccessInterface, bool * aTriedEncode)
+{
+    // TODO: We should probably clone the writer and convert failures here
+    // into status responses, unless our caller already does that.
+    AttributeValueEncoder::AttributeEncodeState state =
+        (aEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *aEncoderState);
+    AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, kTemporaryDataVersion, state);
+    CHIP_ERROR err = aAccessInterface->Read(aPath, valueEncoder);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
+        // The state is used by list chunking feature for now.
+        if (aEncoderState != nullptr)
+        {
+            *aEncoderState = valueEncoder.GetState();
+        }
+        return err;
+    }
+
+    *aTriedEncode = valueEncoder.TriedEncode();
+    return CHIP_NO_ERROR;
+}
+
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
-                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
-                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
+                  "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI
+                  " (expanded=%d)",
+                  ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
+
+    if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
+    {
+        // This is not in our attribute metadata, so we just check for this
+        // endpoint+cluster existing.
+        EmberAfCluster * cluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+        if (cluster)
+        {
+            AttributeListReader reader(cluster);
+            bool ignored; // Our reader always tries to encode
+            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
+                                          &ignored);
+        }
+
+        // else to save codesize just fall through and do the metadata search
+        // (which we know will fail and error out);
+    }
 
     EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
     if (attributeMetadata == nullptr)
     {
-        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
 
         // This path is not actually supported.
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-    // Value encoder will encode the whole AttributeReport, including the path, value and the version.
-    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
-    if (attrOverride != nullptr)
     {
-        // TODO: We should probably clone the writer and convert failures here
-        // into status responses, unless our caller already does that.
-        AttributeValueEncoder::AttributeEncodeState state =
-            (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
-        AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex,
-                                           ConcreteAttributePath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
-                                           kTemporaryDataVersion, state);
-        CHIP_ERROR err = attrOverride->Read(aPath, valueEncoder);
-
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
         if (err != CHIP_NO_ERROR)
         {
-            // If the err is not CHIP_NO_ERROR, means the encoding was aborted, then the valueEncoder may save its state.
-            // The state is used by list chunking feature for now.
-            if (apEncoderState != nullptr)
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            if (aPath.mExpanded)
             {
-                *apEncoderState = valueEncoder.GetState();
+                return CHIP_NO_ERROR;
             }
-            return err;
+            else
+            {
+                AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+                ReturnErrorOnFailure(aAttributeReports.GetError());
+                return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAccess, nullptr);
+            }
         }
+    }
 
-        if (valueEncoder.TriedEncode())
+    // Value encoder will encode the whole AttributeReport, including the path, value and the version.
+    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
+    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
+    {
+        bool triedEncode;
+        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                    attrOverride, &triedEncode));
+
+        if (triedEncode)
         {
             return CHIP_NO_ERROR;
         }
     }
 
-    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
+
     TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
-    AttributeDataIB::Builder attributeDataIBBuilder = attributeReport.CreateAttributeData();
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
@@ -523,14 +656,9 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         case ZCL_ARRAY_ATTRIBUTE_TYPE: {
             // We only get here for attributes of list type that have no override
             // registered.  There should not be any nonempty lists like that.
-            uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
-            if (size != 2)
+            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
+            if (length != 0)
             {
-                // The value returned by emberAfAttributeValueSize for a list
-                // includes the space needed to store the list length (2 bytes) plus
-                // the space needed to store the actual list items.  We expect it to
-                // return 2 here, indicating a zero-length list.  If it doesn't,
-                // something has gone wrong.
                 return CHIP_ERROR_INCORRECT_STATE;
             }
 
@@ -693,7 +821,8 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * attributeMetadata, 
 
 // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
 // as the input argument.
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
@@ -713,6 +842,19 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedWrite);
     }
 
+    {
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(aSubjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            ReturnErrorCodeIf(err != CHIP_ERROR_ACCESS_DENIED, err);
+            // TODO: when wildcard/group writes are supported, handle them to discard rather than fail with status
+            return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
+
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
     {
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
@@ -725,6 +867,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
 
         if (valueDecoder.TriedDecode())
         {
+            MatterReportingAttributeChangeCallback(aPath);
             return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
         }
     }
@@ -776,4 +919,9 @@ void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clust
     // has completed. This ensures that we can 'gather up' multiple attribute changes that have occurred in the same execution
     // context without requiring any explicit 'start' or 'end' change calls into the engine to book-end the change.
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
+}
+
+void MatterReportingAttributeChangeCallback(const ConcreteAttributePath & aPath)
+{
+    return MatterReportingAttributeChangeCallback(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 }

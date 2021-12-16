@@ -26,11 +26,8 @@ import kotlinx.android.synthetic.main.sensor_client_fragment.clusterNameSpinner
 import kotlinx.android.synthetic.main.sensor_client_fragment.deviceIdEd
 import kotlinx.android.synthetic.main.sensor_client_fragment.endpointIdEd
 import kotlinx.android.synthetic.main.sensor_client_fragment.lastValueTv
+import kotlinx.android.synthetic.main.sensor_client_fragment.readSensorBtn
 import kotlinx.android.synthetic.main.sensor_client_fragment.sensorGraph
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.clusterNameSpinner
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.readSensorBtn
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.sensorGraph
-import kotlinx.android.synthetic.main.sensor_client_fragment.view.watchSensorBtn
 import kotlinx.android.synthetic.main.sensor_client_fragment.watchSensorBtn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -52,53 +49,56 @@ class SensorClientFragment : Fragment() {
       savedInstanceState: Bundle?
   ): View {
     scope = viewLifecycleOwner.lifecycleScope
+    return inflater.inflate(R.layout.sensor_client_fragment, container, false)
+  }
 
-    return inflater.inflate(R.layout.sensor_client_fragment, container, false).apply {
-      ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
-      deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-          updateAddress(textView.text.toString())
-          resetSensorGraph() // reset the graph on device change
-        }
-        actionId == EditorInfo.IME_ACTION_DONE
-      }
-      endpointIdEd.setOnEditorActionListener { textView, actionId, _ ->
-        if (actionId == EditorInfo.IME_ACTION_DONE)
-          resetSensorGraph() // reset the graph on endpoint change
-        actionId == EditorInfo.IME_ACTION_DONE
-      }
-      clusterNameSpinner.adapter = makeClusterNamesAdapter()
-      clusterNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-        override fun onNothingSelected(parent: AdapterView<*>?) = Unit
-        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-          resetSensorGraph() // reset the graph on cluster change
-        }
-      }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
 
-      readSensorBtn.setOnClickListener { scope.launch { readSensorCluster() } }
-      watchSensorBtn.setOnCheckedChangeListener { _, isChecked ->
-        if (isChecked) {
-          scope.launch { subscribeSensorCluster() }
-        } else {
-          unsubscribeSensorCluster()
-        }
+    ChipClient.getDeviceController(requireContext()).setCompletionListener(null)
+    deviceIdEd.setOnEditorActionListener { textView, actionId, _ ->
+      if (actionId == EditorInfo.IME_ACTION_DONE) {
+        updateAddress(textView.text.toString())
+        resetSensorGraph() // reset the graph on device change
       }
+      actionId == EditorInfo.IME_ACTION_DONE
+    }
+    endpointIdEd.setOnEditorActionListener { textView, actionId, _ ->
+      if (actionId == EditorInfo.IME_ACTION_DONE)
+        resetSensorGraph() // reset the graph on endpoint change
+      actionId == EditorInfo.IME_ACTION_DONE
+    }
+    clusterNameSpinner.adapter = makeClusterNamesAdapter()
+    clusterNameSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+      override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+      override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        resetSensorGraph() // reset the graph on cluster change
+      }
+    }
 
-      val currentTime = Calendar.getInstance().time.time
-      sensorGraph.addSeries(sensorData)
-      sensorGraph.viewport.isXAxisBoundsManual = true
-      sensorGraph.viewport.setMinX(currentTime.toDouble())
-      sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
-      sensorGraph.gridLabelRenderer.padding = 20
-      sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
-      sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
-      sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
-        override fun setViewport(viewport: Viewport?) = Unit
-        override fun formatLabel(value: Double, isValueX: Boolean): String {
-          if (!isValueX)
-            return "%.2f".format(value)
-          return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
-        }
+    readSensorBtn.setOnClickListener { scope.launch { readSensorCluster() } }
+    watchSensorBtn.setOnCheckedChangeListener { _, isChecked ->
+      if (isChecked) {
+        scope.launch { subscribeSensorCluster() }
+      } else {
+        unsubscribeSensorCluster()
+      }
+    }
+
+    val currentTime = Calendar.getInstance().time.time
+    sensorGraph.addSeries(sensorData)
+    sensorGraph.viewport.isXAxisBoundsManual = true
+    sensorGraph.viewport.setMinX(currentTime.toDouble())
+    sensorGraph.viewport.setMaxX(currentTime.toDouble() + MIN_REFRESH_PERIOD_S * 1000 * MAX_DATA_POINTS)
+    sensorGraph.gridLabelRenderer.padding = 20
+    sensorGraph.gridLabelRenderer.numHorizontalLabels = 4
+    sensorGraph.gridLabelRenderer.setHorizontalLabelsAngle(150)
+    sensorGraph.gridLabelRenderer.labelFormatter = object : LabelFormatter {
+      override fun setViewport(viewport: Viewport?) = Unit
+      override fun formatLabel(value: Double, isValueX: Boolean): String {
+        if (!isValueX)
+          return "%.2f".format(value)
+        return SimpleDateFormat("H:mm:ss").format(Date(value.toLong())).toString()
       }
     }
   }
@@ -243,13 +243,9 @@ class SensorClientFragment : Fragment() {
             },
             "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
               val cluster = ChipClusters.TemperatureMeasurementCluster(device, endpointId)
-              cluster.reportMeasuredValueAttribute(callback)
-              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
-                override fun onSuccess() = Unit
-                override fun onError(ex: Exception) {
-                  callback.onError(ex)
-                }
-              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
+              cluster.subscribeMeasuredValueAttribute(callback,
+                                                      MIN_REFRESH_PERIOD_S,
+                                                      MAX_REFRESH_PERIOD_S)
             },
             "unitValue" to 0.01,
             "unitSymbol" to "\u00B0C"
@@ -261,13 +257,9 @@ class SensorClientFragment : Fragment() {
             },
             "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
               val cluster = ChipClusters.PressureMeasurementCluster(device, endpointId)
-              cluster.reportMeasuredValueAttribute(callback)
-              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
-                override fun onSuccess() = Unit
-                override fun onError(ex: Exception) {
-                  callback.onError(ex)
-                }
-              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
+              cluster.subscribeMeasuredValueAttribute(callback,
+                                                      MIN_REFRESH_PERIOD_S,
+                                                      MAX_REFRESH_PERIOD_S)
             },
             "unitValue" to 1.0,
             "unitSymbol" to "hPa"
@@ -279,13 +271,9 @@ class SensorClientFragment : Fragment() {
             },
             "subscribe" to { device: Long, endpointId: Int, callback: ReadCallback ->
               val cluster = ChipClusters.RelativeHumidityMeasurementCluster(device, endpointId)
-              cluster.reportMeasuredValueAttribute(callback)
-              cluster.subscribeMeasuredValueAttribute(object : ChipClusters.DefaultClusterCallback {
-                override fun onSuccess() = Unit
-                override fun onError(ex: Exception) {
-                  callback.onError(ex)
-                }
-              }, MIN_REFRESH_PERIOD_S, MAX_REFRESH_PERIOD_S)
+              cluster.subscribeMeasuredValueAttribute(callback,
+                                                      MIN_REFRESH_PERIOD_S,
+                                                      MAX_REFRESH_PERIOD_S)
             },
             "unitValue" to 0.01,
             "unitSymbol" to "%"

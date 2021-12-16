@@ -43,3 +43,6 @@ tests:
                 value: "asdf"
               - name: "setupPIN"
                 value: "tempPin123"
+
+    - label: "Logout Command"
+      command: "Logout"

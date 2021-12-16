@@ -110,19 +110,19 @@ public:
      * @brief
      *   Called when the Node detects Node’s Wi-Fi connection has been disconnected.
      */
-    virtual void OnDisconnectionDetected() {}
+    virtual void OnDisconnectionDetected(uint16_t reasonCode) {}
 
     /**
      * @brief
      *   Called when the Node fails to associate or authenticate an access point.
      */
-    virtual void OnAssociationFailureDetected() {}
+    virtual void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) {}
 
     /**
      * @brief
      *   Called when the Node’s connection status to a Wi-Fi network has changed.
      */
-    virtual void OnConnectionStatusChanged() {}
+    virtual void OnConnectionStatusChanged(uint8_t connectionStatus) {}
 };
 
 /**
@@ -131,6 +131,17 @@ public:
 class DiagnosticDataProvider
 {
 public:
+    enum BootReasonType : uint8_t
+    {
+        Unspecified             = 0,
+        PowerOnReboot           = 1,
+        BrownOutReset           = 2,
+        SoftwareWatchdogReset   = 3,
+        HardwareWatchdogReset   = 4,
+        SoftwareUpdateCompleted = 5,
+        SoftwareReset           = 6,
+    };
+
     void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
     GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
 

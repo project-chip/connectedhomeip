@@ -49,7 +49,7 @@ private:
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnConnectFailed;
 
     static void OnConnected(void * context, chip::OperationalDeviceProxy * device);
-    static void OnConnectionFailure(void * context, chip::NodeId deviceId, CHIP_ERROR error);
+    static void OnConnectionFailure(void * context, chip::PeerId peerId, CHIP_ERROR error);
 };
 
 NS_ASSUME_NONNULL_END

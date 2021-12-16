@@ -43,7 +43,7 @@ public:
 
     virtual bool IsEncryptionRequired() const { return true; }
 
-    CHIP_ERROR SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
+    CHIP_ERROR SendMessage(const SessionHandle & session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
 
@@ -56,9 +56,10 @@ public:
      * @param message         The payload to be sent
      * @param preparedMessage The handle to hold the prepared message
      */
-    virtual CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                                      EncryptedPacketBufferHandle & preparedMessage)                                         = 0;
-    virtual CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const = 0;
+    virtual CHIP_ERROR PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader,
+                                      System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage) = 0;
+    virtual CHIP_ERROR SendPreparedMessage(const SessionHandle & session,
+                                           const EncryptedPacketBufferHandle & preparedMessage) const                       = 0;
 
     virtual CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,

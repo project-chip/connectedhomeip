@@ -72,6 +72,11 @@ namespace {{asUpperCamelCase name}} {
         {{#unless struct_contains_array}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
         {{/unless}}
+        {{#if struct_is_fabric_scoped}}
+        bool MatchesFabricIndex(FabricIndex fabricIndex_) const {
+            return {{ asLowerCamelCase struct_fabric_idx_field }} == fabricIndex_;
+        }
+        {{/if}}
     };
 
     {{#if struct_contains_array}}
@@ -158,22 +163,21 @@ public:
 {{/last}}
 {{/zcl_commands}}
 
-{{#zcl_attributes_server}}
-{{#first}}
 namespace Attributes {
-{{/first}}
+
+{{#zcl_attributes_server}}
 namespace {{asUpperCamelCase label}} {
     struct TypeInfo {
     {{! forceNotOptional=true because the optionality is on the attribute
         itself, but we want just the type of the attribute. }}
     {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true isArgument=true}};
+        using Type = {{zapTypeToEncodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true isArgument=true}};
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true isArgument=true}};
+        using Type = {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true isArgument=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
@@ -181,10 +185,21 @@ namespace {{asUpperCamelCase label}} {
         static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
     };
 } // namespace {{asUpperCamelCase label}}
-{{#last}}
-} // namespace Attributes
-{{/last}}
 {{/zcl_attributes_server}}
+
+struct TypeInfo
+{
+    struct DecodableType {
+        static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase name}}::Id; }
+
+        CHIP_ERROR Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path);
+
+{{#zcl_attributes_server}}
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}};
+{{/zcl_attributes_server}}
+    };
+};
+} // namespace Attributes
 {{#zcl_events}}
 {{#first}}
 namespace Events {

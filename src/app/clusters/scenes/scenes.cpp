@@ -289,10 +289,10 @@ bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, c
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                                 ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-            TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
+                                              ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID };
+            TLV::TLVWriter * writer       = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -342,11 +342,10 @@ bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandOb
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                                 ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID,
-                                                 (app::CommandPathFlags::kEndpointIdValid) };
-            TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
+                                              ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID };
+            TLV::TLVWriter * writer       = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -378,10 +377,10 @@ bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, co
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                                 ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-            TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
+                                              ZCL_STORE_SCENE_RESPONSE_COMMAND_ID };
+            TLV::TLVWriter * writer       = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -474,11 +473,10 @@ bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * comman
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                             ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID,
+                                          ZCL_GET_SCENE_MEMBERSHIP_RESPONSE_COMMAND_ID };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1),
@@ -1078,14 +1076,13 @@ kickout:
         return true;
     }
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                             ZCL_ADD_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ADD_SCENE_RESPONSE_COMMAND_ID };
         if (enhanced)
         {
-            cmdParams.mCommandId = ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID;
+            path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ENHANCED_ADD_SCENE_RESPONSE_COMMAND_ID };
         }
         TLV::TLVWriter * writer = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -1135,14 +1132,13 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     // The status, group id, and scene id are always included in the response, but
     // the transition time, name, and extension fields are only included if the
     // scene was found.
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_SCENES_CLUSTER_ID,
-                                         ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID };
     if (enhanced)
     {
-        cmdParams.mCommandId = ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID;
+        path = { emberAfCurrentEndpoint(), ZCL_SCENES_CLUSTER_ID, ZCL_ENHANCED_VIEW_SCENE_RESPONSE_COMMAND_ID };
     }
     TLV::TLVWriter * writer = nullptr;
-    SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+    SuccessOrExit(err = commandObj->PrepareCommand(path));
     VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
     SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));

@@ -28,6 +28,8 @@
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
 
+using namespace chip::Access;
+
 namespace chip {
 namespace app {
 namespace reporting {
@@ -46,42 +48,16 @@ void Engine::Shutdown()
     mpGlobalDirtySet = nullptr;
 }
 
-EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents)
-{
-    EventNumber event_count             = 0;
-    EventNumber * vendedEventNumberList = apReadHandler->GetVendedEventNumberList();
-    for (size_t index = 0; index < kNumPriorityLevel; index++)
-    {
-        if (vendedEventNumberList[index] > apInitialEvents[index])
-        {
-            event_count += vendedEventNumberList[index] - apInitialEvents[index];
-        }
-    }
-    return event_count;
-}
-
 CHIP_ERROR
-Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
+Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
                             const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
-
     MatterPreAttributeReadCallback(aPath);
-    err = ReadSingleClusterData(aAccessingFabricIndex, aPath, aAttributeReportIBs, aEncoderState);
+    ReturnErrorOnFailure(ReadSingleClusterData(aSubjectDescriptor, aPath, aAttributeReportIBs, aEncoderState));
     MatterPostAttributeReadCallback(aPath);
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                     ChipLogValueMEI(aPath.mClusterId), err.Format());
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & aReportDataBuilder,
@@ -95,8 +71,9 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     const uint32_t kReservedSizeEndOfReportIBs = 1;
 
     aReportDataBuilder.Checkpoint(backup);
-    auto attributeReportIBs      = aReportDataBuilder.CreateAttributeReportIBs();
-    size_t emptyReportDataLength = 0;
+
+    AttributeReportIBs::Builder & attributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
+    size_t emptyReportDataLength                     = 0;
 
     SuccessOrExit(err = aReportDataBuilder.GetError());
 
@@ -141,9 +118,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             ConcreteReadAttributePath pathForRetrieval(readPath);
             // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
             AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval, &encodeState);
+            err = RetrieveClusterData(apReadHandler->GetSubjectDescriptor(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
+                ChipLogError(DataManagement,
+                             "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                             ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
+
                 if (encodeState.AllowPartialData())
                 {
                     // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
@@ -240,35 +221,19 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
     TLV::TLVWriter backup;
-    bool eventClean = true;
-    EventNumber initialEvents[kNumPriorityLevel];
+    bool eventClean                = true;
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
-    EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
+    EventNumber & eventMin         = apReadHandler->GetEventMin();
     EventManagement & eventManager = EventManagement::GetInstance();
-    EventReportIBs::Builder EventReportIBs;
-    bool hasMoreChunks = false;
+    bool hasMoreChunks             = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
-    VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     // If the eventManager is not valid or has not been initialized,
     // skip the rest of processing
     VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
-
-    EventReportIBs = aReportDataBuilder.CreateEventReports();
-    SuccessOrExit(err = EventReportIBs.GetError());
-
-    memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
-
-    for (size_t index = 0; index < kNumPriorityLevel; index++)
-    {
-        EventNumber tmpNumber = eventManager.GetFirstEventNumber(static_cast<PriorityLevel>(index));
-        if (tmpNumber > initialEvents[index])
-        {
-            initialEvents[index] = tmpNumber;
-        }
-    }
 
     eventClean = apReadHandler->CheckEventClean(eventManager);
 
@@ -278,19 +243,14 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         ExitNow(); // Read clean, move along
     }
 
-    while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
     {
-        uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-        err = eventManager.FetchEventsSince(*(EventReportIBs.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
-                                            eventNumberList[priorityIndex], eventCount);
+        EventReportIBs::Builder & eventReportIBs = aReportDataBuilder.CreateEventReports();
+        SuccessOrExit(err = aReportDataBuilder.GetError());
+        err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), clusterInfoList, eventMin, eventCount);
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
         {
-            // We have successfully reached the end of the log for
-            // the current priority. Advance to the next
-            // priority level.
-            err = CHIP_NO_ERROR;
-            apReadHandler->MoveToNextScheduledDirtyPriority();
+            err           = CHIP_NO_ERROR;
             hasMoreChunks = false;
         }
         else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
@@ -298,7 +258,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
             // when first cluster event is too big to fit in the packet, ignore that cluster event.
             if (eventCount == 0)
             {
-                eventNumberList[priorityIndex]++;
+                eventMin++;
                 ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
                 err = CHIP_NO_ERROR;
             }
@@ -309,11 +269,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
                 // available events.  This is an expected condition,
                 // so we do not propagate the error to higher levels;
                 // instead, we terminate the event processing for now
-                // (we will get another chance immediately afterwards,
-                // with a ew buffer) and do not advance the processing
-                // to the next priority level.
                 err = CHIP_NO_ERROR;
-                break;
             }
             hasMoreChunks = true;
         }
@@ -324,11 +280,10 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
             // abandoning subscription.
             ExitNow();
         }
+
+        eventReportIBs.EndOfEventReports();
+        SuccessOrExit(err = eventReportIBs.GetError());
     }
-
-    EventReportIBs.EndOfEventReports();
-    SuccessOrExit(err = EventReportIBs.GetError());
-
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
 exit:
@@ -367,6 +322,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
     const uint32_t kReservedSizeForEndOfReportMessage = 1;
 
+    VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
@@ -442,26 +398,6 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);
-
-#if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    {
-        ChipLogDetail(DataManagement, "<RE> Dumping report data...");
-        chip::System::PacketBufferTLVReader reader;
-        ReportDataMessage::Parser report;
-
-        reader.Init(bufHandle.Retain());
-        reader.Next();
-
-        err = report.Init(reader);
-        SuccessOrExit(err);
-
-        if ((err = report.CheckSchemaValidity()) != CHIP_NO_ERROR)
-        {
-            ChipLogError(DataManagement, "<RE> Schema check failed: %s", chip::ErrorStr(err));
-        }
-        SuccessOrExit(err);
-    }
-#endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
     ChipLogDetail(DataManagement, "<RE> Sending report (payload has %" PRIu32 " bytes)...", reportDataWriter.GetLengthWritten());
     err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunks);
@@ -624,10 +560,45 @@ void Engine::OnReportConfirm()
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
 
+void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
+        uint32_t initialWrittenEventsBytes = handler.GetLastWrittenEventsBytes();
+        if (initialWrittenEventsBytes < aMinLogPosition)
+        {
+            aMinLogPosition = initialWrittenEventsBytes;
+        }
+    }
+}
+
+CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
+{
+    uint32_t minEventLogPosition = aBytesWritten;
+    GetMinEventLogPosition(minEventLogPosition);
+    if (aBytesWritten - minEventLogPosition > CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD)
+    {
+        ChipLogProgress(DataManagement, "<RE> Buffer overfilled CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD %d, schedule engine run",
+                        CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD);
+        return ScheduleRun();
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
 {
     for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
     {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
         for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
         {
             if (clusterInfo->IsEventPathSupersetOf(aPath))
@@ -635,10 +606,24 @@ CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
                 ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
                                 InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
                 handler.UnblockUrgentEventDelivery();
+                break;
             }
         }
     }
     return ScheduleRun();
+}
+
+CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten)
+{
+    if (aUrgent != EventOptions::Type::kUrgent)
+    {
+        return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    }
+    else
+    {
+        return ScheduleUrgentEventDelivery(aPath);
+    }
+    return CHIP_NO_ERROR;
 }
 
 }; // namespace reporting

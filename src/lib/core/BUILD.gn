@@ -60,6 +60,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_CONFIG_MEMORY_DEBUG_CHECKS=${chip_config_memory_debug_checks}",
     "CHIP_CONFIG_MEMORY_DEBUG_DMALLOC=${chip_config_memory_debug_dmalloc}",
     "CHIP_CONFIG_PROVIDE_OBSOLESCENT_INTERFACES=false",
+    "CHIP_CONFIG_TRANSPORT_TRACE_ENABLED=${chip_enable_transport_trace}",
   ]
 }
 

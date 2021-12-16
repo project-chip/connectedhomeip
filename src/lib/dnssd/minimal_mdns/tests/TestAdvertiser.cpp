@@ -555,9 +555,10 @@ int TestAdvertiser(void)
     CheckOnlyServer server(&theSuite);
     test::ServerSwapper swapper(&server);
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
-    mdnsAdvertiser.Init(&context.GetInetLayer());
+    mdnsAdvertiser.Init(context.GetUDPEndPointManager());
     nlTestRunner(&theSuite, &server);
     server.Shutdown();
+    context.Shutdown();
     return nlTestRunnerStats(&theSuite);
 }
 

@@ -20,7 +20,8 @@
  * to the OTA Requestor object that handles them
  */
 
-#include "OTARequestorInterface.h"
+#include <app/util/af.h>
+#include <platform/OTARequestorInterface.h>
 
 // OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
@@ -28,7 +29,7 @@ bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
     EmberAfStatus status;
-    OTARequestorInterface * requestor = GetRequestorInstance();
+    chip::OTARequestorInterface * requestor = chip::GetRequestorInstance();
 
     if (requestor != nullptr)
     {

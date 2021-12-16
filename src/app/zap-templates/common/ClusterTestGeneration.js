@@ -27,7 +27,7 @@ const path              = require('path');
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
 const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
-const { asBlocks }                                                   = require('./ClustersHelper.js');
+const { asBlocks, ensureClusters }                                   = require('./ClustersHelper.js');
 
 const kIdentityName           = 'identity';
 const kClusterName            = 'cluster';
@@ -319,7 +319,8 @@ function parse(filename)
         command : "waitForReport",
         attribute : test.attribute,
         response : test.response,
-        async : true
+        async : true,
+        allocateSubscribeDataCallback : true,
       };
       delete test.response;
 
@@ -327,8 +328,9 @@ function parse(filename)
       yaml.tests.splice(index, 0, reportTest);
 
       // Associate the "subscribeAttribute" test with the synthesized report test
-      test.hasWaitForReport = true;
-      test.waitForReport    = reportTest;
+      test.hasWaitForReport              = true;
+      test.waitForReport                 = reportTest;
+      test.allocateSubscribeDataCallback = !test.hasWaitForReport;
     }
   });
 
@@ -363,7 +365,7 @@ function printErrorAndExit(context, msg)
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
-  return getClusters().then(clusters => {
+  return getClusters(context).then(clusters => {
     if (!clusters.find(cluster => cluster.name == clusterName)) {
       const names = clusters.map(item => item.name);
       printErrorAndExit(context, 'Missing cluster "' + clusterName + '" in: \n\t* ' + names.join('\n\t* '));
@@ -374,10 +376,10 @@ function assertCommandOrAttribute(context)
 
     if (context.isCommand) {
       filterName = context.command;
-      items      = getCommands(clusterName);
+      items      = getCommands(context, clusterName);
     } else if (context.isAttribute) {
       filterName = context.attribute;
-      items      = getAttributes(clusterName);
+      items      = getAttributes(context, clusterName);
     } else {
       printErrorAndExit(context, 'Unsupported command type: ', context);
     }
@@ -433,11 +435,14 @@ function chip_tests_pics(options)
 
 async function chip_tests(list, options)
 {
+  // Set a global on our items so assertCommandOrAttribute can work.
+  let global  = this.global;
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
   let tests   = names.map(item => parse(item));
   tests       = await Promise.all(tests.map(async function(test) {
     test.tests = await Promise.all(test.tests.map(async function(item) {
+      item.global = global;
       if (item.isCommand) {
         let command        = await assertCommandOrAttribute(item);
         item.commandObject = command;

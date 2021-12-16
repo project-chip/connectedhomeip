@@ -1,0 +1,344 @@
+diff --git a/src/core/ipv6/nd6.c b/src/core/ipv6/nd6.c
+index d4673ca6..7c2d0c45 100644
+--- a/src/core/ipv6/nd6.c
++++ b/src/core/ipv6/nd6.c
+@@ -84,12 +84,19 @@
+ #if LWIP_ND6_NUM_ROUTERS > 127
+ #error LWIP_ND6_NUM_ROUTERS must fit into an s8_t (max value: 127)
+ #endif
++#if LWIP_ND6_SUPPORT_RIO && LWIP_ND6_NUM_ROUTES <= 0
++#error LWIP_ND6_NUM_ROUTES must be > 0 if LWIP_ND6_SUPPORT_RIO is on.
++#endif
++
+ 
+ /* Router tables. */
+ struct nd6_neighbor_cache_entry neighbor_cache[LWIP_ND6_NUM_NEIGHBORS];
+ struct nd6_destination_cache_entry destination_cache[LWIP_ND6_NUM_DESTINATIONS];
+ struct nd6_prefix_list_entry prefix_list[LWIP_ND6_NUM_PREFIXES];
+ struct nd6_router_list_entry default_router_list[LWIP_ND6_NUM_ROUTERS];
++#if LWIP_ND6_SUPPORT_RIO
++struct nd6_route_list_entry route_list[LWIP_ND6_NUM_ROUTES];
++#endif
+ 
+ /* Default values, can be updated by a RA message. */
+ u32_t reachable_time = LWIP_ND6_REACHABLE_TIME;
+@@ -132,6 +139,10 @@ static s8_t nd6_get_onlink_prefix(const ip6_addr_t *prefix, struct netif *netif)
+ static s8_t nd6_new_onlink_prefix(const ip6_addr_t *prefix, struct netif *netif);
+ static s8_t nd6_get_next_hop_entry(const ip6_addr_t *ip6addr, struct netif *netif);
+ static err_t nd6_queue_packet(s8_t neighbor_index, struct pbuf *q);
++#if LWIP_ND6_SUPPORT_RIO
++static s8_t nd6_get_route(const ip6_addr_t *prefix, const u8_t prefix_len);
++static s8_t nd6_new_route(const ip6_addr_t *prefix, const u8_t prefix_len);
++#endif
+ 
+ #define ND6_SEND_FLAG_MULTICAST_DEST 0x01
+ #define ND6_SEND_FLAG_ALLNODES_DEST 0x02
+@@ -763,12 +774,60 @@ nd6_input(struct pbuf *p, struct netif *inp)
+ 
+         break;
+       }
+-      case ND6_OPTION_TYPE_ROUTE_INFO:
+-        /* @todo implement preferred routes.
+-        struct route_option * route_opt;
+-        route_opt = (struct route_option *)buffer;*/
+-
++      case ND6_OPTION_TYPE_ROUTE_INFO: {
++#if LWIP_ND6_SUPPORT_RIO
++        struct route_option *route_opt;
++        uint32_t route_lifetime;
++        uint8_t prefix_length;
++        uint8_t preference;
++        ip6_addr_t prefix;
++        ip6_addr_p_t packed_prefix;
++        int idx;
++        size_t addr_bytes;
++        if (option_len < sizeof(struct route_option)) {
++          goto lenerr_drop_free_return;
++        }
++        route_opt = (struct route_option *)buffer;
++        memcpy(&prefix_length, &route_opt->prefix_length, sizeof(prefix_length));
++        memcpy(&preference, &route_opt->preference, sizeof(preference));
++        memcpy(&route_lifetime, &route_opt->route_lifetime, sizeof(route_lifetime));
++
++        /* The struct definition contains only the first byte of the address.
++           The option should have enough bytes to encode prefix_length bits
++           of the address. */
++        addr_bytes = (prefix_length + 7) >> 3;
++        if (addr_bytes > sizeof(ip6_addr_p_t) ||
++            option_len < sizeof(struct route_option) + addr_bytes - 1) {
++          goto lenerr_drop_free_return;
++        }
++        /* For now, we only consider 64-bit prefix lengths. */
++        if (prefix_length != 64) {
++          break;
++        }
++        memset(&packed_prefix, 0, sizeof(packed_prefix));
++        memcpy(&packed_prefix, route_opt->prefix, addr_bytes);
++        ip6_addr_copy_from_packed(prefix, packed_prefix);
++        /* Link-local, any address prefix and multicast should not have defined
++           routes set through RIO options. If we got one of these, disregard it. */
++        if (ip6_addr_isany(&prefix) || ip6_addr_islinklocal(&prefix) ||
++            ip6_addr_ismulticast(&prefix)) {
++          break;
++        }
++        route_lifetime = lwip_ntohl(route_lifetime);
++        idx = nd6_get_route(&prefix, prefix_length);
++        if (idx < 0 && route_lifetime > 0) {
++          /* Create a new cache entry */
++          idx = nd6_new_route(&prefix, prefix_length);
++        }
++        if (idx >= 0) {
++          route_list[idx].invalidation_timer = route_lifetime;
++          route_list[idx].preference = preference;
++          route_list[idx].router_list_entry_index = nd6_get_router(ip6_current_src_addr(), inp);
++          route_list[idx].netif = inp;
++        }
++#endif
+         break;
++      }
+ #if LWIP_ND6_RDNSS_MAX_DNS_SERVERS
+       case ND6_OPTION_TYPE_RDNSS:
+       {
+@@ -1075,6 +1134,21 @@ nd6_tmr(void)
+     }
+   }
+ 
++#if LWIP_ND6_SUPPORT_RIO
++  /* Process route entries. */
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; ++i) {
++    if (ip6_addr_isany(&route_list[i].prefix)) {
++        continue;
++    }
++    if (route_list[i].invalidation_timer < ND6_TMR_INTERVAL / 1000) {
++      ip6_addr_set_any(&route_list[i].prefix);
++      route_list[i].invalidation_timer = 0;
++    } else {
++        route_list[i].invalidation_timer -= ND6_TMR_INTERVAL / 1000;
++    }
++  }
++#endif
++
+   /* Process our own addresses, updating address lifetimes and/or DAD state. */
+   NETIF_FOREACH(netif) {
+     for (i = 0; i < LWIP_IPV6_NUM_ADDRESSES; ++i) {
+@@ -1677,6 +1751,16 @@ nd6_is_prefix_in_netif(const ip6_addr_t *ip6addr, struct netif *netif)
+       return 1;
+     }
+   }
++
++#if LWIP_ND6_SUPPORT_RIO
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; i++) {
++    if ((route_list[i].netif == netif) &&
++        (route_list[i].invalidation_timer > 0) &&
++        ip6_addr_net_eq(ip6addr, &(route_list[i].prefix))) {
++      return 1;
++    }
++  }
++#endif
+   return 0;
+ }
+ 
+@@ -1700,7 +1784,34 @@ nd6_select_router(const ip6_addr_t *ip6addr, struct netif *netif)
+   s8_t i, j, valid_router;
+   static s8_t last_router;
+ 
+-  LWIP_UNUSED_ARG(ip6addr); /* @todo match preferred routes!! (must implement ND6_OPTION_TYPE_ROUTE_INFO) */
++#if LWIP_ND6_SUPPORT_RIO
++  /* Check first if we have a route explicitly set for this address from a
++     RIO. This works because we're only considering 64-bit prefixes in RIO
++     and the prefix option. If we later move to support non-64 prefixes,
++     these will need to generate candidate routers and rank based on prefix
++     length */
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; ++i) {
++    /* For now, we assume all route prefixes are /64 */
++    if (ip6_addr_isany(&route_list[i].prefix)) {
++      continue;
++    }
++    if (ip6_addr_netcmp(&route_list[i].prefix, ip6addr)) {
++      s8_t router_idx = route_list[i].router_list_entry_index;
++      router_netif = default_router_list[router_idx].neighbor_entry->netif;
++      /* TODO: Implement preferences. */
++      if (netif != NULL && router_netif != netif) {
++        continue;
++      }
++      /* TODO: If we're up, but not reacheable, then what? */
++      if (default_router_list[router_idx].neighbor_entry->state !=
++          ND6_INCOMPLETE) {
++        return router_idx;
++      }
++    }
++  }
++#else
++  LWIP_UNUSED_ARG(ip6addr);
++#endif
+ 
+   /* @todo: implement default router preference */
+ 
+@@ -1770,7 +1881,6 @@ nd6_find_route(const ip6_addr_t *ip6addr)
+ {
+   struct netif *netif;
+   s8_t i;
+-
+   /* @todo decide if it makes sense to check the destination cache first */
+ 
+   /* Check if there is a matching on-link prefix. There may be multiple
+@@ -1935,6 +2045,57 @@ nd6_new_onlink_prefix(const ip6_addr_t *prefix, struct netif *netif)
+   return -1;
+ }
+ 
++#if LWIP_ND6_SUPPORT_RIO
++/**
++ * Find the cached entry for an RIO configured route.
++ *
++ * @param prefix the IPv6 prefix for the route.
++ * @param prefix_len the length of the prefix (currently assumed /64)
++ * @return the index on the route table, or -1 if not found
++ */
++static s8_t
++nd6_get_route(const ip6_addr_t *prefix, const u8_t prefix_len)
++{
++  s8_t i;
++  /* TODO: add support for non- /64 prefixes */
++  LWIP_UNUSED_ARG(prefix_len);
++  /* Look for prefix in list. */
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; ++i) {
++    if (ip6_addr_netcmp(&route_list[i].prefix, prefix)) {
++      return i;
++    }
++  }
++
++  /* Entry not available. */
++  return -1;
++}
++
++/**
++ * Creates a new entry for an on-link prefix.
++ *
++ * @param prefix the IPv6 prefix for the route.
++ * @param prefix_len the length of the prefix (currently assumed /64)
++ * @return the index on the prefix table, or -1 if not created
++ */
++static s8_t
++nd6_new_route(const ip6_addr_t *prefix, const u8_t prefix_len)
++{
++  s8_t i;
++
++  /* Create new entry. */
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; ++i) {
++    if (ip6_addr_isany(&route_list[i].prefix) || route_list[i].invalidation_timer == 0) {
++      ip6_addr_set(&(route_list[i].prefix), prefix);
++      route_list[i].prefix_len = prefix_len;
++      return i;
++    }
++  }
++
++  /* Entry not available. */
++  return -1;
++}
++#endif
++
+ /**
+  * Determine the next hop for a destination. Will determine if the
+  * destination is on-link, else a suitable on-link router is selected.
+@@ -2394,7 +2555,7 @@ nd6_reachability_hint(const ip6_addr_t *ip6addr)
+ #endif /* LWIP_ND6_TCP_REACHABILITY_HINTS */
+ 
+ /**
+- * Remove all prefix, neighbor_cache and router entries of the specified netif.
++ * Remove all prefix, neighbor_cachei, route and router entries of the specified netif.
+  *
+  * @param netif points to a network interface
+  */
+@@ -2420,6 +2581,18 @@ nd6_cleanup_netif(struct netif *netif)
+       nd6_free_neighbor_cache_entry(i);
+     }
+   }
++#if LWIP_ND6_SUPPORT_RIO
++  for (i = 0; i < LWIP_ND6_NUM_ROUTES; i++) {
++    if (route_list[i].netif == netif) {
++      /* Remove the whole route - if this netif is not up, this is invalid */
++      ip6_addr_set_any(&route_list[i].prefix);
++      route_list[i].prefix_len = 0;
++      route_list[i].invalidation_timer = 0;
++      route_list[i].netif = NULL;
++    }
++  }
++#endif /* LWIP_ND6_SUPPORT_RIO */
++
+   /* Clear the destination cache, since many entries may now have become
+    * invalid for one of several reasons. As destination cache entries have no
+    * netif association, use a sledgehammer approach (this can be improved). */
+diff --git a/src/include/lwip/opt.h b/src/include/lwip/opt.h
+index 9fe0bf04..297c2019 100644
+--- a/src/include/lwip/opt.h
++++ b/src/include/lwip/opt.h
+@@ -2625,6 +2625,20 @@
+ #define LWIP_ND6_NUM_PREFIXES           5
+ #endif
+ 
++/**
++ * LWIP_ND6_SUPPORT_RIO: Support route information options in nd6 packets.
++ */
++#if !defined LWIP_ND6_SUPPORT_RIO || defined __DOXYGEN__
++#define LWIP_ND6_SUPPORT_RIO            LWIP_IPV6
++#endif
++
++/**
++ * LWIP_ND6_NUM_ROUTES: number of entries in IPv6 route list.
++ */
++#if !defined LWIP_ND6_NUM_ROUTES || defined __DOXYGEN__
++#define LWIP_ND6_NUM_ROUTES             5
++#endif
++
+ /**
+  * LWIP_ND6_NUM_ROUTERS: number of entries in IPv6 default router cache
+  */
+diff --git a/src/include/lwip/priv/nd6_priv.h b/src/include/lwip/priv/nd6_priv.h
+index 75d5f02d..6b4aea23 100644
+--- a/src/include/lwip/priv/nd6_priv.h
++++ b/src/include/lwip/priv/nd6_priv.h
+@@ -104,6 +104,18 @@ struct nd6_prefix_list_entry {
+   u32_t invalidation_timer; /* in seconds */
+ };
+ 
++struct nd6_route_list_entry {
++    ip6_addr_t prefix;
++    u8_t prefix_len;
++    u8_t preference;
++    /* Router messages with this prefix should be sent to
++       use the neighbour entry in the router to set the
++       next hop */
++    s8_t router_list_entry_index;
++    struct netif* netif;
++    u32_t invalidation_timer;
++};
++
+ struct nd6_router_list_entry {
+   struct nd6_neighbor_cache_entry *neighbor_entry;
+   u32_t invalidation_timer; /* in seconds */
+@@ -129,6 +141,10 @@ extern struct nd6_neighbor_cache_entry neighbor_cache[];
+ extern struct nd6_destination_cache_entry destination_cache[];
+ extern struct nd6_prefix_list_entry prefix_list[];
+ extern struct nd6_router_list_entry default_router_list[];
++#if LWIP_ND6_SUPPORT_RIO
++extern struct nd6_route_list_entry route_list[];
++#endif
++
+ 
+ /* Default values, can be updated by a RA message. */
+ extern u32_t reachable_time;
+diff --git a/src/include/lwip/prot/nd6.h b/src/include/lwip/prot/nd6.h
+index c270d07c..e97d47a7 100644
+--- a/src/include/lwip/prot/nd6.h
++++ b/src/include/lwip/prot/nd6.h
+@@ -240,7 +240,9 @@ struct route_option {
+   PACK_STRUCT_FLD_8(u8_t prefix_length);
+   PACK_STRUCT_FLD_8(u8_t preference);
+   PACK_STRUCT_FIELD(u32_t route_lifetime);
+-  PACK_STRUCT_FLD_S(ip6_addr_p_t prefix);
++  /* The prefix is formatted like a packed address, but is of a variable length
++     large enough to contain prefix_length bits. See RFC 4191 section 2.3. */
++  PACK_STRUCT_FLD_S(u8_t prefix[1]);
+ } PACK_STRUCT_STRUCT;
+ PACK_STRUCT_END
+ #ifdef PACK_STRUCT_USE_INCLUDES

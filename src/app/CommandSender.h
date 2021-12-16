@@ -26,10 +26,16 @@
 
 #include <type_traits>
 
+#include <app/CommandPathParams.h>
+#include <app/InteractionModelDelegate.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -38,19 +44,33 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/Command.h>
-#include <app/MessageDef/InvokeRequestMessage.h>
-#include <app/MessageDef/InvokeResponseMessage.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
 namespace app {
 
-class CommandSender final : public Command, public Messaging::ExchangeDelegate
+class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    virtual ~CommandSender() { Abort(); }
+
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
     class Callback
     {
     public:
@@ -193,10 +213,24 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     friend class TestCommandInteraction;
+
+    enum class State
+    {
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        AddingCommand,       ///< In the process of adding a command.
+        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
+        CommandSent,         ///< The command has been sent successfully.
+        ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    void MoveToState(const State aTargetState);
+    const char * GetStateStr() const;
 
     /*
      * Allocates a packet buffer used for encoding an invoke request payload.
@@ -220,12 +254,16 @@ private:
     //
     void Close();
 
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
-
-    // SendTimedRequest expects to be called after the exchange has already been
-    // created and we know for sure we need to do a timed invoke.
-    CHIP_ERROR SendTimedRequest(uint16_t aTimeoutMs);
 
     // Handle a message received when we are expecting a status response to a
     // Timed Request.  The caller is assumed to have already checked that our
@@ -242,6 +280,9 @@ private:
 
     CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
+    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+
+    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
@@ -255,6 +296,10 @@ private:
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
+
+    State mState = State::Idle;
+    chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    bool mBufferAllocated = false;
 };
 
 } // namespace app

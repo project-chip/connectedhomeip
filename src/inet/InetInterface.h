@@ -59,6 +59,18 @@ class IPAddress;
 class IPPrefix;
 
 /**
+ * Data type describing interface type.
+ */
+enum class InterfaceType
+{
+    Unknown  = 0,
+    WiFi     = 1,
+    Ethernet = 2,
+    Cellular = 3,
+    Thread   = 4,
+};
+
+/**
  * Indicator for system network interfaces.
  */
 class InterfaceId
@@ -299,6 +311,22 @@ public:
      */
     bool HasBroadcastAddress();
 
+    /**
+     * Get the interface type of the current network interface.
+     *
+     * @param[out]   type       Object to save the interface type.
+     */
+    CHIP_ERROR GetInterfaceType(InterfaceType & type);
+
+    /**
+     * Get the hardware address of the current network interface
+     *
+     * @param[out]   addressBuffer       Region of memory to write the hardware address.
+     * @param[out]   addressSize         Size of the address saved to a buffer.
+     * @param[in]    addressBufferSize   Maximum size of a buffer to save data.
+     */
+    CHIP_ERROR GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize);
+
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct netif * mCurNetif;
@@ -390,10 +418,13 @@ public:
      *
      * @brief   Get the current interface address.
      *
-     * @return  the current interface address or \c IPAddress::Any if the iterator
-     *          is positioned beyond the end of the address list.
+     * @param[out] outIPAddress     The current interface address
+     *
+     * @return CHIP_NO_ERROR        if the result IPAddress is valid.
+     * @return CHIP_ERROR_SENTINEL  if the iterator is positioned beyond the end of the address list.
+     * @return other error from lower-level code
      */
-    IPAddress GetAddress();
+    CHIP_ERROR GetAddress(IPAddress & outIPAddress);
 
     /**
      * @fn      uint8_t InterfaceAddressIterator::GetPrefixLength(void)
@@ -413,14 +444,6 @@ public:
      *     structure can represent arbitrary prefix lengths between 0 and 128.
      */
     uint8_t GetPrefixLength();
-
-    /**
-     * @fn       void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
-     *
-     * @brief    Returns an IPPrefix containing the address and prefix length
-     *           for the current address.
-     */
-    void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
 
     /**
      * @fn      InterfaceId InterfaceAddressIterator::GetInterfaceId(void)

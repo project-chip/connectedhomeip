@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,6 +18,7 @@
 #pragma once
 
 #include "AttributePathIBs.h"
+#include "DataVersionFilterIBs.h"
 #include "EventFilterIBs.h"
 #include "EventPathIBs.h"
 
@@ -35,8 +35,8 @@ namespace ReadRequestMessage {
 enum class Tag : uint8_t
 {
     kAttributeRequests  = 0,
-    kEventRequests      = 1,
-    kDataVersionFilters = 2,
+    kDataVersionFilters = 1,
+    kEventRequests      = 2,
     kEventFilters       = 3,
     kIsFabricFiltered   = 4,
 };
@@ -70,6 +70,14 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
+
+    /**
+     *  @brief Get a TLVReader for the DataVersionFilterIBs. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const;
 
     /**
      *  @brief Get a TLVReader for the EventRequests. Next() must be called before accessing them.
@@ -111,6 +119,13 @@ public:
     AttributePathIBs::Builder & CreateAttributeRequests();
 
     /**
+     *  @brief Initialize a DataVersionFilterIBs::Builder for writing into the TLV stream
+     *
+     *  @return A reference to DataVersionFilterIBs::Builder
+     */
+    DataVersionFilterIBs::Builder & CreateDataVersionFilters();
+
+    /**
      *  @brief Initialize a EventPathIBs::Builder for writing into the TLV stream
      *
      *  @return A reference to EventPathIBs::Builder
@@ -139,6 +154,7 @@ public:
 
 private:
     AttributePathIBs::Builder mAttributeRequests;
+    DataVersionFilterIBs::Builder mDataVersionFilters;
     EventPathIBs::Builder mEventRequests;
     EventFilterIBs::Builder mEventFilters;
 };

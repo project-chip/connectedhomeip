@@ -22,7 +22,7 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 
@@ -30,12 +30,12 @@
 
 #include "include/application-launcher/ApplicationLauncherManager.h"
 #include "include/audio-output/AudioOutputManager.h"
+#include "include/channel/ChannelManager.h"
 #include "include/content-launcher/ContentLauncherManager.h"
 #include "include/keypad-input/KeypadInputManager.h"
 #include "include/media-input/MediaInputManager.h"
 #include "include/media-playback/MediaPlaybackManager.h"
 #include "include/target-navigator/TargetNavigatorManager.h"
-#include "include/tv-channel/TvChannelManager.h"
 
 #if defined(ENABLE_CHIP_SHELL)
 #include <lib/shell/Engine.h>
@@ -46,11 +46,16 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 using namespace chip::AppPlatform;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+namespace {
+static ContentLauncherManager contentLauncherManager;
+constexpr chip::EndpointId kContentLauncherEndpoint = 1;
+} // namespace
 
 int main(int argc, char * argv[])
 {
@@ -72,10 +77,6 @@ int main(int argc, char * argv[])
     err = AudioOutputManager().Init();
     SuccessOrExit(err);
 
-    // Init Content Launcher Manager
-    err = ContentLauncherManager().Init();
-    SuccessOrExit(err);
-
     // Init Media Input Manager
     err = MediaInputManager().Init();
     SuccessOrExit(err);
@@ -88,8 +89,8 @@ int main(int argc, char * argv[])
     err = TargetNavigatorManager().Init();
     SuccessOrExit(err);
 
-    // Init Tv Channel Manager
-    err = TvChannelManager().Init();
+    // Init Channel Manager
+    err = ChannelManager().Init();
     SuccessOrExit(err);
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
@@ -114,4 +115,10 @@ exit:
         return 1;
     }
     return 0;
+}
+
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncherManager::SetDelegate");
+    chip::app::Clusters::ContentLauncher::SetDelegate(kContentLauncherEndpoint, &contentLauncherManager);
 }

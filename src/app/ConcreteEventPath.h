@@ -34,16 +34,8 @@ struct ConcreteEventPath
 
     ConcreteEventPath() {}
 
-    ConcreteEventPath & operator=(ConcreteEventPath && other)
-    {
-        if (&other == this)
-            return *this;
-
-        mEndpointId = other.mEndpointId;
-        mClusterId  = other.mClusterId;
-        mEventId    = other.mEventId;
-        return *this;
-    }
+    ConcreteEventPath(const ConcreteEventPath & other) = default;
+    ConcreteEventPath & operator=(const ConcreteEventPath & other) = default;
 
     bool operator==(const ConcreteEventPath & other) const
     {

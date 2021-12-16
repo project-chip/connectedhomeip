@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <app/CASEClient.h>
+#include <app/CASEClientPool.h>
 #include <app/DeviceProxy.h>
 #include <app/util/attribute-filter.h>
 #include <app/util/basic-types.h>
@@ -35,12 +37,13 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/CASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <system/SystemLayer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -49,16 +52,20 @@ struct DeviceProxyInitParams
     SessionManager * sessionManager          = nullptr;
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
-    FabricInfo * fabricInfo                  = nullptr;
+    FabricTable * fabricTable                = nullptr;
+    CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 
-    CHIP_ERROR Validate()
+    Optional<ReliableMessageProtocolConfig> mrpLocalConfig = Optional<ReliableMessageProtocolConfig>::Missing();
+
+    CHIP_ERROR Validate() const
     {
         ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(exchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorCodeIf(idAllocator == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        ReturnErrorCodeIf(fabricInfo == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(fabricTable == nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorCodeIf(clientPool == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         return CHIP_NO_ERROR;
     }
@@ -67,7 +74,7 @@ struct DeviceProxyInitParams
 class OperationalDeviceProxy;
 
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
+typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
@@ -77,8 +84,10 @@ public:
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
-        mInitParams = params;
-        mPeerId     = peerId;
+        mSystemLayer = params.exchangeMgr->GetSessionManager()->SystemLayer();
+        mInitParams  = params;
+        mPeerId      = peerId;
+        mFabricInfo  = params.fabricTable->FindFabricWithCompressedId(peerId.GetCompressedFabricId());
 
         mState = State::NeedsAddress;
     }
@@ -101,9 +110,11 @@ public:
      * session setup fails, `onFailure` will be called.
      *
      * If the session already exists, `onConnection` will be called immediately.
+     * If the resolver is null and the device state is State::NeedsAddress, CHIP_ERROR_INVALID_ARGUMENT will be
+     * returned.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
@@ -113,7 +124,7 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
@@ -144,23 +155,17 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
     CHIP_ERROR ShutdownSubscriptions() override;
 
-    //////////// SessionEstablishmentDelegate Implementation ///////////////
-    void OnSessionEstablishmentError(CHIP_ERROR error) override;
-    void OnSessionEstablished() override;
-
-    CASESession & GetCASESession() { return mCASESession; }
-
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
@@ -194,8 +199,10 @@ private:
     };
 
     DeviceProxyInitParams mInitParams;
+    FabricInfo * mFabricInfo;
+    System::Layer * mSystemLayer;
 
-    CASESession mCASESession;
+    CASEClient * mCASEClient = nullptr;
 
     PeerId mPeerId;
 
@@ -203,7 +210,7 @@ private:
 
     State mState = State::Uninitialized;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolder mSecureSession;
 
     uint8_t mSequenceNumber = 0;
 
@@ -213,6 +220,13 @@ private:
     CHIP_ERROR EstablishConnection();
 
     bool IsSecureConnected() const override { return mState == State::SecureConnected; }
+
+    static void HandleCASEConnected(void * context, CASEClient * client);
+    static void HandleCASEConnectionFailure(void * context, CASEClient * client, CHIP_ERROR error);
+
+    static void CloseCASESessionTask(System::Layer * layer, void * context);
+
+    void DeferCloseCASESession();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);

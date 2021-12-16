@@ -690,10 +690,10 @@
 #define CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER
 #endif
 
-#if defined(ZCL_USING_TV_CHANNEL_CLUSTER_SERVER) || defined(ZCL_USING_TV_CHANNEL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER { ZCL_TV_CHANNEL_CLUSTER_ID, 1284, "TV Channel" },
+#if defined(ZCL_USING_CHANNEL_CLUSTER_SERVER) || defined(ZCL_USING_CHANNEL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_CHANNEL_CLUSTER { ZCL_CHANNEL_CLUSTER_ID, 1284, "Channel" },
 #else
-#define CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER
+#define CHIP_PRINTCLUSTER_CHANNEL_CLUSTER
 #endif
 
 #if defined(ZCL_USING_TARGET_NAVIGATOR_CLUSTER_SERVER) || defined(ZCL_USING_TARGET_NAVIGATOR_CLUSTER_CLIENT)
@@ -900,7 +900,7 @@
     CHIP_PRINTCLUSTER_IAS_ACE_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_IAS_WD_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_WAKE_ON_LAN_CLUSTER                                                                                          \
-    CHIP_PRINTCLUSTER_TV_CHANNEL_CLUSTER                                                                                           \
+    CHIP_PRINTCLUSTER_CHANNEL_CLUSTER                                                                                              \
     CHIP_PRINTCLUSTER_TARGET_NAVIGATOR_CLUSTER                                                                                     \
     CHIP_PRINTCLUSTER_MEDIA_PLAYBACK_CLUSTER                                                                                       \
     CHIP_PRINTCLUSTER_MEDIA_INPUT_CLUSTER                                                                                          \

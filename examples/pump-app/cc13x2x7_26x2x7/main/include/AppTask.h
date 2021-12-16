@@ -40,6 +40,8 @@ public:
     void PostStartActionRequest(int32_t aActor, PumpManager::Action_t aAction);
     void PostEvent(const AppEvent * event);
     void UpdateClusterState();
+    void InitOnOffClusterState();
+    void InitPCCClusterState();
 
 private:
     friend AppTask & GetAppTask(void);

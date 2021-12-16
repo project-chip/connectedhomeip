@@ -139,7 +139,7 @@ limitations under the License.
     <attribute side="server" code="0x0023" define="LIST_OF_STRUCTS_WITH_OPTIONALS" type="ARRAY" entryType="NullablesAndOptionalsStruct"
                writable="false" optional="false">list_nullables_and_optionals_struct</attribute>
     <attribute side="server" code="0x0024" define="SIMPLE_ENUM" type="SimpleEnum" writable="true" optional="false">enum_attr</attribute>
-    <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="false">struct</attribute>
+    <attribute side="server" code="0x0025" define="STRUCT" type="SimpleStruct" writable="true" optional="false">struct_attr</attribute>
     <attribute side="server" code="0x0026" define="RANGE_RESTRICTED_INT8U" type="int8u" min="20" max="100" writable="true" optional="false" default="70">range_restricted_int8u</attribute>
     <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
@@ -370,6 +370,16 @@ limitations under the License.
       <arg name="arg1" type="BOOLEAN" optional="true"/>
     </command>
 
+    <command source="client" code="0x14" name="TestEmitTestEventRequest"
+             optional="false" response="TestEmitTestEventResponse">
+      <description>
+        Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response.
+      </description>
+      <arg name="arg1" type="INT8U"/>
+      <arg name="arg2" type="SimpleEnum"/>
+      <arg name="arg3" type="BOOLEAN"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -480,6 +490,13 @@ limitations under the License.
         of the struct depend on what we are responding to.
       </description>
       <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Delivers the ID of an event in response to test command emitting events.
+      </description>
+      <arg name="value" type="INT64U"/>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">

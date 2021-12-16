@@ -41,10 +41,12 @@ template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSys
 class SecureSessionTable
 {
 public:
+    ~SecureSessionTable() { mEntries.ReleaseAll(); }
+
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
-     * @param sessionType secure session type
+     * @param secureSessionType secure session type
      * @param localSessionId represents the encryption key ID assigned by local node
      * @param peerNodeId represents peer Node's ID
      * @param peerCATs represents peer CASE Authenticated Tags
@@ -59,7 +61,7 @@ public:
      */
     CHECK_RETURN_VALUE
     SecureSession * CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
-                                           Credentials::CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+                                           CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                                            const ReliableMessageProtocolConfig & config)
     {
         return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config,
@@ -124,7 +126,7 @@ public:
 
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
-    BitMapObjectPool<SecureSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
+    BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
 };
 
 } // namespace Transport

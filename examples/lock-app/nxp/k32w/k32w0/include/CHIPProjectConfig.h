@@ -133,13 +133,6 @@
 #define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
 
 /**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
  *
  * The amount of time in miliseconds after which BLE should change his advertisements
@@ -166,13 +159,6 @@
  */
 #define CONFIG_CHIP_NFC_COMMISSIONING 1
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * E-Lock Demo Application is a Thread SED (Sleepy End Device)
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 
 /**
  *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS

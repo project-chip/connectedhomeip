@@ -28,6 +28,7 @@ class DefaultStorageKeyAllocator
 {
 public:
     DefaultStorageKeyAllocator() = default;
+    const char * KeyName() { return mKeyName; }
 
     // Fabric Table
 
@@ -36,18 +37,13 @@ public:
     // Group Data Provider
 
     const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
-    const char * FabricEndpoint(chip::FabricIndex fabric, chip::EndpointId endpoint)
+    const char * FabricGroup(chip::FabricIndex fabric, chip::GroupId group) { return Format("f/%x/g/%x", fabric, group); }
+    const char * FabricGroupKey(chip::FabricIndex fabric, uint16_t index) { return Format("f/%x/gk/%x", fabric, index); }
+    const char * FabricGroupEndpoint(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId endpoint)
     {
-        return Format("f/%x/e/%x", fabric, endpoint);
+        return Format("f/%x/g/%x/e/%x", fabric, group, endpoint);
     }
-    const char * FabricEndpointGroup(chip::FabricIndex fabric, chip::EndpointId endpoint, chip::GroupId group)
-    {
-        return Format("f/%x/e/%x/g/%x", fabric, endpoint, group);
-    }
-    const char * GroupStates() { return Format("g/s"); }
-    const char * GroupState(uint16_t state_id) { return Format("g/s/%x", state_id); }
-    const char * FabricKeySet(chip::FabricIndex fabric, uint16_t keyset_id) { return Format("f/%x/k/%x", fabric, keyset_id); }
-    const char * KeyName() { return mKeyName; }
+    const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset) { return Format("f/%x/k/%x", fabric, keyset); }
 
 private:
     static const size_t kKeyLengthMax = 32;

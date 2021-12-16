@@ -28,5 +28,5 @@ class MediaInputManager
 {
 public:
     CHIP_ERROR Init();
-    CHIP_ERROR proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder);
+    CHIP_ERROR proxyGetInputList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
 };

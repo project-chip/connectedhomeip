@@ -47,18 +47,21 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mEventMin                  = 0;
+    mLastScheduledEventNumber  = 0;
     mIsPrimingReports          = true;
     MoveToState(HandlerState::Initialized);
-    mpDelegate          = apDelegate;
-    mSubscriptionId     = 0;
-    mHoldReport         = false;
-    mDirty              = false;
-    mActiveSubscription = false;
-    mIsChunkedReport    = false;
-    mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
-    mHoldSync           = false;
+    mpDelegate              = apDelegate;
+    mSubscriptionId         = 0;
+    mHoldReport             = false;
+    mDirty                  = false;
+    mActiveSubscription     = false;
+    mIsChunkedReport        = false;
+    mInteractionType        = aInteractionType;
+    mInitiatorNodeId        = apExchangeContext->GetSessionHandle().GetPeerNodeId();
+    mSubjectDescriptor      = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
+    mHoldSync               = false;
+    mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -103,6 +106,8 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mpAttributeClusterInfoList = nullptr;
     mpEventClusterInfoList     = nullptr;
     mCurrentPriority           = PriorityLevel::Invalid;
+    mEventMin                  = 0;
+    mLastScheduledEventNumber  = 0;
     mIsPrimingReports          = false;
     mpDelegate                 = nullptr;
     mHoldReport                = false;
@@ -111,6 +116,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mIsChunkedReport           = false;
     mInitiatorNodeId           = kUndefinedNodeId;
     mHoldSync                  = false;
+    mLastWrittenEventsBytes    = 0;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
@@ -272,19 +278,15 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
 
     ReadRequestMessage::Parser readRequestParser;
     EventPathIBs::Parser eventPathListParser;
-
+    EventFilterIBs::Parser eventFilterIBsParser;
     AttributePathIBs::Parser attributePathListParser;
 
     reader.Init(std::move(aPayload));
 
-    err = reader.Next();
-    SuccessOrExit(err);
-
-    err = readRequestParser.Init(reader);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(reader.Next());
+    ReturnErrorOnFailure(readRequestParser.Init(reader));
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-    err = readRequestParser.CheckSchemaValidity();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(readRequestParser.CheckSchemaValidity());
 #endif
 
     err = readRequestParser.GetAttributeRequests(&attributePathListParser);
@@ -292,34 +294,35 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     {
         err = CHIP_NO_ERROR;
     }
-    else
+    else if (err == CHIP_NO_ERROR)
     {
-        SuccessOrExit(err);
-        err = ProcessAttributePathList(attributePathListParser);
+        ReturnErrorOnFailure(ProcessAttributePathList(attributePathListParser));
     }
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(err);
     err = readRequestParser.GetEventRequests(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
         err = CHIP_NO_ERROR;
     }
-    else
+    else if (err == CHIP_NO_ERROR)
     {
-        SuccessOrExit(err);
-        err = ProcessEventPaths(eventPathListParser);
+        ReturnErrorOnFailure(err);
+        ReturnErrorOnFailure(ProcessEventPaths(eventPathListParser));
+        err = readRequestParser.GetEventFilters(&eventFilterIBsParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessEventFilters(eventFilterIBsParser));
+        }
     }
-    SuccessOrExit(err);
-
-    // if we have exhausted this container
-    if (CHIP_END_OF_TLV == err)
-    {
-        err = CHIP_NO_ERROR;
-    }
+    ReturnErrorOnFailure(err);
 
     MoveToState(HandlerState::GeneratingReports);
 
-    err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun());
 
     // mpExchangeCtx can be null here due to
     // https://github.com/project-chip/connectedhomeip/issues/8031
@@ -331,8 +334,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     // There must be no code after the WillSendMessage() call that can cause
     // this method to return a failure.
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ReadHandler::ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser)
@@ -467,6 +469,27 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsPars
     return err;
 }
 
+CHIP_ERROR ReadHandler::ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVReader reader;
+    aEventFiltersParser.GetReader(&reader);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        EventFilterIB::Parser filter;
+        ReturnErrorOnFailure(filter.Init(reader));
+        // this is for current node, and would have only one event filter.
+        ReturnErrorOnFailure(filter.GetEventMin(&(mEventMin)));
+    }
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
 const char * ReadHandler::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING
@@ -496,45 +519,24 @@ void ReadHandler::MoveToState(const HandlerState aTargetState)
 
 bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
 {
-    if (mCurrentPriority == PriorityLevel::Invalid)
+    if (mIsChunkedReport)
     {
-        // Upload is not in middle, previous mLastScheduledEventNumber is not valid, Check for new events from Critical high
-        // priority to Debug low priority, and set a checkpoint when there is dirty events
-        for (int index = ArraySize(mSelfProcessedEvents) - 1; index >= 0; index--)
+        if ((mLastScheduledEventNumber != 0) && (mEventMin <= mLastScheduledEventNumber))
         {
-            EventNumber lastEventNumber = aEventManager.GetLastEventNumber(static_cast<PriorityLevel>(index));
-            if ((lastEventNumber != 0) && (lastEventNumber >= mSelfProcessedEvents[index]))
-            {
-                // We have more events. snapshot last event IDs
-                aEventManager.SetScheduledEventEndpoint(&(mLastScheduledEventNumber[0]));
-                // initialize the next dirty priority level to transfer
-                MoveToNextScheduledDirtyPriority();
-                return false;
-            }
+            return false;
         }
-        return true;
     }
     else
     {
-        // Upload is in middle, previous mLastScheduledEventNumber is still valid, recheck via MoveToNextScheduledDirtyPriority,
-        // if finally mCurrentPriority is invalid, it means no more event
-        MoveToNextScheduledDirtyPriority();
-        return mCurrentPriority == PriorityLevel::Invalid;
-    }
-}
-
-void ReadHandler::MoveToNextScheduledDirtyPriority()
-{
-    for (int i = ArraySize(mSelfProcessedEvents) - 1; i >= 0; i--)
-    {
-        if ((mLastScheduledEventNumber[i] != 0) && mSelfProcessedEvents[i] <= mLastScheduledEventNumber[i])
+        EventNumber lastEventNumber = aEventManager.GetLastEventNumber();
+        if ((lastEventNumber != 0) && (mEventMin <= lastEventNumber))
         {
-            mCurrentPriority = static_cast<PriorityLevel>(i);
-            return;
+            // We have more events. snapshot last event number
+            aEventManager.SetScheduledEventInfo(mLastScheduledEventNumber, mLastWrittenEventsBytes);
+            return false;
         }
     }
-
-    mCurrentPriority = PriorityLevel::Invalid;
+    return true;
 }
 
 CHIP_ERROR ReadHandler::SendSubscribeResponse()
@@ -599,12 +601,22 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     else if (err == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(ProcessEventPaths(eventPathListParser));
+        EventFilterIBs::Parser eventFilterIBsParser;
+        err = subscribeRequestParser.GetEventFilters(&eventFilterIBsParser);
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        else if (err == CHIP_NO_ERROR)
+        {
+            ReturnErrorOnFailure(ProcessEventFilters(eventFilterIBsParser));
+        }
     }
     ReturnErrorOnFailure(err);
 
     ReturnErrorOnFailure(subscribeRequestParser.GetMinIntervalFloorSeconds(&mMinIntervalFloorSeconds));
     ReturnErrorOnFailure(subscribeRequestParser.GetMaxIntervalCeilingSeconds(&mMaxIntervalCeilingSeconds));
-    VerifyOrReturnError(mMinIntervalFloorSeconds < mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mMinIntervalFloorSeconds <= mMaxIntervalCeilingSeconds, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(subscribeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered));
     ReturnErrorOnFailure(Crypto::DRBG_get_bytes(reinterpret_cast<uint8_t *>(&mSubscriptionId), sizeof(mSubscriptionId)));
 
@@ -640,13 +652,14 @@ void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLa
     VerifyOrReturn(apAppState != nullptr);
     ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
     readHandler->mHoldSync    = false;
-    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after max %d seconds", readHandler->mMaxIntervalCeilingSeconds);
+    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after %d seconds",
+                    readHandler->mMaxIntervalCeilingSeconds - readHandler->mMinIntervalFloorSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
+    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with max %d seconds", mMaxIntervalCeilingSeconds);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(

@@ -50,10 +50,6 @@ public:
             attrId = ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID;
             break;
         }
-        case app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::Id: {
-            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT_ATTRIBUTE_ID;
-            break;
-        }
         case app::Clusters::MediaPlayback::Attributes::Position::Id: {
             attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID;
             break;
@@ -191,7 +187,8 @@ EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest me
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "MediaPlaybackManager::Request %d-%ld", mediaPlaybackRequest, deltaPositionMilliseconds);
+    ChipLogProgress(Zcl, "MediaPlaybackManager::Request %d-%ld", mediaPlaybackRequest,
+                    static_cast<long>(deltaPositionMilliseconds));
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mRequestMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);

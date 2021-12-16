@@ -44,11 +44,6 @@
             "output": "cluster/Commands.h"
         },
         {
-            "path": "reporting-commands.zapt",
-            "name": "Reporting Commands header",
-            "output": "reporting/Commands.h"
-        },
-        {
             "path": "tests-commands.zapt",
             "name": "Tests Commands header",
             "output": "test/Commands.h"

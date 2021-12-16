@@ -23,6 +23,36 @@ namespace chip {
 
 using namespace Transport;
 
+using AuthMode          = Access::AuthMode;
+using SubjectDescriptor = Access::SubjectDescriptor;
+
+SubjectDescriptor SessionHandle::GetSubjectDescriptor() const
+{
+    SubjectDescriptor subjectDescriptor;
+    if (IsSecure())
+    {
+        if (IsOperationalNodeId(mPeerNodeId))
+        {
+            subjectDescriptor.authMode    = AuthMode::kCase;
+            subjectDescriptor.subject     = mPeerNodeId;
+            subjectDescriptor.fabricIndex = mFabric;
+            // TODO(#10243): add CATs
+        }
+        else if (IsPAKEKeyId(mPeerNodeId))
+        {
+            subjectDescriptor.authMode = AuthMode::kPase;
+            subjectDescriptor.subject  = mPeerNodeId;
+            // TODO(#10242): PASE *can* have fabric in some situations
+        }
+        else if (mGroupId.HasValue())
+        {
+            subjectDescriptor.authMode = AuthMode::kGroup;
+            subjectDescriptor.subject  = NodeIdFromGroupId(mGroupId.Value());
+        }
+    }
+    return subjectDescriptor;
+}
+
 const PeerAddress * SessionHandle::GetPeerAddress(SessionManager * sessionManager) const
 {
     if (IsSecure())

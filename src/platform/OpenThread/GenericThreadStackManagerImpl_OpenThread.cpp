@@ -863,7 +863,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             }
         }
 
-        err = encoder.Encode(static_cast<uint8_t>(routingRole));
+        err = encoder.Encode(routingRole);
     }
     break;
 
