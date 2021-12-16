@@ -381,10 +381,15 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
                                            const chip::app::ConcreteCommandPath & commandPath,
                                            const chip::app::Clusters::DoorLock::Commands::SetUser::DecodableType & commandData)
 {
-    // TODO: Make sure that USR feature is enabled prior to executing command
-
     auto & userIndex = commandData.userIndex;
     emberAfDoorLockClusterPrintln("[SetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
+
+    if (!SupportsUSR(commandPath.mEndpointId))
+    {
+        emberAfDoorLockClusterPrintln("[SetUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return;
+    }
 
     auto & operationType  = commandData.operationType;
     auto & userName       = commandData.userName;
@@ -436,6 +441,13 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
 
     emberAfDoorLockClusterPrintln("[GetUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
+    if (!SupportsUSR(commandPath.mEndpointId))
+    {
+        emberAfDoorLockClusterPrintln("[GetUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return;
+    }
+
     uint16_t maxNumberOfUsers = 0;
     if (!userIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers))
     {
@@ -450,7 +462,7 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
     VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
     {
         app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetUserResponse::Id };
-        TLV::TLVWriter * writer       = nullptr;
+        TLV::TLVWriter * writer;
         SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
@@ -519,6 +531,13 @@ void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * command
     auto & userIndex = commandData.userIndex;
     emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
 
+    if (!SupportsUSR(commandPath.mEndpointId))
+    {
+        emberAfDoorLockClusterPrintln("[ClearUser] User management is not supported [endpointId=%d]", commandPath.mEndpointId);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return;
+    }
+
     uint16_t maxNumberOfUsers = 0;
     if (!userIndexValid(commandPath.mEndpointId, userIndex, maxNumberOfUsers) && userIndex != 0xFFFE)
     {
@@ -582,6 +601,14 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
     auto & userIndex       = commandData.userIndex;
     auto & userStatus      = commandData.userStatus;
     auto & userType        = commandData.userType;
+
+    if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
+    {
+        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential type is not supported [endpointId=%d,credentialType=%hhu]",
+                                      commandPath.mEndpointId, credentialType);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
 
     switch (operationType)
     {
@@ -734,8 +761,109 @@ void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler
 {
     emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
+    auto & credentialType  = commandData.credential.credentialType;
+    auto & credentialIndex = commandData.credential.credentialIndex;
+
+    if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
+    {
+        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential type is not supported [endpointId=%d,credentialType=%hhu]",
+                                      commandPath.mEndpointId, credentialType);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
+        return;
+    }
+
+    uint16_t maxNumberOfCredentials = 0;
+    if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
+    {
+        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential index is out of range "
+                                      "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,maxNumberOfCredentials=%d]",
+                                      commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+        return;
+    }
+
+    EmberAfPluginDoorLockCredentialInfo credentialInfo;
+    if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialInfo))
+    {
+        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
+                                      commandPath.mEndpointId, credentialIndex, credentialType);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return;
+    }
+
+    auto credentialExists            = DlCredentialStatus::kAvailable != credentialInfo.status;
+    uint16_t userIndexWithCredential = 0;
+    if (credentialExists)
+    {
+        if (!findUserIndexByCredential(commandPath.mEndpointId, credentialType, credentialIndex, userIndexWithCredential))
+        {
+            // That means that there's some kind of error in our database -- there is an unassociated credential. I'm not sure how
+            // to handle that properly other than panic in the log.
+            ChipLogError(Zcl,
+                         "[GetCredentialStatus] Database possibly corrupted - credential exists without user assigned "
+                         "[endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
+                         commandPath.mEndpointId, credentialType, credentialIndex);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        }
+    }
+
     // TODO: Implement getting the credential status
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    uint16_t nextCredentialIndex = 0;
+    for (uint16_t i = credentialIndex + 1; i < maxNumberOfCredentials; ++i)
+    {
+        EmberAfPluginDoorLockCredentialInfo info;
+        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialInfo))
+        {
+            emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
+                                          commandPath.mEndpointId, i, credentialType);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return;
+        }
+
+        if (DlCredentialStatus::kAvailable == credentialInfo.status)
+        {
+            nextCredentialIndex = i;
+            break;
+        }
+    }
+
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    using ResponseFields          = Commands::GetCredentialStatusResponse::Fields;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetCredentialStatusResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
+    SuccessOrExit(err = commandObj->PrepareCommand(path));
+    VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialExists)), credentialExists));
+
+    if (0 != userIndexWithCredential)
+    {
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
+    }
+
+    if (0 != nextCredentialIndex)
+    {
+        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextCredentialIndex)), nextCredentialIndex));
+    }
+    SuccessOrExit(err = commandObj->FinishCommand());
+
+    emberAfDoorLockClusterPrintln("[GetCredentialStatus] Prepared credential status "
+                                  "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
+                                  commandPath.mEndpointId, credentialType, credentialIndex, userIndexWithCredential,
+                                  nextCredentialIndex);
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(Zcl,
+                     "[GetCredentialStatus] Error occurred when preparing response: %s "
+                     "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,userIndex=%d,nextCredentialIndex=%d]",
+                     err.AsString(), commandPath.mEndpointId, credentialType, credentialIndex, userIndexWithCredential,
+                     nextCredentialIndex);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
 }
 
 void DoorLockServer::ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj,
@@ -858,6 +986,7 @@ DoorLock::DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpoint
 
     user.credentials[user.totalCredentials++] = credential;
 
+    // TODO: user appropriate fabric here
     if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, user.createdBy, user.lastModifiedBy, user.userName, user.userUniqueId,
                                       user.userStatus, user.userType, user.credentialRule, user.credentials, user.totalCredentials))
     {
@@ -925,6 +1054,95 @@ bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLock::DoorLockF
         return false;
     }
     return (featureMap & to_underlying(feature)) != 0;
+}
+
+bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DoorLock::DlCredentialType type)
+{
+    switch (type)
+    {
+    case DlCredentialType::kProgrammingPIN:
+    case DlCredentialType::kPin:
+        return SupportsPIN(endpointId);
+    case DlCredentialType::kRfid:
+        return SupportsPFID(endpointId);
+    default:
+        return false;
+    }
+    return false;
+}
+
+bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex)
+{
+    uint16_t maxCredentials = 0;
+    return credentialIndexValid(endpointId, type, credentialIndex, maxCredentials);
+}
+
+bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex,
+                                          uint16_t & maxNumberOfCredentials)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    switch (type)
+    {
+        // appclusters, 5.2.6.3.2: This shall be 0 for programming PIN
+    case DlCredentialType::kProgrammingPIN:
+        return credentialIndex == 0;
+    case DlCredentialType::kPin:
+        status = Attributes::NumberOfPINUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        break;
+    case DlCredentialType::kRfid:
+        status = Attributes::NumberOfRFIDUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        break;
+    default:
+        return false;
+    }
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Unable to read attribute to get max number of supported credentials [status=%d]", status);
+        return false;
+    }
+
+    if (0 == credentialIndex || credentialIndex > maxNumberOfCredentials)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+                                               uint16_t credentialIndex, uint16_t & userIndex)
+{
+    uint16_t maxNumberOfUsers = 0;
+    EmberAfStatus status      = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "Unable to read attribute 'NumberOfTotalUsersSupported' [status=%d]", status);
+        return false;
+    }
+
+    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    {
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
+        {
+            ChipLogError(Zcl, "[GetCredentialStatus] Unable to get user: app error [status=%d,userIndex=%d]", status, i);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return false;
+        }
+
+        for (uint16_t j = 0; j < user.totalCredentials; ++j)
+        {
+            if (user.credentials[j].CredentialIndex == credentialIndex &&
+                user.credentials[j].CredentialType == to_underlying(credentialType))
+            {
+                userIndex = i;
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 // =============================================================================

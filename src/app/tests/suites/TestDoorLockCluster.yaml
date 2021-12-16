@@ -500,6 +500,21 @@ tests:
         - name: "nextUserIndex"
           value: null
 
+  - label: "Check that PIN credential does not exist"
+    command: "GetCredentialStatus"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 1 }
+    response:
+      values:
+        - name: "credentialExists"
+          value: false
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 2
+
   - label: "Create new PIN credential and user"
     command: "SetCredential"
     arguments:
@@ -554,6 +569,37 @@ tests:
         - name: "nextUserIndex"
           value: 2
 
+  - label: "Verify created credential"
+    command: "GetCredentialStatus"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 1 }
+    response:
+      values:
+        - name: "credentialExists"
+          value: true
+        - name: "userIndex"
+          value: 1
+        - name: "nextCredentialIndex"
+          value: 2
+
+# TODO: Won't work so far because necessary attributes are not yet enabled
+#  - label: "Check that RFID credential does not exist"
+#    command: "GetCredentialStatus"
+#    arguments:
+#      values:
+#        - name: "credential"
+#          value: { CredentialType: 2, CredentialIndex: 2 }
+#    response:
+#      values:
+#        - name: "credentialExists"
+#          value: false
+#        - name: "userIndex"
+#          value: null
+#        - name: "nextCredentialIndex"
+#          value: 3
+
   - label: "Create new RFID credential and add it to existing user"
     command: "SetCredential"
     arguments:
@@ -607,6 +653,22 @@ tests:
           value: 1
         - name: "nextUserIndex"
           value: 2
+
+# TODO: Won't work so far because necessary attributes are not yet enabled
+#  - label: "Verify created credential"
+#    command: "GetCredentialStatus"
+#    arguments:
+#      values:
+#        - name: "credential"
+#          value: { CredentialType: 2, CredentialIndex: 2 }
+#    response:
+#      values:
+#        - name: "credentialExists"
+#          value: true
+#        - name: "userIndex"
+#          value: 1
+#        - name: "nextCredentialIndex"
+#          value: 3
 
   - label: "Create new PIN credential and try to add it to existing user"
     command: "SetCredential"

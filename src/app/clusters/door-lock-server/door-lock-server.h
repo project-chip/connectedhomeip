@@ -114,6 +114,10 @@ private:
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
 
+    bool credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex);
+    bool credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex,
+                              uint16_t & maxNumberOfCredentials);
+
     chip::FabricIndex getFabricIndex(const chip::app::CommandHandler * commandObj);
     EmberAfStatus clearUser(chip::EndpointId endpointId, uint16_t userIndex);
 
@@ -128,6 +132,11 @@ private:
 
     DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
     DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
+
+    bool credentialTypeSupported(chip::EndpointId endpointId, DoorLock::DlCredentialType type);
+
+    bool findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t credentialIndex,
+                                   uint16_t & userIndex);
 
     static DoorLockServer instance;
 };
