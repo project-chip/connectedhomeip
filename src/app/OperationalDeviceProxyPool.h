@@ -35,7 +35,7 @@ public:
 
     virtual OperationalDeviceProxy * FindDevice(const SessionHandle & session) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(NodeId id) = 0;
+    virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
 
     virtual ~OperationalDeviceProxyPoolDelegate() {}
 };
@@ -74,11 +74,11 @@ public:
         return foundDevice;
     }
 
-    OperationalDeviceProxy * FindDevice(NodeId id) override
+    OperationalDeviceProxy * FindDevice(PeerId peerId) override
     {
         OperationalDeviceProxy * foundDevice = nullptr;
         mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
-            if (activeDevice->GetDeviceId() == id)
+            if (activeDevice->GetPeerId() == peerId)
             {
                 foundDevice = activeDevice;
                 return Loop::Break;

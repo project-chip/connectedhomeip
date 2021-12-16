@@ -237,8 +237,8 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo, mProviderNodeId, &mOnConnectedCallback,
-                                                                 &mOnConnectionFailureCallback);
+    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderNodeId),
+                                                                 &mOnConnectedCallback, &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
@@ -350,9 +350,10 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 }
 
 // Called whenever FindOrEstablishSession fails
-void OTARequestor::OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error)
+void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
 {
-    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, deviceId, error.Format());
+    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, peerId.GetNodeId(),
+                 error.Format());
 }
 
 void OTARequestor::ApplyUpdate()
