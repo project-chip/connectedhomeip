@@ -34,6 +34,7 @@ AutoCommissioner::~AutoCommissioner()
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
+    ChipLogProgress(Controller, "Setting Commissioning parameters");
     if (params.HasThreadOperationalDataset())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
@@ -42,6 +43,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
         memcpy(mThreadOperationalDataset, dataset.data(), dataset.size());
+        ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
     if (params.HasWifiCredentials())
@@ -54,28 +56,33 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         }
         memcpy(mSsid, creds.ssid.data(), creds.ssid.size());
         memcpy(mCredentials, creds.credentials.data(), creds.credentials.size());
+        ChipLogProgress(Controller, "Setting wifi credentials from parameters");
         mParams.SetWifiCredentials(
             WifiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
     // If the AttestationNonce is passed in, using that else using a random one..
     if (params.HasAttestationNonce())
     {
+        ChipLogProgress(Controller, "Setting attestation nonce from parameters");
         VerifyOrReturnError(params.GetAttestationNonce().Value().size() == sizeof(mAttestationNonce), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mAttestationNonce, params.GetAttestationNonce().Value().data(), params.GetAttestationNonce().Value().size());
     }
     else
     {
+        ChipLogProgress(Controller, "Setting attestation nonce to random value");
         Crypto::DRBG_get_bytes(mAttestationNonce, sizeof(mAttestationNonce));
     }
     mParams.SetAttestationNonce(ByteSpan(mAttestationNonce, sizeof(mAttestationNonce)));
 
     if (params.HasCSRNonce())
     {
+        ChipLogProgress(Controller, "Setting CSR nonce from parameters");
         VerifyOrReturnError(params.GetCSRNonce().Value().size() == sizeof(mCSRNonce), CHIP_ERROR_INVALID_ARGUMENT);
         memcpy(mCSRNonce, params.GetCSRNonce().Value().data(), params.GetCSRNonce().Value().size());
     }
     else
     {
+        ChipLogProgress(Controller, "Setting CSR nonce to random value");
         Crypto::DRBG_get_bytes(mCSRNonce, sizeof(mCSRNonce));
     }
     mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
