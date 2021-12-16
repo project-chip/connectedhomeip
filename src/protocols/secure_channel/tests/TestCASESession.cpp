@@ -49,12 +49,12 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = Test::LoopbackMessagingContext<>;
 
 namespace {
-TransportMgrBase gTransportMgr;
-Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
+TestContext sContext;
+
+auto & gLoopback = sContext.GetLoopback();
 
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
@@ -363,7 +363,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     SessionIDAllocator idAllocator;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr, nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), nullptr,
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
@@ -637,8 +637,6 @@ static nlTestSuite sSuite =
 };
 // clang-format on
 
-static TestContext sContext;
-
 namespace {
 /*
  *  Set up the test suite.
@@ -647,20 +645,13 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
-
-    gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init());
-
-    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
+    ReturnErrorOnFailure(ctx.Init());
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);
     ctx.SetBobKeyId(0);
     ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
-
-    gTransportMgr.SetSessionManager(&ctx.GetSecureSessionManager());
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);
@@ -682,13 +673,11 @@ int CASE_TestSecurePairing_Setup(void * inContext)
  */
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
-    reinterpret_cast<TestContext *>(inContext)->Shutdown();
-    gIOContext.Shutdown();
     gCommissionerStorageDelegate.Cleanup();
     gDeviceStorageDelegate.Cleanup();
     gCommissionerFabrics.Reset();
     gDeviceFabrics.Reset();
-    chip::Platform::MemoryShutdown();
+    static_cast<TestContext *>(inContext)->Shutdown();
     return SUCCESS;
 }
 
