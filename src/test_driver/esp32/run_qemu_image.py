@@ -87,11 +87,37 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu):
         logging.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
-                                 "-drive", "file=%s,if=mtd,format=raw" % path])
+                                 "-drive", "file=%s,if=mtd,format=raw" % path], capture_output=True)
 
-        if status.returncode != 0:
-            raise Exception("Execution of %s failed with code %d" %
-                            (path, status.returncode))
+        # Encoding is NOT valid, but want to not try to decode potential
+        # invalid UTF-8 sequences. The strings we care about are ascii anyway
+        output = status.stdout.decode('ascii')
+
+        try:
+            if status.returncode != 0:
+                raise Exception("Execution of %s failed with code %d" %
+                                (path, status.returncode))
+
+            # Parse output of the unit test. Generally expect things like:
+            # Failed Tests:   0 / 5
+            # Failed Asserts: 0 / 77
+            # I (3034) CHIP-tests: CHIP test status: 0
+            for line in output.split('\n'):
+                if line.startswith('Failed Tests:') and not line.startswith('Failed Tests:   0 /'):
+                    raise Exception("Tests seem failed: %s" % line)
+
+                if line.startswith('Failed Asserts:') and not line.startswith('Failed Asserts: 0 /'):
+                    raise Exception("Asserts seem failed: %s" % line)
+
+                if 'CHIP test status: ' in line and 'CHIP test status: 0' not in line:
+                    raise Exception("CHIP test status is NOT 0: %s" % line)
+
+
+            logging.info("Image %s PASSED", path)
+        except:
+            # make sure output is visible in stdout
+            print(output)
+            raise
 
 
 if __name__ == '__main__':

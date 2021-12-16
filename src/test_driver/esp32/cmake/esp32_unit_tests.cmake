@@ -39,6 +39,13 @@ macro(esp32_unit_test)
         nlunit-test
         nlfaultinjection
     )
+
+    add_dependencies(${UNIT_TEST_NAME} idf::main)
+    add_dependencies(${UNIT_TEST_NAME} idf::chip)
+    # TODO:
+    #   - this does NOT properly handle dependencies  on UNIT_TEST_LIBRARY and such,
+    #     so changes in the tests themselves will not re-gen
+
     idf_build_executable(${UNIT_TEST_NAME})
 
     ######################## flashable image #######################
