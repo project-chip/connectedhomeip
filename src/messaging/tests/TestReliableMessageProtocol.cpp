@@ -224,6 +224,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // expect a response.
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
@@ -233,6 +234,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -243,6 +245,7 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     // sleep another 65 ms to trigger second re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -285,6 +288,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 1);
@@ -294,6 +298,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -304,6 +309,7 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     // sleep another 65 ms to trigger second re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 3);
@@ -347,6 +353,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was dropped
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
@@ -354,6 +361,7 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
@@ -393,6 +401,8 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     // We are sending a malicious packet, doesn't expect an ack
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     // Test that the message was actually sent (and not dropped)
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 0);
@@ -439,6 +449,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
@@ -449,6 +460,7 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -504,6 +516,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
@@ -520,6 +533,7 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -576,6 +590,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    inctx.DrainAndServiceIO();
 
     // Ensure the message was dropped, and was added to retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mNumMessagesToDrop == 0);
@@ -586,6 +601,7 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    inctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount >= 2);
@@ -643,6 +659,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent
     // The ack was dropped, and message was added to the retransmit table
@@ -660,6 +677,7 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     // sleep 65 ms to trigger first re-transmit
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
     // and retransmit table was cleared
@@ -709,6 +727,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -725,6 +744,7 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
 
     // Send the standalone ack.
     receiverRc->SendStandaloneAckMessage();
+    ctx.DrainAndServiceIO();
 
     // Ensure the ack was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -740,7 +760,9 @@ void CheckReceiveAfterStandaloneAck(nlTestSuite * inSuite, void * inContext)
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response and its ack was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
@@ -796,6 +818,7 @@ void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -819,8 +842,11 @@ void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
-                                        SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
+    err =
+        mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
+                                            SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -843,6 +869,7 @@ void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer),
                                 SendFlags(SendMessageFlags::kExpectResponse).Set(SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 3);
@@ -864,6 +891,7 @@ void CheckPiggybackAfterPiggyback(nlTestSuite * inSuite, void * inContext)
 
     err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response and its ack was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
@@ -919,6 +947,7 @@ void CheckSendUnsolicitedStandaloneAckMessage(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     // Needs a manual close, because SendMessage does not close for standalone acks.
     exchange->Close();
+    ctx.DrainAndServiceIO();
 
     // Ensure the message and its ack were sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -942,6 +971,7 @@ void CheckSendStandaloneAckMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
     NL_TEST_ASSERT(inSuite, rc->SendStandaloneAckMessage() == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Need manual close because standalone acks don't close exchanges.
     exchange->Close();
@@ -1000,6 +1030,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -1024,7 +1055,9 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -1048,6 +1081,7 @@ void CheckMessageAfterClosed(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent (and the ack for it was also sent).
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
@@ -1123,6 +1157,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -1156,7 +1191,9 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // Stop keeping receiver exchange alive.
     mockReceiver.mRetainExchange = true;
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response was sent but dropped.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -1179,6 +1216,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // sleep 65 ms to trigger re-transmit from sender
     chip::test_utils::SleepMillis(65);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // We resent our first message, which did not make it to the app-level
     // listener on the receiver (because it's a duplicate) but did trigger a
@@ -1208,6 +1246,7 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     // sleep 65*3 ms to trigger re-transmit from receiver
     chip::test_utils::SleepMillis(65 * 3);
     ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    ctx.DrainAndServiceIO();
 
     // And now we've definitely resent our response message, which should show
     // up as an app-level message and trigger a standalone ack.
@@ -1272,6 +1311,7 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer), SendFlags(SendMessageFlags::kExpectResponse));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
@@ -1295,8 +1335,10 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     buffer = chip::MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
-                                        SendFlags(SendMessageFlags::kExpectResponse));
+    err = mockReceiver.mExchange->SendMessage(Echo::MsgType::EchoResponse, std::move(buffer),
+                                              SendFlags(SendMessageFlags::kExpectResponse));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the response was sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 2);
@@ -1323,6 +1365,7 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
 
     err = exchange->SendMessage(Echo::MsgType::EchoRequest, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     // Ensure the message and the standalone ack to it were sent.
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 4);
@@ -1386,7 +1429,7 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on
