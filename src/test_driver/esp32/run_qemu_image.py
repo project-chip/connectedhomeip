@@ -29,6 +29,7 @@ __LOG_LEVELS__ = {
     'fatal': logging.FATAL,
 }
 
+
 @click.command()
 @click.option(
     '--log-level',
@@ -81,16 +82,16 @@ def main(log_level, no_log_timestamps, image, file_image_list, qemu):
                 logging.info("    Found %s => %s", name, image_path)
                 image.append(image_path)
 
-
     # the list "image" contains all the images that need to run
     for path in image:
         logging.info("Executing image %s", path)
 
         status = subprocess.run([qemu, "-nographic", "-no-reboot", "-machine", "esp32",
-            "-drive", "file=%s,if=mtd,format=raw" % path])
+                                 "-drive", "file=%s,if=mtd,format=raw" % path])
 
         if status.returncode != 0:
-            raise Exception("Execution of %s failed with code %d" % (path, status.returncode))
+            raise Exception("Execution of %s failed with code %d" %
+                            (path, status.returncode))
 
 
 if __name__ == '__main__':

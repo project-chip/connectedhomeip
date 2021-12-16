@@ -74,7 +74,7 @@ class Esp32App(Enum):
     def FlashBundleName(self):
         return self.AppNamePrefix + '.flashbundle.txt'
 
-    def IsCompatible(self, board:Esp32Board):
+    def IsCompatible(self, board: Esp32Board):
         if board == Esp32Board.QEMU:
             return self == Esp32App.TESTS
         elif board == Esp32Board.M5Stack:
@@ -82,7 +82,7 @@ class Esp32App(Enum):
         elif board == Esp32Board.C3DevKit:
             return self == Esp32App.ALL_CLUSTERS
         else:
-            return (board == Esp32Board.DevKitC) and (self  != Esp32App.TESTS)
+            return (board == Esp32Board.DevKitC) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
@@ -119,7 +119,8 @@ class Esp32Builder(Builder):
         self.enable_ipv4 = enable_ipv4
 
         if not app.IsCompatible(board):
-            raise Exception("Incompatible app/board combination: %r and %r", app, board)
+            raise Exception(
+                "Incompatible app/board combination: %r and %r", app, board)
 
     def _IdfEnvExecute(self, cmd, title=None):
         # Run activate.sh after export.sh to ensure using the chip environment.
