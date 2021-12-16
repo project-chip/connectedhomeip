@@ -29,11 +29,6 @@ LockManager & LockManager::Instance()
     return instance;
 }
 
-void LockManager::Init()
-{
-    mLocked = false;
-}
-
 bool LockManager::Lock(chip::Optional<chip::ByteSpan> pin)
 {
     mLocked = true;

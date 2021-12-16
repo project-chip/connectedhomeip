@@ -59,7 +59,6 @@ void emberAfDoorLockClusterInitCallback(EndpointId endpoint)
 int main(int argc, char * argv[])
 {
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
-    LockManager::Instance().Init();
     ChipLinuxAppMainLoop();
     return 0;
 }

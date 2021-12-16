@@ -28,14 +28,17 @@
 class LockManager
 {
 public:
-    void Init();
+    LockManager() : mLocked(false)
+    {
+
+    }
 
     bool Lock(chip::Optional<chip::ByteSpan> pin);
     bool Unlock(chip::Optional<chip::ByteSpan> pin);
 
     static LockManager & Instance();
-    static LockManager instance;
 
 private:
     bool mLocked;
+    static LockManager instance;
 };
