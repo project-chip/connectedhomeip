@@ -8,6 +8,9 @@
 #    EXTRA_LIBRAIRES - what else to add to link libraries, generally dependencies
 #                      of $LIBRARY   
 #
+# The list ESP32_TEST_IMAGES keeps track of all output images that could
+# be used for testing
+#
 # TODO: several paths are hard-coded here and could use some updates:
 #      - always links to idf::main
 #      - assumes esp-idf/chip/lib is where the built libraries reside
@@ -54,23 +57,36 @@ macro(esp32_unit_test)
       WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
       COMMENT "Generating binary image from ${UNIT_TEST_NAME}"
     )                                                                                                                                                         
-    add_custom_target(gen_project_binary_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.bin_timestamp")
+    add_custom_target(gen_binary_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.bin_timestamp")
 
+
+    ###################### Image executable in QEMU #################
+
+
+    add_custom_command(
+      OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img_timestamp"
+
+      COMMAND dd if=/dev/zero bs=1024 count=4096 of=${UNIT_TEST_NAME}.img
+      COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/bootloader/bootloader.bin bs=1 seek=4096 of=${UNIT_TEST_NAME}.img conv=notrunc
+      COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/partition_table/partition-table.bin bs=1 seek=32768 of=${UNIT_TEST_NAME}.img conv=notrunc
+      COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.bin bs=1 seek=65536 of=${UNIT_TEST_NAME}.img conv=notrunc
+
+      # $ dd if=build/partition_table/partition-table.bin bs=1 seek=$((0x8000)) of=flash.bin conv=notrunc
+      # $ dd if=build/hello-world.bin bs=1 seek=$((0x10000)) of=flash.bin conv=notrunc
+
+      COMMAND ${CMAKE_COMMAND} -E echo "Generated ${UNIT_TEST_NAME}.img"
+      COMMAND ${CMAKE_COMMAND} -E md5sum "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img" > "${CMAKE_CURRENT_BINARY_DIR}/${UNIT_TEST_NAME}.img_timestamp"
+
+      DEPENDS gen_binary_${UNIT_TEST_NAME}
+      VERBATIM                                                                                                                                                  
+      WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+      COMMENT "Generating binary image from ${UNIT_TEST_NAME}"
+    )                                                                                                                                                         
+    add_custom_target(gen_image_${UNIT_TEST_NAME} ALL DEPENDS "${build_dir}/${UNIT_TEST_NAME}.img_timestamp")
+
+    LIST(APPEND ESP32_TEST_IMAGES ${UNIT_TEST_NAME}.img)
+
+
+    # IMAGE CAN BE RUN AS
+    # $QEMU_ESP32 -nographic -no-reboot -machine esp32 -drive file=out/esp32-qemu-tests/testASN1.img,if=mtd,format=raw
 endmacro()
-
-
-# FIXME: elfbuilder ?
-#    mkdir -p build/chip/
-#    echo "#!/bin/sh" > build/chip/esp32_elf_builder.sh
-#    echo set -e >> build/chip/esp32_elf_builder.sh
-#    echo set -x >> build/chip/esp32_elf_builder.sh
-#    echo $(CXX) $(CXXFLAGS) $(CPPFLAGS) -L$(PROJECT_PATH)/build/chip/lib -Wl,--whole-archive '$$1' -Wl,--no-whole-archive \
-#         -lnlunit-test $(LDFLAGS) -lnlfaultinjection '$$2' -o $(PROJECT_PATH)/build/chip-tests.elf -Wl,-Map=$(APP_MAP) >> build/chip/esp32_elf_builder.sh
-
-#    echo $(ESPTOOLPY) elf2image $(ESPTOOL_FLASH_OPTIONS) $(ESPTOOL_ELF2IMAGE_OPTIONS) \
-#         -o $(PROJECT_PATH)/build/chip/chip-tests.bin $(PROJECT_PATH)/build/chip-tests.elf >> build/chip/esp32_elf_builder.sh
-#    ln -sf $(PROJECT_PATH)/build/partitions.bin $(PROJECT_PATH)/build/chip/partitions.bin
-#    mkdir -p build/chip/bootloader
-#    ln -sf $(PROJECT_PATH)/build/bootloader/bootloader.bin $(PROJECT_PATH)/build/chip/bootloader.bin
-#    ln -sf $(PROJECT_PATH)/idf.sh $(PROJECT_PATH)/build/chip/env.sh
-

@@ -50,3 +50,8 @@ esp32_unit_test(NAME testCore LIBRARY CoreTests)
 esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
 esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
 esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)
+
+
+# allow other tools to discover what images are available without grepping for '.img'
+string (REPLACE ";" "\n" BUILT_IMAGES "${ESP32_TEST_IMAGES}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/test_images.txt" "${BUILT_IMAGES}")
