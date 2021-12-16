@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemConfig.h>
 
@@ -276,10 +277,10 @@ public:
     template <typename... Args>
     T * CreateObject(Args &&... args)
     {
-        T * object = new T(std::forward<Args>(args)...);
+        T * object = Platform::New<T>(std::forward<Args>(args)...);
         if (object != nullptr)
         {
-            auto node = new internal::HeapObjectListNode();
+            auto node = Platform::New<internal::HeapObjectListNode>();
             if (node != nullptr)
             {
                 node->mObject = object;
@@ -300,7 +301,7 @@ public:
             {
                 // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
                 node->mObject = nullptr;
-                delete object;
+                Platform::Delete(object);
                 DecreaseUsage();
             }
         }
@@ -336,14 +337,25 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+/**
+ * Specify ObjectPool storage allocation.
+ */
 enum class ObjectPoolMem
 {
-    kStatic,
+    /**
+     * Use storage inside the containing scope for both objects and pool management state.
+     */
+    kInline,
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    kDynamic,
-    kDefault = kDynamic
+    /**
+     * Allocate objects from the heap, with only pool management state in the containing scope.
+     *
+     * For this case, the ObjectPool size parameter is ignored.
+     */
+    kHeap,
+    kDefault = kHeap
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    kDefault = kStatic
+    kDefault = kInline
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
@@ -351,13 +363,13 @@ template <typename T, size_t N, ObjectPoolMem P = ObjectPoolMem::kDefault>
 class ObjectPool;
 
 template <typename T, size_t N>
-class ObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+class ObjectPool<T, N, ObjectPoolMem::kInline> : public BitMapObjectPool<T, N>
 {
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <typename T, size_t N>
-class ObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 {
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
