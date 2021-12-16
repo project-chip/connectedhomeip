@@ -277,8 +277,8 @@ int main(int argc, char ** args)
                                                                        .SetCommissioningMode(gOptions.commissioningMode)
                                                                        .SetDeviceType(gOptions.deviceType)
                                                                        .SetDeviceName(gOptions.deviceName)
-                                                                       .SetRotatingId(gOptions.rotatingId)
-                                                                       .SetPairingInstr(gOptions.pairingInstr)
+                                                                       .SetRotatingDeviceId(gOptions.rotatingId)
+                                                                       .SetPairingInstruction(gOptions.pairingInstr)
                                                                        .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
