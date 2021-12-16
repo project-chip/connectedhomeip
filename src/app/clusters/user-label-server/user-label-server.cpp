@@ -85,19 +85,15 @@ CHIP_ERROR UserLabelAttrAccess::WriteLabelList(EndpointId endpoint, AttributeVal
 
     ReturnErrorOnFailure(aDecoder.Decode(decodablelist));
 
-    uint8_t index = 0;
-    auto iter     = decodablelist.begin();
+    auto iter = decodablelist.begin();
     while (iter.Next())
     {
         auto & entry = iter.GetValue();
-
-        VerifyOrReturnError(index < DeviceLayer::kMaxUserLabels, CHIP_ERROR_BUFFER_TOO_SMALL);
-        labelList.add(entry);
+        ReturnErrorOnFailure(labelList.add(entry));
     }
+    ReturnErrorOnFailure(iter.GetStatus());
 
-    ReturnErrorOnFailure(DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList));
-
-    return iter.GetStatus();
+    return DeviceLayer::PlatformMgr().SetUserLabelList(endpoint, labelList);
 }
 
 CHIP_ERROR UserLabelAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
