@@ -231,7 +231,7 @@ public:
         while ((err = aReader.Next()) == CHIP_NO_ERROR)
         {
             VerifyOrReturnError(TLV::IsContextTag(aReader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            auto tag = TLV::TagNumFromTag(aReader.GetTag());
+            auto tag = aReader.GetTag();
             if (tag == mConstants.fabricIndexTag)
             {
                 chip::FabricIndex fabricIndex;

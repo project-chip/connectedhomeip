@@ -1178,8 +1178,9 @@ private:
             ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlEntry(i), entryBuffer, bufferSize));
             chip::TLV::TLVReader entryReader;
             entryReader.Init(entryBuffer, bufferSize);
+            ReturnErrorOnFailure(entryReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag));
             ReturnErrorOnFailure(codec.Decode(entryReader));
-            CreateEntry(nullptr, codec.entry, nullptr);
+            ReturnErrorOnFailure(CreateEntry(nullptr, codec.entry, nullptr));
         }
         return reader.ExitContainer(container);
     }
@@ -1209,8 +1210,9 @@ private:
             uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
             chip::TLV::TLVWriter entryWriter;
             entryWriter.Init(entryBuffer);
-            ReadEntry(i, codec.entry, nullptr);
+            ReturnErrorOnFailure(ReadEntry(i, codec.entry, nullptr));
             ReturnErrorOnFailure(codec.Encode(entryWriter, chip::TLV::AnonymousTag));
+            ReturnErrorOnFailure(entryWriter.Finalize());
             ReturnErrorOnFailure(mStorageDelegate->SyncSetKeyValue(key.AccessControlEntry(i), entryBuffer, static_cast<uint16_t>(entryWriter.GetLengthWritten())));
         }
 
