@@ -608,7 +608,7 @@ tests:
         - name: "credential"
           value: { CredentialType: 2, CredentialIndex: 2 }
         - name: "credentialData"
-          value: "rfid_data"
+          value: "rfid_data_123456"
         - name: "userIndex"
           value: 1
         - name: "userStatus"
@@ -742,3 +742,103 @@ tests:
           value: null
         - name: "nextCredentialIndex"
           value: 3
+
+  - label: "Create new PIN with too short data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "12345"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
+
+  - label: "Create new PIN with too long data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "1234567"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
+
+  - label: "Create new RFID with too short data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "rfid_data"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
+
+  - label: "Create new RFID with too short data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "very_long_rfid_data_to_test_boundaries"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
