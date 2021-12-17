@@ -116,7 +116,7 @@ public:
     ~AdvertiserMinMdns() {}
 
     // Service advertiser
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     CHIP_ERROR RemoveServices() override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
@@ -151,7 +151,7 @@ private:
         char mrpRetryIntervalIdleBuf[KeySize(TxtFieldKey::kMrpRetryIntervalIdle) + ValSize(TxtFieldKey::kMrpRetryIntervalIdle) + 2];
         char mrpRetryIntervalActiveBuf[KeySize(TxtFieldKey::kMrpRetryIntervalActive) +
                                        ValSize(TxtFieldKey::kMrpRetryIntervalActive) + 2];
-        char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupport) + ValSize(TxtFieldKey::kTcpSupport) + 2];
+        char tcpSupportedBuf[KeySize(TxtFieldKey::kTcpSupported) + ValSize(TxtFieldKey::kTcpSupported) + 2];
     };
     template <class Derived>
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
@@ -274,7 +274,7 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
     }
 }
 
-CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer)
+CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
 
@@ -285,7 +285,7 @@ CHIP_ERROR AdvertiserMinMdns::Init(chip::Inet::InetLayer * inetLayer)
     // GlobalMinimalMdnsServer (used for testing).
     mResponseSender.SetServer(&GlobalMinimalMdnsServer::Server());
 
-    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort));
+    ReturnErrorOnFailure(GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort));
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
 
@@ -437,7 +437,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
 CHIP_ERROR AdvertiserMinMdns::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (Commissionable::kInstanceNameMaxLength + 1))
+    if (maxLength < (Commission::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -514,7 +514,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     if (params.GetVendorId().HasValue())
     {
         MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                           DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value()));
+                           DiscoveryFilter(DiscoveryFilterType::kVendorId, params.GetVendorId().Value()));
         FullQName vendorServiceName =
             allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -552,7 +552,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
     {
         {
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator()));
+                               DiscoveryFilter(DiscoveryFilterType::kShortDiscriminator, params.GetShortDiscriminator()));
             FullQName shortServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(shortServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -569,7 +569,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
         {
             MakeServiceSubtype(nameBuffer, sizeof(nameBuffer),
-                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator()));
+                               DiscoveryFilter(DiscoveryFilterType::kLongDiscriminator, params.GetLongDiscriminator()));
             FullQName longServiceName =
                 allocator->AllocateQName(nameBuffer, kSubtypeServiceNamePart, serviceType, kCommissionProtocol, kLocalDomain);
             ReturnErrorCodeIf(longServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
@@ -682,7 +682,7 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
     if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
     {
         // a discriminator always exists
-        char txtDiscriminator[chip::Dnssd::kKeyDiscriminatorMaxLength + 3];
+        char txtDiscriminator[chip::Dnssd::kKeyLongDiscriminatorMaxLength + 3];
         snprintf(txtDiscriminator, sizeof(txtDiscriminator), "D=%d", params.GetLongDiscriminator());
         txtFields[numTxtFields++] = txtDiscriminator;
 
@@ -690,10 +690,10 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         snprintf(txtCommissioningMode, sizeof(txtCommissioningMode), "CM=%d", static_cast<int>(params.GetCommissioningMode()));
         txtFields[numTxtFields++] = txtCommissioningMode;
 
-        char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingIdMaxLength + 4];
-        if (params.GetRotatingId().HasValue())
+        char txtRotatingDeviceId[chip::Dnssd::kKeyRotatingDeviceIdMaxLength + 4];
+        if (params.GetRotatingDeviceId().HasValue())
         {
-            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", params.GetRotatingId().Value());
+            snprintf(txtRotatingDeviceId, sizeof(txtRotatingDeviceId), "RI=%s", params.GetRotatingDeviceId().Value());
             txtFields[numTxtFields++] = txtRotatingDeviceId;
         }
 
@@ -705,9 +705,9 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
         }
 
         char txtPairingInstr[chip::Dnssd::kKeyPairingInstructionMaxLength + 4];
-        if (params.GetPairingInstr().HasValue())
+        if (params.GetPairingInstruction().HasValue())
         {
-            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstr().Value());
+            snprintf(txtPairingInstr, sizeof(txtPairingInstr), "PI=%s", params.GetPairingInstruction().Value());
             txtFields[numTxtFields++] = txtPairingInstr;
         }
     }
@@ -766,7 +766,12 @@ void AdvertiserMinMdns::AdvertiseRecords()
             continue;
         }
 
-        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), interfaceAddress.GetAddress()))
+        Inet::IPAddress ipAddress;
+        if (interfaceAddress.GetAddress(ipAddress) != CHIP_NO_ERROR)
+        {
+            continue;
+        }
+        if (!ShouldAdvertiseOn(interfaceAddress.GetInterfaceId(), ipAddress))
         {
             continue;
         }
@@ -774,8 +779,8 @@ void AdvertiserMinMdns::AdvertiseRecords()
         chip::Inet::IPPacketInfo packetInfo;
 
         packetInfo.Clear();
-        packetInfo.SrcAddress = interfaceAddress.GetAddress();
-        if (interfaceAddress.GetAddress().IsIPv4())
+        packetInfo.SrcAddress = ipAddress;
+        if (ipAddress.IsIPv4())
         {
             BroadcastIpAddresses::GetIpv4Into(packetInfo.DestAddress);
         }

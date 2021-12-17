@@ -60,77 +60,78 @@ class {{filename}}: public TestCommand
     {{/chip_tests_item_response_parameters}}
     {{/chip_tests_items}}
 
-    {{#*inline "failureCallback"}}mOnFailureCallback_{{index}}{{/inline}}
-    {{#*inline "successCallback"}}mOnSuccessCallback_{{index}}{{/inline}}
-    
-    {{#if isGroupCommand}}
-    {{#*inline "doneCallback"}}mOnDoneCallback_{{index}}{{/inline}}
-    {{/if}}
+    {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
+        array/nullable/etc context appropriately.}}
+    {{~#*inline "subscribeResponseDataArgument"~}}
+      {{zapTypeToDecodableClusterObjectType type ns=cluster isArgument=true}} value
+    {{~/inline~}}
+    {{~#*inline "subscribeResponseArguments"~}}
+    {{> subscribeResponseDataArgument type=attr.type isArray=attr.isArray isNullable=attr.isNullable}}
+    {{~/inline~}}
 
-    {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
-    {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-
-    {{#*inline "doneResponse"}}OnDoneCallback_{{index}}{{/inline}}
-
-    {{#*inline "successArguments"}}void * context{{#chip_tests_item_response_parameters}}, {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
-    {{#*inline "failureArguments"}}void * context, uint8_t status{{/inline}}
-
-    {{#if isGroupCommand}}
-    {{#*inline "doneArguments"}}void * context{{/inline}}
-    {{/if}}
-
+    {{~#*inline "subscribeDataCallback"}}
+    mTest_{{parent.filename}}_{{attribute}}_Reported
+    {{/inline}}
+    {{#*inline "subscribeDataCallbackType"}}
+    Test_{{parent.filename}}_{{attribute}}_ReportCallback
+    {{/inline}}
     {{#chip_tests_items}}
-    {{#unless (isTestOnlyCluster cluster)}}
-    {{#unless isWait}}
-    {{#unless isCommand}}
-    {{#unless isWriteAttribute}}
-    {{#unless isReadAttribute}}
-    chip::Callback::Callback<void (*) ({{>failureArguments}})> {{>failureCallback}} { {{>failureResponse}}, this };
-    chip::Callback::Callback<void (*) ({{>successArguments}})> {{>successCallback}} { {{>successResponse}}, this };
-    {{/unless}}
-    {{/unless}}
-    {{/unless}}
-    {{/unless}}
-    {{/unless}}
+    {{#if allocateSubscribeDataCallback}}
+    typedef void (*{{> subscribeDataCallbackType}})(void * context, {{> subscribeResponseArguments attr=attributeObject}});
+    {{> subscribeDataCallbackType}} {{> subscribeDataCallback}} = nullptr;
+    {{/if}}
     {{/chip_tests_items}}
+
+    {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
+    {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
+    {{#*inline "subscriptionEstablished"}}OnSubscriptionEstablishedResponse_{{index}}{{/inline}}
+    {{#*inline "doneResponse"}}OnDoneResponse_{{index}}{{/inline}}
+
+    {{#*inline "staticFailureResponse"}}OnFailureCallback_{{index}}{{/inline}}
+    {{#*inline "staticSuccessResponse"}}OnSuccessCallback_{{index}}{{/inline}}
+    {{#*inline "staticSubscriptionEstablished"}}OnSubscriptionEstablished_{{index}}{{/inline}}
+    {{#*inline "staticDoneResponse"}}OnDoneCallback_{{index}}{{/inline}}
+
+    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#first}}{{#if ../leadingComma}}, {{/if}}{{/first}} {{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{#not_last}}, {{/not_last}}{{/chip_tests_item_response_parameters}}{{/inline}}
+    {{#*inline "failureArguments"}}{{#if leadingComma}}, {{/if}}EmberAfStatus status{{/inline}}
+    {{#*inline "staticSuccessArguments"}}void * context{{> successArguments leadingComma=true}}{{/inline}}
+    {{#*inline "staticFailureArguments"}}void * context{{> failureArguments leadingComma=true}}{{/inline}}
+    {{#*inline "staticDoneArguments"}}void * context{{/inline}}
+    {{#*inline "doneArguments"}}{{/inline}}
+
+    {{#*inline "staticSubscriptionEstablishedArguments"}}void * context{{/inline}}
+    {{#*inline "subscriptionEstablishedArguments"}}{{/inline}}
 
     {{#chip_tests_items}}
     {{#unless (isTestOnlyCluster cluster)}}
     {{#unless isWait}}
     {{#unless isCommand}}
     {{#if isWriteAttribute}}
-    static void {{>failureResponse}}(void * context, EmberAfStatus status)
+      {{#if isGroupCommand}}
+      static void {{>staticDoneResponse}}({{>staticDoneArguments}})
+      {
+          (static_cast<{{filename}} *>(context))->{{> doneResponse }}();
+      }
+      {{/if}}
+    {{/if}}
+
+    static void {{>staticFailureResponse}}({{>staticFailureArguments}})
     {
-        (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(chip::to_underlying(status));
+        (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
     }
 
-    {{#if isGroupCommand}}
-    static void {{>doneResponse}}(void * context)
+    static void {{>staticSuccessResponse}}({{> staticSuccessArguments}})
     {
-        (static_cast<{{filename}} *>(context))->OnDoneResponse_{{index}}();
+        (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+    }
 
+    {{#if isSubscribeAttribute}}
+    static void {{> staticSubscriptionEstablished}}({{> staticSubscriptionEstablishedArguments}})
+    {
+        (static_cast<{{filename}} *>(context))->{{> subscriptionEstablished}}();
     }
     {{/if}}
 
-    {{else if isReadAttribute}}
-    static void {{>failureResponse}}(void * context, EmberAfStatus status)
-    {
-        (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(chip::to_underlying(status));
-    }
-    {{else}}
-    static void {{>failureResponse}}({{> failureArguments}})
-    {
-        (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
-    }
-    {{/if}}
-
-
-    static void {{>successResponse}}({{> successArguments}})
-    {
-        (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
-    }
-
-    {{! "isWaitForReport" can be replaced by "async" if there is a mechanism to remove the report handler}}
     {{#if isWaitForReport}}
     bool mReceivedReport_{{index}} = false;
     {{/if}}
@@ -164,13 +165,6 @@ class {{filename}}: public TestCommand
       return CHIP_NO_ERROR;
     }
     {{else}}
-    {{#*inline "failureResponse"}}OnFailureResponse_{{index}}{{/inline}}
-    {{#*inline "successResponse"}}OnSuccessResponse_{{index}}{{/inline}}
-    {{#*inline "doneResponse"}}OnDoneResponse_{{index}}{{/inline}}
-
-    {{#*inline "failureArguments"}}uint8_t status{{/inline}}
-    {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
-    {{#*inline "doneArguments"}}{{/inline}}
 
     {{#*inline "device"}}mDevices[kIdentity{{asUpperCamelCase identity}}]{{/inline}}
     CHIP_ERROR {{>testCommand}}()
@@ -212,11 +206,11 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<{{filename}} *>(context))->OnSuccessResponse_{{index}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
+            (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}data.{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
+            (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
@@ -225,7 +219,6 @@ class {{filename}}: public TestCommand
           {{> maybeTimedInteractionTimeout }}
           ));
         {{> maybeWait }}
-        {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
         {{#if isGroupCommand}}
@@ -240,26 +233,26 @@ class {{filename}}: public TestCommand
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}
-          {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
-          {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-          {{#*inline "doneResponse"}}OnDoneCallback_{{index}}{{/inline}}
-          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}
             {{~> maybeTimedInteractionTimeout ~}}
-            {{~#if isGroupCommand}}, {{>doneResponse}}{{/if~}}
+            {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
             ));
           {{> maybeWait }}
-          {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else if isReadAttribute}}
-          {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
-          {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
-          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}){{#if async}}){{/if}};
+          ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
+        {{else if isSubscribeAttribute}}
+          ReturnErrorOnFailure(cluster.SubscribeAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
+        {{else if isWaitForReport}}
+          {{> subscribeDataCallback}} = {{> staticSuccessResponse}};
         {{else}}
-          {{~#*inline "commandName"}}{{asUpperCamelCase commandName}}{{#if isAttribute}}Attribute{{asUpperCamelCase attribute}}{{/if}}{{/inline}}
-          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.{{>commandName}}({{>successCallback}}.Cancel(){{#unless isWaitForReport}}, {{>failureCallback}}.Cancel(){{/unless}}{{#chip_tests_item_parameters}}, {{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}}){{#if async}}){{/if}};
+          UNEXPECTED COMMAND: {{>commandName}}
         {{/if}}
-
         {{/if}}
-        {{#if async}}return WaitForMs(0);{{/if}}
+        {{#if async}}
+          return WaitForMs(0);
+        {{else}}
+          return CHIP_NO_ERROR;
+        {{/if}}
     }
 
     void {{>failureResponse}}({{>failureArguments}})
@@ -275,6 +268,30 @@ class {{filename}}: public TestCommand
         {{/if}}
     }
 
+    {{#if isSubscribeAttribute}}
+    void {{>successResponse}}({{> subscribeResponseArguments attr=attributeObject}})
+    {
+        {{#if response.error}}
+          ThrowSuccessResponse();
+        {{else if response.errorWrongValue}}
+          ThrowSuccessResponse();
+        {{else}}
+          if ({{> subscribeDataCallback}}) {
+              auto callback = {{> subscribeDataCallback}};
+              {{> subscribeDataCallback}} = nullptr;
+              callback(this, value);
+          }
+       {{/if}}
+    }
+
+    void {{>subscriptionEstablished}}({{> subscriptionEstablishedArguments}})
+    {
+        {{#if hasWaitForReport}}
+          VerifyOrReturn(mReceivedReport_{{waitForReport.index}}, Exit("Initial report not received!"));
+        {{/if}}
+        {{#unless async}}NextTest();{{/unless}}
+    }
+    {{else}}
     void {{>successResponse}}({{>successArguments}})
     {
         {{~#if response.error}}
@@ -282,13 +299,8 @@ class {{filename}}: public TestCommand
         {{else if response.errorWrongValue}}
           ThrowSuccessResponse();
         {{else}}
-          {{! This block can be removed if there is a mechanism to remove the report handler}}
           {{#if isWaitForReport}}
-          VerifyOrReturn(mReceivedReport_{{index}} == false, ChipLogError(chipTool, "Not Fatal: on report called more than once."));
           mReceivedReport_{{index}} = true;
-          {{/if}}
-          {{#if hasWaitForReport}}
-          VerifyOrReturn(mReceivedReport_{{waitForReport.index}}, Exit("Initial report not received!"));
           {{/if}}
           {{#chip_tests_item_response_parameters}}
             {{~#*inline "item"}}{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
@@ -306,8 +318,8 @@ class {{filename}}: public TestCommand
               {{~#if expectedConstraints.endsWith}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
               {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
               {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
-              {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.minValue}}));{{/if}}
-              {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.maxValue}}));{{/if}}
+              {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
+              {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
               {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
             {{/if}}
 
@@ -318,6 +330,7 @@ class {{filename}}: public TestCommand
         {{#unless async}}NextTest();{{/unless}}
         {{/if}}
     }
+    {{/if}}
 
     {{#if isGroupCommand}}
     void {{>doneResponse}}({{>doneArguments}})

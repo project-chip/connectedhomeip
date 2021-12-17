@@ -26,13 +26,6 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-enum class Features
-{
-    Lift          = 0x01,
-    Tilt          = 0x02,
-    PositionAware = 0x04
-};
-
 struct Mode
 {
     uint8_t motorDirReversed : 1; // bit 0

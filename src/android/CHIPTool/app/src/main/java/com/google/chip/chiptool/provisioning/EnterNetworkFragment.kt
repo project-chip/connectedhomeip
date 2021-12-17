@@ -95,10 +95,10 @@ class EnterNetworkFragment : Fragment() {
     val pwdBytes = password.toByteArray()
 
     val cluster = createNetworkCommissioningCluster()
-    val enableNetworkCallback = object :
-      NetworkCommissioningCluster.EnableNetworkResponseCallback {
-      override fun onSuccess(errorCode: Int, debugText: String) {
-        Log.v(TAG, "EnableNetwork for $ssid succeeded, proceeding to OnOff")
+    val connectNetworkCallback = object :
+      NetworkCommissioningCluster.ConnectNetworkResponseCallback {
+      override fun onSuccess(networkingStatus: Int, debugText: String, errorValue: Long) {
+        Log.v(TAG, "ConnectNetwork for $ssid succeeded, proceeding to OnOff")
 
         requireActivity().runOnUiThread {
           Toast.makeText(
@@ -115,7 +115,7 @@ class EnterNetworkFragment : Fragment() {
       }
 
       override fun onError(ex: Exception) {
-        Log.e(TAG, "EnableNetwork for $ssid failed", ex)
+        Log.e(TAG, "ConnectNetwork for $ssid failed", ex)
         // TODO: consolidate error codes
         FragmentUtil.getHost(
           this@EnterNetworkFragment,
@@ -124,26 +124,25 @@ class EnterNetworkFragment : Fragment() {
       }
     }
 
-    cluster.addWiFiNetwork(object :
-                             NetworkCommissioningCluster.AddWiFiNetworkResponseCallback {
-      override fun onSuccess(errorCode: Int, debugText: String) {
-        Log.v(TAG, "AddWifiNetwork for $ssid succeeded")
-        cluster.enableNetwork(
-          enableNetworkCallback,
+    cluster.addOrUpdateWiFiNetwork(object :
+                             NetworkCommissioningCluster.NetworkConfigResponseCallback {
+      override fun onSuccess(networkingStatus: Int, debugText: String) {
+        Log.v(TAG, "AddOrUpdateWiFiNetwork for $ssid succeeded")
+        cluster.connectNetwork(
+          connectNetworkCallback,
           ssidBytes,
           /* breadcrumb = */ 0L,
-          ENABLE_NETWORK_TIMEOUT
         )
       }
 
       override fun onError(ex: Exception) {
-        Log.e(TAG, "AddWifiNetwork for $ssid failed", ex)
+        Log.e(TAG, "AddOrUpdateWiFiNetwork for $ssid failed", ex)
         FragmentUtil.getHost(
           this@EnterNetworkFragment,
           DeviceProvisioningFragment.Callback::class.java
         )?.onCommissioningComplete(-1)
       }
-    }, ssidBytes, pwdBytes, /* breadcrumb = */ 0L, ADD_NETWORK_TIMEOUT)
+    }, ssidBytes, pwdBytes, /* breadcrumb = */ 0L)
   }
 
   private fun saveThreadNetwork() {
@@ -191,10 +190,10 @@ class EnterNetworkFragment : Fragment() {
       masterKeyStr.hexToByteArray()
     )
 
-    val enableNetworkCallback = object :
-      NetworkCommissioningCluster.EnableNetworkResponseCallback {
-      override fun onSuccess(errorCode: Int, debugText: String) {
-        Log.v(TAG, "EnableNetwork for $panIdStr succeeded, proceeding to OnOff")
+    val connectNetworkCallback = object :
+      NetworkCommissioningCluster.ConnectNetworkResponseCallback {
+      override fun onSuccess(networkingStatus: Int, debugText: String, errorValue: Long) {
+        Log.v(TAG, "ConnectNetwork for $panIdStr succeeded, proceeding to OnOff")
 
         requireActivity().runOnUiThread {
           Toast.makeText(
@@ -211,7 +210,7 @@ class EnterNetworkFragment : Fragment() {
       }
 
       override fun onError(ex: Exception) {
-        Log.e(TAG, "EnableNetwork for $panIdStr failed", ex)
+        Log.e(TAG, "ConnectNetwork for $panIdStr failed", ex)
         // TODO: consolidate error codes
         FragmentUtil.getHost(
           this@EnterNetworkFragment,
@@ -220,30 +219,25 @@ class EnterNetworkFragment : Fragment() {
       }
     }
 
-    cluster.addThreadNetwork(object :
-                             NetworkCommissioningCluster.AddThreadNetworkResponseCallback {
-      override fun onSuccess(errorCode: Int, debugText: String) {
-        Log.v(TAG, "AddThreadNetwork for $panIdStr succeeded")
-        println(xpanIdStr.toByteArray())
-        for( b in xpanIdStr.toByteArray()) {
-          println("> $b")
-        }
-        cluster.enableNetwork(
-          enableNetworkCallback,
+    cluster.addOrUpdateThreadNetwork(object :
+                             NetworkCommissioningCluster.NetworkConfigResponseCallback {
+      override fun onSuccess(networkingStatus: Int, debugText: String) {
+        Log.v(TAG, "AddOrUpdateThreadNetwork for $panIdStr succeeded")
+        cluster.connectNetwork(
+          connectNetworkCallback,
           xpanIdStr.hexToByteArray(),
-          /* breadcrumb = */ 0L,
-          ENABLE_NETWORK_TIMEOUT
+          /* breadcrumb = */ 0L
         )
       }
 
       override fun onError(ex: Exception) {
-        Log.e(TAG, "AddThreadNetwork for $panIdStr failed", ex)
+        Log.e(TAG, "AddOrUpdateThreadNetwork for $panIdStr failed", ex)
         FragmentUtil.getHost(
           this@EnterNetworkFragment,
           DeviceProvisioningFragment.Callback::class.java
         )?.onCommissioningComplete(-1)
       }
-    }, operationalDataset, /* breadcrumb = */ 0L, ADD_NETWORK_TIMEOUT)
+    }, operationalDataset, /* breadcrumb = */ 0L)
   }
 
   private fun makeThreadOperationalDataset(
@@ -296,8 +290,6 @@ class EnterNetworkFragment : Fragment() {
     private const val USE_HARDCODED_WIFI = false
     private const val HARDCODED_WIFI_SSID = ""
     private const val HARDCODED_WIFI_PASSWORD = ""
-    private const val ADD_NETWORK_TIMEOUT = 10000L
-    private const val ENABLE_NETWORK_TIMEOUT = 10000L
 
     private const val NUM_CHANNEL_BYTES = 3
     private const val NUM_PANID_BYTES = 2

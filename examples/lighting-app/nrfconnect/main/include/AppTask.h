@@ -52,6 +52,7 @@ private:
 
     friend AppTask & GetAppTask(void);
     int Init();
+    void InitOTARequestor();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
     static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);

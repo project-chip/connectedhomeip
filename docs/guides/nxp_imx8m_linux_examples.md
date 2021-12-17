@@ -269,15 +269,15 @@ Thermostat-app is used as an example below.
     -   Provision the **i.MX 8M Mini EVK** to a Wi-Fi AP with the following
         commands by `NetworkCommissioning` Cluster.
 
-        Command `AddWiFiNetwork` sends the target Wi-Fi AP's SSID and password.
-        The `${SSID}` and `${PASSWORD}` should be in plaintext format. At this
-        moment, Wi-Fi is still idle on the **i.MX8 Mini EVK**.
+        Command `AddOrUpdateWiFiNetwork` sends the target Wi-Fi AP's SSID and
+        password. The `${SSID}` and `${PASSWORD}` should be in plaintext format.
+        At this moment, Wi-Fi is still idle on the **i.MX8 Mini EVK**.
 
-        Command `EnableNetwork` triggers the Wi-Fi AP connecting operation on
+        Command `ConnectNetwork` triggers the Wi-Fi AP connecting operation on
         **i.MX8 Mini EVK**.
 
-                chip-device-ctrl > zcl NetworkCommissioning AddWiFiNetwork 8889 0 0 ssid=str:${SSID} credentials=str:${PASSWORD} breadcrumb=0 timeoutMs=5000
-                chip-device-ctrl > zcl NetworkCommissioning EnableNetwork 8889 0 0 networkID=str:${SSID} breadcrumb=0 timeoutMs=15000
+                chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 8889 0 0 ssid=str:${SSID} credentials=str:${PASSWORD} breadcrumb=0 timeoutMs=5000
+                chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 8889 0 0 networkID=str:${SSID} breadcrumb=0 timeoutMs=15000
 
     -   Make sure the controller device is connected to the same network of this
         Wi-Fi AP because the Wi-Fi connection is established between the Wi-Fi

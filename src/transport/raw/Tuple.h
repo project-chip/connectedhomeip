@@ -86,6 +86,11 @@ public:
         return SendMessageImpl<0>(address, std::move(msgBuf));
     }
 
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override
+    {
+        return MulticastGroupJoinLeaveImpl<0>(address, join);
+    }
+
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
 
     void Disconnect(const PeerAddress & address) override { return DisconnectImpl<0>(address); }
@@ -199,6 +204,36 @@ private:
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
     CHIP_ERROR SendMessageImpl(const PeerAddress & address, System::PacketBufferHandle msgBuf)
+    {
+        return CHIP_ERROR_NO_MESSAGE_HANDLER;
+    }
+
+    /**
+     * Recursive GroupJoinLeave implementation iterating through transport members.
+     *
+     * Listener is activated through the first transport from index N or above, which returns 'CanListenMulticast'
+     *
+     * @tparam N the index of the underlying transport to run GroupJoinLeave through.
+     *
+     * @param address where to send the message
+     * @param msgBuf the message to send.  Includes all CHIP message fields except optional length.
+     */
+    template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
+    {
+        Base * base = &std::get<N>(mTransports);
+        if (base->CanListenMulticast())
+        {
+            return base->MulticastGroupJoinLeave(address, join);
+        }
+        return MulticastGroupJoinLeaveImpl<N + 1>(address, join);
+    }
+
+    /**
+     * GroupJoinLeave when N is out of range. Always returns an error code.
+     */
+    template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
+    CHIP_ERROR MulticastGroupJoinLeaveImpl(const Transport::PeerAddress & address, bool join)
     {
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }

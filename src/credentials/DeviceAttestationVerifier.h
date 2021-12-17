@@ -34,21 +34,24 @@ enum class AttestationVerificationResult : uint16_t
     kPaaSignatureInvalid = 103,
     kPaaRevoked          = 104,
     kPaaFormatInvalid    = 105,
+    kPaaArgumentInvalid  = 106,
 
     kPaiExpired           = 200,
     kPaiSignatureInvalid  = 201,
     kPaiRevoked           = 202,
     kPaiFormatInvalid     = 203,
-    kPaiVendorIdMismatch  = 204,
-    kPaiAuthorityNotFound = 205,
+    kPaiArgumentInvalid   = 204,
+    kPaiVendorIdMismatch  = 205,
+    kPaiAuthorityNotFound = 206,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
     kDacRevoked           = 302,
     kDacFormatInvalid     = 303,
-    kDacVendorIdMismatch  = 304,
-    kDacProductIdMismatch = 305,
-    kDacAuthorityNotFound = 306,
+    kDacArgumentInvalid   = 304,
+    kDacVendorIdMismatch  = 305,
+    kDacProductIdMismatch = 306,
+    kDacAuthorityNotFound = 307,
 
     kFirmwareInformationMismatch = 400,
     kFirmwareInformationMissing  = 401,
@@ -68,6 +71,8 @@ enum class AttestationVerificationResult : uint16_t
     kNoMemory = 700,
 
     kInvalidArgument = 800,
+
+    kInternalError = 900,
 
     kNotImplemented = 0xFFFFU,
 

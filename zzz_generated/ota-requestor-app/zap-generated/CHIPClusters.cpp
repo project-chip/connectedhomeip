@@ -184,23 +184,5 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateProvider Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 } // namespace Controller
 } // namespace chip

@@ -147,13 +147,13 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     switch (subtype[1])
     {
     case 'S':
-        filterType = Dnssd::DiscoveryFilterType::kShort;
+        filterType = Dnssd::DiscoveryFilterType::kShortDiscriminator;
         break;
     case 'L':
-        filterType = Dnssd::DiscoveryFilterType::kLong;
+        filterType = Dnssd::DiscoveryFilterType::kLongDiscriminator;
         break;
     case 'V':
-        filterType = Dnssd::DiscoveryFilterType::kVendor;
+        filterType = Dnssd::DiscoveryFilterType::kVendorId;
         break;
     case 'T':
         filterType = Dnssd::DiscoveryFilterType::kDeviceType;
@@ -221,7 +221,7 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 
-    Dnssd::Resolver::Instance().Init(&DeviceLayer::InetLayer());
+    Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
     Dnssd::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);

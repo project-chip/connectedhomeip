@@ -114,7 +114,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     VerifyOrReturnError(mExchangeMgr != nullptr, CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(mSession.HasValue(), CHIP_ERROR_CONNECTION_ABORTED);
+    VerifyOrReturnError(mSession, CHIP_ERROR_CONNECTION_ABORTED);
 
     // Don't let method get called on a freed object.
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
@@ -161,7 +161,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch->SendMessage(mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
+        CHIP_ERROR err = mDispatch->SendMessage(mSession.Get(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
@@ -248,14 +248,14 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
     ec->mExchangeMgr->ReleaseContext(ec);
 }
 
-ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
+ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
     mExchangeMgr = em;
     mExchangeId  = ExchangeId;
-    mSession.SetValue(session);
+    mSession.Grab(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
@@ -312,7 +312,8 @@ ExchangeContext::~ExchangeContext()
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -320,8 +321,8 @@ bool ExchangeContext::MatchExchange(SessionHandle session, const PacketHeader & 
         // The exchange identifier of the message matches the exchange identifier of the context.
         (mExchangeId == payloadHeader.GetExchangeID())
 
-        // AND The Session ID associated with the incoming message matches the Session ID associated with the exchange.
-        && (mSession.HasValue() && mSession.Value().MatchIncomingSession(session))
+        // AND The Session associated with the incoming message matches the Session associated with the exchange.
+        && (mSession.Contains(session))
 
         // TODO: This check should be already implied by the equality of session check,
         // It should be removed after we have implemented the temporary node id for PASE and CASE sessions
@@ -340,7 +341,7 @@ void ExchangeContext::OnConnectionExpired()
     // connection state) value, because it's still referencing the now-expired
     // connection.  This will mean that no more messages can be sent via this
     // exchange, which seems fine given the semantics of connection expiration.
-    mSession.ClearValue();
+    mSession.Release();
 
     if (!IsResponseExpected())
     {

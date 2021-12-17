@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
@@ -63,27 +64,27 @@ void SignalHandler(int signum)
     switch (signum)
     {
     case SIGINT:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGHUP:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::BrownOutReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTERM:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::PowerOnReboot);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR1:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR2:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTSTP:
-        ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTRAP:
@@ -97,6 +98,9 @@ void SignalHandler(int signum)
         break;
     case SIGVTALRM:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::kEventId);
+        break;
+    case SIGIO:
+        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::kEventId);
         break;
     default:
         break;
@@ -238,7 +242,14 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    uint64_t upTime = 0;
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
+    uint64_t upTime                                   = 0;
+
+    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
 
     if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
@@ -261,13 +272,82 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
+CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
+    EndpointId endpoint, LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+{
+    // In Linux simulation, return following hardcoded labelList on all endpoints.
+    FixedLabel::Structs::LabelStruct::Type room;
+    FixedLabel::Structs::LabelStruct::Type orientation;
+    FixedLabel::Structs::LabelStruct::Type floor;
+    FixedLabel::Structs::LabelStruct::Type direction;
+
+    room.label = CharSpan("room", strlen("room"));
+    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+
+    orientation.label = CharSpan("orientation", strlen("orientation"));
+    orientation.value = CharSpan("North", strlen("North"));
+
+    floor.label = CharSpan("floor", strlen("floor"));
+    floor.value = CharSpan("2", strlen("2"));
+
+    direction.label = CharSpan("direction", strlen("direction"));
+    direction.value = CharSpan("up", strlen("up"));
+
+    labelList.add(room);
+    labelList.add(orientation);
+    labelList.add(floor);
+    labelList.add(direction);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetUserLabelList(EndpointId endpoint,
+                                       LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    // In Linux simulation, return following hardcoded labelList on all endpoints.
+    UserLabel::Structs::LabelStruct::Type room;
+    UserLabel::Structs::LabelStruct::Type orientation;
+    UserLabel::Structs::LabelStruct::Type floor;
+    UserLabel::Structs::LabelStruct::Type direction;
+
+    room.label = CharSpan("room", strlen("room"));
+    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+
+    orientation.label = CharSpan("orientation", strlen("orientation"));
+    orientation.value = CharSpan("North", strlen("North"));
+
+    floor.label = CharSpan("floor", strlen("floor"));
+    floor.value = CharSpan("2", strlen("2"));
+
+    direction.label = CharSpan("direction", strlen("direction"));
+    direction.value = CharSpan("up", strlen("up"));
+
+    labelList.add(room);
+    labelList.add(orientation);
+    labelList.add(floor);
+    labelList.add(direction);
+
+    return CHIP_NO_ERROR;
+}
+
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
-    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    if (delegate != nullptr)
+    if (generalDiagnosticsDelegate != nullptr)
     {
-        delegate->OnDeviceRebooted();
+        generalDiagnosticsDelegate->OnDeviceRebooted();
+    }
+
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint16_t softwareVersion;
+
+        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
+        platformManagerDelegate->OnStartUp(softwareVersion);
     }
 }
 
@@ -333,6 +413,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
     }
     else
     {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
     }
 }
 
@@ -352,6 +433,89 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
         softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
 
         delegate->OnSoftwareFaultDetected(softwareFault);
+    }
+}
+
+void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
+{
+    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
+        return;
+    }
+
+    if (EventId == Switch::Events::SwitchLatched::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnSwitchLatched(newPosition);
+    }
+    else if (EventId == Switch::Events::InitialPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnInitialPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::LongPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnLongPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::ShortRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnShortReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::LongRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnLongReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::MultiPressOngoing::kEventId)
+    {
+        uint8_t newPosition                   = 0;
+        uint8_t currentNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                   = 10;
+        currentNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
+    }
+    else if (EventId == Switch::Events::MultiPressComplete::kEventId)
+    {
+        uint8_t newPosition                 = 0;
+        uint8_t totalNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                 = 10;
+        totalNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
     }
 }
 

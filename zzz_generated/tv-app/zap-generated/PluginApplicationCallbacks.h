@@ -29,10 +29,12 @@
     MatterAudioOutputPluginServerInitCallback();                                                                                   \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterBindingPluginServerInitCallback();                                                                                       \
+    MatterChannelPluginServerInitCallback();                                                                                       \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
+    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginClientInitCallback();                                                                          \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
@@ -50,8 +52,8 @@
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterRelativeHumidityMeasurementPluginServerInitCallback();                                                                   \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
-    MatterTvChannelPluginServerInitCallback();                                                                                     \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWakeOnLanPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

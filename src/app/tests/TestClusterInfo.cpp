@@ -99,11 +99,11 @@ void TestAttributePathIncludedDifferentClusterId(nlTestSuite * apSuite, void * a
 }
 
 /*
-{ClusterInfo::kInvalidEndpointId, ClusterInfo::kInvalidClusterId, ClusterInfo::kInvalidEventId},
-{ClusterInfo::kInvalidEndpointId, MockClusterId(1), ClusterInfo::kInvalidEventId},
-{ClusterInfo::kInvalidEndpointId, MockClusterId(1), MockEventId(1)},
-{kMockEndpoint1, ClusterInfo::kInvalidClusterId, ClusterInfo::kInvalidEventId},
-{kMockEndpoint1, MockClusterId(1), ClusterInfo::kInvalidEventId},
+{kInvalidEndpointId, kInvalidClusterId, kInvalidEventId},
+{kInvalidEndpointId, MockClusterId(1), kInvalidEventId},
+{kInvalidEndpointId, MockClusterId(1), MockEventId(1)},
+{kMockEndpoint1, kInvalidClusterId, kInvalidEventId},
+{kMockEndpoint1, MockClusterId(1), kInvalidEventId},
 {kMockEndpoint1, MockClusterId(1), MockEventId(1)},
 */
 chip::app::ClusterInfo validEventpaths[6];

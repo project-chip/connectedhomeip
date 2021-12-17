@@ -79,22 +79,13 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatusIBs::Builder attributeStatuses;
-    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
-    err               = attributeStatuses.GetError();
-    SuccessOrExit(err);
-
+    VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
+    AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
+    ReturnErrorOnFailure(attributeStatusIBs.GetError());
     mWriteResponseBuilder.EndOfWriteResponseMessage();
-    err = mWriteResponseBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mMessageWriter.Finalize(&packet);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteHandler::SendWriteResponse()
@@ -120,7 +111,9 @@ exit:
 CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
+    const Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle().GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
@@ -180,7 +173,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             const ConcreteAttributePath concretePath =
                 ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
             MatterPreAttributeWriteCallback(concretePath);
-            err = WriteSingleClusterData(clusterInfo, dataReader, this);
+            err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
             MatterPostAttributeWriteCallback(concretePath);
         }
         SuccessOrExit(err);

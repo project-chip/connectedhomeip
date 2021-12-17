@@ -297,8 +297,6 @@ void MatterElectricalMeasurementPluginServerInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
-void MatterFixedLabelPluginServerInitCallback() {}
-void MatterSwitchPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
@@ -319,7 +317,6 @@ void MatterPollControlPluginServerInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterLocalizationUnitPluginServerInitCallback() {}
 void MatterLocalizationTimeFormatPluginServerInitCallback() {}
-void MatterUserLabelPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}

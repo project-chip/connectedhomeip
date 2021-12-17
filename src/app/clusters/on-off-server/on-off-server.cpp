@@ -68,7 +68,7 @@ using namespace chip::app::Clusters::OnOff;
  * Attributes Definition
  *********************************************************/
 
-static std::array<OnOffEffect *, EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT> instances = { 0 };
+static OnOffEffect * firstEffect = nullptr;
 OnOffServer OnOffServer::instance;
 
 /**********************************************************
@@ -251,9 +251,9 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
 
-bool OnOffServer::offCommand()
+bool OnOffServer::offCommand(const app::ConcreteCommandPath & commandPath)
 {
-    EmberAfStatus status = setOnOffValue(emberAfCurrentEndpoint(), Commands::Off::Id, false);
+    EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Off::Id, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -264,9 +264,9 @@ bool OnOffServer::offCommand()
     return true;
 }
 
-bool OnOffServer::onCommand()
+bool OnOffServer::onCommand(const app::ConcreteCommandPath & commandPath)
 {
-    EmberAfStatus status = setOnOffValue(emberAfCurrentEndpoint(), Commands::On::Id, false);
+    EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::On::Id, false);
 
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
@@ -279,9 +279,9 @@ bool OnOffServer::onCommand()
     return true;
 }
 
-bool OnOffServer::toggleCommand()
+bool OnOffServer::toggleCommand(const app::ConcreteCommandPath & commandPath)
 {
-    EmberAfStatus status = setOnOffValue(emberAfCurrentEndpoint(), Commands::Toggle::Id, false);
+    EmberAfStatus status = setOnOffValue(commandPath.mEndpointId, Commands::Toggle::Id, false);
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -292,10 +292,13 @@ bool OnOffServer::toggleCommand()
     return true;
 }
 
-bool OnOffServer::offWithEffectCommand(uint8_t effectId, uint8_t effectVariant)
+bool OnOffServer::offWithEffectCommand(const app::ConcreteCommandPath & commandPath,
+                                       const Commands::OffWithEffect::DecodableType & commandData)
 {
-    chip::EndpointId endpoint = emberAfCurrentEndpoint();
-    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
+    OnOffEffectIdentifier effectId = commandData.effectId;
+    uint8_t effectVariant          = commandData.effectVariant;
+    chip::EndpointId endpoint      = commandPath.mEndpointId;
+    EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;
 
     bool globalSceneControl = false;
     OnOff::Attributes::GlobalSceneControl::Get(endpoint, &globalSceneControl);
@@ -333,9 +336,9 @@ bool OnOffServer::offWithEffectCommand(uint8_t effectId, uint8_t effectVariant)
     return true;
 }
 
-bool OnOffServer::OnWithRecallGlobalSceneCommand()
+bool OnOffServer::OnWithRecallGlobalSceneCommand(const app::ConcreteCommandPath & commandPath)
 {
-    chip::EndpointId endpoint = emberAfCurrentEndpoint();
+    chip::EndpointId endpoint = commandPath.mEndpointId;
     EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
 
     bool globalSceneControl = false;
@@ -354,13 +357,17 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand()
     return true;
 }
 
-bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uint16_t onTime, uint16_t offWaitTime)
+bool OnOffServer::OnWithTimedOffCommand(const app::ConcreteCommandPath & commandPath,
+                                        const Commands::OnWithTimedOff::DecodableType & commandData)
 {
-    EmberAfStatus status        = EMBER_ZCL_STATUS_SUCCESS;
-    chip::EndpointId endpoint   = emberAfCurrentEndpoint();
-    bool isOn                   = false;
-    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
-    uint16_t currentOnTime      = 0;
+    BitFlags<OnOffControl> onOffControl = commandData.onOffControl;
+    uint16_t onTime                     = commandData.onTime;
+    uint16_t offWaitTime                = commandData.offWaitTime;
+    EmberAfStatus status                = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpoint           = commandPath.mEndpointId;
+    bool isOn                           = false;
+    uint16_t currentOffWaitTime         = MAX_TIME_VALUE;
+    uint16_t currentOnTime              = 0;
 
     EmberEventControl * event = configureEventControl(endpoint);
     VerifyOrExit(event != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
@@ -508,7 +515,7 @@ EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
     uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
     EmberEventControl * event = nullptr;
 
-    if (index < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (index < ArraySize(eventControls))
     {
         event = &eventControls[index];
     }
@@ -539,42 +546,47 @@ EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 
 static OnOffEffect * inst(EndpointId endpoint)
 {
-    for (size_t i = 0; i < instances.size(); i++)
+    OnOffEffect * current = firstEffect;
+    while (current != nullptr && current->mEndpoint != endpoint)
     {
-        if (nullptr != instances[i] && endpoint == instances[i]->mEndpoint)
-        {
-            return instances[i];
-        }
+        current = current->next();
     }
 
-    return nullptr;
+    return current;
 }
 
 static inline void reg(OnOffEffect * inst)
 {
-    for (size_t i = 0; i < instances.size(); i++)
-    {
-        if (nullptr == instances[i])
-        {
-            instances[i] = inst;
-            break;
-        }
-    }
+    inst->setNext(firstEffect);
+    firstEffect = inst;
 }
 
 static inline void unreg(OnOffEffect * inst)
 {
-    for (size_t i = 0; i < instances.size(); i++)
+    if (firstEffect == inst)
     {
-        if (inst == instances[i])
+        firstEffect = firstEffect->next();
+    }
+    else
+    {
+        OnOffEffect * previous = firstEffect;
+        OnOffEffect * current  = firstEffect->next();
+
+        while (current != nullptr && current != inst)
         {
-            instances[i] = nullptr;
+            previous = current;
+            current  = current->next();
+        }
+
+        if (current != nullptr)
+        {
+            previous->setNext(current->next());
         }
     }
 }
 
-OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger, uint8_t effectIdentifier,
-                         uint8_t effectVariant) :
+OnOffEffect::OnOffEffect(chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
+                         OnOffEffectIdentifier effectIdentifier, uint8_t effectVariant) :
     mEndpoint(endpoint),
     mOffWithEffectTrigger(offWithEffectTrigger), mEffectIdentifier(effectIdentifier), mEffectVariant(effectVariant)
 {
@@ -593,45 +605,38 @@ OnOffEffect::~OnOffEffect()
 bool emberAfOnOffClusterOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                     const Commands::Off::DecodableType & commandData)
 {
-    return OnOffServer::Instance().offCommand();
+    return OnOffServer::Instance().offCommand(commandPath);
 }
 
 bool emberAfOnOffClusterOnCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                    const Commands::On::DecodableType & commandData)
 {
-    return OnOffServer::Instance().onCommand();
+    return OnOffServer::Instance().onCommand(commandPath);
 }
 
 bool emberAfOnOffClusterToggleCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                        const Commands::Toggle::DecodableType & commandData)
 {
-    return OnOffServer::Instance().toggleCommand();
+    return OnOffServer::Instance().toggleCommand(commandPath);
 }
 
 bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::OffWithEffect::DecodableType & commandData)
 {
-    auto & effectId      = commandData.effectId;
-    auto & effectVariant = commandData.effectVariant;
-
-    return OnOffServer::Instance().offWithEffectCommand(effectId, effectVariant);
+    return OnOffServer::Instance().offWithEffectCommand(commandPath, commandData);
 }
 
 bool emberAfOnOffClusterOnWithRecallGlobalSceneCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::OnWithRecallGlobalScene::DecodableType & commandData)
 {
-    return OnOffServer::Instance().OnWithRecallGlobalSceneCommand();
+    return OnOffServer::Instance().OnWithRecallGlobalSceneCommand(commandPath);
 }
 
 bool emberAfOnOffClusterOnWithTimedOffCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                const Commands::OnWithTimedOff::DecodableType & commandData)
 {
-    auto & onOffControl = commandData.onOffControl;
-    auto & onTime       = commandData.onTime;
-    auto & offWaitTime  = commandData.offWaitTime;
-
-    return OnOffServer::Instance().OnWithTimedOffCommand(onOffControl, onTime, offWaitTime);
+    return OnOffServer::Instance().OnWithTimedOffCommand(commandPath, commandData);
 }
 
 void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint)

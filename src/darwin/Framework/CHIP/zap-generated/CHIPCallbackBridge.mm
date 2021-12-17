@@ -37,6 +37,22 @@ void CHIPOctetStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::B
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOctetStringAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
 {
@@ -49,12 +65,44 @@ void CHIPNullableOctetStringAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableOctetStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableOctetStringAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPCharStringAttributeCallbackBridge::OnSuccessFn(void * context, chip::CharSpan value)
 {
     NSString * _Nonnull objCValue;
     objCValue = [[NSString alloc] initWithBytes:value.data() length:value.size() encoding:NSUTF8StringEncoding];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPCharStringAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableCharStringAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
@@ -68,12 +116,44 @@ void CHIPNullableCharStringAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableCharStringAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPBooleanAttributeCallbackBridge::OnSuccessFn(void * context, bool value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithBool:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBooleanAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value)
 {
@@ -86,12 +166,44 @@ void CHIPNullableBooleanAttributeCallbackBridge::OnSuccessFn(void * context, con
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableBooleanAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableBooleanAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt8uAttributeCallbackBridge::OnSuccessFn(void * context, uint8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt8uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
 {
@@ -104,12 +216,44 @@ void CHIPNullableInt8uAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt8uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt8sAttributeCallbackBridge::OnSuccessFn(void * context, int8_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithChar:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt8sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
 {
@@ -122,12 +266,44 @@ void CHIPNullableInt8sAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt8sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt8sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt16uAttributeCallbackBridge::OnSuccessFn(void * context, uint16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt16uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
 {
@@ -140,12 +316,44 @@ void CHIPNullableInt16uAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt16uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt16sAttributeCallbackBridge::OnSuccessFn(void * context, int16_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithShort:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt16sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
 {
@@ -158,12 +366,44 @@ void CHIPNullableInt16sAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt16sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt16sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt32uAttributeCallbackBridge::OnSuccessFn(void * context, uint32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedInt:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt32uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
 {
@@ -176,12 +416,44 @@ void CHIPNullableInt32uAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt32uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt32uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt32sAttributeCallbackBridge::OnSuccessFn(void * context, int32_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithInt:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt32sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
 {
@@ -194,12 +466,44 @@ void CHIPNullableInt32sAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt32sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt32sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt64uAttributeCallbackBridge::OnSuccessFn(void * context, uint64_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedLongLong:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt64uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
 {
@@ -212,12 +516,44 @@ void CHIPNullableInt64uAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt64uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt64uAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPInt64sAttributeCallbackBridge::OnSuccessFn(void * context, int64_t value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithLongLong:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPInt64sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
 {
@@ -230,12 +566,44 @@ void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableInt64sAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableInt64sAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPFloatAttributeCallbackBridge::OnSuccessFn(void * context, float value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithFloat:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFloatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableFloatAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value)
 {
@@ -248,12 +616,44 @@ void CHIPNullableFloatAttributeCallbackBridge::OnSuccessFn(void * context, const
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableFloatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableFloatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPDoubleAttributeCallbackBridge::OnSuccessFn(void * context, double value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithDouble:value];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoubleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableDoubleAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value)
 {
@@ -266,12 +666,44 @@ void CHIPNullableDoubleAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPNullableDoubleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoubleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPVendorIdAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value)
@@ -284,6 +716,22 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     }
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPNullableVendorIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableVendorIdAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
@@ -302,57 +750,86 @@ void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context
         if (entry_0.subjects.IsNull()) {
             newElement_0.subjects = nil;
         } else {
-            auto * array_NaN = [NSMutableArray new];
-            auto iter_NaN = entry_0.subjects.Value().begin();
-            while (iter_NaN.Next()) {
-                auto & entry_NaN = iter_NaN.GetValue();
-                NSNumber * newElement_NaN;
-                newElement_NaN = [NSNumber numberWithUnsignedLongLong:entry_NaN];
-                [array_NaN addObject:newElement_NaN];
+            auto * array_3 = [NSMutableArray new];
+            auto iter_3 = entry_0.subjects.Value().begin();
+            while (iter_3.Next()) {
+                auto & entry_3 = iter_3.GetValue();
+                NSNumber * newElement_3;
+                newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
+                [array_3 addObject:newElement_3];
             }
-            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_3.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
             }
-            newElement_0.subjects = array_NaN;
+            newElement_0.subjects = array_3;
         }
         if (entry_0.targets.IsNull()) {
             newElement_0.targets = nil;
         } else {
-            auto * array_NaN = [NSMutableArray new];
-            auto iter_NaN = entry_0.targets.Value().begin();
-            while (iter_NaN.Next()) {
-                auto & entry_NaN = iter_NaN.GetValue();
-                CHIPAccessControlClusterTarget * newElement_NaN;
-                newElement_NaN = [CHIPAccessControlClusterTarget new];
-                if (entry_NaN.cluster.IsNull()) {
-                    newElement_NaN.cluster = nil;
+            auto * array_3 = [NSMutableArray new];
+            auto iter_3 = entry_0.targets.Value().begin();
+            while (iter_3.Next()) {
+                auto & entry_3 = iter_3.GetValue();
+                CHIPAccessControlClusterTarget * newElement_3;
+                newElement_3 = [CHIPAccessControlClusterTarget new];
+                if (entry_3.cluster.IsNull()) {
+                    newElement_3.cluster = nil;
                 } else {
-                    newElement_NaN.cluster = [NSNumber numberWithUnsignedInt:entry_NaN.cluster.Value()];
+                    newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
                 }
-                if (entry_NaN.endpoint.IsNull()) {
-                    newElement_NaN.endpoint = nil;
+                if (entry_3.endpoint.IsNull()) {
+                    newElement_3.endpoint = nil;
                 } else {
-                    newElement_NaN.endpoint = [NSNumber numberWithUnsignedShort:entry_NaN.endpoint.Value()];
+                    newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
                 }
-                if (entry_NaN.deviceType.IsNull()) {
-                    newElement_NaN.deviceType = nil;
+                if (entry_3.deviceType.IsNull()) {
+                    newElement_3.deviceType = nil;
                 } else {
-                    newElement_NaN.deviceType = [NSNumber numberWithUnsignedInt:entry_NaN.deviceType.Value()];
+                    newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
                 }
-                [array_NaN addObject:newElement_NaN];
+                [array_3 addObject:newElement_3];
             }
-            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_3.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
             }
-            newElement_0.targets = array_NaN;
+            newElement_0.targets = array_3;
         }
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPAccessControlAclListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlAclListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
@@ -368,13 +845,188 @@ void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * c
         newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlExtensionListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAccessControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAccountLoginAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccountLoginAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplicationBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
@@ -388,13 +1040,72 @@ void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::
         newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplicationLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & value)
@@ -413,13 +1124,266 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
                                                    encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPAudioOutputAudioOutputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAudioOutputAudioOutputListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAudioOutputAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAudioOutputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBarrierControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBarrierControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBinaryInputBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBindingAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBindingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBooleanStateAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBooleanStateAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & value)
@@ -441,13 +1405,32 @@ void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void *
         newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsActionListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
@@ -465,49 +1448,53 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
         newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
-        auto * array_NaN = [NSMutableArray new];
-        auto iter_NaN = entry_0.endpoints.begin();
-        while (iter_NaN.Next()) {
-            auto & entry_NaN = iter_NaN.GetValue();
-            NSNumber * newElement_NaN;
-            newElement_NaN = [NSNumber numberWithUnsignedShort:entry_NaN];
-            [array_NaN addObject:newElement_NaN];
+        auto * array_2 = [NSMutableArray new];
+        auto iter_2 = entry_0.endpoints.begin();
+        while (iter_2.Next()) {
+            auto & entry_2 = iter_2.GetValue();
+            NSNumber * newElement_2;
+            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+            [array_2 addObject:newElement_2];
         }
-        if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        newElement_0.endpoints = array_NaN;
+        newElement_0.endpoints = array_2;
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+void CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    NSArray * _Nonnull objCValue;
-    auto * array_0 = [NSMutableArray new];
-    auto iter_0 = value.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        NSData * newElement_0;
-        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
-        [array_0 addObject:newElement_0];
-    }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+    auto * self = static_cast<CHIPBridgedActionsEndpointListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
         return;
     }
-    objCValue = array_0;
-    DispatchSuccess(context, objCValue);
-};
 
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedActionsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
@@ -515,16 +1502,280 @@ void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSu
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
         NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedDeviceBasicAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPChannelClusterChannelInfo * newElement_0;
+        newElement_0 = [CHIPChannelClusterChannelInfo new];
+        newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
+        newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
+        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
+                                                     length:entry_0.name.size()
+                                                   encoding:NSUTF8StringEncoding];
+        newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
+                                                         length:entry_0.callSign.size()
+                                                       encoding:NSUTF8StringEncoding];
+        newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
+                                                                  length:entry_0.affiliateCallSign.size()
+                                                                encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelChannelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelChannelListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPContentLauncherAcceptHeaderListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSString * newElement_0;
+        newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPContentLauncherAcceptHeaderListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPContentLauncherAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
@@ -540,13 +1791,32 @@ void CHIPDescriptorDeviceListListAttributeCallbackBridge::OnSuccessFn(void * con
         newElement_0.revision = [NSNumber numberWithUnsignedShort:entry_0.revision];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPDescriptorDeviceListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDescriptorDeviceListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
@@ -560,13 +1830,32 @@ void CHIPDescriptorServerListListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPDescriptorServerListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDescriptorServerListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
@@ -580,13 +1869,32 @@ void CHIPDescriptorClientListListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPDescriptorClientListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDescriptorClientListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
@@ -600,13 +1908,227 @@ void CHIPDescriptorPartsListListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPDescriptorPartsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDescriptorPartsListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDescriptorAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDescriptorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDescriptorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDiagnosticLogsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDiagnosticLogsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPElectricalMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPElectricalMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPEthernetNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
@@ -632,13 +2154,110 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
                                                     encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFixedLabelLabelListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPFixedLabelAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFixedLabelAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPFlowMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPFlowMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -654,13 +2273,72 @@ void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBrid
         newElement_0.failSafeExpiryLengthMs = [NSNumber numberWithUnsignedInt:entry_0.failSafeExpiryLengthMs];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralCommissioningAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -683,13 +2361,32 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
         newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -703,13 +2400,32 @@ void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge::OnSu
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -723,13 +2439,32 @@ void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge::OnSucce
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -743,13 +2478,71 @@ void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge::OnSuc
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & value)
@@ -766,13 +2559,32 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void *
         newElement_0.groupKeySetIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetIndex];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
@@ -791,13 +2603,305 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
         newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGroupKeyManagementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGroupKeyManagementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGroupsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGroupsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIdentifyAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIdentifyAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIlluminanceMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIlluminanceMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPKeypadInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPKeypadInputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLowPowerAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
@@ -819,13 +2923,110 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
                                                                 encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPMediaInputMediaInputListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaInputMediaInputListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaInputAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaInputAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaPlaybackAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaPlaybackAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & value)
@@ -844,13 +3045,308 @@ void CHIPModeSelectSupportedModesListAttributeCallbackBridge::OnSuccessFn(void *
         newElement_0.semanticTag = [NSNumber numberWithUnsignedInt:entry_0.semanticTag];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPModeSelectSupportedModesListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPModeSelectAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPModeSelectAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNetworkCommissioningNetworksListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+        value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPNetworkCommissioningClusterNetworkInfo * newElement_0;
+        newElement_0 = [CHIPNetworkCommissioningClusterNetworkInfo new];
+        newElement_0.networkID = [NSData dataWithBytes:entry_0.networkID.data() length:entry_0.networkID.size()];
+        newElement_0.connected = [NSNumber numberWithBool:entry_0.connected];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNetworkCommissioningNetworksListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOccupancySensingAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOccupancySensingAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOnOffAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOnOffAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOnOffSwitchConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -873,13 +3369,32 @@ void CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge::OnSuccess
                                                     encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOperationalCredentialsFabricsListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
@@ -893,13 +3408,72 @@ void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridg
         newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOperationalCredentialsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOperationalCredentialsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -913,13 +3487,71 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -933,13 +3565,227 @@ void CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceConfigurationSourcesListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPowerSourceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPowerSourceConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPressureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPressureMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPPumpConfigurationAndControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPRelativeHumidityMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPScenesAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPScenesAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
@@ -961,44 +3807,110 @@ void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessF
         newElement_0.stackSize = [NSNumber numberWithUnsignedInt:entry_0.stackSize];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
+void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPTvChannelClusterTvChannelInfo * newElement_0;
-        newElement_0 = [CHIPTvChannelClusterTvChannelInfo new];
-        newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
-        newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
-        newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                     length:entry_0.name.size()
-                                                   encoding:NSUTF8StringEncoding];
-        newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
-                                                         length:entry_0.callSign.size()
-                                                       encoding:NSUTF8StringEncoding];
-        newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
-                                                                  length:entry_0.affiliateCallSign.size()
-                                                                encoding:NSUTF8StringEncoding];
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPSoftwareDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -1017,13 +3929,110 @@ void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSucces
                                                    encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTargetNavigatorAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTargetNavigatorAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTemperatureMeasurementAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTemperatureMeasurementAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
@@ -1037,13 +4046,32 @@ void CHIPTestClusterListInt8uListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTestClusterListInt8uListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterListInt8uListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
@@ -1057,13 +4085,32 @@ void CHIPTestClusterListOctetStringListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTestClusterListOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterListOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
@@ -1080,13 +4127,32 @@ void CHIPTestClusterListStructOctetStringListAttributeCallbackBridge::OnSuccessF
         newElement_0.operationalCert = [NSData dataWithBytes:entry_0.operationalCert.data() length:entry_0.operationalCert.size()];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterListStructOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -1205,30 +4271,40 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
         if (entry_0.nullableList.IsNull()) {
             newElement_0.nullableList = nil;
         } else {
-            auto * array_NaN = [NSMutableArray new];
-            auto iter_NaN = entry_0.nullableList.Value().begin();
-            while (iter_NaN.Next()) {
-                auto & entry_NaN = iter_NaN.GetValue();
-                NSNumber * newElement_NaN;
-                newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
-                [array_NaN addObject:newElement_NaN];
+            auto * array_3 = [NSMutableArray new];
+            auto iter_3 = entry_0.nullableList.Value().begin();
+            while (iter_3.Next()) {
+                auto & entry_3 = iter_3.GetValue();
+                NSNumber * newElement_3;
+                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                [array_3 addObject:newElement_3];
             }
-            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_3.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
             }
-            newElement_0.nullableList = array_NaN;
+            newElement_0.nullableList = array_3;
         }
         if (entry_0.optionalList.HasValue()) {
-            auto * array_NaN = [NSMutableArray new];
-            auto iter_NaN = entry_0.optionalList.Value().begin();
-            while (iter_NaN.Next()) {
-                auto & entry_NaN = iter_NaN.GetValue();
-                NSNumber * newElement_NaN;
-                newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
-                [array_NaN addObject:newElement_NaN];
+            auto * array_3 = [NSMutableArray new];
+            auto iter_3 = entry_0.optionalList.Value().begin();
+            while (iter_3.Next()) {
+                auto & entry_3 = iter_3.GetValue();
+                NSNumber * newElement_3;
+                newElement_3 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_3)];
+                [array_3 addObject:newElement_3];
             }
-            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_3.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
             }
-            newElement_0.optionalList = array_NaN;
+            newElement_0.optionalList = array_3;
         } else {
             newElement_0.optionalList = nil;
         }
@@ -1236,30 +4312,55 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             if (entry_0.nullableOptionalList.Value().IsNull()) {
                 newElement_0.nullableOptionalList = nil;
             } else {
-                auto * array_NaN = [NSMutableArray new];
-                auto iter_NaN = entry_0.nullableOptionalList.Value().Value().begin();
-                while (iter_NaN.Next()) {
-                    auto & entry_NaN = iter_NaN.GetValue();
-                    NSNumber * newElement_NaN;
-                    newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
-                    [array_NaN addObject:newElement_NaN];
+                auto * array_4 = [NSMutableArray new];
+                auto iter_4 = entry_0.nullableOptionalList.Value().Value().begin();
+                while (iter_4.Next()) {
+                    auto & entry_4 = iter_4.GetValue();
+                    NSNumber * newElement_4;
+                    newElement_4 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_4)];
+                    [array_4 addObject:newElement_4];
                 }
-                if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+                { // Scope for the error so we will know what it's named
+                    CHIP_ERROR err = iter_4.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                        return;
+                    }
                 }
-                newElement_0.nullableOptionalList = array_NaN;
+                newElement_0.nullableOptionalList = array_4;
             }
         } else {
             newElement_0.nullableOptionalList = nil;
         }
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
@@ -1273,13 +4374,151 @@ void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
         newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterListLongOctetStringListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTestClusterAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTestClusterAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThermostatAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThermostatAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPThermostatUserInterfaceConfigurationAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -1308,13 +4547,32 @@ void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::O
         newElement_0.isChild = [NSNumber numberWithBool:entry_0.isChild];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
@@ -1339,13 +4597,32 @@ void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge::OnSu
         newElement_0.linkEstablished = [NSNumber numberWithBool:entry_0.linkEstablished];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -1362,13 +4639,32 @@ void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge::OnSu
         newElement_0.flags = [NSNumber numberWithUnsignedShort:entry_0.flags];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
@@ -1395,13 +4691,34 @@ void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallba
         newElement_0.channelMaskPresent = [NSNumber numberWithBool:entry_0.channelMaskPresent];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
@@ -1415,22 +4732,263 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBri
         newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
         [array_0 addObject:newElement_0];
     }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
     }
     objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
+
+void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPUserLabelClusterLabelStruct * newElement_0;
+        newElement_0 = [CHIPUserLabelClusterLabelStruct new];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                      length:entry_0.value.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                      length:entry_0.value.size()
+                                                    encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPUserLabelLabelListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWakeOnLanAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWakeOnLanAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWiFiNetworkDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWindowCoveringAttributeListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWindowCoveringAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
 
 void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data)
 {
     auto * response = [CHIPAccountLoginClusterGetSetupPINResponseParams new];
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.setupPIN.data() length:data.setupPIN.size() encoding:NSUTF8StringEncoding];
-        response.setupPIN = value;
+        response.setupPIN = [[NSString alloc] initWithBytes:data.setupPIN.data()
+                                                     length:data.setupPIN.size()
+                                                   encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPApplicationLauncherClusterHideAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterHideAppResponseParams new];
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1440,14 +4998,47 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPApplicationLauncherClusterStopAppResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
+{
+    auto * response = [CHIPApplicationLauncherClusterStopAppResponseParams new];
+    {
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
+    }
+    {
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data)
+{
+    auto * response = [CHIPChannelClusterChangeChannelResponseParams new];
+    {
+        response.channelMatch = [CHIPChannelClusterChannelInfo new];
+        response.channelMatch.majorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.majorNumber];
+        response.channelMatch.minorNumber = [NSNumber numberWithUnsignedShort:data.channelMatch.minorNumber];
+        response.channelMatch.name = [[NSString alloc] initWithBytes:data.channelMatch.name.data()
+                                                              length:data.channelMatch.name.size()
+                                                            encoding:NSUTF8StringEncoding];
+        response.channelMatch.callSign = [[NSString alloc] initWithBytes:data.channelMatch.callSign.data()
+                                                                  length:data.channelMatch.callSign.size()
+                                                                encoding:NSUTF8StringEncoding];
+        response.channelMatch.affiliateCallSign = [[NSString alloc] initWithBytes:data.channelMatch.affiliateCallSign.data()
+                                                                           length:data.channelMatch.affiliateCallSign.size()
+                                                                         encoding:NSUTF8StringEncoding];
+    }
+    {
+        response.errorType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
     }
     DispatchSuccess(context, response);
 };
@@ -1457,14 +5048,10 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
+        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
-        response.contentLaunchStatus = value;
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1474,14 +5061,10 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
+        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
-        response.contentLaunchStatus = value;
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1491,272 +5074,152 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPDiagnosticLogsClusterRetrieveLogsResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.content.data() length:data.content.size()];
-        response.content = value;
+        response.content = [NSData dataWithBytes:data.content.data() length:data.content.size()];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.timeStamp];
-        response.timeStamp = value;
+        response.timeStamp = [NSNumber numberWithUnsignedInt:data.timeStamp];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
-        response.timeSinceBoot = value;
+        response.timeSinceBoot = [NSNumber numberWithUnsignedInt:data.timeSinceBoot];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+void CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetCredentialStatusResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.holidayIndex];
-        response.holidayIndex = value;
+        response.credentialExists = [NSNumber numberWithBool:data.credentialExists];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        if (data.userIndex.IsNull()) {
+            response.userIndex = nil;
+        } else {
+            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
+        }
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.localStartTime];
-        response.localStartTime = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.localEndTime];
-        response.localEndTime = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode)];
-        response.operatingMode = value;
+        if (data.nextCredentialIndex.IsNull()) {
+            response.nextCredentialIndex = nil;
+        } else {
+            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
+void CHIPDoorLockClusterGetUserResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetLogRecordResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetUserResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.logEntryId];
-        response.logEntryId = value;
+        response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.timestamp];
-        response.timestamp = value;
+        if (data.userName.IsNull()) {
+            response.userName = nil;
+        } else {
+            response.userName = [[NSString alloc] initWithBytes:data.userName.Value().data()
+                                                         length:data.userName.Value().size()
+                                                       encoding:NSUTF8StringEncoding];
+        }
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.eventType];
-        response.eventType = value;
+        if (data.userUniqueId.IsNull()) {
+            response.userUniqueId = nil;
+        } else {
+            response.userUniqueId = [NSNumber numberWithUnsignedInt:data.userUniqueId.Value()];
+        }
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.source];
-        response.source = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.eventIdOrAlarmCode];
-        response.eventIdOrAlarmCode = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
-    }
-    {
-        NSData * value;
-        value = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
-        response.pin = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetPINCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetPINCodeResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
-    }
-    {
-        NSNumber * value;
         if (data.userStatus.IsNull()) {
-            value = nil;
+            response.userStatus = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
+            response.userStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
         }
-        response.userStatus = value;
     }
     {
-        NSNumber * value;
         if (data.userType.IsNull()) {
-            value = nil;
+            response.userType = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
+            response.userType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
         }
-        response.userType = value;
     }
     {
-        NSData * value;
-        if (data.pin.IsNull()) {
-            value = nil;
+        if (data.credentialRule.IsNull()) {
+            response.credentialRule = nil;
         } else {
-            value = [NSData dataWithBytes:data.pin.Value().data() length:data.pin.Value().size()];
+            response.credentialRule = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.credentialRule.Value())];
         }
-        response.pin = value;
+    }
+    {
+        if (data.credentials.IsNull()) {
+            response.credentials = nil;
+        } else {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.credentials.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPDoorLockClusterDlCredential * newElement_1;
+                newElement_1 = [CHIPDoorLockClusterDlCredential new];
+                newElement_1.credentialType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.credentialType)];
+                newElement_1.credentialIndex = [NSNumber numberWithUnsignedShort:entry_1.credentialIndex];
+                [array_1 addObject:newElement_1];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.credentials = array_1;
+        }
+    }
+    {
+        if (data.creatorFabricIndex.IsNull()) {
+            response.creatorFabricIndex = nil;
+        } else {
+            response.creatorFabricIndex = [NSNumber numberWithUnsignedChar:data.creatorFabricIndex.Value()];
+        }
+    }
+    {
+        if (data.lastModifiedFabricIndex.IsNull()) {
+            response.lastModifiedFabricIndex = nil;
+        } else {
+            response.lastModifiedFabricIndex = [NSNumber numberWithUnsignedChar:data.lastModifiedFabricIndex.Value()];
+        }
+    }
+    {
+        response.nextUserIndex = [NSNumber numberWithUnsignedShort:data.nextUserIndex];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
+void CHIPDoorLockClusterSetCredentialResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetRFIDCodeResponseParams new];
+    auto * response = [CHIPDoorLockClusterSetCredentialResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        NSNumber * value;
-        if (data.userStatus.IsNull()) {
-            value = nil;
+        if (data.userIndex.IsNull()) {
+            response.userIndex = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
+            response.userIndex = [NSNumber numberWithUnsignedShort:data.userIndex.Value()];
         }
-        response.userStatus = value;
     }
     {
-        NSNumber * value;
-        if (data.userType.IsNull()) {
-            value = nil;
+        if (data.nextCredentialIndex.IsNull()) {
+            response.nextCredentialIndex = nil;
         } else {
-            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
+            response.nextCredentialIndex = [NSNumber numberWithUnsignedShort:data.nextCredentialIndex.Value()];
         }
-        response.userType = value;
-    }
-    {
-        NSData * value;
-        if (data.rfidCode.IsNull()) {
-            value = nil;
-        } else {
-            value = [NSData dataWithBytes:data.rfidCode.Value().data() length:data.rfidCode.Value().size()];
-        }
-        response.rfidCode = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetUserTypeResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
-        response.userType = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetWeekDayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
-        response.weekDayIndex = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userIndex];
-        response.userIndex = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.daysMask.Raw()];
-        response.daysMask = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.startHour];
-        response.startHour = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.startMinute];
-        response.startMinute = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.endHour];
-        response.endHour = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.endMinute];
-        response.endMinute = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterGetYearDayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
-        response.yearDayIndex = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userIndex];
-        response.userIndex = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.localStartTime];
-        response.localStartTime = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.localEndTime];
-        response.localEndTime = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1766,14 +5229,12 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccess
 {
     auto * response = [CHIPGeneralCommissioningClusterArmFailSafeResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-        response.errorCode = value;
+        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1783,14 +5244,12 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge:
 {
     auto * response = [CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-        response.errorCode = value;
+        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1800,14 +5259,12 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::O
 {
     auto * response = [CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
-        response.errorCode = value;
+        response.errorCode = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1817,14 +5274,10 @@ void CHIPGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupsClusterAddGroupResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     DispatchSuccess(context, response);
 };
@@ -1834,12 +5287,9 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupsClusterGetGroupMembershipResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.capacity];
-        response.capacity = value;
+        response.capacity = [NSNumber numberWithUnsignedChar:data.capacity];
     }
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.groupList.begin();
         while (iter_0.Next()) {
@@ -1848,12 +5298,14 @@ void CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge::OnSuccessFn(
             newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.groupList = value;
+        response.groupList = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -1863,14 +5315,10 @@ void CHIPGroupsClusterRemoveGroupResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupsClusterRemoveGroupResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     DispatchSuccess(context, response);
 };
@@ -1880,19 +5328,15 @@ void CHIPGroupsClusterViewGroupResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupsClusterViewGroupResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.groupName.data() length:data.groupName.size() encoding:NSUTF8StringEncoding];
-        response.groupName = value;
+        response.groupName = [[NSString alloc] initWithBytes:data.groupName.data()
+                                                      length:data.groupName.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -1902,9 +5346,7 @@ void CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPIdentifyClusterIdentifyQueryResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.timeout];
-        response.timeout = value;
+        response.timeout = [NSNumber numberWithUnsignedShort:data.timeout];
     }
     DispatchSuccess(context, response);
 };
@@ -1914,9 +5356,7 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPKeypadInputClusterSendKeyResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     DispatchSuccess(context, response);
 };
@@ -1926,9 +5366,7 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn
 {
     auto * response = [CHIPMediaPlaybackClusterMediaFastForwardResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1938,9 +5376,7 @@ void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaNextResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1950,9 +5386,7 @@ void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaPauseResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1962,9 +5396,7 @@ void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaPlayResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1974,9 +5406,7 @@ void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaPreviousResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1986,9 +5416,7 @@ void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaRewindResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -1998,9 +5426,7 @@ void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaSeekResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -2010,9 +5436,7 @@ void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessF
 {
     auto * response = [CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -2022,9 +5446,7 @@ void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn
 {
     auto * response = [CHIPMediaPlaybackClusterMediaSkipForwardResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -2034,9 +5456,7 @@ void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaStartOverResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
@@ -2046,94 +5466,40 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterMediaStopResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-        response.mediaPlaybackStatus = value;
+        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data)
+void CHIPNetworkCommissioningClusterConnectNetworkResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetworkResponse::DecodableType & data)
 {
-    auto * response = [CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams new];
+    auto * response = [CHIPNetworkCommissioningClusterConnectNetworkResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
+    }
+    {
+        response.errorValue = [NSNumber numberWithInt:data.errorValue];
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data)
+void CHIPNetworkCommissioningClusterNetworkConfigResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::NetworkConfigResponse::DecodableType & data)
 {
-    auto * response = [CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams new];
+    auto * response = [CHIPNetworkCommissioningClusterNetworkConfigResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterDisableNetworkResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
-    }
-    {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterEnableNetworkResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
-    }
-    {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterRemoveNetworkResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
-    }
-    {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -2143,19 +5509,16 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
 {
     auto * response = [CHIPNetworkCommissioningClusterScanNetworksResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
+        response.networkingStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.networkingStatus)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.wifiScanResults.begin();
+        auto iter_0 = data.wiFiScanResults.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_0;
@@ -2164,68 +5527,46 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
             newElement_0.ssid = [NSData dataWithBytes:entry_0.ssid.data() length:entry_0.ssid.size()];
             newElement_0.bssid = [NSData dataWithBytes:entry_0.bssid.data() length:entry_0.bssid.size()];
             newElement_0.channel = [NSNumber numberWithUnsignedChar:entry_0.channel];
-            newElement_0.frequencyBand = [NSNumber numberWithUnsignedInt:entry_0.frequencyBand];
+            newElement_0.wiFiBand = [NSNumber numberWithUnsignedInt:entry_0.wiFiBand];
+            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.wifiScanResults = value;
+        response.wiFiScanResults = array_0;
     }
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.threadScanResults.begin();
         while (iter_0.Next()) {
             auto & entry_0 = iter_0.GetValue();
             CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_0;
             newElement_0 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
-            newElement_0.discoveryResponse = [NSData dataWithBytes:entry_0.discoveryResponse.data()
-                                                            length:entry_0.discoveryResponse.size()];
+            newElement_0.panId = [NSNumber numberWithUnsignedLongLong:entry_0.panId];
+            newElement_0.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanId];
+            newElement_0.networkName = [[NSString alloc] initWithBytes:entry_0.networkName.data()
+                                                                length:entry_0.networkName.size()
+                                                              encoding:NSUTF8StringEncoding];
+            newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
+            newElement_0.version = [NSNumber numberWithUnsignedChar:entry_0.version];
+            newElement_0.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extendedAddress];
+            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
+            newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.threadScanResults = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
-    }
-    {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data)
-{
-    auto * response = [CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
-        response.errorCode = value;
-    }
-    {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.threadScanResults = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -2235,14 +5576,10 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSu
 {
     auto * response = [CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
-        response.action = value;
+        response.action = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedInt:data.delayedActionTime];
-        response.delayedActionTime = value;
+        response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime];
     }
     DispatchSuccess(context, response);
 };
@@ -2252,76 +5589,61 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
 {
     auto * response = [CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        NSNumber * value;
         if (data.delayedActionTime.HasValue()) {
-            value = [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()];
+            response.delayedActionTime = [NSNumber numberWithUnsignedInt:data.delayedActionTime.Value()];
         } else {
-            value = nil;
+            response.delayedActionTime = nil;
         }
-        response.delayedActionTime = value;
     }
     {
-        NSString * value;
         if (data.imageURI.HasValue()) {
-            value = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
-                                             length:data.imageURI.Value().size()
-                                           encoding:NSUTF8StringEncoding];
+            response.imageURI = [[NSString alloc] initWithBytes:data.imageURI.Value().data()
+                                                         length:data.imageURI.Value().size()
+                                                       encoding:NSUTF8StringEncoding];
         } else {
-            value = nil;
+            response.imageURI = nil;
         }
-        response.imageURI = value;
     }
     {
-        NSNumber * value;
         if (data.softwareVersion.HasValue()) {
-            value = [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()];
+            response.softwareVersion = [NSNumber numberWithUnsignedInt:data.softwareVersion.Value()];
         } else {
-            value = nil;
+            response.softwareVersion = nil;
         }
-        response.softwareVersion = value;
     }
     {
-        NSString * value;
         if (data.softwareVersionString.HasValue()) {
-            value = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
-                                             length:data.softwareVersionString.Value().size()
-                                           encoding:NSUTF8StringEncoding];
+            response.softwareVersionString = [[NSString alloc] initWithBytes:data.softwareVersionString.Value().data()
+                                                                      length:data.softwareVersionString.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
         } else {
-            value = nil;
+            response.softwareVersionString = nil;
         }
-        response.softwareVersionString = value;
     }
     {
-        NSData * value;
         if (data.updateToken.HasValue()) {
-            value = [NSData dataWithBytes:data.updateToken.Value().data() length:data.updateToken.Value().size()];
+            response.updateToken = [NSData dataWithBytes:data.updateToken.Value().data() length:data.updateToken.Value().size()];
         } else {
-            value = nil;
+            response.updateToken = nil;
         }
-        response.updateToken = value;
     }
     {
-        NSNumber * value;
         if (data.userConsentNeeded.HasValue()) {
-            value = [NSNumber numberWithBool:data.userConsentNeeded.Value()];
+            response.userConsentNeeded = [NSNumber numberWithBool:data.userConsentNeeded.Value()];
         } else {
-            value = nil;
+            response.userConsentNeeded = nil;
         }
-        response.userConsentNeeded = value;
     }
     {
-        NSData * value;
         if (data.metadataForRequestor.HasValue()) {
-            value = [NSData dataWithBytes:data.metadataForRequestor.Value().data() length:data.metadataForRequestor.Value().size()];
+            response.metadataForRequestor = [NSData dataWithBytes:data.metadataForRequestor.Value().data()
+                                                           length:data.metadataForRequestor.Value().size()];
         } else {
-            value = nil;
+            response.metadataForRequestor = nil;
         }
-        response.metadataForRequestor = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2331,14 +5653,11 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge::OnSucce
 {
     auto * response = [CHIPOperationalCredentialsClusterAttestationResponseParams new];
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.attestationElements.data() length:data.attestationElements.size()];
-        response.attestationElements = value;
+        response.attestationElements = [NSData dataWithBytes:data.attestationElements.data()
+                                                      length:data.attestationElements.size()];
     }
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.signature.data() length:data.signature.size()];
-        response.signature = value;
+        response.signature = [NSData dataWithBytes:data.signature.data() length:data.signature.size()];
     }
     DispatchSuccess(context, response);
 };
@@ -2348,9 +5667,7 @@ void CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge::On
 {
     auto * response = [CHIPOperationalCredentialsClusterCertificateChainResponseParams new];
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.certificate.data() length:data.certificate.size()];
-        response.certificate = value;
+        response.certificate = [NSData dataWithBytes:data.certificate.data() length:data.certificate.size()];
     }
     DispatchSuccess(context, response);
 };
@@ -2360,19 +5677,15 @@ void CHIPOperationalCredentialsClusterNOCResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPOperationalCredentialsClusterNOCResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.statusCode];
-        response.statusCode = value;
+        response.statusCode = [NSNumber numberWithUnsignedChar:data.statusCode];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.fabricIndex];
-        response.fabricIndex = value;
+        response.fabricIndex = [NSNumber numberWithUnsignedChar:data.fabricIndex];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.debugText.data() length:data.debugText.size() encoding:NSUTF8StringEncoding];
-        response.debugText = value;
+        response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
+                                                      length:data.debugText.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -2382,14 +5695,11 @@ void CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPOperationalCredentialsClusterOpCSRResponseParams new];
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
-        response.nocsrElements = value;
+        response.nocsrElements = [NSData dataWithBytes:data.NOCSRElements.data() length:data.NOCSRElements.size()];
     }
     {
-        NSData * value;
-        value = [NSData dataWithBytes:data.attestationSignature.data() length:data.attestationSignature.size()];
-        response.attestationSignature = value;
+        response.attestationSignature = [NSData dataWithBytes:data.attestationSignature.data()
+                                                       length:data.attestationSignature.size()];
     }
     DispatchSuccess(context, response);
 };
@@ -2399,19 +5709,13 @@ void CHIPScenesClusterAddSceneResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterAddSceneResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response.sceneId = value;
+        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
     }
     DispatchSuccess(context, response);
 };
@@ -2421,27 +5725,18 @@ void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterGetSceneMembershipResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.capacity];
-        response.capacity = value;
+        response.capacity = [NSNumber numberWithUnsignedChar:data.capacity];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.sceneCount];
-        response.sceneCount = value;
+        response.sceneCount = [NSNumber numberWithUnsignedChar:data.sceneCount];
     }
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.sceneList.begin();
         while (iter_0.Next()) {
@@ -2450,12 +5745,14 @@ void CHIPScenesClusterGetSceneMembershipResponseCallbackBridge::OnSuccessFn(
             newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.sceneList = value;
+        response.sceneList = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -2465,14 +5762,10 @@ void CHIPScenesClusterRemoveAllScenesResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterRemoveAllScenesResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     DispatchSuccess(context, response);
 };
@@ -2482,19 +5775,13 @@ void CHIPScenesClusterRemoveSceneResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterRemoveSceneResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response.sceneId = value;
+        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
     }
     DispatchSuccess(context, response);
 };
@@ -2504,19 +5791,13 @@ void CHIPScenesClusterStoreSceneResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterStoreSceneResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response.sceneId = value;
+        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
     }
     DispatchSuccess(context, response);
 };
@@ -2526,32 +5807,23 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPScenesClusterViewSceneResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:data.status];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.groupId];
-        response.groupId = value;
+        response.groupId = [NSNumber numberWithUnsignedShort:data.groupId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.sceneId];
-        response.sceneId = value;
+        response.sceneId = [NSNumber numberWithUnsignedChar:data.sceneId];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.transitionTime];
-        response.transitionTime = value;
+        response.transitionTime = [NSNumber numberWithUnsignedShort:data.transitionTime];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.sceneName.data() length:data.sceneName.size() encoding:NSUTF8StringEncoding];
-        response.sceneName = value;
+        response.sceneName = [[NSString alloc] initWithBytes:data.sceneName.data()
+                                                      length:data.sceneName.size()
+                                                    encoding:NSUTF8StringEncoding];
     }
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.extensionFieldSets.begin();
         while (iter_0.Next()) {
@@ -2563,52 +5835,14 @@ void CHIPScenesClusterViewSceneResponseCallbackBridge::OnSuccessFn(
             newElement_0.value = [NSNumber numberWithUnsignedChar:entry_0.value];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.extensionFieldSets = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data)
-{
-    auto * response = [CHIPTvChannelClusterChangeChannelResponseParams new];
-    {
-        NSMutableArray * value;
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.channelMatch.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPTvChannelClusterTvChannelInfo * newElement_0;
-            newElement_0 = [CHIPTvChannelClusterTvChannelInfo new];
-            newElement_0.majorNumber = [NSNumber numberWithUnsignedShort:entry_0.majorNumber];
-            newElement_0.minorNumber = [NSNumber numberWithUnsignedShort:entry_0.minorNumber];
-            newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
-                                                         length:entry_0.name.size()
-                                                       encoding:NSUTF8StringEncoding];
-            newElement_0.callSign = [[NSString alloc] initWithBytes:entry_0.callSign.data()
-                                                             length:entry_0.callSign.size()
-                                                           encoding:NSUTF8StringEncoding];
-            newElement_0.affiliateCallSign = [[NSString alloc] initWithBytes:entry_0.affiliateCallSign.data()
-                                                                      length:entry_0.affiliateCallSign.size()
-                                                                    encoding:NSUTF8StringEncoding];
-            [array_0 addObject:newElement_0];
-        }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
-        }
-        value = array_0;
-        response.channelMatch = value;
-    }
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
-        response.errorType = value;
+        response.extensionFieldSets = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -2618,14 +5852,10 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
 {
     auto * response = [CHIPTargetNavigatorClusterNavigateTargetResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
+        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     DispatchSuccess(context, response);
 };
@@ -2635,9 +5865,7 @@ void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTestClusterClusterBooleanResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithBool:data.value];
-        response.value = value;
+        response.value = [NSNumber numberWithBool:data.value];
     }
     DispatchSuccess(context, response);
 };
@@ -2647,17 +5875,17 @@ void CHIPTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTestClusterClusterSimpleStructResponseParams new];
     {
-        CHIPTestClusterClusterSimpleStruct * value;
-        value = [CHIPTestClusterClusterSimpleStruct new];
-        value.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
-        value.b = [NSNumber numberWithBool:data.arg1.b];
-        value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
-        value.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
-        value.e = [[NSString alloc] initWithBytes:data.arg1.e.data() length:data.arg1.e.size() encoding:NSUTF8StringEncoding];
-        value.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
-        value.g = [NSNumber numberWithFloat:data.arg1.g];
-        value.h = [NSNumber numberWithDouble:data.arg1.h];
-        response.arg1 = value;
+        response.arg1 = [CHIPTestClusterClusterSimpleStruct new];
+        response.arg1.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
+        response.arg1.b = [NSNumber numberWithBool:data.arg1.b];
+        response.arg1.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
+        response.arg1.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
+        response.arg1.e = [[NSString alloc] initWithBytes:data.arg1.e.data()
+                                                   length:data.arg1.e.size()
+                                                 encoding:NSUTF8StringEncoding];
+        response.arg1.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
+        response.arg1.g = [NSNumber numberWithFloat:data.arg1.g];
+        response.arg1.h = [NSNumber numberWithDouble:data.arg1.h];
     }
     DispatchSuccess(context, response);
 };
@@ -2667,9 +5895,7 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTestClusterClusterTestAddArgumentsResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.returnValue];
-        response.returnValue = value;
+        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
     }
     DispatchSuccess(context, response);
 };
@@ -2679,14 +5905,10 @@ void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTestClusterClusterTestEnumsResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
-        response.arg1 = value;
+        response.arg1 = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
     }
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg2)];
-        response.arg2 = value;
+        response.arg2 = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg2)];
     }
     DispatchSuccess(context, response);
 };
@@ -2696,7 +5918,6 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
 {
     auto * response = [CHIPTestClusterClusterTestListInt8UReverseResponseParams new];
     {
-        NSMutableArray * value;
         auto * array_0 = [NSMutableArray new];
         auto iter_0 = data.arg1.begin();
         while (iter_0.Next()) {
@@ -2705,12 +5926,14 @@ void CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge::OnSuccess
             newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
             [array_0 addObject:newElement_0];
         }
-        if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
         }
-        value = array_0;
-        response.arg1 = value;
+        response.arg1 = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -2720,40 +5943,32 @@ void CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge::OnSuccess
 {
     auto * response = [CHIPTestClusterClusterTestNullableOptionalResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithBool:data.wasPresent];
-        response.wasPresent = value;
+        response.wasPresent = [NSNumber numberWithBool:data.wasPresent];
     }
     {
-        NSNumber * value;
         if (data.wasNull.HasValue()) {
-            value = [NSNumber numberWithBool:data.wasNull.Value()];
+            response.wasNull = [NSNumber numberWithBool:data.wasNull.Value()];
         } else {
-            value = nil;
+            response.wasNull = nil;
         }
-        response.wasNull = value;
     }
     {
-        NSNumber * value;
         if (data.value.HasValue()) {
-            value = [NSNumber numberWithUnsignedChar:data.value.Value()];
+            response.value = [NSNumber numberWithUnsignedChar:data.value.Value()];
         } else {
-            value = nil;
+            response.value = nil;
         }
-        response.value = value;
     }
     {
-        NSNumber * value;
         if (data.originalValue.HasValue()) {
             if (data.originalValue.Value().IsNull()) {
-                value = nil;
+                response.originalValue = nil;
             } else {
-                value = [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()];
+                response.originalValue = [NSNumber numberWithUnsignedChar:data.originalValue.Value().Value()];
             }
         } else {
-            value = nil;
+            response.originalValue = nil;
         }
-        response.originalValue = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2763,9 +5978,5861 @@ void CHIPTestClusterClusterTestSpecificResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPTestClusterClusterTestSpecificResponseParams new];
     {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.returnValue];
-        response.returnValue = value;
+        response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
     }
     DispatchSuccess(context, response);
 };
+
+void CHIPThermostatClusterGetRelayStatusLogResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLogResponse::DecodableType & data)
+{
+    auto * response = [CHIPThermostatClusterGetRelayStatusLogResponseParams new];
+    {
+        response.timeOfDay = [NSNumber numberWithUnsignedShort:data.timeOfDay];
+    }
+    {
+        response.relayStatus = [NSNumber numberWithUnsignedShort:data.relayStatus];
+    }
+    {
+        response.localTemperature = [NSNumber numberWithShort:data.localTemperature];
+    }
+    {
+        response.humidityInPercentage = [NSNumber numberWithUnsignedChar:data.humidityInPercentage];
+    }
+    {
+        response.setpoint = [NSNumber numberWithShort:data.setpoint];
+    }
+    {
+        response.unreadEntries = [NSNumber numberWithUnsignedShort:data.unreadEntries];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPThermostatClusterGetWeeklyScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::Thermostat::Commands::GetWeeklyScheduleResponse::DecodableType & data)
+{
+    auto * response = [CHIPThermostatClusterGetWeeklyScheduleResponseParams new];
+    {
+        response.numberOfTransitionsForSequence = [NSNumber numberWithUnsignedChar:data.numberOfTransitionsForSequence];
+    }
+    {
+        response.dayOfWeekForSequence = [NSNumber numberWithUnsignedChar:data.dayOfWeekForSequence.Raw()];
+    }
+    {
+        response.modeForSequence = [NSNumber numberWithUnsignedChar:data.modeForSequence.Raw()];
+    }
+    {
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.payload.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        response.payload = array_0;
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::IdentifyEffectIdentifier value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectIdentifier> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableIdentifyClusterIdentifyEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::IdentifyEffectVariant value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyEffectVariant> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIdentifyClusterIdentifyEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Identify::IdentifyIdentifyType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Identify::IdentifyIdentifyType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIdentifyClusterIdentifyIdentifyTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDelayedAllOffEffectVariant> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOnOffClusterOnOffDelayedAllOffEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffDyingLightEffectVariant> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableOnOffClusterOnOffDyingLightEffectVariantAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OnOff::OnOffEffectIdentifier value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OnOff::OnOffEffectIdentifier> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableOnOffClusterOnOffEffectIdentifierAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LevelControl::MoveMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLevelControlClusterMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::MoveMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableLevelControlClusterMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LevelControl::StepMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLevelControlClusterStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLevelControlClusterStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LevelControl::StepMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableLevelControlClusterStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplianceControl::ApplianceStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::ApplianceStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableApplianceControlClusterApplianceStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplianceControl::CommandIdentification value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::CommandIdentification> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableApplianceControlClusterCommandIdentificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplianceControl::WarningEvent value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplianceControlClusterWarningEventAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceControl::WarningEvent> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableApplianceControlClusterWarningEventAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::AuthMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAccessControlClusterAuthModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::Privilege value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableAccessControlClusterPrivilegeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedActions::ActionErrorEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionErrorEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableBridgedActionsClusterActionErrorEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedActions::ActionStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableBridgedActionsClusterActionStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedActions::ActionTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::ActionTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableBridgedActionsClusterActionTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::BridgedActions::EndpointListTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::BridgedActions::EndpointListTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableBridgedActionsClusterEndpointListTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOtaSoftwareUpdateProviderClusterOTAApplyUpdateActionAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableOtaSoftwareUpdateProviderClusterOTADownloadProtocolAttributeCallbackSubscriptionBridge *>(
+        context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableGeneralCommissioningClusterRegulatoryLocationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::LogsIntent value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsIntent> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDiagnosticLogsClusterLogsIntentAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::LogsStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDiagnosticLogsClusterLogsStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DiagnosticLogs::LogsTransferProtocol> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableDiagnosticLogsClusterLogsTransferProtocolAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::BootReasonType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::BootReasonType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableGeneralDiagnosticsClusterBootReasonTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::HardwareFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::HardwareFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableGeneralDiagnosticsClusterHardwareFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::InterfaceType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::InterfaceType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableGeneralDiagnosticsClusterInterfaceTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::NetworkFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::NetworkFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableGeneralDiagnosticsClusterNetworkFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GeneralDiagnostics::RadioFaultType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GeneralDiagnostics::RadioFaultType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableGeneralDiagnosticsClusterRadioFaultTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableThreadNetworkDiagnosticsClusterNetworkFaultAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::RoutingRole> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableThreadNetworkDiagnosticsClusterRoutingRoleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ThreadNetworkDiagnostics::ThreadConnectionStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableThreadNetworkDiagnosticsClusterThreadConnectionStatusAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::AssociationFailureCause> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableWiFiNetworkDiagnosticsClusterAssociationFailureCauseAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::SecurityType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableWiFiNetworkDiagnosticsClusterSecurityTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiConnectionStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableWiFiNetworkDiagnosticsClusterWiFiConnectionStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::WiFiNetworkDiagnostics::WiFiVersionType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableWiFiNetworkDiagnosticsClusterWiFiVersionTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::EthernetNetworkDiagnostics::PHYRateType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableEthernetNetworkDiagnosticsClusterPHYRateTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableAdministratorCommissioningClusterCommissioningWindowStatusAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AdministratorCommissioning::StatusCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AdministratorCommissioning::StatusCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableAdministratorCommissioningClusterStatusCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OperationalCredentials::NodeOperationalCertStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge::
+    OnSubscriptionEstablished(void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableOperationalCredentialsClusterNodeOperationalCertStatusAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableGroupKeyManagementClusterGroupKeySecurityPolicyAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlAlarmCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlAlarmCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlAlarmCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlCredentialRule value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialRule> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlCredentialRuleAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlCredentialType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlCredentialType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlCredentialTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlDataOperationType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDataOperationType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlDataOperationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlDoorLockStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorLockStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlDoorLockStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlDoorState value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlDoorStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlLockDataType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockDataType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlLockDataTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlLockOperationType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockOperationType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlLockOperationTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlLockState value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlLockStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlLockStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlLockType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlLockTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperatingMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlOperatingModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlOperationError value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationError> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlOperationErrorAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlOperationSource value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlOperationSource> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlOperationSourceAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::DoorLock::DlStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlUserStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlUserStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DlUserType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlUserType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDlUserTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorLockOperationEventCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockOperationEventCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDoorLockOperationEventCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockProgrammingEventCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableDoorLockClusterDoorLockProgrammingEventCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDoorLockSetPinOrIdStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorLockUserStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDoorLockUserStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::DoorLock::DoorLockUserType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DoorLockUserType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableDoorLockClusterDoorLockUserTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPPumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpControlMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullablePumpConfigurationAndControlClusterPumpControlModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPPumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::PumpConfigurationAndControl::PumpOperationMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullablePumpConfigurationAndControlClusterPumpOperationModeAttributeCallbackSubscriptionBridge *>(
+        context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Thermostat::SetpointAdjustMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Thermostat::SetpointAdjustMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableThermostatClusterSetpointAdjustModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::ColorLoopAction value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterColorLoopActionAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopAction> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterColorLoopActionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::ColorLoopDirection value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorLoopDirection> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterColorLoopDirectionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::ColorMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterColorModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterColorModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::ColorMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterColorModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::HueDirection value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterHueDirectionAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueDirection> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterHueDirectionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::HueMoveMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterHueMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueMoveMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterHueMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::HueStepMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterHueStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::HueStepMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterHueStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::SaturationMoveMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationMoveMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterSaturationMoveModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ColorControl::SaturationStepMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ColorControl::SaturationStepMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableColorControlClusterSaturationStepModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IlluminanceMeasurement::LightSensorType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IlluminanceMeasurement::LightSensorType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableIlluminanceMeasurementClusterLightSensorTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasZone::IasEnrollResponseCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasEnrollResponseCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasZoneClusterIasEnrollResponseCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasZone::IasZoneType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasZone::IasZoneType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasZoneClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAceAlarmStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAlarmStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAceAlarmStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAceArmMode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmMode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAceArmModeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAceArmNotification value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceArmNotification> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAceArmNotificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAceAudibleNotification value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceAudibleNotification> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAceAudibleNotificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAceBypassResult value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAceBypassResult> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAceBypassResultAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasAcePanelStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasAcePanelStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasAcePanelStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::IasAce::IasZoneType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::IasAce::IasZoneType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Channel::ChannelErrorType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelErrorType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Channel::ChannelLineupInfoType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelLineupInfoType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TargetNavigator::NavigateTargetStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::NavigateTargetStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackState value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackState> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMediaInputClusterMediaInputTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaInput::MediaInputType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::MediaInputType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::KeypadInput::KeypadInputStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchMetricType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchMetricType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchParameterEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchParameterEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AudioOutput::AudioOutputType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::AudioOutputType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge *>(
+        context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableTestClusterClusterSimpleEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::app::Clusters::Messaging::EventId value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMessagingClusterEventIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMessagingClusterEventIdAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMessagingClusterEventIdAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::EventId> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableMessagingClusterEventIdAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Messaging::MessagingControlConfirmation value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlConfirmation> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableMessagingClusterMessagingControlConfirmationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlEnhancedConfirmation> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableMessagingClusterMessagingControlEnhancedConfirmationAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMessagingClusterMessagingControlImportanceAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Messaging::MessagingControlImportance value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlImportance> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableMessagingClusterMessagingControlImportanceAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Messaging::MessagingControlTransmission value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Messaging::MessagingControlTransmission> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableMessagingClusterMessagingControlTransmissionAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplianceEventsAndAlert::EventIdentification> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPNullableApplianceEventsAndAlertClusterEventIdentificationAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}

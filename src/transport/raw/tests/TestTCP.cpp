@@ -106,7 +106,7 @@ public:
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
@@ -131,14 +131,6 @@ public:
 
         // Should be able to send a message to itself by just calling send.
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
-        if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
-        {
-            // TODO(#2698): the underlying system does not support IPV6. This early return
-            // should be removed and error should be made fatal.
-            printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
-            return;
-        }
-
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
@@ -172,7 +164,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     TCPImpl tcp;
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }

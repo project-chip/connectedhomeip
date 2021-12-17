@@ -27,12 +27,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace NetworkCommissioning {
-void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
-                                               ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
-void OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath, ByteSpan ssid,
-                                             ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
-void OnEnableNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath, ByteSpan networkID,
-                                            uint64_t breadcrumb, uint32_t timeoutMs);
+void OnAddOrUpdateThreadNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+                                                       ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs);
+void OnAddOrUpdateWiFiNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+                                                     ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs);
+void OnConnectNetworkCommandCallbackInternal(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
+                                             ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
 } // namespace NetworkCommissioning
 
 } // namespace Clusters

@@ -240,7 +240,7 @@ public class ClusterInfoMapping {
 
       {{/if}}
 
-      public static class Delegated{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -255,7 +255,7 @@ public class ClusterInfoMapping {
             {{#if (isOctetString type)}}
             CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
             {{else if (isCharString type)}}
-            // Add String field here after ByteSpan is properly emitted in C++ layer
+            CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
             {{else}}
             {{! NOTE: asJavaBasicTypeForZclType does not handle isArray well, so
                 add an inline partial to force isArray to false when we want the

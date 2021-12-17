@@ -23,11 +23,10 @@
  */
 
 #include "CommandHandler.h"
-#include "Command.h"
-#include "CommandSender.h"
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
+#include <access/AccessControl.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -54,8 +53,6 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 
         mInvokeResponseBuilder.CreateInvokeResponses();
         ReturnErrorOnFailure(mInvokeResponseBuilder.GetError());
-
-        mCommandIndex    = 0;
         mBufferAllocated = true;
     }
 
@@ -66,7 +63,7 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
                                                   System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     System::PacketBufferHandle response;
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
 
     // NOTE: we already know this is an InvokeCommand Request message because we explicitly registered with the
     // Exchange Manager for unsolicited InvokeCommand Requests.
@@ -144,7 +141,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
 void CommandHandler::Close()
 {
     mSuppressResponse = false;
-    MoveToState(CommandState::AwaitingDestruction);
+    MoveToState(State::AwaitingDestruction);
 
     // We must finish all async work before we can shut down a CommandHandler. The actual CommandHandler MUST finish their work
     // in reasonable time or there is a bug. The only case for releasing CommandHandler without CommandHandler::Handle releasing its
@@ -152,7 +149,17 @@ void CommandHandler::Close()
     VerifyOrDieWithMsg(mPendingWork == 0, DataManagement, "CommandHandler::Close() called with %zu unfinished async work items",
                        mPendingWork);
 
-    Command::Close();
+    // OnDone below can destroy us before we unwind all the way back into the
+    // exchange code and it tries to close itself.  Make sure that it doesn't
+    // try to notify us that it's closing, since we will be dead.
+    //
+    // For more details, see #10344.
+    if (mpExchangeCtx != nullptr)
+    {
+        mpExchangeCtx->SetDelegate(nullptr);
+    }
+
+    mpExchangeCtx = nullptr;
 
     if (mpCallback)
     {
@@ -197,7 +204,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     System::PacketBufferHandle commandPacket;
 
     VerifyOrReturnError(mPendingWork == 0, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(commandPacket));
@@ -206,7 +213,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse()
     // The ExchangeContext is automatically freed here, and it makes mpExchangeCtx be temporarily dangling, but in
     // all cases, we are going to call Close immediately after this function, which nulls out mpExchangeCtx.
 
-    MoveToState(CommandState::CommandSent);
+    MoveToState(State::CommandSent);
 
     return CHIP_NO_ERROR;
 }
@@ -215,18 +222,18 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
+    ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
-    ClusterId clusterId;
-    CommandId commandId;
-    EndpointId endpointId;
+
+    // NOTE: errors may occur before the concrete command path is even fully decoded.
 
     err = aCommandElement.GetPath(&commandPath);
     SuccessOrExit(err);
 
-    err = commandPath.GetClusterId(&clusterId);
+    err = commandPath.GetClusterId(&concretePath.mClusterId);
     SuccessOrExit(err);
 
-    err = commandPath.GetCommandId(&commandId);
+    err = commandPath.GetCommandId(&concretePath.mCommandId);
     SuccessOrExit(err);
 
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
@@ -235,17 +242,33 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         // Issue 11075
 
         // Using endpoint 1 for test purposes
-        endpointId = 1;
-        err        = CHIP_NO_ERROR;
+        concretePath.mEndpointId = 1;
+        err                      = CHIP_NO_ERROR;
     }
     else
     {
-        err = commandPath.GetEndpointId(&endpointId);
+        err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     }
     SuccessOrExit(err);
 
-    VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
-                 err = CHIP_ERROR_INVALID_PROFILE_ID);
+    VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        err                                = CHIP_NO_ERROR; // TODO: remove override
+        if (err != CHIP_NO_ERROR)
+        {
+            if (err != CHIP_ERROR_ACCESS_DENIED)
+            {
+                return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
+            }
+            // TODO: when wildcard/group invokes are supported, handle them to discard rather than fail with status
+            return AddStatus(concretePath, Protocols::InteractionModel::Status::UnsupportedAccess);
+        }
+    }
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -253,37 +276,34 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
                       " Command=" ChipLogFormatMEI,
-                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         err = CHIP_NO_ERROR;
     }
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(DataManagement,
                       "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId));
-        const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
-        mpCallback->DispatchCommand(*this, ConcreteCommandPath(endpointId, clusterId, commandId), commandDataReader);
+        mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
         MatterPostCommandReceivedCallback(concretePath);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ConcreteCommandPath path(endpointId, clusterId, commandId);
-
         // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
         // TODO: The behavior when receiving a malformed message is not clear in the Spec. (Spec#3259)
         // TODO: The error code should be updated after #7072 added error codes required by IM.
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
-            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16, ChipLogValueMEI(clusterId),
-                          endpointId);
+            ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
+                          ChipLogValueMEI(concretePath.mClusterId), concretePath.mEndpointId);
         }
 
         // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
-        AddStatus(path, Protocols::InteractionModel::Status::InvalidCommand);
+        AddStatus(concretePath, Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
@@ -336,7 +356,7 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -351,14 +371,14 @@ CHIP_ERROR CommandHandler::PrepareCommand(const ConcreteCommandPath & aCommandPa
         ReturnErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
                                                                      TLV::kTLVType_Structure, mDataElementContainerType));
     }
-    MoveToState(CommandState::AddingCommand);
+    MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
 {
-    VerifyOrReturnError(mState == CommandState::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
-    CommandDataIB::Builder commandData = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand();
+    VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    CommandDataIB::Builder & commandData = mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetCommand();
     if (aStartDataStruct)
     {
         ReturnErrorOnFailure(commandData.GetWriter()->EndContainer(mDataElementContainerType));
@@ -367,7 +387,7 @@ CHIP_ERROR CommandHandler::FinishCommand(bool aStartDataStruct)
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
-    MoveToState(CommandState::AddedCommand);
+    MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
 
@@ -377,7 +397,7 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
-    VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::Idle, CHIP_ERROR_INCORRECT_STATE);
     InvokeResponseIBs::Builder & invokeResponses = mInvokeResponseBuilder.GetInvokeResponses();
     InvokeResponseIB::Builder & invokeResponse   = invokeResponses.CreateInvokeResponse();
     ReturnErrorOnFailure(invokeResponses.GetError());
@@ -386,25 +406,25 @@ CHIP_ERROR CommandHandler::PrepareStatus(const ConcreteCommandPath & aCommandPat
     CommandPathIB::Builder & path = commandStatus.CreatePath();
     ReturnErrorOnFailure(commandStatus.GetError());
     ReturnErrorOnFailure(path.Encode(aCommandPath));
-    MoveToState(CommandState::AddingCommand);
+    MoveToState(State::AddingCommand);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandHandler::FinishStatus()
 {
-    VerifyOrReturnError(mState == CommandState::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == State::AddingCommand, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(
         mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().GetStatus().EndOfCommandStatusIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().GetInvokeResponse().EndOfInvokeResponseIB().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.GetInvokeResponses().EndOfInvokeResponses().GetError());
     ReturnErrorOnFailure(mInvokeResponseBuilder.EndOfInvokeResponseMessage().GetError());
-    MoveToState(CommandState::AddedCommand);
+    MoveToState(State::AddedCommand);
     return CHIP_NO_ERROR;
 }
 
 TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 {
-    if (mState != CommandState::AddingCommand)
+    if (mState != State::AddingCommand)
     {
         return nullptr;
     }
@@ -447,6 +467,63 @@ CommandHandler::Handle::Handle(CommandHandler * handle)
     }
 }
 
+CHIP_ERROR CommandHandler::Finalize(System::PacketBufferHandle & commandPacket)
+{
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    return mCommandMessageWriter.Finalize(&commandPacket);
+}
+
+const char * CommandHandler::GetStateStr() const
+{
+#if CHIP_DETAIL_LOGGING
+    switch (mState)
+    {
+    case State::Idle:
+        return "Idle";
+
+    case State::AddingCommand:
+        return "AddingCommand";
+
+    case State::AddedCommand:
+        return "AddedCommand";
+
+    case State::CommandSent:
+        return "CommandSent";
+
+    case State::AwaitingDestruction:
+        return "AwaitingDestruction";
+    }
+#endif // CHIP_DETAIL_LOGGING
+    return "N/A";
+}
+
+void CommandHandler::MoveToState(const State aTargetState)
+{
+    mState = aTargetState;
+    ChipLogDetail(DataManagement, "ICR moving to [%10.10s]", GetStateStr());
+}
+
+void CommandHandler::Abort()
+{
+    //
+    // If the exchange context hasn't already been gracefully closed
+    // (signaled by setting it to null), then we need to forcibly
+    // tear it down.
+    //
+    if (mpExchangeCtx != nullptr)
+    {
+        // We might be a delegate for this exchange, and we don't want the
+        // OnExchangeClosing notification in that case.  Null out the delegate
+        // to avoid that.
+        //
+        // TODO: This makes all sorts of assumptions about what the delegate is
+        // (notice the "might" above!) that might not hold in practice.  We
+        // really need a better solution here....
+        mpExchangeCtx->SetDelegate(nullptr);
+        mpExchangeCtx->Abort();
+        mpExchangeCtx = nullptr;
+    }
+}
 } // namespace app
 } // namespace chip
 

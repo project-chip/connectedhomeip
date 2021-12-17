@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <app/ReadHandler.h>
 #include <app/util/basic-types.h>
@@ -90,10 +91,10 @@ public:
 
     /**
      * @brief
-     *  Schedule the urgent event delivery
+     *  Schedule the event delivery
      *
      */
-    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+    CHIP_ERROR ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten);
 
 private:
     friend class TestReportingEngine;
@@ -107,10 +108,10 @@ private:
                                                        bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks, bool * apHasEncodedData);
-    CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
+    CHIP_ERROR RetrieveClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                   AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
-    EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
      * Check all active subscription, if the subscription has no paths that intersect with global dirty set,
@@ -129,6 +130,10 @@ private:
      *
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
+
+    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+    CHIP_ERROR ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten);
+    void GetMinEventLogPosition(uint32_t & aMinLogPosition);
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times

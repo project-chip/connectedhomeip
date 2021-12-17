@@ -49,6 +49,11 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -75,8 +80,19 @@ class ChipClusters:
                         "setupPIN": "str",
                     },
                 },
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "Logout",
+                    "args": {
+                    },
+                },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -116,6 +132,26 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "WindowStatus",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "AdminFabricIndex",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "AdminVendorId",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -161,23 +197,28 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000004: {
+                    "attributeName": "ApplicationApp",
+                    "attributeId": 0x00000004,
+                    "type": "",
+                    "writable": True,
+                },
                 0x00000005: {
-                    "attributeName": "ApplicationId",
+                    "attributeName": "ApplicationStatus",
                     "attributeId": 0x00000005,
-                    "type": "str",
+                    "type": "int",
                     "reportable": True,
                 },
                 0x00000006: {
-                    "attributeName": "CatalogVendorId",
+                    "attributeName": "ApplicationVersion",
                     "attributeId": 0x00000006,
-                    "type": "int",
+                    "type": "str",
                     "reportable": True,
                 },
-                0x00000007: {
-                    "attributeName": "ApplicationStatus",
-                    "attributeId": 0x00000007,
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
-                    "reportable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -191,11 +232,27 @@ class ChipClusters:
             "clusterName": "ApplicationLauncher",
             "clusterId": 0x0000050C,
             "commands": {
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "HideApp",
+                    "args": {
+                        "catalogVendorId": "int",
+                        "applicationId": "str",
+                    },
+                },
             0x00000000: {
                     "commandId": 0x00000000,
                     "commandName": "LaunchApp",
                     "args": {
                         "data": "str",
+                        "catalogVendorId": "int",
+                        "applicationId": "str",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "StopApp",
+                    "args": {
                         "catalogVendorId": "int",
                         "applicationId": "str",
                     },
@@ -208,17 +265,10 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000001: {
-                    "attributeName": "CatalogVendorId",
-                    "attributeId": 0x00000001,
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
-                    "reportable": True,
-                },
-                0x00000002: {
-                    "attributeName": "ApplicationId",
-                    "attributeId": 0x00000002,
-                    "type": "int",
-                    "reportable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -260,6 +310,11 @@ class ChipClusters:
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -311,6 +366,11 @@ class ChipClusters:
                     "attributeId": 0x0000000A,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -448,6 +508,11 @@ class ChipClusters:
                     "attributeId": 0x00000012,
                     "type": "str",
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -481,6 +546,11 @@ class ChipClusters:
                     "attributeId": 0x0000006F,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -516,6 +586,11 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -535,6 +610,11 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "bool",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -669,6 +749,11 @@ class ChipClusters:
                     "type": "str",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -683,6 +768,58 @@ class ChipClusters:
             "commands": {
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
+                    "reportable": True,
+                },
+            },
+    }
+    _CHANNEL_CLUSTER_INFO = {
+            "clusterName": "Channel",
+            "clusterId": 0x00000504,
+            "commands": {
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "ChangeChannel",
+                    "args": {
+                        "match": "str",
+                    },
+                },
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "ChangeChannelByNumber",
+                    "args": {
+                        "majorNumber": "int",
+                        "minorNumber": "int",
+                    },
+                },
+            0x00000002: {
+                    "commandId": 0x00000002,
+                    "commandName": "SkipChannel",
+                    "args": {
+                        "count": "int",
+                    },
+                },
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "ChannelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                    "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -1227,6 +1364,11 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -1245,6 +1387,9 @@ class ChipClusters:
                     "args": {
                         "autoPlay": "bool",
                         "data": "str",
+                        "type": "int",
+                        "value": "str",
+                        "externalIDList": "",
                     },
                 },
             0x00000001: {
@@ -1253,21 +1398,33 @@ class ChipClusters:
                     "args": {
                         "contentURL": "str",
                         "displayString": "str",
+                        "providerName": "str",
+                        "background": "",
+                        "logo": "",
+                        "progressBar": "",
+                        "splash": "",
+                        "waterMark": "",
                     },
                 },
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "AcceptsHeaderList",
+                    "attributeName": "AcceptHeaderList",
                     "attributeId": 0x00000000,
-                    "type": "bytes",
+                    "type": "str",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "SupportedStreamingTypes",
+                    "attributeName": "SupportedStreamingProtocols",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -1307,6 +1464,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -1330,109 +1492,44 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
             },
     }
     _DOOR_LOCK_CLUSTER_INFO = {
             "clusterName": "DoorLock",
             "clusterId": 0x00000101,
             "commands": {
-            0x00000008: {
-                    "commandId": 0x00000008,
-                    "commandName": "ClearAllPINCodes",
+            0x00000026: {
+                    "commandId": 0x00000026,
+                    "commandName": "ClearCredential",
                     "args": {
+                        "credentialType": "int",
+                        "credentialIndex": "int",
                     },
                 },
-            0x00000019: {
-                    "commandId": 0x00000019,
-                    "commandName": "ClearAllRFIDCodes",
+            0x0000001D: {
+                    "commandId": 0x0000001D,
+                    "commandName": "ClearUser",
                     "args": {
-                    },
-                },
-            0x00000013: {
-                    "commandId": 0x00000013,
-                    "commandName": "ClearHolidaySchedule",
-                    "args": {
-                        "holidayIndex": "int",
-                    },
-                },
-            0x00000007: {
-                    "commandId": 0x00000007,
-                    "commandName": "ClearPINCode",
-                    "args": {
-                        "pinSlotIndex": "int",
-                    },
-                },
-            0x00000018: {
-                    "commandId": 0x00000018,
-                    "commandName": "ClearRFIDCode",
-                    "args": {
-                        "rfidSlotIndex": "int",
-                    },
-                },
-            0x0000000D: {
-                    "commandId": 0x0000000D,
-                    "commandName": "ClearWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
                         "userIndex": "int",
                     },
                 },
-            0x00000010: {
-                    "commandId": 0x00000010,
-                    "commandName": "ClearYearDaySchedule",
+            0x00000024: {
+                    "commandId": 0x00000024,
+                    "commandName": "GetCredentialStatus",
                     "args": {
-                        "yearDayIndex": "int",
-                        "userIndex": "int",
+                        "credentialType": "int",
+                        "credentialIndex": "int",
                     },
                 },
-            0x00000012: {
-                    "commandId": 0x00000012,
-                    "commandName": "GetHolidaySchedule",
+            0x0000001B: {
+                    "commandId": 0x0000001B,
+                    "commandName": "GetUser",
                     "args": {
-                        "holidayIndex": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "GetLogRecord",
-                    "args": {
-                        "logIndex": "int",
-                    },
-                },
-            0x00000006: {
-                    "commandId": 0x00000006,
-                    "commandName": "GetPINCode",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x00000017: {
-                    "commandId": 0x00000017,
-                    "commandName": "GetRFIDCode",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x00000015: {
-                    "commandId": 0x00000015,
-                    "commandName": "GetUserType",
-                    "args": {
-                        "userId": "int",
-                    },
-                },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "GetWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
-                        "userIndex": "int",
-                    },
-                },
-            0x0000000F: {
-                    "commandId": 0x0000000F,
-                    "commandName": "GetYearDaySchedule",
-                    "args": {
-                        "yearDayIndex": "int",
                         "userIndex": "int",
                     },
                 },
@@ -1443,79 +1540,35 @@ class ChipClusters:
                         "pinCode": "bytes",
                     },
                 },
-            0x00000011: {
-                    "commandId": 0x00000011,
-                    "commandName": "SetHolidaySchedule",
+            0x00000022: {
+                    "commandId": 0x00000022,
+                    "commandName": "SetCredential",
                     "args": {
-                        "holidayIndex": "int",
-                        "localStartTime": "int",
-                        "localEndTime": "int",
-                        "operatingMode": "int",
+                        "operationType": "int",
+                        "credentialType": "int",
+                        "credentialIndex": "int",
+                        "credentialData": "bytes",
+                        "userIndex": "int",
+                        "userStatus": "int",
                     },
                 },
-            0x00000005: {
-                    "commandId": 0x00000005,
-                    "commandName": "SetPINCode",
+            0x0000001A: {
+                    "commandId": 0x0000001A,
+                    "commandName": "SetUser",
                     "args": {
-                        "userId": "int",
+                        "operationType": "int",
+                        "userIndex": "int",
+                        "userName": "str",
+                        "userUniqueId": "int",
                         "userStatus": "int",
                         "userType": "int",
-                        "pin": "bytes",
-                    },
-                },
-            0x00000016: {
-                    "commandId": 0x00000016,
-                    "commandName": "SetRFIDCode",
-                    "args": {
-                        "userId": "int",
-                        "userStatus": "int",
-                        "userType": "int",
-                        "rfidCode": "bytes",
-                    },
-                },
-            0x00000014: {
-                    "commandId": 0x00000014,
-                    "commandName": "SetUserType",
-                    "args": {
-                        "userId": "int",
-                        "userType": "int",
-                    },
-                },
-            0x0000000B: {
-                    "commandId": 0x0000000B,
-                    "commandName": "SetWeekDaySchedule",
-                    "args": {
-                        "weekDayIndex": "int",
-                        "userIndex": "int",
-                        "daysMask": "int",
-                        "startHour": "int",
-                        "startMinute": "int",
-                        "endHour": "int",
-                        "endMinute": "int",
-                    },
-                },
-            0x0000000E: {
-                    "commandId": 0x0000000E,
-                    "commandName": "SetYearDaySchedule",
-                    "args": {
-                        "yearDayIndex": "int",
-                        "userIndex": "int",
-                        "localStartTime": "int",
-                        "localEndTime": "int",
+                        "credentialRule": "int",
                     },
                 },
             0x00000001: {
                     "commandId": 0x00000001,
                     "commandName": "UnlockDoor",
                     "args": {
-                        "pinCode": "bytes",
-                    },
-                },
-            0x00000003: {
-                    "commandId": 0x00000003,
-                    "commandName": "UnlockWithTimeout",
-                    "args": {
-                        "timeout": "int",
                         "pinCode": "bytes",
                     },
                 },
@@ -1538,6 +1591,91 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "bool",
                     "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "DoorState",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000011: {
+                    "attributeName": "NumberOfTotalUsersSupported",
+                    "attributeId": 0x00000011,
+                    "type": "int",
+                },
+                0x00000012: {
+                    "attributeName": "NumberOfPINUsersSupported",
+                    "attributeId": 0x00000012,
+                    "type": "int",
+                },
+                0x00000017: {
+                    "attributeName": "MaxPINCodeLength",
+                    "attributeId": 0x00000017,
+                    "type": "int",
+                },
+                0x00000018: {
+                    "attributeName": "MinPINCodeLength",
+                    "attributeId": 0x00000018,
+                    "type": "int",
+                },
+                0x00000021: {
+                    "attributeName": "Language",
+                    "attributeId": 0x00000021,
+                    "type": "str",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000023: {
+                    "attributeName": "AutoRelockTime",
+                    "attributeId": 0x00000023,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000024: {
+                    "attributeName": "SoundVolume",
+                    "attributeId": 0x00000024,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000025: {
+                    "attributeName": "OperatingMode",
+                    "attributeId": 0x00000025,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000026: {
+                    "attributeName": "SupportedOperatingModes",
+                    "attributeId": 0x00000026,
+                    "type": "int",
+                },
+                0x00000029: {
+                    "attributeName": "EnableOneTouchLocking",
+                    "attributeId": 0x00000029,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x0000002B: {
+                    "attributeName": "EnablePrivacyModeButton",
+                    "attributeId": 0x0000002B,
+                    "type": "bool",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x00000030: {
+                    "attributeName": "WrongCodeEntryLimit",
+                    "attributeId": 0x00000030,
+                    "type": "int",
+                    "reportable": True,
+                    "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -1619,6 +1757,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -1693,6 +1836,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -1717,6 +1865,11 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -1755,6 +1908,11 @@ class ChipClusters:
                     "attributeId": 0x00000003,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -1816,6 +1974,11 @@ class ChipClusters:
                 0x00000003: {
                     "attributeName": "LocationCapability",
                     "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
                 },
                 0x0000FFFD: {
@@ -1880,6 +2043,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -1905,6 +2073,11 @@ class ChipClusters:
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -1969,6 +2142,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2017,6 +2195,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2061,6 +2244,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2082,6 +2270,11 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2257,6 +2450,11 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2277,6 +2475,11 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2329,6 +2532,11 @@ class ChipClusters:
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2431,35 +2639,27 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000003: {
-                    "attributeName": "PositionUpdatedAt",
-                    "attributeId": 0x00000003,
-                    "type": "int",
-                    "reportable": True,
-                },
                 0x00000004: {
-                    "attributeName": "Position",
+                    "attributeName": "PlaybackSpeed",
                     "attributeId": 0x00000004,
-                    "type": "int",
-                    "reportable": True,
+                    "type": "",
                 },
                 0x00000005: {
-                    "attributeName": "PlaybackSpeed",
+                    "attributeName": "SeekRangeEnd",
                     "attributeId": 0x00000005,
                     "type": "int",
                     "reportable": True,
                 },
                 0x00000006: {
-                    "attributeName": "SeekRangeEnd",
+                    "attributeName": "SeekRangeStart",
                     "attributeId": 0x00000006,
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000007: {
-                    "attributeName": "SeekRangeStart",
-                    "attributeId": 0x00000007,
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
-                    "reportable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2513,6 +2713,11 @@ class ChipClusters:
                     "type": "str",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2525,50 +2730,46 @@ class ChipClusters:
             "clusterName": "NetworkCommissioning",
             "clusterId": 0x00000031,
             "commands": {
-            0x00000006: {
-                    "commandId": 0x00000006,
-                    "commandName": "AddThreadNetwork",
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "AddOrUpdateThreadNetwork",
                     "args": {
                         "operationalDataset": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             0x00000002: {
                     "commandId": 0x00000002,
-                    "commandName": "AddWiFiNetwork",
+                    "commandName": "AddOrUpdateWiFiNetwork",
                     "args": {
                         "ssid": "bytes",
                         "credentials": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000E: {
-                    "commandId": 0x0000000E,
-                    "commandName": "DisableNetwork",
+            0x00000006: {
+                    "commandId": 0x00000006,
+                    "commandName": "ConnectNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
-            0x0000000C: {
-                    "commandId": 0x0000000C,
-                    "commandName": "EnableNetwork",
-                    "args": {
-                        "networkID": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x0000000A: {
-                    "commandId": 0x0000000A,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "RemoveNetwork",
                     "args": {
                         "networkID": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
+                    },
+                },
+            0x00000008: {
+                    "commandId": 0x00000008,
+                    "commandName": "ReorderNetwork",
+                    "args": {
+                        "networkID": "bytes",
+                        "networkIndex": "int",
+                        "breadcrumb": "int",
                     },
                 },
             0x00000000: {
@@ -2577,30 +2778,51 @@ class ChipClusters:
                     "args": {
                         "ssid": "bytes",
                         "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000008: {
-                    "commandId": 0x00000008,
-                    "commandName": "UpdateThreadNetwork",
-                    "args": {
-                        "operationalDataset": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
-                    },
-                },
-            0x00000004: {
-                    "commandId": 0x00000004,
-                    "commandName": "UpdateWiFiNetwork",
-                    "args": {
-                        "ssid": "bytes",
-                        "credentials": "bytes",
-                        "breadcrumb": "int",
-                        "timeoutMs": "int",
                     },
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "MaxNetworks",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "Networks",
+                    "attributeId": 0x00000001,
+                    "type": "",
+                },
+                0x00000002: {
+                    "attributeName": "ScanMaxTimeSeconds",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "ConnectMaxTimeSeconds",
+                    "attributeId": 0x00000003,
+                    "type": "int",
+                },
+                0x00000004: {
+                    "attributeName": "InterfaceEnabled",
+                    "attributeId": 0x00000004,
+                    "type": "bool",
+                    "writable": True,
+                },
+                0x00000005: {
+                    "attributeName": "LastNetworkingStatus",
+                    "attributeId": 0x00000005,
+                    "type": "int",
+                },
+                0x00000006: {
+                    "attributeName": "LastNetworkID",
+                    "attributeId": 0x00000006,
+                    "type": "bytes",
+                },
+                0x00000007: {
+                    "attributeName": "LastConnectErrorValue",
+                    "attributeId": 0x00000007,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -2619,16 +2841,16 @@ class ChipClusters:
             "clusterName": "OtaSoftwareUpdateProvider",
             "clusterId": 0x00000029,
             "commands": {
-            0x00000001: {
-                    "commandId": 0x00000001,
+            0x00000002: {
+                    "commandId": 0x00000002,
                     "commandName": "ApplyUpdateRequest",
                     "args": {
                         "updateToken": "bytes",
                         "newVersion": "int",
                     },
                 },
-            0x00000002: {
-                    "commandId": 0x00000002,
+            0x00000004: {
+                    "commandId": 0x00000004,
                     "commandName": "NotifyUpdateApplied",
                     "args": {
                         "updateToken": "bytes",
@@ -2651,6 +2873,11 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2688,6 +2915,11 @@ class ChipClusters:
                     "type": "bool",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -2719,6 +2951,11 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2808,6 +3045,11 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -2840,6 +3082,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                     "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -2953,6 +3200,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -3021,6 +3273,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -3044,6 +3301,11 @@ class ChipClusters:
                 0x00000000: {
                     "attributeName": "Sources",
                     "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
                     "type": "int",
                 },
                 0x0000FFFD: {
@@ -3076,6 +3338,11 @@ class ChipClusters:
                     "attributeId": 0x00000002,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -3239,6 +3506,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -3282,6 +3554,11 @@ class ChipClusters:
                     "attributeId": 0x00000003,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -3387,6 +3664,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -3431,6 +3713,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -3468,64 +3755,15 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
                     "type": "int",
-                    "reportable": True,
-                },
-                0x0000FFFD: {
-                    "attributeName": "ClusterRevision",
-                    "attributeId": 0x0000FFFD,
-                    "type": "int",
-                    "reportable": True,
-                },
-            },
-    }
-    _TV_CHANNEL_CLUSTER_INFO = {
-            "clusterName": "TvChannel",
-            "clusterId": 0x00000504,
-            "commands": {
-            0x00000000: {
-                    "commandId": 0x00000000,
-                    "commandName": "ChangeChannel",
-                    "args": {
-                        "match": "str",
-                    },
-                },
-            0x00000001: {
-                    "commandId": 0x00000001,
-                    "commandName": "ChangeChannelByNumber",
-                    "args": {
-                        "majorNumber": "int",
-                        "minorNumber": "int",
-                    },
-                },
-            0x00000002: {
-                    "commandId": 0x00000002,
-                    "commandName": "SkipChannel",
-                    "args": {
-                        "count": "int",
-                    },
-                },
-            },
-            "attributes": {
-                0x00000000: {
-                    "attributeName": "TvChannelList",
-                    "attributeId": 0x00000000,
-                    "type": "",
-                    "reportable": True,
-                },
-                0x00000001: {
-                    "attributeName": "TvChannelLineup",
-                    "attributeId": 0x00000001,
-                    "type": "bytes",
-                    "reportable": True,
-                },
-                0x00000002: {
-                    "attributeName": "CurrentTvChannel",
-                    "attributeId": 0x00000002,
-                    "type": "bytes",
                     "reportable": True,
                 },
                 0x0000FFFD: {
@@ -3555,6 +3793,16 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                },
+                0x00000001: {
+                    "attributeName": "CurrentNavigatorTarget",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -3593,6 +3841,11 @@ class ChipClusters:
                     "attributeId": 0x00000003,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -4018,7 +4271,7 @@ class ChipClusters:
                     "writable": True,
                 },
                 0x00000025: {
-                    "attributeName": "Struct",
+                    "attributeName": "StructAttr",
                     "attributeId": 0x00000025,
                     "type": "",
                     "reportable": True,
@@ -4301,6 +4554,11 @@ class ChipClusters:
                     "reportable": True,
                     "writable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -4464,6 +4722,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -4504,6 +4767,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                     "writable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -4903,6 +5171,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -4913,6 +5186,24 @@ class ChipClusters:
                     "attributeId": 0x0000FFFD,
                     "type": "int",
                     "reportable": True,
+                },
+            },
+    }
+    _USER_LABEL_CLUSTER_INFO = {
+            "clusterName": "UserLabel",
+            "clusterId": 0x00000041,
+            "commands": {
+            },
+            "attributes": {
+                0x00000000: {
+                    "attributeName": "LabelList",
+                    "attributeId": 0x00000000,
+                    "type": "",
+                },
+                0x0000FFFD: {
+                    "attributeName": "ClusterRevision",
+                    "attributeId": 0x0000FFFD,
+                    "type": "int",
                 },
             },
     }
@@ -4927,6 +5218,11 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "str",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
@@ -5025,6 +5321,11 @@ class ChipClusters:
                     "attributeId": 0x0000000C,
                     "type": "int",
                     "reportable": True,
+                },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
                 },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
@@ -5202,6 +5503,11 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
+                0x0000FFFB: {
+                    "attributeName": "AttributeList",
+                    "attributeId": 0x0000FFFB,
+                    "type": "int",
+                },
                 0x0000FFFC: {
                     "attributeName": "FeatureMap",
                     "attributeId": 0x0000FFFC,
@@ -5231,6 +5537,7 @@ class ChipClusters:
     0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
     0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
     0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+    0x00000504: _CHANNEL_CLUSTER_INFO,
     0x00000300: _COLOR_CONTROL_CLUSTER_INFO,
     0x0000050A: _CONTENT_LAUNCHER_CLUSTER_INFO,
     0x0000001D: _DESCRIPTOR_CLUSTER_INFO,
@@ -5267,13 +5574,13 @@ class ChipClusters:
     0x00000005: _SCENES_CLUSTER_INFO,
     0x00000034: _SOFTWARE_DIAGNOSTICS_CLUSTER_INFO,
     0x0000003B: _SWITCH_CLUSTER_INFO,
-    0x00000504: _TV_CHANNEL_CLUSTER_INFO,
     0x00000505: _TARGET_NAVIGATOR_CLUSTER_INFO,
     0x00000402: _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
     0x0000050F: _TEST_CLUSTER_CLUSTER_INFO,
     0x00000201: _THERMOSTAT_CLUSTER_INFO,
     0x00000204: _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
     0x00000035: _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+    0x00000041: _USER_LABEL_CLUSTER_INFO,
     0x00000503: _WAKE_ON_LAN_CLUSTER_INFO,
     0x00000036: _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
     0x00000102: _WINDOW_COVERING_CLUSTER_INFO,
@@ -5293,6 +5600,7 @@ class ChipClusters:
         "BooleanState": _BOOLEAN_STATE_CLUSTER_INFO,
         "BridgedActions": _BRIDGED_ACTIONS_CLUSTER_INFO,
         "BridgedDeviceBasic": _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
+        "Channel": _CHANNEL_CLUSTER_INFO,
         "ColorControl": _COLOR_CONTROL_CLUSTER_INFO,
         "ContentLauncher": _CONTENT_LAUNCHER_CLUSTER_INFO,
         "Descriptor": _DESCRIPTOR_CLUSTER_INFO,
@@ -5329,13 +5637,13 @@ class ChipClusters:
         "Scenes": _SCENES_CLUSTER_INFO,
         "SoftwareDiagnostics": _SOFTWARE_DIAGNOSTICS_CLUSTER_INFO,
         "Switch": _SWITCH_CLUSTER_INFO,
-        "TvChannel": _TV_CHANNEL_CLUSTER_INFO,
         "TargetNavigator": _TARGET_NAVIGATOR_CLUSTER_INFO,
         "TemperatureMeasurement": _TEMPERATURE_MEASUREMENT_CLUSTER_INFO,
         "TestCluster": _TEST_CLUSTER_CLUSTER_INFO,
         "Thermostat": _THERMOSTAT_CLUSTER_INFO,
         "ThermostatUserInterfaceConfiguration": _THERMOSTAT_USER_INTERFACE_CONFIGURATION_CLUSTER_INFO,
         "ThreadNetworkDiagnostics": _THREAD_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
+        "UserLabel": _USER_LABEL_CLUSTER_INFO,
         "WakeOnLan": _WAKE_ON_LAN_CLUSTER_INFO,
         "WiFiNetworkDiagnostics": _WI_FI_NETWORK_DIAGNOSTICS_CLUSTER_INFO,
         "WindowCovering": _WINDOW_COVERING_CLUSTER_INFO,

@@ -46,6 +46,7 @@ class IPPrefix
 {
 public:
     IPPrefix() = default;
+    IPPrefix(const IPAddress & ipAddress, uint8_t length) : IPAddr(ipAddress), Length(length) {}
 
     /**
      *  Copy constructor for the IPPrefix class.

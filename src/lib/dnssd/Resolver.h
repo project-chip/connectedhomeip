@@ -23,7 +23,7 @@
 #include "lib/support/logging/CHIPLogging.h"
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <inet/InetLayer.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
@@ -96,7 +96,7 @@ struct DiscoveredNodeData
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     char hostName[kHostNameMaxLength + 1];
-    char instanceName[Commissionable::kInstanceNameMaxLength + 1];
+    char instanceName[Commission::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -227,9 +227,9 @@ struct DiscoveredNodeData
 enum class DiscoveryFilterType : uint8_t
 {
     kNone,
-    kShort,
-    kLong,
-    kVendor,
+    kShortDiscriminator,
+    kLongDiscriminator,
+    kVendorId,
     kDeviceType,
     kCommissioningMode,
     kInstanceName,
@@ -289,7 +289,7 @@ public:
      * The method must be called before other methods of this class.
      * If the resolver has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) = 0;
+    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) = 0;
 
     /**
      * Shuts down the resolver if it has been initialized before.

@@ -45,8 +45,9 @@ using WriteResponseSuccessCallback   = void (*)(void * context);
 using WriteResponseFailureCallback   = void (*)(void * context, EmberAfStatus status);
 using WriteResponseDoneCallback      = void (*)(void * context);
 template <typename T>
-using ReadResponseSuccessCallback = void (*)(void * context, T responseData);
-using ReadResponseFailureCallback = void (*)(void * context, EmberAfStatus status);
+using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
+using ReadResponseFailureCallback     = void (*)(void * context, EmberAfStatus status);
+using SubscriptionEstablishedCallback = void (*)(void * context);
 
 class DLL_EXPORT ClusterBase
 {
@@ -205,23 +206,58 @@ public:
                                                         mEndpoint, clusterId, attributeId, onSuccessCb, onFailureCb);
     }
 
+    /**
+     * Subscribe to attribute and get a type-safe callback with the attribute
+     * value when it changes.
+     */
+    template <typename AttributeInfo>
+    CHIP_ERROR SubscribeAttribute(void * context, ReadResponseSuccessCallback<typename AttributeInfo::DecodableArgType> reportCb,
+                                  ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                                  uint16_t maxIntervalCeilingSeconds,
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        return SubscribeAttribute<typename AttributeInfo::DecodableType, typename AttributeInfo::DecodableArgType>(
+            context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), reportCb, failureCb, minIntervalFloorSeconds,
+            maxIntervalCeilingSeconds, subscriptionEstablishedCb);
+    }
+
+    template <typename DecodableType, typename DecodableArgType>
+    CHIP_ERROR SubscribeAttribute(void * context, ClusterId clusterId, AttributeId attributeId,
+                                  ReadResponseSuccessCallback<DecodableArgType> reportCb, ReadResponseFailureCallback failureCb,
+                                  uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,
+                                  SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onReportCb = [context, reportCb](const app::ConcreteAttributePath & commandPath, const DecodableType & aData) {
+            if (reportCb != nullptr)
+            {
+                reportCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::ConcreteAttributePath * commandPath, app::StatusIB status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status.mStatus));
+            }
+        };
+
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+            if (subscriptionEstablishedCb != nullptr)
+            {
+                subscriptionEstablishedCb(context);
+            }
+        };
+
+        return Controller::SubscribeAttribute<DecodableType>(
+            mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId, onReportCb,
+            onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+    }
+
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
-
-    /**
-     * @brief
-     *   Request attribute reports from the device. Add a callback
-     *   handler, that'll be called when the reports are received from the device.
-     *
-     * @param[in] attributeId       The report target attribute id
-     * @param[in] reportHandler     The handler function that's called on receiving attribute reports
-     *                              The reporting handler continues to be called as long as the callback
-     *                              is active. The user can stop the reporting by cancelling the callback.
-     *                              Reference: chip::Callback::Cancel()
-     * @param[in] tlvDataFilter     Filter interface for processing data from TLV
-     */
-    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler,
-                                         app::TLVDataFilter tlvDataFilter);
 
     const ClusterId mClusterId;
     DeviceProxy * mDevice;

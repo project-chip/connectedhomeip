@@ -40,9 +40,9 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 class ThreadStackManagerImpl;
 class ConfigurationManagerImpl;
+class DeviceControlServer;
 
 namespace Internal {
-class DeviceControlServer;
 class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
@@ -124,10 +124,10 @@ private:
 
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class DeviceControlServer;
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
 #endif
-    friend class Internal::DeviceControlServer;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
     template <class>

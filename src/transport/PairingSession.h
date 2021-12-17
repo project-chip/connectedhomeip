@@ -26,6 +26,7 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
@@ -47,7 +48,7 @@ public:
     // SetPeerNodeId is not necessary.
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
     // TODO: the local key id should be allocateed at start
     // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
@@ -85,7 +86,7 @@ public:
     virtual uint32_t GetPeerCounter()
     {
         // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
-        return LocalSessionMessageCounter::kInitialValue;
+        return LocalSessionMessageCounter::kInitialSyncValue;
     }
 
     /**
@@ -96,14 +97,16 @@ public:
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    virtual const char * GetI2RSessionInfo() const = 0;
-
-    virtual const char * GetR2ISessionInfo() const = 0;
+    /**
+     * Encode the provided MRP parameters using the provided TLV tag.
+     */
+    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+                                          TLV::TLVWriter & tlvWriter);
 
 protected:
     void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    void SetPeerCATs(Credentials::CATValues peerCATs) { mPeerCATs = peerCATs; }
+    void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
@@ -159,12 +162,24 @@ protected:
         return err;
     }
 
+    /**
+     * Try to decode the current element (pointed by the TLV reader) as MRP parameters.
+     * If the MRP parameters are found, mMRPConfig is updated with the devoded values.
+     *
+     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
+     * the function is a noop.
+     *
+     * If the parameters are present, but TLV reader fails to correctly parse it, the function will
+     * return the corresponding error.
+     */
+    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TLV::ContiguousBufferTLVReader & tlvReader);
+
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
     {
         mSecureSessionType = Transport::SecureSession::Type::kUndefined;
         mPeerNodeId        = kUndefinedNodeId;
-        mPeerCATs          = Credentials::kUndefinedCATs;
+        mPeerCATs          = kUndefinedCATs;
         mPeerAddress       = Transport::PeerAddress::Uninitialized();
         mPeerSessionId.ClearValue();
         mLocalSessionId = kInvalidKeyId;
@@ -173,7 +188,7 @@ protected:
 private:
     Transport::SecureSession::Type mSecureSessionType = Transport::SecureSession::Type::kUndefined;
     NodeId mPeerNodeId                                = kUndefinedNodeId;
-    Credentials::CATValues mPeerCATs                  = Credentials::kUndefinedCATs;
+    CATValues mPeerCATs;
 
     // TODO: the local key id should be allocateed at start
     // then we can remove kInvalidKeyId

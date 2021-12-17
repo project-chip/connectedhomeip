@@ -47,8 +47,8 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    char instanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
-    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
+    char instanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commission::kInstanceNameMaxLength);
     msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';

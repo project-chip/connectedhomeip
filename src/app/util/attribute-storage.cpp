@@ -183,7 +183,7 @@ EmberAfStatus emberAfSetDynamicEndpoint(uint16_t index, EndpointId id, EmberAfEn
     index = static_cast<uint16_t>(realIndex);
     for (uint16_t i = FIXED_ENDPOINT_COUNT; i < MAX_ENDPOINT_COUNT; i++)
     {
-        if (emAfEndpoints[i].endpoint == id)
+        if (emAfEndpoints[i].endpoint == id && emAfEndpoints[i].endpointType != NULL)
         {
             return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
         }
@@ -431,13 +431,8 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // If src == NULL, then this method will set memory to zeroes
 // See documentation for emAfReadOrWriteAttribute for the semantics of
 // readLength when reading and writing.
-//
-// The index argument is used exclusively for List. When reading or writing a List attribute, it could take 3 types of values:
-//  -1: Read/Write the whole list content, including the number of elements in the list
-//   0: Read/Write the number of elements in the list, represented as a uint16_t
-//   n: Read/Write the nth element of the list
 static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
-                                          bool write, uint16_t readLength, int32_t index)
+                                          bool write, uint16_t readLength)
 {
     EmberAfAttributeType attributeType = am->attributeType;
     // readLength == 0 for a read indicates that we should just trust that the
@@ -468,7 +463,8 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
 
-        emberAfCopyList(clusterId, am, write, dest, src, index);
+        // Just copy the length.
+        memmove(dest, src, 2);
     }
     else
     {
@@ -530,7 +526,7 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
+                                       uint8_t * buffer, uint16_t readLength, bool write)
 {
     uint16_t attributeOffsetIndex = 0;
 
@@ -598,19 +594,19 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                          am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                          buffer, index)
-                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                         am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                         buffer, emberAfAttributeSize(am), index));
+                                    return (write
+                                                ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                        am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer)
+                                                : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                       am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer,
+                                                                                       emberAfAttributeSize(am)));
                                 }
                                 else
                                 {
                                     // Internal storage is only supported for fixed endpoints
                                     if (!isDynamicEndpoint)
                                     {
-                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
+                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                     }
                                     else
                                     {
@@ -647,32 +643,33 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
 }
 
-// Check if a cluster is implemented or not. If yes, the cluster is returned.
-// If the cluster is not manufacturerSpecific [ClusterId < FC00] then
-// manufacturerCode argument is ignored otherwise checked.
-//
-// mask = 0 -> find either client or server
-// mask = CLUSTER_MASK_CLIENT -> find client
-// mask = CLUSTER_MASK_SERVER -> find server
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, ClusterId clusterId,
                                                      EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index)
 {
     uint8_t i;
+    uint8_t scopedIndex = 0;
+
     for (i = 0; i < endpointType->clusterCount; i++)
     {
         EmberAfCluster * cluster = &(endpointType->cluster[i]);
-        if (cluster->clusterId == clusterId &&
-            (mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
+
+        if ((mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
              (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))))
         {
-            if (index)
+            if (cluster->clusterId == clusterId)
             {
-                *index = i;
+                if (index)
+                {
+                    *index = scopedIndex;
+                }
+
+                return cluster;
             }
 
-            return cluster;
+            scopedIndex++;
         }
     }
+
     return NULL;
 }
 
@@ -778,28 +775,31 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
 namespace chip {
 namespace app {
 
-Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context)
+EnabledEndpointsWithServerCluster::EnabledEndpointsWithServerCluster(ClusterId clusterId) : mClusterId(clusterId)
 {
-    uint16_t count = emberAfEndpointCount();
-    for (uint16_t index = 0; index < count; ++index)
+    EnsureMatchingEndpoint();
+}
+EnabledEndpointsWithServerCluster & EnabledEndpointsWithServerCluster::operator++()
+{
+    ++mEndpointIndex;
+    EnsureMatchingEndpoint();
+    return *this;
+}
+
+void EnabledEndpointsWithServerCluster::EnsureMatchingEndpoint()
+{
+    for (; mEndpointIndex < mEndpointCount; ++mEndpointIndex)
     {
-        if (!emberAfEndpointIndexIsEnabled(index))
+        if (!emberAfEndpointIndexIsEnabled(mEndpointIndex))
         {
             continue;
         }
 
-        if (!emberAfContainsServerFromIndex(index, clusterId))
+        if (emberAfContainsServerFromIndex(mEndpointIndex, mClusterId))
         {
-            continue;
-        }
-
-        if (callback(emberAfEndpointFromIndex(index), context) == Loop::Break)
-        {
-            return Loop::Break;
+            break;
         }
     }
-
-    return Loop::Finish;
 }
 
 } // namespace app

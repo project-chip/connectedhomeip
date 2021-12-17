@@ -85,6 +85,59 @@ protected:
     uint32_t mSetupPIN = 0;
 };
 
+class DLL_EXPORT KeypadInputImpl : public KeypadInput
+{
+public:
+    virtual ~KeypadInputImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
+{
+public:
+    virtual ~ApplicationLauncherImpl() {}
+
+    ApplicationLauncherResponse LaunchApp(ApplicationLauncherApp application, std::string data) override;
+
+protected:
+};
+
+class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
+{
+public:
+    virtual ~ContentLauncherImpl() {}
+
+    ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, std::string data) override;
+
+protected:
+};
+
+class DLL_EXPORT MediaPlaybackImpl : public MediaPlayback
+{
+public:
+    virtual ~MediaPlaybackImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT TargetNavigatorImpl : public TargetNavigator
+{
+public:
+    TargetNavigatorImpl() : TargetNavigator{ { "home", "search", "info", "guide", "menu" }, 0 } {};
+    virtual ~TargetNavigatorImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT ChannelImpl : public Channel
+{
+public:
+    virtual ~ChannelImpl() {}
+
+protected:
+};
+
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
@@ -94,24 +147,39 @@ public:
 
     inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };
     inline AccountLogin * GetAccountLogin() override { return &mAccountLogin; };
+    inline KeypadInput * GetKeypadInput() override { return &mKeypadInput; };
+    inline ApplicationLauncher * GetApplicationLauncher() override { return &mApplicationLauncher; };
+    inline ContentLauncher * GetContentLauncher() override { return &mContentLauncher; };
+    inline MediaPlayback * GetMediaPlayback() override { return &mMediaPlayback; };
+    inline TargetNavigator * GetTargetNavigator() override { return &mTargetNavigator; };
+    inline Channel * GetChannel() override { return &mChannel; };
 
 protected:
     ApplicationBasicImpl mApplicationBasic;
     AccountLoginImpl mAccountLogin;
+    KeypadInputImpl mKeypadInput;
+    ApplicationLauncherImpl mApplicationLauncher;
+    ContentLauncherImpl mContentLauncher;
+    MediaPlaybackImpl mMediaPlayback;
+    TargetNavigatorImpl mTargetNavigator;
+    ChannelImpl mChannel;
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory
 {
+#define APP_LIBRARY_SIZE 4
 public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
     ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
+    ContentApp * LoadContentAppByAppId(ApplicationLauncherApp application);
 
 protected:
-    ContentAppImpl mContentApps[3] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
-                                       ContentAppImpl("Vendor2", 2, "App2", 22, "Version2"),
-                                       ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3") };
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
+                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2"),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3"),
+                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2") };
 };
 
 } // namespace AppPlatform

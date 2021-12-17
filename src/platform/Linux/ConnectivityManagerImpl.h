@@ -41,6 +41,8 @@
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+
+#include <mutex>
 #endif
 
 namespace chip {
@@ -153,10 +155,13 @@ private:
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                        gpointer user_data);
     static void _OnWpaInterfaceAdded(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties, gpointer user_data);
+    static void _OnWpaPropertiesChanged(WpaFiW1Wpa_supplicant1Interface * proxy, GVariant * changed_properties,
+                                        const gchar * const * invalidated_properties, gpointer user_data);
     static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
+    static bool mAssociattionStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
     static std::mutex mWpaSupplicantMutex;

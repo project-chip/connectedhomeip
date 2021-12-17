@@ -116,7 +116,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -188,8 +188,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                                        System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, const Transport::PeerAddress & source,
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
@@ -236,6 +236,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
         {
             return;
         }
+    }
+    else
+    {
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
+                        packetHeader.GetDestinationGroupId().Value());
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
@@ -309,15 +314,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 }
 
-void ExchangeManager::OnSessionReleased(SessionHandle session)
+void ExchangeManager::OnSessionReleased(const SessionHandle & session)
 {
     ExpireExchangesForSession(session);
 }
 
-void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
+void ExchangeManager::ExpireExchangesForSession(const SessionHandle & session)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSession.HasValue() && ec->mSession.Value() == session)
+        if (ec->mSession.Contains(session))
         {
             ec->OnConnectionExpired();
             // Continue to iterate because there can be multiple exchanges

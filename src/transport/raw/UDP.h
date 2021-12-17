@@ -41,7 +41,7 @@ namespace Transport {
 class UdpListenParameters
 {
 public:
-    explicit UdpListenParameters(Inet::InetLayer * inetLayer) : mEndPointManager(inetLayer->GetUDPEndPointManager()) {}
+    explicit UdpListenParameters(Inet::EndPointManager<Inet::UDPEndPoint> * endPointManager) : mEndPointManager(endPointManager) {}
     UdpListenParameters(const UdpListenParameters &) = default;
     UdpListenParameters(UdpListenParameters &&)      = default;
 
@@ -114,6 +114,13 @@ public:
     void Close() override;
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override;
+
+    bool CanListenMulticast() override
+    {
+        return (mState == State::kInitialized) && (mUDPEndpointType == Inet::IPAddressType::kIPv6);
+    }
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {

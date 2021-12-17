@@ -20,19 +20,27 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
+#include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
+#include <protocols/bdx/BdxUri.h>
 
 #include <string.h>
 
 using chip::ByteSpan;
 using chip::CharSpan;
+using chip::FabricIndex;
+using chip::FabricInfo;
+using chip::MutableCharSpan;
+using chip::NodeId;
 using chip::Optional;
+using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
@@ -55,24 +63,6 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
     {
         buf[i] = chip::Crypto::GetRandU8();
     }
-}
-
-bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
-{
-    static constexpr char bdxPrefix[] = "bdx://";
-    chip::NodeId nodeId               = chip::kTestDeviceNodeId; // TODO: read this dynamically
-    size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
-    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + 1 + fileDesignator.size();
-
-    if (expectedLength >= availableSize)
-    {
-        return false;
-    }
-
-    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "/%s", bdxPrefix,
-                                                  ChipLogValueX64(nodeId), fileDesignator.data()));
-
-    return expectedLength == written;
 }
 
 OTAProviderExample::OTAProviderExample()
@@ -100,7 +90,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 {
     // TODO: add confiuration for returning BUSY status
 
-    EmberAfOTAQueryStatus queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
     uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
                                                                    // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
@@ -115,9 +105,16 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     if (strlen(mOTAFilePath))
     {
+        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
+        // supplying the response is not the provider supplying the OTA image.
+        FabricIndex fabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
+
         // Only doing BDX transport for now
-        GenerateBdxUri(Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, 0), kUriMaxLen);
-        ChipLogDetail(SoftwareUpdate, "generated URI: %s", uriBuf);
+        MutableCharSpan uri(uriBuf, kUriMaxLen);
+        chip::bdx::MakeURI(nodeId, CharSpan(mOTAFilePath, strlen(mOTAFilePath)), uri);
+        ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
     }
 
     // Set Status for the Query Image Response
@@ -126,25 +123,25 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     case kRespondWithUpdateAvailable: {
         if (strlen(mOTAFilePath) != 0)
         {
-            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE;
+            queryStatus = OTAQueryStatus::kUpdateAvailable;
         }
         else
         {
-            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+            queryStatus = OTAQueryStatus::kNotAvailable;
             ChipLogError(SoftwareUpdate, "No OTA file configured on the Provider");
         }
         break;
     }
     case kRespondWithBusy: {
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_BUSY;
+        queryStatus = OTAQueryStatus::kBusy;
         break;
     }
     case kRespondWithNotAvailable: {
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
     }
     default:
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+        queryStatus = OTAQueryStatus::kNotAvailable;
     }
 
     QueryImageResponse::Type response;

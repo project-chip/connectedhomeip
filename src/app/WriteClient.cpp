@@ -149,15 +149,11 @@ CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePa
 
 CHIP_ERROR WriteClient::FinishAttribute()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-    AttributeDataIB.EndOfAttributeDataIB();
-    SuccessOrExit(err = AttributeDataIB.GetError());
+    AttributeDataIB::Builder & attributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
+    attributeDataIB.EndOfAttributeDataIB();
+    ReturnErrorOnFailure(attributeDataIB.GetError());
     MoveToState(State::AddAttribute);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
@@ -167,22 +163,14 @@ TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeDataIBs::Builder AttributeDataIBsBuilder;
-    VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
-    AttributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
-    err                     = AttributeDataIBsBuilder.GetError();
-    SuccessOrExit(err);
+    VerifyOrReturnError(mState == State::AddAttribute, CHIP_ERROR_INCORRECT_STATE);
+    AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
+    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
     mWriteRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
-    err = mWriteRequestBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mMessageWriter.Finalize(&aPacket);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&aPacket));
+    return CHIP_NO_ERROR;
 }
 
 const char * WriteClient::GetStateStr() const
@@ -223,7 +211,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -260,14 +248,20 @@ exit:
         ChipLogError(DataManagement, "Write client failed to SendWriteRequest");
         ClearExistingExchangeContext();
     }
-
-    if (session.IsGroupSession())
+    else
     {
-        // Always shutdown on Group communication
-        ChipLogDetail(DataManagement, "Closing on group Communication ");
+        // TODO: Ideally this would happen async, but to make sure that we
+        // handle this object dying (e.g. due to IM enging shutdown) while the
+        // async bits are pending we'd need to malloc some state bit that we can
+        // twiddle if we die.  For now just do the OnDone callback sync.
+        if (session.IsGroupSession())
+        {
+            // Always shutdown on Group communication
+            ChipLogDetail(DataManagement, "Closing on group Communication ");
 
-        // onDone is called
-        ShutdownInternal();
+            // onDone is called
+            ShutdownInternal();
+        }
     }
 
     return err;
@@ -397,7 +391,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClientHandle::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 

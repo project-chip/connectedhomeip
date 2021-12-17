@@ -275,4 +275,20 @@ jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
     return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
+CHIP_ERROR JniReferences::CallSubscriptionEstablished(jobject javaCallback)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    jmethodID subscriptionEstablishedMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallback, "onSubscriptionEstablished", "()V",
+                                                        &subscriptionEstablishedMethod);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+
+    env->CallVoidMethod(javaCallback, subscriptionEstablishedMethod);
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    return err;
+}
+
 } // namespace chip

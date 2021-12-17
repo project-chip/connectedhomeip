@@ -29,6 +29,28 @@ scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
 
 which puts the binary at `SOME-PATH/chip-tool`.
 
+### Building with message tracing
+
+Message tracing allows capture of the secure messages which can be used for test
+automation.
+
+```
+gn gen out/with_trace/ --args='import("//with_pw_trace.gni")'
+ninja -C out/with_trace chip-tool
+```
+
+This enables tracing and adds additional flags to chip-tool to control where the
+traces should go:
+
+-   --trace_file <file> Outputs trace data to the specified file.
+-   --trace_log Outputs trace data to the chip log stream.
+
+For example:
+
+```
+out/with_trace/chip-tool pairing <pairing_args> --trace_file trace.log
+```
+
 ## Using the Client to commission a device
 
 In order to send commands to a device, it must be commissioned with the client.

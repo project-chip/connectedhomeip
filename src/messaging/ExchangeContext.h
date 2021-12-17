@@ -63,7 +63,8 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -76,7 +77,7 @@ public:
 
     bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
 
-    bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
+    bool IsGroupExchangeContext() const { return (mSession && mSession.Get().IsGroupSession()); }
 
     /**
      *  Send a CHIP message on this exchange.
@@ -151,8 +152,8 @@ public:
 
     ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
 
-    SessionHandle GetSessionHandle() const { return mSession.Value(); }
-    bool HasSessionHandle() const { return mSession.HasValue(); }
+    SessionHandle GetSessionHandle() const { return mSession.Get(); }
+    bool HasSessionHandle() const { return mSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -185,8 +186,8 @@ private:
 
     ExchangeMessageDispatch * mDispatch = nullptr;
 
-    Optional<SessionHandle> mSession; // The connection state
-    uint16_t mExchangeId;             // Assigned exchange ID.
+    SessionHolder mSession; // The connection state
+    uint16_t mExchangeId;   // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -226,7 +227,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify the exchange that its connection has expired.

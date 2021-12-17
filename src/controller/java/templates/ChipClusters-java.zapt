@@ -19,37 +19,44 @@ public class ChipClusters {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface OctetStringAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface IntegerAttributeCallback {
     void onSuccess(int value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface LongAttributeCallback {
     void onSuccess(long value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface BooleanAttributeCallback {
     void onSuccess(boolean value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface FloatAttributeCallback {
     void onSuccess(float value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface DoubleAttributeCallback {
     void onSuccess(double value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public static abstract class BaseChipCluster {
@@ -207,11 +214,13 @@ public class ChipClusters {
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess(List<{{#>list_attribute_callback_type}}{{/list_attribute_callback_type}}> valueList);
         void onError(Exception ex);
+        default void onSubscriptionEstablished() {}
       }
     {{else}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#>list_attribute_callback_type}}{{/list_attribute_callback_type}} value);
         void onError(Exception ex);
+        default void onSubscriptionEstablished() {}
       }
     {{/if}}
   {{/if_in_global_responses}}
@@ -241,12 +250,14 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
   {{#unless isList}}
-    public void subscribe{{asCamelCased name false}}Attribute(DefaultClusterCallback callback, int minInterval, int maxInterval) {
+    public void subscribe{{asCamelCased name false}}Attribute(
+      {{#if_in_global_responses}}
+        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{else}}
+        {{asUpperCamelCase name}}AttributeCallback callback
+      {{/if_in_global_responses}},
+      int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void report{{asCamelCased name false}}Attribute({{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback) {
-      report{{asCamelCased name false}}Attribute(chipClusterPtr, callback);
     }
   {{/unless}}
   {{/if}}
@@ -272,9 +283,12 @@ public class ChipClusters {
   {{/if}}
   {{#if isReportableAttribute}}
   {{#unless isList}}
-    private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void report{{asCamelCased name false}}Attribute(long chipClusterPtr, {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback);
+    private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
+      {{#if_in_global_responses}}
+        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{else}}
+        {{asUpperCamelCase name}}AttributeCallback callback
+      {{/if_in_global_responses}}, int minInterval, int maxInterval);
   {{/unless}}
   {{/if}}
   {{/unless}}

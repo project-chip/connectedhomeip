@@ -114,6 +114,21 @@ void ReadClient::MoveToState(const ClientState aTargetState)
                   GetStateStr());
 }
 
+CHIP_ERROR ReadClient::SendRequest(ReadPrepareParams & aReadPrepareParams)
+{
+    if (mInteractionType == InteractionType::Read)
+    {
+        return SendReadRequest(aReadPrepareParams);
+    }
+
+    if (mInteractionType == InteractionType::Subscribe)
+    {
+        return SendSubscribeRequest(aReadPrepareParams);
+    }
+
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 {
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
@@ -222,7 +237,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        AttributePathIB::Builder path = aAttributePathIBsBuilder.CreatePath();
+        AttributePathIB::Builder & path = aAttributePathIBsBuilder.CreatePath();
         ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
         ReturnErrorOnFailure(path.Encode(apAttributePathParamsList[index]));
     }
@@ -540,7 +555,7 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
         header.mTimestamp = mEventTimestamp;
         ReturnErrorOnFailure(data.DecodeEventHeader(header));
         mEventTimestamp = header.mTimestamp;
-
+        mEventMin       = header.mEventNumber + 1;
         ReturnErrorOnFailure(data.GetData(&dataReader));
 
         mpCallback->OnEventData(this, header, &dataReader, nullptr);
@@ -635,7 +650,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds <= aReadPrepareParams.mMaxIntervalCeilingSeconds,
                  err = CHIP_ERROR_INVALID_ARGUMENT);
 
     writer.Init(std::move(msgBuf));
@@ -666,16 +681,17 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
         if (aReadPrepareParams.mEventNumber != 0)
         {
-            // EventNumber is optional
-            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
-            SuccessOrExit(err = request.GetError());
-            EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
-            SuccessOrExit(err = eventFilters.GetError());
-            eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
-            SuccessOrExit(err = eventFilter.GetError());
-            eventFilters.EndOfEventFilters();
-            SuccessOrExit(err = eventFilters.GetError());
+            mEventMin = aReadPrepareParams.mEventNumber;
         }
+
+        EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
+        SuccessOrExit(err = request.GetError());
+        EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+        SuccessOrExit(err = eventFilters.GetError());
+        eventFilter.EventMin(mEventMin).EndOfEventFilterIB();
+        SuccessOrExit(err = eventFilter.GetError());
+        eventFilters.EndOfEventFilters();
+        SuccessOrExit(err = eventFilters.GetError());
     }
 
     request.IsFabricFiltered(false).EndOfSubscribeRequestMessage();

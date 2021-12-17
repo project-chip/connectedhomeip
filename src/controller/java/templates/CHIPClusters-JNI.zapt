@@ -8,6 +8,7 @@
 #include <zap-generated/CHIPClusters.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
+#include <controller/java/AndroidCallbacks.h>
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
 #include <lib/support/JniReferences.h>
@@ -52,7 +53,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
 
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label)}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=parent.parent.name}}
     {{/chip_cluster_command_arguments}}
 
     {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name false}}Cluster{{asUpperCamelCase responseName false}}{{else}}DefaultSuccess{{/if}}{{/inline}}
@@ -93,7 +94,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     TypeInfo::Type cppValue;
 
-    {{>encode_value target="cppValue" source="value"}}
+    {{>encode_value target="cppValue" source="value" cluster=parent.name}}
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -125,37 +126,33 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
 JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    {{~#*inline "callbackName"~}}
+    {{~#if_in_global_responses~}}
+    CHIP{{chipCallback.name}}AttributeCallback
+    {{~else~}}
+    CHIP{{asCamelCased parent.name false}}{{asCamelCased name false}}AttributeCallback
+    {{~/if_in_global_responses~}}
+    {{~/inline}}
+
+    std::unique_ptr<{{>callbackName}}, void (*)({{>callbackName}} *)> onSuccess(Platform::New<{{>callbackName}}>(callback, true), chip::Platform::Delete<{{>callbackName}}>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
 
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onFailure.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
     VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    err = cppCluster->SubscribeAttribute{{asCamelCased name false}}(onSuccess->Cancel(), onFailure->Cancel(), static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval));
+    using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval), {{>callbackName}}::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
-}
-
-JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
-{
-    chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIP{{chipCallback.name}}AttributeCallback, void (*)(CHIP{{chipCallback.name}}AttributeCallback *)> onReport(Platform::New<CHIP{{chipCallback.name}}AttributeCallback>(callback, true), Platform::Delete<CHIP{{chipCallback.name}}AttributeCallback>);
-    VerifyOrReturn(onReport.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native report callback", CHIP_ERROR_NO_MEMORY));
-    
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    {{asCamelCased ../name false}}Cluster * cppCluster = reinterpret_cast<{{asCamelCased ../name false}}Cluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    err = cppCluster->ReportAttribute{{asCamelCased name false}}(onReport->Cancel());
-    VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error registering for attribute reporting", err));
-
-    onReport.release();
 }
 {{/unless}}
 {{/if}}

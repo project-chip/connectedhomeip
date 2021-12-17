@@ -17,22 +17,22 @@ import os
 from typing import Any, List
 from itertools import combinations
 
+from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
 from builders.host import HostBuilder, HostApp, HostBoard
+from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
+from builders.k32w import K32WApp, K32WBuilder
+from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 from builders.nrf import NrfApp, NrfBoard, NrfConnectBuilder
 from builders.qpg import QpgBuilder
-from builders.infineon import InfineonBuilder, InfineonApp, InfineonBoard
 from builders.telink import TelinkApp, TelinkBoard, TelinkBuilder
 from builders.tizen import TizenApp, TizenBoard, TizenBuilder
-from builders.ameba import AmebaApp, AmebaBoard, AmebaBuilder
-from builders.mbed import MbedApp, MbedBoard, MbedProfile, MbedBuilder
 
 
 class Target:
     """Represents a build target:
-
         Has a name identifier plus parameters on how to build it (what
         builder class to use and what arguments are required to produce
         the specified build)
@@ -56,7 +56,6 @@ class Target:
 
     def Extend(self, suffix, **kargs):
         """Creates a clone of the current object extending its build parameters.
-
         Arguments:
            suffix: appended with a "-" as separator to the clone name
            **kargs: arguments needed to produce the new build variant
@@ -101,12 +100,15 @@ class AcceptAnyName:
         return True
 
 
-class AcceptNameWithSubstring:
-    def __init__(self, substr: str):
+class AcceptNameWithSubstrings:
+    def __init__(self, substr: List[str]):
         self.substr = substr
 
     def Accept(self, name: str):
-        return self.substr in name
+        for s in self.substr:
+            if s in name:
+                return True
+        return False
 
 
 class HostBuildVariant:
@@ -157,8 +159,10 @@ def HostTargets():
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
         HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
+        HostBuildVariant(name="test-group",
+                         validator=AcceptNameWithSubstrings(['-all-clusters', '-chip-tool']), test_group=True),
         HostBuildVariant(name="same-event-loop",
-                         validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
+                         validator=AcceptNameWithSubstrings(['-chip-tool']), separate_event_loop=False),
     ]
 
     glob_whitelist = set(['ipv6only'])
@@ -191,6 +195,10 @@ def HostTargets():
                         'Reduce default build variants')
 
                 yield variant_target
+
+    test_target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
+    for board in [HostBoard.NATIVE, HostBoard.FAKE]:
+        yield test_target.Extend(board.BoardName() + '-tests', board=board, app=HostApp.TESTS)
 
 
 def Esp32Targets():
@@ -251,6 +259,8 @@ def Efr32Targets():
 def NrfTargets():
     target = Target('nrf', NrfConnectBuilder)
 
+    yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
+
     targets = [
         target.Extend('nrf5340', board=NrfBoard.NRF5340),
         target.Extend('nrf52840', board=NrfBoard.NRF52840),
@@ -285,7 +295,7 @@ def AndroidTargets():
     yield target.Extend('androidstudio-x86-chip-tool', board=AndroidBoard.AndroidStudio_X86, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('androidstudio-x64-chip-tool', board=AndroidBoard.AndroidStudio_X64, app=AndroidApp.CHIP_TOOL)
     yield target.Extend('arm64-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
-    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM64, app=AndroidApp.CHIP_TVServer)
+    yield target.Extend('arm-chip-tvserver', board=AndroidBoard.ARM, app=AndroidApp.CHIP_TVServer)
 
 
 def MbedTargets():
@@ -319,6 +329,28 @@ def InfineonTargets():
     yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
 
 
+def AmebaTargets():
+    ameba_target = Target('ameba', AmebaBuilder)
+
+    yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
+    yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
+
+
+def K32WTargets():
+    target = Target('k32w', K32WBuilder)
+
+    # This is for testing only  in case debug builds are to be fixed
+    # Error is LWIP_DEBUG being redefined between 0 and 1 in debug builds in:
+    #    third_party/connectedhomeip/src/lwip/k32w0/lwipopts.h
+    #    gen/include/lwip/lwip_buildconfig.h
+    yield target.Extend('light', app=K32WApp.LIGHT).GlobBlacklist("Debug builds broken due to LWIP_DEBUG redefition")
+
+    yield target.Extend('light-release', app=K32WApp.LIGHT, release=True)
+    yield target.Extend('shell-release', app=K32WApp.SHELL, release=True)
+    yield target.Extend('lock-release', app=K32WApp.LOCK, release=True)
+    yield target.Extend('lock-low-power-release', app=K32WApp.LOCK, low_power=True, release=True).GlobBlacklist("Only on demand build")
+
+
 ALL = []
 
 target_generators = [
@@ -328,8 +360,9 @@ target_generators = [
     NrfTargets(),
     AndroidTargets(),
     MbedTargets(),
-    InfineonTargets()
-
+    InfineonTargets(),
+    AmebaTargets(),
+    K32WTargets(),
 ]
 
 for generator in target_generators:
@@ -342,8 +375,6 @@ ALL.append(Target('telink-tlsr9518adk80d-light', TelinkBuilder,
                   board=TelinkBoard.TLSR9518ADK80D, app=TelinkApp.LIGHT))
 ALL.append(Target('tizen-arm-light', TizenBuilder,
                   board=TizenBoard.ARM, app=TizenApp.LIGHT))
-ALL.append(Target('ameba-amebad-all-clusters', AmebaBuilder,
-                  board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS))
 
 # have a consistent order overall
 ALL.sort(key=lambda t: t.name)

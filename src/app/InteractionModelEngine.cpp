@@ -24,9 +24,6 @@
  */
 
 #include "InteractionModelEngine.h"
-#include "Command.h"
-#include "CommandHandler.h"
-#include "CommandSender.h"
 #include <cinttypes>
 
 namespace chip {
@@ -81,28 +78,13 @@ void InteractionModelEngine::Shutdown()
     // Increase magic number to invalidate all Handle-s.
     mMagic++;
 
-    mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> Loop {
-        // Modifying the pool during iteration is generally frowned upon.
-        // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
-        // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
-        //
-        // Deallocate an CommandHandler will call its destructor (and abort the exchange context it holds) without calling
-        // Shutdown().
-        //
-        // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
-
-        mCommandHandlerObjs.Deallocate(obj);
-        return Loop::Continue;
-    });
+    mCommandHandlerObjs.ReleaseAll();
 
     mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
-        // This calls back into us and deallocates |obj|.  As above, this is not
-        // really guaranteed, and we should do something better here (like
-        // ignoring the calls to OnTimedInteractionFailed and then doing a
-        // DeallocateAll.
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
         return Loop::Continue;
     });
+    mTimedHandlers.ReleaseAll();
 
     for (auto & readClient : mReadClients)
     {
@@ -149,7 +131,6 @@ CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClien
                                                  ReadClient::Callback * aCallback)
 {
     *apReadClient = nullptr;
-
     for (auto & readClient : mReadClients)
     {
         if (readClient.IsFree())
@@ -332,6 +313,15 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
         }
     }
 
+    // Reserve the last ReadHandler for ReadInteraction
+    if (aInteractionType == ReadHandler::InteractionType::Subscribe &&
+        ((CHIP_IM_MAX_NUM_READ_HANDLER - GetNumActiveReadHandlers()) == 1) && !HasActiveRead())
+    {
+        ChipLogProgress(InteractionModel, "Reserve the last ReadHandler for IM read Interaction");
+        aStatus = Protocols::InteractionModel::Status::ResourceExhausted;
+        return CHIP_NO_ERROR;
+    }
+
     for (auto & readHandler : mReadHandlers)
     {
         if (readHandler.IsFree())
@@ -477,7 +467,7 @@ CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrep
     ReadClient * client = nullptr;
     CHIP_ERROR err      = CHIP_NO_ERROR;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendReadRequest(aReadPrepareParams);
+    err = client->SendRequest(aReadPrepareParams);
     if (err != CHIP_NO_ERROR)
     {
         client->Shutdown();
@@ -489,7 +479,7 @@ CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aRea
 {
     ReadClient * client = nullptr;
     ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendSubscribeRequest(aReadPrepareParams));
+    ReturnErrorOnFailure(client->SendRequest(aReadPrepareParams));
     return CHIP_NO_ERROR;
 }
 
@@ -702,7 +692,7 @@ CommandHandlerInterface * InteractionModelEngine::FindCommandHandler(EndpointId 
 
 void InteractionModelEngine::OnTimedInteractionFailed(TimedHandler * apTimedHandler)
 {
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 }
 
 void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
@@ -713,7 +703,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     // Reset the ourselves as the exchange delegate for now, to match what we'd
     // do with an initial unsolicited invoke.
     apExchangeContext->SetDelegate(this);
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
@@ -734,7 +724,7 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     // Reset the ourselves as the exchange delegate for now, to match what we'd
     // do with an initial unsolicited write.
     apExchangeContext->SetDelegate(this);
-    mTimedHandlers.Deallocate(apTimedHandler);
+    mTimedHandlers.ReleaseObject(apTimedHandler);
 
     VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::WriteRequest));
     VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
@@ -744,6 +734,19 @@ void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messagi
     {
         StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
+}
+
+bool InteractionModelEngine::HasActiveRead()
+{
+    for (auto & readHandler : mReadHandlers)
+    {
+        if (!readHandler.IsFree() && readHandler.IsReadType())
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace app

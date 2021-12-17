@@ -27,6 +27,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/EFR32/EFR32Config.h>
 
 #include "em_rmu.h"
@@ -106,50 +107,50 @@ uint32_t ConfigurationManagerImpl::GetBootReason(void)
 #if defined(_SILICON_LABS_32B_SERIES_1)
     if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
     }
     else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
     }
     else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #elif defined(_SILICON_LABS_32B_SERIES_2)
     if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
     }
     else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
              rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
     }
     else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
     }
     else
     {
-        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
     }
     // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
 #else
-    matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
 #endif
 
     return matterBootCause;

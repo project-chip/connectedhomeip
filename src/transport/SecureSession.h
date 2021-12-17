@@ -64,15 +64,12 @@ public:
         kCASE      = 2,
     };
 
-    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, Credentials::CATValues peerCATs,
-                  uint16_t peerSessionId, FabricIndex fabric, const ReliableMessageProtocolConfig & config,
-                  System::Clock::Timestamp currentTime) :
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
         mSecureSessionType(secureSessionType),
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
-        mFabric(fabric), mMRPConfig(config)
-    {
-        SetLastActivityTime(currentTime);
-    }
+        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {}
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
@@ -85,7 +82,7 @@ public:
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
@@ -96,7 +93,7 @@ public:
     FabricIndex GetFabricIndex() const { return mFabric; }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
-    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
@@ -117,7 +114,7 @@ public:
 private:
     const Type mSecureSessionType;
     const NodeId mPeerNodeId;
-    const Credentials::CATValues mPeerCATs;
+    const CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
     const FabricIndex mFabric;

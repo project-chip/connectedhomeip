@@ -26,6 +26,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -111,7 +112,7 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     case ListNullablesAndOptionalsStruct::Id: {
         return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return ReadStructAttribute(aEncoder);
     }
     case ListLongOctetString::Id: {
@@ -144,7 +145,7 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case ListNullablesAndOptionalsStruct::Id: {
         return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
     }
-    case Struct::Id: {
+    case StructAttr::Id: {
         return WriteStructAttribute(aDecoder);
     }
     case NullableStruct::Id: {
@@ -184,6 +185,13 @@ CHIP_ERROR TestAttrAccess::WriteListInt8uAttribute(AttributeValueDecoder & aDeco
     ListInt8u::TypeInfo::DecodableType list;
 
     ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    size_t size;
+    ReturnErrorOnFailure(list.ComputeSize(&size));
+
+    // We never change our length, so fail out attempts to change it.  This
+    // should really return one of the spec errors!
+    VerifyOrReturnError(size == kAttributeListLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     uint8_t index = 0;
     auto iter     = list.begin();
@@ -443,9 +451,29 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
 
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
+bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestEventRequest::DecodableType & commandData)
+{
+    Commands::TestEmitTestEventResponse::Type responseData;
+    Structs::SimpleStruct::Type arg4;
+    DataModel::List<const Structs::SimpleStruct::Type> arg5;
+    DataModel::List<const SimpleEnum> arg6;
+
+    // TODO:  Add code to pull arg4, arg5 and arg6 from the arguments of the command
+    Events::TestEvent::Type event{ commandData.arg1, commandData.arg2, commandData.arg3, arg4, arg5, arg6 };
+
+    if (CHIP_NO_ERROR != LogEvent(event, commandPath.mEndpointId, responseData.value))
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+        return true;
+    }
+    commandObj->AddResponseData(commandPath, responseData);
+    return true;
+}
 
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
-    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UArgumentRequest::DecodableType const & commandData)
 {
     bool shouldReturnTrue = true;

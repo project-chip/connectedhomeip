@@ -89,13 +89,13 @@ to help achieve our interoperability architectural goal. Matter will initially
 support Wi-Fi and Thread for core, operational communications and Bluetooth Low
 Energy (BLE) to simplify device commissioning and setup.
 
-The Application Layer can be further broken down seven main components:
+The Application Layer can be further broken down into seven main components:
 
 ![Matter Stack Architecture](docs/images/CHIP_Arch_Pyramid.png)
 
 1. **Application:** High order business logic of a device. For example, an
    application that is focused on lighting might contain logic to handle turning
-   on/off the bulb as well its color characteristics.
+   on/off the bulb as well as its color characteristics.
 
 2. **Data Model:** Data primitives that help describe the various
    functionalities of the devices. The Application operates on these data
@@ -116,7 +116,7 @@ The Application Layer can be further broken down seven main components:
 
 6. **Message Framing & Routing:** With an interaction encrypted and signed, the
    Message Layer constructs the payload format with required and optional header
-   fields; which specify properties of the message as well some routing
+   fields; which specify properties of the message as well as some routing
    information.
 
 7. **IP Framing & Transport Management:** After the final payload has been

@@ -73,6 +73,10 @@
 @property (readonly) chip::Controller::BridgedDeviceBasicCluster cppCluster;
 @end
 
+@interface CHIPChannel ()
+@property (readonly) chip::Controller::ChannelCluster cppCluster;
+@end
+
 @interface CHIPColorControl ()
 @property (readonly) chip::Controller::ColorControlCluster cppCluster;
 @end
@@ -217,10 +221,6 @@
 @property (readonly) chip::Controller::SwitchCluster cppCluster;
 @end
 
-@interface CHIPTvChannel ()
-@property (readonly) chip::Controller::TvChannelCluster cppCluster;
-@end
-
 @interface CHIPTargetNavigator ()
 @property (readonly) chip::Controller::TargetNavigatorCluster cppCluster;
 @end
@@ -243,6 +243,10 @@
 
 @interface CHIPThreadNetworkDiagnostics ()
 @property (readonly) chip::Controller::ThreadNetworkDiagnosticsCluster cppCluster;
+@end
+
+@interface CHIPUserLabel ()
+@property (readonly) chip::Controller::UserLabelCluster cppCluster;
 @end
 
 @interface CHIPWakeOnLan ()

@@ -85,7 +85,9 @@ public:
     }
 
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
+                                                        chip::System::Layer * systemLayer,
+                                                        chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
+                                                        chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                         CHIP_ERROR * errInfoOnFailure);
 
     CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,

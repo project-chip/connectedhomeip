@@ -34,7 +34,14 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EndpointId endpoint, ::ApplicationLauncherApp application,
+                                                                std::string data);
+
+ApplicationLauncherResponse applicationLauncherClusterStopApp(EndpointId endpoint, ::ApplicationLauncherApp application,
+                                                              std::string data);
+
+ApplicationLauncherResponse applicationLauncherClusterHideApp(EndpointId endpoint, ::ApplicationLauncherApp application,
+                                                              std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
@@ -45,11 +52,10 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
     return true;
 }
 
-void sendResponse(app::CommandHandler * command, ApplicationLauncherResponse response)
+void sendResponse(app::CommandHandler * command, app::ConcreteCommandPath path, ApplicationLauncherResponse response)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::LaunchAppResponse::Id };
-    TLV::TLVWriter * writer       = nullptr;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
     SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
@@ -65,9 +71,8 @@ exit:
 ::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, CharSpan applicationId)
 {
     ::ApplicationLauncherApp application = {};
-    // TODO: Need to figure out what types we're using here.
-    // application.applicationId            = applicationId;
-    application.catalogVendorId = catalogVendorId;
+    application.applicationId            = applicationId;
+    application.catalogVendorId          = catalogVendorId;
     return application;
 }
 
@@ -75,13 +80,50 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
                                                         const Commands::LaunchApp::DecodableType & commandData)
 {
     auto & requestData                       = commandData.data;
-    auto & requestApplicationCatalogVendorId = commandData.catalogVendorId;
-    auto & requestApplicationId              = commandData.applicationId;
+    auto & requestApplicationCatalogVendorId = commandData.application.catalogVendorId;
+    auto & requestApplicationId              = commandData.application.applicationId;
+
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::LaunchAppResponse::Id };
 
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     std::string reqestDataString(requestData.data(), requestData.size());
-    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
-    sendResponse(command, response);
+    ApplicationLauncherResponse response =
+        applicationLauncherClusterLaunchApp(emberAfCurrentEndpoint(), application, reqestDataString);
+    sendResponse(command, path, response);
+    return true;
+}
+
+/**
+ * @brief Application Launcher Cluster StopApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterStopAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::StopApp::DecodableType & commandData)
+{
+    auto & requestApplicationCatalogVendorId = commandData.application.catalogVendorId;
+    auto & requestApplicationId              = commandData.application.applicationId;
+
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::StopAppResponse::Id };
+
+    ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    ApplicationLauncherResponse response = applicationLauncherClusterStopApp(emberAfCurrentEndpoint(), application, "data");
+    sendResponse(command, path, response);
+    return true;
+}
+/**
+ * @brief Application Launcher Cluster HideApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterHideAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                      const Commands::HideApp::DecodableType & commandData)
+{
+
+    auto & requestApplicationCatalogVendorId = commandData.application.catalogVendorId;
+    auto & requestApplicationId              = commandData.application.applicationId;
+
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ApplicationLauncher::Id, Commands::HideAppResponse::Id };
+
+    ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
+    ApplicationLauncherResponse response = applicationLauncherClusterHideApp(emberAfCurrentEndpoint(), application, "data");
+    sendResponse(command, path, response);
     return true;
 }
 

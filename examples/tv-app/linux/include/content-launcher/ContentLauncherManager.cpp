@@ -24,90 +24,69 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
 
-#include <app/Command.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CodeUtils.h>
 
 #include <map>
+#include <string>
 
 using namespace std;
+using namespace chip::AppPlatform;
 
-CHIP_ERROR ContentLauncherManager::Init()
+ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                  const std::list<ContentLaunchParamater> & parameterList,
+                                                                  bool autoplay, const chip::CharSpan & data)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["CS"] = true;
-    featureMap["UP"] = true;
-    featureMap["WA"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        char headerExample[]  = "exampleHeader";
-        int maximumVectorSize = 1;
-
-        for (uint16_t i = 0; i < maximumVectorSize; ++i)
-        {
-            ReturnErrorOnFailure(encoder.Encode(chip::ByteSpan(chip::Uint8::from_char(headerExample), sizeof(headerExample) - 1)));
-        }
-        return CHIP_NO_ERROR;
-    });
-}
-
-CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH));
-        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS));
-        return CHIP_NO_ERROR;
-    });
-}
-
-ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                                        string data)
-{
-    // TODO: Insert code here
-    ContentLaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
-    response.data   = "Example data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
-    return response;
-}
-ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string contentUrl, string displayString,
-                                                                    ContentLaunchBrandingInformation brandingInformation)
-{
-    // TODO: Insert code here
-    ContentLaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
-    response.data   = "Example data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
-    return response;
-}
-
-ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                          const chip::CharSpan & data)
-{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
     string dataString(data.data(), data.size());
-    return ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
+    if (app != NULL)
+    {
+        return app->GetContentLauncher()->LaunchContent(parameterList, autoplay, dataString);
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+    // TODO: Insert code here
+    ContentLaunchResponse response;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    return response;
 }
 
-ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                      ContentLaunchBrandingInformation & brandingInformation)
+ContentLaunchResponse
+ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
 {
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
+
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
-    return ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
+
+    // TODO: Insert code here
+    ContentLaunchResponse response;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    return response;
+}
+
+std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
+    return { "example", "example" };
+}
+
+uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
+    uint32_t streamingProtocols = 0;
+    return streamingProtocols;
 }

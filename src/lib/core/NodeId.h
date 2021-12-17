@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <lib/core/GroupId.h>
+
 #include <cstdint>
 
 namespace chip {
@@ -54,6 +56,26 @@ constexpr NodeId kMaxOperationalNodeId = 0xFFFF'FFEF'FFFF'FFFFULL;
 constexpr bool IsOperationalNodeId(NodeId aNodeId)
 {
     return (aNodeId != kUndefinedNodeId) && (aNodeId <= kMaxOperationalNodeId);
+}
+
+constexpr bool IsGroupId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinGroupNodeId);
+}
+
+constexpr bool IsCASEAuthTag(NodeId aNodeId)
+{
+    return (aNodeId >= kMinCASEAuthTag) && (aNodeId <= kMaxCASEAuthTag);
+}
+
+constexpr bool IsPAKEKeyId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinPAKEKeyId) && (aNodeId <= kMaxPAKEKeyId);
+}
+
+constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
+{
+    return kMinGroupNodeId | aGroupId;
 }
 
 } // namespace chip

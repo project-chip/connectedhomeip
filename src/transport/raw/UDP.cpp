@@ -125,5 +125,22 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
     }
 }
 
+CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
+{
+    char addressStr[Transport::PeerAddress::kMaxToStringSize];
+    address.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
+
+    if (join)
+    {
+        ChipLogProgress(Inet, "Joining Multicast Group with address %s", addressStr);
+        return mUDPEndPoint->JoinMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
+    }
+    else
+    {
+        ChipLogProgress(Inet, "Leaving Multicast Group with address %s", addressStr);
+        return mUDPEndPoint->LeaveMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
+    }
+}
+
 } // namespace Transport
 } // namespace chip

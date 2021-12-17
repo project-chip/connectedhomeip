@@ -873,7 +873,7 @@
  *   for the debug level events.
  */
 #ifndef CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (256)
+#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
 #endif
 
 /**
@@ -887,43 +887,13 @@
 #endif
 
 /**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY
+ *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
  *
  *  @brief
- *    The critical event id counter (eidc) persisted storage key.
+ *    The Global event id counter (eidc) persisted storage key.
  */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY "crit-eidc"
-#endif
-
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY
- *
- *  @brief
- *    The production event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY "prod-eidc"
-#endif
-
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY
- *
- *  @brief
- *    The info event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY "info-eidc"
-#endif
-
-/**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY
- *
- *  @brief
- *    The debug event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY "debug-eidc"
+#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY "global-eidc"
 #endif
 
 // -------------------- Software Update Manager Configuration --------------------

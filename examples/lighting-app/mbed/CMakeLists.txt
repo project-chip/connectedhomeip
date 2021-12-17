@@ -47,7 +47,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp
@@ -56,7 +55,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/util/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
-               ${CHIP_ROOT}/src/app/util/attribute-list-byte-span.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size-util.cpp
                ${CHIP_ROOT}/src/app/util/attribute-storage.cpp
                ${CHIP_ROOT}/src/app/util/attribute-table.cpp
@@ -81,11 +79,14 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/descriptor/descriptor.cpp
                ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/ethernet_network_diagnostics_server/ethernet_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/thread_network_diagnostics_server/thread_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/wifi_network_diagnostics_server/wifi_network_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/software_diagnostics_server/software_diagnostics_server.cpp
-               ${CHIP_ROOT}/src/app/clusters/general_diagnostics_server/general_diagnostics_server.cpp               	                                    
+               ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
+               ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	                                    
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp

@@ -1208,8 +1208,29 @@ CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, 
 
 CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
 
+enum class CertificateChainValidationResult
+{
+    kSuccess = 0,
+
+    kRootFormatInvalid   = 100,
+    kRootArgumentInvalid = 101,
+
+    kICAFormatInvalid   = 200,
+    kICAArgumentInvalid = 201,
+
+    kLeafFormatInvalid   = 300,
+    kLeafArgumentInvalid = 301,
+
+    kChainInvalid = 400,
+
+    kNoMemory = 500,
+
+    kInternalFrameworkError = 600,
+};
+
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
-                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result);
 
 /**
  * @brief Validate timestamp of a certificate (toBeEvaluatedCertificate) in comparison with other certificate's

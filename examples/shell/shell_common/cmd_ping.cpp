@@ -249,8 +249,8 @@ CHIP_ERROR EstablishSecureSession(streamer_t * stream, const Transport::PeerAddr
     peerAddr = Optional<Transport::PeerAddress>::Value(peerAddress);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(peerAddr, kTestDeviceNodeId, testSecurePairingSecret, CryptoContext::SessionRole::kInitiator,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peerAddr, kTestDeviceNodeId, testSecurePairingSecret,
+                                     CryptoContext::SessionRole::kInitiator, gFabricIndex);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -292,13 +292,13 @@ void StartPinging(streamer_t * stream, char * destination)
     }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gTCPManager.Init(Transport::TcpListenParameters(&DeviceLayer::InetLayer())
+    err = gTCPManager.Init(Transport::TcpListenParameters(DeviceLayer::TCPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init TCP manager error: %s\n", ErrorStr(err)));
 #endif
 
-    err = gUDPManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer())
+    err = gUDPManager.Init(Transport::UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(gDestAddr.Type())
                                .SetListenPort(gPingArguments.GetEchoPort() + 1));
     VerifyOrExit(err == CHIP_NO_ERROR, streamer_printf(stream, "Failed to init UDP manager error: %s\n", ErrorStr(err)));
@@ -329,7 +329,7 @@ void StartPinging(streamer_t * stream, char * destination)
     err = EstablishSecureSession(stream, GetEchoPeerAddress());
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager, SessionHandle(kTestDeviceNodeId, 1, 1, gFabricIndex));
+    err = gEchoClient.Init(&gExchangeManager, gSession.Get());
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.

@@ -1238,32 +1238,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _newVersion = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _softwareVersion = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
@@ -1289,6 +1263,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _newVersion = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
@@ -1297,6 +1284,19 @@ NS_ASSUME_NONNULL_BEGIN
         _action = @(0);
 
         _delayedActionTime = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _softwareVersion = @(0);
     }
     return self;
 }
@@ -1398,8 +1398,6 @@ NS_ASSUME_NONNULL_BEGIN
         _ssid = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
@@ -1410,11 +1408,11 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
 
-        _wifiScanResults = [NSArray array];
+        _wiFiScanResults = [NSArray array];
 
         _threadScanResults = [NSArray array];
     }
@@ -1422,7 +1420,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkParams
+@implementation CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1432,57 +1430,12 @@ NS_ASSUME_NONNULL_BEGIN
         _credentials = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _ssid = [NSData data];
-
-        _credentials = [NSData data];
-
-        _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkParams
+@implementation CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1490,49 +1443,6 @@ NS_ASSUME_NONNULL_BEGIN
         _operationalDataset = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _operationalDataset = [NSData data];
-
-        _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
     }
     return self;
 }
@@ -1546,19 +1456,17 @@ NS_ASSUME_NONNULL_BEGIN
         _networkID = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponseParams
+@implementation CHIPNetworkCommissioningClusterNetworkConfigResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
     }
@@ -1566,7 +1474,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkParams
+@implementation CHIPNetworkCommissioningClusterConnectNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1574,49 +1482,36 @@ NS_ASSUME_NONNULL_BEGIN
         _networkID = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkResponseParams
+@implementation CHIPNetworkCommissioningClusterConnectNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
+
+        _errorValue = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkParams
+@implementation CHIPNetworkCommissioningClusterReorderNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _networkID = [NSData data];
 
+        _networkIndex = @(0);
+
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterDisableNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
     }
     return self;
 }
@@ -2324,7 +2219,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = @(0);
 
-        _credentialRule = nil;
+        _credentialRule = @(0);
     }
     return self;
 }
@@ -2438,9 +2333,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialData = [NSData data];
 
-        _userIndex = nil;
+        _userIndex = @(0);
 
-        _userStatus = nil;
+        _userStatus = @(0);
     }
     return self;
 }
@@ -2570,7 +2465,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
+@implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2604,7 +2499,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterRelayStatusLogParams
+@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3294,7 +3189,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelParams
+@implementation CHIPChannelClusterChangeChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3305,12 +3200,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponseParams
+@implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _channelMatch = [NSArray array];
+        _channelMatch = [CHIPChannelClusterChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3318,7 +3213,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberParams
+@implementation CHIPChannelClusterChangeChannelByNumberParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3331,7 +3226,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterSkipChannelParams
+@implementation CHIPChannelClusterSkipChannelParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3576,6 +3471,8 @@ NS_ASSUME_NONNULL_BEGIN
         _autoPlay = @(0);
 
         _data = @"";
+
+        _search = [NSArray array];
     }
     return self;
 }
@@ -3586,9 +3483,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
-
         _contentLaunchStatus = @(0);
+
+        _data = @"";
     }
     return self;
 }
@@ -3602,6 +3499,8 @@ NS_ASSUME_NONNULL_BEGIN
         _contentURL = @"";
 
         _displayString = @"";
+
+        _brandingInformation = [NSArray array];
     }
     return self;
 }
@@ -3612,9 +3511,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
-
         _contentLaunchStatus = @(0);
+
+        _data = @"";
     }
     return self;
 }
@@ -3651,15 +3550,61 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = @"";
 
-        _catalogVendorId = @(0);
-
-        _applicationId = @"";
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
     }
     return self;
 }
 @end
 
 @implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterStopAppParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterStopAppResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _data = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3989,6 +3934,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestEventResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -4096,6 +4052,21 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _arg1 = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _arg2 = @(0);
+
+        _arg3 = @(0);
     }
     return self;
 }

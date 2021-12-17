@@ -30,6 +30,7 @@ const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
 const kGlobalAttributes = [
+  0xfffb, // AttributeList
   0xfffc, // ClusterRevision
   0xfffd, // FeatureMap
 ];
@@ -96,15 +97,16 @@ function asReadType(type)
 // List of all cluster with generated functions
 var endpointClusterWithInit = [
   'Basic',
-  'Identify',
+  'Color Control',
   'Groups',
-  'Scenes',
+  'IAS Zone',
+  'Identify',
+  'Level Control',
   'Occupancy Sensing',
   'On/Off',
-  'Level Control',
-  'Color Control',
-  'IAS Zone',
   'Pump Configuration and Control',
+  'Scenes',
+  'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
 var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
@@ -651,13 +653,11 @@ function isWeaklyTypedEnum(label)
     "MediaPlaybackState",
     "MediaPlaybackStatus",
     "MoveMode",
-    "NetworkCommissioningError",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
     "OTAAnnouncementReason",
     "OTAApplyUpdateAction",
     "OTADownloadProtocol",
-    "OTAQueryStatus",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",

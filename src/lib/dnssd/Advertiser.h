@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <cstdint>
 
-#include <inet/InetLayer.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/core/PeerId.h>
@@ -122,6 +121,8 @@ public:
     }
     PeerId GetPeerId() const { return mPeerId; }
 
+    CompressedFabricId GetCompressedFabricId() const { return mPeerId.GetCompressedFabricId(); }
+
 private:
     PeerId mPeerId;
 };
@@ -195,7 +196,7 @@ public:
         return mDeviceNameHasValue ? Optional<const char *>::Value(mDeviceName) : Optional<const char *>::Missing();
     }
 
-    CommissionAdvertisingParameters & SetRotatingId(Optional<const char *> rotatingId)
+    CommissionAdvertisingParameters & SetRotatingDeviceId(Optional<const char *> rotatingId)
     {
         if (rotatingId.HasValue())
         {
@@ -208,12 +209,12 @@ public:
         }
         return *this;
     }
-    Optional<const char *> GetRotatingId() const
+    Optional<const char *> GetRotatingDeviceId() const
     {
         return mRotatingIdHasValue ? Optional<const char *>::Value(mRotatingId) : Optional<const char *>::Missing();
     }
 
-    CommissionAdvertisingParameters & SetPairingInstr(Optional<const char *> pairingInstr)
+    CommissionAdvertisingParameters & SetPairingInstruction(Optional<const char *> pairingInstr)
     {
         if (pairingInstr.HasValue())
         {
@@ -226,7 +227,7 @@ public:
         }
         return *this;
     }
-    Optional<const char *> GetPairingInstr() const
+    Optional<const char *> GetPairingInstruction() const
     {
         return mPairingInstrHasValue ? Optional<const char *>::Value(mPairingInstr) : Optional<const char *>::Missing();
     }
@@ -258,7 +259,7 @@ private:
     char mDeviceName[kKeyDeviceNameMaxLength + 1];
     bool mDeviceNameHasValue = false;
 
-    char mRotatingId[kKeyRotatingIdMaxLength + 1];
+    char mRotatingId[kKeyRotatingDeviceIdMaxLength + 1];
     bool mRotatingIdHasValue = false;
 
     char mPairingInstr[kKeyPairingInstructionMaxLength + 1];
@@ -287,7 +288,7 @@ public:
      * The method must be called before other methods of this class.
      * If the advertiser has already been initialized, the method exits immediately with no error.
      */
-    virtual CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) = 0;
+    virtual CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) = 0;
 
     /**
      * Shuts down the advertiser.

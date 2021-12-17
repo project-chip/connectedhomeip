@@ -29,7 +29,7 @@ class LogPipe(threading.Thread):
         self.daemon = False
         self.level = level
         self.fd_read, self.fd_write = os.pipe()
-        self.pipeReader = os.fdopen(self.fd_read)
+        self.pipeReader = os.fdopen(self.fd_read, errors='replace')
         self.start()
 
     def fileno(self):

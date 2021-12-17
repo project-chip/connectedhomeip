@@ -2,7 +2,10 @@
 cd "{root}"
 
 # Generating ameba-amebad-all-clusters
-bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters'
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-all-clusters all-clusters-app'
+
+# Generating ameba-amebad-light
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
@@ -71,7 +74,7 @@ python3 build/chip/java/tests/generate_jars_for_test.py
 python3 third_party/android_deps/set_up_android_deps.py
 
 # Generating android-arm-chip-tvserver
-gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=target_os="android" target_cpu="arm64" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
+gn gen --check --fail-on-unused-args {out}/android-arm-chip-tvserver '--args=target_os="android" target_cpu="arm" android_ndk_root="TEST_ANDROID_NDK_HOME" android_sdk_root="TEST_ANDROID_HOME" chip_config_network_layer_ble=false ' --root={root}/examples/tv-app/android/
 
 # Accepting NDK licenses @ tools
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
@@ -416,6 +419,31 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-light
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-light-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-light-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-lock-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-lock-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-shell-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
+
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
 
@@ -506,6 +534,11 @@ mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/shell/
 # Generating mbed-CY8CPROTO_062_4343W-shell-release
 cmake -S {root}/examples/shell/mbed -B {out}/mbed-CY8CPROTO_062_4343W-shell-release -GNinja -DCMAKE_BUILD_TYPE=release -DMBED_OS_PATH={root}/third_party/mbed-os/repo -DMBED_OS_POSIX_SOCKET_PATH={root}/third_party/mbed-os-posix-socket/repo
 
+# Generating nrf-native-posix-64-tests
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
+
 # Generating nrf-nrf52840-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
@@ -582,6 +615,9 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
 
+# Building ameba-amebad-light
+ninja -C {out}/ameba-amebad-light
+
 # Building APP android-androidstudio-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=armeabi-v7a assembleDebug
 
@@ -619,13 +655,13 @@ cp {out}/android-arm-chip-tool/lib/src/platform/android/AndroidPlatform.jar {roo
 ninja -C {out}/android-arm-chip-tvserver
 
 # Prepare Native libs android-arm-chip-tvserver
-mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a
+mkdir -p {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a
 
-cp {out}/android-arm-chip-tvserver/lib/jni/arm64-v8a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libSetupPayloadParser.so
+cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libSetupPayloadParser.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libSetupPayloadParser.so
 
-cp {out}/android-arm-chip-tvserver/lib/jni/arm64-v8a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libc++_shared.so
+cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libc++_shared.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libc++_shared.so
 
-cp {out}/android-arm-chip-tvserver/lib/jni/arm64-v8a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/arm64-v8a/libTvApp.so
+cp {out}/android-arm-chip-tvserver/lib/jni/armeabi-v7a/libTvApp.so {root}/examples/tv-app/android/App/app/libs/jniLibs/armeabi-v7a/libTvApp.so
 
 cp {out}/android-arm-chip-tvserver/lib/third_party/connectedhomeip/src/setup_payload/java/SetupPayloadParser.jar {root}/examples/tv-app/android/App/app/libs/SetupPayloadParser.jar
 
@@ -975,6 +1011,21 @@ ninja -C {out}/infineon-p6-light
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
 
+# Building k32w-light
+ninja -C {out}/k32w-light
+
+# Building k32w-light-release
+ninja -C {out}/k32w-light-release
+
+# Building k32w-lock-low-power-release
+ninja -C {out}/k32w-lock-low-power-release
+
+# Building k32w-lock-release
+ninja -C {out}/k32w-lock-release
+
+# Building k32w-shell-release
+ninja -C {out}/k32w-shell-release
+
 # Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-debug
 bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug/chip-*'
 
@@ -1064,6 +1115,12 @@ bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-shell-release/chip-*'
 
 # Building mbed-CY8CPROTO_062_4343W-shell-release
 cmake --build {out}/mbed-CY8CPROTO_062_4343W-shell-release
+
+# Building nrf-native-posix-64-tests
+ninja -C {out}/nrf-native-posix-64-tests
+
+# Run Tests nrf-native-posix-64-tests
+ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
 # Building nrf-nrf52840-light
 ninja -C {out}/nrf-nrf52840-light

@@ -255,7 +255,7 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(&DeviceLayer::InetLayer()) != CHIP_NO_ERROR)
+    if (chip::Dnssd::ServiceAdvertiser::Instance().Init(DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
     {
         fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
@@ -277,8 +277,8 @@ int main(int argc, char ** args)
                                                                        .SetCommissioningMode(gOptions.commissioningMode)
                                                                        .SetDeviceType(gOptions.deviceType)
                                                                        .SetDeviceName(gOptions.deviceName)
-                                                                       .SetRotatingId(gOptions.rotatingId)
-                                                                       .SetPairingInstr(gOptions.pairingInstr)
+                                                                       .SetRotatingDeviceId(gOptions.rotatingId)
+                                                                       .SetPairingInstruction(gOptions.pairingInstr)
                                                                        .SetPairingHint(gOptions.pairingHint));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)

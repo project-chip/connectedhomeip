@@ -958,32 +958,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -1305,7 +1280,7 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1313,11 +1288,11 @@
             },
             {
               "name": "NotifyUpdateApplied",
-              "code": 2,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1348,15 +1323,15 @@
           "commands": [
             {
               "name": "QueryImageResponse",
-              "code": 3,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -1575,7 +1550,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetwork",
+              "name": "AddOrUpdateWiFiNetwork",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -1583,24 +1558,8 @@
               "outgoing": 0
             },
             {
-              "name": "UpdateWiFiNetwork",
-              "code": 4,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "AddThreadNetwork",
-              "code": 6,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "UpdateThreadNetwork",
-              "code": 8,
+              "name": "AddOrUpdateThreadNetwork",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
@@ -1608,27 +1567,27 @@
             },
             {
               "name": "RemoveNetwork",
-              "code": 10,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
-              "name": "EnableNetwork",
-              "code": 12,
+              "name": "ConnectNetwork",
+              "code": 6,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
-              "name": "DisableNetwork",
-              "code": 14,
+              "name": "ReorderNetwork",
+              "code": 8,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -1666,15 +1625,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetworkResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "UpdateWiFiNetworkResponse",
+              "name": "NetworkConfigResponse",
               "code": 5,
               "mfgCode": null,
               "source": "server",
@@ -1682,47 +1633,135 @@
               "outgoing": 1
             },
             {
-              "name": "AddThreadNetworkResponse",
+              "name": "ConnectNetworkResponse",
               "code": 7,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
               "outgoing": 1
-            },
-            {
-              "name": "UpdateThreadNetworkResponse",
-              "code": 9,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "RemoveNetworkResponse",
-              "code": 11,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "EnableNetworkResponse",
-              "code": 13,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "DisableNetworkResponse",
-              "code": 15,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
             }
           ],
           "attributes": [
+            {
+              "name": "MaxNetworks",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "Networks",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ScanMaxTimeSeconds",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ConnectMaxTimeSeconds",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "InterfaceEnabled",
+              "code": 4,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "LastNetworkingStatus",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "LastNetworkID",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "LastConnectErrorValue",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "FeatureMap",
               "code": 65532,
@@ -3699,6 +3738,51 @@
           "commands": [],
           "attributes": [
             {
+              "name": "WindowStatus",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AdminFabricIndex",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AdminVendorId",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -4026,6 +4110,108 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "Fixed Label",
+          "code": 64,
+          "mfgCode": null,
+          "define": "FIXED_LABEL_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "Fixed Label",
+          "code": 64,
+          "mfgCode": null,
+          "define": "FIXED_LABEL_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "label list",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
+          "name": "User Label",
+          "code": 65,
+          "mfgCode": null,
+          "define": "USER_LABEL_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "User Label",
+          "code": 65,
+          "mfgCode": null,
+          "define": "USER_LABEL_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "label list",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ClusterRevision",
+              "code": 65533,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             }
           ]
@@ -7776,32 +7962,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -8003,14 +8164,6 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "NotifyUpdateApplied",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -8045,16 +8198,8 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "QueryImageResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -8264,7 +8409,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetwork",
+              "name": "AddOrUpdateWiFiNetwork",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -8272,7 +8417,7 @@
               "outgoing": 0
             },
             {
-              "name": "UpdateWiFiNetwork",
+              "name": "RemoveNetwork",
               "code": 4,
               "mfgCode": null,
               "source": "client",
@@ -8280,7 +8425,7 @@
               "outgoing": 0
             },
             {
-              "name": "AddThreadNetwork",
+              "name": "ConnectNetwork",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -8288,36 +8433,12 @@
               "outgoing": 0
             },
             {
-              "name": "UpdateThreadNetwork",
+              "name": "ReorderNetwork",
               "code": 8,
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
               "outgoing": 0
-            },
-            {
-              "name": "RemoveNetwork",
-              "code": 10,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "EnableNetwork",
-              "code": 12,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "DisableNetwork",
-              "code": 14,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 1,
-              "outgoing": 1
             }
           ],
           "attributes": [
@@ -8355,15 +8476,7 @@
               "outgoing": 1
             },
             {
-              "name": "AddWiFiNetworkResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "UpdateWiFiNetworkResponse",
+              "name": "NetworkConfigResponse",
               "code": 5,
               "mfgCode": null,
               "source": "server",
@@ -8371,43 +8484,11 @@
               "outgoing": 1
             },
             {
-              "name": "AddThreadNetworkResponse",
+              "name": "ConnectNetworkResponse",
               "code": 7,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "UpdateThreadNetworkResponse",
-              "code": 9,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "RemoveNetworkResponse",
-              "code": 11,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "EnableNetworkResponse",
-              "code": 13,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "DisableNetworkResponse",
-              "code": 15,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
               "outgoing": 1
             }
           ],
@@ -10368,7 +10449,7 @@
           "enabled": 1,
           "commands": [
             {
-              "name": "CurrentWeeklySchedule",
+              "name": "GetWeeklyScheduleResponse",
               "code": 0,
               "mfgCode": null,
               "source": "server",
@@ -10376,7 +10457,7 @@
               "outgoing": 1
             },
             {
-              "name": "RelayStatusLog",
+              "name": "GetRelayStatusLogResponse",
               "code": 1,
               "mfgCode": null,
               "source": "server",
@@ -12301,10 +12382,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "client",
           "enabled": 0,
           "commands": [
@@ -12352,10 +12433,10 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "server",
           "enabled": 0,
           "commands": [
@@ -12370,7 +12451,7 @@
           ],
           "attributes": [
             {
-              "name": "tv channel list",
+              "name": "channel list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -12385,7 +12466,7 @@
               "reportableChange": 0
             },
             {
-              "name": "tv channel lineup",
+              "name": "channel lineup",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -12400,7 +12481,7 @@
               "reportableChange": 0
             },
             {
-              "name": "current tv channel",
+              "name": "current channel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -13039,7 +13120,7 @@
           ],
           "attributes": [
             {
-              "name": "accepts header list",
+              "name": "accept header list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -13054,7 +13135,7 @@
               "reportableChange": 0
             },
             {
-              "name": "supported streaming types",
+              "name": "supported streaming protocols",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -13350,7 +13431,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -13365,7 +13446,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -13374,21 +13455,6 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "application status",
-              "code": 7,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x01",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,

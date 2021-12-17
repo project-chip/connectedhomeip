@@ -18,3 +18,5 @@ chip_system_config_clock = "gettimeofday"
 chip_device_platform = "darwin"
 
 chip_project_config_include_dirs = [ "${chip_root}/config/ios" ]
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]
