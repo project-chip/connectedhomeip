@@ -1783,6 +1783,13 @@ tests:
       response:
           value: 254
 
+    - label: "Read attribute NULLABLE_INT8U unchanged Value with constraint"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              notValue: null
+
     - label: "Write attribute NULLABLE_INT8U null Value"
       command: "writeAttribute"
       attribute: "nullable_int8u"
