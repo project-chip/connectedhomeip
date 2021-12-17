@@ -29855,7 +29855,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue charValue], 0);
+            XCTAssertEqual([actualValue charValue], -20);
         }
 
         [expectation fulfill];
@@ -29976,7 +29976,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue charValue], 0);
+            XCTAssertEqual([actualValue charValue], -20);
         }
 
         [expectation fulfill];
@@ -30147,7 +30147,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue shortValue], 0);
+            XCTAssertEqual([actualValue shortValue], -100);
         }
 
         [expectation fulfill];
@@ -30268,7 +30268,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue shortValue], 0);
+            XCTAssertEqual([actualValue shortValue], -100);
         }
 
         [expectation fulfill];
@@ -31154,7 +31154,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
         {
             id actualValue = value;
             XCTAssertFalse(actualValue == nil);
-            XCTAssertEqual([actualValue charValue], 0);
+            XCTAssertEqual([actualValue charValue], -20);
         }
 
         [expectation fulfill];
@@ -31282,7 +31282,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
         {
             id actualValue = value;
             XCTAssertFalse(actualValue == nil);
-            XCTAssertEqual([actualValue charValue], 0);
+            XCTAssertEqual([actualValue charValue], -20);
         }
 
         [expectation fulfill];
@@ -31512,7 +31512,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
             {
                 id actualValue = value;
                 XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue shortValue], 0);
+                XCTAssertEqual([actualValue shortValue], -100);
             }
 
             [expectation fulfill];
@@ -31639,7 +31639,7 @@ ResponseHandler test_TestCluster_list_int8u_Reported = nil;
             {
                 id actualValue = value;
                 XCTAssertFalse(actualValue == nil);
-                XCTAssertEqual([actualValue shortValue], 0);
+                XCTAssertEqual([actualValue shortValue], -100);
             }
 
             [expectation fulfill];
