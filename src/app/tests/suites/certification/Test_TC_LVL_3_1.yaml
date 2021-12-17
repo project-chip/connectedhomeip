@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Level Control [TC-LVL-3.1] Move Verification (DUT as Server)
+name: 24.3.1. [TC-LVL-3.1] MoveToLevel Verification (DUT as Server)
 
 config:
     cluster: "Level Control"
@@ -23,98 +23,32 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "reads current level attribute from DUT"
+    - label: "reads current Level attribute from DUT"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "current Level"
       response:
           value: 254
 
-    - label: "reads max level attribute from DUT"
-      command: "readAttribute"
-      attribute: "max level"
-      response:
-          value: 255
-
-    - label: "sends a Move up command"
-      command: "Move"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 200
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 3000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 3000
-
-    - label: "reads current level attribute from DUT"
-      command: "readAttribute"
-      attribute: "current level"
-      response:
-          value: 255
-
-    - label: "reads min level attribute from DUT"
+    - label: "Reads the MinLevel attribute"
       command: "readAttribute"
       attribute: "min level"
       response:
           value: 0
 
-    - label: "sends a Move down command"
-      command: "Move"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 1
-              - name: "rate"
-                value: 250
-              - name: "optionMask"
-                value: 1
-              - name: "optionOverride"
-                value: 1
-
-    - label: "Wait 3000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 3000
-
-    - label: "reads current level attribute from DUT"
+    - label: "Reads the MaxLevel attribute"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "max level"
       response:
-          value: 0
+          value: 255
 
-    - label: "Write default move rate attribute from DUT"
-      command: "writeAttribute"
-      attribute: "default move rate"
-      arguments:
-          value: 20
-
-    - label: "reads default move rate attribute from DUT"
-      command: "readAttribute"
-      attribute: "default move rate"
-      response:
-          value: 20
-
-    - label: "sends a Move up command at default move rate"
-      command: "Move"
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "moveMode"
+              - name: "level"
+                value: 64
+              - name: "transitionTime"
                 value: 0
-              - name: "rate"
-                value: 255
               - name: "optionMask"
                 value: 1
               - name: "optionOverride"
@@ -128,12 +62,71 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "reads current level attribute from DUT"
+    - label: "reads current Level attribute from DUT"
       command: "readAttribute"
-      attribute: "current level"
+      attribute: "current Level"
       response:
-          constraints:
-              notValue: 255
+          value: 64
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 128
+              - name: "transitionTime"
+                value: 1
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 200ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 200
+
+    - label: "reads current Level attribute from DUT"
+      command: "readAttribute"
+      attribute: "current Level"
+      response:
+          value: 128
+
+    - label: "reads On Off Transition Time attribute from DUT"
+      command: "readAttribute"
+      attribute: "On Off Transition Time"
+      response:
+          value: 0
+
+    - label: "sends a Move to level command"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 65535
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 10ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10
+
+    - label: "reads current Level attribute from DUT"
+      command: "readAttribute"
+      attribute: "current Level"
+      response:
+          value: 254
 
     - label: "Reset level to 254"
       command: "MoveToLevel"
