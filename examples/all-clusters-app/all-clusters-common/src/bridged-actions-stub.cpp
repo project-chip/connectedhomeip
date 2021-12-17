@@ -53,13 +53,13 @@ constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
-    return aEncoder.Encode(DataModel::List<BridgedActions::Structs::ActionStruct::Type>());
+    return aEncoder.EncodeEmptyList();
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadEndpointListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list
-    return aEncoder.Encode(DataModel::List<BridgedActions::Structs::EndpointListStruct::Type>());
+    return aEncoder.EncodeEmptyList();
 }
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
