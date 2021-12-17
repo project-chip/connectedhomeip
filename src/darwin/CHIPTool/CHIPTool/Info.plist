@@ -23,7 +23,7 @@
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>customflow</string>
+				<string>mt</string>
 			</array>
 		</dict>
 	</array>
@@ -34,7 +34,7 @@
 		<key>CommissioningCustomFlowLedgerUrl</key>
 		<string>https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
 		<key>CommissioningCustomFlowReturnUrl</key>
-		<string>mt://modelinfo?payload=&lt;&gt;</string>
+		<string>mt://modelinfo?payload</string>
 		<key>CommissioningCustomFlowUseMockFlag</key>
 		<true/>
 	</dict>
