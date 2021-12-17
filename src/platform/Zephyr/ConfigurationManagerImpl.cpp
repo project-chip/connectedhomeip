@@ -111,6 +111,22 @@ CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
     return WriteConfigValue(ZephyrConfig::kCounterKey_RebootCount, rebootCount);
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    if (!ZephyrConfig::ConfigValueExists(ZephyrConfig::kCounterKey_TotalOperationalHours))
+    {
+        totalOperationalHours = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    return ZephyrConfig::ReadConfigValue(ZephyrConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return ZephyrConfig::WriteConfigValue(ZephyrConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
