@@ -27,7 +27,20 @@ tests:
       cluster: "On/Off"
       command: "on"
 
-    - label: "Precondition: DUT level is set to 0x80"
+    - label: "Precondition: DUT move to minimal level"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Sends step Up command to DUT with by a step of 0x80"
       command: "Step"
       arguments:
           values:

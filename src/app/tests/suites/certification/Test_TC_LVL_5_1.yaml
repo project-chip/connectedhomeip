@@ -28,19 +28,17 @@ tests:
       command: "on"
 
     - label: "Precondition: DUT level is set to 0x80"
-      command: "Step"
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "stepMode"
-                value: 0
-              - name: "stepSize"
+              - name: "level"
                 value: 128
               - name: "transitionTime"
-                value: 20
+                value: 0
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Wait 3000ms"
       cluster: "DelayCommands"
@@ -56,9 +54,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          constraints:
-              minValue: 128
-              maxValue: 129
+          value: 128
 
     - label: "Sends a move up command to DUT"
       command: "Move"

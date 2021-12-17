@@ -10887,9 +10887,34 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000002_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000002_MoveToLevel
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to 0x80"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT move to minimal level"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPLevelControlClusterMoveToLevelParams alloc] init];
+    params.level = [NSNumber numberWithUnsignedChar:0];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    params.optionMask = [NSNumber numberWithUnsignedChar:1];
+    params.optionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevelWithParams:params
+                 completionHandler:^(NSError * _Nullable err) {
+                     NSLog(@"Precondition: DUT move to minimal level Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_4_1_000003_Step
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Sends step Up command to DUT with by a step of 0x80"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -10904,7 +10929,7 @@ CHIPDevice * GetConnectedDevice(void)
     params.optionOverride = [NSNumber numberWithUnsignedChar:0];
     [cluster stepWithParams:params
           completionHandler:^(NSError * _Nullable err) {
-              NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
+              NSLog(@"Sends step Up command to DUT with by a step of 0x80 Error: %@", err);
 
               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
@@ -10913,7 +10938,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000003_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000004_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -10921,7 +10946,7 @@ CHIPDevice * GetConnectedDevice(void)
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -10953,7 +10978,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000005_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000006_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends step down command to DUT"];
 
@@ -10979,7 +11004,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000006_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000007_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -10987,7 +11012,7 @@ CHIPDevice * GetConnectedDevice(void)
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000008_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -11019,7 +11044,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000008_Step
+- (void)testSendClusterTest_TC_LVL_4_1_000009_Step
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends a Step up command"];
 
@@ -11045,7 +11070,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000009_WaitForMs
+- (void)testSendClusterTest_TC_LVL_4_1_000010_WaitForMs
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 3000ms"];
 
@@ -11053,7 +11078,7 @@ CHIPDevice * GetConnectedDevice(void)
     WaitForMs(expectation, queue, 3000);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000010_ReadAttribute
+- (void)testSendClusterTest_TC_LVL_4_1_000011_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reads current level attribute from DUT"];
 
@@ -11085,7 +11110,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_4_1_000011_Off
+- (void)testSendClusterTest_TC_LVL_4_1_000012_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sending off command"];
 
@@ -11132,7 +11157,7 @@ CHIPDevice * GetConnectedDevice(void)
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_5_1_000002_Step
+- (void)testSendClusterTest_TC_LVL_5_1_000002_MoveToLevel
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Precondition: DUT level is set to 0x80"];
 
@@ -11141,20 +11166,19 @@ CHIPDevice * GetConnectedDevice(void)
     CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    __auto_type * params = [[CHIPLevelControlClusterStepParams alloc] init];
-    params.stepMode = [NSNumber numberWithUnsignedChar:0];
-    params.stepSize = [NSNumber numberWithUnsignedChar:128];
-    params.transitionTime = [NSNumber numberWithUnsignedShort:20U];
-    params.optionMask = [NSNumber numberWithUnsignedChar:0];
-    params.optionOverride = [NSNumber numberWithUnsignedChar:0];
-    [cluster stepWithParams:params
-          completionHandler:^(NSError * _Nullable err) {
-              NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
+    __auto_type * params = [[CHIPLevelControlClusterMoveToLevelParams alloc] init];
+    params.level = [NSNumber numberWithUnsignedChar:128];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    params.optionMask = [NSNumber numberWithUnsignedChar:1];
+    params.optionOverride = [NSNumber numberWithUnsignedChar:1];
+    [cluster moveToLevelWithParams:params
+                 completionHandler:^(NSError * _Nullable err) {
+                     NSLog(@"Precondition: DUT level is set to 0x80 Error: %@", err);
 
-              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
 
-              [expectation fulfill];
-          }];
+                     [expectation fulfill];
+                 }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
