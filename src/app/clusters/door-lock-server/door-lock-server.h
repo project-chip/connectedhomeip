@@ -103,6 +103,11 @@ public:
         return HasFeature(endpointId, DoorLock::DoorLockFeature::kPINCredentials);
     }
 
+    inline bool SupportsPFID(chip::EndpointId endpointId)
+    {
+        return HasFeature(endpointId, DoorLock::DoorLockFeature::kRFIDCredentials);
+    }
+
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
