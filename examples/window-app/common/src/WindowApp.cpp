@@ -138,8 +138,11 @@ CHIP_ERROR WindowApp::Run()
 {
     StateFlags oldState;
 
+#if CHIP_ENABLE_OPENTHREAD
     oldState.isThreadProvisioned = !ConnectivityMgr().IsThreadProvisioned();
-
+#else
+    oldState.isWiFiProvisioned = !ConnectivityMgr().IsWiFiStationProvisioned();
+#endif
     while (true)
     {
         ProcessEvents();
@@ -151,13 +154,22 @@ CHIP_ERROR WindowApp::Run()
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
+#if CHIP_ENABLE_OPENTHREAD
             mState.isThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
             mState.isThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+#else
+            mState.isWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+            mState.isWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+#endif
             mState.haveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
+#if CHIP_ENABLE_OPENTHREAD
         if (mState.isThreadProvisioned != oldState.isThreadProvisioned)
+#else
+        if (mState.isWiFiProvisioned != oldState.isWiFiProvisioned)
+#endif
         {
             // Provisioned state changed
             DispatchEvent(EventId::ProvisionedStateChanged);

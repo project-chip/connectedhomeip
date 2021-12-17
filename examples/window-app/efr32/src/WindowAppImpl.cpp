@@ -308,7 +308,13 @@ void WindowAppImpl::UpdateLEDs()
         {
             mStatusLED.Blink(200, 200);
         }
-        else if (mState.isThreadProvisioned && mState.isThreadEnabled)
+        else
+#if CHIP_ENABLE_OPENTHREAD
+        if (mState.isThreadProvisioned && mState.isThreadEnabled)
+#else
+        if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
+#endif
+
         {
             mStatusLED.Blink(950, 50);
         }
@@ -346,7 +352,11 @@ void WindowAppImpl::UpdateLCD()
 {
     // Update LCD
 #ifdef DISPLAY_ENABLED
+#if CHIP_ENABLE_OPENTHREAD
     if (mState.isThreadProvisioned)
+#else
+    if (mState.isWiFiProvisioned)
+#endif
     {
         Cover & cover      = GetCover();
         EmberAfWcType type = TypeGet(cover.mEndpoint);
