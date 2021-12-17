@@ -60,6 +60,11 @@ public:
         printf("Test_TC_CC_9_1\n");
         printf("Test_TC_CC_9_2\n");
         printf("Test_TC_CC_9_3\n");
+        printf("Test_TC_DD_1_5\n");
+        printf("Test_TC_DD_1_6\n");
+        printf("Test_TC_DD_1_7\n");
+        printf("Test_TC_DD_1_8\n");
+        printf("Test_TC_DD_1_9\n");
         printf("Test_TC_DM_1_1\n");
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
@@ -13754,6 +13759,361 @@ private:
     void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_14() { NextTest(); }
+};
+
+class Test_TC_DD_1_5 : public TestCommand
+{
+public:
+    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_5\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_5\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the onboarding payload for NFC tags SHALL use NDEF URI Record Type Definition as defined by NFC "
+                   "Forum in URI Record Type Definition RTD URI");
+    }
+};
+
+class Test_TC_DD_1_6 : public TestCommand
+{
+public:
+    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_6\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_6\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 2 verificaiton\n");
+            err = TestStep2Verificaiton_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the DUTs QR code using a QR code reader");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify the QR code gets scanned successfully and the QR code must be of sufficient size and contrast respective to "
+            "surface material as to be readable with standard readers such as smartphones in normal lighting conditions");
+    }
+
+    CHIP_ERROR TestStep2Verificaiton_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify QR code version is 1 or higher");
+    }
+};
+
+class Test_TC_DD_1_7 : public TestCommand
+{
+public:
+    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_7\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_7\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the Manual Pairing Code should be printed using a minimum font size of 6 points typically "
+                   "producing a typeface height of 2.1 mm");
+    }
+};
+
+class Test_TC_DD_1_8 : public TestCommand
+{
+public:
+    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_8\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_8\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Step 1\n");
+            err = TestStep1_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1 verification\n");
+            err = TestStep1Verification_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestStep1_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Scan the device QR code using DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify the DUT is able to scan and parse the QR code successfully to onboard the device onto the CHIP network");
+    }
+};
+
+class Test_TC_DD_1_9 : public TestCommand
+{
+public:
+    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DD_1_9\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DD_1_9\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Precondition\n");
+            err = TestPrecondition_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Step 1\n");
+            err = TestStep1_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Step 1 verification\n");
+            err = TestStep1Verification_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestPrecondition_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Verify that the manual pairing code is printed on the device or in additional provided materials");
+    }
+
+    CHIP_ERROR TestStep1_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("Provide the 11 digit or 21 digit pairing code from the Device in text speech or any format supported by DUT");
+    }
+
+    CHIP_ERROR TestStep1Verification_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log(
+            "Verify that the manual pairing code can be provided to DUT and parsed to onboard the device onto the CHIP network");
+    }
 };
 
 class Test_TC_DM_1_1 : public TestCommand
@@ -54956,24 +55316,16 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read location\n");
-            err = TestReadLocation_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Write location\n");
+            err = TestWriteLocation_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Write location\n");
-            err = TestWriteLocation_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read back location\n");
-            err = TestReadBackLocation_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_4();
-            break;
-        case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read AttributeList value\n");
-            err = TestReadAttributeListValue_5();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read AttributeList value\n");
+            err = TestReadAttributeListValue_3();
             break;
         }
 
@@ -54986,17 +55338,14 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 6;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, chip::CharSpan location)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(location);
-    }
+    static void OnSuccessCallback_1(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_1(); }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -55010,26 +55359,9 @@ private:
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, chip::CharSpan location)
+    static void OnSuccessCallback_3(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
     {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_3(location);
-    }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_4(status);
-    }
-
-    static void OnSuccessCallback_4(void * context) { (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_4(); }
-
-    static void OnFailureCallback_5(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnFailureResponse_5(status);
-    }
-
-    static void OnSuccessCallback_5(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
-    {
-        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_5(attributeList);
+        (static_cast<TestBasicInformation *>(context))->OnSuccessResponse_3(attributeList);
     }
 
     //
@@ -55042,27 +55374,7 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadLocation_1()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_1, OnFailureCallback_1));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_1(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("XX", 2)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteLocation_2()
+    CHIP_ERROR TestWriteLocation_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
@@ -55070,6 +55382,24 @@ private:
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1() { NextTest(); }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan locationArgument;
+        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
@@ -55080,58 +55410,20 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestReadBackLocation_3()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_3(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestRestoreInitialLocationValue_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::CharSpan locationArgument;
-        locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeListValue_5()
+    CHIP_ERROR TestReadAttributeListValue_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
+    void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::AttributeId> & attributeList)
     {
         auto iter = attributeList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(attributeList)>("attributeList", iter, 0));
@@ -56819,16 +57111,8 @@ public:
             err = TestGroupWriteAttribute_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read back Attribute\n");
-            err = TestReadBackAttribute_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
-            err = TestReadBackAttribute_4();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_2();
             break;
         }
 
@@ -56841,7 +57125,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 3;
 
     static void OnDoneCallback_1(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_1(); }
 
@@ -56852,34 +57136,14 @@ private:
 
     static void OnSuccessCallback_1(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_1(); }
 
+    static void OnDoneCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_2(); }
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, chip::CharSpan location)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(location);
-    }
-
-    static void OnDoneCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3(); }
-
-    static void OnFailureCallback_3(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(status);
-    }
-
-    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_4(status);
-    }
-
-    static void OnSuccessCallback_4(void * context, chip::CharSpan location)
-    {
-        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -56911,27 +57175,7 @@ private:
 
     void OnDoneResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestReadBackAttribute_2()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestRestoreInitialLocationValue_3()
+    CHIP_ERROR TestRestoreInitialLocationValue_2()
     {
         const chip::GroupId groupId = 1234;
         chip::Controller::BasicClusterTest cluster;
@@ -56941,35 +57185,15 @@ private:
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
+            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2, OnDoneCallback_2));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3() { NextTest(); }
+    void OnSuccessResponse_2() { NextTest(); }
 
-    void OnDoneResponse_3() { NextTest(); }
-
-    CHIP_ERROR TestReadBackAttribute_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
-        chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(chip::CharSpan location)
-    {
-        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
-
-        NextTest();
-    }
+    void OnDoneResponse_2() { NextTest(); }
 };
 
 class Test_TC_DIAGSW_1_1 : public TestCommand
@@ -57587,6 +57811,11 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_CC_9_1>(),
         make_unique<Test_TC_CC_9_2>(),
         make_unique<Test_TC_CC_9_3>(),
+        make_unique<Test_TC_DD_1_5>(),
+        make_unique<Test_TC_DD_1_6>(),
+        make_unique<Test_TC_DD_1_7>(),
+        make_unique<Test_TC_DD_1_8>(),
+        make_unique<Test_TC_DD_1_9>(),
         make_unique<Test_TC_DM_1_1>(),
         make_unique<Test_TC_DM_3_1>(),
         make_unique<Test_TC_DM_2_2>(),
