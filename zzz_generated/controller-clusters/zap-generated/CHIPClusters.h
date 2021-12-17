@@ -375,8 +375,7 @@ public:
     // Cluster Commands
     CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                           uint16_t groupKeySetID);
-    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t groupKeySetIDs);
+    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             uint16_t groupKeySetID);
     CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,

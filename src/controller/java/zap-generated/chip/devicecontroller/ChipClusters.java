@@ -5105,9 +5105,8 @@ public class ChipClusters {
       keySetRead(chipClusterPtr, callback, groupKeySetID);
     }
 
-    public void keySetReadAllIndices(
-        KeySetReadAllIndicesResponseCallback callback, Integer groupKeySetIDs) {
-      keySetReadAllIndices(chipClusterPtr, callback, groupKeySetIDs);
+    public void keySetReadAllIndices(KeySetReadAllIndicesResponseCallback callback) {
+      keySetReadAllIndices(chipClusterPtr, callback);
     }
 
     public void keySetRemove(DefaultClusterCallback callback, Integer groupKeySetID) {
@@ -5141,7 +5140,7 @@ public class ChipClusters {
         long chipClusterPtr, KeySetReadResponseCallback Callback, Integer groupKeySetID);
 
     private native void keySetReadAllIndices(
-        long chipClusterPtr, KeySetReadAllIndicesResponseCallback Callback, Integer groupKeySetIDs);
+        long chipClusterPtr, KeySetReadAllIndicesResponseCallback Callback);
 
     private native void keySetRemove(
         long chipClusterPtr, DefaultClusterCallback Callback, Integer groupKeySetID);

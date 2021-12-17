@@ -6669,11 +6669,6 @@ public class ClusterInfoMapping {
         "keySetRead", groupKeyManagementkeySetReadInteractionInfo);
     Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo =
-        new CommandParameterInfo("groupKeySetIDs", int.class);
-    groupKeyManagementkeySetReadAllIndicesCommandParams.put(
-        "groupKeySetIDs", groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
-
     // Populate commands
     InteractionInfo groupKeyManagementkeySetReadAllIndicesInteractionInfo =
         new InteractionInfo(
@@ -6681,8 +6676,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.GroupKeyManagementCluster) cluster)
                   .keySetReadAllIndices(
                       (ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback)
-                          callback,
-                      (Integer) commandArguments.get("groupKeySetIDs"));
+                          callback);
             },
             () -> new DelegatedKeySetReadAllIndicesResponseCallback(),
             groupKeyManagementkeySetReadAllIndicesCommandParams);

@@ -3079,7 +3079,7 @@ exit:
 }
 
 CHIP_ERROR GroupKeyManagementCluster::KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t groupKeySetIDs)
+                                                           Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3102,9 +3102,7 @@ CHIP_ERROR GroupKeyManagementCluster::KeySetReadAllIndices(Callback::Cancelable 
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // groupKeySetIDs: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetIDs));
+    // Command takes no arguments.
 
     SuccessOrExit(err = sender->FinishCommand());
 

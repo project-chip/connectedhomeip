@@ -10534,7 +10534,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetIDs)), groupKeySetIDs));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10550,9 +10549,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupKeySetIDs):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIDs));
-            break;
         default:
             break;
         }

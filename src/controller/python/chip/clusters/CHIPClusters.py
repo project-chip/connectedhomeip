@@ -2067,7 +2067,6 @@ class ChipClusters:
                     "commandId": 0x00000004,
                     "commandName": "KeySetReadAllIndices",
                     "args": {
-                        "groupKeySetIDs": "int",
                     },
                 },
             0x00000003: {
@@ -2098,6 +2097,7 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000001: {
                     "attributeName": "GroupTable",

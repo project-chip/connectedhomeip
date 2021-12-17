@@ -1788,17 +1788,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupKeySetIDs = [NSArray array];
-    }
-    return self;
-}
-@end
-
 @implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
 - (instancetype)init
 {
