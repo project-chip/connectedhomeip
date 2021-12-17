@@ -190,7 +190,8 @@
     [_deviceModelInfoView.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:10].active = YES;
     [_deviceModelInfoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_deviceModelInfoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [_deviceModelInfoView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
+    [_deviceModelInfoView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active
+        = YES;
 
     // manual entry field
     _manualCodeLabel = [UILabel new];
@@ -264,7 +265,8 @@
 
     _readFromLedgerButton.translatesAutoresizingMaskIntoConstraints = false;
     [_readFromLedgerButton.widthAnchor constraintEqualToConstant:200].active = YES;
-    [_readFromLedgerButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+    [_readFromLedgerButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active
+        = YES;
     [_readFromLedgerButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
     // Redirect Custom Flow button
@@ -333,31 +335,34 @@
 
 - (void)addResultsUIToStackView:(UIStackView *)stackView
 {
-    NSArray<NSString *> * resultLabelTexts =
-        @[ @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #", @"Commissioning Flow" ];
-    NSArray<UILabel *> * resultLabels =
-        @[ _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber, _commissioningFlowLabel ];
+    NSArray<NSString *> * resultLabelTexts = @[
+        @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #",
+        @"Commissioning Flow"
+    ];
+    NSArray<UILabel *> * resultLabels = @[
+        _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber,
+        _commissioningFlowLabel
+    ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
 - (void)addDeviceInfoUIToStackView:(UIStackView *)stackView
 {
-    NSArray<NSString *> * resultLabelTexts =
-        @[ @"Vendor ID", @"Product ID", @"Commissioning URL" ];
-    NSArray<UILabel *> * resultLabels =
-        @[ _vendorID, _productID, _commissioningCustomFlowUrl ];
+    NSArray<NSString *> * resultLabelTexts = @[ @"Vendor ID", @"Product ID", @"Commissioning URL" ];
+    NSArray<UILabel *> * resultLabels = @[ _vendorID, _productID, _commissioningCustomFlowUrl ];
     [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
 }
 
-- (void)addItemToStackView:(UIStackView *) stackView
-              resultLabels:(NSArray<UILabel *> *) resultLabels
-          resultLabelTexts:(NSArray<NSString *> *) resultLabelTexts
+- (void)addItemToStackView:(UIStackView *)stackView
+              resultLabels:(NSArray<UILabel *> *)resultLabels
+          resultLabelTexts:(NSArray<NSString *> *)resultLabelTexts
 {
     for (int i = 0; i < resultLabels.count && i < resultLabelTexts.count; i++) {
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
         UILabel * result = [resultLabels objectAtIndex:i];
-        if (!result.text) result.text = @"N/A";
+        if (!result.text)
+            result.text = @"N/A";
         UIStackView * labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
         labelStackView.translatesAutoresizingMaskIntoConstraints = false;
         [stackView addArrangedSubview:labelStackView];
@@ -366,8 +371,8 @@
 
 - (void)updateResultViewUI:(UIView *)superView
 {
-    NSArray *viewsToRemove = [superView subviews];
-    for (UIView *v in viewsToRemove) {
+    NSArray * viewsToRemove = [superView subviews];
+    for (UIView * v in viewsToRemove) {
         [v removeFromSuperview];
     }
     [self addDetailSubview:superView];
@@ -1005,7 +1010,7 @@
 {
     // check vendor Id and product Id
     NSLog(@"Validating Vender Id and Product Id...");
-    if ([_vendorID.text isEqual:@"N/A"] || [_productID.text isEqual:@"N/A"] ) {
+    if ([_vendorID.text isEqual:@"N/A"] || [_productID.text isEqual:@"N/A"]) {
         NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.customflow"
                                                      code:1
                                                  userInfo:@{ NSLocalizedDescriptionKey : @"Vendor ID or Product Id is invalid." }];
@@ -1014,56 +1019,58 @@
     }
     // make API call
     NSLog(@"Making API call...");
-    [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowLedgerUrl"] vendorId:self->_vendorID.text productId:self->_productID.text];
+    [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"]
+                         objectForKey:@"CommissioningCustomFlowLedgerUrl"]
+            vendorId:self->_vendorID.text
+           productId:self->_productID.text];
 }
 
-- (void)getRequest:(NSString *)url
-                  vendorId:(NSString *)vendorId
-                 productId:(NSString *)productId
+- (void)getRequest:(NSString *)url vendorId:(NSString *)vendorId productId:(NSString *)productId
 {
     [_activityIndicator startAnimating];
     _activityIndicator.hidden = NO;
-    NSString *targetUrl = [NSString stringWithFormat:@"%@/%@/%@", url, vendorId, productId];
-    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    NSString * targetUrl = [NSString stringWithFormat:@"%@/%@/%@", url, vendorId, productId];
+    NSMutableURLRequest * request = [[NSMutableURLRequest alloc] init];
     [request setHTTPMethod:@"GET"];
     [request setURL:[NSURL URLWithString:targetUrl]];
 
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:
-      ^(NSData * _Nullable data,
-        NSURLResponse * _Nullable response,
-        NSError * _Nullable error) {
-            NSString *myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            NSLog(@"Data received: %@", myString);
-            self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-            [self getRequestCallback];
-    }] resume];
+    [[[NSURLSession sharedSession]
+        dataTaskWithRequest:request
+          completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+              NSString * myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+              NSLog(@"Data received: %@", myString);
+              self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+              [self getRequestCallback];
+          }] resume];
 }
 
 - (void)getRequestCallback
 {
-    BOOL commissioningCustomFlowUseMockFlag = (BOOL)[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
+    BOOL commissioningCustomFlowUseMockFlag = (BOOL)
+        [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
     // use mock respond if useMockFlag is TRUE
     if (commissioningCustomFlowUseMockFlag) {
         NSLog(@"Using mock respond");
         _ledgerRespond = @{
-            @"height": @"mockHeight",
-            @"result": @{
-              @"vid": @1,
-              @"pid": @1,
-              @"cid": @1,
-              @"name": @"mockName",
-              @"owner": @"mockOwner",
-              @"description": @"mockDescription",
-              @"sku": @"mockSku",
-              @"firmware_version": @"mockFirmware",
-              @"hardware_version": @"mockHardware",
-              @"tis_or_trp_testing_completed": @TRUE,
-              @"CommissioningCustomFlowUrl": @"https://lijusankar.github.io/commissioning-react-app/"
+            @"height" : @"mockHeight",
+            @"result" : @ {
+                @"vid" : @1,
+                @"pid" : @1,
+                @"cid" : @1,
+                @"name" : @"mockName",
+                @"owner" : @"mockOwner",
+                @"description" : @"mockDescription",
+                @"sku" : @"mockSku",
+                @"firmware_version" : @"mockFirmware",
+                @"hardware_version" : @"mockHardware",
+                @"tis_or_trp_testing_completed" : @TRUE,
+                @"CommissioningCustomFlowUrl" : @"https://lijusankar.github.io/commissioning-react-app/"
             }
-          };
+        };
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        self->_commissioningCustomFlowUrl.text = [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
+        self->_commissioningCustomFlowUrl.text =
+            [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
         [self->_activityIndicator stopAnimating];
         self->_activityIndicator.hidden = YES;
         self->_deviceModelInfoView.hidden = NO;
@@ -1079,30 +1086,31 @@
 
 - (void)redirectToUrl
 {
-    NSArray *redirectPayload = @[ @{
-        @"version": _versionLabel.text,
-        @"vendorID": _vendorID.text,
-        @"productID": _productID.text,
-        @"commissioingFlow": _commissioningFlowLabel.text,
-        @"discriminator": _discriminatorLabel.text,
-        @"setupPinCode": _setupPinCodeLabel.text,
-        @"serialNumber": _serialNumber.text,
-        @"rendezvousInformation": _rendezVousInformation.text
+    NSArray * redirectPayload = @[ @{
+        @"version" : _versionLabel.text,
+        @"vendorID" : _vendorID.text,
+        @"productID" : _productID.text,
+        @"commissioingFlow" : _commissioningFlowLabel.text,
+        @"discriminator" : _discriminatorLabel.text,
+        @"setupPinCode" : _setupPinCodeLabel.text,
+        @"serialNumber" : _serialNumber.text,
+        @"rendezvousInformation" : _rendezVousInformation.text
     } ];
-    NSString * returnUrl = [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowReturnUrl"];
+    NSString * returnUrl =
+        [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowReturnUrl"];
     NSString * base64EncodedString = [self encodeStringTo64:redirectPayload];
-    NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
+    NSString * urlString =
+        [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
     NSURL * url = [NSURL URLWithString:urlString];
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
-- (NSString*)encodeStringTo64:(NSArray*)fromArray
+- (NSString *)encodeStringTo64:(NSArray *)fromArray
 {
     NSData * jsonData = [NSJSONSerialization dataWithJSONObject:fromArray options:NSJSONWritingWithoutEscapingSlashes error:nil];
     NSString * base64String = [jsonData base64EncodedStringWithOptions:kNilOptions];
     return base64String;
 }
-
 
 @synthesize description;
 
