@@ -90,9 +90,11 @@ function getTests()
   const LevelControl = [
     'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
+    'Test_TC_LVL_2_2',
     'Test_TC_LVL_3_1',
     'Test_TC_LVL_4_1',
     'Test_TC_LVL_5_1',
+    'Test_TC_LVL_6_1',
   ];
 
   const MediaControl = [
@@ -109,6 +111,17 @@ function getTests()
     'Test_TC_MC_3_9',
     'Test_TC_MC_3_10',
     'Test_TC_MC_3_11',
+    'Test_TC_MC_5_1',
+    'Test_TC_MC_5_2',
+    'Test_TC_MC_5_3',
+    'Test_TC_MC_6_1',
+    'Test_TC_MC_6_2',
+    'Test_TC_MC_6_3',
+    'Test_TC_MC_6_4',
+    'Test_TC_MC_7_1',
+    'Test_TC_MC_7_2',
+    'Test_TC_MC_8_1',
+    'Test_TC_MC_9_1',
   ];
 
   const OnOff = [

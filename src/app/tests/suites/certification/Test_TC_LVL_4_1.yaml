@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 24.4.1. [TC-LVL-4.1] Step Verification (DUT as Server)
+name: 24.4.1. [TC-LVL-4.1] Move Verification (DUT as Server)
 
 config:
     cluster: "Level Control"
@@ -23,53 +23,30 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Sending on command"
-      cluster: "On/Off"
-      command: "on"
-
-    - label: "Precondition: DUT level is set to 0x80"
-      command: "Step"
-      arguments:
-          values:
-              - name: "stepMode"
-                value: 0
-              - name: "stepSize"
-                value: 128
-              - name: "transitionTime"
-                value: 20
-              - name: "optionMask"
-                value: 0
-              - name: "optionOverride"
-                value: 0
-
-    - label: "Wait 3000ms"
-      cluster: "DelayCommands"
-      command: "WaitForMs"
-      arguments:
-          values:
-              - name: "ms"
-                value: 3000
-
-    - label: "Reads current level attribute from DUT"
+    - label: "reads current level attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: 0
 
-    - label: "Sends step down command to DUT"
-      command: "Step"
+    - label: "reads max level attribute from DUT"
+      command: "readAttribute"
+      attribute: "max level"
+      response:
+          value: 255
+
+    - label: "sends a Move up command"
+      command: "Move"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 200
+              - name: "optionMask"
                 value: 1
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
-              - name: "optionMask"
-                value: 0
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Wait 3000ms"
       cluster: "DelayCommands"
@@ -79,26 +56,30 @@ tests:
               - name: "ms"
                 value: 3000
 
-    - label: "Reads current level attribute from DUT"
+    - label: "reads current level attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 64
+          value: 255
 
-    - label: "Sends a Step up command"
-      command: "Step"
+    - label: "reads min level attribute from DUT"
+      command: "readAttribute"
+      attribute: "min level"
+      response:
+          value: 0
+
+    - label: "sends a Move down command"
+      command: "Move"
       arguments:
           values:
-              - name: "stepMode"
-                value: 0
-              - name: "stepSize"
-                value: 64
-              - name: "transitionTime"
-                value: 20
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 250
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
     - label: "Wait 3000ms"
       cluster: "DelayCommands"
@@ -108,12 +89,48 @@ tests:
               - name: "ms"
                 value: 3000
 
-    - label: "Reads current level attribute from DUT"
+    - label: "reads current level attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: 0
 
-    - label: "Sending off command"
-      cluster: "On/Off"
-      command: "off"
+    - label: "Write default move rate attribute from DUT"
+      command: "writeAttribute"
+      attribute: "default move rate"
+      arguments:
+          value: 20
+
+    - label: "reads default move rate attribute from DUT"
+      command: "readAttribute"
+      attribute: "default move rate"
+      response:
+          value: 20
+
+    - label: "sends a Move up command at default move rate"
+      command: "Move"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 255
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
+
+    - label: "reads current level attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          constraints:
+              notValue: 255
