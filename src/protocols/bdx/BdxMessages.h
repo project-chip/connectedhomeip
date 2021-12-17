@@ -95,7 +95,7 @@ struct BdxMessage
      *  so it is essential that the underlying PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
-     * @param[in] aBuffer A PacketBufferHandle with a refernce to the PacketBuffer containing the data.
+     * @param[in] aBuffer A PacketBufferHandle with a reference to the PacketBuffer containing the data.
      *
      * @return CHIP_ERROR Return an error if the message format is invalid and/or can't be parsed
      */

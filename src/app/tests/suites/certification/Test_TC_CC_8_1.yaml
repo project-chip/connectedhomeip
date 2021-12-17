@@ -34,7 +34,7 @@ tests:
       response:
           value: 1
 
-    - label: "Color Loop Set Command - Set all Attributs"
+    - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
       arguments:
           values:

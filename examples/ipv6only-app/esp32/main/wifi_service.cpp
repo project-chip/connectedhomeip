@@ -42,7 +42,7 @@ constexpr pw::containers::FlatMap<uint8_t, uint32_t, 73> kChannelToFreqMap({ {
 
 // Class handles the event handlers needed for station startup.
 // Creating the object will register all handlers needed, destroying will
-// unregister. The object is only needed during initalization, after the station
+// unregister. The object is only needed during initialization, after the station
 // is up it is safe to destroy this object.
 class WifiInitStationEventHandler
 {
@@ -114,7 +114,7 @@ public:
         vEventGroupDelete(handler_context_.event_group);
     }
 
-    // Waits for the events to determine if connected succesfully.
+    // Waits for the events to determine if connected successfully.
     pw::Status WaitForConnection(chip_rpc_ConnectionResult * result)
     {
         EventBits_t bits = xEventGroupWaitBits(handler_context_.event_group, kWifiFailBit | kWifiIpv6ConnectedBit, pdFALSE, pdFALSE,

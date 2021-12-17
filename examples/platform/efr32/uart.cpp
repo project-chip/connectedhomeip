@@ -97,7 +97,7 @@ static uint16_t AvailableDataCount(Fifo_t * fifo)
     // if equal there is no data return 0 directly
     if (fifo->Tail != fifo->Head)
     {
-        // determine if a wrap around occured to get the right data size avalaible.
+        // determine if a wrap around occurred to get the right data size avalaible.
         size = (fifo->Tail < fifo->Head) ? (fifo->MaxSize - fifo->Head + fifo->Tail) : (fifo->Tail - fifo->Head);
     }
 

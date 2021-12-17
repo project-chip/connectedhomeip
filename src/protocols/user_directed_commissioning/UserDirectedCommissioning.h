@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a User-Directed Commissioning unsolicitied
+ *      This file defines objects for a User-Directed Commissioning unsolicited
  *      initiator (client) and recipient (server).
  *
  */
