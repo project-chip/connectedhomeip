@@ -112,7 +112,7 @@
 
     // Setup nav bar button
     [self changeNavBarButtonToCamera];
-    
+
     // Initialize all Labels
     [self initializeAllLabels];
 
@@ -182,7 +182,7 @@
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
-    
+
     _deviceModelInfoView = [UIView new];
     [self.view addSubview:_deviceModelInfoView];
 
@@ -191,7 +191,7 @@
     [_deviceModelInfoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_deviceModelInfoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [_deviceModelInfoView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
-    
+
     // manual entry field
     _manualCodeLabel = [UILabel new];
     _manualCodeLabel.text = @"00000000000000000000";
@@ -249,7 +249,7 @@
     [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
     [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Read from Ledger button
     _readFromLedgerButton = [UIButton new];
     [_readFromLedgerButton setTitle:@"Read from Ledger" forState:UIControlStateNormal];
@@ -266,7 +266,7 @@
     [_readFromLedgerButton.widthAnchor constraintEqualToConstant:200].active = YES;
     [_readFromLedgerButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_readFromLedgerButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Redirect Custom Flow button
     _redirectButton = [UIButton new];
     [_redirectButton setTitle:@"Redirect" forState:UIControlStateNormal];
@@ -322,7 +322,7 @@
     [parserResultsView.leadingAnchor constraintEqualToAnchor:resultsScrollView.leadingAnchor].active = YES;
     [parserResultsView.trailingAnchor constraintEqualToAnchor:resultsScrollView.trailingAnchor].active = YES;
     [parserResultsView.bottomAnchor constraintEqualToAnchor:resultsScrollView.bottomAnchor].active = YES;
-    
+
     if (superView == _setupPayloadView) {
         [superView addSubview:_manualCodeLabel];
         [self addResultsUIToStackView:parserResultsView];
@@ -766,9 +766,9 @@
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
     _commissioningFlowLabel.text = [NSString stringWithFormat:@"%lu", payload.commissioningFlow];
-    
+
     [self updateResultViewUI:_setupPayloadView];
-    
+
     if (payload.commissioningFlow == kCommissioningFlowCustom) {
         _readFromLedgerButton.hidden = NO;
     }
