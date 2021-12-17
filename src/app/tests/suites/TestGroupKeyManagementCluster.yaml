@@ -23,8 +23,7 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Add Group 1"
-      disabled: true
+    - label: "Add Group"
       cluster: "Groups"
       endpoint: 1
       command: "AddGroup"
@@ -41,26 +40,7 @@ tests:
               - name: "groupId"
                 value: 11
 
-    - label: "Add Group 2"
-      disabled: true
-      cluster: "Groups"
-      endpoint: 1
-      command: "AddGroup"
-      arguments:
-          values:
-              - name: "groupId"
-                value: 12
-              - name: "groupName"
-                value: "Group #2"
-      response:
-          values:
-              - name: "status"
-                value: 0
-              - name: "groupId"
-                value: 12
-
-    - label: "KeySetWrite 1"
-      disabled: true
+    - label: "KeySet Write"
       command: "KeySetWrite"
       arguments:
           values:
@@ -69,89 +49,53 @@ tests:
                     {
                         groupKeySetID: 101,
                         securityPolicy: 0,
-                        epochKey0:
-                            [
-                                0xa0,
-                                0xa1,
-                                0xa2,
-                                0xa3,
-                                0xa4,
-                                0xa5,
-                                0xa6,
-                                0xa7,
-                                0xa8,
-                                0xa9,
-                                0xaa,
-                                0xab,
-                                0xac,
-                                0xad,
-                                0xae,
-                                0xaf,
-                            ],
+                        epochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         epochStartTime0: 1110000,
-                        epochKey1:
-                            [
-                                0xb0,
-                                0xb1,
-                                0xb2,
-                                0xb3,
-                                0xb4,
-                                0xb5,
-                                0xb6,
-                                0xb7,
-                                0xb8,
-                                0xb9,
-                                0xba,
-                                0xbb,
-                                0xbc,
-                                0xbd,
-                                0xbe,
-                                0xbf,
-                            ],
+                        epochKey1: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
                         epochStartTime1: 1110001,
-                        epochKey2:
-                            [
-                                0xc0,
-                                0xc1,
-                                0xc2,
-                                0xc3,
-                                0xc4,
-                                0xc5,
-                                0xc6,
-                                0xc7,
-                                0xc8,
-                                0xc9,
-                                0xca,
-                                0xcb,
-                                0xcc,
-                                0xcd,
-                                0xce,
-                                0xcf,
-                            ],
+                        epochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
                         epochStartTime2: 1110002,
                     }
 
+    - label: "KeySet Read"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 101
+      response:
+          values:
+              - name: "groupKeySet"
+                value:
+                    {
+                        groupKeySetID: 101,
+                        securityPolicy: 0,
+                        epochKey0: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        epochStartTime0: 1110000,
+                        epochKey1: "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf",
+                        epochStartTime1: 1110001,
+                        epochKey2: "\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf",
+                        epochStartTime2: 1110002,
+                    }
+
+    - label: "KeySet Read All"
+      command: "KeySetReadAllIndices"
+      response:
+          values:
+              - name: "groupKeySetIDs"
+                value: [101]
+
     - label: "Write Group Keys"
-      disabled: true
       command: "writeAttribute"
       attribute: "groupKeyMap"
       arguments:
-          value:
-              [
-                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
-                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
-              ]
+          value: [{ fabricIndex: 1, groupId: 11, groupKeySetID: 101 }]
 
     - label: "Read Group Keys"
-      disabled: true
       command: "readAttribute"
       attribute: "groupKeyMap"
       response:
-          value:
-              [
-                  { fabricIndex: 1, groupId: 11, groupKeySetID: 101 },
-                  { fabricIndex: 1, groupId: 12, groupKeySetID: 102 },
-              ]
+          value: [{ fabricIndex: 1, groupId: 11, groupKeySetID: 101 }]
 
     - label: "Read GroupTable"
       disabled: true
@@ -179,3 +123,28 @@ tests:
       attribute: "maxGroupKeysPerFabric"
       response:
           value: 1
+
+    - label: "KeySet Remove"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 101
+
+    - label: "KeySet Read (removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 101
+      response:
+          error: 0x8B
+
+    - label: "KeySet Read (removed)"
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 101
+      response:
+          error: 0x8B

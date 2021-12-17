@@ -19508,11 +19508,7 @@ private:
 class GroupKeyManagementKeySetReadAllIndices : public ModelCommand
 {
 public:
-    GroupKeyManagementKeySetReadAllIndices() : ModelCommand("key-set-read-all-indices")
-    {
-        // groupKeySetIDs Array parsing is not supported yet
-        ModelCommand::AddArguments();
-    }
+    GroupKeyManagementKeySetReadAllIndices() : ModelCommand("key-set-read-all-indices") { ModelCommand::AddArguments(); }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {

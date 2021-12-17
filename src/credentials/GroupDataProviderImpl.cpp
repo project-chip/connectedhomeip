@@ -1421,6 +1421,7 @@ CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint
     VerifyOrReturnError(keyset.Find(mStorage, fabric, target_id), CHIP_ERROR_NOT_FOUND);
 
     // Target keyset found
+    out_keyset.keyset_id     = target_id;
     out_keyset.policy        = keyset.policy;
     out_keyset.num_keys_used = keyset.num_keys_used;
     memcpy(out_keyset.epoch_keys, keyset.epoch_keys, sizeof(out_keyset.epoch_keys));

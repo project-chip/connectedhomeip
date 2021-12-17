@@ -845,11 +845,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
-@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
-- (instancetype)init;
-@end
-
 @interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 - (instancetype)init;

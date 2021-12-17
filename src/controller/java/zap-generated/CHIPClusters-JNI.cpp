@@ -9704,16 +9704,13 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRead)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetIDs)
+JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupKeyManagementCluster * cppCluster;
 
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
-
-    request.groupKeySetIDs = chip::app::DataModel::List<const uint16_t>();
 
     std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback,
                     void (*)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *)>

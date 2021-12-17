@@ -15145,7 +15145,6 @@ public:
 namespace KeySetReadAllIndices {
 enum class Fields
 {
-    kGroupKeySetIDs = 0,
 };
 
 struct Type
@@ -15154,8 +15153,6 @@ public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-
-    DataModel::List<const uint16_t> groupKeySetIDs;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15170,7 +15167,6 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    DataModel::DecodableList<uint16_t> groupKeySetIDs;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadAllIndices

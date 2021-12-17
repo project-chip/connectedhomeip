@@ -56138,12 +56138,48 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read maxGroupsPerFabric\n");
-            err = TestReadMaxGroupsPerFabric_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Add Group\n");
+            err = TestAddGroup_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read maxGroupKeysPerFabric\n");
-            err = TestReadMaxGroupKeysPerFabric_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : KeySet Write\n");
+            err = TestKeySetWrite_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : KeySet Read\n");
+            err = TestKeySetRead_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : KeySet Read All\n");
+            err = TestKeySetReadAll_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write Group Keys\n");
+            err = TestWriteGroupKeys_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read Group Keys\n");
+            err = TestReadGroupKeys_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read maxGroupsPerFabric\n");
+            err = TestReadMaxGroupsPerFabric_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read maxGroupKeysPerFabric\n");
+            err = TestReadMaxGroupKeysPerFabric_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : KeySet Remove\n");
+            err = TestKeySetRemove_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : KeySet Read (removed)\n");
+            err = TestKeySetReadRemoved_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : KeySet Read (removed)\n");
+            err = TestKeySetReadRemoved_11();
             break;
         }
 
@@ -56156,26 +56192,49 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 12;
 
-    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(status);
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_1(void * context, uint16_t maxGroupsPerFabric)
+    static void OnSuccessCallback_5(void * context)
     {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1(maxGroupsPerFabric);
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_5();
     }
 
-    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_2(status);
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_2(void * context, uint16_t maxGroupKeysPerFabric)
+    static void OnSuccessCallback_6(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
+            groupKeyMap)
     {
-        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_2(maxGroupKeysPerFabric);
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_6(groupKeyMap);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, uint16_t maxGroupsPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_7(maxGroupsPerFabric);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint16_t maxGroupKeysPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_8(maxGroupKeysPerFabric);
     }
 
     //
@@ -56188,7 +56247,196 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadMaxGroupsPerFabric_1()
+    CHIP_ERROR TestAddGroup_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+
+        RequestType request;
+        request.groupId   = 11U;
+        request.groupName = chip::Span<const char>("Group #1garbage: not in length on purpose", 8);
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 11U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestKeySetWrite_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type;
+
+        RequestType request;
+
+        request.groupKeySet.groupKeySetID  = 101U;
+        request.groupKeySet.securityPolicy = static_cast<chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy>(0);
+        request.groupKeySet.epochKey0 =
+            chip::ByteSpan(chip::Uint8::from_const_char(" ¡¢£¤¥¦§¨©ª«¬­®¯garbage: not in length on purpose"), 16);
+        request.groupKeySet.epochStartTime0 = 1110000ULL;
+        request.groupKeySet.epochKey1 =
+            chip::ByteSpan(chip::Uint8::from_const_char(" ¡¢£¤¥¦§¨©ª«¬­®¯garbage: not in length on purpose"), 16);
+        request.groupKeySet.epochStartTime1 = 1110001ULL;
+        request.groupKeySet.epochKey2 =
+            chip::ByteSpan(chip::Uint8::from_const_char("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏgarbage: not in length on purpose"), 16);
+        request.groupKeySet.epochStartTime2 = 1110002ULL;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_2(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2() { NextTest(); }
+
+    CHIP_ERROR TestKeySetRead_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 101U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_3(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_3(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & groupKeySet)
+    {
+        VerifyOrReturn(CheckValue("groupKeySet.groupKeySetID", groupKeySet.groupKeySetID, 101U));
+        VerifyOrReturn(CheckValue("groupKeySet.securityPolicy", groupKeySet.securityPolicy, 0));
+        VerifyOrReturn(CheckValueAsString("groupKeySet.epochKey0", groupKeySet.epochKey0,
+                                          chip::ByteSpan(chip::Uint8::from_const_char(" ¡¢£¤¥¦§¨©ª«¬­®¯"), 16)));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0, 1110000ULL));
+        VerifyOrReturn(CheckValueAsString("groupKeySet.epochKey1", groupKeySet.epochKey1,
+                                          chip::ByteSpan(chip::Uint8::from_const_char(" ¡¢£¤¥¦§¨©ª«¬­®¯"), 16)));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime1", groupKeySet.epochStartTime1, 1110001ULL));
+        VerifyOrReturn(CheckValueAsString("groupKeySet.epochKey2", groupKeySet.epochKey2,
+                                          chip::ByteSpan(chip::Uint8::from_const_char("ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ"), 16)));
+        VerifyOrReturn(CheckValue("groupKeySet.epochStartTime2", groupKeySet.epochStartTime2, 1110002ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestKeySetReadAll_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_4(data.groupKeySetIDs);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_4(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(const chip::app::DataModel::DecodableList<uint16_t> & groupKeySetIDs)
+    {
+        auto iter = groupKeySetIDs.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeySetIDs)>("groupKeySetIDs", iter, 0));
+        VerifyOrReturn(CheckValue("groupKeySetIDs[0]", iter.GetValue(), 101U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupKeySetIDs)>("groupKeySetIDs", iter, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteGroupKeys_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type> groupKeyMapArgument;
+
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type groupKeyMapList[1];
+
+        groupKeyMapList[0].fabricIndex   = 1U;
+        groupKeyMapList[0].groupId       = 11U;
+        groupKeyMapList[0].groupKeySetID = 101U;
+
+        groupKeyMapArgument = groupKeyMapList;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            groupKeyMapArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadGroupKeys_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
+            groupKeyMap)
+    {
+        auto iter = groupKeyMap.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupKeyMap)>("groupKeyMap", iter, 0));
+        VerifyOrReturn(CheckValue("groupKeyMap[0].fabricIndex", iter.GetValue().fabricIndex, 1U));
+        VerifyOrReturn(CheckValue("groupKeyMap[0].groupId", iter.GetValue().groupId, 11U));
+        VerifyOrReturn(CheckValue("groupKeyMap[0].groupKeySetID", iter.GetValue().groupKeySetID, 101U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupKeyMap)>("groupKeyMap", iter, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadMaxGroupsPerFabric_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::GroupKeyManagementClusterTest cluster;
@@ -56196,20 +56444,20 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
-                this, OnSuccessCallback_1, OnFailureCallback_1));
+                this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint16_t maxGroupsPerFabric)
+    void OnSuccessResponse_7(uint16_t maxGroupsPerFabric)
     {
         VerifyOrReturn(CheckValue("maxGroupsPerFabric", maxGroupsPerFabric, 1U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadMaxGroupKeysPerFabric_2()
+    CHIP_ERROR TestReadMaxGroupKeysPerFabric_8()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::GroupKeyManagementClusterTest cluster;
@@ -56217,17 +56465,103 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint16_t maxGroupKeysPerFabric)
+    void OnSuccessResponse_8(uint16_t maxGroupKeysPerFabric)
     {
         VerifyOrReturn(CheckValue("maxGroupKeysPerFabric", maxGroupKeysPerFabric, 1U));
 
         NextTest();
+    }
+
+    CHIP_ERROR TestKeySetRemove_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
+
+        RequestType request;
+        request.groupKeySetID = 101U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_9(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestKeySetReadRemoved_10()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 101U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_10(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_10(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+        NextTest();
+    }
+
+    void OnSuccessResponse_10(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & groupKeySet)
+    {
+        ThrowSuccessResponse();
+    }
+
+    CHIP_ERROR TestKeySetReadRemoved_11()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+
+        RequestType request;
+        request.groupKeySetID = 101U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_11(data.groupKeySet);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_11(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+        NextTest();
+    }
+
+    void OnSuccessResponse_11(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & groupKeySet)
+    {
+        ThrowSuccessResponse();
     }
 };
 
