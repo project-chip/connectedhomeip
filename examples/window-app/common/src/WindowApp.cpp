@@ -427,7 +427,7 @@ void WindowApp::Cover::LiftUp()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; //set at middle
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
@@ -449,7 +449,7 @@ void WindowApp::Cover::LiftDown()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; //set at middle
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
     status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
@@ -512,7 +512,7 @@ void WindowApp::Cover::TiltUp()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; //set at middle
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
@@ -534,7 +534,7 @@ void WindowApp::Cover::TiltDown()
 {
     EmberAfStatus status;
     chip::app::DataModel::Nullable<chip::Percent100ths> current;
-    chip::Percent100ths percent100ths = 5000; //set at middle
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
     status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 

@@ -81,12 +81,12 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
                       "chip::Percent is expected to be uint8_t, change this when necessary");
         return ZCL_INT8U_ATTRIBUTE_TYPE;
 
-    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE: // Endpoint Number
-    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:    // Group Id
-    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:   // Vendor Id
-    case ZCL_ENUM16_ATTRIBUTE_TYPE:      // 16-bit enumeration
-    case ZCL_BITMAP16_ATTRIBUTE_TYPE:    // 16-bit bitmap
-    case ZCL_STATUS_ATTRIBUTE_TYPE:      // Status Code
+    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE:   // Endpoint Number
+    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:      // Group Id
+    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:     // Vendor Id
+    case ZCL_ENUM16_ATTRIBUTE_TYPE:        // 16-bit enumeration
+    case ZCL_BITMAP16_ATTRIBUTE_TYPE:      // 16-bit bitmap
+    case ZCL_STATUS_ATTRIBUTE_TYPE:        // Status Code
     case ZCL_PERCENT100THS_ATTRIBUTE_TYPE: // 100ths of a percent
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
                       "chip::EndpointId is expected to be uint16_t, change this when necessary");
