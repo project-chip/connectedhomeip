@@ -29,6 +29,7 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mInitialized = true;
 
     mIOContext = ioContext;
+    mTransport = transport;
 
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
 
@@ -54,6 +55,20 @@ CHIP_ERROR MessagingContext::Shutdown()
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
+{
+    return Init(existing.mTransport, existing.mIOContext);
+}
+
+CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
+{
+    CHIP_ERROR err = Shutdown();
+    // Point the transport back to the original session manager, since we had
+    // pointed it to ours.
+    existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
+    return err;
 }
 
 SessionHandle MessagingContext::GetSessionBobToAlice()
