@@ -273,4 +273,4 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(chip::EndpointI
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 void emberAfPluginLevelControlCoupledColorTempChangeCallback(chip::EndpointId endpoint);
-#endif
+#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

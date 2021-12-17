@@ -54,7 +54,7 @@
 
 #ifdef EMBER_AF_PLUGIN_SCENES
 #include <app/clusters/scenes/scenes.h>
-#endif
+#endif // EMBER_AF_PLUGIN_SCENES
 
 #ifdef EMBER_AF_PLUGIN_ON_OFF
 #include <app/clusters/on-off-server/on-off-server.h>
@@ -62,7 +62,7 @@
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 #include <app/clusters/color-control-server/color-control-server.h>
-#endif
+#endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
 #include <assert.h>
 
@@ -72,13 +72,13 @@ using namespace chip::app::Clusters::LevelControl;
 
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
-#endif
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
 #if (EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE == 0)
 #define FASTEST_TRANSITION_TIME_MS 0
 #else
 #define FASTEST_TRANSITION_TIME_MS (MILLISECOND_TICKS_PER_SECOND / EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE)
-#endif
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE
 
 #define LEVEL_CONTROL_LIGHTING_MIN_LEVEL 0x01
 #define LEVEL_CONTROL_LIGHTING_MAX_LEVEL 0xFE
@@ -225,7 +225,7 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
     {
         emberAfScenesClusterMakeInvalidCallback(endpoint);
     }
-#endif
+#endif // EMBER_AF_PLUGIN_SCENES
 
     // Are we at the requested level?
     if (currentLevel == state->moveToLevel)
@@ -299,7 +299,7 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
             emberAfLevelControlClusterPrintln("ERR: writing remaining time %x", status);
         }
     }
-#endif
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME
 }
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
@@ -409,7 +409,7 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionMask,
                                       optionOverride);
-    moveToLevelHandler(emberAfCurrentEndpoint(), Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
+    moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
                        INVALID_STORED_LEVEL); // Don't revert to the stored level
     return true;
 }
@@ -422,7 +422,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
     auto & transitionTime = commandData.transitionTime;
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
-    moveToLevelHandler(emberAfCurrentEndpoint(), Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
+    moveToLevelHandler(commandPath.mEndpointId, Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
                        INVALID_STORED_LEVEL); // Don't revert to the stored level
     return true;
 }
@@ -927,19 +927,19 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
             return;
         }
 
-        if (resolvedLevel.Value() == 0xFF)
+        if (resolvedLevel.IsNull())
         {
             // OnLevel has undefined value; fall back to CurrentLevel.
-            resolvedLevel.Value() = temporaryCurrentLevelCache;
+            resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
         }
     }
     else
     {
-        resolvedLevel.Value() = temporaryCurrentLevelCache;
+        resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
     }
 #else
-    resolvedLevel.Value() = temporaryCurrentLevelCache;
-#endif
+    resolvedLevel.SetNonNull(temporaryCurrentLevelCache);
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_LEVEL_ATTRIBUTE
 
     // Read the OnOffTransitionTime attribute.
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
@@ -958,7 +958,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
     }
 #else
     currentOnOffTransitionTime = 0xFFFF;
-#endif
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME
 
     if (newValue)
     {
@@ -992,7 +992,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
-    // If Those read only attribute are enabled we use those values as our set minLevel and maxLevel
+    // If these read only attributes are enabled we use those values as our set minLevel and maxLevel
     // if get isn't possible, value stays at default
     Attributes::MinLevel::Get(endpoint, &minLevel);
     Attributes::MaxLevel::Get(endpoint, &maxLevel);
@@ -1067,8 +1067,8 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
                 Attributes::CurrentLevel::Set(endpoint, currentLevel);
             }
         }
-#endif
-        // In any case, we make sure that the respects min/max
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
+       // In any case, we make sure that the respects min/max
         if (currentLevel < minLevel)
         {
             Attributes::CurrentLevel::Set(endpoint, minLevel);
@@ -1101,7 +1101,7 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 
     return false;
 }
-#endif
+#endif // IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 
 void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}
 

@@ -557,6 +557,7 @@ limitations under the License.
     <attribute side="server" code="0x0100" define="APPLICATION_TYPE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">application type</attribute>
   </cluster>
   <bitmap name="LevelControlFeature" type="BITMAP32">
+      <cluster code="0x0008"/>
       <field name="OnOff" mask="0x1"/>
       <field name="Lighting" mask="0x2"/>
       <field name="Frequency" mask="0x4"/>
