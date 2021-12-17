@@ -370,9 +370,9 @@ void DeviceController::OnPIDReadResponse(void * context, uint16_t value)
     }
 }
 
-void DeviceController::OnVIDReadResponse(void * context, uint16_t value)
+void DeviceController::OnVIDReadResponse(void * context, VendorId value)
 {
-    ChipLogProgress(Controller, "Received VID for the device. Value %d", value);
+    ChipLogProgress(Controller, "Received VID for the device. Value %d", to_underlying(value));
 
     DeviceController * controller = static_cast<DeviceController *>(context);
 

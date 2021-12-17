@@ -1413,8 +1413,9 @@ JNI_METHOD(void, BasicCluster, subscribeVendorIDAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPBasicVendorIDAttributeCallback, void (*)(CHIPBasicVendorIDAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBasicVendorIDAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPBasicVendorIDAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -1437,7 +1438,7 @@ JNI_METHOD(void, BasicCluster, subscribeVendorIDAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPBasicVendorIDAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

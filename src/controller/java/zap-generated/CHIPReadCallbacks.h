@@ -757,6 +757,35 @@ private:
     bool keepAlive;
 };
 
+class CHIPBasicVendorIDAttributeCallback : public chip::Callback::Callback<CHIPBasicClusterVendorIDAttributeCallbackType>
+{
+public:
+    CHIPBasicVendorIDAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPBasicVendorIDAttributeCallback();
+
+    static void maybeDestroy(CHIPBasicVendorIDAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPBasicVendorIDAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::VendorId value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPBasicVendorIDAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPBasicAttributeListAttributeCallback : public chip::Callback::Callback<CHIPBasicClusterAttributeListAttributeCallbackType>
 {
 public:

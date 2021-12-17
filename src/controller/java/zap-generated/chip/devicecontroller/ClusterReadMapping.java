@@ -519,7 +519,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readVendorIDAttribute(
+                      (ChipClusters.BasicCluster.VendorIDAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBasicVendorIDCommandParams);
