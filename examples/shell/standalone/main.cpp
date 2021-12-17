@@ -38,8 +38,8 @@ int main()
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     chip::DeviceLayer::ConnectivityManagerImpl().StartWiFiManagement();
 #endif
-    // Initialize the default streamer that was linked.
-    const int rc = streamer_init(streamer_get());
+
+    const int rc = Engine::Root().Init();
 
     if (rc != 0)
     {

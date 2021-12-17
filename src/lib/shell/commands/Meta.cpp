@@ -40,9 +40,13 @@ namespace Shell {
 static CHIP_ERROR ExitHandler(int argc, char ** argv)
 {
     streamer_printf(streamer_get(), "Goodbye\r\n");
-    chip::DeviceLayer::PlatformMgr().Shutdown();
     exit(0);
     return CHIP_NO_ERROR;
+}
+
+static void AtExitShell()
+{
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 static CHIP_ERROR HelpHandler(int argc, char ** argv)
@@ -64,6 +68,8 @@ void RegisterMetaCommands()
         { &HelpHandler, "help", "List out all top level commands" },
         { &VersionHandler, "version", "Output the software version" },
     };
+
+    std::atexit(AtExitShell);
 
     Engine::Root().RegisterCommands(sCmds, ArraySize(sCmds));
 }
