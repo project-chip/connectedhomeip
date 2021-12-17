@@ -808,26 +808,7 @@ void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler
         }
     }
 
-    // TODO: Implement getting the credential status
     uint16_t nextCredentialIndex = 0;
-    for (uint16_t i = credentialIndex + 1; i < maxNumberOfCredentials; ++i)
-    {
-        EmberAfPluginDoorLockCredentialInfo info;
-        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialInfo))
-        {
-            emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
-                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
-                                          commandPath.mEndpointId, i, credentialType);
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-            return;
-        }
-
-        if (DlCredentialStatus::kAvailable == credentialInfo.status)
-        {
-            nextCredentialIndex = i;
-            break;
-        }
-    }
 
     CHIP_ERROR err                = CHIP_NO_ERROR;
     using ResponseFields          = Commands::GetCredentialStatusResponse::Fields;
@@ -835,15 +816,12 @@ void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler
     TLV::TLVWriter * writer       = nullptr;
     SuccessOrExit(err = commandObj->PrepareCommand(path));
     VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialExists)), credentialExists));
-
     if (0 != userIndexWithCredential)
     {
         SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserIndex)), userIndexWithCredential));
     }
-
-    if (0 != nextCredentialIndex)
+    if (findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextCredentialIndex))
     {
         SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kNextCredentialIndex)), nextCredentialIndex));
     }
@@ -1080,25 +1058,8 @@ bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock:
 bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex,
                                           uint16_t & maxNumberOfCredentials)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    switch (type)
+    if (getMaxNumberOfCredentials(endpointId, type, maxNumberOfCredentials))
     {
-        // appclusters, 5.2.6.3.2: This shall be 0 for programming PIN
-    case DlCredentialType::kProgrammingPIN:
-        return credentialIndex == 0;
-    case DlCredentialType::kPin:
-        status = Attributes::NumberOfPINUsersSupported::Get(endpointId, &maxNumberOfCredentials);
-        break;
-    case DlCredentialType::kRfid:
-        status = Attributes::NumberOfRFIDUsersSupported::Get(endpointId, &maxNumberOfCredentials);
-        break;
-    default:
-        return false;
-    }
-
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(Zcl, "Unable to read attribute to get max number of supported credentials [status=%d]", status);
         return false;
     }
 
@@ -1143,6 +1104,66 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Door
     }
 
     return false;
+}
+
+bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+                                                  uint16_t startIndex, uint16_t & credentialIndex)
+{
+    uint16_t maxNumberOfCredentials = 0;
+    if (!getMaxNumberOfCredentials(endpointId, credentialType, maxNumberOfCredentials))
+    {
+        return false;
+    }
+
+    for (uint16_t i = startIndex; i < maxNumberOfCredentials; ++i)
+    {
+        EmberAfPluginDoorLockCredentialInfo info;
+        if (!emberAfPluginDoorLockGetCredential(endpointId, i, info))
+        {
+            ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
+                         endpointId, credentialType, i);
+            return false;
+        }
+
+        if (DlCredentialStatus::kAvailable == info.status)
+        {
+            credentialIndex = i;
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+                                               uint16_t & maxNumberOfCredentials)
+{
+    maxNumberOfCredentials = 0;
+    EmberAfStatus status   = EMBER_ZCL_STATUS_SUCCESS;
+    switch (credentialType)
+    {
+    case DlCredentialType::kProgrammingPIN:
+        maxNumberOfCredentials = 1;
+        return true;
+    case DlCredentialType::kPin:
+        status = Attributes::NumberOfPINUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        break;
+    case DlCredentialType::kRfid:
+        status = Attributes::NumberOfRFIDUsersSupported::Get(endpointId, &maxNumberOfCredentials);
+        break;
+    default:
+        return false;
+    }
+
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(
+            Zcl, "Unable to read an attribute to get the max number of credentials [endpointId=%d,credentialType=%hhu,status=%d]",
+            endpointId, credentialType, status);
+        return false;
+    }
+
+    return true;
 }
 
 // =============================================================================
