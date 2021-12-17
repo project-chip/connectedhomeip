@@ -957,10 +957,10 @@ limitations under the License.
         <field name="FingerCredentials" mask="0x04"/>
         <field name="Logging" mask="0x08"/>
         <field name="AccessSchedules" mask="0x10"/>
-        <field name="DoorPositionSensor" mask="0x10"/>
-        <field name="FaceCredentials" mask="0x20"/>
-        <field name="CredentialsOTA" mask="0x40"/>
-        <field name="UsersManagement" mask="0x80"/>
-        <field name="Notifications" mask="0x100"/>
+        <field name="DoorPositionSensor" mask="0x20"/>
+        <field name="FaceCredentials" mask="0x40"/>
+        <field name="CredentialsOTA" mask="0x80"/>
+        <field name="UsersManagement" mask="0x100"/>
+        <field name="Notifications" mask="0x200"/>
     </bitmap>
 </configurator>
