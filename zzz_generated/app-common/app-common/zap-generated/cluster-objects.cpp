@@ -13750,23 +13750,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::InstalledClosedLimitTilt::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, installedClosedLimitTilt));
         break;
-    case Attributes::VelocityLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, velocityLift));
-        break;
-    case Attributes::AccelerationTimeLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, accelerationTimeLift));
-        break;
-    case Attributes::DecelerationTimeLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, decelerationTimeLift));
-        break;
     case Attributes::Mode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, mode));
-        break;
-    case Attributes::IntermediateSetpointsLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intermediateSetpointsLift));
-        break;
-    case Attributes::IntermediateSetpointsTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intermediateSetpointsTilt));
         break;
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, safetyStatus));
