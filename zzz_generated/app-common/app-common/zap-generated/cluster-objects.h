@@ -19296,6 +19296,16 @@ enum class WcConfigStatus : uint8_t
     kTiltEncoderControlled     = 0x40,
 };
 
+// Bitmap for WcFeature
+enum class WcFeature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for WcMode
 enum class WcMode : uint8_t
 {
@@ -19328,16 +19338,6 @@ enum class WcSafetyStatus : uint16_t
     kHardwareFailure     = 0x200,
     kManualOperation     = 0x400,
     kProtection          = 0x800,
-};
-
-// Bitmap for WindowCoveringFeature
-enum class WindowCoveringFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
 };
 
 namespace Commands {
