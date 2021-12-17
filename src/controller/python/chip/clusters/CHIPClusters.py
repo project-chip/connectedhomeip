@@ -5199,6 +5199,7 @@ class ChipClusters:
                     "attributeName": "LabelList",
                     "attributeId": 0x00000000,
                     "type": "",
+                    "writable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",

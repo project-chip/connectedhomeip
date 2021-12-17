@@ -180,6 +180,8 @@ public:
 
     CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
                                  LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
+                                LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR GetUserLabelList(EndpointId endpoint,
                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
@@ -428,6 +430,13 @@ PlatformManager::GetFixedLabelList(EndpointId endpoint,
                                    LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR
+PlatformManager::SetUserLabelList(EndpointId endpoint,
+                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
 inline CHIP_ERROR

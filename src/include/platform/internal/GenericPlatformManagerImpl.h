@@ -60,6 +60,8 @@ protected:
 
     CHIP_ERROR _GetFixedLabelList(EndpointId endpoint,
                                   LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
@@ -81,6 +83,13 @@ extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetFixedLabelList(
     EndpointId endpoint, LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
+    EndpointId endpoint, LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
