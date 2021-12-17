@@ -429,11 +429,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
     if (HasFeature(endpoint, WcFeature::kLift))
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, 0);
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN);
     }
     if (HasFeature(endpoint, WcFeature::kTilt))
     {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, 0);
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN);
     }
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
