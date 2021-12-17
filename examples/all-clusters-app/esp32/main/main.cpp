@@ -473,7 +473,8 @@ void SetupPretendDevices()
     AddCluster("Lock");
     AddAttribute("State", "Open");
     // write the door lock state
-    chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT, chip::app::Clusters::DoorLock::DlLockState::kUnlocked);
+    chip::app::Clusters::DoorLock::Attributes::LockState::Set(DOOR_LOCK_SERVER_ENDPOINT,
+                                                              chip::app::Clusters::DoorLock::DlLockState::kUnlocked);
     AddDevice("Garage 1");
     AddEndpoint("Door 1");
     AddCluster("Door");
