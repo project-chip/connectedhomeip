@@ -82,7 +82,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
         ChipLogError(Zcl, "Unable to set the Lock State to %hhu: internal error", lockState);
     }
 
-    return status;
+    return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
 bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState)
@@ -97,7 +97,7 @@ bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newAct
         ChipLogError(Zcl, "Unable to set the Actuator Enabled State to %hhu: internal error", actuatorState);
     }
 
-    return false;
+    return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
 bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDoorState)
@@ -112,7 +112,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDo
         ChipLogError(Zcl, "Unable to set the Door State to %hhu: internal error", doorState);
     }
 
-    return false;
+    return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
 bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLanguage)
@@ -120,9 +120,19 @@ bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLa
     return true;
 }
 
-bool DoorLockServer::SetAutoRelockTime(chip::EndpointId, uint32_t newAutoRelockTimeSec)
+bool DoorLockServer::SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec)
 {
-    return true;
+    auto autoRelockTimeSec = static_cast<uint32_t>(newAutoRelockTimeSec);
+
+    emberAfDoorLockClusterPrintln("Setting Auto Relock Time to '%u'", autoRelockTimeSec);
+    auto status = Attributes::AutoRelockTime::Set(endpointId, autoRelockTimeSec);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(Zcl, "Unable to set the Auto Relock Time to %u: internal error", autoRelockTimeSec);
+    }
+
+    return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
 bool DoorLockServer::SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoundVolume)
