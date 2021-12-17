@@ -108,8 +108,8 @@ static uint8_t maxLevel = EMBER_AF_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
-static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
-                               uint8_t optionOverride, uint16_t storedLevel);
+static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
+                               uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel);
 static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
 static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
                         uint8_t optionOverride);
@@ -409,7 +409,7 @@ bool emberAfLevelControlClusterMoveToLevelCallback(app::CommandHandler * command
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL %x %2x %x %x", "RX level-control:", level, transitionTime, optionMask,
                                       optionOverride);
-    moveToLevelHandler(Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
+    moveToLevelHandler(emberAfCurrentEndpoint(), Commands::MoveToLevel::Id, level, transitionTime, optionMask, optionOverride,
                        INVALID_STORED_LEVEL); // Don't revert to the stored level
     return true;
 }
@@ -422,7 +422,7 @@ bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(app::CommandHandler 
     auto & transitionTime = commandData.transitionTime;
 
     emberAfLevelControlClusterPrintln("%pMOVE_TO_LEVEL_WITH_ON_OFF %x %2x", "RX level-control:", level, transitionTime);
-    moveToLevelHandler(Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
+    moveToLevelHandler(emberAfCurrentEndpoint(), Commands::MoveToLevelWithOnOff::Id, level, transitionTime, 0xFF, 0xFF,
                        INVALID_STORED_LEVEL); // Don't revert to the stored level
     return true;
 }
@@ -496,10 +496,9 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(app::CommandHandler * comma
     return true;
 }
 
-static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
-                               uint8_t optionOverride, uint16_t storedLevel)
+static void moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8_t level, uint16_t transitionTimeDs,
+                               uint8_t optionMask, uint8_t optionOverride, uint16_t storedLevel)
 {
-    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -974,7 +973,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 
         // "Move CurrentLevel to OnLevel, or to the stored level if OnLevel is not
         // defined, over the time period OnOffTransitionTime."
-        moveToLevelHandler(Commands::MoveToLevel::Id, resolvedLevel.Value(), currentOnOffTransitionTime, 0xFF, 0xFF,
+        moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, resolvedLevel.Value(), currentOnOffTransitionTime, 0xFF, 0xFF,
                            INVALID_STORED_LEVEL); // Don't revert to stored level
     }
     else
@@ -982,8 +981,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         // ...else if newValue is OnOff::Commands::Off::Id...
         // "Move CurrentLevel to the minimum level allowed for the device over the
         // time period OnOffTransitionTime."
-        moveToLevelHandler(Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime, 0xFF, 0xFF,
-                           temporaryCurrentLevelCache);
+        moveToLevelHandler(endpoint, Commands::MoveToLevel::Id, minimumLevelAllowedForTheDevice, currentOnOffTransitionTime, 0xFF,
+                           0xFF, temporaryCurrentLevelCache);
 
         // "If OnLevel is not defined, set the CurrentLevel to the stored level."
         // The emberAfLevelControlClusterServerTickCallback implementation handles
