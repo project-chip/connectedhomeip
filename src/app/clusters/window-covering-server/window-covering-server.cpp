@@ -468,18 +468,18 @@ emberAfWindowCoveringClusterStopMotionCallback(app::CommandHandler * commandObj,
                                                const Commands::StopMotion::DecodableType & fields)
 {
     emberAfWindowCoveringClusterPrint("StopMotion command received");
-    uint16_t current          = 0;
+    app::DataModel::Nullable<Percent100ths> current;
     chip::EndpointId endpoint = commandPath.mEndpointId;
 
     if (HasFeaturePaLift(endpoint))
     {
-        (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
+        (void) Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
         (void) Attributes::TargetPositionLiftPercent100ths::Set(endpoint, current);
     }
 
     if (HasFeaturePaTilt(endpoint))
     {
-        (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
+        (void) Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
         (void) Attributes::TargetPositionTiltPercent100ths::Set(endpoint, current);
     }
 
