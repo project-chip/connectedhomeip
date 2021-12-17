@@ -356,15 +356,11 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma1;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma1;
 
     ChipLogDetail(SecureChannel, "Sent Sigma1 msg");
 
@@ -496,15 +492,11 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma2Resume;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msg_R2_resume),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma2Resume;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
 
@@ -630,15 +622,11 @@ CHIP_ERROR CASESession::SendSigma2()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() }));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma2;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma2;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2 msg");
 
@@ -982,12 +970,6 @@ CHIP_ERROR CASESession::SendSigma3()
     err = mCommissioningHash.AddData(ByteSpan{ msg_R3->Start(), msg_R3->DataLength() });
     SuccessOrExit(err);
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma3;
-
     // Call delegate to send the Msg3 to peer
     err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
                                      SendFlags(SendMessageFlags::kExpectResponse));
@@ -997,6 +979,8 @@ CHIP_ERROR CASESession::SendSigma3()
 
     err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
+
+    mState = kSentSigma3;
 
 exit:
 
