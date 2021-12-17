@@ -383,6 +383,7 @@ config("sanitize_default") {
 config("libfuzzer_fuzzing") {
   cflags = [ "-fsanitize=fuzzer" ]
   ldflags = cflags
+  defines = [ "LIBFUZZER_ENABLED=1" ]
 }
 
 config("fuzzing_default") {
