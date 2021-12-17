@@ -51,8 +51,6 @@ public:
 
     virtual bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const { return false; }
 
-    virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
-
     virtual CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                                  Callback::Cancelable * onFailureCallback);
 

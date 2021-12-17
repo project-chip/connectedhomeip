@@ -84,15 +84,8 @@ void InteractionModelEngine::Shutdown()
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
         return Loop::Continue;
     });
-    mTimedHandlers.ReleaseAll();
 
-    for (auto & readClient : mReadClients)
-    {
-        if (!readClient.IsFree())
-        {
-            readClient.Shutdown();
-        }
-    }
+    mTimedHandlers.ReleaseAll();
 
     for (auto & readHandler : mReadHandlers)
     {
@@ -101,6 +94,15 @@ void InteractionModelEngine::Shutdown()
             readHandler.Shutdown();
         }
     }
+
+    //
+    // We hold weak references to ReadClient objects. The application ultimately
+    // actually owns them, so it's on them to eventually shut them down and free them
+    // up.
+    //
+    // We just null out our tracker.
+    //
+    mpActiveReadClientList = nullptr;
 
     for (auto & writeClient : mWriteClients)
     {
@@ -125,43 +127,6 @@ void InteractionModelEngine::Shutdown()
     mpNextAvailableClusterInfo = nullptr;
 
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
-}
-
-CHIP_ERROR InteractionModelEngine::NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                                                 ReadClient::Callback * aCallback)
-{
-    *apReadClient = nullptr;
-    for (auto & readClient : mReadClients)
-    {
-        if (readClient.IsFree())
-        {
-            CHIP_ERROR err;
-
-            *apReadClient = &readClient;
-            err           = readClient.Init(mpExchangeMgr, aCallback, aInteractionType);
-            if (CHIP_NO_ERROR != err)
-            {
-                *apReadClient = nullptr;
-            }
-            return err;
-        }
-    }
-    return CHIP_ERROR_NO_MEMORY;
-}
-
-uint32_t InteractionModelEngine::GetNumActiveReadClients() const
-{
-    uint32_t numActive = 0;
-
-    for (auto & readClient : mReadClients)
-    {
-        if (!readClient.IsFree())
-        {
-            numActive++;
-        }
-    }
-
-    return numActive;
 }
 
 uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
@@ -207,39 +172,6 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     }
 
     return numActive;
-}
-
-CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
-{
-    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
-
-    for (auto & readClient : mReadClients)
-    {
-        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.IsMatchingClient(aSubscriptionId))
-        {
-            readClient.Shutdown();
-            err = CHIP_NO_ERROR;
-        }
-    }
-
-    return err;
-}
-
-CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
-{
-    CHIP_ERROR err = CHIP_ERROR_KEY_NOT_FOUND;
-
-    for (ReadClient & readClient : mReadClients)
-    {
-        if (!readClient.IsFree() && readClient.IsSubscriptionType() && readClient.GetFabricIndex() == aFabricIndex &&
-            readClient.GetPeerNodeId() == aPeerNodeId)
-        {
-            readClient.Shutdown();
-            err = CHIP_NO_ERROR;
-        }
-    }
-
-    return err;
 }
 
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
@@ -392,18 +324,21 @@ CHIP_ERROR InteractionModelEngine::OnUnsolicitedReportData(Messaging::ExchangeCo
     uint64_t subscriptionId = 0;
     ReturnLogErrorOnFailure(report.GetSubscriptionId(&subscriptionId));
 
-    for (auto & readClient : mReadClients)
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
     {
-        if (!readClient.IsSubscriptionIdle())
+        if (!readClient->IsSubscriptionIdle())
         {
             continue;
         }
-        if (!readClient.IsMatchingClient(subscriptionId))
+
+        if (!readClient->IsMatchingClient(subscriptionId))
         {
             continue;
         }
-        return readClient.OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
+
+        return readClient->OnUnsolicitedReportData(apExchangeContext, std::move(aPayload));
     }
+
     return CHIP_NO_ERROR;
 }
 
@@ -462,32 +397,6 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
                     ChipLogValueExchange(ec));
 }
 
-CHIP_ERROR InteractionModelEngine::SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
-{
-    ReadClient * client = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Read, aCallback));
-    err = client->SendRequest(aReadPrepareParams);
-    if (err != CHIP_NO_ERROR)
-    {
-        client->Shutdown();
-    }
-    return err;
-}
-
-CHIP_ERROR InteractionModelEngine::SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback)
-{
-    ReadClient * client = nullptr;
-    ReturnErrorOnFailure(NewReadClient(&client, ReadClient::InteractionType::Subscribe, aCallback));
-    ReturnErrorOnFailure(client->SendRequest(aReadPrepareParams));
-    return CHIP_NO_ERROR;
-}
-
-uint16_t InteractionModelEngine::GetReadClientArrayIndex(const ReadClient * const apReadClient) const
-{
-    return static_cast<uint16_t>(apReadClient - mReadClients);
-}
-
 uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const
 {
     return static_cast<uint16_t>(apWriteClient - mWriteClients);
@@ -496,6 +405,88 @@ uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * co
 uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const
 {
     return static_cast<uint16_t>(apReadHandler - mReadHandlers);
+}
+
+void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
+{
+    ReadClient * pPrevListItem = nullptr;
+    ReadClient * pCurListItem  = mpActiveReadClientList;
+
+    while (pCurListItem)
+    {
+        pPrevListItem = pCurListItem;
+        pCurListItem  = pCurListItem->GetNextClient();
+    }
+
+    if (pPrevListItem)
+    {
+        pPrevListItem->SetNextClient(apReadClient);
+    }
+    else
+    {
+        mpActiveReadClientList = apReadClient;
+    }
+
+    apReadClient->SetNextClient(nullptr);
+}
+
+void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)
+{
+    ReadClient * pPrevListItem = nullptr;
+    ReadClient * pCurListItem  = mpActiveReadClientList;
+
+    while (pCurListItem != apReadClient)
+    {
+        pPrevListItem = pCurListItem;
+        pCurListItem  = pCurListItem->GetNextClient();
+    }
+
+    //
+    // Item must exist in this tracker list. If not, there's a bug somewhere.
+    //
+    VerifyOrDie(pCurListItem != nullptr);
+
+    if (pPrevListItem)
+    {
+        pPrevListItem->SetNextClient(apReadClient->GetNextClient());
+    }
+    else
+    {
+        mpActiveReadClientList = apReadClient->GetNextClient();
+    }
+
+    apReadClient->SetNextClient(nullptr);
+}
+
+size_t InteractionModelEngine::GetNumActiveReadClients()
+{
+    ReadClient * pListItem = mpActiveReadClientList;
+    size_t count           = 0;
+
+    while (pListItem)
+    {
+        pListItem = pListItem->GetNextClient();
+        count++;
+    }
+
+    return count;
+}
+
+bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
+{
+    ReadClient * pListItem = mpActiveReadClientList;
+
+    while (pListItem)
+    {
+        if (pListItem == apReadClient)
+        {
+            return true;
+        }
+
+        pListItem = pListItem->GetNextClient();
+    }
+
+    return false;
 }
 
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)

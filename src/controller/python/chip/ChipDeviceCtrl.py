@@ -650,12 +650,6 @@ class ChipDeviceController(object):
             raise UnknownAttribute(cluster, attribute)
         return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], False, reportInterval=(minInterval, maxInterval)))
 
-    def ZCLShutdownSubscription(self, subscriptionId: int):
-        res = self._ChipStack.Call(
-            lambda: self._dmLib.pychip_InteractionModel_ShutdownSubscription(subscriptionId))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-
     def ZCLCommandList(self):
         return self._Cluster.ListClusterCommands()
 
@@ -797,7 +791,3 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
                 c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
-
-            self._dmLib.pychip_InteractionModel_ShutdownSubscription.argtypes = [
-                c_uint64]
-            self._dmLib.pychip_InteractionModel_ShutdownSubscription.restype = c_uint32
