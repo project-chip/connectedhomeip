@@ -31,6 +31,7 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/time-util.h>
+#include <inttypes.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
@@ -61,19 +62,19 @@ DoorLockServer & DoorLockServer::Instance()
  */
 void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
-    emberAfDoorLockClusterPrintln("Door Lock cluster initialized at %d", endpointId);
+    emberAfDoorLockClusterPrintln("Door Lock cluster initialized at endpoint #%" PRIu16, endpointId);
 }
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
 {
     auto lockState = static_cast<uint8_t>(newLockState);
 
-    emberAfDoorLockClusterPrintln("Setting LockState to '%hhu'", lockState);
+    emberAfDoorLockClusterPrintln("Setting LockState to '%" PRIu8 "'", lockState);
     EmberAfStatus status = Attributes::LockState::Set(endpointId, lockState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set LockState attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set LockState attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -83,12 +84,12 @@ bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActua
 {
     auto actuatorState = static_cast<uint8_t>(newActuatorState);
 
-    emberAfDoorLockClusterPrintln("Setting ActuatorEnabled to '%hhu'", actuatorState);
+    emberAfDoorLockClusterPrintln("Setting ActuatorEnabled to '%" PRIu8 "'", actuatorState);
     EmberAfStatus status = Attributes::ActuatorEnabled::Set(endpointId, newActuatorState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set ActuatorEnabled attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set ActuatorEnabled attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -98,12 +99,12 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDo
 {
     auto doorState = static_cast<uint8_t>(newDoorState);
 
-    emberAfDoorLockClusterPrintln("Setting DoorState to '%hhu'", doorState);
+    emberAfDoorLockClusterPrintln("Setting DoorState to '%" PRIu8 "'", doorState);
     EmberAfStatus status = Attributes::DoorState::Set(endpointId, doorState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set DoorState attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set DoorState attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -118,7 +119,7 @@ bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLa
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set Language attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set Language attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -126,12 +127,12 @@ bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLa
 
 bool DoorLockServer::SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec)
 {
-    emberAfDoorLockClusterPrintln("Setting AutoRelockTime to '%u'", newAutoRelockTimeSec);
+    emberAfDoorLockClusterPrintln("Setting AutoRelockTime to '%" PRIu32 "'", newAutoRelockTimeSec);
     EmberAfStatus status = Attributes::AutoRelockTime::Set(endpointId, newAutoRelockTimeSec);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set AutoRelockTime attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set AutoRelockTime attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -139,12 +140,12 @@ bool DoorLockServer::SetAutoRelockTime(chip::EndpointId endpointId, uint32_t new
 
 bool DoorLockServer::SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoundVolume)
 {
-    emberAfDoorLockClusterPrintln("Setting SoundVolume to '%hhu'", newSoundVolume);
+    emberAfDoorLockClusterPrintln("Setting SoundVolume to '%" PRIu8 "'", newSoundVolume);
     EmberAfStatus status = Attributes::SoundVolume::Set(endpointId, newSoundVolume);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set SoundVolume attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set SoundVolume attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -154,12 +155,12 @@ bool DoorLockServer::SetOneTouchLocking(chip::EndpointId endpointId, bool isEnab
 {
     auto enable = static_cast<uint8_t>(isEnabled);
 
-    emberAfDoorLockClusterPrintln("Setting EnableOneTouchLocking to '%hhu'", enable);
+    emberAfDoorLockClusterPrintln("Setting EnableOneTouchLocking to '%" PRIu8 "'", enable);
     EmberAfStatus status = Attributes::EnableOneTouchLocking::Set(endpointId, isEnabled);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set EnableOneTouchLocking attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set EnableOneTouchLocking attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
@@ -169,12 +170,12 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
 {
     auto enable = static_cast<uint8_t>(isEnabled);
 
-    emberAfDoorLockClusterPrintln("Setting EnablePrivacyModeButton to '%hhu'", enable);
+    emberAfDoorLockClusterPrintln("Setting EnablePrivacyModeButton to '%" PRIu8 "'", enable);
     EmberAfStatus status = Attributes::EnablePrivacyModeButton::Set(endpointId, isEnabled);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
-        ChipLogError(Zcl, "Unable to set EnablePrivacyModeButton attribute: status=0x%hhx", status);
+        ChipLogError(Zcl, "Unable to set EnablePrivacyModeButton attribute: status=0x%" PRIx8, status);
     }
 
     return (EMBER_ZCL_STATUS_SUCCESS == status);
