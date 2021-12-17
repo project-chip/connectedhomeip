@@ -32,6 +32,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
@@ -55,9 +56,11 @@
 #define ONOFF_CLUSTER_ENDPOINT 1
 #define EXTENDED_DISCOVERY_TIMEOUT_SEC 20
 
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -325,12 +328,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+            // Post event for demonstration purposes
+            sAppTask.PostEvents();
+
             // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
                 if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
-                    PLAT_LOG("Enabled BLE Advertisement");
+                    PLAT_LOG("Enabled BLE Advertisements");
                 }
                 else
                 {
@@ -483,5 +489,22 @@ void AppTask::UpdateClusterState()
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
+    }
+}
+
+void AppTask::PostEvents()
+{
+    // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
+    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
+    {
+        PumpConfigurationAndControl::Events::GeneralFault::Type event;
+        EventNumber eventNumber;
+
+        ChipLogProgress(Zcl, "AppTask: Post PCC GeneralFault event");
+        // Using default priority for the event
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
+        }
     }
 }
