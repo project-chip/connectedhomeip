@@ -85,13 +85,13 @@ public:
     void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
 
-    EmberAfStatus CreateUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-                             uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
+    EmberAfStatus CreateUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, uint16_t userIndex,
+                             const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
                              const Nullable<DoorLock::DlCredentialRule> & credentialRule,
                              const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
 
-    EmberAfStatus ModifyUser(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    EmberAfStatus ModifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
                              const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
                              const Nullable<DoorLock::DlCredentialRule> & credentialRule);
@@ -132,21 +132,21 @@ private:
     bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t startIndex,
                                       uint16_t & credentialIndex);
 
-    DoorLock::DlStatus createNewCredentialAndUser(chip::app::CommandHandler * commandObj,
-                                                  const chip::app::ConcreteCommandPath & commandPath,
+    DoorLock::DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
                                                   const Nullable<DoorLock::DlUserStatus> & userStatus,
                                                   const Nullable<DoorLock::DlUserType> & userType, const DlCredential & credential,
                                                   const chip::ByteSpan & credentialData, uint16_t & createdUserIndex);
 
-    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::app::CommandHandler * commandObj,
-                                                         const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
+    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                                          const DlCredential & credential, const chip::ByteSpan & credentialData);
 
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
 
-    DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
-    DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
+    DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                           const DlCredential & credential);
+    DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                               const DlCredential & credential);
 
     bool getCredentialRange(chip::EndpointId endpointId, DoorLock::DlCredentialType type, size_t & minSize, size_t & maxSize);
 
