@@ -305,19 +305,16 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     NVIC_SystemReset();
 }
 
+#ifdef SL_WIFI
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 	sl_wfx_mac_address_t macaddr;
 	wfx_get_wifi_mac_addr (SL_WFX_STA_INTERFACE, &macaddr);
 	memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
 
 	return CHIP_NO_ERROR;
-#else
-	return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
-
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

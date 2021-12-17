@@ -35,8 +35,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
-#include <support/BitFlags.h>
-#include <core/CHIPError.h>
 
 namespace Inet {
 class IPAddress;
@@ -77,7 +75,7 @@ private:
 
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if 0//CHIP_DEVICE_CONFIG_ENABLE_THREAD
     bool _HaveServiceConnectivity(void);
 #endif
     CHIP_ERROR _Init(void);
@@ -142,12 +140,6 @@ inline bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
 #endif
 }
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
-{
-    return _HaveServiceConnectivityViaThread();
-}
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 inline bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled(void)
 {
@@ -167,6 +159,12 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectI
 inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
     return mWiFiStationState != kWiFiStationState_Connecting;
+}
+#endif
+#if 0//CHIP_DEVICE_CONFIG_ENABLE_THREAD
+inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
+{
+    return _HaveServiceConnectivityViaThread();
 }
 #endif
 
