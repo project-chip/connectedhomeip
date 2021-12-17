@@ -74,7 +74,8 @@ private:
     template <typename U = T, typename std::enable_if_t<std::is_enum<U>::value, int> = 0>
     static constexpr StorageType GetNullValue()
     {
-        return GetNullValue<std::underlying_type_t<T>>();
+        static_assert(!std::is_signed<std::underlying_type_t<T>>::value, "Enums must be unsigned");
+        return static_cast<StorageType>(std::numeric_limits<std::underlying_type_t<T>>::max());
     }
 
 public:

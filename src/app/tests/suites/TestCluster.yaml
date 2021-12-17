@@ -1745,6 +1745,18 @@ tests:
 
     # Tests for nullable UInt8 attribute
 
+    - label: "Write attribute NULLABLE_INT8U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_INT8U Max Value"
       command: "writeAttribute"
       attribute: "nullable_int8u"
@@ -1820,6 +1832,18 @@ tests:
               notValue: 129
 
     # Tests for nullable UInt16 attribute
+
+    - label: "Write attribute NULLABLE_INT16U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT16U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT16U Max Value"
       command: "writeAttribute"
@@ -1897,6 +1921,18 @@ tests:
 
     # Tests for nullable UInt32 attribute
 
+    - label: "Write attribute NULLABLE_INT32U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT32U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_INT32U Max Value"
       command: "writeAttribute"
       attribute: "nullable_int32u"
@@ -1972,6 +2008,18 @@ tests:
               notValue: 2147483648
 
     # Tests for nullable UInt64 attribute
+
+    - label: "Write attribute NULLABLE_INT64U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT64U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT64U Max Value"
       command: "writeAttribute"
@@ -2480,6 +2528,18 @@ tests:
 
     # Tests for Enum8 attribute
 
+    - label: "Write attribute NULLABLE_ENUM8 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM8 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_ENUM8 Max Value"
       command: "writeAttribute"
       attribute: "nullable_enum8"
@@ -2520,6 +2580,18 @@ tests:
 
     # Tests for Enum16 attribute
 
+    - label: "Write attribute NULLABLE_ENUM16 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM16 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_ENUM16 Max Value"
       command: "writeAttribute"
       attribute: "nullable_enum16"
@@ -2555,6 +2627,58 @@ tests:
     - label: "Read attribute NULLABLE_ENUM16 null Value"
       command: "readAttribute"
       attribute: "nullable_enum16"
+      response:
+          value: null
+
+    # Tests for named enum attribute
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
       response:
           value: null
 
