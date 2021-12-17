@@ -51,6 +51,9 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #endif
+#ifdef SL_WIFI
+#include "wfx_host_events.h"
+#endif /* SL_WIFI */
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -73,8 +76,16 @@ QueueHandle_t sAppEventQueue;
 LEDWidget sStatusLED;
 LEDWidget sLightLED;
 
-bool sIsThreadProvisioned = false;
-bool sIsThreadEnabled     = false;
+#ifdef SL_WIFI
+bool sIsWiFiProvisioned       = false;
+bool sIsWiFiEnabled           = false;
+bool sIsWiFiAttached          = false;
+#endif /* SL_WIFI */
+
+#if CHIP_ENABLE_OPENTHREAD
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+#endif /* CHIP_ENABLE_OPENTHREAD */
 bool sHaveBLEConnections  = false;
 
 EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
@@ -88,12 +99,11 @@ StaticTask_t appTaskStruct;
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
+
+inline void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 }
-} // namespace
 
 void OnTriggerIdentifyEffect(Identify * identify)
 {
@@ -142,8 +152,8 @@ Identify gIdentify = {
 
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
-    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
-    uint8_t effectVariant                                      = effect->mEffectVariant;
+    uint8_t effectId      = effect->mEffectIdentifier;
+    uint8_t effectVariant = effect->mEffectVariant;
 
     // Uses print outs until we can support the effects
     if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
@@ -294,8 +304,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         // when the CHIP task is busy (e.g. with a long crypto operation).
         if (PlatformMgr().TryLockChipStack())
         {
+#ifdef SL_WIFI
+            sIsWiFiProvisioned       = ConnectivityMgr().IsWiFiStationProvisioned();
+            sIsWiFiEnabled           = ConnectivityMgr().IsWiFiStationEnabled();
+            sIsWiFiAttached          = ConnectivityMgr().IsWiFiStationConnected();
+#endif /* SL_WIFI */
+#if CHIP_ENABLE_OPENTHREAD
             sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
             sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
+#endif /* CHIP_ENABLE_OPENTHREAD */
             sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
@@ -333,7 +350,11 @@ void AppTask::AppTaskMain(void * pvParameter)
                     sStatusLED.Blink(300, 700);
                 }
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled)
+#if CHIP_ENABLE_OPENTHREAD
+            if (sIsThreadProvisioned && sIsThreadEnabled)
+#else
+            if (sIsWiFiProvisioned && sIsWiFiEnabled && !sIsWiFiAttached)
+#endif
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -484,7 +505,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.CancelTimer();
             sAppTask.mFunction = kFunction_NoneSelected;
 
+#ifdef SL_WIFI
+            if (!ConnectivityMgr().IsWiFiStationProvisioned())
+#else
             if (!ConnectivityMgr().IsThreadProvisioned())
+#endif /* !SL_WIFI */
             {
                 // Enable BLE advertisements
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);

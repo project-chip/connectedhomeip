@@ -16,8 +16,8 @@
  */
 
 #include <platform/CHIPDeviceLayer.h>
-#include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/EFR32/EFR32Config.h>
 #include "wfx_host_events.h"

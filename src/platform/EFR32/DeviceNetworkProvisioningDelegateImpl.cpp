@@ -43,9 +43,9 @@ exit:
 #endif // CHIP_ENABLE_OPENTHREAD
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(NetworkProvisioning, "EFR Wifi provision: SSID: %s", ssid);
@@ -56,10 +56,8 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
     }
 
     return err;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 }
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip
