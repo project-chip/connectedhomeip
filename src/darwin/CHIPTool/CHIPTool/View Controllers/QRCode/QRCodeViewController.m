@@ -1075,7 +1075,6 @@
 // redirect
 - (IBAction)redirectToUrl:(id)sender
 {
-    NSLog(@"Clicked redirect...");
     [self redirectToUrl];
 }
 
@@ -1095,7 +1094,6 @@
     NSString * base64EncodedString = [self encodeStringTo64:redirectPayload];
     NSString * urlString = [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
     NSURL * url = [NSURL URLWithString:urlString];
-    NSLog(@"%@", url);
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
