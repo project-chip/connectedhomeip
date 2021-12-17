@@ -10318,7 +10318,9 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 1);
+            }
         }
 
         [expectation fulfill];
@@ -10579,7 +10581,9 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 1);
+            }
         }
 
         [expectation fulfill];
@@ -10603,7 +10607,7 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 255);
+            XCTAssertEqual([actualValue unsignedCharValue], 254);
         }
 
         [expectation fulfill];
@@ -10660,7 +10664,7 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 255);
+            XCTAssertEqual([actualValue unsignedCharValue], 254);
         }
 
         [expectation fulfill];
@@ -10741,7 +10745,7 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            XCTAssertEqual([actualValue unsignedCharValue], 1);
         }
 
         [expectation fulfill];
@@ -10846,7 +10850,7 @@ CHIPDevice * GetConnectedDevice(void)
         {
             id actualValue = value;
             if (actualValue != nil) {
-                XCTAssertNotEqual([actualValue unsignedCharValue], 255);
+                XCTAssertNotEqual([actualValue unsignedCharValue], 254);
             }
         }
 
@@ -10933,7 +10937,15 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 128);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 128);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 129);
+            }
         }
 
         [expectation fulfill];
@@ -10991,7 +11003,15 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 64);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 64);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 65);
+            }
         }
 
         [expectation fulfill];
@@ -11049,7 +11069,15 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 128);
+            if (actualValue != nil) {
+                XCTAssertGreaterThanOrEqual([actualValue unsignedCharValue], 128);
+            }
+        }
+        {
+            id actualValue = value;
+            if (actualValue != nil) {
+                XCTAssertLessThanOrEqual([actualValue unsignedCharValue], 129);
+            }
         }
 
         [expectation fulfill];

@@ -16245,7 +16245,6 @@ private:
     void OnSuccessResponse_5(uint32_t featureMap)
     {
         VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
-
         NextTest();
     }
 
@@ -16447,7 +16446,6 @@ private:
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
-
         NextTest();
     }
 
@@ -16870,7 +16868,6 @@ private:
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 1));
-
         NextTest();
     }
 
@@ -17318,7 +17315,6 @@ private:
     {
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 128));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 129));
-
         NextTest();
     }
 
@@ -17373,7 +17369,6 @@ private:
     {
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 64));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 65));
-
         NextTest();
     }
 
@@ -17428,7 +17423,6 @@ private:
     {
         VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentLevel", currentLevel, 128));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentLevel", currentLevel, 129));
-
         NextTest();
     }
 
