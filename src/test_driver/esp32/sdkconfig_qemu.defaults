@@ -44,3 +44,8 @@ CONFIG_ENABLE_WIFI_AP=n
 # Use a custom partition table
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# No watchdog - we run on the host and tests have timeouts
+# Crypto tests generally take long enough for the watchdog to trigger
+# otherwise.
+CONFIG_ESP_TASK_WDT=n
