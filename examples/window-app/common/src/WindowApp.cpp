@@ -474,6 +474,11 @@ void WindowApp::Cover::GotoLift(EventId action)
     Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
 
+    if (current.IsNull() || target.IsNull())
+    {
+        return;
+    }
+
     if (EventId::None != action)
     {
         mLiftAction = action;
@@ -558,6 +563,11 @@ void WindowApp::Cover::GotoTilt(EventId action)
     chip::app::DataModel::Nullable<chip::Percent100ths> target;
     Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
     Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+
+    if (current.IsNull() || target.IsNull())
+    {
+        return;
+    }
 
     if (EventId::None != action)
     {
