@@ -129,6 +129,9 @@ private:
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
 
+    bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t startIndex,
+                                      uint16_t & credentialIndex);
+
     DoorLock::DlStatus createNewCredentialAndUser(chip::EndpointId endpointId);
     DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId);
 
@@ -142,6 +145,8 @@ private:
 
     bool findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t credentialIndex,
                                    uint16_t & userIndex);
+
+    bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t &maxNumberOfCredentials);
 
     static DoorLockServer instance;
 };
