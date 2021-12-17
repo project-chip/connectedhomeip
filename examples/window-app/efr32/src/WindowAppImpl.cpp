@@ -327,11 +327,11 @@ void WindowAppImpl::UpdateLEDs()
         {
             mActionLED.Blink(100);
         }
-        else if (IsOpen(cover.mEndpoint))
+        else if (IsLiftOpen(cover.mEndpoint))
         {
             mActionLED.Set(true);
         }
-        else if (IsClosed(cover.mEndpoint))
+        else if (IsLiftClosed(cover.mEndpoint))
         {
             mActionLED.Set(false);
         }
