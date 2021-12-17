@@ -147,6 +147,7 @@ public:
         printf("TestBasicInformation\n");
         printf("TestIdentifyCluster\n");
         printf("TestGroupsCluster\n");
+        printf("TestGroupKeyManagementCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestGroupMessaging\n");
@@ -55619,84 +55620,52 @@ public:
             err = TestGetGroupMembership1All_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Add Group 2 (new)\n");
-            err = TestAddGroup2New_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : View Group 3 (not found)\n");
+            err = TestViewGroup3NotFound_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : View Group 2 (new)\n");
-            err = TestViewGroup2New_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : View Group 1 (existing)\n");
+            err = TestViewGroup1Existing_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : View Group 3 (not found)\n");
-            err = TestViewGroup3NotFound_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Remove Group 0 (invalid)\n");
+            err = TestRemoveGroup0Invalid_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Add Group 3 (new)\n");
-            err = TestAddGroup3New_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Remove Group 4 (not found)\n");
+            err = TestRemoveGroup4NotFound_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : View Group 1 (existing)\n");
-            err = TestViewGroup1Existing_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : View Group 1 (not removed)\n");
+            err = TestViewGroup1NotRemoved_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : View Group 2 (existing)\n");
-            err = TestViewGroup2Existing_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : View Group 2 (removed)\n");
+            err = TestViewGroup2Removed_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Get Group Membership 2\n");
-            err = TestGetGroupMembership2_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Get Group Membership 3\n");
+            err = TestGetGroupMembership3_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : View Group 3 (new)\n");
-            err = TestViewGroup3New_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Remove All\n");
+            err = TestRemoveAll_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Remove Group 0 (invalid)\n");
-            err = TestRemoveGroup0Invalid_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : View Group 1 (removed)\n");
+            err = TestViewGroup1Removed_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Remove Group 4 (not found)\n");
-            err = TestRemoveGroup4NotFound_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : View Group 2 (still removed)\n");
+            err = TestViewGroup2StillRemoved_16();
             break;
         case 17:
-            ChipLogProgress(chipTool, " ***** Test Step 17 : Remove Group 2 (existing)\n");
-            err = TestRemoveGroup2Existing_17();
+            ChipLogProgress(chipTool, " ***** Test Step 17 : View Group 3 (removed)\n");
+            err = TestViewGroup3Removed_17();
             break;
         case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : View Group 1 (not removed)\n");
-            err = TestViewGroup1NotRemoved_18();
-            break;
-        case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : View Group 2 (removed)\n");
-            err = TestViewGroup2Removed_19();
-            break;
-        case 20:
-            ChipLogProgress(chipTool, " ***** Test Step 20 : View Group 3 (not removed)\n");
-            err = TestViewGroup3NotRemoved_20();
-            break;
-        case 21:
-            ChipLogProgress(chipTool, " ***** Test Step 21 : Get Group Membership 3\n");
-            err = TestGetGroupMembership3_21();
-            break;
-        case 22:
-            ChipLogProgress(chipTool, " ***** Test Step 22 : Remove All\n");
-            err = TestRemoveAll_22();
-            break;
-        case 23:
-            ChipLogProgress(chipTool, " ***** Test Step 23 : View Group 1 (removed)\n");
-            err = TestViewGroup1Removed_23();
-            break;
-        case 24:
-            ChipLogProgress(chipTool, " ***** Test Step 24 : View Group 2 (still removed)\n");
-            err = TestViewGroup2StillRemoved_24();
-            break;
-        case 25:
-            ChipLogProgress(chipTool, " ***** Test Step 25 : View Group 3 (removed)\n");
-            err = TestViewGroup3Removed_25();
-            break;
-        case 26:
-            ChipLogProgress(chipTool, " ***** Test Step 26 : Get Group Membership 4\n");
-            err = TestGetGroupMembership4_26();
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Get Group Membership 4\n");
+            err = TestGetGroupMembership4_18();
             break;
         }
 
@@ -55709,7 +55678,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 27;
+    const uint16_t mTestCount = 19;
 
     //
     // Tests methods
@@ -55914,17 +55883,16 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestAddGroup2New_7()
+    CHIP_ERROR TestViewGroup3NotFound_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId   = 4369U;
-        request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
+        request.groupId = 32767U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -55937,22 +55905,22 @@ private:
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_7(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("status", status, 139));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup2New_8()
+    CHIP_ERROR TestViewGroup1Existing_8()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4369U;
+        request.groupId = 1U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_8(data.status, data.groupId, data.groupName);
@@ -55972,23 +55940,23 @@ private:
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
 
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #2", 8)));
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup3NotFound_9()
+    CHIP_ERROR TestRemoveGroup0Invalid_9()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
 
         RequestType request;
-        request.groupId = 32767U;
+        request.groupId = 0U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -56001,23 +55969,22 @@ private:
 
     void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_9(uint8_t status, uint16_t groupId)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("status", status, 135));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestAddGroup3New_10()
+    CHIP_ERROR TestRemoveGroup4NotFound_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
 
         RequestType request;
-        request.groupId   = 32767U;
-        request.groupName = chip::Span<const char>("Group #3garbage: not in length on purpose", 8);
+        request.groupId = 4U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_10(data.status, data.groupId);
@@ -56035,14 +56002,14 @@ private:
 
     void OnSuccessResponse_10(uint8_t status, uint16_t groupId)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("status", status, 139));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 4U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup1Existing_11()
+    CHIP_ERROR TestViewGroup1NotRemoved_11()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
@@ -56075,7 +56042,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup2Existing_12()
+    CHIP_ERROR TestViewGroup2Removed_12()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
@@ -56099,26 +56066,25 @@ private:
 
     void OnSuccessResponse_12(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("status", status, 139));
 
         VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #2", 8)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestGetGroupMembership2_13()
+    CHIP_ERROR TestGetGroupMembership3_13()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
 
-        uint16_t groupListList[3];
-        groupListList[0]  = 2U;
-        groupListList[1]  = 3U;
-        groupListList[2]  = 32767U;
+        uint16_t groupListList[4];
+        groupListList[0]  = 1U;
+        groupListList[1]  = 2U;
+        groupListList[2]  = 4369U;
+        groupListList[3]  = 3U;
         request.groupList = groupListList;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -56141,22 +56107,21 @@ private:
 
         auto iter = groupList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
-        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 32767U));
+        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 1U));
         VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup3New_14()
+    CHIP_ERROR TestRemoveAll_14()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
 
         RequestType request;
-        request.groupId = 32767U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_14(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_14();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -56169,27 +56134,18 @@ private:
 
     void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_14(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
+    void OnSuccessResponse_14() { NextTest(); }
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #3", 8)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestRemoveGroup0Invalid_15()
+    CHIP_ERROR TestViewGroup1Removed_15()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 0U;
+        request.groupId = 1U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_15(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_15(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -56202,25 +56158,25 @@ private:
 
     void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_15(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_15(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, 139));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 0U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRemoveGroup4NotFound_16()
+    CHIP_ERROR TestViewGroup2StillRemoved_16()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4U;
+        request.groupId = 4369U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_16(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_16(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -56233,25 +56189,25 @@ private:
 
     void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_16(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_16(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRemoveGroup2Existing_17()
+    CHIP_ERROR TestViewGroup3Removed_17()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4369U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_17(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_17(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -56264,260 +56220,7 @@ private:
 
     void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_17(uint8_t status, uint16_t groupId)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestViewGroup1NotRemoved_18()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_18(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_18(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_18(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestViewGroup2Removed_19()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 4369U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_19(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_19(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_19(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 139));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestViewGroup3NotRemoved_20()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 32767U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_20(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_20(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_20(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 0));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #3", 8)));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestGetGroupMembership3_21()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
-
-        RequestType request;
-
-        uint16_t groupListList[4];
-        groupListList[0]  = 1U;
-        groupListList[1]  = 2U;
-        groupListList[2]  = 4369U;
-        groupListList[3]  = 3U;
-        request.groupList = groupListList;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_21(data.capacity, data.groupList);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_21(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_21(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
-    {
-        VerifyOrReturn(CheckValue("capacity", capacity, 255));
-
-        auto iter = groupList.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
-        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 1U));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 1));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestRemoveAll_22()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_22();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_22(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_22(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_22() { NextTest(); }
-
-    CHIP_ERROR TestViewGroup1Removed_23()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 1U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_23(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_23(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_23(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_23(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 139));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestViewGroup2StillRemoved_24()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 4369U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_24(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_24(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_24(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_24(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
-    {
-        VerifyOrReturn(CheckValue("status", status, 139));
-
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestViewGroup3Removed_25()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
-
-        RequestType request;
-        request.groupId = 32767U;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_25(data.status, data.groupId, data.groupName);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_25(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_25(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_25(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_17(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
@@ -56526,7 +56229,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestGetGroupMembership4_26()
+    CHIP_ERROR TestGetGroupMembership4_18()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
@@ -56542,25 +56245,153 @@ private:
         request.groupList = groupListList;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_26(data.capacity, data.groupList);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_18(data.capacity, data.groupList);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_26(status);
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_18(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_26(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_26(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    void OnSuccessResponse_18(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
     {
         VerifyOrReturn(CheckValue("capacity", capacity, 255));
 
         auto iter = groupList.begin();
         VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 0));
+
+        NextTest();
+    }
+};
+
+class TestGroupKeyManagementCluster : public TestCommand
+{
+public:
+    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupKeyManagementCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupKeyManagementCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read maxGroupsPerFabric\n");
+            err = TestReadMaxGroupsPerFabric_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read maxGroupKeysPerFabric\n");
+            err = TestReadMaxGroupKeysPerFabric_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t maxGroupsPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1(maxGroupsPerFabric);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint16_t maxGroupKeysPerFabric)
+    {
+        (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_2(maxGroupKeysPerFabric);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadMaxGroupsPerFabric_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t maxGroupsPerFabric)
+    {
+        VerifyOrReturn(CheckValue("maxGroupsPerFabric", maxGroupsPerFabric, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadMaxGroupKeysPerFabric_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::GroupKeyManagementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t maxGroupKeysPerFabric)
+    {
+        VerifyOrReturn(CheckValue("maxGroupKeysPerFabric", maxGroupKeysPerFabric, 1U));
 
         NextTest();
     }
@@ -57898,6 +57729,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
         make_unique<TestGroupsCluster>(),
+        make_unique<TestGroupKeyManagementCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),
