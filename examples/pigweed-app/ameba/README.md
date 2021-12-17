@@ -45,8 +45,8 @@ following features are available:
 
           $ ./scripts/build/build_examples.py --target ameba-amebad-pigweed build
 
-    The output image files are stored in
-    `out/ameba-amebad-pigweed/asdk/image` folder.
+    The output image files are stored in `out/ameba-amebad-pigweed/asdk/image`
+    folder.
 
     The bootloader image files are stored in
     `out/ameba-amebad-pigweed/asdk/bootloader` folder.
@@ -69,9 +69,11 @@ Connect a USB-TTL Adapter as shown below
           A18           RX
           GND           GND
 
-Build the [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
+Build the
+[chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-Input `ATS$` command, then launch the chip-rpc console, where the Echo RPC commands can be invoked
+Input `ATS$` command, then launch the chip-rpc console, where the Echo RPC
+commands can be invoked
 
         python -m pw_hdlc.rpc_console --device /dev/tty<USB-TTL port> -b 115200
 
