@@ -117,24 +117,28 @@ to be On or Off.
 
 ## Running RPC Console
 
-- Connect a USB-TTL Adapter as shown below
+-   Connect a USB-TTL Adapter as shown below
 
-          Ameba         USB-TTL
-          A19           TX
-          A18           RX
-          GND           GND
+            Ameba         USB-TTL
+            A19           TX
+            A18           RX
+            GND           GND
 
-- Build the [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
+-   Build the
+    [chip-rpc console](https://github.com/project-chip/connectedhomeip/tree/master/examples/common/pigweed/rpc_console)
 
-- As part of building the example with RPCs enabled the chip_rpc python interactive console is installed into your venv. The python wheel files are also created in the output folder: out/debug/chip_rpc_console_wheels. To install the wheel files without rebuilding:
+-   As part of building the example with RPCs enabled the chip_rpc python
+    interactive console is installed into your venv. The python wheel files are
+    also created in the output folder: out/debug/chip_rpc_console_wheels. To
+    install the wheel files without rebuilding:
 
-          $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
+            $ pip3 install out/debug/chip_rpc_console_wheels/*.whl
 
-- Launch the chip-rpc console after inputting `ATS$` command
+-   Launch the chip-rpc console after inputting `ATS$` command
 
-          $ python3 -m chip_rpc.console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
+            $ python3 -m chip_rpc.console --device /dev/tty<port connected to USB-TTL adapter> -b 115200
 
-- Get and Set lighting directly using the RPC console
+-   Get and Set lighting directly using the RPC console
 
-          rpcs.chip.rpc.Lighting.Get()
-          rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
+            rpcs.chip.rpc.Lighting.Get()
+            rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))
