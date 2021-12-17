@@ -132,21 +132,32 @@ private:
     bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t startIndex,
                                       uint16_t & credentialIndex);
 
-    DoorLock::DlStatus createNewCredentialAndUser(chip::EndpointId endpointId);
-    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId);
+    DoorLock::DlStatus createNewCredentialAndUser(chip::app::CommandHandler * commandObj,
+                                                  const chip::app::ConcreteCommandPath & commandPath,
+                                                  const Nullable<DoorLock::DlUserStatus> & userStatus,
+                                                  const Nullable<DoorLock::DlUserType> & userType, const DlCredential & credential,
+                                                  const chip::ByteSpan & credentialData, uint16_t & createdUserIndex);
 
-    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status,
-                                         const Nullable<uint16_t> & userIndex, const Nullable<uint16_t> & nextCredentialIndex);
+    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::app::CommandHandler * commandObj,
+                                                         const chip::app::ConcreteCommandPath & commandPath, uint16_t userIndex,
+                                                         const DlCredential & credential, const chip::ByteSpan & credentialData);
+
+    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status, uint16_t userIndex,
+                                         uint16_t nextCredentialIndex);
 
     DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
     DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, uint16_t userIndex, const DlCredential & credential);
 
+    bool getCredentialRange(chip::EndpointId endpointId, DoorLock::DlCredentialType type, size_t & minSize, size_t & maxSize);
+
+    // TODO: Maybe use CHIP_APPLICATION_ERROR instead of boolean here?
     bool credentialTypeSupported(chip::EndpointId endpointId, DoorLock::DlCredentialType type);
 
     bool findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t credentialIndex,
                                    uint16_t & userIndex);
 
-    bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t &maxNumberOfCredentials);
+    bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+                                   uint16_t & maxNumberOfCredentials);
 
     static DoorLockServer instance;
 };
