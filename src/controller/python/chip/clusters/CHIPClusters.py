@@ -2060,19 +2060,64 @@ class ChipClusters:
             "clusterName": "GroupKeyManagement",
             "clusterId": 0x0000003F,
             "commands": {
+            0x00000001: {
+                    "commandId": 0x00000001,
+                    "commandName": "KeySetRead",
+                    "args": {
+                        "groupKeySetID": "int",
+                    },
+                },
+            0x00000004: {
+                    "commandId": 0x00000004,
+                    "commandName": "KeySetReadAllIndices",
+                    "args": {
+                        "groupKeySetIDs": "int",
+                    },
+                },
+            0x00000003: {
+                    "commandId": 0x00000003,
+                    "commandName": "KeySetRemove",
+                    "args": {
+                        "groupKeySetID": "int",
+                    },
+                },
+            0x00000000: {
+                    "commandId": 0x00000000,
+                    "commandName": "KeySetWrite",
+                    "args": {
+                        "groupKeySetID": "int",
+                        "securityPolicy": "int",
+                        "epochKey0": "bytes",
+                        "epochStartTime0": "int",
+                        "epochKey1": "bytes",
+                        "epochStartTime1": "int",
+                        "epochKey2": "bytes",
+                        "epochStartTime2": "int",
+                    },
+                },
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "Groups",
+                    "attributeName": "GroupKeyMap",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "GroupKeys",
+                    "attributeName": "GroupTable",
                     "attributeId": 0x00000001,
                     "type": "",
                     "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "MaxGroupsPerFabric",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
+                0x00000003: {
+                    "attributeName": "MaxGroupKeysPerFabric",
+                    "attributeId": 0x00000003,
+                    "type": "int",
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
@@ -5199,6 +5244,7 @@ class ChipClusters:
                     "attributeName": "LabelList",
                     "attributeId": 0x00000000,
                     "type": "",
+                    "writable": True,
                 },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",

@@ -104,7 +104,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     DiscoveryFilter filter;
 
     // Long tests
-    filter.type = DiscoveryFilterType::kLong;
+    filter.type = DiscoveryFilterType::kLongDiscriminator;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_L3") == 0);
@@ -117,7 +117,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
 
     // Short tests
-    filter.type = DiscoveryFilterType::kShort;
+    filter.type = DiscoveryFilterType::kShortDiscriminator;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_S3") == 0);
@@ -130,7 +130,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) != CHIP_NO_ERROR);
 
     // Vendor tests
-    filter.type = DiscoveryFilterType::kVendor;
+    filter.type = DiscoveryFilterType::kVendorId;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_V3") == 0);
@@ -147,7 +147,7 @@ void TestMakeServiceNameSubtype(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T3") == 0);
     // TODO: Add tests for longer device types once spec issue #3226 is closed.
 
-    // Commisioning mode tests
+    // Commissioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
     NL_TEST_ASSERT(inSuite, MakeServiceSubtype(buffer, sizeof(buffer), filter) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_CM") == 0);
@@ -178,7 +178,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
     DiscoveryFilter filter;
 
     // Long tests
-    filter.type = DiscoveryFilterType::kLong;
+    filter.type = DiscoveryFilterType::kLongDiscriminator;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
@@ -194,7 +194,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
 
     // Short tests
-    filter.type = DiscoveryFilterType::kShort;
+    filter.type = DiscoveryFilterType::kShortDiscriminator;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
@@ -210,7 +210,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) != CHIP_NO_ERROR);
 
     // Vendor tests
-    filter.type = DiscoveryFilterType::kVendor;
+    filter.type = DiscoveryFilterType::kVendorId;
     filter.code = 3;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
@@ -232,7 +232,7 @@ void TestMakeServiceTypeName(nlTestSuite * inSuite, void * inContext)
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, strcmp(buffer, "_T3._sub._matterc") == 0);
 
-    // Commisioning mode tests
+    // Commissioning mode tests
     filter.type = DiscoveryFilterType::kCommissioningMode;
     NL_TEST_ASSERT(inSuite,
                    MakeServiceTypeName(buffer, sizeof(buffer), filter, DiscoveryType::kCommissionableNode) == CHIP_NO_ERROR);

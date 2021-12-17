@@ -104,6 +104,12 @@ private:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
     {

@@ -37,6 +37,7 @@
 #include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
+#include <inet/InetError.h>
 
 #include "inet/IANAConstants.h"
 
@@ -512,8 +513,11 @@ public:
     /**
      * Get the IP address from a SockAddr.
      */
-    static IPAddress FromSockAddr(const SockAddr & sockaddr);
-    static IPAddress FromSockAddr(const sockaddr & sockaddr) { return FromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr)); }
+    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const sockaddr & sockaddr, IPAddress & outIPAddress)
+    {
+        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
+    }
     static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
 #if INET_CONFIG_ENABLE_IPV4
     static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }

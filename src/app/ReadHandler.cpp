@@ -51,16 +51,17 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mLastScheduledEventNumber  = 0;
     mIsPrimingReports          = true;
     MoveToState(HandlerState::Initialized);
-    mpDelegate          = apDelegate;
-    mSubscriptionId     = 0;
-    mHoldReport         = false;
-    mDirty              = false;
-    mActiveSubscription = false;
-    mIsChunkedReport    = false;
-    mInteractionType    = aInteractionType;
-    mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mSubjectDescriptor  = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
-    mHoldSync           = false;
+    mpDelegate              = apDelegate;
+    mSubscriptionId         = 0;
+    mHoldReport             = false;
+    mDirty                  = false;
+    mActiveSubscription     = false;
+    mIsChunkedReport        = false;
+    mInteractionType        = aInteractionType;
+    mInitiatorNodeId        = apExchangeContext->GetSessionHandle().GetPeerNodeId();
+    mSubjectDescriptor      = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
+    mHoldSync               = false;
+    mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -115,6 +116,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mIsChunkedReport           = false;
     mInitiatorNodeId           = kUndefinedNodeId;
     mHoldSync                  = false;
+    mLastWrittenEventsBytes    = 0;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
@@ -530,7 +532,7 @@ bool ReadHandler::CheckEventClean(EventManagement & aEventManager)
         if ((lastEventNumber != 0) && (mEventMin <= lastEventNumber))
         {
             // We have more events. snapshot last event number
-            aEventManager.SetScheduledEventNumber(mLastScheduledEventNumber);
+            aEventManager.SetScheduledEventInfo(mLastScheduledEventNumber, mLastWrittenEventsBytes);
             return false;
         }
     }

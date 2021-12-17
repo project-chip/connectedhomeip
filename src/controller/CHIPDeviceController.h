@@ -200,7 +200,7 @@ public:
      *  grab the CHIP stack lock.
      *
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
-     *  ensure this happend before calling this method.
+     *  ensure this happened before calling this method.
      */
     virtual CHIP_ERROR Shutdown();
 
@@ -221,7 +221,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(mFabricInfo, deviceId, onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
     /**
@@ -375,7 +375,7 @@ protected:
     ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
@@ -398,6 +398,8 @@ private:
     static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
+
+    PeerId GetPeerIdWithCommissioningWindowOpen() { return mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen); }
 
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
@@ -682,7 +684,7 @@ private:
     void OnSessionEstablishmentTimeout();
 
     //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
@@ -695,22 +697,22 @@ private:
      */
     CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
     /* This function sends the operational credentials to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
                                           const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
        */
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 
@@ -745,7 +747,7 @@ private:
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac);
@@ -777,7 +779,7 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-    CommissioneeDeviceProxy * FindCommissioneeDevice(SessionHandle session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 

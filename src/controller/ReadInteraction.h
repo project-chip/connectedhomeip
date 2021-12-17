@@ -30,7 +30,10 @@ namespace detail {
 template <typename DecodableAttributeType>
 struct ReportAttributeParams : public app::ReadPrepareParams
 {
-    ReportAttributeParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportAttributeParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle)
+    {
+        mKeepSubscriptions = false;
+    }
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
@@ -84,7 +87,7 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
  * basis, we have a helper that's just templated on the type.
  */
 template <typename DecodableAttributeType>
-CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                          ClusterId clusterId, AttributeId attributeId,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb)
@@ -106,7 +109,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const Session
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR
-ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
 {
@@ -117,7 +120,7 @@ ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sess
 
 // Helper for SubscribeAttribute to reduce the amount of code generated.
 template <typename DecodableAttributeType>
-CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                               ClusterId clusterId, AttributeId attributeId,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
@@ -142,7 +145,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR SubscribeAttribute(
-    Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+    Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onReportCb,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
     uint16_t aMinIntervalFloorSeconds, uint16_t aMaxIntervalCeilingSeconds,
@@ -159,7 +162,7 @@ namespace detail {
 template <typename DecodableEventType>
 struct ReportEventParams : public app::ReadPrepareParams
 {
-    ReportEventParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportEventParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
@@ -220,7 +223,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
  * GetEventId() methods is expected to work.
  */
 template <typename DecodableEventType>
-CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                      typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb)
 {
@@ -235,7 +238,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
  * similarly to ReadEvent but keeps reporting events as they are emitted.
  */
 template <typename DecodableEventType>
-CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                           typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onReportCb,
                           typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
                           uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,

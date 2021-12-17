@@ -85,7 +85,7 @@
  *
  *  @brief
  *    This is amount of time, in milliseconds, which a BLE end point will wait for an unsubscribe operation to complete
- *    before it automatically releases its BLE connection and frees itself. The default value of 5 seconds is arbitary.
+ *    before it automatically releases its BLE connection and frees itself. The default value of 5 seconds is arbitrary.
  *
  */
 #define BLE_UNSUBSCRIBE_TIMEOUT_MS                            5000 // 5 seconds

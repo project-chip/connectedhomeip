@@ -342,7 +342,6 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(app::CommandHandler * commandOb
 #ifdef EMBER_AF_PLUGIN_SCENES
     {
         GroupDataProvider::EndpointIterator * iter = provider->IterateEndpoints(fabricIndex);
-        ;
         GroupDataProvider::GroupEndpoint mapping;
 
         VerifyOrExit(nullptr != iter, status = EMBER_ZCL_STATUS_FAILURE);

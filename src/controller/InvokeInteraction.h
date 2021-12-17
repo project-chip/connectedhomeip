@@ -44,7 +44,7 @@ namespace Controller {
  */
 template <typename RequestObjectT>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
@@ -78,8 +78,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle se
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
 
     //
-    // We've effectively transfered ownership of the above allocated objects to CommandSender, and we need to wait for it to call us
-    // back when processing is completed (through OnDone) to eventually free up resources.
+    // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
+    // us back when processing is completed (through OnDone) to eventually free up resources.
     //
     // So signal that by releasing the smart pointer.
     //
@@ -91,7 +91,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle se
 
 template <typename RequestObjectT>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
@@ -103,7 +103,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle ses
 
 template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)

@@ -176,7 +176,7 @@ CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, a
 
 /*
  * This validates all the various corner cases encountered during chunking by
- * artifically reducing the size of a packet buffer used to encode attribute data
+ * artificially reducing the size of a packet buffer used to encode attribute data
  * to force chunking to happen over multiple packets even with a small number of attributes
  * and then slowly increasing the available size by 1 byte in each test iteration and re-running
  * the report generation logic. This 1-byte incremental approach sweeps through from a base scenario of

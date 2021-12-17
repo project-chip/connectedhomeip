@@ -39,6 +39,7 @@ public:
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
+    using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
     CHIPCommand(const char * commandName) : Command(commandName)
@@ -84,7 +85,7 @@ protected:
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
-    // The default commissioner instance name is "alpha", but it can be overriden by passing
+    // The default commissioner instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 

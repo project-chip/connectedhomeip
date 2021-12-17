@@ -669,8 +669,6 @@ struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistent
 // General
 //
 
-constexpr uint16_t GroupDataProvider::kMaxGroupsPerFabric;
-constexpr uint16_t GroupDataProvider::kMaxGroupKeysPerFabric;
 constexpr size_t GroupDataProvider::GroupInfo::kGroupNameMax;
 constexpr size_t GroupDataProviderImpl::kIteratorsMax;
 
@@ -781,6 +779,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupInfoAt(chip::FabricIndex fabric_index,
 
     // Insert last
     VerifyOrReturnError(fabric.group_count == index, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabric.group_count < mMaxGroupsPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     group.group_id = info.group_id;
     group.next     = 0;
@@ -1227,6 +1226,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupKeyAt(chip::FabricIndex fabric_index, 
 
     // Insert last
     VerifyOrReturnError(fabric.map_count == index, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(fabric.map_count < mMaxGroupKeysPerFabric, CHIP_ERROR_INVALID_LIST_LENGTH);
 
     map.next = 0;
     ReturnErrorOnFailure(map.Save(mStorage));
@@ -1294,6 +1294,31 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeyAt(chip::FabricIndex fabric_inde
         fabric.map_count--;
     }
     // Update fabric
+    return fabric.Save(mStorage);
+}
+
+CHIP_ERROR GroupDataProviderImpl::RemoveGroupKeys(chip::FabricIndex fabric_index)
+{
+    VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
+
+    FabricData fabric(fabric_index);
+    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
+
+    size_t count = 0;
+    KeyMapData map(fabric_index, fabric.first_map);
+    while (count++ < fabric.map_count)
+    {
+        if (CHIP_NO_ERROR != map.Load(mStorage))
+        {
+            break;
+        }
+        map.Delete(mStorage);
+        map.id = map.next;
+    }
+
+    // Update fabric
+    fabric.first_map = 0;
+    fabric.map_count = 0;
     return fabric.Save(mStorage);
 }
 

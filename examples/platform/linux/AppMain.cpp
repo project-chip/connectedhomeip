@@ -401,7 +401,7 @@ void ChipLinuxAppMainLoop()
     uint16_t securePort   = CHIP_PORT;
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
     securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;

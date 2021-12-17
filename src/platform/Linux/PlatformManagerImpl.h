@@ -67,6 +67,8 @@ private:
     CHIP_ERROR _Shutdown();
     CHIP_ERROR _GetFixedLabelList(EndpointId endpoint,
                                   LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 

@@ -130,7 +130,6 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     char intName[chip::Inet::InterfaceId::kMaxIfNameLength];
     InterfaceId intId;
     IPAddress addr;
-    IPPrefix addrWithPrefix;
     InterfaceType intType;
     // 64 bit IEEE MAC address
     const uint8_t kMaxHardwareAddressSize = 8;
@@ -209,8 +208,9 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     printf("    Addresses:\n");
     for (; addrIterator.HasCurrent(); addrIterator.Next())
     {
-        addr = addrIterator.GetAddress();
-        addrIterator.GetAddressWithPrefix(addrWithPrefix);
+        err = addrIterator.GetAddress(addr);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        IPPrefix addrWithPrefix(addr, addrIterator.GetPrefixLength());
         char addrStr[80];
         addrWithPrefix.IPAddr.ToString(addrStr);
         intId = addrIterator.GetInterfaceId();
@@ -231,8 +231,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
                addrIterator.HasBroadcastAddress() ? "has" : "no");
     }
     NL_TEST_ASSERT(inSuite, !addrIterator.Next());
-    addrIterator.GetAddressWithPrefix(addrWithPrefix);
-    NL_TEST_ASSERT(inSuite, addrWithPrefix.IsZero());
+    NL_TEST_ASSERT(inSuite, addrIterator.GetAddress(addr) == CHIP_ERROR_SENTINEL);
     NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceId() == InterfaceId::Null());
     NL_TEST_ASSERT(inSuite, addrIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, !addrIterator.SupportsMulticast());

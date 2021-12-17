@@ -1330,7 +1330,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used.
  *          So most headers will be considerably smaller than this.
@@ -2723,21 +2723,12 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
- *
- * @brief Defines the max number of SessionCreationDelegates
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
-#endif
-
-/**
  * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
  *
  * @brief Defines the max number of SessionReleaseDelegate
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 4
 #endif
 
 /**
@@ -2746,7 +2737,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @brief Defines the max number of SessionRecoveryDelegate
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
 #endif
 
 /**
@@ -2758,6 +2749,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
 #define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
 #endif
+
+/**
+ * @def CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+ *
+ * @brief The number of bytes written to the event logging system that
+ *   will trigger Report Delivery.
+ *
+ * The configuration captures the number of bytes written to the event
+ * logging subsystem needed to trigger a report. For example, if an application wants to offload all DEBUG events
+ * reliably, the threshold should be set to less than the size of the
+ * DEBUG buffer (plus a slop factor to account for events generated
+ * during the scheduling and event offload).  Similarly, if the
+ * application does not want to drop INFO events, the threshold should
+ * be set to the sum of DEBUG and INFO buffers (with the same
+ * correction).
+ *
+ */
+#ifndef CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+#define CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD 512
+#endif /* CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD */
 
 /**
  * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT

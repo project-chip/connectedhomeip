@@ -41,7 +41,7 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(const SessionHandle & session, uint16_t exchangeId, bool isInitiator,
                                                 ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
                                                 Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
 {

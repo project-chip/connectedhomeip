@@ -445,8 +445,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestGroupKeyManagement : CHIPGroupKeyManagement
 
-- (void)writeAttributeGroupsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeGroupKeysWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxGroupsPerFabricWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeMaxGroupKeysPerFabricWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
@@ -1000,7 +1003,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestUserLabel : CHIPUserLabel
 
-- (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

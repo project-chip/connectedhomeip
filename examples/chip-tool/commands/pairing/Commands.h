@@ -54,7 +54,7 @@ class PairOnNetworkShort : public PairingCommand
 public:
     PairOnNetworkShort() :
         PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Dnssd::DiscoveryFilterType::kShort)
+                       chip::Dnssd::DiscoveryFilterType::kShortDiscriminator)
     {}
 };
 
@@ -62,7 +62,8 @@ class PairOnNetworkLong : public PairingCommand
 {
 public:
     PairOnNetworkLong() :
-        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, chip::Dnssd::DiscoveryFilterType::kLong)
+        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None,
+                       chip::Dnssd::DiscoveryFilterType::kLongDiscriminator)
     {}
 };
 
@@ -71,7 +72,7 @@ class PairOnNetworkVendor : public PairingCommand
 public:
     PairOnNetworkVendor() :
         PairingCommand("onnetwork-vendor", PairingMode::OnNetwork, PairingNetworkType::None,
-                       chip::Dnssd::DiscoveryFilterType::kVendor)
+                       chip::Dnssd::DiscoveryFilterType::kVendorId)
     {}
 };
 

@@ -33,8 +33,9 @@ tests:
       groupId: "1234"
       arguments:
           value: "us"
-
+    #Disabled due to issue-12983
     - label: "Read back Attribute"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
@@ -46,8 +47,9 @@ tests:
       groupId: "1234"
       arguments:
           value: ""
-
+    #Disabled due to issue-12983
     - label: "Read back Attribute"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:

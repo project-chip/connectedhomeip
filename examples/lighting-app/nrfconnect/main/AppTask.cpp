@@ -23,27 +23,33 @@
 #include "LEDWidget.h"
 #include "LightingManager.h"
 #include "ThreadUtil.h"
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
 #include <lib/support/ErrorStr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#endif
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
 #include <zephyr.h>
 
 LOG_MODULE_DECLARE(app);
+
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
 
 namespace {
 
@@ -65,10 +71,20 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
 
-} // namespace
+#if CONFIG_CHIP_OTA_REQUESTOR
+class DummyOTARequestorDriver : public chip::OTARequestorDriver
+{
+    bool CheckImageDownloadAllowed() override { return true; }
+    chip::UserConsentAction RequestUserConsent() override { return chip::ImmediateYes; }
+    void ImageDownloadComplete() override {}
+} sOTARequestorDriver;
 
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
+OTAImageProcessorImpl sOTAImageProcessor;
+chip::BDXDownloader sBDXDownloader;
+chip::OTARequestor sOTARequestor;
+#endif
+
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -119,7 +135,20 @@ int AppTask::Init()
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
 
+    InitOTARequestor();
+
     return 0;
+}
+
+void AppTask::InitOTARequestor()
+{
+#if CONFIG_CHIP_OTA_REQUESTOR
+    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
+    sOTARequestor.SetOtaRequestorDriver(&sOTARequestorDriver);
+    sOTARequestor.SetBDXDownloader(&sBDXDownloader);
+    sOTARequestor.SetServerInstance(&chip::Server::GetInstance());
+    chip::SetRequestorInstance(&sOTARequestor);
+#endif
 }
 
 int AppTask::StartApp()

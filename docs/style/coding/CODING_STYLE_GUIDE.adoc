@@ -273,7 +273,7 @@ Heap-based resource allocation should be avoided.
 As emphasized throughout this document, the software produced by Project
 CHIP is consumed both inside and outside Project CHIP, across a variety
 of platforms. The capabilities of these platforms are broad, spanning
-soft real-time, deeply-embedded systems based on based on RTOSes that
+soft real-time, deeply-embedded systems based on RTOSes that
 may cover life safety and/or physical security applications to richer,
 softly-embedded systems based on non-RTOS platforms such as Darwin or
 Linux. While the latter are apt to have fully-functional heaps, the

@@ -427,7 +427,7 @@ uint8_t ColorControlServer::addHue(uint8_t hue1, uint8_t hue2)
 }
 
 /**
- * @brief Return difference betwen two hues.
+ * @brief Return difference between two hues.
  *
  * @param hue1
  * @param hue2
@@ -2065,7 +2065,7 @@ void ColorControlServer::startUpColorTempCommand(EndpointId endpoint)
     // the StartUpColorTemperatureMireds attribute are listed in the table below.
     // Value                Action on power up
     // 0x0000-0xffef        Set the ColorTemperatureMireds attribute to this value.
-    // 0xffff               Set the ColorTemperatureMireds attribue to its previous value.
+    // 0xffff               Set the ColorTemperatureMireds attribute to its previous value.
 
     // Initialize startUpColorTempMireds to "maintain previous value" value 0xFFFF
     uint16_t startUpColorTemp = 0xFFFF;

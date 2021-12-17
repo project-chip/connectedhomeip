@@ -946,8 +946,8 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                 if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
                     strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
                 {
-                    chip::Inet::IPAddress addr = it.GetAddress();
-                    if (addr.IsIPv4())
+                    chip::Inet::IPAddress addr;
+                    if ((it.GetAddress(addr) == CHIP_NO_ERROR) && addr.IsIPv4())
                     {
                         ChipDeviceEvent event;
                         event.Type                            = DeviceEventType::kInternetConnectivityChange;

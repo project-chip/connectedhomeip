@@ -136,6 +136,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/identify-server/identify-server.cpp
                ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
+               ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
 )
 

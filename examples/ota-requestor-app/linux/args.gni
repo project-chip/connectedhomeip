@@ -15,3 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/config/standalone/args.gni")
+
+declare_args() {
+  chip_enable_ota_requestor = true
+}

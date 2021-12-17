@@ -86,7 +86,7 @@ CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj
     return commandObj->SendCommandRequest(mSecureSession.Get());
 }
 
-void CommissioneeDeviceProxy::OnSessionReleased(SessionHandle session)
+void CommissioneeDeviceProxy::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));

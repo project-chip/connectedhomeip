@@ -432,16 +432,24 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
-    {
-        mRunScheduled = true;
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->ScheduleWork(Run,
-                                                                                                                             this);
-    }
-    else
+    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    SessionManager * sessionManager = exchangeManager->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
+    mRunScheduled = true;
+    return CHIP_NO_ERROR;
 }
 
 void Engine::Run()
@@ -560,10 +568,45 @@ void Engine::OnReportConfirm()
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
 
+void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
+        uint32_t initialWrittenEventsBytes = handler.GetLastWrittenEventsBytes();
+        if (initialWrittenEventsBytes < aMinLogPosition)
+        {
+            aMinLogPosition = initialWrittenEventsBytes;
+        }
+    }
+}
+
+CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
+{
+    uint32_t minEventLogPosition = aBytesWritten;
+    GetMinEventLogPosition(minEventLogPosition);
+    if (aBytesWritten - minEventLogPosition > CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD)
+    {
+        ChipLogProgress(DataManagement, "<RE> Buffer overfilled CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD %d, schedule engine run",
+                        CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD);
+        return ScheduleRun();
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
 {
     for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
     {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
         for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
         {
             if (clusterInfo->IsEventPathSupersetOf(aPath))
@@ -571,10 +614,24 @@ CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
                 ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
                                 InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
                 handler.UnblockUrgentEventDelivery();
+                break;
             }
         }
     }
     return ScheduleRun();
+}
+
+CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten)
+{
+    if (aUrgent != EventOptions::Type::kUrgent)
+    {
+        return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    }
+    else
+    {
+        return ScheduleUrgentEventDelivery(aPath);
+    }
+    return CHIP_NO_ERROR;
 }
 
 }; // namespace reporting

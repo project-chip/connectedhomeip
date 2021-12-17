@@ -1841,18 +1841,36 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
-- (void)readAttributeGroupsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeGroupsWithMinInterval:(uint16_t)minInterval
-                                    maxInterval:(uint16_t)maxInterval
-                        subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                  reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)keySetReadWithParams:(CHIPGroupKeyManagementClusterKeySetReadParams *)params
+           completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler;
+- (void)keySetReadAllIndicesWithParams:(CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+                     completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler;
+- (void)keySetRemoveWithParams:(CHIPGroupKeyManagementClusterKeySetRemoveParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
+- (void)keySetWriteWithParams:(CHIPGroupKeyManagementClusterKeySetWriteParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeGroupKeysWithCompletionHandler:(void (^)(
-                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeGroupKeysWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
-                           subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                     reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+- (void)readAttributeGroupKeyMapWithCompletionHandler:(void (^)(
+                                                          NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeGroupKeyMapWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                             subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                       reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeGroupTableWithCompletionHandler:(void (^)(
+                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)subscribeAttributeGroupTableWithMinInterval:(uint16_t)minInterval
+                                        maxInterval:(uint16_t)maxInterval
+                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                      reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler;
+
+- (void)readAttributeMaxGroupsPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeMaxGroupKeysPerFabricWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
                                                             NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -4946,6 +4964,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLabelListWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;

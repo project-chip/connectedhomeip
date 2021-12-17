@@ -9662,6 +9662,169 @@ JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobje
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, GroupKeyManagementCluster, keySetRead)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type request;
+
+    request.groupKeySetID =
+        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadResponseCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementClusterKeySetReadResponseCallback>(callback),
+                  Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetIDs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
+
+    request.groupKeySetIDs = chip::app::DataModel::List<const uint16_t>();
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>(callback),
+                  Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetRemove)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type request;
+
+    request.groupKeySetID =
+        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject securityPolicy,
+ jbyteArray epochKey0, jobject epochStartTime0, jbyteArray epochKey1, jobject epochStartTime1, jbyteArray epochKey2,
+ jobject epochStartTime2)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type request;
+
+    request.groupKeySet = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type();
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GroupKeyManagementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {

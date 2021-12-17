@@ -140,7 +140,7 @@ void PtrSrvTxtAnyResponseToServiceName(nlTestSuite * inSuite, void * inContext)
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
-    // We should get all because we request to report all instance names when teh PTR is sent.
+    // We should get all because we request to report all instance names when the PTR is sent.
     common.server.AddExpectedRecord(&common.ptrRecord);
     common.server.AddExpectedRecord(&common.srvRecord);
     common.server.AddExpectedRecord(&common.txtRecord);

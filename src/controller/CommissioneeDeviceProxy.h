@@ -164,7 +164,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -204,7 +204,7 @@ public:
 
     NodeId GetDeviceId() const override { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
     SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }

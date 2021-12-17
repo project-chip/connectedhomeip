@@ -96,7 +96,7 @@ struct DiscoveredNodeData
     // TODO(cecille): is 4 OK? IPv6 LL, GUA, ULA, IPv4?
     static constexpr int kMaxIPAddresses = 5;
     char hostName[kHostNameMaxLength + 1];
-    char instanceName[Commissionable::kInstanceNameMaxLength + 1];
+    char instanceName[Commission::kInstanceNameMaxLength + 1];
     uint16_t longDiscriminator;
     uint16_t vendorId;
     uint16_t productId;
@@ -227,9 +227,9 @@ struct DiscoveredNodeData
 enum class DiscoveryFilterType : uint8_t
 {
     kNone,
-    kShort,
-    kLong,
-    kVendor,
+    kShortDiscriminator,
+    kLongDiscriminator,
+    kVendorId,
     kDeviceType,
     kCommissioningMode,
     kInstanceName,

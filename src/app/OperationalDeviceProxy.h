@@ -74,7 +74,7 @@ struct DeviceProxyInitParams
 class OperationalDeviceProxy;
 
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, NodeId deviceId, CHIP_ERROR error);
+typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
 
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
@@ -124,7 +124,7 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
@@ -155,7 +155,7 @@ public:
 
     PeerId GetPeerId() const { return mPeerId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 

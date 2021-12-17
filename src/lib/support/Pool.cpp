@@ -151,7 +151,7 @@ Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
             if (p->mObject == nullptr)
             {
                 p->Remove();
-                delete p;
+                Platform::Delete(p);
             }
             p = next;
         }

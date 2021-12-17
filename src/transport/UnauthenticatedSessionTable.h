@@ -49,7 +49,7 @@ class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, U
 {
 public:
     UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
-        mPeerAddress(address), mMRPConfig(config)
+        mPeerAddress(address), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
@@ -58,7 +58,7 @@ public:
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
-    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
@@ -69,9 +69,8 @@ public:
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
-
     const PeerAddress mPeerAddress;
+    System::Clock::Timestamp mLastActivityTime;
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
@@ -84,7 +83,7 @@ private:
  *   hold by using UnauthenticatedSessionHandle, which increase the reference
  *   count by 1. If the reference count is not 0, the entry won't be pruned.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class UnauthenticatedSessionTable
 {
 public:
@@ -113,15 +112,6 @@ public:
             return Optional<UnauthenticatedSessionHandle>::Missing();
         }
     }
-
-    /// Mark a session as active
-    void MarkSessionActive(UnauthenticatedSessionHandle session)
-    {
-        session->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp());
-    }
-
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
     /**
@@ -224,7 +214,6 @@ private:
         return false;
     }
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
     BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 
