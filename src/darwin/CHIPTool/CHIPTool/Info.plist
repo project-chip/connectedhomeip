@@ -34,7 +34,7 @@
 		<key>CommissioningCustomFlowLedgerUrl</key>
 		<string>https://dcl.dev.dsr-corporation.com/api/modelinfo/models</string>
 		<key>CommissioningCustomFlowReturnUrl</key>
-		<string>customflow://payload</string>
+		<string>mt://modelinfo?payload=&lt;&gt;</string>
 		<key>CommissioningCustomFlowUseMockFlag</key>
 		<true/>
 	</dict>
