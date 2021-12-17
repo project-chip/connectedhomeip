@@ -85,7 +85,7 @@ public class ChipClusters {
     public abstract long initWithDevice(long devicePtr, int endpointId);
 
     public native void deleteCluster(long chipClusterPtr);
-    
+
     @SuppressWarnings("deprecation")
     protected void finalize() throws Throwable {
       super.finalize();
@@ -113,11 +113,11 @@ public class ChipClusters {
       public Integer fabricIndex;
             public Integer privilege;
             public Integer authMode;
-      
+
       public AclAttribute(
         Integer fabricIndex ,
                 Integer privilege ,
-                Integer authMode 
+                Integer authMode
               ) {
         this.fabricIndex = fabricIndex;
                 this.privilege = privilege;
@@ -130,15 +130,15 @@ public class ChipClusters {
             output.append("int fabricIndex: ");
             output.append(this.fabricIndex);
             output.append("\n");
-            
+
             output.append("int privilege: ");
             output.append(this.privilege);
             output.append("\n");
-            
+
             output.append("int authMode: ");
             output.append(this.authMode);
             output.append("\n");
-            
+
 
 
         return output.toString();
@@ -157,7 +157,7 @@ public class ChipClusters {
 
       public ExtensionAttribute(
         Integer fabricIndex ,
-                byte[] data 
+                byte[] data
       ) {
         this.fabricIndex = fabricIndex;
                 this.data = data;
@@ -169,7 +169,7 @@ public class ChipClusters {
             output.append("int fabricIndex: ");
             output.append(this.fabricIndex);
             output.append("\n");
-            
+
             output.append("byte[] ");
             output.append(Arrays.toString(data));
             output.append("\n");
@@ -272,7 +272,7 @@ public class ChipClusters {
     public interface GetSetupPINResponseCallback {
       void onSuccess(  String setupPIN
 );
-      
+
       void onError(Exception error);
     }
 
@@ -647,7 +647,7 @@ public class ChipClusters {
       void onSuccess(  Integer status,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -655,7 +655,7 @@ public class ChipClusters {
       void onSuccess(  Integer status,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -663,7 +663,7 @@ public class ChipClusters {
       void onSuccess(  Integer status,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -760,7 +760,7 @@ public class ChipClusters {
       public AudioOutputListAttribute(
         Integer index ,
                 Integer outputType ,
-                String name 
+                String name
       ) {
         this.index = index;
                 this.outputType = outputType;
@@ -773,11 +773,11 @@ public class ChipClusters {
             output.append("int index: ");
             output.append(this.index);
             output.append("\n");
-            
+
             output.append("int outputType: ");
             output.append(this.outputType);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -1832,14 +1832,14 @@ public class ChipClusters {
             public Integer endpointListID;
             public Integer supportedCommands;
             public Integer status;
-      
+
       public ActionListAttribute(
         Integer actionID ,
                 String name ,
         Integer type ,
                 Integer endpointListID ,
                 Integer supportedCommands ,
-                Integer status 
+                Integer status
               ) {
         this.actionID = actionID;
                 this.name = name;
@@ -1855,7 +1855,7 @@ public class ChipClusters {
             output.append("int actionID: ");
             output.append(this.actionID);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -1863,19 +1863,19 @@ public class ChipClusters {
             output.append("int type: ");
             output.append(this.type);
             output.append("\n");
-            
+
             output.append("int endpointListID: ");
             output.append(this.endpointListID);
             output.append("\n");
-            
+
             output.append("int supportedCommands: ");
             output.append(this.supportedCommands);
             output.append("\n");
-            
+
             output.append("int status: ");
             output.append(this.status);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -1890,11 +1890,11 @@ public class ChipClusters {
       public Integer endpointListID;
             public String name;
       public Integer type;
-      
+
       public EndpointListAttribute(
         Integer endpointListID ,
                 String name ,
-        Integer type 
+        Integer type
               ) {
         this.endpointListID = endpointListID;
                 this.name = name;
@@ -1907,7 +1907,7 @@ public class ChipClusters {
             output.append("int endpointListID: ");
             output.append(this.endpointListID);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -1915,7 +1915,7 @@ public class ChipClusters {
             output.append("int type: ");
             output.append(this.type);
             output.append("\n");
-            
+
 
         return output.toString();
       }
@@ -3409,7 +3409,7 @@ public class ChipClusters {
       void onSuccess(  Integer contentLaunchStatus,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -3417,7 +3417,7 @@ public class ChipClusters {
       void onSuccess(  Integer contentLaunchStatus,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -3519,10 +3519,10 @@ public class ChipClusters {
     public static class DeviceListAttribute {
       public Long type;
             public Integer revision;
-      
+
       public DeviceListAttribute(
         Long type ,
-                Integer revision 
+                Integer revision
               ) {
         this.type = type;
                 this.revision = revision;
@@ -3534,11 +3534,11 @@ public class ChipClusters {
             output.append("long type: ");
             output.append(this.type);
             output.append("\n");
-            
+
             output.append("int revision: ");
             output.append(this.revision);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -3674,7 +3674,7 @@ public class ChipClusters {
   Long timeStamp,
   Long timeSinceBoot
 );
-      
+
       void onError(Exception error);
     }
 
@@ -3780,7 +3780,7 @@ public class ChipClusters {
   @Nullable
   Integer nextCredentialIndex
 );
-      
+
       void onError(Exception error);
     }
 
@@ -3796,7 +3796,7 @@ public class ChipClusters {
   Integer userType,
   @Nullable
   Integer credentialRule,
-  // credentials: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // credentials: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
   @Nullable
   Integer creatorFabricIndex,
@@ -3804,7 +3804,7 @@ public class ChipClusters {
   Integer lastModifiedFabricIndex,
   Integer nextUserIndex
 );
-      
+
       void onError(Exception error);
     }
 
@@ -3815,7 +3815,7 @@ public class ChipClusters {
   @Nullable
   Integer nextCredentialIndex
 );
-      
+
       void onError(Exception error);
     }
 
@@ -4727,7 +4727,7 @@ Integer   value);
 
       public LabelListAttribute(
         String label ,
-        String value 
+        String value
       ) {
         this.label = label;
                 this.value = value;
@@ -4973,7 +4973,7 @@ Integer   value);
       void onSuccess(  Integer errorCode,
   String debugText
 );
-      
+
       void onError(Exception error);
     }
 
@@ -4981,7 +4981,7 @@ Integer   value);
       void onSuccess(  Integer errorCode,
   String debugText
 );
-      
+
       void onError(Exception error);
     }
 
@@ -4989,7 +4989,7 @@ Integer   value);
       void onSuccess(  Integer errorCode,
   String debugText
 );
-      
+
       void onError(Exception error);
     }
 
@@ -4997,9 +4997,9 @@ Integer   value);
 
     public static class BasicCommissioningInfoListAttribute {
       public Long failSafeExpiryLengthMs;
-      
+
       public BasicCommissioningInfoListAttribute(
-        Long failSafeExpiryLengthMs 
+        Long failSafeExpiryLengthMs
               ) {
         this.failSafeExpiryLengthMs = failSafeExpiryLengthMs;
               }
@@ -5010,7 +5010,7 @@ Integer   value);
             output.append("long failSafeExpiryLengthMs: ");
             output.append(this.failSafeExpiryLengthMs);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -5136,14 +5136,14 @@ Integer   value);
             public Boolean offPremiseServicesReachableIPv6;
             public byte[] hardwareAddress;
       public Integer type;
-      
+
       public NetworkInterfacesAttribute(
         String name ,
         Boolean fabricConnected ,
                 Boolean offPremiseServicesReachableIPv4 ,
                 Boolean offPremiseServicesReachableIPv6 ,
                 byte[] hardwareAddress ,
-        Integer type 
+        Integer type
               ) {
         this.name = name;
                 this.fabricConnected = fabricConnected;
@@ -5163,15 +5163,15 @@ Integer   value);
             output.append("boolean fabricConnected: ");
             output.append(this.fabricConnected);
             output.append("\n");
-            
+
             output.append("boolean offPremiseServicesReachableIPv4: ");
             output.append(this.offPremiseServicesReachableIPv4);
             output.append("\n");
-            
+
             output.append("boolean offPremiseServicesReachableIPv6: ");
             output.append(this.offPremiseServicesReachableIPv6);
             output.append("\n");
-            
+
             output.append("byte[] ");
             output.append(Arrays.toString(hardwareAddress));
             output.append("\n");
@@ -5179,7 +5179,7 @@ Integer   value);
             output.append("int type: ");
             output.append(this.type);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -5386,11 +5386,11 @@ Integer   value);
       public Integer vendorId;
             public Integer vendorGroupId;
             public Integer groupKeySetIndex;
-      
+
       public GroupsAttribute(
         Integer vendorId ,
                 Integer vendorGroupId ,
-                Integer groupKeySetIndex 
+                Integer groupKeySetIndex
               ) {
         this.vendorId = vendorId;
                 this.vendorGroupId = vendorGroupId;
@@ -5403,15 +5403,15 @@ Integer   value);
             output.append("int vendorId: ");
             output.append(this.vendorId);
             output.append("\n");
-            
+
             output.append("int vendorGroupId: ");
             output.append(this.vendorGroupId);
             output.append("\n");
-            
+
             output.append("int groupKeySetIndex: ");
             output.append(this.groupKeySetIndex);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -5428,13 +5428,13 @@ Integer   value);
             public byte[] groupKeyRoot;
       public Long groupKeyEpochStartTime;
             public Integer groupKeySecurityPolicy;
-      
+
       public GroupKeysAttribute(
         Integer vendorId ,
                 Integer groupKeyIndex ,
                 byte[] groupKeyRoot ,
         Long groupKeyEpochStartTime ,
-                Integer groupKeySecurityPolicy 
+                Integer groupKeySecurityPolicy
               ) {
         this.vendorId = vendorId;
                 this.groupKeyIndex = groupKeyIndex;
@@ -5449,11 +5449,11 @@ Integer   value);
             output.append("int vendorId: ");
             output.append(this.vendorId);
             output.append("\n");
-            
+
             output.append("int groupKeyIndex: ");
             output.append(this.groupKeyIndex);
             output.append("\n");
-            
+
             output.append("byte[] ");
             output.append(Arrays.toString(groupKeyRoot));
             output.append("\n");
@@ -5461,11 +5461,11 @@ Integer   value);
             output.append("long groupKeyEpochStartTime: ");
             output.append(this.groupKeyEpochStartTime);
             output.append("\n");
-            
+
             output.append("int groupKeySecurityPolicy: ");
             output.append(this.groupKeySecurityPolicy);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -5598,16 +5598,16 @@ Integer   value);
       void onSuccess(  Integer status,
   Integer groupId
 );
-      
+
       void onError(Exception error);
     }
 
     public interface GetGroupMembershipResponseCallback {
       void onSuccess(  Integer capacity
-  // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -5615,7 +5615,7 @@ Integer   value);
       void onSuccess(  Integer status,
   Integer groupId
 );
-      
+
       void onError(Exception error);
     }
 
@@ -5624,7 +5624,7 @@ Integer   value);
   Integer groupId,
   String groupName
 );
-      
+
       void onError(Exception error);
     }
 
@@ -5726,7 +5726,7 @@ Integer   value);
     public interface IdentifyQueryResponseCallback {
       void onSuccess(  Integer timeout
 );
-      
+
       void onError(Exception error);
     }
 
@@ -6013,7 +6013,7 @@ Integer   value);
     public interface SendKeyResponseCallback {
       void onSuccess(  Integer status
 );
-      
+
       void onError(Exception error);
     }
 
@@ -6631,7 +6631,7 @@ Integer   value);
         Integer index ,
                 Integer inputType ,
                 String name ,
-        String description 
+        String description
       ) {
         this.index = index;
                 this.inputType = inputType;
@@ -6645,11 +6645,11 @@ Integer   value);
             output.append("int index: ");
             output.append(this.index);
             output.append("\n");
-            
+
             output.append("int inputType: ");
             output.append(this.inputType);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -6839,77 +6839,77 @@ Integer   value);
     public interface MediaFastForwardResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaNextResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaPauseResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaPlayResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaPreviousResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaRewindResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaSeekResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaSkipBackwardResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaSkipForwardResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaStartOverResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
     public interface MediaStopResponseCallback {
       void onSuccess(  Integer mediaPlaybackStatus
 );
-      
+
       void onError(Exception error);
     }
 
@@ -7089,11 +7089,11 @@ Integer   value);
       public String label;
       public Integer mode;
             public Long semanticTag;
-      
+
       public SupportedModesAttribute(
         String label ,
         Integer mode ,
-                Long semanticTag 
+                Long semanticTag
               ) {
         this.label = label;
                 this.mode = mode;
@@ -7110,11 +7110,11 @@ Integer   value);
             output.append("int mode: ");
             output.append(this.mode);
             output.append("\n");
-            
+
             output.append("long semanticTag: ");
             output.append(this.semanticTag);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -7323,7 +7323,7 @@ Integer   value);
   String DebugText,
   Long ErrorValue
 );
-      
+
       void onError(Exception error);
     }
 
@@ -7331,19 +7331,19 @@ Integer   value);
       void onSuccess(  Integer NetworkingStatus,
   String DebugText
 );
-      
+
       void onError(Exception error);
     }
 
     public interface ScanNetworksResponseCallback {
       void onSuccess(  Integer NetworkingStatus,
   String DebugText
-  // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
-  // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -7352,10 +7352,10 @@ Integer   value);
     public static class NetworksAttribute {
       public byte[] networkID;
       public Boolean connected;
-      
+
       public NetworksAttribute(
         byte[] networkID ,
-        Boolean connected 
+        Boolean connected
               ) {
         this.networkID = networkID;
                 this.connected = connected;
@@ -7371,7 +7371,7 @@ Integer   value);
             output.append("boolean connected: ");
             output.append(this.connected);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -7555,7 +7555,7 @@ Integer   value);
       void onSuccess(  Integer action,
   Long delayedActionTime
 );
-      
+
       void onError(Exception error);
     }
 
@@ -7569,7 +7569,7 @@ Integer   value);
   Optional<Boolean> userConsentNeeded,
   Optional<byte[]> metadataForRequestor
 );
-      
+
       void onError(Exception error);
     }
 
@@ -8250,14 +8250,14 @@ Integer   value);
       void onSuccess(  byte[] AttestationElements,
   byte[] Signature
 );
-      
+
       void onError(Exception error);
     }
 
     public interface CertificateChainResponseCallback {
       void onSuccess(  byte[] Certificate
 );
-      
+
       void onError(Exception error);
     }
 
@@ -8266,7 +8266,7 @@ Integer   value);
   Integer FabricIndex,
   String DebugText
 );
-      
+
       void onError(Exception error);
     }
 
@@ -8274,7 +8274,7 @@ Integer   value);
       void onSuccess(  byte[] NOCSRElements,
   byte[] AttestationSignature
 );
-      
+
       void onError(Exception error);
     }
 
@@ -8293,7 +8293,7 @@ Integer   value);
         Integer vendorId ,
                 Long fabricId ,
                 Long nodeId ,
-                String label 
+                String label
       ) {
         this.fabricIndex = fabricIndex;
                 this.rootPublicKey = rootPublicKey;
@@ -8309,7 +8309,7 @@ Integer   value);
             output.append("int fabricIndex: ");
             output.append(this.fabricIndex);
             output.append("\n");
-            
+
             output.append("byte[] ");
             output.append(Arrays.toString(rootPublicKey));
             output.append("\n");
@@ -8317,15 +8317,15 @@ Integer   value);
             output.append("int vendorId: ");
             output.append(this.vendorId);
             output.append("\n");
-            
+
             output.append("long fabricId: ");
             output.append(this.fabricId);
             output.append("\n");
-            
+
             output.append("long nodeId: ");
             output.append(this.nodeId);
             output.append("\n");
-            
+
             output.append("String label: ");
             output.append(this.label);
             output.append("\n");
@@ -9679,7 +9679,7 @@ Long   value);
   Integer groupId,
   Integer sceneId
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9688,10 +9688,10 @@ Long   value);
   Integer capacity,
   Integer groupId,
   Integer sceneCount
-  // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9699,7 +9699,7 @@ Long   value);
       void onSuccess(  Integer status,
   Integer groupId
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9708,7 +9708,7 @@ Long   value);
   Integer groupId,
   Integer sceneId
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9717,7 +9717,7 @@ Long   value);
   Integer groupId,
   Integer sceneId
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9727,10 +9727,10 @@ Long   value);
   Integer sceneId,
   Integer transitionTime,
   String sceneName
-  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -9900,13 +9900,13 @@ Long   value);
       public Long stackFreeCurrent;
             public Long stackFreeMinimum;
             public Long stackSize;
-      
+
       public ThreadMetricsAttribute(
         Long id ,
                 String name ,
         Long stackFreeCurrent ,
                 Long stackFreeMinimum ,
-                Long stackSize 
+                Long stackSize
               ) {
         this.id = id;
                 this.name = name;
@@ -9921,7 +9921,7 @@ Long   value);
             output.append("long id: ");
             output.append(this.id);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -9929,15 +9929,15 @@ Long   value);
             output.append("long stackFreeCurrent: ");
             output.append(this.stackFreeCurrent);
             output.append("\n");
-            
+
             output.append("long stackFreeMinimum: ");
             output.append(this.stackFreeMinimum);
             output.append("\n");
-            
+
             output.append("long stackSize: ");
             output.append(this.stackSize);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -10239,7 +10239,7 @@ Long   value);
   // Conversion from this type to Java is not properly implemented yet
   Integer errorType
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10256,7 +10256,7 @@ Long   value);
                 Integer minorNumber ,
                 String name ,
         String callSign ,
-        String affiliateCallSign 
+        String affiliateCallSign
       ) {
         this.majorNumber = majorNumber;
                 this.minorNumber = minorNumber;
@@ -10271,11 +10271,11 @@ Long   value);
             output.append("int majorNumber: ");
             output.append(this.majorNumber);
             output.append("\n");
-            
+
             output.append("int minorNumber: ");
             output.append(this.minorNumber);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -10370,7 +10370,7 @@ Long   value);
       void onSuccess(  Integer status,
   String data
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10381,7 +10381,7 @@ Long   value);
 
       public TargetNavigatorListAttribute(
         Integer identifier ,
-                String name 
+                String name
       ) {
         this.identifier = identifier;
                 this.name = name;
@@ -10393,7 +10393,7 @@ Long   value);
             output.append("int identifier: ");
             output.append(this.identifier);
             output.append("\n");
-            
+
             output.append("String name: ");
             output.append(this.name);
             output.append("\n");
@@ -10749,7 +10749,7 @@ Long   value);
     public interface BooleanResponseCallback {
       void onSuccess(  Boolean value
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10757,14 +10757,14 @@ Long   value);
       void onSuccess(  // arg1: Struct SimpleStruct
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(  Integer returnValue
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10772,15 +10772,15 @@ Long   value);
       void onSuccess(  Integer arg1,
   Integer arg2
 );
-      
+
       void onError(Exception error);
     }
 
     public interface TestListInt8UReverseResponseCallback {
-      void onSuccess(  // arg1: /* TYPE WARNING: array array defaults to */ uint8_t * 
+      void onSuccess(  // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10790,14 +10790,14 @@ Long   value);
   Optional<Integer> value,
   Optional<Integer> originalValue
 );
-      
+
       void onError(Exception error);
     }
 
     public interface TestSpecificResponseCallback {
       void onSuccess(  Integer returnValue
 );
-      
+
       void onError(Exception error);
     }
 
@@ -10848,7 +10848,7 @@ Long   value);
 
       public ListStructOctetStringAttribute(
         Long fabricIndex ,
-                byte[] operationalCert 
+                byte[] operationalCert
       ) {
         this.fabricIndex = fabricIndex;
                 this.operationalCert = operationalCert;
@@ -10860,7 +10860,7 @@ Long   value);
             output.append("long fabricIndex: ");
             output.append(this.fabricIndex);
             output.append("\n");
-            
+
             output.append("byte[] ");
             output.append(Arrays.toString(operationalCert));
             output.append("\n");
@@ -10908,7 +10908,7 @@ Long   value);
         String nullableString ,
         Optional<String> optionalString ,
         @Nullable
-        Optional<String> nullableOptionalString 
+        Optional<String> nullableOptionalString
       ) {
         this.nullableInt = nullableInt;
                 this.optionalInt = optionalInt;
@@ -13097,7 +13097,7 @@ Integer   value);
   Integer setpoint,
   Integer unreadEntries
 );
-      
+
       void onError(Exception error);
     }
 
@@ -13105,10 +13105,10 @@ Integer   value);
       void onSuccess(  Integer numberOfTransitionsForSequence,
   Integer dayOfWeekForSequence,
   Integer modeForSequence
-  // payload: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 );
-      
+
       void onError(Exception error);
     }
 
@@ -13737,7 +13737,7 @@ Integer   value);
             public Boolean fullThreadDevice;
             public Boolean fullNetworkData;
             public Boolean isChild;
-      
+
       public NeighborTableListAttribute(
         Long extAddress ,
                 Long age ,
@@ -13752,7 +13752,7 @@ Integer   value);
                 Boolean rxOnWhenIdle ,
                 Boolean fullThreadDevice ,
                 Boolean fullNetworkData ,
-                Boolean isChild 
+                Boolean isChild
               ) {
         this.extAddress = extAddress;
                 this.age = age;
@@ -13776,59 +13776,59 @@ Integer   value);
             output.append("long extAddress: ");
             output.append(this.extAddress);
             output.append("\n");
-            
+
             output.append("long age: ");
             output.append(this.age);
             output.append("\n");
-            
+
             output.append("int rloc16: ");
             output.append(this.rloc16);
             output.append("\n");
-            
+
             output.append("long linkFrameCounter: ");
             output.append(this.linkFrameCounter);
             output.append("\n");
-            
+
             output.append("long mleFrameCounter: ");
             output.append(this.mleFrameCounter);
             output.append("\n");
-            
+
             output.append("int lqi: ");
             output.append(this.lqi);
             output.append("\n");
-            
+
             output.append("int averageRssi: ");
             output.append(this.averageRssi);
             output.append("\n");
-            
+
             output.append("int lastRssi: ");
             output.append(this.lastRssi);
             output.append("\n");
-            
+
             output.append("int frameErrorRate: ");
             output.append(this.frameErrorRate);
             output.append("\n");
-            
+
             output.append("int messageErrorRate: ");
             output.append(this.messageErrorRate);
             output.append("\n");
-            
+
             output.append("boolean rxOnWhenIdle: ");
             output.append(this.rxOnWhenIdle);
             output.append("\n");
-            
+
             output.append("boolean fullThreadDevice: ");
             output.append(this.fullThreadDevice);
             output.append("\n");
-            
+
             output.append("boolean fullNetworkData: ");
             output.append(this.fullNetworkData);
             output.append("\n");
-            
+
             output.append("boolean isChild: ");
             output.append(this.isChild);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -13850,7 +13850,7 @@ Integer   value);
             public Integer age;
             public Boolean allocated;
             public Boolean linkEstablished;
-      
+
       public RouteTableListAttribute(
         Long extAddress ,
                 Integer rloc16 ,
@@ -13861,7 +13861,7 @@ Integer   value);
                 Integer LQIOut ,
                 Integer age ,
                 Boolean allocated ,
-                Boolean linkEstablished 
+                Boolean linkEstablished
               ) {
         this.extAddress = extAddress;
                 this.rloc16 = rloc16;
@@ -13881,43 +13881,43 @@ Integer   value);
             output.append("long extAddress: ");
             output.append(this.extAddress);
             output.append("\n");
-            
+
             output.append("int rloc16: ");
             output.append(this.rloc16);
             output.append("\n");
-            
+
             output.append("int routerId: ");
             output.append(this.routerId);
             output.append("\n");
-            
+
             output.append("int nextHop: ");
             output.append(this.nextHop);
             output.append("\n");
-            
+
             output.append("int pathCost: ");
             output.append(this.pathCost);
             output.append("\n");
-            
+
             output.append("int LQIIn: ");
             output.append(this.LQIIn);
             output.append("\n");
-            
+
             output.append("int LQIOut: ");
             output.append(this.LQIOut);
             output.append("\n");
-            
+
             output.append("int age: ");
             output.append(this.age);
             output.append("\n");
-            
+
             output.append("boolean allocated: ");
             output.append(this.allocated);
             output.append("\n");
-            
+
             output.append("boolean linkEstablished: ");
             output.append(this.linkEstablished);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -13981,10 +13981,10 @@ Integer   value);
     public static class SecurityPolicyAttribute {
       public Integer rotationTime;
             public Integer flags;
-      
+
       public SecurityPolicyAttribute(
         Integer rotationTime ,
-                Integer flags 
+                Integer flags
               ) {
         this.rotationTime = rotationTime;
                 this.flags = flags;
@@ -13996,11 +13996,11 @@ Integer   value);
             output.append("int rotationTime: ");
             output.append(this.rotationTime);
             output.append("\n");
-            
+
             output.append("int flags: ");
             output.append(this.flags);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -14025,7 +14025,7 @@ Integer   value);
             public Boolean pskcPresent;
             public Boolean securityPolicyPresent;
             public Boolean channelMaskPresent;
-      
+
       public OperationalDatasetComponentsAttribute(
         Boolean activeTimestampPresent ,
                 Boolean pendingTimestampPresent ,
@@ -14038,7 +14038,7 @@ Integer   value);
                 Boolean channelPresent ,
                 Boolean pskcPresent ,
                 Boolean securityPolicyPresent ,
-                Boolean channelMaskPresent 
+                Boolean channelMaskPresent
               ) {
         this.activeTimestampPresent = activeTimestampPresent;
                 this.pendingTimestampPresent = pendingTimestampPresent;
@@ -14060,51 +14060,51 @@ Integer   value);
             output.append("boolean activeTimestampPresent: ");
             output.append(this.activeTimestampPresent);
             output.append("\n");
-            
+
             output.append("boolean pendingTimestampPresent: ");
             output.append(this.pendingTimestampPresent);
             output.append("\n");
-            
+
             output.append("boolean masterKeyPresent: ");
             output.append(this.masterKeyPresent);
             output.append("\n");
-            
+
             output.append("boolean networkNamePresent: ");
             output.append(this.networkNamePresent);
             output.append("\n");
-            
+
             output.append("boolean extendedPanIdPresent: ");
             output.append(this.extendedPanIdPresent);
             output.append("\n");
-            
+
             output.append("boolean meshLocalPrefixPresent: ");
             output.append(this.meshLocalPrefixPresent);
             output.append("\n");
-            
+
             output.append("boolean delayPresent: ");
             output.append(this.delayPresent);
             output.append("\n");
-            
+
             output.append("boolean panIdPresent: ");
             output.append(this.panIdPresent);
             output.append("\n");
-            
+
             output.append("boolean channelPresent: ");
             output.append(this.channelPresent);
             output.append("\n");
-            
+
             output.append("boolean pskcPresent: ");
             output.append(this.pskcPresent);
             output.append("\n");
-            
+
             output.append("boolean securityPolicyPresent: ");
             output.append(this.securityPolicyPresent);
             output.append("\n");
-            
+
             output.append("boolean channelMaskPresent: ");
             output.append(this.channelMaskPresent);
             output.append("\n");
-            
+
         return output.toString();
       }
     }
@@ -15342,7 +15342,7 @@ Integer   value);
 
       public LabelListAttribute(
         String label ,
-        String value 
+        String value
       ) {
         this.label = label;
                 this.value = value;
