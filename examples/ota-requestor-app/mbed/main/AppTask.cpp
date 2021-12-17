@@ -37,6 +37,20 @@
 #include <OTARequestor.h>
 #endif // CHIP_OTA_REQUESTOR
 
+#ifdef BOOT_ENABLED
+#include "blockdevice/SlicingBlockDevice.h"
+#include <bootutil/bootutil.h>
+#endif
+
+#ifdef BOOT_ENABLED
+mbed::BlockDevice * get_secondary_bd()
+{
+    mbed::BlockDevice * default_bd = mbed::BlockDevice::get_default_instance();
+    static mbed::SlicingBlockDevice sliced_bd(default_bd, 0x0, MCUBOOT_SLOT_SIZE);
+    return &sliced_bd;
+}
+#endif
+
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;

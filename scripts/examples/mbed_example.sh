@@ -22,46 +22,49 @@ cd "$CHIP_ROOT"/examples
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)
-SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell ota-requestor-app bootloader)
+SUPPORTED_APP=(lock-app lighting-app pigweed-app all-clusters-app shell ota-requestor-app)
 SUPPORTED_PROFILES=(release develop debug)
 SUPPORTED_COMMAND=(build flash build-flash)
+SUPPORTED_TYPE=(simple boot upgrade)
 
 COMMAND=build
 APP=lock-app
 TARGET_BOARD=CY8CPROTO_062_4343W
 TOOLCHAIN=GCC_ARM
 PROFILE=release
-BOOTLOADER=false
+TYPE=simple
+
+TARGET_MEMORY_ALIGN[CY8CPROTO_062_4343W]=8
 
 for i in "$@"; do
     case $i in
-        -a=* | --app=*)
-            APP="${i#*=}"
-            shift
-            ;;
-        -b=* | --board=*)
-            TARGET_BOARD="${i#*=}"
-            shift
-            ;;
-        -t=* | --toolchain=*)
-            TOOLCHAIN="${i#*=}"
-            shift
-            ;;
-        -p=* | --profile=*)
-            PROFILE="${i#*=}"
-            shift
-            ;;
-        -c=* | --command=*)
-            COMMAND="${i#*=}"
-            shift
-            ;;
-        -B=* | --bootloader=*)
-            BOOTLOADER="${i#*=}"
-            shift
-            ;;
-        *)
-            # unknown option
-            ;;
+    -a=* | --app=*)
+        APP="${i#*=}"
+        shift
+        ;;
+    -b=* | --board=*)
+        TARGET_BOARD="${i#*=}"
+        shift
+        ;;
+    -t=* | --toolchain=*)
+        TOOLCHAIN="${i#*=}"
+        shift
+        ;;
+    -p=* | --profile=*)
+        PROFILE="${i#*=}"
+        shift
+        ;;
+    -c=* | --command=*)
+        COMMAND="${i#*=}"
+        shift
+        ;;
+    -T=* | --type=*)
+        TYPE="${i#*=}"
+        shift
+        ;;
+    *)
+        # unknown option
+        ;;
     esac
 done
 
@@ -90,6 +93,11 @@ if [[ ! " ${SUPPORTED_PROFILES[@]} " =~ " ${PROFILE} " ]]; then
     exit 1
 fi
 
+if [[ ! " ${SUPPORTED_TYPE[@]} " =~ " ${TYPE} " ]]; then
+    echo "ERROR: Type $TYPE not supported"
+    exit 1
+fi
+
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # Activate Matter environment
@@ -105,7 +113,7 @@ BOOTLOADER_ROOT_DIRECTORY="$CHIP_ROOT"/examples/platform/mbed/bootloader
 BOOTLOADER_BUILD_DIRECTORY="$BOOTLOADER_ROOT_DIRECTORY"/build-"$TARGET_BOARD"/"$PROFILE"/
 
 if [[ "$COMMAND" == *"build"* ]]; then
-    echo "Build $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
+    echo "Build $TYPE $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
     # Set Mbed OS path
     MBED_OS_PATH="$CHIP_ROOT"/third_party/mbed-os/repo
@@ -113,9 +121,10 @@ if [[ "$COMMAND" == *"build"* ]]; then
     # Set Mbed OS posix socket submodule path
     MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
-    if [[ "$APP" == "bootloader" || $BOOTLOADER == true ]]; then
-        # Set Mbed MCU boot path
-        MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
+    # Set Mbed MCU boot path
+    MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
+
+    if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
 
         cd "$BOOTLOADER_ROOT_DIRECTORY"
 
@@ -143,17 +152,13 @@ if [[ "$COMMAND" == *"build"* ]]; then
         cmake -S . -B "$BOOTLOADER_BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
         cmake --build "$BOOTLOADER_BUILD_DIRECTORY"
 
-        if [[ "$APP" == "bootloader" ]]; then
-            exit
-        fi
-
         cd "$CHIP_ROOT"/examples
     fi
 
     # Set Mbed OS posix socket submodule path
     MBED_OS_POSIX_SOCKET_PATH="$CHIP_ROOT"/third_party/mbed-os-posix-socket/repo
 
-    if [[ $BOOTLOADER == true ]]; then
+    if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
         ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed "$APP"/mbed/mcuboot
     fi
 
@@ -164,13 +169,16 @@ if [[ "$COMMAND" == *"build"* ]]; then
     rm -rf "$BUILD_DIRECTORY/chip-"*
 
     # Build application
-    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH"
+    cmake -S "$APP/mbed" -B "$BUILD_DIRECTORY" -GNinja -DCMAKE_BUILD_TYPE="$PROFILE" -DMBED_OS_PATH="$MBED_OS_PATH" -DMBED_OS_POSIX_SOCKET_PATH="$MBED_OS_POSIX_SOCKET_PATH" -DMBED_MCU_BOOT_PATH="$MBED_MCU_BOOT_PATH" -DMBED_APP_TYPE="$TYPE"
     cmake --build "$BUILD_DIRECTORY"
 
-    if [[ $BOOTLOADER == true ]]; then
+    if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
+        APP_VERSION=$(jq '.config."version-number-str".value' $APP/mbed/mbed_app.json | tr -d '\\"')
+        HEADER_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.header-size"' $APP/mbed/mbed_app.json | tr -d \")
+        SLOT_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.slot-size"' $APP/mbed/mbed_app.json | tr -d \")
         # Signed the primary application
         "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$BOOTLOADER_ROOT_DIRECTORY"/signing-keys.pem \
-            --align 8 -v "0.1.0" --header-size 4096 --pad-header -S 0xC0000 \
+            --align ${TARGET_MEMORY_ALIGN[$TARGET_BOARD]} -v $APP_VERSION --header-size $(($HEADER_SIZE)) --pad-header -S $SLOT_SIZE \
             "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
 
         # Create the factory firmware (bootlaoder + signed primary application)
