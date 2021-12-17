@@ -162,44 +162,56 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-bool IsOpen(chip::EndpointId endpoint)
+bool IsLiftOpen(chip::EndpointId endpoint)
 {
-    EmberAfStatus liftStatus;
-    app::DataModel::Nullable<Percent100ths> liftPosition;
+    EmberAfStatus status;
+    app::DataModel::Nullable<Percent100ths> position;
 
-    EmberAfStatus tiltStatus;
-    app::DataModel::Nullable<Percent100ths> tiltPosition;
+    status = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
 
-    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
-    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
-
-    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
         return false;
 
-    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
-        return false;
-
-    return ((liftPosition.Value() == WC_PERCENT100THS_MIN) && (tiltPosition.Value() == WC_PERCENT100THS_MIN));
+    return ((position.Value() == WC_PERCENT100THS_MIN));
 }
 
-bool IsClosed(chip::EndpointId endpoint)
+bool IsTiltOpen(chip::EndpointId endpoint)
 {
-    EmberAfStatus liftStatus;
-    app::DataModel::Nullable<Percent100ths> liftPosition;
+    EmberAfStatus status;
+    app::DataModel::Nullable<Percent100ths> position;
 
-    EmberAfStatus tiltStatus;
-    app::DataModel::Nullable<Percent100ths> tiltPosition;
+    status = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
 
-    liftStatus = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, liftPosition);
-    tiltStatus = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, tiltPosition);
-
-    if ((liftStatus != EMBER_ZCL_STATUS_SUCCESS) || liftPosition.IsNull())
+    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
         return false;
 
-    if ((tiltStatus != EMBER_ZCL_STATUS_SUCCESS) || tiltPosition.IsNull())
+    return ((position.Value() == WC_PERCENT100THS_MIN));
+}
+
+bool IsLiftClosed(chip::EndpointId endpoint)
+{
+    EmberAfStatus status;
+    app::DataModel::Nullable<Percent100ths> position;
+
+    status = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
+
+    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
         return false;
 
-    return ((liftPosition.Value() == WC_PERCENT100THS_MAX) && (tiltPosition.Value() == WC_PERCENT100THS_MAX));
+    return ((position.Value() == WC_PERCENT100THS_MAX));
+}
+
+bool IsTiltClosed(chip::EndpointId endpoint)
+{
+    EmberAfStatus status;
+    app::DataModel::Nullable<Percent100ths> position;
+
+    status = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
+
+    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
+        return false;
+
+    return ((position.Value() == WC_PERCENT100THS_MAX));
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
