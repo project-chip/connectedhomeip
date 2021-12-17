@@ -19,10 +19,10 @@
         "CY8CPROTO_062_4343W": {
             "target.components_remove": [ "WHD" ],
             "mcuboot.primary-slot-address": "0x10022000",
-            "mcuboot.slot-size": "0xC0000",
+            "mcuboot.slot-size": "0x140000",
             "mcuboot.scratch-address": "0x101A2000",
             "mcuboot.scratch-size": "0x1000",
-            "mcuboot.max-img-sectors": "0x600"
+            "mcuboot.max-img-sectors": "0xA00"
         }
     }
 }

@@ -23,6 +23,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
 
+#ifdef BOOT_ENABLED
+#include <bootutil/bootutil.h>
+#endif
+
 using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Platform;
@@ -36,6 +40,20 @@ int main()
     mbed_logging_init();
 
     ChipLogProgress(SoftwareUpdate, "Mbed OTA Requestor example application start");
+
+#ifdef BOOT_ENABLED
+    ret = boot_set_confirmed();
+    if (ret == 0)
+    {
+        ChipLogProgress(NotSpecified, "Boot confirmed");
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Failed to confirm boot: %d", ret);
+    }
+    ChipLogProgress(NotSpecified, "Current software version: [%ld] %s", uint32_t(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION),
+                    CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+#endif
 
     ret = mbedtls_platform_setup(NULL);
     if (ret)

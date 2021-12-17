@@ -469,6 +469,33 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     )
 endif(CONFIG_CHIP_OTA_REQUESTOR)
 
+if(BOOT_ENABLED)
+    add_subdirectory(${MCUBOOT_PATH}/boot/bootutil/ ./mbed_mcu_boot_util_build)
+    add_subdirectory(${MCUBOOT_PATH}/boot/mbed/ ./mbed_mcu_boot_build)
+
+    target_include_directories(bootutil PUBLIC
+                           ${CHIP_ROOT}/config/mbed/mbedtls
+    )
+
+    target_link_libraries(${APP_TARGET} mbed-mcuboot bootutil)
+
+    file(READ ${APP_PATH}/mbed_app.json mbedAppJson)
+    string(JSON PRIMARY_SLOT_ADDRESS GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.primary-slot-address)
+    string(JSON HEADER_SIZE GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.header-size)
+    string(JSON SLOT_SIZE GET "${mbedAppJson}" target_overrides ${MBED_TARGET} mcuboot.slot-size)
+    math(EXPR APP_START "${PRIMARY_SLOT_ADDRESS} + ${HEADER_SIZE}" OUTPUT_FORMAT HEXADECIMAL)
+    math(EXPR APP_SIZE "${SLOT_SIZE} - 2 * ${HEADER_SIZE}" OUTPUT_FORMAT HEXADECIMAL)
+    target_compile_definitions(mbed-core
+        INTERFACE
+            "-DMBED_APP_START=${APP_START}"
+            "-DMBED_APP_SIZE=${APP_SIZE}"
+    )
+
+    list(APPEND CHIP_DEFINES 
+        BOOT_ENABLED=1
+    )
+endif()
+
 
 target_include_directories(${APP_TARGET} PRIVATE 
                            ${CHIP_INCLUDES}
