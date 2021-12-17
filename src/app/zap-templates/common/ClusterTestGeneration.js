@@ -99,6 +99,7 @@ function setDefaultTypeForWaitCommand(test)
     break;
   default:
     test.isCommand = true;
+    test.command = test.wait
     break;
   }
 
