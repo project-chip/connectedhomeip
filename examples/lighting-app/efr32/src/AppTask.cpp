@@ -218,6 +218,17 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG ("APP: Wait WiFi Init");
+    while (!wfx_hw_ready ()) {
+        vTaskDelay (10);
+    }
+    EFR32_LOG ("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+#endif
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();
 
