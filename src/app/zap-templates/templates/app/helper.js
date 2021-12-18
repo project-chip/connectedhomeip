@@ -683,6 +683,11 @@ function isWeaklyTypedEnum(label)
   ].includes(label);
 }
 
+function incrementDepth(depth)
+{
+  return depth + 1;
+}
+
 //
 // Module exports
 //
@@ -701,3 +706,4 @@ exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
 exports.getPythonFieldDefault               = getPythonFieldDefault;
+exports.incrementDepth                      = incrementDepth;

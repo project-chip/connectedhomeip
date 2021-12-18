@@ -4307,6 +4307,7 @@ class ChipClusters:
                     "attributeId": 0x00000023,
                     "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000024: {
                     "attributeName": "EnumAttr",

@@ -3787,6 +3787,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListNullablesAndOptionalsStructWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
+                                             completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                  subscriptionEstablished:
