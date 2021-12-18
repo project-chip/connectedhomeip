@@ -31,6 +31,10 @@
 #include <sl_simple_led_instances.h>
 #include <sl_system_kernel.h>
 
+#ifdef SL_WIFI
+#include "wfx_host_events.h"
+#endif
+
 #define APP_TASK_STACK_SIZE (4096)
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
@@ -143,6 +147,17 @@ void WindowAppImpl::OnIconTimeout(WindowApp::Timer & timer)
 
 CHIP_ERROR WindowAppImpl::Init()
 {
+#ifdef SL_WIFI
+    /*
+     * Wait for the WiFi to be initialized
+     */
+    EFR32_LOG ("APP: Wait WiFi Init");
+    while (!wfx_hw_ready ()) {
+        vTaskDelay (10);
+    }
+    EFR32_LOG ("APP: Done WiFi Init");
+    /* We will init server when we get IP */
+#endif
     WindowApp::Init();
 
     // Initialize App Task
