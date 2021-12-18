@@ -357,7 +357,8 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(Attribu
     VerifyOrReturnError(count == 1, CHIP_ERROR_INVALID_ARGUMENT);
 
     auto iter = list.begin();
-    while (iter.Next()) {
+    while (iter.Next())
+    {
         auto & value = iter.GetValue();
         // We only support some values so far.
         VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -371,20 +372,22 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(Attribu
 
         // Start our value off as null, just in case we fail to decode things.
         gNullablesAndOptionalsStruct.nullableList.SetNull();
-        if (!value.nullableList.IsNull()) {
+        if (!value.nullableList.IsNull())
+        {
             ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
             VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
-            auto iter2 = value.nullableList.Value().begin();
+            auto iter2       = value.nullableList.Value().begin();
             gSimpleEnumCount = 0;
-            while (iter2.Next()) {
+            while (iter2.Next())
+            {
                 gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
                 ++gSimpleEnumCount;
             }
             ReturnErrorOnFailure(iter2.GetStatus());
             gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
         }
-        gNullablesAndOptionalsStruct.nullableInt = value.nullableInt;
-        gNullablesAndOptionalsStruct.optionalInt = value.optionalInt;
+        gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
+        gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
         gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
     }
 
