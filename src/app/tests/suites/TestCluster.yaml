@@ -722,6 +722,18 @@ tests:
       response:
           value: "Tes\x00ti\x00ng"
 
+    - label: "Write attribute OCTET_STRING with weird chars"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "\r\n\xff\"\xa0"
+
+    - label: "Read attribute OCTET_STRING with weird chars"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "\r\n\xff\"\xa0"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"
