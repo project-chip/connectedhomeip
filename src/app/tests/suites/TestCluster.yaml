@@ -1592,11 +1592,12 @@ tests:
                       NullableInt: null,
                       NullableString: null,
                       NullableStruct: null,
-                      NullableList: [ 1, 2 ],
+                      NullableList: [1, 2],
                   },
               ]
 
-    - label: "Read list of structs containing nullables and optionals after writing"
+    - label:
+          "Read list of structs containing nullables and optionals after writing"
       command: "readAttribute"
       attribute: "list_nullables_and_optionals_struct"
       response:
@@ -1606,7 +1607,7 @@ tests:
                       NullableInt: null,
                       NullableString: null,
                       NullableStruct: null,
-                      NullableList: [ 1, 2 ],
+                      NullableList: [1, 2],
                   },
               ]
 

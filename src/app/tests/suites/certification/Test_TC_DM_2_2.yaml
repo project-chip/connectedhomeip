@@ -50,8 +50,7 @@ tests:
       command: "readAttribute"
       attribute: "fabrics list"
       response:
-          value:
-              [
+          value: [
                   {
                       # We really don't know what values to expect for any of
                       # the fields, except Label.
