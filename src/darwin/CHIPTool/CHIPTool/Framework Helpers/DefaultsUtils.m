@@ -99,8 +99,7 @@ CHIPDevice * CHIPGetDeviceBeingCommissioned(void)
     NSError * error;
     CHIPDeviceController * controller = InitializeCHIP();
     CHIPDevice * device = [controller getDeviceBeingCommissioned:CHIPGetLastPairedDeviceId() error:&error];
-    if (error)
-    {
+    if (error) {
         NSLog(@"Error retrieving device being commissioned for deviceId %llu", CHIPGetLastPairedDeviceId());
         return nil;
     }
