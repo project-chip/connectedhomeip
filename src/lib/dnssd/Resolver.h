@@ -111,6 +111,11 @@ struct DiscoveredNodeData
     bool supportsTcp;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
     Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
+    ReliableMessageProtocolConfig GetMRPConfig() const
+    {
+        return ReliableMessageProtocolConfig(mrpRetryIntervalIdle.ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
+                                             mrpRetryIntervalActive.ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
+    }
     uint16_t port;
     int numIPs;
     Inet::InterfaceId interfaceId[kMaxIPAddresses];

@@ -228,6 +228,14 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
+    /**
+     * @brief
+     *   Set a new delegate for the PASESession to callback to.
+     *
+     * @param delegate Callback object
+     */
+    CHIP_ERROR SetDelegate(SessionEstablishmentDelegate * delegate);
+
     Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
 private:

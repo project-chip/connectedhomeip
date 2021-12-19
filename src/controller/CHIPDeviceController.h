@@ -322,6 +322,7 @@ public:
      * @brief Get the raw Fabric ID assigned to the device.
      */
     uint64_t GetFabricId() const { return mFabricId; }
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
 
     /**
      * @brief Get the Node ID of this instance.
@@ -329,6 +330,9 @@ public:
     NodeId GetNodeId() const { return mLocalId.GetNodeId(); }
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
+
+    void EmplaceOperationalDevice(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config,
+                                  const PeerId & peerId, SessionHolder & session);
 
 protected:
     enum class State
@@ -386,9 +390,6 @@ protected:
     void OnNodeIdResolutionFailed(const chip::PeerId & peerId, CHIP_ERROR error) override;
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
-    void EmplaceOperationalDevice(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config,
-                                  const PeerId & peerId, SessionHolder & session);
 
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
