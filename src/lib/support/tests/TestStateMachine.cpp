@@ -131,7 +131,7 @@ class SimpleStateMachine
 {
 public:
     Transitions mTransitions;
-    chip::StateMachine::StateMachine<State, Event, Transitions> mStateMachine;
+    chip::StateMachine::StateMachine<chip::StateMachine::Context<Event>, State, Event, Transitions> mStateMachine;
 
     SimpleStateMachine() : mTransitions(mStateMachine), mStateMachine(mTransitions) {}
     ~SimpleStateMachine() {}

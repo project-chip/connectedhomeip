@@ -182,17 +182,21 @@ CHIP_ERROR PASESession::FromSerializable(const PASESessionSerializable & seriali
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PASESession::Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+CHIP_ERROR PASESession::SetDelegate(SessionEstablishmentDelegate * delegate)
 {
     VerifyOrReturnError(delegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mDelegate = delegate;
+    return CHIP_NO_ERROR;
+}
 
+CHIP_ERROR PASESession::Init(uint16_t mySessionId, uint32_t setupCode, SessionEstablishmentDelegate * delegate)
+{
     // Reset any state maintained by PASESession object (in case it's being reused for pairing)
     Clear();
 
     ReturnErrorOnFailure(mCommissioningHash.Begin());
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ Uint8::from_const_char(kSpake2pContext), strlen(kSpake2pContext) }));
-
-    mDelegate = delegate;
+    ReturnErrorOnFailure(SetDelegate(delegate));
 
     ChipLogDetail(SecureChannel, "Assigned local session key ID %d", mySessionId);
     SetLocalSessionId(mySessionId);

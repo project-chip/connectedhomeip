@@ -35,7 +35,7 @@ class CHIPCommand : public Command
 {
 public:
     using ChipDevice             = ::chip::DeviceProxy;
-    using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+    using ChipDeviceCommissioner = ::chip::Controller::DeviceController;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;

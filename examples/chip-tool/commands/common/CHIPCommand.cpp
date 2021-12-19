@@ -145,7 +145,7 @@ uint16_t CHIPCommand::CurrentCommissionerIndex()
     return index;
 }
 
-chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
+chip::Controller::DeviceController & CHIPCommand::CurrentCommissioner()
 {
     auto item = mCommissioners.find(GetIdentity());
     return *item->second.get();
@@ -196,7 +196,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     commissionerParams.controllerNOC                  = nocSpan;
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
+    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupController(commissionerParams, *(commissioner.get())));
     mCommissioners[key] = std::move(commissioner);
 
     return CHIP_NO_ERROR;

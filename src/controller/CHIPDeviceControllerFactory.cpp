@@ -162,6 +162,11 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     return CHIP_NO_ERROR;
 }
 
+DeviceControllerSystemState * DeviceControllerFactory::GetSystemState()
+{
+    return mSystemState;
+}
+
 void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controllerParams, const SetupParams & params)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD

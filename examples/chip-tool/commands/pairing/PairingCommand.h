@@ -19,7 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
-#include <controller/CommissioningDelegate.h>
+#include <commissioner/ExampleCommissioningStateMachine.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -46,10 +46,10 @@ enum class PairingNetworkType
     Ethernet,
 };
 
-class PairingCommand : public CHIPCommand,
-                       public chip::Controller::DevicePairingDelegate,
-                       public chip::Controller::DeviceDiscoveryDelegate
+class PairingCommand : public CHIPCommand, public chip::Dnssd::ResolverDelegate
 {
+    using CommissioningStateMachine = chip::Commissioner::ExampleCommissioningStateMachine::ExampleCommissioningStateMachine;
+
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
                    CredentialIssuerCommands * credIssuerCmds,
@@ -135,14 +135,10 @@ public:
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(120); }
 
-    /////////// DevicePairingDelegate Interface /////////
-    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
-    void OnPairingComplete(CHIP_ERROR error) override;
-    void OnPairingDeleted(CHIP_ERROR error) override;
-    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
-
-    /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    /////////// ResolverDelegate Interface /////////
+    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
+    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -153,6 +149,8 @@ private:
     CHIP_ERROR PairWithCode(NodeId remoteId, chip::SetupPayload payload);
     CHIP_ERROR Unpair(NodeId remoteId);
     chip::Controller::CommissioningParameters GetCommissioningParameters();
+    void OnCommissioningComplete(CommissioningStateMachine & stateMachine);
+    void OnCommissioningFailure(CommissioningStateMachine & stateMachine);
 
     const PairingMode mPairingMode;
     const PairingNetworkType mNetworkType;
@@ -168,6 +166,7 @@ private:
     char * mOnboardingPayload;
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
+    chip::Dnssd::ResolverProxy mDnsResolver;
 
     chip::CommissioneeDeviceProxy * mDevice;
     chip::EndpointId mEndpointId = 0;
