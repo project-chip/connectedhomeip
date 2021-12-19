@@ -17,18 +17,26 @@
  */
 
 #include "DiscoverCommissionablesCommand.h"
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <lib/support/BytesToHex.h>
 
 using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
+    ReturnErrorOnFailure(
+        mDnsResolver.Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState()->UDPEndPointManager()));
+    mDnsResolver.SetResolverDelegate(this);
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(mDnsResolver.FindCommissionableNodes(filter));
+    return CHIP_NO_ERROR;
 }
 
-void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void DiscoverCommissionablesCommand::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     nodeData.LogDetail();
 }
+
+void DiscoverCommissionablesCommand::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) {}
+
+void DiscoverCommissionablesCommand::OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) {}
