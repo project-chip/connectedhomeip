@@ -539,20 +539,19 @@
     CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
     if (chipDevice) {
         self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-        __auto_type * params = [[CHIPNetworkCommissioningClusterAddWiFiNetworkParams alloc] init];
+        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
         params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
         params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
         params.breadcrumb = @(0);
 
         __weak typeof(self) weakSelf = self;
-        [self->_cluster addWiFiNetworkWithParams:params
-                               completionHandler:^(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams * _Nullable response,
-                                   NSError * _Nullable error) {
-                                   // TODO: addWiFiNetworkWithParams
-                                   // returns status in its response,
-                                   // not via the NSError!
-                                   [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                               }];
+        [self->_cluster addOrUpdateWiFiNetworkWithParams:params
+                                       completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response, NSError * _Nullable error) {
+            // TODO: addWiFiNetworkWithParams
+            // returns status in its response,
+            // not via the NSError!
+            [weakSelf onAddNetworkResponse:error isWiFi:YES];
+        }];
     } else {
         NSLog(@"Status: Failed to find a device being commissioned");
     }
@@ -563,14 +562,14 @@
     CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
     if (chipDevice) {
         self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-        __auto_type * params = [[CHIPNetworkCommissioningClusterAddThreadNetworkParams alloc] init];
+        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
         params.operationalDataset = threadDataSet;
         params.breadcrumb = @(0);
 
         __weak typeof(self) weakSelf = self;
         [self->_cluster
-            addThreadNetworkWithParams:params
-                     completionHandler:^(CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams * _Nullable response,
+         addOrUpdateThreadNetworkWithParams:params
+                     completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
                          NSError * _Nullable error) {
                          // TODO: addThreadNetworkWithParams
                          // returns status in its response,
