@@ -136,6 +136,12 @@ public:
      * @param evt a variant holding an Event for the State Machine.
      */
     virtual void Dispatch(const TEvent & evt) = 0;
+
+    /**
+     * Provide access to the Event variant type so we can invoke the static
+     * Variant Create method.
+     */
+    using Event = TEvent;
 };
 
 /**
@@ -208,8 +214,8 @@ public:
  * @tparam TEvent a variant holding the Events.
  * @tparam TTransitions an object that implements the () operator for transitions.
  */
-template <typename TState, typename TEvent, typename TTransitions>
-class StateMachine : public Context<TEvent>
+template <typename TContext, typename TState, typename TEvent, typename TTransitions>
+class StateMachine : public TContext
 {
 public:
     StateMachine(TTransitions & tr) : mCurrentState(tr.GetInitState()), mTransitions(tr), mSequence(0) {}

@@ -20,16 +20,21 @@
 
 #include "../common/CHIPCommand.h"
 
-class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Controller::DeviceDiscoveryDelegate
+class DiscoverCommissionablesCommand : public CHIPCommand, public chip::Dnssd::ResolverDelegate
 {
 public:
     DiscoverCommissionablesCommand(CredentialIssuerCommands * credsIssuerConfig) : CHIPCommand("commissionables", credsIssuerConfig)
     {}
 
-    /////////// DeviceDiscoveryDelegate Interface /////////
-    void OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
+    /////////// ResolverDelegate Interface /////////
+    void OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) override;
+    void OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) override;
+    void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
+
+private:
+    chip::Dnssd::ResolverProxy mDnsResolver;
 };

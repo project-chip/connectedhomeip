@@ -157,7 +157,7 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     return id;
 }
 
-chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
+chip::Controller::DeviceController & CHIPCommand::CurrentCommissioner()
 {
     auto item = mCommissioners.find(GetIdentity());
     return *item->second.get();
@@ -212,7 +212,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupCommissioner(commissionerParams, *(commissioner.get())));
+    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupController(commissionerParams, *(commissioner.get())));
     mCommissioners[key] = std::move(commissioner);
 
     return CHIP_NO_ERROR;

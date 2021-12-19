@@ -18,6 +18,7 @@
 
 #include "PairingCommand.h"
 #include "platform/PlatformManager.h"
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPSafeCasts.h>
@@ -29,10 +30,10 @@
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+using Commissionee = chip::Commissioner::Commissionee;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    CurrentCommissioner().RegisterPairingDelegate(this);
     return RunInternal(mNodeId);
 }
 
@@ -85,20 +86,51 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    auto stateMachine = Platform::MakeShared<CommissioningStateMachine>();
+    VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
+    auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
+                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
+    if (err != CHIP_NO_ERROR)
+    {
+        stateMachine.get()->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
 {
-    return CurrentCommissioner().PairDevice(remoteId, mOnboardingPayload);
+    auto stateMachine = Platform::MakeShared<CommissioningStateMachine>();
+    VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
+    auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
+                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
+    if (err != CHIP_NO_ERROR)
+    {
+        stateMachine.get()->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
 {
-    RendezvousParameters params =
-        RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator).SetPeerAddress(address);
-    CommissioningParameters commissioningParams = GetCommissioningParameters();
-    return CurrentCommissioner().PairDevice(remoteId, params, commissioningParams);
+    auto stateMachine = Platform::MakeShared<CommissioningStateMachine>();
+    VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
+    auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
+    auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
+                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    CHIP_ERROR err =
+        stateMachine.get()->Commission(chip::RendezvousInformationFlag::kNone, mDiscriminator, mSetupPINCode, onSuccess, onFailure);
+    if (err != CHIP_NO_ERROR)
+    {
+        stateMachine.get()->Shutdown();
+    }
+    return err;
 }
 
 CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
@@ -109,7 +141,18 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     case chip::Dnssd::DiscoveryFilterType::kNone:
         break;
     case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
-    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator: {
+        auto stateMachine = Platform::MakeShared<CommissioningStateMachine>();
+        VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
+        auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
+        auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
+        stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
+                                 CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+        CHIP_ERROR err =
+            stateMachine.get()->Commission(chip::RendezvousInformationFlag::kOnNetwork, static_cast<uint16_t>(mDiscoveryFilterCode),
+                                           mSetupPINCode, onSuccess, onFailure);
+        return err;
+    }
     case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
     case chip::Dnssd::DiscoveryFilterType::kVendorId:
     case chip::Dnssd::DiscoveryFilterType::kDeviceType:
@@ -126,63 +169,24 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
         break;
     }
 
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
-    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
+    ReturnErrorOnFailure(
+        mDnsResolver.Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState()->UDPEndPointManager()));
+    mDnsResolver.SetResolverDelegate(this);
+    ReturnErrorOnFailure(mDnsResolver.FindCommissionableNodes(filter));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
+    CurrentCommissioner().ReleaseOperationalDevice(remoteId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
     SetCommandExitStatus(err);
     return err;
 }
 
-void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
+void PairingCommand::OnCommissioningComplete(CommissioningStateMachine & stateMachine)
 {
-    switch (status)
-    {
-    case DevicePairingDelegate::Status::SecurePairingSuccess:
-        ChipLogProgress(chipTool, "Secure Pairing Success");
-        break;
-    case DevicePairingDelegate::Status::SecurePairingFailed:
-        ChipLogError(chipTool, "Secure Pairing Failed");
-        break;
-    }
-}
-
-void PairingCommand::OnPairingComplete(CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Pairing Success");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "Pairing Failure: %s", ErrorStr(err));
-    }
-
-    if (err != CHIP_NO_ERROR)
-    {
-        SetCommandExitStatus(err);
-    }
-}
-
-void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
-{
-    if (err == CHIP_NO_ERROR)
-    {
-        ChipLogProgress(chipTool, "Pairing Deleted Success");
-    }
-    else
-    {
-        ChipLogProgress(chipTool, "Pairing Deleted Failure: %s", ErrorStr(err));
-    }
-
-    SetCommandExitStatus(err);
-}
-
-void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
-{
+    CHIP_ERROR err = stateMachine.GrabCommissionee(CurrentCommissioner());
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Device commissioning completed with success");
@@ -191,19 +195,24 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     {
         ChipLogProgress(chipTool, "Device commissioning Failure: %s", ErrorStr(err));
     }
-
+    stateMachine.Shutdown();
     SetCommandExitStatus(err);
 }
 
-void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
+void PairingCommand::OnCommissioningFailure(CommissioningStateMachine & stateMachine)
+{
+    ChipLogProgress(chipTool, "Device commissioning Failure");
+    SetCommandExitStatus(CHIP_ERROR_INTERNAL);
+}
+
+void PairingCommand::OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     const uint16_t port = nodeData.port;
     char buf[chip::Inet::IPAddress::kMaxStringLength];
     nodeData.ipAddress[0].ToString(buf);
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
-    // Stop Mdns discovery. Is it the right method ?
-    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(nullptr);
+    mDnsResolver.Shutdown();
 
     Inet::InterfaceId interfaceId = nodeData.ipAddress[0].IsIPv6LinkLocal() ? nodeData.interfaceId[0] : Inet::InterfaceId::Null();
     PeerAddress peerAddress       = PeerAddress::UDP(nodeData.ipAddress[0], port, interfaceId);
@@ -213,3 +222,7 @@ void PairingCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & 
         SetCommandExitStatus(err);
     }
 }
+
+void PairingCommand::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & nodeData) {}
+
+void PairingCommand::OnNodeIdResolutionFailed(const PeerId & peerId, CHIP_ERROR error) {}
