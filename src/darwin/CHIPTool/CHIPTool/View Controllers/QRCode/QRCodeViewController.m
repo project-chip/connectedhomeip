@@ -545,13 +545,15 @@
         params.breadcrumb = @(0);
 
         __weak typeof(self) weakSelf = self;
-        [self->_cluster addOrUpdateWiFiNetworkWithParams:params
-                                       completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response, NSError * _Nullable error) {
-            // TODO: addWiFiNetworkWithParams
-            // returns status in its response,
-            // not via the NSError!
-            [weakSelf onAddNetworkResponse:error isWiFi:YES];
-        }];
+        [self->_cluster
+            addOrUpdateWiFiNetworkWithParams:params
+                           completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
+                               NSError * _Nullable error) {
+                               // TODO: addWiFiNetworkWithParams
+                               // returns status in its response,
+                               // not via the NSError!
+                               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                           }];
     } else {
         NSLog(@"Status: Failed to find a device being commissioned");
     }
@@ -568,14 +570,14 @@
 
         __weak typeof(self) weakSelf = self;
         [self->_cluster
-         addOrUpdateThreadNetworkWithParams:params
-                     completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
-                         NSError * _Nullable error) {
-                         // TODO: addThreadNetworkWithParams
-                         // returns status in its response,
-                         // not via the NSError!
-                         [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                     }];
+            addOrUpdateThreadNetworkWithParams:params
+                             completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
+                                 NSError * _Nullable error) {
+                                 // TODO: addThreadNetworkWithParams
+                                 // returns status in its response,
+                                 // not via the NSError!
+                                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                             }];
     } else {
         NSLog(@"Status: Failed to find a device being  commissioned");
     }
