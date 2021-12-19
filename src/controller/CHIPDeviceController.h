@@ -279,7 +279,10 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
-        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+        mSuggestedSetUpPINCode = payload.setUpPINCode;
+        ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
+        payload = mSetupPayload;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -405,6 +408,7 @@ private:
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+    uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
     uint16_t mCommissioningWindowIteration;
