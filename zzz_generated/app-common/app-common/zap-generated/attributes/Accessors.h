@@ -2675,14 +2675,14 @@ namespace CurrentPositionLift {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
 } // namespace CurrentPositionLift
 
 namespace CurrentPositionTilt {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<uint16_t> & value);
 } // namespace CurrentPositionTilt
 
 namespace NumberOfActuationsLift {
@@ -2704,14 +2704,14 @@ namespace CurrentPositionLiftPercentage {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace CurrentPositionLiftPercentage
 
 namespace CurrentPositionTiltPercentage {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent> & value); // Percent
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent> & value);
 } // namespace CurrentPositionTiltPercentage
 
 namespace OperationalStatus {
@@ -2723,14 +2723,14 @@ namespace TargetPositionLiftPercent100ths {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent100ths> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace TargetPositionLiftPercent100ths
 
 namespace TargetPositionTiltPercent100ths {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent100ths> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace TargetPositionTiltPercent100ths
 
 namespace EndProductType {
@@ -2742,14 +2742,14 @@ namespace CurrentPositionLiftPercent100ths {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent100ths> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace CurrentPositionLiftPercent100ths
 
 namespace CurrentPositionTiltPercent100ths {
 EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<chip::Percent100ths> & value); // Percent100ths
 EmberAfStatus Set(chip::EndpointId endpoint, chip::Percent100ths value);
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<chip::Percent100ths> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, const chip::app::DataModel::Nullable<chip::Percent100ths> & value);
 } // namespace CurrentPositionTiltPercent100ths
 
 namespace InstalledOpenLimitLift {
