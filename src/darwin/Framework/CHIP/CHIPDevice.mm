@@ -155,8 +155,8 @@ private:
     params.mAttributePathParamsListSize = 1;
 
     auto callback = new SubscriptionCallback(queue, reportHandler, subscriptionEstablishedHandler);
-    ReadClient * readClient = new ReadClient(
-        InteractionModelEngine::GetInstance(), device->GetExchangeManager(), callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
+    ReadClient * readClient = new ReadClient(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
     CHIP_ERROR err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR) {

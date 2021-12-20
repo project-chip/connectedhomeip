@@ -176,8 +176,10 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
-        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId)) {
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId))
+        {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
         }
@@ -188,7 +190,8 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
         if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
             readClient->GetPeerNodeId() == aPeerNodeId)
         {

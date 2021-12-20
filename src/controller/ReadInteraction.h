@@ -61,7 +61,8 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
         clusterId, attributeId, readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, exchangeMgr, callback->GetBufferedCallback(), readParams.mReportType);
+    auto readClient =
+        chip::Platform::MakeUnique<app::ReadClient>(engine, exchangeMgr, callback->GetBufferedCallback(), readParams.mReportType);
 
     ReturnErrorOnFailure(readClient->SendRequest(readParams));
 
