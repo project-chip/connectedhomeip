@@ -48,6 +48,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/logging/Constants.h>
 
 /*
  * TODO: Revisit these if and when fabric ID and node ID support has
@@ -622,7 +623,7 @@ void PrintOptionHelp(OptionSet * optSets[], FILE * s)
  * Applications should call through the PrintArgError function pointer, rather
  * than calling this function directly.
  */
-void DefaultPrintArgError(const char * msg, ...)
+void ENFORCE_FORMAT(1, 2) DefaultPrintArgError(const char * msg, ...)
 {
     va_list ap;
 

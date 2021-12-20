@@ -202,6 +202,8 @@ config("strict_warnings") {
     "-Wshadow",
     "-Wunreachable-code",
     "-Wvla",
+    "-Wformat-nonliteral",
+    "-Wformat-security",
   ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
@@ -210,7 +212,6 @@ config("strict_warnings") {
 
   if (is_clang) {
     cflags += [
-      "-Wformat-nonliteral",
       "-Wimplicit-fallthrough",
       "-Wheader-hygiene",
       "-Wformat-type-confusion",

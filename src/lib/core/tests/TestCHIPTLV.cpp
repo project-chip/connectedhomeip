@@ -38,6 +38,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/UnitTestUtils.h>
+#include <lib/support/logging/Constants.h>
 
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -1628,8 +1629,7 @@ static void TestIntMinMax(nlTestSuite * inSuite, void * inContext)
  *                           to the format specifiers in @a aFormat.
  *
  */
-__attribute__((format_arg(1)))
-void SimpleDumpWriter(const char * aFormat, ...)
+void ENFORCE_FORMAT(1, 2) SimpleDumpWriter(const char * aFormat, ...)
 {
     va_list args;
 

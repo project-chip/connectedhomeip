@@ -36,6 +36,7 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/logging/Constants.h>
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1614,7 +1615,9 @@ public:
      *               `WriteElementHead` or `GetNewBuffer` -- failed, their
      *               error is immediately forwarded up the call stack.
      */
-    CHIP_ERROR PutStringF(Tag tag, const char * fmt, ...);
+    // The ENFORCE_FORMAT args are "off by one" because this is a class method,
+    // with an implicit "this" as first arg.
+    CHIP_ERROR PutStringF(Tag tag, const char * fmt, ...) ENFORCE_FORMAT(3, 4);
 
     /**
      * @brief
@@ -1660,7 +1663,9 @@ public:
      *               `WriteElementHead` or `GetNewBuffer` -- failed, their
      *               error is immediately forwarded up the call stack.
      */
-    CHIP_ERROR VPutStringF(Tag tag, const char * fmt, va_list ap);
+    // The ENFORCE_FORMAT args are "off by one" because this is a class method,
+    // with an implicit "this" as first arg.
+    CHIP_ERROR VPutStringF(Tag tag, const char * fmt, va_list ap) ENFORCE_FORMAT(3, 0);
 
     /**
      * Encodes a TLV null value.

@@ -174,7 +174,7 @@ CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t 
     return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, value.Value());
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, int minCharactersWritten, const char * format, ...)
+CHIP_ERROR ENFORCE_FORMAT(4, 5) CopyTextRecordValue(char * buffer, size_t bufferLen, int minCharactersWritten, const char * format, ...)
 {
     va_list args;
     va_start(args, format);

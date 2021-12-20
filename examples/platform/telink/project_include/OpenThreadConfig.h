@@ -25,6 +25,8 @@
 // Project-specific settings
 #include "openthread/platform/logging.h"
 
+#include <lib/support/logging/Constants.h>
+
 #undef OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 64
 
@@ -98,4 +100,4 @@
 #undef OPENTHREAD_CONFIG_PLAT_LOG_MACRO_NAME
 #define OPENTHREAD_CONFIG_PLAT_LOG_MACRO_NAME tlOtPlatLog
 
-void tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...);
+void tlOtPlatLog(otLogLevel aLogLevel, otLogRegion aLogRegion, const char * aFormat, ...) ENFORCE_FORMAT(3, 4);

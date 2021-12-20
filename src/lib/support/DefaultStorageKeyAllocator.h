@@ -18,6 +18,7 @@
 
 #include <app/util/basic-types.h>
 #include <string.h>
+#include <lib/support/logging/Constants.h>
 
 namespace chip {
 
@@ -48,7 +49,9 @@ public:
 private:
     static const size_t kKeyLengthMax = 32;
 
-    const char * Format(const char * format...)
+    // The ENFORCE_FORMAT args are "off by one" because this is a class method,
+    // with an implicit "this" as first arg.
+    const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
     {
         va_list args;
         va_start(args, format);

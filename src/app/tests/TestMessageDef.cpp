@@ -37,6 +37,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/logging/Constants.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -46,8 +47,7 @@ namespace {
 
 using namespace chip::app;
 
-__attribute__((format_arg(1)))
-void TLVPrettyPrinter(const char * aFormat, ...)
+void ENFORCE_FORMAT(1, 2) TLVPrettyPrinter(const char * aFormat, ...)
 {
     va_list args;
 
