@@ -269,7 +269,7 @@ public:
      * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
-     * @param[out] payload        The generated setup payload.
+     * @param[in,out] payload     The generated setup payload.
      *                            - The payload is generated only if the user didn't ask for using the original setup code.
      *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
      *                              this payload
