@@ -35,7 +35,7 @@ class NFCManagerImpl;
  * @brief Defines an abstract interface for programming an NFC Tag.
  *
  * NFC Tag can be used in Project CHIP to share commissioning information such
- * as the device discriminator and PIN code with a comissioner. This class
+ * as the device discriminator and PIN code with a commissioner. This class
  * provides an interface to set contents of a programmable NFC Tag.
  */
 class NFCManager

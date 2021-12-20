@@ -116,7 +116,7 @@ public:
 ///
 /// Calls appropriate delegate callbacks while parsing
 ///
-/// returns true if packet was succesfully parsed, false otherwise
+/// returns true if packet was successfully parsed, false otherwise
 bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate);
 
 } // namespace Minimal

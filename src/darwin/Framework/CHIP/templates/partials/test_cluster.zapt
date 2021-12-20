@@ -155,6 +155,11 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
             XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
           }
         }
+        {{else if (isLiteralNull expectedConstraints.notValue)}}
+        {
+          {{> actualValue}}
+          XCTAssertFalse(actualValue == nil);
+        }
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}

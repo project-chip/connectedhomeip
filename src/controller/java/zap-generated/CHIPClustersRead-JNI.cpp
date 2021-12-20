@@ -7305,13 +7305,15 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, readClusterRevisionAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeyMapAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::Groups::TypeInfo;
-    std::unique_ptr<CHIPGroupKeyManagementGroupsAttributeCallback, void (*)(CHIPGroupKeyManagementGroupsAttributeCallback *)>
-        onSuccess(chip::Platform::New<CHIPGroupKeyManagementGroupsAttributeCallback>(callback, false),
-                  chip::Platform::Delete<CHIPGroupKeyManagementGroupsAttributeCallback>);
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo;
+    std::unique_ptr<CHIPGroupKeyManagementGroupKeyMapAttributeCallback,
+                    void (*)(CHIPGroupKeyManagementGroupKeyMapAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPGroupKeyManagementGroupKeyMapAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPGroupKeyManagementGroupKeyMapAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -7329,8 +7331,8 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, j
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn =
-        chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto successFn = chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
     err            = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(
@@ -7341,13 +7343,14 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupsAttribute)(JNIEnv * env, j
     onFailure.release();
 }
 
-JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, GroupKeyManagementCluster, readGroupTableAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
-    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeys::TypeInfo;
-    std::unique_ptr<CHIPGroupKeyManagementGroupKeysAttributeCallback, void (*)(CHIPGroupKeyManagementGroupKeysAttributeCallback *)>
-        onSuccess(chip::Platform::New<CHIPGroupKeyManagementGroupKeysAttributeCallback>(callback, false),
-                  chip::Platform::Delete<CHIPGroupKeyManagementGroupKeysAttributeCallback>);
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::GroupTable::TypeInfo;
+    std::unique_ptr<CHIPGroupKeyManagementGroupTableAttributeCallback,
+                    void (*)(CHIPGroupKeyManagementGroupTableAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPGroupKeyManagementGroupTableAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPGroupKeyManagementGroupTableAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -7366,7 +7369,80 @@ JNI_METHOD(void, GroupKeyManagementCluster, readGroupKeysAttribute)(JNIEnv * env
                        env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, GroupKeyManagementCluster, readMaxGroupsPerFabricAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        chip::Platform::New<CHIPInt16uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<chip::CHIPDefaultFailureCallback, void (*)(chip::CHIPDefaultFailureCallback *)> onFailure(
+        chip::Platform::New<chip::CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<chip::CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Controller::GroupKeyManagementCluster * cppCluster =
+        reinterpret_cast<chip::Controller::GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPGroupKeyManagementClusterMaxGroupsPerFabricAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+    err            = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error reading attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+
+JNI_METHOD(void, GroupKeyManagementCluster, readMaxGroupKeysPerFabricAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+{
+    chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        chip::Platform::New<CHIPInt16uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<chip::CHIPDefaultFailureCallback, void (*)(chip::CHIPDefaultFailureCallback *)> onFailure(
+        chip::Platform::New<chip::CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<chip::CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Controller::GroupKeyManagementCluster * cppCluster =
+        reinterpret_cast<chip::Controller::GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterMaxGroupKeysPerFabricAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
     err            = cppCluster->ReadAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall);
     VerifyOrReturn(

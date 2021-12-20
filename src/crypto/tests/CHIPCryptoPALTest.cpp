@@ -615,7 +615,7 @@ static void TestAsn1Conversions(nlTestSuite * inSuite, void * inContext)
         out_der_sig.Calloc(out_der_sig_allocated_size);
         NL_TEST_ASSERT(inSuite, out_der_sig);
 
-        // Test converstion from ASN.1 ER to raw
+        // Test conversion from ASN.1 ER to raw
         MutableByteSpan out_raw_sig_span(out_raw_sig.Get(), out_raw_sig_allocated_size);
 
         CHIP_ERROR status = EcdsaAsn1SignatureToRaw(vector->fe_length_bytes,

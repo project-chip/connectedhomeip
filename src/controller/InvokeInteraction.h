@@ -78,8 +78,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
 
     //
-    // We've effectively transfered ownership of the above allocated objects to CommandSender, and we need to wait for it to call us
-    // back when processing is completed (through OnDone) to eventually free up resources.
+    // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
+    // us back when processing is completed (through OnDone) to eventually free up resources.
     //
     // So signal that by releasing the smart pointer.
     //

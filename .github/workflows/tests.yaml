@@ -68,8 +68,7 @@ jobs:
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name:
-                      bootstrap-logs-linux-${{ matrix.type }}-${{
-                      matrix.eventloop }}
+                      bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -100,8 +99,7 @@ jobs:
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name:
-                      crash-core-linux-${{ matrix.type }}-${{ matrix.eventloop
-                      }}
+                      crash-core-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /tmp/cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -110,8 +108,7 @@ jobs:
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name:
-                      crash-objdir-linux-${{ matrix.type }}-${{ matrix.eventloop
-                      }}
+                      crash-objdir-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5
@@ -161,8 +158,7 @@ jobs:
               if: ${{ always() }} && ${{ !env.ACT }}
               with:
                   name:
-                      bootstrap-logs-darwin-${{ matrix.type }}-${{
-                      matrix.eventloop }}
+                      bootstrap-logs-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: |
                       .environment/gn_out/.ninja_log
                       .environment/pigweed-venv/*.log
@@ -192,8 +188,7 @@ jobs:
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name:
-                      crash-core-darwin-${{ matrix.type }}-${{ matrix.eventloop
-                      }}
+                      crash-core-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: /cores/
                   # Cores are big; don't hold on to them too long.
                   retention-days: 5
@@ -202,16 +197,14 @@ jobs:
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name:
-                      crash-log-darwin-${{ matrix.type }}-${{ matrix.eventloop
-                      }}
+                      crash-log-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Uploading objdir for debugging
               uses: actions/upload-artifact@v2
               if: ${{ failure() }} && ${{ !env.ACT }}
               with:
                   name:
-                      crash-objdir-darwin-${{ matrix.type }}-${{
-                      matrix.eventloop }}
+                      crash-objdir-darwin-${{ matrix.build_variant }}${{ matrix.chip_tool }}
                   path: objdir-clone/
                   # objdirs are big; don't hold on to them too long.
                   retention-days: 5

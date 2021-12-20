@@ -178,6 +178,15 @@ public:
     }
 
     /**
+     * Encode an explicit empty list.
+     */
+    CHIP_ERROR EncodeEmptyList()
+    {
+        // Doesn't matter what type List we use here.
+        return Encode(DataModel::List<uint8_t>());
+    }
+
+    /**
      * aCallback is expected to take a const auto & argument and Encode() on it as many times as needed to encode all the list
      * elements one by one.  If any of those Encode() calls returns failure, aCallback must stop encoding and return failure.  When
      * all items are encoded aCallback is expected to return success.
@@ -200,7 +209,7 @@ public:
         // EmptyList acts as the beginning of the whole array type attribute report.
         // An empty list is encoded iff both mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex are invalid
         // values. After encoding the empty list, mEncodeState.mCurrentEncodingListIndex and mCurrentEncodingListIndex are set to 0.
-        ReturnErrorOnFailure(EncodeEmptyList());
+        ReturnErrorOnFailure(EnsureListStarted());
         ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
         // The Encode procedure finished without any error, clear the state.
         mEncodeState = AttributeEncodeState();
@@ -226,7 +235,7 @@ private:
     template <typename... Ts>
     CHIP_ERROR EncodeListItem(Ts &&... aArgs)
     {
-        // EncodeListItem must be called after EncodeEmptyList(), thus mCurrentEncodingListIndex and
+        // EncodeListItem must be called after EnsureListStarted(), thus mCurrentEncodingListIndex and
         // mEncodeState.mCurrentEncodingListIndex are not invalid values.
         if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)
         {
@@ -273,7 +282,8 @@ private:
     }
 
     /**
-     * EncodeEmptyList encodes the first item of one report with lists (an empty list).
+     * EnsureListStarted encodes the first item of one report with lists (an
+     * empty list), as needed.
      *
      * If internal state indicates we have already encoded the empty list, this function will encode nothing, set
      * mCurrentEncodingListIndex to 0 and return CHIP_NO_ERROR.
@@ -282,7 +292,7 @@ private:
      * after it returns, because at that point we will be encoding the list
      * items.
      */
-    CHIP_ERROR EncodeEmptyList();
+    CHIP_ERROR EnsureListStarted();
 
     bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;

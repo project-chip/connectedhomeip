@@ -62,7 +62,7 @@ void TestOutOfMemory(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, alloc.AnyAllocFailed());
 }
 
-const nlTest sTests[] = { NL_TEST_DEF("Test successfull clone", TestClone), NL_TEST_DEF("Test out of memory", TestOutOfMemory),
+const nlTest sTests[] = { NL_TEST_DEF("Test successful clone", TestClone), NL_TEST_DEF("Test out of memory", TestOutOfMemory),
                           NL_TEST_SENTINEL() };
 
 } // namespace

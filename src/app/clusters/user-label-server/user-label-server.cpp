@@ -72,7 +72,7 @@ CHIP_ERROR UserLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValu
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<Structs::LabelStruct::Type>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;

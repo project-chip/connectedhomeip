@@ -49,12 +49,12 @@ using namespace chip::Transport;
 using namespace chip::Messaging;
 using namespace chip::Protocols;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = Test::LoopbackMessagingContext<>;
 
 namespace {
-TransportMgrBase gTransportMgr;
-Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
+TestContext sContext;
+
+auto & gLoopback = sContext.GetLoopback();
 
 FabricTable gCommissionerFabrics;
 FabricIndex gCommissionerFabricIndex;
@@ -179,12 +179,17 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), nullptr, Node01_01, 0, nullptr,
                                             nullptr) != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, nullptr,
                                             nullptr) != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(inSuite,
                    pairing.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context,
                                             &delegate) == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 1);
 
@@ -205,6 +210,8 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite,
                    pairing1.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0, context1,
                                              &delegate) == CHIP_ERROR_BAD_REQUEST);
+    ctx.DrainAndServiceIO();
+
     gLoopback.mMessageSendError = CHIP_NO_ERROR;
 }
 
@@ -237,6 +244,7 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                         contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
@@ -363,7 +371,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     SessionIDAllocator idAllocator;
 
     NL_TEST_ASSERT(inSuite,
-                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &gTransportMgr, nullptr,
+                   gPairingServer.ListenForSessionEstablishment(&ctx.GetExchangeManager(), &ctx.GetTransportMgr(), nullptr,
                                                                 &ctx.GetSecureSessionManager(), &gDeviceFabrics,
                                                                 &idAllocator) == CHIP_NO_ERROR);
 
@@ -375,6 +383,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                          contextCommissioner, &delegateCommissioner) == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
@@ -386,6 +395,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner1->EstablishSession(Transport::PeerAddress(Transport::Type::kBle), fabric, Node01_01, 0,
                                                           contextCommissioner1, &delegateCommissioner) == CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
 
     chip::Platform::Delete(pairingCommissioner);
     chip::Platform::Delete(pairingCommissioner1);
@@ -637,8 +647,6 @@ static nlTestSuite sSuite =
 };
 // clang-format on
 
-static TestContext sContext;
-
 namespace {
 /*
  *  Set up the test suite.
@@ -647,20 +655,14 @@ CHIP_ERROR CASETestSecurePairingSetup(void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
-
-    gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init());
-
-    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
+    ReturnErrorOnFailure(ctx.Init());
+    ctx.EnableAsyncDispatch();
 
     ctx.SetBobNodeId(kPlaceholderNodeId);
     ctx.SetAliceNodeId(kPlaceholderNodeId);
     ctx.SetBobKeyId(0);
     ctx.SetAliceKeyId(0);
     ctx.SetFabricIndex(kUndefinedFabricIndex);
-
-    gTransportMgr.SetSessionManager(&ctx.GetSecureSessionManager());
 
     gCommissionerFabrics.Init(&gCommissionerStorageDelegate);
     gDeviceFabrics.Init(&gDeviceStorageDelegate);
@@ -682,13 +684,11 @@ int CASE_TestSecurePairing_Setup(void * inContext)
  */
 int CASE_TestSecurePairing_Teardown(void * inContext)
 {
-    reinterpret_cast<TestContext *>(inContext)->Shutdown();
-    gIOContext.Shutdown();
     gCommissionerStorageDelegate.Cleanup();
     gDeviceStorageDelegate.Cleanup();
     gCommissionerFabrics.Reset();
     gDeviceFabrics.Reset();
-    chip::Platform::MemoryShutdown();
+    static_cast<TestContext *>(inContext)->Shutdown();
     return SUCCESS;
 }
 

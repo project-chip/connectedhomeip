@@ -175,7 +175,7 @@ bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, 
     bool globalSceneControl;
     uint8_t endpoint = emberAfCurrentEndpoint();
 
-    // Ensure parameters have values withing proper range.
+    // Ensure parameters have values within proper range.
     if (effectId > EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT ||
         effectVariant >
             EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_50_PERCENT_DIM_DOWN_IN_0P8_SECONDS_THEN_FADE_TO_OFF_IN_12_SECONDS ||

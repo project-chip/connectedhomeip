@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
+ *      This file implements an object for a CHIP Echo unsolicited
  *      responder (server).
  *
  */

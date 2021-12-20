@@ -600,8 +600,10 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
-#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
+#define ZCL_GROUP_KEY_MAP_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUP_TABLE_ATTRIBUTE_ID (0x0001)
+#define ZCL_MAX_GROUPS_PER_FABRIC_ATTRIBUTE_ID (0x0002)
+#define ZCL_MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Fixed Label
 
