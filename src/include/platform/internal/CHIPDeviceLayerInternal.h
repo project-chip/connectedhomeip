@@ -20,13 +20,3 @@
 #pragma once
 
 #include <platform/CHIPDeviceLayer.h>
-
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-
-extern const char * const TAG;
-
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip

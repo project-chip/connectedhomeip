@@ -194,8 +194,9 @@ public:
 static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inContext)
 {
     MockSystemLayer systemLayer;
+    System::Layer & savedSystemLayer = DeviceLayer::SystemLayer();
 
-    DeviceLayer::SetSystemLayerForTesting(&systemLayer);
+    DeviceLayer::Internal::SetSystemLayerForTesting(&systemLayer);
     NL_TEST_ASSERT(inSuite, &DeviceLayer::SystemLayer() == static_cast<chip::System::Layer *>(&systemLayer));
 
     CHIP_ERROR err = PlatformMgr().InitChipStack();
@@ -209,7 +210,7 @@ static void TestPlatformMgr_MockSystemLayer(nlTestSuite * inSuite, void * inCont
     err = PlatformMgr().Shutdown();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    DeviceLayer::SetSystemLayerForTesting(nullptr);
+    DeviceLayer::Internal::SetSystemLayerForTesting(&savedSystemLayer);
 }
 
 /**

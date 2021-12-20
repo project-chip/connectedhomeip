@@ -155,7 +155,7 @@ void RequestUserDirectedCommissioning(System::SocketEvents events, intptr_t data
     int selectedCommissionerNumber = CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES;
     scanf("%d", &selectedCommissionerNumber);
     printf("%d\n", selectedCommissionerNumber);
-    chip::DeviceLayer::SystemLayerSockets().StopWatchingSocket(&gToken);
+    static_cast<chip::System::LayerSockets &>(chip::DeviceLayer::SystemLayer()).StopWatchingSocket(&gToken);
 
     const Dnssd::DiscoveredNodeData * selectedCommissioner =
         gCommissionableNodeController.GetDiscoveredCommissioner(selectedCommissionerNumber - 1);
@@ -187,10 +187,12 @@ void InitCommissioningFlow(intptr_t commandArg)
         int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         VerifyOrReturn(fcntl(0, F_SETFL, flags | O_NONBLOCK) == 0,
                        ChipLogError(AppServer, "Could not set non-blocking mode for user input!"));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().StartWatchingSocket(STDIN_FILENO, &gToken));
         ReturnOnFailure(
-            chip::DeviceLayer::SystemLayerSockets().SetCallback(gToken, RequestUserDirectedCommissioning, (intptr_t) NULL));
-        ReturnOnFailure(chip::DeviceLayer::SystemLayerSockets().RequestCallbackOnPendingRead(gToken));
+            static_cast<chip::System::LayerSockets &>(chip::DeviceLayer::SystemLayer()).StartWatchingSocket(STDIN_FILENO, &gToken));
+        ReturnOnFailure(static_cast<chip::System::LayerSockets &>(chip::DeviceLayer::SystemLayer())
+                            .SetCallback(gToken, RequestUserDirectedCommissioning, (intptr_t) NULL));
+        ReturnOnFailure(
+            static_cast<chip::System::LayerSockets &>(chip::DeviceLayer::SystemLayer()).RequestCallbackOnPendingRead(gToken));
     }
     else
     {

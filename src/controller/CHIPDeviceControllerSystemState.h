@@ -63,8 +63,10 @@ namespace Controller {
 struct DeviceControllerSystemStateParams
 {
     System::Layer * systemLayer                                   = nullptr;
-    Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager = nullptr;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -84,11 +86,13 @@ class DeviceControllerSystemState
 public:
     ~DeviceControllerSystemState(){};
     DeviceControllerSystemState(DeviceControllerSystemStateParams params) :
-        mSystemLayer(params.systemLayer), mTCPEndPointManager(params.tcpEndPointManager),
-        mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr), mSessionMgr(params.sessionMgr),
-        mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager), mFabrics(params.fabricTable),
-        mIMDelegate(params.imDelegate)
+        mSystemLayer(params.systemLayer), mUDPEndPointManager(params.udpEndPointManager), mTransportMgr(params.transportMgr),
+        mSessionMgr(params.sessionMgr), mExchangeMgr(params.exchangeMgr), mMessageCounterManager(params.messageCounterManager),
+        mFabrics(params.fabricTable), mIMDelegate(params.imDelegate)
     {
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        mTCPEndPointManager = params.tcpEndPointManager;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -123,7 +127,6 @@ public:
     };
 
     System::Layer * SystemLayer() { return mSystemLayer; };
-    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() { return mTCPEndPointManager; };
     Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager() { return mUDPEndPointManager; };
     DeviceTransportMgr * TransportMgr() { return mTransportMgr; };
     SessionManager * SessionMgr() { return mSessionMgr; };
@@ -131,6 +134,9 @@ public:
     secure_channel::MessageCounterManager * MessageCounterManager() { return mMessageCounterManager; };
     FabricTable * Fabrics() { return mFabrics; };
     DeviceControllerInteractionModelDelegate * IMDelegate() { return mIMDelegate; }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager() { return mTCPEndPointManager; };
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() { return mBleLayer; };
 #endif
@@ -139,8 +145,10 @@ private:
     DeviceControllerSystemState(){};
 
     System::Layer * mSystemLayer                                   = nullptr;
-    Inet::EndPointManager<Inet::TCPEndPoint> * mTCPEndPointManager = nullptr;
     Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    Inet::EndPointManager<Inet::TCPEndPoint> * mTCPEndPointManager = nullptr;
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif

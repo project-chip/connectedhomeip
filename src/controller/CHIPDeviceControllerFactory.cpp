@@ -64,8 +64,10 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
     if (mSystemState != nullptr)
     {
         params.systemLayer        = mSystemState->SystemLayer();
-        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
         params.udpEndPointManager = mSystemState->UDPEndPointManager();
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+#endif
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
@@ -93,11 +95,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
     stateParams.systemLayer        = &DeviceLayer::SystemLayer();
-    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
     stateParams.udpEndPointManager = DeviceLayer::UDPEndPointManager();
 #else
     stateParams.systemLayer        = params.systemLayer;
-    stateParams.tcpEndPointManager = params.tcpEndPointManager;
     stateParams.udpEndPointManager = params.udpEndPointManager;
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
@@ -105,11 +105,19 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+#if CONFIG_DEVICE_LAYER
+    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
+#else
+    stateParams.tcpEndPointManager = params.tcpEndPointManager;
+#endif // CONFIG_DEVICE_LAYER
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
     stateParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #else
-    stateParams.bleLayer = params.bleLayer;
+    stateParams.bleLayer           = params.bleLayer;
 #endif // CONFIG_DEVICE_LAYER
     VerifyOrReturnError(stateParams.bleLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif

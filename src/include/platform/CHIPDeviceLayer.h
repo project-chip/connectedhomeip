@@ -42,16 +42,64 @@
 namespace chip {
 namespace DeviceLayer {
 
-void SetSystemLayerForTesting(System::LayerImpl * layer);
+namespace Internal {
 
-// These functions are defined in src/platform/Globals.cpp
-chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager();
-chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager();
-chip::System::Layer & SystemLayer();
+extern const char * const TAG;
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-chip::System::LayerSockets & SystemLayerSockets();
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+// These globals should only be used via the functions declared below.
+extern System::Clock::ClockBase * gClock;
+extern System::Layer * gSystemLayer;
+extern Inet::EndPointManager<Inet::UDPEndPoint> * gUDPEndPointManager;
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+extern Inet::EndPointManager<Inet::TCPEndPoint> * gTCPEndPointManager;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+// Inside the Internal namespace to emphasize that it is not for general use.
+inline void SetSystemLayerForTesting(System::Layer * layer)
+{
+    Internal::gSystemLayer = layer;
+}
+
+}; // namespace Internal
+
+/**
+ * Access to the global System::Layer singleton.
+ */
+inline System::Layer & SystemLayer()
+{
+    return *Internal::gSystemLayer;
+}
+
+/**
+ * Access to the global EndPointManager<UDPEndPoint> singleton.
+ */
+inline Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
+{
+    return Internal::gUDPEndPointManager;
+}
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+
+/**
+ * Access to the global EndPointManager<TCPEndPoint> singleton.
+ *
+ * Only valid after `InitTCPEndPointManager()` has been called.
+ */
+inline Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
+{
+    return Internal::gTCPEndPointManager;
+}
+
+/**
+ * Initialize the global EndPointManager<TCPEndPoint> singleton.
+ *
+ * Must be called before any use of TCP (i.e., any call to `TCPEndPointManager()`).
+ * Must be paired with a call to `TCPEndPointManager()->Shutdown()` on exit, after any
+ * TCP EndPoints have been released and before `SystemLayer().Shutdown()`.
+ */
+CHIP_ERROR InitTCPEndPointManager();
+
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace DeviceLayer
 } // namespace chip
