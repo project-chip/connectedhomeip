@@ -110,8 +110,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
     ReturnErrorOnFailure(GetUpTime(upTimeS));
 
-    uint32_t totalHours = 0;
-    const uint32_t upTimeH = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
+    uint32_t totalHours      = 0;
+    const uint32_t upTimeH   = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
     const uint32_t deltaTime = upTimeH - PlatformMgrImpl().GetSavedOperationalHoursSinceBoot();
 
     ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(totalHours));

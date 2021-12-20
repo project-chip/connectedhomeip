@@ -64,7 +64,7 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
 
-    System::Clock::Timestamp mStartTime                    = System::Clock::kZero;
+    System::Clock::Timestamp mStartTime      = System::Clock::kZero;
     uint32_t mSavedOperationalHoursSinceBoot = 0;
 
     explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}

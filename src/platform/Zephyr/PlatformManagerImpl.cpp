@@ -72,14 +72,15 @@ void PlatformManagerImpl::UpdateOperationalHours(intptr_t arg)
 {
     uint64_t upTimeS;
 
-    if (GetDiagnosticDataProvider().GetUpTime(upTimeS) != CHIP_NO_ERROR) {
+    if (GetDiagnosticDataProvider().GetUpTime(upTimeS) != CHIP_NO_ERROR)
+    {
         ChipLogError(DeviceLayer, "Failed to get up time of the node");
         return;
     }
 
     uint32_t totalOperationalHours = 0;
-    const uint32_t upTimeH = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
-    const uint32_t deltaTime = upTimeH - sInstance.mSavedOperationalHoursSinceBoot;
+    const uint32_t upTimeH         = upTimeS / 3600 < UINT32_MAX ? static_cast<uint32_t>(upTimeS / 3600) : UINT32_MAX;
+    const uint32_t deltaTime       = upTimeH - sInstance.mSavedOperationalHoursSinceBoot;
 
     if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
     {
@@ -133,7 +134,8 @@ void PlatformManagerImpl::OnDeviceBoot(intptr_t arg)
 {
     GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    if (generalDiagnosticsDelegate) {
+    if (generalDiagnosticsDelegate)
+    {
         generalDiagnosticsDelegate->OnDeviceRebooted();
     }
 }
