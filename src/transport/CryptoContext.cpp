@@ -184,7 +184,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     KeyUsage usage = kR2IKey;
 
     // Message is encrypted before sending. If the secure session was created by session
-    // initiator, we'll use I2R key to encrypt the message that's being transmittted.
+    // initiator, we'll use I2R key to encrypt the message that's being transmitted.
     // Otherwise, we'll use R2I key, as the responder is sending the message.
     if (mSessionRole == SessionRole::kInitiator)
     {

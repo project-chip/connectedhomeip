@@ -320,7 +320,11 @@ class {{filename}}: public TestCommand
               {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
               {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
               {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
-              {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
+              {{~#if expectedConstraints.notValue}}
+                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+              {{else if (isLiteralNull expectedConstraints.notValue)}}
+                VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>item}}));
+              {{/if}}
             {{/if}}
 
             {{#if saveAs}}

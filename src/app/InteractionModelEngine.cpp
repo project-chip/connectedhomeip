@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and
+ *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicited IM message, and
  *      manage different kinds of IM client and handlers.
  *
  */

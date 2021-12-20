@@ -748,7 +748,7 @@ uint8_t BLEManagerImpl::ProcessStackEvent(ICall_Hdr * pMsg)
                 }
                 else
                 {
-                    /* PHY Update successfull */
+                    /* PHY Update successful */
                 }
             }
             break;

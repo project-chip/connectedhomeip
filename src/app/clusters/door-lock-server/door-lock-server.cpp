@@ -70,7 +70,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 
     emberAfDoorLockClusterPrintln("Setting Lock State to '%hhu'", lockState);
 
-    bool status = Attributes::LockState::Set(endpointId, lockState);
+    bool status = (Attributes::LockState::Set(endpointId, newLockState) == EMBER_ZCL_STATUS_SUCCESS);
     if (!status)
     {
         ChipLogError(Zcl, "Unable to set the Lock State to %hhu: internal error", lockState);
@@ -79,13 +79,13 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     return status;
 }
 
-bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActuatorState)
+bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState)
 {
     auto actuatorState = static_cast<uint8_t>(newActuatorState);
 
     emberAfDoorLockClusterPrintln("Setting Actuator State to '%hhu'", actuatorState);
 
-    bool status = Attributes::LockState::Set(endpointId, actuatorState);
+    bool status = (Attributes::ActuatorEnabled::Set(endpointId, newActuatorState) == EMBER_ZCL_STATUS_SUCCESS);
     if (!status)
     {
         ChipLogError(Zcl, "Unable to set the Actuator State to %hhu: internal error", actuatorState);
@@ -94,12 +94,12 @@ bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActua
     return false;
 }
 
-bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDoorState)
+bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState)
 {
     auto doorState = static_cast<uint8_t>(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting Door State to '%hhu'", doorState);
-    bool status = Attributes::DoorState::Set(endpointId, doorState);
+    bool status = (Attributes::DoorState::Set(endpointId, newDoorState) == EMBER_ZCL_STATUS_SUCCESS);
 
     if (!status)
     {

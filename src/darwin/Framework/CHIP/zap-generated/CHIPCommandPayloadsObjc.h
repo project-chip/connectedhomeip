@@ -622,10 +622,11 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull providerLocation;
+@property (strong, nonatomic) NSNumber * _Nonnull providerNodeId;
 @property (strong, nonatomic) NSNumber * _Nonnull vendorId;
 @property (strong, nonatomic) NSNumber * _Nonnull announcementReason;
 @property (strong, nonatomic) NSData * _Nullable metadataForNode;
+@property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 - (instancetype)init;
 @end
 
@@ -822,6 +823,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull trustedRootIdentifier;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetRemoveParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 - (instancetype)init;
 @end
 

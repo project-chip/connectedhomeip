@@ -2544,19 +2544,19 @@ void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & value)
+void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupState * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupState new];
-        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-        newElement_0.vendorGroupId = [NSNumber numberWithUnsignedShort:entry_0.vendorGroupId];
-        newElement_0.groupKeySetIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetIndex];
+        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2570,9 +2570,9 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void *
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2586,21 +2586,37 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
+void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
-        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-        newElement_0.groupKeyIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeyIndex];
-        newElement_0.groupKeyRoot = [NSData dataWithBytes:entry_0.groupKeyRoot.data() length:entry_0.groupKeyRoot.size()];
-        newElement_0.groupKeyEpochStartTime = [NSNumber numberWithUnsignedLongLong:entry_0.groupKeyEpochStartTime];
-        newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
+        CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        auto * array_2 = [NSMutableArray new];
+        auto iter_2 = entry_0.endpoints.begin();
+        while (iter_2.Next()) {
+            auto & entry_2 = iter_2.GetValue();
+            NSNumber * newElement_2;
+            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+            [array_2 addObject:newElement_2];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        newElement_0.endpoints = array_2;
+        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
+                                                          length:entry_0.groupName.size()
+                                                        encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2614,9 +2630,9 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -3179,6 +3195,50 @@ void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSu
 void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+        newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
+        newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -5265,6 +5325,53 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::O
         response.debugText = [[NSString alloc] initWithBytes:data.debugText.data()
                                                       length:data.debugText.size()
                                                     encoding:NSUTF8StringEncoding];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
+{
+    auto * response = [CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
+    {
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.groupKeySetIDs.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        response.groupKeySetIDs = array_0;
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
+{
+    auto * response = [CHIPGroupKeyManagementClusterKeySetReadResponseParams new];
+    {
+        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
+        response.groupKeySet.securityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.securityPolicy)];
+        response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.data()
+                                                        length:data.groupKeySet.epochKey0.size()];
+        response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0];
+        response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.data()
+                                                        length:data.groupKeySet.epochKey1.size()];
+        response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1];
+        response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.data()
+                                                        length:data.groupKeySet.epochKey2.size()];
+        response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2];
     }
     DispatchSuccess(context, response);
 };

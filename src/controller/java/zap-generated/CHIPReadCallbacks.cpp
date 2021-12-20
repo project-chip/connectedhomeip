@@ -5184,144 +5184,9 @@ void CHIPGeneralDiagnosticsAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
-CHIPGroupKeyManagementGroupsAttributeCallback::CHIPGroupKeyManagementGroupsAttributeCallback(jobject javaCallback, bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupsAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPGroupKeyManagementGroupsAttributeCallback::~CHIPGroupKeyManagementGroupsAttributeCallback()
-{
-    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-}
-
-void CHIPGroupKeyManagementGroupsAttributeCallback::CallbackFn(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
-
-    std::unique_ptr<CHIPGroupKeyManagementGroupsAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallback *>(context), maybeDestroy);
-
-    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
-    javaCallbackRef = cppCallback.get()->javaCallbackRef;
-    VerifyOrReturn(javaCallbackRef != nullptr,
-                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
-
-    jclass arrayListClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
-    chip::JniClass arrayListJniClass(arrayListClass);
-    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
-    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
-    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
-                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
-    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
-    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
-
-    jmethodID javaMethod;
-    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
-
-    jclass attributeClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupsAttribute", attributeClass);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupsAttribute"));
-    chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupsAttribute constructor"));
-
-    auto iter = list.begin();
-    while (iter.Next())
-    {
-        auto & entry = iter.GetValue();
-        (void) entry;
-        bool vendorIdNull     = false;
-        bool vendorIdHasValue = true;
-
-        uint16_t vendorIdValue = entry.vendorId;
-
-        jobject vendorId = nullptr;
-        if (!vendorIdNull && vendorIdHasValue)
-        {
-            jclass vendorIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", vendorIdEntryCls);
-            chip::JniClass vendorIdJniClass(vendorIdEntryCls);
-            jmethodID vendorIdEntryTypeCtor = env->GetMethodID(vendorIdEntryCls, "<init>", "(I)V");
-            vendorId                        = env->NewObject(vendorIdEntryCls, vendorIdEntryTypeCtor, vendorIdValue);
-        }
-
-        bool vendorGroupIdNull     = false;
-        bool vendorGroupIdHasValue = true;
-
-        uint16_t vendorGroupIdValue = entry.vendorGroupId;
-
-        jobject vendorGroupId = nullptr;
-        if (!vendorGroupIdNull && vendorGroupIdHasValue)
-        {
-            jclass vendorGroupIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", vendorGroupIdEntryCls);
-            chip::JniClass vendorGroupIdJniClass(vendorGroupIdEntryCls);
-            jmethodID vendorGroupIdEntryTypeCtor = env->GetMethodID(vendorGroupIdEntryCls, "<init>", "(I)V");
-            vendorGroupId = env->NewObject(vendorGroupIdEntryCls, vendorGroupIdEntryTypeCtor, vendorGroupIdValue);
-        }
-
-        bool groupKeySetIndexNull     = false;
-        bool groupKeySetIndexHasValue = true;
-
-        uint16_t groupKeySetIndexValue = entry.groupKeySetIndex;
-
-        jobject groupKeySetIndex = nullptr;
-        if (!groupKeySetIndexNull && groupKeySetIndexHasValue)
-        {
-            jclass groupKeySetIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeySetIndexEntryCls);
-            chip::JniClass groupKeySetIndexJniClass(groupKeySetIndexEntryCls);
-            jmethodID groupKeySetIndexEntryTypeCtor = env->GetMethodID(groupKeySetIndexEntryCls, "<init>", "(I)V");
-            groupKeySetIndex = env->NewObject(groupKeySetIndexEntryCls, groupKeySetIndexEntryTypeCtor, groupKeySetIndexValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, vendorId, vendorGroupId, groupKeySetIndex);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupsAttribute object"));
-
-        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
-    }
-    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding GroupsAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
-
-    env->ExceptionClear();
-    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
-}
-
-CHIPGroupKeyManagementGroupKeysAttributeCallback::CHIPGroupKeyManagementGroupKeysAttributeCallback(jobject javaCallback,
-                                                                                                   bool keepAlive) :
-    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType>(CallbackFn, this),
+CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CHIPGroupKeyManagementGroupKeyMapAttributeCallback(jobject javaCallback,
+                                                                                                       bool keepAlive) :
+    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>(CallbackFn, this),
     keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -5338,7 +5203,7 @@ CHIPGroupKeyManagementGroupKeysAttributeCallback::CHIPGroupKeyManagementGroupKey
     }
 }
 
-CHIPGroupKeyManagementGroupKeysAttributeCallback::~CHIPGroupKeyManagementGroupKeysAttributeCallback()
+CHIPGroupKeyManagementGroupKeyMapAttributeCallback::~CHIPGroupKeyManagementGroupKeyMapAttributeCallback()
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -5349,7 +5214,7 @@ CHIPGroupKeyManagementGroupKeysAttributeCallback::~CHIPGroupKeyManagementGroupKe
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
+void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
 {
@@ -5360,8 +5225,8 @@ void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIPGroupKeyManagementGroupKeysAttributeCallback, decltype(&maybeDestroy)> cppCallback(
-        reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallback *>(context), maybeDestroy);
+    std::unique_ptr<CHIPGroupKeyManagementGroupKeyMapAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGroupKeyManagementGroupKeyMapAttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -5385,103 +5250,207 @@ void CHIPGroupKeyManagementGroupKeysAttributeCallback::CallbackFn(
 
     jclass attributeClass;
     err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeysAttribute", attributeClass);
+        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute", attributeClass);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
-        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeysAttribute"));
+        ChipLogError(Zcl,
+                     "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute"));
     chip::JniClass attributeJniClass(attributeClass);
-    jmethodID attributeCtor = env->GetMethodID(attributeClass, "<init>",
-                                               "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;Ljava/lang/Integer;)V");
-    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupKeysAttribute constructor"));
+    jmethodID attributeCtor =
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupKeyMapAttribute constructor"));
 
     auto iter = list.begin();
     while (iter.Next())
     {
         auto & entry = iter.GetValue();
         (void) entry;
-        bool vendorIdNull     = false;
-        bool vendorIdHasValue = true;
+        bool fabricIndexNull     = false;
+        bool fabricIndexHasValue = true;
 
-        uint16_t vendorIdValue = entry.vendorId;
+        uint16_t fabricIndexValue = entry.fabricIndex;
 
-        jobject vendorId = nullptr;
-        if (!vendorIdNull && vendorIdHasValue)
+        jobject fabricIndex = nullptr;
+        if (!fabricIndexNull && fabricIndexHasValue)
         {
-            jclass vendorIdEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", vendorIdEntryCls);
-            chip::JniClass vendorIdJniClass(vendorIdEntryCls);
-            jmethodID vendorIdEntryTypeCtor = env->GetMethodID(vendorIdEntryCls, "<init>", "(I)V");
-            vendorId                        = env->NewObject(vendorIdEntryCls, vendorIdEntryTypeCtor, vendorIdValue);
+            jclass fabricIndexEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
+            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
+            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
+            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
         }
 
-        bool groupKeyIndexNull     = false;
-        bool groupKeyIndexHasValue = true;
+        bool groupIdNull     = false;
+        bool groupIdHasValue = true;
 
-        uint16_t groupKeyIndexValue = entry.groupKeyIndex;
+        uint16_t groupIdValue = entry.groupId;
 
-        jobject groupKeyIndex = nullptr;
-        if (!groupKeyIndexNull && groupKeyIndexHasValue)
+        jobject groupId = nullptr;
+        if (!groupIdNull && groupIdHasValue)
         {
-            jclass groupKeyIndexEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeyIndexEntryCls);
-            chip::JniClass groupKeyIndexJniClass(groupKeyIndexEntryCls);
-            jmethodID groupKeyIndexEntryTypeCtor = env->GetMethodID(groupKeyIndexEntryCls, "<init>", "(I)V");
-            groupKeyIndex = env->NewObject(groupKeyIndexEntryCls, groupKeyIndexEntryTypeCtor, groupKeyIndexValue);
+            jclass groupIdEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
+            chip::JniClass groupIdJniClass(groupIdEntryCls);
+            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
+            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
         }
 
-        bool groupKeyRootNull     = false;
-        bool groupKeyRootHasValue = true;
+        bool groupKeySetIDNull     = false;
+        bool groupKeySetIDHasValue = true;
 
-        chip::ByteSpan groupKeyRootValue = entry.groupKeyRoot;
+        uint16_t groupKeySetIDValue = entry.groupKeySetID;
 
-        jbyteArray groupKeyRoot = nullptr;
-        if (!groupKeyRootNull && groupKeyRootHasValue)
+        jobject groupKeySetID = nullptr;
+        if (!groupKeySetIDNull && groupKeySetIDHasValue)
         {
-            groupKeyRoot = env->NewByteArray(groupKeyRootValue.size());
-            env->SetByteArrayRegion(groupKeyRoot, 0, groupKeyRootValue.size(),
-                                    reinterpret_cast<const jbyte *>(groupKeyRootValue.data()));
+            jclass groupKeySetIDEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeySetIDEntryCls);
+            chip::JniClass groupKeySetIDJniClass(groupKeySetIDEntryCls);
+            jmethodID groupKeySetIDEntryTypeCtor = env->GetMethodID(groupKeySetIDEntryCls, "<init>", "(I)V");
+            groupKeySetID = env->NewObject(groupKeySetIDEntryCls, groupKeySetIDEntryTypeCtor, groupKeySetIDValue);
         }
 
-        bool groupKeyEpochStartTimeNull     = false;
-        bool groupKeyEpochStartTimeHasValue = true;
-
-        uint64_t groupKeyEpochStartTimeValue = entry.groupKeyEpochStartTime;
-
-        jobject groupKeyEpochStartTime = nullptr;
-        if (!groupKeyEpochStartTimeNull && groupKeyEpochStartTimeHasValue)
-        {
-            jclass groupKeyEpochStartTimeEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", groupKeyEpochStartTimeEntryCls);
-            chip::JniClass groupKeyEpochStartTimeJniClass(groupKeyEpochStartTimeEntryCls);
-            jmethodID groupKeyEpochStartTimeEntryTypeCtor = env->GetMethodID(groupKeyEpochStartTimeEntryCls, "<init>", "(J)V");
-            groupKeyEpochStartTime =
-                env->NewObject(groupKeyEpochStartTimeEntryCls, groupKeyEpochStartTimeEntryTypeCtor, groupKeyEpochStartTimeValue);
-        }
-
-        bool groupKeySecurityPolicyNull     = false;
-        bool groupKeySecurityPolicyHasValue = true;
-
-        chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy groupKeySecurityPolicyValue = entry.groupKeySecurityPolicy;
-
-        jobject groupKeySecurityPolicy = nullptr;
-        if (!groupKeySecurityPolicyNull && groupKeySecurityPolicyHasValue)
-        {
-            jclass groupKeySecurityPolicyEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeySecurityPolicyEntryCls);
-            chip::JniClass groupKeySecurityPolicyJniClass(groupKeySecurityPolicyEntryCls);
-            jmethodID groupKeySecurityPolicyEntryTypeCtor = env->GetMethodID(groupKeySecurityPolicyEntryCls, "<init>", "(I)V");
-            groupKeySecurityPolicy =
-                env->NewObject(groupKeySecurityPolicyEntryCls, groupKeySecurityPolicyEntryTypeCtor, groupKeySecurityPolicyValue);
-        }
-
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, vendorId, groupKeyIndex, groupKeyRoot,
-                                              groupKeyEpochStartTime, groupKeySecurityPolicy);
-        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupKeysAttribute object"));
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupKeySetID);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupKeyMapAttribute object"));
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
     }
     VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Error decoding GroupKeysAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+                   ChipLogError(Zcl, "Error decoding GroupKeyMapAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPGroupKeyManagementGroupTableAttributeCallback::CHIPGroupKeyManagementGroupTableAttributeCallback(jobject javaCallback,
+                                                                                                     bool keepAlive) :
+    chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPGroupKeyManagementGroupTableAttributeCallback::~CHIPGroupKeyManagementGroupTableAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPGroupKeyManagementGroupTableAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPGroupKeyManagementGroupTableAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jclass arrayListClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+    chip::JniClass arrayListJniClass(arrayListClass);
+    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor =
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupTableAttribute constructor"));
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+        (void) entry;
+        bool fabricIndexNull     = false;
+        bool fabricIndexHasValue = true;
+
+        uint16_t fabricIndexValue = entry.fabricIndex;
+
+        jobject fabricIndex = nullptr;
+        if (!fabricIndexNull && fabricIndexHasValue)
+        {
+            jclass fabricIndexEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
+            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
+            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
+            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+        }
+
+        bool groupIdNull     = false;
+        bool groupIdHasValue = true;
+
+        uint16_t groupIdValue = entry.groupId;
+
+        jobject groupId = nullptr;
+        if (!groupIdNull && groupIdHasValue)
+        {
+            jclass groupIdEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
+            chip::JniClass groupIdJniClass(groupIdEntryCls);
+            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
+            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
+        }
+
+        bool groupNameNull     = false;
+        bool groupNameHasValue = true;
+
+        chip::CharSpan groupNameValue = entry.groupName;
+
+        jstring groupName = nullptr;
+        chip::UtfString groupNameStr(env, groupNameValue);
+        if (!groupNameNull && groupNameHasValue)
+        {
+            groupName = jstring(groupNameStr.jniValue());
+        }
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupName);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupTableAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+    }
+    VerifyOrReturn(iter.GetStatus() == CHIP_NO_ERROR,
+                   ChipLogError(Zcl, "Error decoding GroupTableAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
@@ -7345,6 +7314,210 @@ void CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::CallbackFn(
 
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
+    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::
+    ~CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jclass arrayListClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+    chip::JniClass arrayListJniClass(arrayListClass);
+    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$OtaSoftwareUpdateRequestorCluster$DefaultOtaProvidersAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl,
+                     "Could not find class "
+                     "chip/devicecontroller/ChipClusters$OtaSoftwareUpdateRequestorCluster$DefaultOtaProvidersAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor =
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Long;Ljava/lang/Integer;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find DefaultOtaProvidersAttribute constructor"));
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & entry = iter.GetValue();
+        (void) entry;
+        bool fabricIndexNull     = false;
+        bool fabricIndexHasValue = true;
+
+        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
+
+        jobject fabricIndex = nullptr;
+        if (!fabricIndexNull && fabricIndexHasValue)
+        {
+            jclass fabricIndexEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
+            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
+            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
+            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+        }
+
+        bool providerNodeIDNull     = false;
+        bool providerNodeIDHasValue = true;
+
+        chip::NodeId providerNodeIDValue = entry.providerNodeID;
+
+        jobject providerNodeID = nullptr;
+        if (!providerNodeIDNull && providerNodeIDHasValue)
+        {
+            jclass providerNodeIDEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", providerNodeIDEntryCls);
+            chip::JniClass providerNodeIDJniClass(providerNodeIDEntryCls);
+            jmethodID providerNodeIDEntryTypeCtor = env->GetMethodID(providerNodeIDEntryCls, "<init>", "(J)V");
+            providerNodeID = env->NewObject(providerNodeIDEntryCls, providerNodeIDEntryTypeCtor, providerNodeIDValue);
+        }
+
+        bool endpointNull     = false;
+        bool endpointHasValue = true;
+
+        chip::EndpointId endpointValue = entry.endpoint;
+
+        jobject endpoint = nullptr;
+        if (!endpointNull && endpointHasValue)
+        {
+            jclass endpointEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", endpointEntryCls);
+            chip::JniClass endpointJniClass(endpointEntryCls);
+            jmethodID endpointEntryTypeCtor = env->GetMethodID(endpointEntryCls, "<init>", "(I)V");
+            endpoint                        = env->NewObject(endpointEntryCls, endpointEntryTypeCtor, endpointValue);
+        }
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, providerNodeID, endpoint);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create DefaultOtaProvidersAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
+    }
+    VerifyOrReturn(
+        iter.GetStatus() == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Error decoding DefaultOtaProvidersAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
+CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::
+    CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::
+    ~CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    jobject javaValue;
+
+    std::string javaValueClassName     = "java/lang/Integer";
+    std::string javaValueCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(javaValueClassName.c_str(), javaValueCtorSignature.c_str(),
+                                                                  value.Value(), javaValue);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
 
 CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback::CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback(

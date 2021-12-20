@@ -27,10 +27,10 @@ namespace Credentials {
 constexpr size_t kExpectedAttestationNonceSize = 32;
 
 /**
- *  @brief Take the attestation elements buffer and return each component seperately.
+ *  @brief Take the attestation elements buffer and return each component separately.
  *         All output data stays valid while attestationElements buffer is valid.
  *
- *  @param[in]    attestationElements ByteSpan containg source of Attestation Elements data.
+ *  @param[in]    attestationElements ByteSpan containing source of Attestation Elements data.
  *  @param[out]   certificationDeclaration
  *  @param[out]   attestationNonce
  *  @param[out]   timestamp

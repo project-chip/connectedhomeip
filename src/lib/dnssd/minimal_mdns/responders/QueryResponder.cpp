@@ -45,7 +45,7 @@ void QueryResponderBase::Init()
 
     if (mResponderInfoSize < 2)
     {
-        // Nothing usefull really
+        // Nothing useful really
         ChipLogError(Discovery, "Query responder storage size too small");
     }
 }

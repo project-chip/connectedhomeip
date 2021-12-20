@@ -33,13 +33,7 @@
 
 using namespace chip;
 
-using TestContext = chip::Test::MessagingContext;
-
 namespace {
-TransportMgrBase gTransportMgr;
-Test::LoopbackTransport gLoopback;
-chip::Test::IOContext gIOContext;
-
 NodeId sTest_PeerId = 0xEDEDEDED00010001;
 
 uint8_t sTest_SharedSecret[] = {
@@ -197,23 +191,13 @@ static nlTestSuite sSuite =
 };
 // clang-format on
 
-static TestContext sContext;
-
 namespace {
 /*
  *  Set up the test suite.
  */
 CHIP_ERROR CASETestCacheSetup(void * inContext)
 {
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
     ReturnErrorOnFailure(chip::Platform::MemoryInit());
-
-    gTransportMgr.Init(&gLoopback);
-    ReturnErrorOnFailure(gIOContext.Init());
-
-    ReturnErrorOnFailure(ctx.Init(&gTransportMgr, &gIOContext));
-
     return CHIP_NO_ERROR;
 }
 } // anonymous namespace
@@ -231,8 +215,6 @@ int CASESessionCache_Test_Setup(void * inContext)
  */
 int CASESessionCache_Test_Teardown(void * inContext)
 {
-    reinterpret_cast<TestContext *>(inContext)->Shutdown();
-    gIOContext.Shutdown();
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
@@ -243,7 +225,7 @@ int CASESessionCache_Test_Teardown(void * inContext)
 int TestCASESessionCache()
 {
     // Run test suit against one context
-    nlTestRunner(&sSuite, &sContext);
+    nlTestRunner(&sSuite, nullptr);
 
     return (nlTestRunnerStats(&sSuite));
 }

@@ -264,23 +264,35 @@ typedef struct _FabricDescriptor
     chip::CharSpan Label;
 } FabricDescriptor;
 
+// Struct for GroupInfo
+typedef struct _GroupInfo
+{
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    /* TYPE WARNING: array array defaults to */ uint8_t * endpoints;
+    chip::CharSpan groupName;
+} GroupInfo;
+
 // Struct for GroupKey
 typedef struct _GroupKey
 {
-    uint16_t VendorId;
-    uint16_t GroupKeyIndex;
-    chip::ByteSpan GroupKeyRoot;
-    uint64_t GroupKeyEpochStartTime;
-    uint8_t GroupKeySecurityPolicy;
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    uint16_t groupKeySetID;
 } GroupKey;
 
-// Struct for GroupState
-typedef struct _GroupState
+// Struct for GroupKeySet
+typedef struct _GroupKeySet
 {
-    uint16_t VendorId;
-    uint16_t VendorGroupId;
-    uint16_t GroupKeySetIndex;
-} GroupState;
+    uint16_t groupKeySetID;
+    uint8_t securityPolicy;
+    chip::ByteSpan epochKey0;
+    uint64_t epochStartTime0;
+    chip::ByteSpan epochKey1;
+    uint64_t epochStartTime1;
+    chip::ByteSpan epochKey2;
+    uint64_t epochStartTime2;
+} GroupKeySet;
 
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult
@@ -403,6 +415,14 @@ typedef struct _PowerProfileRecord
     bool powerProfileRemoteControl;
     uint8_t powerProfileState;
 } PowerProfileRecord;
+
+// Struct for ProviderLocation
+typedef struct _ProviderLocation
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId ProviderNodeID;
+    chip::EndpointId Endpoint;
+} ProviderLocation;
 
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord

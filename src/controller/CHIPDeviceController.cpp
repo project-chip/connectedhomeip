@@ -468,6 +468,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         break;
     case 2:
         mCommissioningWindowOption = CommissioningWindowOption::kTokenWithProvidedPIN;
+        mSetupPayload.setUpPINCode = mSuggestedSetUpPINCode;
         break;
     default:
         ChipLogError(Controller, "Invalid Pairing Window option");
@@ -1182,7 +1183,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
         {
             ChipLogError(Controller,
                          "Failed in verifying 'Attestation Information' command received from the device due to default "
-                         "DeviceAttestationVerifier Class not being overriden by a real implementation.");
+                         "DeviceAttestationVerifier Class not being overridden by a real implementation.");
             return CHIP_ERROR_NOT_IMPLEMENTED;
         }
         else

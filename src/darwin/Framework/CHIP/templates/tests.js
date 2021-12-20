@@ -177,6 +177,7 @@ function getTests()
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestGroupsCluster',
+    'TestGroupKeyManagementCluster',
     'TestIdentifyCluster',
     'TestLogCommands',
     'TestOperationalCredentialsCluster',

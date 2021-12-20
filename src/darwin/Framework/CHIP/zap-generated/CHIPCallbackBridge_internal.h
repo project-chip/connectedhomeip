@@ -59,6 +59,10 @@ typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallb
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
@@ -2468,28 +2472,28 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGroupKeyManagementGroupsListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGroupsListAttributeCallback>
+class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>
 {
 public:
-    CHIPGroupKeyManagementGroupsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGroupsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementGroupKeyMapListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
             value);
 };
 
-class CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementGroupsListAttributeCallbackBridge
+class CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge
 {
 public:
-    CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                        CHIPActionBlock action,
-                                                                        SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementGroupsListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action,
+                                                                             SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2499,28 +2503,28 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
-class CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGroupKeysListAttributeCallback>
+class CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>
 {
 public:
-    CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGroupKeysListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GroupKeyManagementGroupTableListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
             value);
 };
 
-class CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge
-    : public CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge
+class CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge
+    : public CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge
 {
 public:
-    CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                           CHIPActionBlock action,
-                                                                           SubscriptionEstablishedHandler establishedHandler) :
-        CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge(queue, handler, action, true),
+    CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action,
+                                                                            SubscriptionEstablishedHandler establishedHandler) :
+        CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -2917,6 +2921,37 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
+    : public CHIPCallbackBridge<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>
+{
+public:
+    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value);
+};
+
+class CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge
+    : public CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge
+{
+public:
+    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
@@ -4232,6 +4267,33 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action,
+                                                                                                  OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
 };
 
 class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<CHIPGroupsClusterAddGroupResponseCallbackType>

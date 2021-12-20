@@ -101,6 +101,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPOtaSoftwareUpdateRequestorClusterProviderLocation : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull providerNodeID;
+@property (strong, nonatomic) NSNumber * _Nonnull endpoint;
+- (instancetype)init;
+@end
+
 @interface CHIPGeneralCommissioningClusterBasicCommissioningInfoType : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull failSafeExpiryLengthMs;
 - (instancetype)init;
@@ -230,19 +237,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyIndex;
-@property (strong, nonatomic) NSData * _Nonnull groupKeyRoot;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyEpochStartTime;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
+@interface CHIPGroupKeyManagementClusterGroupInfo : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (strong, nonatomic) NSArray * _Nonnull endpoints;
+@property (strong, nonatomic) NSString * _Nonnull groupName;
 - (instancetype)init;
 @end
 
-@interface CHIPGroupKeyManagementClusterGroupState : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull vendorGroupId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetIndex;
+@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterGroupKeySet : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (strong, nonatomic) NSNumber * _Nonnull securityPolicy;
+@property (strong, nonatomic) NSData * _Nonnull epochKey0;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime0;
+@property (strong, nonatomic) NSData * _Nonnull epochKey1;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime1;
+@property (strong, nonatomic) NSData * _Nonnull epochKey2;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime2;
 - (instancetype)init;
 @end
 

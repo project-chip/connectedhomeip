@@ -489,11 +489,19 @@ typedef void (*CHIPGeneralDiagnosticsClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 
-typedef void (*CHIPGroupKeyManagementClusterGroupsAttributeCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Attributes::Groups::TypeInfo::DecodableType &);
-typedef void (*CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeys::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Attributes::GroupTable::TypeInfo::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterMaxGroupsPerFabricAttributeCallbackType)(
+    void *, chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo::DecodableArgType);
+typedef void (*CHIPGroupKeyManagementClusterMaxGroupKeysPerFabricAttributeCallbackType)(
+    void *, chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupKeyManagementClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupKeyManagementClusterClusterRevisionAttributeCallbackType)(
@@ -684,10 +692,14 @@ typedef void (*CHIPOtaSoftwareUpdateProviderClusterAttributeListAttributeCallbac
 typedef void (*CHIPOtaSoftwareUpdateProviderClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProviderAttributeCallbackType)(
-    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo::DecodableArgType);
+typedef void (*CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdatePossibleAttributeCallbackType)(
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo::DecodableArgType);
+typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdateStateAttributeCallbackType)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo::DecodableArgType);
+typedef void (*CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttributeCallbackType)(
+    void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo::DecodableArgType);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPOtaSoftwareUpdateRequestorClusterClusterRevisionAttributeCallbackType)(

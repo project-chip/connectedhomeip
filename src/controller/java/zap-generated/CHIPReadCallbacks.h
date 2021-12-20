@@ -1792,53 +1792,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPGroupKeyManagementGroupsAttributeCallback
-    : public chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupsAttributeCallbackType>
+class CHIPGroupKeyManagementGroupKeyMapAttributeCallback
+    : public chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>
 {
 public:
-    CHIPGroupKeyManagementGroupsAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPGroupKeyManagementGroupKeyMapAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPGroupKeyManagementGroupsAttributeCallback();
+    ~CHIPGroupKeyManagementGroupKeyMapAttributeCallback();
 
-    static void maybeDestroy(CHIPGroupKeyManagementGroupsAttributeCallback * callback)
+    static void maybeDestroy(CHIPGroupKeyManagementGroupKeyMapAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPGroupKeyManagementGroupsAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
-            list);
-    static void OnSubscriptionEstablished(void * context)
-    {
-        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementGroupsAttributeCallback *>(context)->javaCallbackRef);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
-    };
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-class CHIPGroupKeyManagementGroupKeysAttributeCallback
-    : public chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType>
-{
-public:
-    CHIPGroupKeyManagementGroupKeysAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPGroupKeyManagementGroupKeysAttributeCallback();
-
-    static void maybeDestroy(CHIPGroupKeyManagementGroupKeysAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPGroupKeyManagementGroupKeysAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPGroupKeyManagementGroupKeyMapAttributeCallback>(callback);
         }
     }
 
@@ -1849,7 +1816,40 @@ public:
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
-            reinterpret_cast<CHIPGroupKeyManagementGroupKeysAttributeCallback *>(context)->javaCallbackRef);
+            reinterpret_cast<CHIPGroupKeyManagementGroupKeyMapAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPGroupKeyManagementGroupTableAttributeCallback
+    : public chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>
+{
+public:
+    CHIPGroupKeyManagementGroupTableAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPGroupKeyManagementGroupTableAttributeCallback();
+
+    static void maybeDestroy(CHIPGroupKeyManagementGroupTableAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPGroupKeyManagementGroupTableAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
+            list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPGroupKeyManagementGroupTableAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 
@@ -2518,6 +2518,68 @@ public:
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
             reinterpret_cast<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback
+    : public chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType>
+{
+public:
+    CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback();
+
+    static void maybeDestroy(CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context,
+                           const chip::app::DataModel::DecodableList<
+                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback
+    : public chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttributeCallbackType>
+{
+public:
+    CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback();
+
+    static void maybeDestroy(CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback *>(context)->javaCallbackRef);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
     };
 

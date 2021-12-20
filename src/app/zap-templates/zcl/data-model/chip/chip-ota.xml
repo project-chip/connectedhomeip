@@ -39,7 +39,7 @@ limitations under the License.
     <cluster>
         <name>OTA Software Update Provider</name>
         <domain>CHIP</domain>
-        <description></description>
+        <description>Provides an interface for providing OTA software updates</description>
         <code>0x0029</code>
         <define>OTA_PROVIDER_CLUSTER</define>
         <client tick="false" init="false">true</client>
@@ -107,42 +107,51 @@ limitations under the License.
         <item name="Failure" value="0x2"/>
         <item name="TimeOut" value="0x3"/>
         <item name="DelayByProvider" value="0x4"/>
-    </enum>         
+    </enum>
+    <struct name="ProviderLocation">
+        <cluster code="0x002a"/>
+        <item fieldId="0" name="FabricIndex" type="fabric_idx"/>
+        <item fieldId="1" name="ProviderNodeID" type="node_id"/>
+        <item fieldId="2" name="Endpoint" type="endpoint_no"/>
+    </struct>
     <cluster>
         <name>OTA Software Update Requestor</name>
         <domain>CHIP</domain>
-        <description>TODO</description>
+        <description>Provides an interface for downloading and applying OTA software updates</description>
         <code>0x002a</code>
         <define>OTA_REQUESTOR_CLUSTER</define>
         <client tick="false" init="false">true</client>
         <server tick="false" init="false">true</server>
-        <attribute side="server" code="0x0001" define="DEFAULT_OTA_PROVIDER" type="OCTET_STRING" length="16" writable="true"  optional="false">default ota provider</attribute>
-        <attribute side="server" code="0x0002" define="UPDATE_POSSIBLE"      type="BOOLEAN"                  writable="false" optional="false">update possible</attribute>
-        <command source="client" code="0" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
-            <description>Notify OTA Provider that an update was applied</description>
-            <arg name="providerLocation" type="NODE_ID"/>
-            <arg name="vendorId" type="VENDOR_ID"/>
+        <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOtaProviders</attribute>
+        <attribute side="server" code="0x0001" define="UPDATE_POSSIBLE" type="BOOLEAN" default="true" writable="false" optional="false">UpdatePossible</attribute>
+        <attribute side="server" code="0x0002" define="UPDATE_STATE" type="UpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
+        <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="INT8U" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
+        <command source="client" code="0x00" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
+            <description>Announce the presence of an OTA Provider</description>
+            <arg name="providerNodeId" type="node_id"/>
+            <arg name="vendorId" type="vendor_id"/>
             <arg name="announcementReason" type="OTAAnnouncementReason"/>
             <arg name="metadataForNode" type="OCTET_STRING" length="512" optional="true"/>
+            <arg name="endpoint" type="endpoint_no"/>
         </command>
         <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
           <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
-          <field id="0" name="PreviousState" type="UpdateStateEnum"/>
+          <field id="0" name="PreviousState" type="UpdateStateEnum" isNullable="true"/>
           <field id="1" name="NewState" type="UpdateStateEnum"/>
           <field id="2" name="Reason" type="ChangeReasonEnum"/>
-          <field id="3" name="TargetSoftwareVersion" type="INT32U"/>                 
+          <field id="3" name="TargetSoftwareVersion" type="INT32U" isNullable="true"/>
         </event> 
         <event side="server" code="0x01" name="VersionApplied" priority="critical" optional="false">
           <description>This event SHALL be generated whenever a new version starts executing after being applied due to a software update.</description>
           <field id="0" name="SoftwareVersion" type="INT32U"/> 
-          <field id="1" name="ProductID" type="INT16U"/> 
+          <field id="1" name="ProductID" type="INT16U"/>
         </event>
         <event side="server" code="0x02" name="DownloadError" priority="info" optional="false">
           <description>This event SHALL be generated whenever an error occurs during OTA Requestor download operation.</description>
           <field id="0" name="SoftwareVersion" type="INT32U"/> 
           <field id="1" name="BytesDownloaded" type="INT64U"/>
-          <field id="2" name="ProgressPercent" type="INT8U"/> 
-          <field id="3" name="PlatformCode" type="INT64S"/>         
+          <field id="2" name="ProgressPercent" type="INT8U" min="0" max="100"/>
+          <field id="3" name="PlatformCode" type="INT64S" isNullable="true"/>
         </event>                     
     </cluster>
 </configurator>

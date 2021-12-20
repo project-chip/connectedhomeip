@@ -2798,35 +2798,66 @@ public class ClusterReadMapping {
         readGeneralDiagnosticsClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("generalDiagnostics", readGeneralDiagnosticsInteractionInfo);
     Map<String, InteractionInfo> readGroupKeyManagementInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> readGroupKeyManagementGroupsCommandParams =
+    Map<String, CommandParameterInfo> readGroupKeyManagementGroupKeyMapCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readGroupKeyManagementGroupsAttributeInteractionInfo =
+    InteractionInfo readGroupKeyManagementGroupKeyMapAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.GroupKeyManagementCluster) cluster)
-                  .readGroupsAttribute(
-                      (ChipClusters.GroupKeyManagementCluster.GroupsAttributeCallback) callback);
-            },
-            () ->
-                new ClusterInfoMapping.DelegatedGroupKeyManagementClusterGroupsAttributeCallback(),
-            readGroupKeyManagementGroupsCommandParams);
-    readGroupKeyManagementInteractionInfo.put(
-        "readGroupsAttribute", readGroupKeyManagementGroupsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readGroupKeyManagementGroupKeysCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readGroupKeyManagementGroupKeysAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.GroupKeyManagementCluster) cluster)
-                  .readGroupKeysAttribute(
-                      (ChipClusters.GroupKeyManagementCluster.GroupKeysAttributeCallback) callback);
+                  .readGroupKeyMapAttribute(
+                      (ChipClusters.GroupKeyManagementCluster.GroupKeyMapAttributeCallback)
+                          callback);
             },
             () ->
                 new ClusterInfoMapping
-                    .DelegatedGroupKeyManagementClusterGroupKeysAttributeCallback(),
-            readGroupKeyManagementGroupKeysCommandParams);
+                    .DelegatedGroupKeyManagementClusterGroupKeyMapAttributeCallback(),
+            readGroupKeyManagementGroupKeyMapCommandParams);
     readGroupKeyManagementInteractionInfo.put(
-        "readGroupKeysAttribute", readGroupKeyManagementGroupKeysAttributeInteractionInfo);
+        "readGroupKeyMapAttribute", readGroupKeyManagementGroupKeyMapAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGroupKeyManagementGroupTableCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGroupKeyManagementGroupTableAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .readGroupTableAttribute(
+                      (ChipClusters.GroupKeyManagementCluster.GroupTableAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedGroupKeyManagementClusterGroupTableAttributeCallback(),
+            readGroupKeyManagementGroupTableCommandParams);
+    readGroupKeyManagementInteractionInfo.put(
+        "readGroupTableAttribute", readGroupKeyManagementGroupTableAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGroupKeyManagementMaxGroupsPerFabricCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGroupKeyManagementMaxGroupsPerFabricAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .readMaxGroupsPerFabricAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGroupKeyManagementMaxGroupsPerFabricCommandParams);
+    readGroupKeyManagementInteractionInfo.put(
+        "readMaxGroupsPerFabricAttribute",
+        readGroupKeyManagementMaxGroupsPerFabricAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGroupKeyManagementMaxGroupKeysPerFabricCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGroupKeyManagementMaxGroupKeysPerFabricAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .readMaxGroupKeysPerFabricAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGroupKeyManagementMaxGroupKeysPerFabricCommandParams);
+    readGroupKeyManagementInteractionInfo.put(
+        "readMaxGroupKeysPerFabricAttribute",
+        readGroupKeyManagementMaxGroupKeysPerFabricAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGroupKeyManagementAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGroupKeyManagementAttributeListAttributeInteractionInfo =
@@ -3729,20 +3760,24 @@ public class ClusterReadMapping {
     Map<String, InteractionInfo> readOtaSoftwareUpdateRequestorInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo>
-        readOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams =
+        readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo =
+    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .readDefaultOtaProviderAttribute(
-                      (ChipClusters.OctetStringAttributeCallback) callback);
+                  .readDefaultOtaProvidersAttribute(
+                      (ChipClusters.OtaSoftwareUpdateRequestorCluster
+                              .DefaultOtaProvidersAttributeCallback)
+                          callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
-            readOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams);
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback(),
+            readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams);
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
-        "readDefaultOtaProviderAttribute",
-        readOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo);
+        "readDefaultOtaProvidersAttribute",
+        readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdatePossibleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo =
@@ -3756,6 +3791,36 @@ public class ClusterReadMapping {
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
         "readUpdatePossibleAttribute",
         readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdateStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateRequestorUpdateStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
+                  .readUpdateStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOtaSoftwareUpdateRequestorUpdateStateCommandParams);
+    readOtaSoftwareUpdateRequestorInteractionInfo.put(
+        "readUpdateStateAttribute",
+        readOtaSoftwareUpdateRequestorUpdateStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readOtaSoftwareUpdateRequestorUpdateStateProgressCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateRequestorUpdateStateProgressAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
+                  .readUpdateStateProgressAttribute(
+                      (ChipClusters.OtaSoftwareUpdateRequestorCluster
+                              .UpdateStateProgressAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOtaSoftwareUpdateRequestorUpdateStateProgressCommandParams);
+    readOtaSoftwareUpdateRequestorInteractionInfo.put(
+        "readUpdateStateProgressAttribute",
+        readOtaSoftwareUpdateRequestorUpdateStateProgressAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorAttributeListAttributeInteractionInfo =

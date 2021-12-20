@@ -59,7 +59,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             gSupportedModeManager->getModeOptionsProvider(aPath.mEndpointId);
         if (modeOptionsProvider.begin() == nullptr)
         {
-            aEncoder.Encode(DataModel::List<ModeSelect::Structs::ModeOptionStruct::Type>());
+            aEncoder.EncodeEmptyList();
             return CHIP_NO_ERROR;
         }
         CHIP_ERROR err;

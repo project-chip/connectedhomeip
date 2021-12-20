@@ -93,7 +93,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 
 void mbed_logging_init()
 {
-    // Mbed trace initalization
+    // Mbed trace initialization
     mbed_trace_init();
     mbed_trace_include_filters_set((char *) TRACE_GROUP);
     mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);

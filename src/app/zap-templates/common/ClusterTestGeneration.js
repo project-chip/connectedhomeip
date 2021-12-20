@@ -597,9 +597,11 @@ function expectedValueHasProp(value, name)
 
 function octetStringEscapedForCLiteral(value)
 {
-  return value.replace(/\p{Control}/gu, ch => {
+  // Escape control characters, things outside the ASCII range, and single
+  // quotes (because that's our string terminator).
+  return value.replace(/\p{Control}|\P{ASCII}|"/gu, ch => {
     let code = ch.charCodeAt(0);
-    code     = code.toString();
+    code     = code.toString(16);
     if (code.length == 1) {
       code = "0" + code;
     }

@@ -690,7 +690,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-s', help='discover commissionable nodes with given short discriminator', type=int)
             group.add_argument(
-                '-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+                '-v', help='discover commissionable nodes with given vendor ID', type=int)
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(

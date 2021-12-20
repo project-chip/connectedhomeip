@@ -1743,8 +1743,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGroupKeyManagementClusterGroupsAttributeCallback
-      implements ChipClusters.GroupKeyManagementCluster.GroupsAttributeCallback,
+  public static class DelegatedKeySetReadAllIndicesResponseCallback
+      implements ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1754,11 +1754,64 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<ChipClusters.GroupKeyManagementCluster.GroupsAttribute> valueList) {
+    public void onSuccess( // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedKeySetReadResponseCallback
+      implements ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess( // groupKeySet: Struct GroupKeySet
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // groupKeySet: Struct GroupKeySet
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedGroupKeyManagementClusterGroupKeyMapAttributeCallback
+      implements ChipClusters.GroupKeyManagementCluster.GroupKeyMapAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipClusters.GroupKeyManagementCluster.GroupKeyMapAttribute> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupsAttribute>");
+              "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupKeyMapAttribute>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
@@ -1770,8 +1823,8 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGroupKeyManagementClusterGroupKeysAttributeCallback
-      implements ChipClusters.GroupKeyManagementCluster.GroupKeysAttributeCallback,
+  public static class DelegatedGroupKeyManagementClusterGroupTableAttributeCallback
+      implements ChipClusters.GroupKeyManagementCluster.GroupTableAttributeCallback,
           DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -1782,11 +1835,11 @@ public class ClusterInfoMapping {
 
     @Override
     public void onSuccess(
-        List<ChipClusters.GroupKeyManagementCluster.GroupKeysAttribute> valueList) {
+        List<ChipClusters.GroupKeyManagementCluster.GroupTableAttribute> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
-              "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupKeysAttribute>");
+              "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupTableAttribute>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
@@ -2743,6 +2796,37 @@ public class ClusterInfoMapping {
     public void onSuccess(List<Object> valueList) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
+  public static class DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback
+      implements ChipClusters.OtaSoftwareUpdateRequestorCluster
+              .DefaultOtaProvidersAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipClusters.OtaSoftwareUpdateRequestorCluster.DefaultOtaProvidersAttribute>
+            valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList",
+              "List<ChipClusters.OtaSoftwareUpdateRequestorCluster.DefaultOtaProvidersAttribute>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
@@ -6891,6 +6975,129 @@ public class ClusterInfoMapping {
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetReadCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetReadCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetReadInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetRead(
+                      (ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"));
+            },
+            () -> new DelegatedKeySetReadResponseCallback(),
+            groupKeyManagementkeySetReadCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetRead", groupKeyManagementkeySetReadInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetIDs", int.class);
+    groupKeyManagementkeySetReadAllIndicesCommandParams.put(
+        "groupKeySetIDs", groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetReadAllIndicesInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetReadAllIndices(
+                      (ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("groupKeySetIDs"));
+            },
+            () -> new DelegatedKeySetReadAllIndicesResponseCallback(),
+            groupKeyManagementkeySetReadAllIndicesCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetReadAllIndices", groupKeyManagementkeySetReadAllIndicesInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetRemoveCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetRemoveCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetRemoveInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetRemove(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groupKeyManagementkeySetRemoveCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetRemove", groupKeyManagementkeySetRemoveInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetWriteCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo =
+        new CommandParameterInfo("securityPolicy", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "securityPolicy", groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey0CommandParameterInfo =
+        new CommandParameterInfo("epochKey0", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey0", groupKeyManagementkeySetWriteepochKey0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime0", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime0", groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey1CommandParameterInfo =
+        new CommandParameterInfo("epochKey1", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey1", groupKeyManagementkeySetWriteepochKey1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime1", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime1", groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey2CommandParameterInfo =
+        new CommandParameterInfo("epochKey2", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey2", groupKeyManagementkeySetWriteepochKey2CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime2", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime2", groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetWriteInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetWrite(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"),
+                      (Integer) commandArguments.get("securityPolicy"),
+                      (byte[]) commandArguments.get("epochKey0"),
+                      (Long) commandArguments.get("epochStartTime0"),
+                      (byte[]) commandArguments.get("epochKey1"),
+                      (Long) commandArguments.get("epochStartTime1"),
+                      (byte[]) commandArguments.get("epochKey2"),
+                      (Long) commandArguments.get("epochStartTime2"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groupKeyManagementkeySetWriteCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetWrite", groupKeyManagementkeySetWriteInteractionInfo);
     commandMap.put("groupKeyManagement", groupKeyManagementClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> groupsaddGroupCommandParams =
@@ -7918,11 +8125,11 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo =
-            new CommandParameterInfo("providerLocation", long.class);
+        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo =
+            new CommandParameterInfo("providerNodeId", long.class);
     otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
-        "providerLocation",
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo);
+        "providerNodeId",
+        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo =
         new CommandParameterInfo("vendorId", int.class);
@@ -7943,6 +8150,11 @@ public class ClusterInfoMapping {
         "metadataForNode",
         otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo);
 
+    CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo =
+        new CommandParameterInfo("endpoint", int.class);
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
+        "endpoint", otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo);
+
     // Populate commands
     InteractionInfo otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo =
         new InteractionInfo(
@@ -7950,10 +8162,11 @@ public class ClusterInfoMapping {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
                   .announceOtaProvider(
                       (DefaultClusterCallback) callback,
-                      (Long) commandArguments.get("providerLocation"),
+                      (Long) commandArguments.get("providerNodeId"),
                       (Integer) commandArguments.get("vendorId"),
                       (Integer) commandArguments.get("announcementReason"),
-                      (Optional<byte[]>) commandArguments.get("metadataForNode"));
+                      (Optional<byte[]>) commandArguments.get("metadataForNode"),
+                      (Integer) commandArguments.get("endpoint"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);

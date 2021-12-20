@@ -14125,6 +14125,42 @@ bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
 /**
+ * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetRead Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadResponse Command callback (from server)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet);
+/**
+ * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadAllIndices Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadAllIndicesResponse Command callback (from server)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+/**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */
 bool emberAfModeSelectClusterChangeToModeCallback(
