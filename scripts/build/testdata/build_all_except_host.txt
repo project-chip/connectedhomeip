@@ -410,6 +410,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
 
+# Generating esp32-qemu-tests
+mkdir -p {out}/esp32-qemu-tests
+
+cp src/test_driver/esp32/sdkconfig_qemu.defaults {out}/esp32-qemu-tests/sdkconfig.defaults
+
+rm -f src/test_driver/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
+idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
+
 # Generating infineon-p6-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
@@ -1001,6 +1012,13 @@ rm -f examples/all-clusters-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
+
+rm -f src/test_driver/esp32/sdkconfig
+
+# Building esp32-qemu-tests
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
+idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
 
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters

@@ -153,7 +153,7 @@ private:
     // connection is established.
     PacketBufferHandle mSendQueue;
 
-    // Pending stand-alone BTP acknolwedgement. Pre-empts regular send queue or fragmented message transmission in
+    // Pending stand-alone BTP acknowledgement. Pre-empts regular send queue or fragmented message transmission in
     // progress.
     PacketBufferHandle mAckToSend;
 

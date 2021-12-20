@@ -24,7 +24,7 @@ tests:
       command: "WaitForCommissionee"
 
     #issue #12190 as per spec default value is 3 but expecting 2
-    #refering default value of Water Content Measurement
+    #referring default value of Water Content Measurement
     - label: "read the global attribute: ClusterRevision"
       disabled: true
       command: "readAttribute"

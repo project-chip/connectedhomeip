@@ -200,7 +200,7 @@ public:
      *  grab the CHIP stack lock.
      *
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
-     *  ensure this happend before calling this method.
+     *  ensure this happened before calling this method.
      */
     virtual CHIP_ERROR Shutdown();
 
@@ -269,7 +269,7 @@ public:
      * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
-     * @param[out] payload        The generated setup payload.
+     * @param[in,out] payload     The generated setup payload.
      *                            - The payload is generated only if the user didn't ask for using the original setup code.
      *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
      *                              this payload
@@ -279,7 +279,10 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
-        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+        mSuggestedSetUpPINCode = payload.setUpPINCode;
+        ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
+        payload = mSetupPayload;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -405,6 +408,7 @@ private:
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+    uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
     uint16_t mCommissioningWindowIteration;
@@ -697,22 +701,22 @@ private:
      */
     CHIP_ERROR SendAttestationRequestCommand(CommissioneeDeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(CommissioneeDeviceProxy * device);
     /* This function sends the operational credentials to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
                                           const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendTrustedRootCertificate(CommissioneeDeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
        */
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 

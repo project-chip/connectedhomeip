@@ -60,6 +60,9 @@ typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)
                                                                                  chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                chip::CharSpan debugText);
+typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback)(
+    void * context, /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
+typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySet groupKeySet);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
@@ -339,17 +342,18 @@ void GeneralDiagnosticsClusterAttributeListListAttributeFilter(chip::TLV::TLVRea
                                                                chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GeneralDiagnosticsAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
-void GroupKeyManagementClusterGroupsListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
-                                                        chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GroupKeyManagementGroupsListAttributeCallback)(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & data);
-void GroupKeyManagementClusterGroupKeysListAttributeFilter(chip::TLV::TLVReader * data,
-                                                           chip::Callback::Cancelable * onSuccessCallback,
-                                                           chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GroupKeyManagementGroupKeysListAttributeCallback)(
+void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(chip::TLV::TLVReader * data,
+                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & data);
+void GroupKeyManagementClusterGroupTableListAttributeFilter(chip::TLV::TLVReader * data,
+                                                            chip::Callback::Cancelable * onSuccessCallback,
+                                                            chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GroupKeyManagementGroupTableListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & data);
 void GroupKeyManagementClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                chip::Callback::Cancelable * onSuccessCallback,
                                                                chip::Callback::Cancelable * onFailureCallback);
@@ -416,6 +420,13 @@ void OtaSoftwareUpdateProviderClusterAttributeListListAttributeFilter(chip::TLV:
                                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*OtaSoftwareUpdateProviderAttributeListListAttributeCallback)(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & data);
+void OtaSoftwareUpdateRequestorClusterDefaultOtaProvidersListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                             chip::Callback::Cancelable * onSuccessCallback,
+                                                                             chip::Callback::Cancelable * onFailureCallback);
+typedef void (*OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & data);
 void OtaSoftwareUpdateRequestorClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                        chip::Callback::Cancelable * onSuccessCallback,
                                                                        chip::Callback::Cancelable * onFailureCallback);

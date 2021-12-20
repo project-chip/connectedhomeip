@@ -80,12 +80,12 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         // Enable SO_REUSEPORT.  This permits coexistence between an
         // untargetted CHIP client and other services that listen on
         // a CHIP port on a specific address (such as a CHIP client
-        // with TARGETTED_LISTEN or TCP proxying services).  Note that
+        // with TARGETED_LISTEN or TCP proxying services).  Note that
         // one of the costs of this implementation is the
         // non-deterministic connection dispatch when multple clients
-        // listen on the address wih the same degreee of selectivity,
+        // listen on the address with the same degreee of selectivity,
         // e.g. two untargetted-listen CHIP clients, or two
-        // targetted-listen CHIP clients with the same node id.
+        // targeted-listen CHIP clients with the same node id.
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {

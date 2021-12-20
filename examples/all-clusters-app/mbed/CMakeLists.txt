@@ -68,6 +68,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/ota-requestor-stub.cpp
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
@@ -136,6 +137,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/identify-server/identify-server.cpp
                ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
+               ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
 )
 

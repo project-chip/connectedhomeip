@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and
+ *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicited IM message, and
  *      manage different kinds of IM client and handlers.
  *
  */
@@ -176,8 +176,10 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
-        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId)) {
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId))
+        {
             readClient->Close(CHIP_NO_ERROR);
             return CHIP_NO_ERROR;
         }
@@ -188,7 +190,8 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId
 
 CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
 {
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
         if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
             readClient->GetPeerNodeId() == aPeerNodeId)
         {

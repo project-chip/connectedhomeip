@@ -393,7 +393,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
-    // Test a message in a chain of three packet buffers. The message length is split accross buffers.
+    // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));

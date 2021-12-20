@@ -8520,6 +8520,32 @@ enum class UpdateStateEnum : uint8_t
 using UpdateStateEnum                 = EmberAfUpdateStateEnum;
 #endif
 
+namespace Structs {
+namespace ProviderLocation {
+enum class Fields
+{
+    kFabricIndex    = 0,
+    kProviderNodeID = 1,
+    kEndpoint       = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    chip::NodeId providerNodeID;
+    chip::EndpointId endpoint;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+};
+
+using DecodableType = Type;
+
+} // namespace ProviderLocation
+} // namespace Structs
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -8534,10 +8560,11 @@ namespace Commands {
 namespace AnnounceOtaProvider {
 enum class Fields
 {
-    kProviderLocation   = 0,
+    kProviderNodeId     = 0,
     kVendorId           = 1,
     kAnnouncementReason = 2,
     kMetadataForNode    = 3,
+    kEndpoint           = 4,
 };
 
 struct Type
@@ -8547,10 +8574,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -8565,10 +8593,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOtaProvider
@@ -8576,18 +8605,20 @@ public:
 
 namespace Attributes {
 
-namespace DefaultOtaProvider {
+namespace DefaultOtaProviders {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProviders::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DefaultOtaProvider
+} // namespace DefaultOtaProviders
 namespace UpdatePossible {
 struct TypeInfo
 {
@@ -8600,6 +8631,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpdatePossible
+namespace UpdateState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateState
+namespace UpdateStateProgress {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateStateProgress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateStateProgress
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8645,8 +8700,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DefaultOtaProvider::TypeInfo::DecodableType defaultOtaProvider;
+        Attributes::DefaultOtaProviders::TypeInfo::DecodableType defaultOtaProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible;
+        Attributes::UpdateState::TypeInfo::DecodableType updateState;
+        Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8673,10 +8730,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
+    DataModel::Nullable<UpdateStateEnum> previousState;
     UpdateStateEnum newState;
     ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8688,10 +8745,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
+    DataModel::Nullable<UpdateStateEnum> previousState;
     UpdateStateEnum newState;
     ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8754,7 +8811,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8769,7 +8826,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -14891,24 +14948,51 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 
 namespace Structs {
-namespace GroupKey {
+namespace GroupInfo {
 enum class Fields
 {
-    kVendorId               = 1,
-    kGroupKeyIndex          = 2,
-    kGroupKeyRoot           = 3,
-    kGroupKeyEpochStartTime = 4,
-    kGroupKeySecurityPolicy = 5,
+    kFabricIndex = 0,
+    kGroupId     = 1,
+    kEndpoints   = 2,
+    kGroupName   = 3,
 };
 
 struct Type
 {
 public:
-    uint16_t vendorId;
-    uint16_t groupKeyIndex;
-    chip::ByteSpan groupKeyRoot;
-    uint64_t groupKeyEpochStartTime;
-    GroupKeySecurityPolicy groupKeySecurityPolicy;
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    DataModel::List<const uint16_t> endpoints;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    DataModel::DecodableList<uint16_t> endpoints;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace GroupInfo
+namespace GroupKey {
+enum class Fields
+{
+    kFabricIndex   = 0,
+    kGroupId       = 1,
+    kGroupKeySetID = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    uint16_t groupKeySetID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14917,20 +15001,30 @@ public:
 using DecodableType = Type;
 
 } // namespace GroupKey
-namespace GroupState {
+namespace GroupKeySet {
 enum class Fields
 {
-    kVendorId         = 1,
-    kVendorGroupId    = 2,
-    kGroupKeySetIndex = 3,
+    kGroupKeySetID   = 0,
+    kSecurityPolicy  = 1,
+    kEpochKey0       = 2,
+    kEpochStartTime0 = 3,
+    kEpochKey1       = 4,
+    kEpochStartTime1 = 5,
+    kEpochKey2       = 6,
+    kEpochStartTime2 = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t vendorId;
-    uint16_t vendorGroupId;
-    uint16_t groupKeySetIndex;
+    uint16_t groupKeySetID;
+    GroupKeySecurityPolicy securityPolicy;
+    chip::ByteSpan epochKey0;
+    uint64_t epochStartTime0;
+    chip::ByteSpan epochKey1;
+    uint64_t epochStartTime1;
+    chip::ByteSpan epochKey2;
+    uint64_t epochStartTime2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14938,26 +15032,242 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupState
+} // namespace GroupKeySet
 } // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace KeySetWrite {
+struct Type;
+struct DecodableType;
+} // namespace KeySetWrite
+
+namespace KeySetRead {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRead
+
+namespace KeySetReadResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadResponse
+
+namespace KeySetRemove {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRemove
+
+namespace KeySetReadAllIndices {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndices
+
+namespace KeySetReadAllIndicesResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndicesResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace KeySetWrite {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetWrite
+namespace KeySetRead {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRead
+namespace KeySetReadResponse {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadResponse
+namespace KeySetRemove {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRemove
+namespace KeySetReadAllIndices {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndices
+namespace KeySetReadAllIndicesResponse {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndicesResponse
+} // namespace Commands
 
 namespace Attributes {
 
-namespace Groups {
-struct TypeInfo
-{
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupState::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Groups
-namespace GroupKeys {
+namespace GroupKeyMap {
 struct TypeInfo
 {
     using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>;
@@ -14967,10 +15277,48 @@ struct TypeInfo
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyMap::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace GroupKeys
+} // namespace GroupKeyMap
+namespace GroupTable {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupTable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace GroupTable
+namespace MaxGroupsPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxGroupsPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxGroupsPerFabric
+namespace MaxGroupKeysPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxGroupKeysPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxGroupKeysPerFabric
 namespace AttributeList {
 struct TypeInfo
 {
@@ -15016,8 +15364,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Groups::TypeInfo::DecodableType groups;
-        Attributes::GroupKeys::TypeInfo::DecodableType groupKeys;
+        Attributes::GroupKeyMap::TypeInfo::DecodableType groupKeyMap;
+        Attributes::GroupTable::TypeInfo::DecodableType groupTable;
+        Attributes::MaxGroupsPerFabric::TypeInfo::DecodableType maxGroupsPerFabric;
+        Attributes::MaxGroupKeysPerFabric::TypeInfo::DecodableType maxGroupKeysPerFabric;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;

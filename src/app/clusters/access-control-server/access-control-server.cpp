@@ -371,7 +371,7 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
 
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    return aEncoder.EncodeEmptyList();
 }
 
 CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)

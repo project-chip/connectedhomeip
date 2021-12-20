@@ -3325,37 +3325,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::GroupKeyManagement::Id: {
         using namespace Clusters::GroupKeyManagement;
         switch (aPath.mAttributeId) {
-        case Attributes::Groups::Id: {
-            using TypeInfo = Attributes::Groups::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR) {
-                return nil;
-            }
-            NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupState * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupState new];
-                newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-                newElement_0.vendorGroupId = [NSNumber numberWithUnsignedShort:entry_0.vendorGroupId];
-                newElement_0.groupKeySetIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetIndex];
-                [array_0 addObject:newElement_0];
-            }
-            { // Scope for the error so we will know what it's named
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-            }
-            value = array_0;
-            return value;
-        }
-        case Attributes::GroupKeys::Id: {
-            using TypeInfo = Attributes::GroupKeys::TypeInfo;
+        case Attributes::GroupKeyMap::Id: {
+            using TypeInfo = Attributes::GroupKeyMap::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
@@ -3368,12 +3339,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 auto & entry_0 = iter_0.GetValue();
                 CHIPGroupKeyManagementClusterGroupKey * newElement_0;
                 newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
-                newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-                newElement_0.groupKeyIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeyIndex];
-                newElement_0.groupKeyRoot = [NSData dataWithBytes:entry_0.groupKeyRoot.data() length:entry_0.groupKeyRoot.size()];
-                newElement_0.groupKeyEpochStartTime = [NSNumber numberWithUnsignedLongLong:entry_0.groupKeyEpochStartTime];
-                newElement_0.groupKeySecurityPolicy =
-                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named
@@ -3384,6 +3352,75 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
             }
             value = array_0;
+            return value;
+        }
+        case Attributes::GroupTable::Id: {
+            using TypeInfo = Attributes::GroupTable::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
+                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                auto * array_2 = [NSMutableArray new];
+                auto iter_2 = entry_0.endpoints.begin();
+                while (iter_2.Next()) {
+                    auto & entry_2 = iter_2.GetValue();
+                    NSNumber * newElement_2;
+                    newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+                    [array_2 addObject:newElement_2];
+                }
+                { // Scope for the error so we will know what it's named
+                    CHIP_ERROR err = iter_2.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
+                    }
+                }
+                newElement_0.endpoints = array_2;
+                newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
+                                                                  length:entry_0.groupName.size()
+                                                                encoding:NSUTF8StringEncoding];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
+            return value;
+        }
+        case Attributes::MaxGroupsPerFabric::Id: {
+            using TypeInfo = Attributes::MaxGroupsPerFabric::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        case Attributes::MaxGroupKeysPerFabric::Id: {
+            using TypeInfo = Attributes::MaxGroupKeysPerFabric::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedShort:cppValue];
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -4488,15 +4525,33 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::OtaSoftwareUpdateRequestor::Id: {
         using namespace Clusters::OtaSoftwareUpdateRequestor;
         switch (aPath.mAttributeId) {
-        case Attributes::DefaultOtaProvider::Id: {
-            using TypeInfo = Attributes::DefaultOtaProvider::TypeInfo;
+        case Attributes::DefaultOtaProviders::Id: {
+            using TypeInfo = Attributes::DefaultOtaProviders::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSData * _Nonnull value;
-            value = [NSData dataWithBytes:cppValue.data() length:cppValue.size()];
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+                newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+                newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
+                newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
             return value;
         }
         case Attributes::UpdatePossible::Id: {
@@ -4508,6 +4563,32 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithBool:cppValue];
+            return value;
+        }
+        case Attributes::UpdateState::Id: {
+            using TypeInfo = Attributes::UpdateState::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
+            return value;
+        }
+        case Attributes::UpdateStateProgress::Id: {
+            using TypeInfo = Attributes::UpdateStateProgress::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::AttributeList::Id: {

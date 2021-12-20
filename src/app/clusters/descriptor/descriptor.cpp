@@ -79,7 +79,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<EndpointId>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;

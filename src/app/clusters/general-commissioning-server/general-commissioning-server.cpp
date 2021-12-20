@@ -110,10 +110,19 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
     return true;
 }
 
+/**
+ * Pass fabric and nodeId of commissioner to DeviceControlSvr.
+ * This allows device to send messages back to commissioner.
+ * Once bindings are implemented, this may no longer be needed.
+ */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetFabricIndex(handle.GetFabricIndex());
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetPeerNodeId(handle.GetPeerNodeId());
+
     CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
