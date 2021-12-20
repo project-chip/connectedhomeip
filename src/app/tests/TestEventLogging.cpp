@@ -33,8 +33,8 @@
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPTLVUtilities.hpp>
 #include <lib/support/ErrorStr.h>
-#include <lib/support/logging/Constants.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/Constants.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <platform/CHIPDeviceLayer.h>

@@ -23,9 +23,9 @@
 
 #include "streamer.h"
 
+#include <lib/support/logging/Constants.h>
 #include <limits.h>
 #include <stdio.h>
-#include <lib/support/logging/Constants.h>
 
 #ifndef CONSOLE_DEFAULT_MAX_LINE
 #define CONSOLE_DEFAULT_MAX_LINE 256

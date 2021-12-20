@@ -17,8 +17,8 @@
 #pragma once
 
 #include <app/util/basic-types.h>
-#include <string.h>
 #include <lib/support/logging/Constants.h>
+#include <string.h>
 
 namespace chip {
 

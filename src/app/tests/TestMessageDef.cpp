@@ -37,8 +37,8 @@
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/logging/Constants.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/Constants.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 #include <nlunit-test.h>

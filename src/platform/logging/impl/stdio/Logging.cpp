@@ -1,7 +1,7 @@
 /* See Project CHIP LICENSE file for licensing information. */
 
-#include <platform/logging/LogV.h>
 #include <lib/support/logging/Constants.h>
+#include <platform/logging/LogV.h>
 
 #include <stdio.h>
 
