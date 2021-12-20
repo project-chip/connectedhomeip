@@ -40,6 +40,11 @@
 #include "sl_system_kernel.h"
 #include <app/server/Server.h>
 
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/EFR32/OTAImageProcessorImpl.h"
+#include "platform/EFR32/OTARequestorDriverImpl.h"
+
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
 #endif
@@ -75,6 +80,12 @@ using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
 #define UNUSED_PARAMETER(a) (a = a)
+
+// Global OTA objects
+OTARequestor gRequestorCore;
+OTARequestorDriverImpl gRequestorUser;
+BDXDownloader gDownloader;
+OTAImageProcessorImpl gImageProcessor;
 
 volatile int apperror_cnt;
 // ================================================================================
@@ -152,6 +163,32 @@ int main(void)
         appError(ret);
     }
 #endif // CHIP_ENABLE_OPENTHREAD
+
+
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    SetRequestorInstance(&gRequestorCore);
+
+    // Set server instance used for session establishment
+    chip::Server * server = &(chip::Server::GetInstance());
+    gRequestorCore.SetServerInstance(server);
+
+    // Connect the Requestor and Requestor Driver objects
+    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+
+    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
+    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
+    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
+    OTAImageProcessorParams ipParams;
+    ipParams.imageFile = CharSpan("test.txt");
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Connect the Downloader and Image Processor objects
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+
+    gRequestorCore.SetBDXDownloader(&gDownloader);
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     EFR32_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
