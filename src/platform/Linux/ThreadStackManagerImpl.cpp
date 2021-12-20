@@ -486,7 +486,7 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     case ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
     case ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
     case ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        err = encoder.Encode(DataModel::List<EndpointId>());
+        err = encoder.EncodeEmptyList();
         break;
     }
     default: {
