@@ -169,8 +169,10 @@ union EmberAfDefaultOrMinMaxAttributeValue
 //
 // Attribute that has this mask is NOT read-only
 #define ATTRIBUTE_MASK_WRITABLE (0x01)
-// Attribute that has this mask is saved to a token
-#define ATTRIBUTE_MASK_TOKENIZE (0x02)
+// Attribute that has this mask is saved in non-volatile memory
+#define ATTRIBUTE_MASK_NONVOLATILE (0x02)
+// Alias until ZAP gets updated to output ATTRIBUTE_MASK_NONVOLATILE
+#define ATTRIBUTE_MASK_TOKENIZE ATTRIBUTE_MASK_NONVOLATILE
 // Attribute that has this mask has a min/max values
 #define ATTRIBUTE_MASK_MIN_MAX (0x04)
 // Attribute requires a timed interaction to write
@@ -228,6 +230,18 @@ struct EmberAfAttributeMetadata
      * Check whether this attribute requires a timed write.
      */
     bool MustUseTimedWrite() const { return mask & ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE; }
+
+    /**
+     * Check whether this attibute's storage is managed outside the built-in
+     * attribute store.
+     */
+    bool IsExternal() const { return mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE; }
+
+    /**
+     * Check whether this attribute is automatically stored in non-volatile
+     * memory.
+     */
+    bool IsNonVolatile() const { return (mask & ATTRIBUTE_MASK_NONVOLATILE) && !IsExternal(); }
 };
 
 /**
@@ -869,36 +883,6 @@ typedef void (*EmberAfNetworkEventHandler)(void);
  */
 typedef void (*EmberAfEndpointEventHandler)(chip::EndpointId endpoint);
 
-#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
-/**
- * @brief Indicates the absence of a Group table entry.
- */
-#define EMBER_AF_GROUP_TABLE_NULL_INDEX 0xFF
-/**
- * @brief Value used when setting or getting the endpoint in a Group table
- * entry.  It indicates that the entry is not in use.
- */
-#define EMBER_AF_GROUP_TABLE_UNUSED_ENDPOINT_ID 0x00
-/**
- * @brief Maximum length of Group names, not including the length byte.
- */
-#define ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH 16
-/**
- * @brief A structure used to store group table entries in RAM or in tokens,
- * depending on the platform.  If the endpoint field is
- * ::EMBER_AF_GROUP_TABLE_UNUSED_ENDPOINT_ID, the entry is unused.
- */
-typedef struct
-{
-    chip::EndpointId endpoint; // 0x00 when not in use
-    chip::GroupId groupId;
-    uint8_t bindingIndex;
-#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER_NAME_SUPPORT
-    uint8_t name[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
-#endif
-} EmberAfGroupTableEntry;
-#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
-
 /**
  * @brief Indicates the absence of a Scene table entry.
  */
@@ -921,7 +905,7 @@ typedef struct
  */
 #define ZCL_SCENES_GLOBAL_SCENE_SCENE_ID 0x00
 /**
- * @brief A structure used to store scene table entries in RAM or in tokens,
+ * @brief A structure used to store scene table entries in RAM or in storage,
  * depending on a plugin setting.  If endpoint field is
  * ::EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID, the entry is unused.
  */
