@@ -117,7 +117,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     ReturnErrorOnFailure(ConfigurationMgr().GetTotalOperationalHours(totalHours));
 
     totalOperationalHours = totalHours + deltaTime < UINT32_MAX ? totalHours + deltaTime : UINT32_MAX;
-    
+
     return CHIP_NO_ERROR;
 }
 

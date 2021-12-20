@@ -71,7 +71,7 @@ void PlatformManagerImpl::OperationalHoursSavingTimerEventHandler(k_timer * time
 void PlatformManagerImpl::UpdateOperationalHours(intptr_t arg)
 {
     uint64_t upTimeS;
-    
+
     if (GetDiagnosticDataProvider().GetUpTime(upTimeS) != CHIP_NO_ERROR) {
         ChipLogError(DeviceLayer, "Failed to get up time of the node");
         return;
