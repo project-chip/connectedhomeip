@@ -159,6 +159,8 @@ public:
 
     uint8_t GetNextSequenceNumber() override { return mSequenceNumber++; };
 
+    CHIP_ERROR ShutdownSubscriptions() override;
+
     Controller::DeviceControllerInteractionModelDelegate * GetInteractionModelDelegate() override { return mInitParams.imDelegate; }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mInitParams.exchangeMgr; }

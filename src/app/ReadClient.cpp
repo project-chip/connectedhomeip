@@ -103,7 +103,7 @@ const char * ReadClient::GetStateStr() const
 void ReadClient::MoveToState(const ClientState aTargetState)
 {
     mState = aTargetState;
-    ChipLogDetail(DataManagement, "ReadClient moving to [%10.10s]", GetStateStr());
+    ChipLogDetail(DataManagement, "%s ReadClient[%p]: Moving to [%10.10s]", __func__, this, GetStateStr());
 }
 
 CHIP_ERROR ReadClient::SendRequest(ReadPrepareParams & aReadPrepareParams)
@@ -126,7 +126,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     // TODO: SendRequest parameter is too long, need to have the structure to represent it
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
-    ChipLogDetail(DataManagement, "%s: Client[%lx] [%5.5s]", __func__, (uintptr_t) this, GetStateStr());
+    ChipLogDetail(DataManagement, "%s ReadClient[%p]: Sending Read Request", __func__, this);
 
     VerifyOrReturnError(ClientState::Idle == mState, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -595,8 +595,8 @@ void ReadClient::OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void *
 
     //
     // Might as well try to see if this instance exists in the tracked list in the IM.
-    // This might blow-up if there is a bug (in which case), but that's ok since it's at least blowing
-    // up here and folks debugging would know why
+    // This might blow-up if either the client has since been free'ed (use-after-free), or if the engine has since
+    // been shutdown at which point the client wouldn't exist in the active read client list.
     //
     VerifyOrDie(client->mpImEngine->InActiveReadClientList(client));
 

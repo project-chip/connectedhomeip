@@ -174,6 +174,31 @@ uint32_t InteractionModelEngine::GetNumActiveWriteHandlers() const
     return numActive;
 }
 
+CHIP_ERROR InteractionModelEngine::ShutdownSubscription(uint64_t aSubscriptionId)
+{
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
+        if (readClient->IsSubscriptionType() && readClient->IsMatchingClient(aSubscriptionId)) {
+            readClient->Close(CHIP_NO_ERROR);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_KEY_NOT_FOUND;
+}
+
+CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId)
+{
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient()) {
+        if (readClient->IsSubscriptionType() && readClient->GetFabricIndex() == aFabricIndex &&
+            readClient->GetPeerNodeId() == aPeerNodeId)
+        {
+            readClient->Close(CHIP_NO_ERROR);
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
                                                   const Optional<uint16_t> & aTimedWriteTimeoutMs)
 {
@@ -409,25 +434,8 @@ uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * co
 
 void InteractionModelEngine::AddReadClient(ReadClient * apReadClient)
 {
-    ReadClient * pPrevListItem = nullptr;
-    ReadClient * pCurListItem  = mpActiveReadClientList;
-
-    while (pCurListItem)
-    {
-        pPrevListItem = pCurListItem;
-        pCurListItem  = pCurListItem->GetNextClient();
-    }
-
-    if (pPrevListItem)
-    {
-        pPrevListItem->SetNextClient(apReadClient);
-    }
-    else
-    {
-        mpActiveReadClientList = apReadClient;
-    }
-
-    apReadClient->SetNextClient(nullptr);
+    apReadClient->SetNextClient(mpActiveReadClientList);
+    mpActiveReadClientList = apReadClient;
 }
 
 void InteractionModelEngine::RemoveReadClient(ReadClient * apReadClient)

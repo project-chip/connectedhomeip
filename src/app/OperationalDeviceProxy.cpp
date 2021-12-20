@@ -298,6 +298,11 @@ void OperationalDeviceProxy::OnSessionReleased(const SessionHandle & session)
     mSecureSession.Release();
 }
 
+CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()
+{
+    return app::InteractionModelEngine::GetInstance()->ShutdownSubscriptions(mFabricInfo->GetFabricIndex(), GetDeviceId());
+}
+
 OperationalDeviceProxy::~OperationalDeviceProxy() {}
 
 } // namespace chip

@@ -149,7 +149,7 @@ public:
         virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when ReadClient has finished all work and is safe to destory and free the
+         * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
          * allocated CommandSender object.
          *
          * This function will:

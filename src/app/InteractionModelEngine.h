@@ -96,6 +96,22 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
+     * Tears down an active subscription.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscription(uint64_t aSubscriptionId);
+
+    /**
+     * Tears down active subscriptions for a given peer node ID.
+     *
+     * @retval #CHIP_ERROR_KEY_NOT_FOUND If no active subscription is found.
+     * @retval #CHIP_NO_ERROR On success.
+     */
+    CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
+
+    /**
      *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
      *  see WriteClient documentation for lifetime handling.
      *
@@ -161,7 +177,7 @@ public:
 
     /**
      * Add a read client to the internally tracked list of weak references. This list is used to
-     * correctly dispatch unsolicted reports to the right matching handler by subscription ID.
+     * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
      */
     void AddReadClient(ReadClient * apReadClient);
 

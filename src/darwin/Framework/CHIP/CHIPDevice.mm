@@ -124,8 +124,8 @@ private:
     //
     // To handle this, enforce the following rules:
     //
-    // 2) We guarantee that mReportCallback is only invoked with an error once.
-    // 3) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
+    // 1) We guarantee that mReportCallback is only invoked with an error once.
+    // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
     ReadClient * mReadClient = nullptr;
@@ -156,7 +156,7 @@ private:
 
     auto callback = new SubscriptionCallback(queue, reportHandler, subscriptionEstablishedHandler);
     ReadClient * readClient = new ReadClient(
-        InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback, ReadClient::InteractionType::Subscribe);
+        InteractionModelEngine::GetInstance(), device->GetExchangeManager(), callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
     CHIP_ERROR err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR) {

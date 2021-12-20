@@ -336,9 +336,12 @@ JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle
     DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
 
     //
-    // TODO: Consult with austin if we can delete this function entirely in the PR.
+    // We should move away from this model of shutting down subscriptions in this manner and instead,
+    // have Java own the ReadClient objects directly and manage their lifetimes.
     //
-    // device->ShutdownSubscriptions();
+    // #13163 tracks this issue.
+    //
+    device->ShutdownSubscriptions();
 }
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
