@@ -175,7 +175,10 @@ public:
      *
      *  The callback passed in has to outlive this ReadClient object.
      *
-     *  @param[in]    apImEngine       A pointer to the IM engine.
+     *  This object can outlive the InteractionModelEngine passed in. However, upon shutdown of the engine,
+     *  this object will cease to function correctly since it depends on the engine for a number of critical functions.
+     *
+     *  @param[in]    apImEngine       A valid pointer to the IM engine.
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apCallback       InteractionModelDelegate set by application.
      *  @param[in]    aInteractionType Type of interaction (read or subscribe)

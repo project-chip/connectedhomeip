@@ -100,7 +100,18 @@ void InteractionModelEngine::Shutdown()
     // actually owns them, so it's on them to eventually shut them down and free them
     // up.
     //
-    // We just null out our tracker.
+    // However, we should null out their pointers back to us at the very least so that
+    // at destruction time, they won't attempt to reach back here to remove themselves
+    // from this list.
+    //
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    {
+        readClient->mpImEngine = nullptr;
+        readClient->SetNextClient(nullptr);
+    }
+
+    //
+    // After that, we just null out our tracker.
     //
     mpActiveReadClientList = nullptr;
 

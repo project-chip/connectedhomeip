@@ -56,7 +56,15 @@ ReadClient::~ReadClient()
     {
         CancelLivenessCheckTimer();
 
-        mpImEngine->RemoveReadClient(this);
+        //
+        // Only remove ourselves from the engine's tracker list if we still continue to have a valid pointer to it.
+        // This won't be the case if the engine shut-down before this destructor was called (in which case, mpImEngine
+        // will point to null)
+        //
+        if (mpImEngine)
+        {
+            mpImEngine->RemoveReadClient(this);
+        }
     }
 }
 
