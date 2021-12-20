@@ -70,7 +70,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     auto lockState = static_cast<uint8_t>(newLockState);
 
     emberAfDoorLockClusterPrintln("Setting LockState to '%" PRIu8 "'", lockState);
-    EmberAfStatus status = Attributes::LockState::Set(endpointId, lockState);
+    EmberAfStatus status = Attributes::LockState::Set(endpointId, newLockState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
@@ -100,7 +100,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDo
     auto doorState = static_cast<uint8_t>(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting DoorState to '%" PRIu8 "'", doorState);
-    EmberAfStatus status = Attributes::DoorState::Set(endpointId, doorState);
+    EmberAfStatus status = Attributes::DoorState::Set(endpointId, newDoorState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
@@ -181,7 +181,9 @@ bool DoorLockServer::SetPrivacyModeButton(chip::EndpointId endpointId, bool isEn
     return (EMBER_ZCL_STATUS_SUCCESS == status);
 }
 
-// =======================================================
+// =============================================================================
+// Cluster commands callbacks
+// =============================================================================
 
 bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandObj,
                                             const chip::app::ConcreteCommandPath & commandPath,
@@ -201,6 +203,17 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     emberAfDoorLockClusterPrintln("Received Unlock Door command (not implemented)");
 
     // TODO: Implement door unlocking by calling emberAfPluginDoorLockOnDoorUnlockCommand
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterUnlockWithTimeoutCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("UnlockWithTimeout: command not implemented");
+
+    // TODO: Implement door unlocking with timeout
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
@@ -270,6 +283,109 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+bool emberAfDoorLockClusterSetWeekDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("SetWeekDaySchedule: command not implemented");
+
+    // TODO: Implement setting weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterGetWeekDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("GetWeekDaySchedule: command not implemented");
+
+    // TODO: Implement getting weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterClearWeekDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("ClearWeekDaySchedule: command not implemented");
+
+    // TODO: Implement clearing weekday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterSetYearDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("SetYearDaySchedule: command not implemented");
+
+    // TODO: Implement setting year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterGetYearDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("GetYearDaySchedule: command not implemented");
+
+    // TODO: Implement getting year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterClearYearDayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("ClearYearDaySchedule: command not implemented");
+
+    // TODO: Implement clearing year day schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterSetHolidayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("SetHolidaySchedule: command not implemented");
+
+    // TODO: Implement setting holiday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterGetHolidayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("GetHolidaySchedule: command not implemented");
+
+    // TODO: Implement getting holiday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+bool emberAfDoorLockClusterClearHolidayScheduleCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::DecodableType & commandData)
+{
+    emberAfDoorLockClusterPrintln("ClearHolidaySchedule: command not implemented");
+
+    // TODO: Implement clearing holiday schedule
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
+// =============================================================================
+// SDK callbacks
+// =============================================================================
 
 chip::Protocols::InteractionModel::Status
 MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
@@ -354,7 +470,7 @@ void MatterDoorLockPluginServerInitCallback()
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
 // =============================================================================
-// Pre-change callbacks for cluster attributes
+// Cluster attributes pre-change callbacks
 // =============================================================================
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))

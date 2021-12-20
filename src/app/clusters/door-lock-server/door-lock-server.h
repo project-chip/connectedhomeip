@@ -55,6 +55,7 @@ private:
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCOde);
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
+bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, const char * PINCode, uint16_t timeout);
 
 // =============================================================================
 // Pre-change callbacks for cluster attributes
