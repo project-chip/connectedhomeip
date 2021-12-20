@@ -183,7 +183,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const AnnounceOtaProvider::DecodableType & commandData)
 {
-    auto & providerLocation   = commandData.providerLocation;
+    auto & providerNodeId     = commandData.providerNodeId;
     auto & announcementReason = commandData.announcementReason;
 
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
@@ -192,7 +192,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
         return EMBER_ZCL_STATUS_FAILURE;
     }
 
-    mProviderNodeId      = providerLocation;
+    mProviderNodeId      = providerNodeId;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");

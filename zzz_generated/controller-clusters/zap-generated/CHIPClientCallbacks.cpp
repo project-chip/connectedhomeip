@@ -1383,6 +1383,29 @@ void OtaSoftwareUpdateProviderClusterAttributeListListAttributeFilter(TLV::TLVRe
     cb->mCall(cb->mContext, list);
 }
 
+void OtaSoftwareUpdateRequestorClusterDefaultOtaProvidersListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                             Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
+        list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void OtaSoftwareUpdateRequestorClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                        Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback)
