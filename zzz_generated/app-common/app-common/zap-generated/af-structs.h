@@ -416,6 +416,14 @@ typedef struct _PowerProfileRecord
     uint8_t powerProfileState;
 } PowerProfileRecord;
 
+// Struct for ProviderLocation
+typedef struct _ProviderLocation
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId ProviderNodeID;
+    chip::EndpointId Endpoint;
+} ProviderLocation;
+
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
 {

@@ -3760,20 +3760,24 @@ public class ClusterReadMapping {
     Map<String, InteractionInfo> readOtaSoftwareUpdateRequestorInteractionInfo =
         new LinkedHashMap<>();
     Map<String, CommandParameterInfo>
-        readOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams =
+        readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo =
+    InteractionInfo readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .readDefaultOtaProviderAttribute(
-                      (ChipClusters.OctetStringAttributeCallback) callback);
+                  .readDefaultOtaProvidersAttribute(
+                      (ChipClusters.OtaSoftwareUpdateRequestorCluster
+                              .DefaultOtaProvidersAttributeCallback)
+                          callback);
             },
-            () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
-            readOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams);
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback(),
+            readOtaSoftwareUpdateRequestorDefaultOtaProvidersCommandParams);
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
-        "readDefaultOtaProviderAttribute",
-        readOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo);
+        "readDefaultOtaProvidersAttribute",
+        readOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdatePossibleCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo =
@@ -3787,6 +3791,36 @@ public class ClusterReadMapping {
     readOtaSoftwareUpdateRequestorInteractionInfo.put(
         "readUpdatePossibleAttribute",
         readOtaSoftwareUpdateRequestorUpdatePossibleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorUpdateStateCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateRequestorUpdateStateAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
+                  .readUpdateStateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOtaSoftwareUpdateRequestorUpdateStateCommandParams);
+    readOtaSoftwareUpdateRequestorInteractionInfo.put(
+        "readUpdateStateAttribute",
+        readOtaSoftwareUpdateRequestorUpdateStateAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
+        readOtaSoftwareUpdateRequestorUpdateStateProgressCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readOtaSoftwareUpdateRequestorUpdateStateProgressAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
+                  .readUpdateStateProgressAttribute(
+                      (ChipClusters.OtaSoftwareUpdateRequestorCluster
+                              .UpdateStateProgressAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readOtaSoftwareUpdateRequestorUpdateStateProgressCommandParams);
+    readOtaSoftwareUpdateRequestorInteractionInfo.put(
+        "readUpdateStateProgressAttribute",
+        readOtaSoftwareUpdateRequestorUpdateStateProgressAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readOtaSoftwareUpdateRequestorAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readOtaSoftwareUpdateRequestorAttributeListAttributeInteractionInfo =

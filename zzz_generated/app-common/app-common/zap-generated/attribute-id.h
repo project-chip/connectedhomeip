@@ -317,8 +317,10 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
-#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
+#define ZCL_DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID (0x0000)
+#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0001)
+#define ZCL_UPDATE_STATE_ATTRIBUTE_ID (0x0002)
+#define ZCL_UPDATE_STATE_PROGRESS_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Localization Configuration
 

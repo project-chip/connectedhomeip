@@ -143,6 +143,15 @@ public:
      */
     CHIP_ERROR Disconnect() override;
 
+    /**
+     * Use SetConnectedSession if 'this' object is a newly allocated device proxy.
+     * It will take an existing session, such as the one established
+     * during commissioning, and use it for this device proxy.
+     *
+     * Note: Avoid using this function generally as it is Deprecated
+     */
+    void SetConnectedSession(SessionHandle handle);
+
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
     /**

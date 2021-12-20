@@ -5124,8 +5124,9 @@ exit:
 // OtaSoftwareUpdateRequestor Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
-                                                                  chip::NodeId providerLocation, chip::VendorId vendorId,
-                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode)
+                                                                  chip::NodeId providerNodeId, chip::VendorId vendorId,
+                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode,
+                                                                  chip::EndpointId endpoint)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5149,14 +5150,16 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Canc
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // providerLocation: nodeId
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerLocation));
+    // providerNodeId: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerNodeId));
     // vendorId: vendorId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // announcementReason: OTAAnnouncementReason
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), announcementReason));
     // metadataForNode: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForNode));
+    // endpoint: endpointNo
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpoint));
 
     SuccessOrExit(err = sender->FinishCommand());
 
