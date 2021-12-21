@@ -29,6 +29,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <lib/support/ChipThreadWork.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
@@ -127,6 +128,14 @@ exit:
     {
         return JNI_FALSE;
     }
+    return JNI_TRUE;
+}
+
+JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
+{
+    chip::ThreadWork::ChipMainThreadScheduleAndWait([&] {
+        ChipAndroidAppShutdown();
+    });
     return JNI_TRUE;
 }
 

@@ -2,9 +2,13 @@ package com.tcl.chip.chiptvserver;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.tcl.chip.chiptvserver.service.MatterServant;
+
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
@@ -23,6 +27,12 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeImg = findViewById(R.id.qrCodeImg);
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
+    findViewById(R.id.resetBtn).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        MatterServant.get().restart();
+      }
+    });
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();

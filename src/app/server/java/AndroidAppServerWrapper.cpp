@@ -62,3 +62,11 @@ exit:
     }
     return err;
 }
+
+CHIP_ERROR ChipAndroidAppShutdown(void)
+{
+    chip::Server::GetInstance().Shutdown();
+    chip::Platform::MemoryShutdown();
+
+    return CHIP_NO_ERROR;
+}

@@ -20,6 +20,8 @@ import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
 
+  private ChipAppServer chipAppServer;
+
   private MatterServant() {}
 
   private static class SingletonHolder {
@@ -49,7 +51,14 @@ public class MatterServant {
             new NsdManagerServiceResolver(applicationContext),
             new ChipMdnsCallbackImpl());
 
-    ChipAppServer chipAppServer = new ChipAppServer();
+    chipAppServer = new ChipAppServer();
+    chipAppServer.startApp();
+  }
+
+
+
+  public void restart() {
+    chipAppServer.stopApp();
     chipAppServer.startApp();
   }
 }
