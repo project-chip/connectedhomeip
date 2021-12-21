@@ -20,11 +20,11 @@
 
 void LEDWidget::Init(void)
 {
-    mState = false;
+    mState      = false;
     mBrightness = UINT8_MAX;
 
 #if CONFIG_LED_TYPE_RMT
-    rmt_config_t config = RMT_DEFAULT_CONFIG_TX((gpio_num_t)CONFIG_LED_GPIO, (rmt_channel_t)CONFIG_LED_RMT_CHANNEL);
+    rmt_config_t config             = RMT_DEFAULT_CONFIG_TX((gpio_num_t) CONFIG_LED_GPIO, (rmt_channel_t) CONFIG_LED_RMT_CHANNEL);
     led_strip_config_t strip_config = LED_STRIP_DEFAULT_CONFIG(1, (led_strip_dev_t) config.channel);
 
     config.clk_div = 2;
@@ -35,7 +35,7 @@ void LEDWidget::Init(void)
     mHue        = 0;
     mSaturation = 0;
 #else
-    mGPIONum = (gpio_num_t)CONFIG_LED_GPIO;
+    mGPIONum                       = (gpio_num_t) CONFIG_LED_GPIO;
     ledc_timer_config_t ledc_timer = {
         .speed_mode      = LEDC_LOW_SPEED_MODE, // timer mode
         .duty_resolution = LEDC_TIMER_8_BIT,    // resolution of PWM duty
@@ -83,7 +83,7 @@ void LEDWidget::SetColor(uint8_t Hue, uint8_t Saturation)
     if (Hue == mHue && Saturation == mSaturation)
         return;
 
-    mHue = Hue;
+    mHue        = Hue;
     mSaturation = Saturation;
 
     DoSet();
@@ -97,7 +97,7 @@ void LEDWidget::DoSet(void)
 #if CONFIG_LED_TYPE_RMT
     if (mStrip)
     {
-        HsvColor_t hsv = {mHue, mSaturation, brightness};
+        HsvColor_t hsv = { mHue, mSaturation, brightness };
         RgbColor_t rgb = HsvToRgb(hsv);
 
         mStrip->set_pixel(mStrip, 0, rgb.r, rgb.g, rgb.b);
