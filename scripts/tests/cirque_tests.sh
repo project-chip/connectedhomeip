@@ -104,18 +104,6 @@ function cirquetest_bootstrap() {
 
     __cirquetest_build_ot_lazy
     pip3 install -r requirements_nogrpc.txt
-
-    if [[ "x$GITHUB_ACTION_RUN" = "x1" ]]; then
-        # We may run Cirque tests locally, in that case, we will run
-        # CHIP bootstrap script elsewhere. Don't run bootstrap so we
-        # won't break local environment.
-        set +x
-
-        # Call activate here so the later tests can be faster
-        # set -e will cause error if activate.sh is sourced twice
-        # this is an expected behavior caused by pigweed/activate.sh
-        source "$REPO_DIR/scripts/bootstrap.sh"
-    fi
 }
 
 function cirquetest_run_test() {

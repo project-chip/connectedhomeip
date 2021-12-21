@@ -60,6 +60,8 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value);
@@ -632,6 +634,38 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoints'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("FabricIndex", indent + 1, value.fabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'FabricIndex'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ProviderNodeID", indent + 1, value.providerNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ProviderNodeID'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -25189,8 +25223,10 @@ private:
 | * AnnounceOtaProvider                                               |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * DefaultOtaProvider                                                | 0x0001 |
-| * UpdatePossible                                                    | 0x0002 |
+| * DefaultOtaProviders                                               | 0x0000 |
+| * UpdatePossible                                                    | 0x0001 |
+| * UpdateState                                                       | 0x0002 |
+| * UpdateStateProgress                                               | 0x0003 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -25203,12 +25239,13 @@ class OtaSoftwareUpdateRequestorAnnounceOtaProvider : public ModelCommand
 public:
     OtaSoftwareUpdateRequestorAnnounceOtaProvider() : ModelCommand("announce-ota-provider")
     {
-        AddArgument("ProviderLocation", 0, UINT64_MAX, &mRequest.providerLocation);
+        AddArgument("ProviderNodeId", 0, UINT64_MAX, &mRequest.providerNodeId);
         AddArgument("VendorId", 0, UINT16_MAX, &mRequest.vendorId);
         AddArgument(
             "AnnouncementReason", 0, UINT8_MAX,
             reinterpret_cast<std::underlying_type_t<decltype(mRequest.announcementReason)> *>(&mRequest.announcementReason));
         AddArgument("MetadataForNode", &mRequest.metadataForNode);
+        AddArgument("Endpoint", 0, UINT16_MAX, &mRequest.endpoint);
         ModelCommand::AddArguments();
     }
 
@@ -25225,18 +25262,18 @@ private:
 };
 
 /*
- * Attribute DefaultOtaProvider
+ * Attribute DefaultOtaProviders
  */
-class ReadOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+class ReadOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
 {
 public:
-    ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("read")
+    ReadOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("read")
     {
-        AddArgument("attr-name", "default-ota-provider");
+        AddArgument("attr-name", "default-ota-providers");
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() {}
+    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25244,55 +25281,32 @@ public:
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo>(
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
     {
-        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProvider response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProviders response", value);
     }
 };
 
-class WriteOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
+class ReportOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
 {
 public:
-    WriteOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("write")
+    ReportOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("report")
     {
-        AddArgument("attr-name", "default-ota-provider");
-        AddArgument("attr-value", &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WriteOtaSoftwareUpdateRequestorDefaultOtaProvider() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x01) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
-            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::ByteSpan mValue;
-};
-
-class ReportOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
-{
-public:
-    ReportOtaSoftwareUpdateRequestorDefaultOtaProvider() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "default-ota-provider");
+        AddArgument("attr-name", "default-ota-providers");
         AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
         AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
         AddArgument("wait", 0, 1, &mWait);
         ModelCommand::AddArguments();
     }
 
-    ~ReportOtaSoftwareUpdateRequestorDefaultOtaProvider() {}
+    ~ReportOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25303,7 +25317,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
-            .SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
+            .SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo>(
                 this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
@@ -25312,9 +25326,12 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::ByteSpan value)
+    static void
+    OnValueReport(void * context,
+                  const chip::app::DataModel::DecodableList<
+                      chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
     {
-        LogValue("OtaSoftwareUpdateRequestor.DefaultOtaProvider report", 0, value);
+        LogValue("OtaSoftwareUpdateRequestor.DefaultOtaProviders report", 0, value);
     }
 
 private:
@@ -25387,6 +25404,151 @@ public:
     static void OnValueReport(void * context, bool value)
     {
         LogValue("OtaSoftwareUpdateRequestor.UpdatePossible report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute UpdateState
+ */
+class ReadOtaSoftwareUpdateRequestorUpdateState : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorUpdateState() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "update-state");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorUpdateState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdateState response", value);
+    }
+};
+
+class ReportOtaSoftwareUpdateRequestorUpdateState : public ModelCommand
+{
+public:
+    ReportOtaSoftwareUpdateRequestorUpdateState() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "update-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOtaSoftwareUpdateRequestorUpdateState() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+    {
+        LogValue("OtaSoftwareUpdateRequestor.UpdateState report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute UpdateStateProgress
+ */
+class ReadOtaSoftwareUpdateRequestorUpdateStateProgress : public ModelCommand
+{
+public:
+    ReadOtaSoftwareUpdateRequestorUpdateStateProgress() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "update-state-progress");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadOtaSoftwareUpdateRequestorUpdateStateProgress() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdateStateProgress response", value);
+    }
+};
+
+class ReportOtaSoftwareUpdateRequestorUpdateStateProgress : public ModelCommand
+{
+public:
+    ReportOtaSoftwareUpdateRequestorUpdateStateProgress() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "update-state-progress");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOtaSoftwareUpdateRequestorUpdateStateProgress() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        LogValue("OtaSoftwareUpdateRequestor.UpdateStateProgress report", 0, value);
     }
 
 private:
@@ -51991,15 +52153,17 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
     const char * clusterName = "OtaSoftwareUpdateRequestor";
 
     commands_list clusterCommands = {
-        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),      //
-        make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProvider>(),   //
-        make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProvider>(),  //
-        make_unique<ReportOtaSoftwareUpdateRequestorDefaultOtaProvider>(), //
-        make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),       //
-        make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),     //
-        make_unique<ReadOtaSoftwareUpdateRequestorAttributeList>(),        //
-        make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),      //
-        make_unique<ReportOtaSoftwareUpdateRequestorClusterRevision>(),    //
+        make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),       //
+        make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProviders>(),   //
+        make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),        //
+        make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),      //
+        make_unique<ReadOtaSoftwareUpdateRequestorUpdateState>(),           //
+        make_unique<ReportOtaSoftwareUpdateRequestorUpdateState>(),         //
+        make_unique<ReadOtaSoftwareUpdateRequestorUpdateStateProgress>(),   //
+        make_unique<ReportOtaSoftwareUpdateRequestorUpdateStateProgress>(), //
+        make_unique<ReadOtaSoftwareUpdateRequestorAttributeList>(),         //
+        make_unique<ReadOtaSoftwareUpdateRequestorClusterRevision>(),       //
+        make_unique<ReportOtaSoftwareUpdateRequestorClusterRevision>(),     //
     };
 
     commands.Register(clusterName, clusterCommands);

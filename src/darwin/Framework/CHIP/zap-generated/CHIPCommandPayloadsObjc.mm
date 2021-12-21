@@ -1307,13 +1307,15 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _providerLocation = @(0);
+        _providerNodeId = @(0);
 
         _vendorId = @(0);
 
         _announcementReason = @(0);
 
         _metadataForNode = nil;
+
+        _endpoint = @(0);
     }
     return self;
 }

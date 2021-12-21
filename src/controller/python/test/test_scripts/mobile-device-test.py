@@ -22,7 +22,8 @@ import os
 import sys
 from optparse import OptionParser
 from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
-from cluster_objects import ClusterObjectTests
+from cluster_objects import NODE_ID, ClusterObjectTests
+from network_commissioning import NetworkCommissioningTests
 import asyncio
 
 # The thread network dataset tlv for testing, splited into T-L-V.
@@ -94,6 +95,11 @@ def main():
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=1),
               "Failed to resolve nodeid")
+
+    # Still test network commissioning
+    logger.info("Testing network commissioning")
+    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=1).run()),
+              "Failed to finish network commissioning")
 
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,

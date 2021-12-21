@@ -1060,13 +1060,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProvider {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace DefaultOtaProvider
+namespace DefaultOtaProviders {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace DefaultOtaProviders
 
 namespace UpdatePossible {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace UpdatePossible
+
+namespace UpdateState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UpdateState
+
+namespace UpdateStateProgress {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace UpdateStateProgress
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

@@ -76,18 +76,34 @@ CHIPDeviceController * InitializeCHIP(void)
     return controller;
 }
 
+uint64_t CHIPGetLastPairedDeviceId(void)
+{
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID();
+    if (deviceId > 1) {
+        deviceId--;
+    }
+    return deviceId;
+}
+
 BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler)
 {
     CHIPDeviceController * controller = InitializeCHIP();
 
-    uint64_t deviceId = CHIPGetNextAvailableDeviceID();
-    if (deviceId > 1) {
-        // Let's use the last device that was paired
-        deviceId--;
-        return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
-    }
+    // Let's use the last device that was paired
+    uint64_t deviceId = CHIPGetLastPairedDeviceId();
+    return [controller getConnectedDevice:deviceId queue:dispatch_get_main_queue() completionHandler:completionHandler];
+}
 
-    return NO;
+CHIPDevice * CHIPGetDeviceBeingCommissioned(void)
+{
+    NSError * error;
+    CHIPDeviceController * controller = InitializeCHIP();
+    CHIPDevice * device = [controller getDeviceBeingCommissioned:CHIPGetLastPairedDeviceId() error:&error];
+    if (error) {
+        NSLog(@"Error retrieving device being commissioned for deviceId %llu", CHIPGetLastPairedDeviceId());
+        return nil;
+    }
+    return device;
 }
 
 BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler)

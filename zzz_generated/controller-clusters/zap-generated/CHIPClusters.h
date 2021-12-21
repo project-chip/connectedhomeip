@@ -559,8 +559,8 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::NodeId providerLocation, chip::VendorId vendorId, uint8_t announcementReason,
-                                   chip::ByteSpan metadataForNode);
+                                   chip::NodeId providerNodeId, chip::VendorId vendorId, uint8_t announcementReason,
+                                   chip::ByteSpan metadataForNode, chip::EndpointId endpoint);
 };
 
 class DLL_EXPORT OccupancySensingCluster : public ClusterBase

@@ -6709,15 +6709,19 @@ class OtaSoftwareUpdateRequestor(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="defaultOtaProvider", Tag=0x00000001, Type=bytes),
-                ClusterObjectFieldDescriptor(Label="updatePossible", Tag=0x00000002, Type=bool),
+                ClusterObjectFieldDescriptor(Label="defaultOtaProviders", Tag=0x00000000, Type=typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]),
+                ClusterObjectFieldDescriptor(Label="updatePossible", Tag=0x00000001, Type=bool),
+                ClusterObjectFieldDescriptor(Label="updateState", Tag=0x00000002, Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum),
+                ClusterObjectFieldDescriptor(Label="updateStateProgress", Tag=0x00000003, Type=typing.Union[Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    defaultOtaProvider: 'bytes' = None
+    defaultOtaProviders: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = None
     updatePossible: 'bool' = None
+    updateState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
+    updateStateProgress: 'typing.Union[Nullable, uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -6747,6 +6751,23 @@ class OtaSoftwareUpdateRequestor(Cluster):
             kDelayedOnUserConsent = 0x08
 
 
+    class Structs:
+        @dataclass
+        class ProviderLocation(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="fabricIndex", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="providerNodeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="endpoint", Tag=2, Type=uint),
+                    ])
+
+            fabricIndex: 'uint' = 0
+            providerNodeID: 'uint' = 0
+            endpoint: 'uint' = 0
+
+
 
     class Commands:
         @dataclass
@@ -6759,21 +6780,39 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="providerLocation", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="providerNodeId", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="vendorId", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="announcementReason", Tag=2, Type=OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason),
                             ClusterObjectFieldDescriptor(Label="metadataForNode", Tag=3, Type=typing.Optional[bytes]),
+                            ClusterObjectFieldDescriptor(Label="endpoint", Tag=4, Type=uint),
                     ])
 
-            providerLocation: 'uint' = 0
+            providerNodeId: 'uint' = 0
             vendorId: 'uint' = 0
             announcementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = 0
             metadataForNode: 'typing.Optional[bytes]' = None
+            endpoint: 'uint' = 0
 
 
     class Attributes:
         @dataclass
-        class DefaultOtaProvider(ClusterAttributeDescriptor):
+        class DefaultOtaProviders(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation])
+
+            value: 'typing.List[OtaSoftwareUpdateRequestor.Structs.ProviderLocation]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class UpdatePossible(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002A
@@ -6784,12 +6823,12 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bytes)
+                return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bytes' = b""
+            value: 'bool' = False
 
         @dataclass
-        class UpdatePossible(ClusterAttributeDescriptor):
+        class UpdateState(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002A
@@ -6800,9 +6839,25 @@ class OtaSoftwareUpdateRequestor(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=bool)
+                return ClusterObjectFieldDescriptor(Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum)
 
-            value: 'bool' = False
+            value: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
+
+        @dataclass
+        class UpdateStateProgress(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002A
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000003
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
+
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -6868,16 +6923,16 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="previousState", Tag=0, Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum),
+                            ClusterObjectFieldDescriptor(Label="previousState", Tag=0, Type=typing.Union[Nullable, OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum]),
                             ClusterObjectFieldDescriptor(Label="newState", Tag=1, Type=OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum),
                             ClusterObjectFieldDescriptor(Label="reason", Tag=2, Type=OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum),
-                            ClusterObjectFieldDescriptor(Label="targetSoftwareVersion", Tag=3, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="targetSoftwareVersion", Tag=3, Type=typing.Union[Nullable, uint]),
                     ])
 
-            previousState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
+            previousState: 'typing.Union[Nullable, OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum]' = NullValue
             newState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
             reason: 'OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum' = 0
-            targetSoftwareVersion: 'uint' = 0
+            targetSoftwareVersion: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class VersionApplied(ClusterEvent):
@@ -6917,13 +6972,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
                             ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="bytesDownloaded", Tag=1, Type=uint),
                             ClusterObjectFieldDescriptor(Label="progressPercent", Tag=2, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="platformCode", Tag=3, Type=int),
+                            ClusterObjectFieldDescriptor(Label="platformCode", Tag=3, Type=typing.Union[Nullable, int]),
                     ])
 
             softwareVersion: 'uint' = 0
             bytesDownloaded: 'uint' = 0
             progressPercent: 'uint' = 0
-            platformCode: 'int' = 0
+            platformCode: 'typing.Union[Nullable, int]' = NullValue
 
 
 @dataclass
@@ -8179,6 +8234,13 @@ class NetworkCommissioning(Cluster):
             kIPBindFailed = 0x0B
             kUnknownError = 0x0C
 
+        class WiFiBand(IntEnum):
+            k2g4 = 0x00
+            k3g65 = 0x01
+            k5g = 0x02
+            k6g = 0x03
+            k60g = 0x04
+
 
     class Structs:
         @dataclass
@@ -8229,7 +8291,7 @@ class NetworkCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=2, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="bssid", Tag=3, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="channel", Tag=4, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=NetworkCommissioning.Enums.WiFiBand),
                             ClusterObjectFieldDescriptor(Label="rssi", Tag=6, Type=int),
                     ])
 
@@ -8237,7 +8299,7 @@ class NetworkCommissioning(Cluster):
             ssid: 'bytes' = b""
             bssid: 'bytes' = b""
             channel: 'uint' = 0
-            wiFiBand: 'uint' = 0
+            wiFiBand: 'NetworkCommissioning.Enums.WiFiBand' = 0
             rssi: 'int' = 0
 
 

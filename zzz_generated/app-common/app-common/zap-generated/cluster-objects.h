@@ -8520,6 +8520,32 @@ enum class UpdateStateEnum : uint8_t
 using UpdateStateEnum                 = EmberAfUpdateStateEnum;
 #endif
 
+namespace Structs {
+namespace ProviderLocation {
+enum class Fields
+{
+    kFabricIndex    = 0,
+    kProviderNodeID = 1,
+    kEndpoint       = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    chip::NodeId providerNodeID;
+    chip::EndpointId endpoint;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+};
+
+using DecodableType = Type;
+
+} // namespace ProviderLocation
+} // namespace Structs
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -8534,10 +8560,11 @@ namespace Commands {
 namespace AnnounceOtaProvider {
 enum class Fields
 {
-    kProviderLocation   = 0,
+    kProviderNodeId     = 0,
     kVendorId           = 1,
     kAnnouncementReason = 2,
     kMetadataForNode    = 3,
+    kEndpoint           = 4,
 };
 
 struct Type
@@ -8547,10 +8574,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -8565,10 +8593,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOtaProvider
@@ -8576,18 +8605,20 @@ public:
 
 namespace Attributes {
 
-namespace DefaultOtaProvider {
+namespace DefaultOtaProviders {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProviders::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DefaultOtaProvider
+} // namespace DefaultOtaProviders
 namespace UpdatePossible {
 struct TypeInfo
 {
@@ -8600,6 +8631,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpdatePossible
+namespace UpdateState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateState
+namespace UpdateStateProgress {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateStateProgress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateStateProgress
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8645,8 +8700,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DefaultOtaProvider::TypeInfo::DecodableType defaultOtaProvider;
+        Attributes::DefaultOtaProviders::TypeInfo::DecodableType defaultOtaProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible;
+        Attributes::UpdateState::TypeInfo::DecodableType updateState;
+        Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8673,10 +8730,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
+    DataModel::Nullable<UpdateStateEnum> previousState;
     UpdateStateEnum newState;
     ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8688,10 +8745,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
+    DataModel::Nullable<UpdateStateEnum> previousState;
     UpdateStateEnum newState;
     ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8754,7 +8811,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8769,7 +8826,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -9902,6 +9959,15 @@ enum class NetworkCommissioningStatus : uint8_t
     kIPBindFailed           = 0x0B,
     kUnknownError           = 0x0C,
 };
+// Enum for WiFiBand
+enum class WiFiBand : uint8_t
+{
+    k2g4  = 0x00,
+    k3g65 = 0x01,
+    k5g   = 0x02,
+    k6g   = 0x03,
+    k60g  = 0x04,
+};
 
 namespace Structs {
 namespace NetworkInfo {
@@ -9973,8 +10039,8 @@ public:
     uint8_t security;
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint8_t channel;
-    uint32_t wiFiBand;
+    uint16_t channel;
+    WiFiBand wiFiBand;
     int8_t rssi;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;

@@ -45,6 +45,10 @@
 #include <mutex>
 #endif
 
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#include <platform/NetworkCommissioning.h>
+#include <vector>
+
 namespace chip {
 namespace Inet {
 class IPAddress;
@@ -110,11 +114,19 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     CHIP_ERROR ProvisionWiFiNetwork(const char * ssid, const char * key);
+    CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
+                                       NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
+    void PostNetworkConnect();
+    static void _ConnectWiFiNetworkAsyncCallback(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    CHIP_ERROR CommitConfig();
+
     void StartWiFiManagement();
     bool IsWiFiManagementStarted();
     CHIP_ERROR GetWiFiBssId(ByteSpan & value);
     CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
     CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
+    CHIP_ERROR GetConnectedNetwork(NetworkCommissioning::Network & network);
+    CHIP_ERROR StartWiFiScan(ByteSpan ssid, NetworkCommissioning::WiFiDriver::ScanCallback * callback);
 #endif
 
     const char * GetEthernetIfName() { return (mEthIfName[0] == '\0') ? nullptr : mEthIfName; }
@@ -125,6 +137,18 @@ public:
 
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
+
+    struct WiFiNetworkScanned
+    {
+        // The fields matches WiFiInterfaceScanResult::Type.
+        uint8_t ssid[Internal::kMaxWiFiSSIDLength];
+        uint8_t ssidLen;
+        uint8_t bssid[6];
+        int8_t rssi;
+        uint16_t frequencyBand;
+        uint8_t channel;
+        uint8_t security;
+    };
 
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
@@ -150,6 +174,7 @@ private:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
+    static CHIP_ERROR StopAutoScan();
 
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
@@ -160,6 +185,9 @@ private:
     static void _OnWpaInterfaceReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaBssProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
+    static void _OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data);
+
+    static bool _GetBssInfo(const gchar * bssPath, NetworkCommissioning::WiFiScanResponse & result);
 
     static bool mAssociattionStarted;
     static BitFlags<ConnectivityFlags> mConnectivityFlag;
@@ -199,6 +227,9 @@ private:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     static char sWiFiIfName[IFNAMSIZ];
 #endif
+
+    static NetworkCommissioning::WiFiDriver::ScanCallback * mpScanCallback;
+    static NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * mpConnectCallback;
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
