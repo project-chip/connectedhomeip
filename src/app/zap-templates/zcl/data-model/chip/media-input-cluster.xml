@@ -28,20 +28,20 @@ limitations under the License.
     <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST" type="ARRAY" entryType="MediaInputInfo" length="254" writable="false" optional="false">media input list</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current media input</attribute>
 
-    <command source="client" code="0x00" name="SelectInput" optional="false">
+    <command source="client" code="0x00" name="SelectInputRequest" optional="false">
       <description>Upon receipt, this SHALL change the input on the media device to the input at a specific index in the Input List.</description>
       <arg name="index" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x01" name="ShowInputStatus" optional="false">
+    <command source="client" code="0x01" name="ShowInputStatusRequest" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
     </command>
 
-    <command source="client" code="0x02" name="HideInputStatus" optional="false">
+    <command source="client" code="0x02" name="HideInputStatusRequest" optional="false">
       <description>Upon receipt, this SHALL hide the input list from the screen.</description>
     </command>
 
-    <command source="client" code="0x03" name="RenameInput" optional="false">
+    <command source="client" code="0x03" name="RenameInputRequest" optional="false">
       <description>Upon receipt, this SHALL rename the input at a specific index in the Input List. Updates to the input name SHALL appear in the TV settings menus.    </description>
       <arg name="index" type="INT8U"/>
       <arg name="name" type="CHAR_STRING"/>
