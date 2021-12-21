@@ -17,6 +17,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
@@ -103,6 +104,8 @@ struct DeviceInfoForAttestation
     // Vendor ID from  PAA cert
     uint16_t paaVendorId = VendorId::NotSpecified;
 };
+
+typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);
 
 /**
  * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
@@ -205,15 +208,13 @@ public:
      *                                If length zero, there was no PAI certificate.
      * @param[in] dacDerBuffer Buffer containing the DAC certificate from device in DER format.
      * @param[in] attestationNonce Buffer containing attestation nonce.
-     *
-     * @returns AttestationVerificationResult::kSuccess on success or another specific
-     *          value from AttestationVerificationResult enum on failure.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         VerifyAttestationInformation()
      */
-    virtual AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
-                                                                       const ByteSpan & attestationChallengeBuffer,
-                                                                       const ByteSpan & attestationSignatureBuffer,
-                                                                       const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
-                                                                       const ByteSpan & attestationNonce) = 0;
+    virtual void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
+                                              const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
+                                              const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                              Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
 
     /**
      * @brief Verify a CMS Signed Data signature against the CSA certificate of Subject Key Identifier that matches
