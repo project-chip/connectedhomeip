@@ -78,8 +78,8 @@ static_library("EFR32") {
     }
 
     sources += [
-      "ConnectivityManagerImpl.cpp",
       "../OpenThread/OpenThreadUtils.cpp",
+      "ConnectivityManagerImpl.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
