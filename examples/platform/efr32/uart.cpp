@@ -202,7 +202,7 @@ void USART_IRQHandler(void)
 #endif
 #if defined(SL_WIFI)
     /* TODO */
-#elif !defined (PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }
@@ -228,7 +228,7 @@ static void UART_rx_callback(UARTDRV_Handle_t handle, Ecode_t transferStatus, ui
 #endif
 #if defined(SL_WIFI)
     /* TODO */
-#elif !defined (PW_RPC_ENABLED)
+#elif !defined(PW_RPC_ENABLED)
     otSysEventSignalPending();
 #endif
 }

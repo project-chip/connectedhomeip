@@ -151,11 +151,12 @@ CHIP_ERROR WindowAppImpl::Init()
     /*
      * Wait for the WiFi to be initialized
      */
-    EFR32_LOG ("APP: Wait WiFi Init");
-    while (!wfx_hw_ready ()) {
-        vTaskDelay (10);
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
     }
-    EFR32_LOG ("APP: Done WiFi Init");
+    EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
 #endif
     WindowApp::Init();
@@ -325,22 +326,16 @@ void WindowAppImpl::UpdateLEDs()
         }
         else
 #if CHIP_ENABLE_OPENTHREAD
-        if (mState.isThreadProvisioned && mState.isThreadEnabled)
+            if (mState.isThreadProvisioned && mState.isThreadEnabled)
 #else
-        if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
+            if (mState.isWiFiProvisioned && mState.isWiFiEnabled)
 #endif
 
         {
             mStatusLED.Blink(950, 50);
         }
-        else if (mState.haveBLEConnections)
-        {
-            mStatusLED.Blink(100, 100);
-        }
-        else
-        {
-            mStatusLED.Blink(50, 950);
-        }
+        else if (mState.haveBLEConnections) { mStatusLED.Blink(100, 100); }
+        else { mStatusLED.Blink(50, 950); }
 
         // Action LED
 

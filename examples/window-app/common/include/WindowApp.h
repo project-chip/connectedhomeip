@@ -142,8 +142,8 @@ protected:
         bool isWiFiProvisioned = false;
         bool isWiFiEnabled     = false;
 #endif
-        bool haveBLEConnections  = false;
-        bool isWinking           = false;
+        bool haveBLEConnections = false;
+        bool isWinking          = false;
     };
 
     Cover & GetCover();

@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#include <platform/EFR32/EFR32Config.h>
 #include "wfx_host_events.h"
+#include <platform/EFR32/EFR32Config.h>
 
 #include "ServiceProvisioning.h"
 
