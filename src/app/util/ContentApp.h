@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
 #include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/util/attribute-storage.h>
@@ -97,18 +98,6 @@ public:
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
 };
 
-class DLL_EXPORT ContentLauncher : public ContentAppCluster
-{
-public:
-    virtual ~ContentLauncher() = default;
-
-    virtual ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                std::string data) = 0;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
 class DLL_EXPORT MediaPlayback : public ContentAppCluster
 {
 public:
@@ -156,10 +145,11 @@ public:
     virtual AccountLogin * GetAccountLogin()               = 0;
     virtual KeypadInput * GetKeypadInput()                 = 0;
     virtual ApplicationLauncher * GetApplicationLauncher() = 0;
-    virtual ContentLauncher * GetContentLauncher()         = 0;
     virtual MediaPlayback * GetMediaPlayback()             = 0;
     virtual TargetNavigator * GetTargetNavigator()         = 0;
     virtual Channel * GetChannel()                         = 0;
+
+    virtual chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() = 0;
 
     EmberAfStatus HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
     EmberAfStatus HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer);

@@ -66,10 +66,6 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::Attribu
     {
         return GetApplicationLauncher()->HandleReadAttribute(attributeId, buffer, maxReadLength);
     }
-    if (clusterId == ZCL_CONTENT_LAUNCH_CLUSTER_ID)
-    {
-        return GetContentLauncher()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
     if (clusterId == ZCL_MEDIA_PLAYBACK_CLUSTER_ID)
     {
         return GetMediaPlayback()->HandleReadAttribute(attributeId, buffer, maxReadLength);
@@ -106,10 +102,6 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::Attrib
     if (clusterId == ZCL_APPLICATION_LAUNCHER_CLUSTER_ID)
     {
         return GetApplicationLauncher()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_CONTENT_LAUNCH_CLUSTER_ID)
-    {
-        return GetContentLauncher()->HandleWriteAttribute(attributeId, buffer);
     }
     if (clusterId == ZCL_MEDIA_PLAYBACK_CLUSTER_ID)
     {
@@ -228,19 +220,6 @@ EmberAfStatus ApplicationLauncher::HandleReadAttribute(chip::AttributeId attribu
 EmberAfStatus ApplicationLauncher::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer, "ApplicationLauncher::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus ContentLauncher::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
-{
-    ChipLogProgress(DeviceLayer, "ContentLauncher::HandleReadAttribute: attrId=%d, maxReadLength=%d",
-                    static_cast<uint16_t>(attributeId), maxReadLength);
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus ContentLauncher::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
-{
-    ChipLogProgress(DeviceLayer, "ContentLauncher::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
     return EMBER_ZCL_STATUS_FAILURE;
 }
 

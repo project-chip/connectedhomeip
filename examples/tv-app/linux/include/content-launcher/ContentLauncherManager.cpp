@@ -45,14 +45,6 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
     string dataString(data.data(), data.size());
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpointId);
-    if (app != NULL)
-    {
-        return app->GetContentLauncher()->LaunchContent(parameterList, autoplay, dataString);
-    }
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
     // TODO: Insert code here
     ContentLaunchResponse response;
     response.err    = CHIP_NO_ERROR;
@@ -81,7 +73,7 @@ ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const
 std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
-    return { "example", "example" };
+    return { "image/*", "video/*" };
 }
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()

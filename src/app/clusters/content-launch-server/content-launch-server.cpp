@@ -48,6 +48,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <list>
@@ -59,15 +60,25 @@ using namespace chip::app;
 // Delegate Implementation
 
 using chip::app::Clusters::ContentLauncher::Delegate;
+using namespace chip::AppPlatform;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_CONTENT_LAUNCH_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegate = NULL;
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
+    if (app != NULL && app->GetContentLauncherDelegate() != NULL)
+    {
+        ChipLogError(Zcl, "Content Launcher returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetContentLauncherDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "Content Launcher NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    return gDelegate;
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -86,16 +97,9 @@ namespace app {
 namespace Clusters {
 namespace ContentLauncher {
 
-void SetDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ContentLauncher::Id);
-    if (ep != 0xFFFF)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-    else
-    {
-    }
+    gDelegate = delegate;
 }
 
 } // namespace ContentLauncher

@@ -207,18 +207,6 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLaunch
     return response;
 }
 
-ContentLaunchResponse ContentLauncherImpl::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                         std::string data)
-{
-    ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
-
-    ContentLaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
-    response.data   = "Example app data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
-    return response;
-}
-
 ContentAppFactoryImpl::ContentAppFactoryImpl()
 {
     mContentApps[1].GetAccountLogin()->SetSetupPIN(34567890);

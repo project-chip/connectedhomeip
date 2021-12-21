@@ -30,6 +30,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "include/content-launcher/ContentLauncherManager.h"
+
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 namespace chip {
@@ -103,16 +105,6 @@ public:
 protected:
 };
 
-class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
-{
-public:
-    virtual ~ContentLauncherImpl() {}
-
-    ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, std::string data) override;
-
-protected:
-};
-
 class DLL_EXPORT MediaPlaybackImpl : public MediaPlayback
 {
 public:
@@ -149,20 +141,25 @@ public:
     inline AccountLogin * GetAccountLogin() override { return &mAccountLogin; };
     inline KeypadInput * GetKeypadInput() override { return &mKeypadInput; };
     inline ApplicationLauncher * GetApplicationLauncher() override { return &mApplicationLauncher; };
-    inline ContentLauncher * GetContentLauncher() override { return &mContentLauncher; };
     inline MediaPlayback * GetMediaPlayback() override { return &mMediaPlayback; };
     inline TargetNavigator * GetTargetNavigator() override { return &mTargetNavigator; };
     inline Channel * GetChannel() override { return &mChannel; };
+
+    inline chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() override
+    {
+        return &mContentLauncherDelegate;
+    };
 
 protected:
     ApplicationBasicImpl mApplicationBasic;
     AccountLoginImpl mAccountLogin;
     KeypadInputImpl mKeypadInput;
     ApplicationLauncherImpl mApplicationLauncher;
-    ContentLauncherImpl mContentLauncher;
     MediaPlaybackImpl mMediaPlayback;
     TargetNavigatorImpl mTargetNavigator;
     ChannelImpl mChannel;
+
+    ContentLauncherManager mContentLauncherDelegate;
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory

@@ -54,7 +54,6 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
 
 namespace {
 static ContentLauncherManager contentLauncherManager;
-constexpr chip::EndpointId kContentLauncherEndpoint = 1;
 } // namespace
 
 int main(int argc, char * argv[])
@@ -119,6 +118,6 @@ exit:
 
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncherManager::SetDelegate");
-    chip::app::Clusters::ContentLauncher::SetDelegate(kContentLauncherEndpoint, &contentLauncherManager);
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncherManager::SetDefaultDelegate");
+    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(&contentLauncherManager);
 }
