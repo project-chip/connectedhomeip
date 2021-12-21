@@ -57,7 +57,6 @@ static const int kNameSize = 32;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 static const int kDescriptorAttributeArraySize = 254;
-static const int kFixedLabelAttributeArraySize = 254;
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
 // (taken from chip-devices.xml)
@@ -202,20 +201,20 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = (uint8_t) chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
 }
 
-ContentLaunchResponse ContentLauncherImpl::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Paramater> parameterList, bool autoplay,
                                                          std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
-    ContentLaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
-    response.data   = "Example app data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    LaunchResponse response;
+    response.err        = CHIP_NO_ERROR;
+    response.data       = "Example app data";
+    response.statusEnum = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 
