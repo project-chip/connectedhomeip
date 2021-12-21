@@ -25,7 +25,7 @@ import("device.gni")
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
-  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
     import("//build_overrides/ot_br_posix.gni")
   }
 }

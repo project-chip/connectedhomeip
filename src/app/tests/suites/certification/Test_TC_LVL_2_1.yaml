@@ -27,7 +27,7 @@ tests:
       command: "readAttribute"
       attribute: "current Level"
       response:
-          value: 0
+          value: 255
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"

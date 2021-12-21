@@ -10229,7 +10229,7 @@ CHIPDevice * GetConnectedDevice(void)
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue unsignedCharValue], 0);
+            XCTAssertEqual([actualValue unsignedCharValue], 255);
         }
 
         [expectation fulfill];

@@ -16311,7 +16311,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 255));
 
         NextTest();
     }
