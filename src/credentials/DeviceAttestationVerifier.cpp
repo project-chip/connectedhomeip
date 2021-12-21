@@ -62,6 +62,21 @@ public:
         (void) deviceInfo;
         return AttestationVerificationResult::kNotImplemented;
     }
+
+    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                   const ByteSpan & attestationChallengeBuffer,
+                                                   const ByteSpan & attestationSignatureBuffer,
+                                                   const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce,
+                                                   ByteSpan & csr) override
+    {
+        (void) nocsrElementsBuffer;
+        (void) attestationChallengeBuffer;
+        (void) attestationSignatureBuffer;
+        (void) dacPublicKey;
+        (void) csrNonce;
+        (void) csr;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

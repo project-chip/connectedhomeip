@@ -228,9 +228,8 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChainAfterValidation(N
     return err;
 }
 
-CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csrElements,
-    const chip::ByteSpan & attestationSignature, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
-    chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::ByteSpan & csr, const chip::ByteSpan & DAC,
+    const chip::ByteSpan & PAI, const chip::ByteSpan & PAA, chip::Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     chip::NodeId assignedId;
     if (mNodeIdRequested) {
@@ -242,23 +241,6 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
         }
         assignedId = mDeviceBeingPaired;
     }
-
-    TLVReader reader;
-    reader.Init(csrElements);
-
-    if (reader.GetType() == kTLVType_NotSpecified) {
-        ReturnErrorOnFailure(reader.Next());
-    }
-
-    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
-    TLVType containerType;
-    ReturnErrorOnFailure(reader.EnterContainer(containerType));
-    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
-
-    ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
-    reader.ExitContainer(containerType);
 
     chip::Crypto::P256PublicKey pubkey;
     ReturnErrorOnFailure(chip::Crypto::VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

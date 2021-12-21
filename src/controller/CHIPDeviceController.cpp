@@ -1341,13 +1341,27 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
 
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
+    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+
+    P256PublicKey dacPubkey;
+    ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(device->GetDAC(), dacPubkey));
+
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge = mSystemState->SessionMgr()
+                                        ->GetSecureSession(device->GetSecureSession().Value())
+                                        ->GetCryptoContext()
+                                        .GetAttestationChallenge();
+
+    ByteSpan csr;
+    ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
+                                                                          dacPubkey, device->GetCSRNonce(), csr));
+
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(device->GetDeviceId());
 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
 
-    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, ByteSpan(), ByteSpan(),
-                                                             ByteSpan(), &mDeviceNOCChainCallback);
+    return mOperationalCredentialsDelegate->GenerateNOCChain(csr, ByteSpan(), ByteSpan(), ByteSpan(), &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,
