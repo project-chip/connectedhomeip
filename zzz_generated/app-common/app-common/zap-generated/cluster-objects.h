@@ -30267,14 +30267,14 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WakeOnLan
 namespace Channel {
-// Enum for ChannelErrorType
-enum class ChannelErrorType : uint8_t
+// Enum for ErrorTypeEnum
+enum class ErrorTypeEnum : uint8_t
 {
     kMultipleMatches = 0x00,
     kNoMatches       = 0x01,
 };
-// Enum for ChannelLineupInfoType
-enum class ChannelLineupInfoType : uint8_t
+// Enum for LineupInfoTypeEnum
+enum class LineupInfoTypeEnum : uint8_t
 {
     kMso = 0x00,
 };
@@ -30306,13 +30306,13 @@ public:
 using DecodableType = Type;
 
 } // namespace ChannelInfo
-namespace ChannelLineupInfo {
+namespace LineupInfo {
 enum class Fields
 {
-    kOperatorName   = 1,
-    kLineupName     = 2,
-    kPostalCode     = 3,
-    kLineupInfoType = 4,
+    kOperatorName       = 1,
+    kLineupName         = 2,
+    kPostalCode         = 3,
+    kLineupInfoTypeEnum = 4,
 };
 
 struct Type
@@ -30321,7 +30321,7 @@ public:
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    ChannelLineupInfoType lineupInfoType;
+    LineupInfoTypeEnum lineupInfoTypeEnum;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30329,7 +30329,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ChannelLineupInfo
+} // namespace LineupInfo
 } // namespace Structs
 
 namespace Commands {
@@ -30393,8 +30393,8 @@ public:
 namespace ChangeChannelResponse {
 enum class Fields
 {
-    kChannelMatch = 0,
-    kErrorType    = 1,
+    kChannelMatch  = 0,
+    kErrorTypeEnum = 1,
 };
 
 struct Type
@@ -30405,7 +30405,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::Type channelMatch;
-    ChannelErrorType errorType;
+    ErrorTypeEnum errorTypeEnum;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30421,7 +30421,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     Structs::ChannelInfo::DecodableType channelMatch;
-    ChannelErrorType errorType;
+    ErrorTypeEnum errorTypeEnum;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
@@ -30512,9 +30512,9 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::Channel::Structs::ChannelLineupInfo::Type;
-    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType &;
+    using Type             = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
+    using DecodableType    = chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
@@ -30589,8 +30589,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Channel
 namespace TargetNavigator {
-// Enum for NavigateTargetStatus
-enum class NavigateTargetStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
@@ -30598,7 +30598,7 @@ enum class NavigateTargetStatus : uint8_t
 };
 
 namespace Structs {
-namespace NavigateTargetTargetInfo {
+namespace TargetInfo {
 enum class Fields
 {
     kIdentifier = 1,
@@ -30617,7 +30617,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace NavigateTargetTargetInfo
+} // namespace TargetInfo
 } // namespace Structs
 
 namespace Commands {
@@ -30674,8 +30674,8 @@ public:
 namespace NavigateTargetResponse {
 enum class Fields
 {
-    kStatus = 0,
-    kData   = 1,
+    kStatusEnum = 0,
+    kData       = 1,
 };
 
 struct Type
@@ -30685,7 +30685,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    NavigateTargetStatus status;
+    StatusEnum statusEnum;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30701,7 +30701,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    NavigateTargetStatus status;
+    StatusEnum statusEnum;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30713,11 +30713,11 @@ namespace Attributes {
 namespace TargetNavigatorList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetNavigatorList::Id; }
@@ -30791,25 +30791,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TargetNavigator
 namespace MediaPlayback {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaPlaybackState
-enum class MediaPlaybackState : uint8_t
+// Enum for PlaybackStateEnum
+enum class PlaybackStateEnum : uint8_t
 {
     kPlaying    = 0x00,
     kPaused     = 0x01,
     kNotPlaying = 0x02,
     kBuffering  = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackState              = EmberAfMediaPlaybackState;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaPlaybackStatus
-enum class MediaPlaybackStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -30818,12 +30809,9 @@ enum class MediaPlaybackStatus : uint8_t
     kSpeedOutOfRange        = 0x04,
     kSeekOutOfRange         = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackStatus             = EmberAfMediaPlaybackStatus;
-#endif
 
 namespace Structs {
-namespace MediaPlaybackPosition {
+namespace PlaybackPosition {
 enum class Fields
 {
     kUpdatedAt = 1,
@@ -30842,7 +30830,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace MediaPlaybackPosition
+} // namespace PlaybackPosition
 } // namespace Structs
 
 namespace Commands {
@@ -31202,7 +31190,7 @@ public:
 namespace PlaybackResponse {
 enum class Fields
 {
-    kMediaPlaybackStatus = 0,
+    kStatusEnum = 0,
 };
 
 struct Type
@@ -31212,7 +31200,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatus mediaPlaybackStatus;
+    StatusEnum statusEnum;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31227,7 +31215,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatus mediaPlaybackStatus;
+    StatusEnum statusEnum;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace PlaybackResponse
@@ -31270,9 +31258,9 @@ namespace Attributes {
 namespace PlaybackState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
+    using DecodableType    = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
+    using DecodableArgType = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
@@ -31306,9 +31294,9 @@ struct TypeInfo
 namespace Position {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::MediaPlayback::Structs::MediaPlaybackPosition::Type;
-    using DecodableType    = chip::app::Clusters::MediaPlayback::Structs::MediaPlaybackPosition::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::MediaPlayback::Structs::MediaPlaybackPosition::DecodableType &;
+    using Type             = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type;
+    using DecodableType    = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
@@ -31411,11 +31399,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MediaPlayback
 namespace MediaInput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaInputType
-enum class MediaInputType : uint8_t
+// Enum for InputTypeEnum
+enum class InputTypeEnum : uint8_t
 {
     kInternal  = 0x00,
     kAux       = 0x01,
@@ -31430,25 +31415,22 @@ enum class MediaInputType : uint8_t
     kUsb       = 0x0A,
     kOther     = 0x0B,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaInputType                  = EmberAfMediaInputType;
-#endif
 
 namespace Structs {
-namespace MediaInputInfo {
+namespace InputInfo {
 enum class Fields
 {
-    kIndex       = 1,
-    kInputType   = 2,
-    kName        = 3,
-    kDescription = 4,
+    kIndex         = 1,
+    kInputTypeEnum = 2,
+    kName          = 3,
+    kDescription   = 4,
 };
 
 struct Type
 {
 public:
     uint8_t index;
-    MediaInputType inputType;
+    InputTypeEnum inputTypeEnum;
     chip::CharSpan name;
     chip::CharSpan description;
 
@@ -31458,7 +31440,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace MediaInputInfo
+} // namespace InputInfo
 } // namespace Structs
 
 namespace Commands {
@@ -31617,11 +31599,10 @@ namespace Attributes {
 namespace MediaInputList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::MediaInput::Structs::MediaInputInfo::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::MediaInput::Structs::InputInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MediaInputList::Id; }
@@ -31792,11 +31773,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LowPower
 namespace KeypadInput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for KeypadInputCecKeyCode
-enum class KeypadInputCecKeyCode : uint8_t
+// Enum for CecKeyCode
+enum class CecKeyCode : uint8_t
 {
     kSelect                    = 0x00,
     kUp                        = 0x01,
@@ -31885,22 +31863,13 @@ enum class KeypadInputCecKeyCode : uint8_t
     kF5                        = 0x75,
     kData                      = 0x76,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputCecKeyCode           = EmberAfKeypadInputCecKeyCode;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for KeypadInputStatus
-enum class KeypadInputStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
     kInvalidKeyInCurrentState = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputStatus               = EmberAfKeypadInputStatus;
-#endif
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -31931,7 +31900,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputCecKeyCode keyCode;
+    CecKeyCode keyCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31946,14 +31915,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputCecKeyCode keyCode;
+    CecKeyCode keyCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyRequest
 namespace SendKeyResponse {
 enum class Fields
 {
-    kStatus = 0,
+    kStatusEnum = 0,
 };
 
 struct Type
@@ -31963,7 +31932,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputStatus status;
+    StatusEnum statusEnum;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31978,7 +31947,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputStatus status;
+    StatusEnum statusEnum;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse
@@ -32039,14 +32008,14 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace KeypadInput
 namespace ContentLauncher {
-// Enum for ContentLaunchMetricType
-enum class ContentLaunchMetricType : uint8_t
+// Enum for MetricTypeEnum
+enum class MetricTypeEnum : uint8_t
 {
     kPixels     = 0x00,
     kPercentage = 0x01,
 };
-// Enum for ContentLaunchParameterEnum
-enum class ContentLaunchParameterEnum : uint8_t
+// Enum for ParameterEnum
+enum class ParameterEnum : uint8_t
 {
     kActor      = 0x00,
     kChannel    = 0x01,
@@ -32062,19 +32031,13 @@ enum class ContentLaunchParameterEnum : uint8_t
     kSportsTeam = 0x0B,
     kType       = 0x0C,
 };
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ContentLaunchStatus
-enum class ContentLaunchStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kUrlNotAvailable = 0x01,
     kAuthFailed      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchStatus             = EmberAfContentLaunchStatus;
-#endif
 
 // Bitmap for SupportedStreamingProtocol
 enum class SupportedStreamingProtocol : uint32_t
@@ -32084,12 +32047,12 @@ enum class SupportedStreamingProtocol : uint32_t
 };
 
 namespace Structs {
-namespace ContentLaunchDimension {
+namespace Dimension {
 enum class Fields
 {
-    kWidth  = 1,
-    kHeight = 2,
-    kMetric = 3,
+    kWidth          = 1,
+    kHeight         = 2,
+    kMetricTypeEnum = 3,
 };
 
 struct Type
@@ -32097,7 +32060,7 @@ struct Type
 public:
     double width;
     double height;
-    ContentLaunchMetricType metric;
+    MetricTypeEnum metricTypeEnum;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32105,8 +32068,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchDimension
-namespace ContentLaunchAdditionalInfo {
+} // namespace Dimension
+namespace AdditionalInfo {
 enum class Fields
 {
     kName  = 1,
@@ -32125,8 +32088,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchAdditionalInfo
-namespace ContentLaunchParamater {
+} // namespace AdditionalInfo
+namespace Paramater {
 enum class Fields
 {
     kType           = 1,
@@ -32137,9 +32100,9 @@ enum class Fields
 struct Type
 {
 public:
-    ContentLaunchParameterEnum type;
+    ParameterEnum type;
     chip::CharSpan value;
-    DataModel::List<const Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
+    DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -32147,14 +32110,14 @@ public:
 struct DecodableType
 {
 public:
-    ContentLaunchParameterEnum type;
+    ParameterEnum type;
     chip::CharSpan value;
-    DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
+    DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace ContentLaunchParamater
-namespace ContentLaunchStyleInformation {
+} // namespace Paramater
+namespace StyleInformation {
 enum class Fields
 {
     kImageUrl = 1,
@@ -32167,7 +32130,7 @@ struct Type
 public:
     chip::CharSpan imageUrl;
     chip::CharSpan color;
-    Structs::ContentLaunchDimension::Type size;
+    Structs::Dimension::Type size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32175,8 +32138,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchStyleInformation
-namespace ContentLaunchBrandingInformation {
+} // namespace StyleInformation
+namespace BrandingInformation {
 enum class Fields
 {
     kProviderName = 1,
@@ -32191,11 +32154,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Structs::ContentLaunchStyleInformation::Type background;
-    Structs::ContentLaunchStyleInformation::Type logo;
-    Structs::ContentLaunchStyleInformation::Type progressBar;
-    Structs::ContentLaunchStyleInformation::Type splash;
-    Structs::ContentLaunchStyleInformation::Type waterMark;
+    Structs::StyleInformation::Type background;
+    Structs::StyleInformation::Type logo;
+    Structs::StyleInformation::Type progressBar;
+    Structs::StyleInformation::Type splash;
+    Structs::StyleInformation::Type waterMark;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32203,7 +32166,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchBrandingInformation
+} // namespace BrandingInformation
 } // namespace Structs
 
 namespace Commands {
@@ -32244,7 +32207,7 @@ public:
 
     bool autoPlay;
     chip::CharSpan data;
-    DataModel::List<const Structs::ContentLaunchParamater::Type> search;
+    DataModel::List<const Structs::Paramater::Type> search;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32261,7 +32224,7 @@ public:
 
     bool autoPlay;
     chip::CharSpan data;
-    DataModel::DecodableList<Structs::ContentLaunchParamater::DecodableType> search;
+    DataModel::DecodableList<Structs::Paramater::DecodableType> search;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContentRequest
@@ -32282,7 +32245,7 @@ public:
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
-    DataModel::List<const Structs::ContentLaunchBrandingInformation::Type> brandingInformation;
+    DataModel::List<const Structs::BrandingInformation::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32299,15 +32262,15 @@ public:
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
-    DataModel::DecodableList<Structs::ContentLaunchBrandingInformation::DecodableType> brandingInformation;
+    DataModel::DecodableList<Structs::BrandingInformation::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURLRequest
 namespace LaunchResponse {
 enum class Fields
 {
-    kContentLaunchStatus = 0,
-    kData                = 1,
+    kStatusEnum = 0,
+    kData       = 1,
 };
 
 struct Type
@@ -32317,7 +32280,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatus contentLaunchStatus;
+    StatusEnum statusEnum;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32333,7 +32296,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatus contentLaunchStatus;
+    StatusEnum statusEnum;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32421,11 +32384,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ContentLauncher
 namespace AudioOutput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for AudioOutputType
-enum class AudioOutputType : uint8_t
+// Enum for OutputTypeEnum
+enum class OutputTypeEnum : uint8_t
 {
     kHdmi      = 0x00,
     kBt        = 0x01,
@@ -32434,24 +32394,21 @@ enum class AudioOutputType : uint8_t
     kInternal  = 0x04,
     kOther     = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using AudioOutputType                 = EmberAfAudioOutputType;
-#endif
 
 namespace Structs {
-namespace AudioOutputInfo {
+namespace OutputInfo {
 enum class Fields
 {
-    kIndex      = 1,
-    kOutputType = 2,
-    kName       = 3,
+    kIndex          = 1,
+    kOutputTypeEnum = 2,
+    kName           = 3,
 };
 
 struct Type
 {
 public:
     uint8_t index;
-    AudioOutputType outputType;
+    OutputTypeEnum outputTypeEnum;
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32460,7 +32417,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AudioOutputInfo
+} // namespace OutputInfo
 } // namespace Structs
 
 namespace Commands {
@@ -32553,11 +32510,10 @@ namespace Attributes {
 namespace AudioOutputList {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::Type>;
-    using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType>;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType>;
     using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &;
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AudioOutputList::Id; }
@@ -32631,22 +32587,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AudioOutput
 namespace ApplicationLauncher {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ApplicationLauncherStatus
-enum class ApplicationLauncherStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
     kSystemBusy      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationLauncherStatus       = EmberAfApplicationLauncherStatus;
-#endif
 
 namespace Structs {
-namespace ApplicationLauncherApp {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -32665,8 +32615,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApp
-namespace ApplicationLauncherEndpoint {
+} // namespace Application
+namespace ApplicationEP {
 enum class Fields
 {
     kApplication = 1,
@@ -32676,7 +32626,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32685,7 +32635,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherEndpoint
+} // namespace ApplicationEP
 } // namespace Structs
 
 namespace Commands {
@@ -32729,7 +32679,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32745,7 +32695,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -32762,7 +32712,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32777,7 +32727,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -32794,7 +32744,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32809,15 +32759,15 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
 namespace LauncherResponse {
 enum class Fields
 {
-    kStatus = 0,
-    kData   = 1,
+    kStatusEnum = 0,
+    kData       = 1,
 };
 
 struct Type
@@ -32827,7 +32777,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    ApplicationLauncherStatus status;
+    StatusEnum statusEnum;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32843,7 +32793,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    ApplicationLauncherStatus status;
+    StatusEnum statusEnum;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32867,9 +32817,9 @@ struct TypeInfo
 namespace ApplicationLauncherApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherApp::Id; }
@@ -32931,8 +32881,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-// Enum for ApplicationBasicStatus
-enum class ApplicationBasicStatus : uint8_t
+// Enum for ApplicationStatusEnum
+enum class ApplicationStatusEnum : uint8_t
 {
     kStopped               = 0x00,
     kActiveVisibleFocus    = 0x01,
@@ -32941,7 +32891,7 @@ enum class ApplicationBasicStatus : uint8_t
 };
 
 namespace Structs {
-namespace ApplicationBasicApp {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -32960,7 +32910,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationBasicApp
+} // namespace Application
 } // namespace Structs
 
 namespace Attributes {
@@ -33016,9 +32966,9 @@ struct TypeInfo
 namespace ApplicationApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::Application::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationApp::Id; }
@@ -33028,9 +32978,9 @@ struct TypeInfo
 namespace ApplicationStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+    using DecodableArgType = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }

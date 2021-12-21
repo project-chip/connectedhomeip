@@ -32116,8 +32116,8 @@ private:
 
     static void OnSuccessCallback_1(
         void * context,
-        const chip::app::DataModel::DecodableList<
-            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+            targetNavigatorList)
     {
         (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_1(targetNavigatorList);
     }
@@ -32156,8 +32156,8 @@ private:
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
-        const chip::app::DataModel::DecodableList<
-            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & targetNavigatorList)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+            targetNavigatorList)
     {
         auto iter = targetNavigatorList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(targetNavigatorList)>("targetNavigatorList", iter, 0));
@@ -32202,7 +32202,7 @@ private:
         request.data   = chip::Span<const char>("1garbage: not in length on purpose", 1);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
+            (static_cast<TV_TargetNavigatorCluster *>(context))->OnSuccessResponse_3(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -32215,9 +32215,9 @@ private:
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::NavigateTargetStatus status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::TargetNavigator::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data response", 13)));
 
@@ -32295,7 +32295,7 @@ private:
 
     static void OnSuccessCallback_1(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
             audioOutputList)
     {
         (static_cast<TV_AudioOutputCluster *>(context))->OnSuccessResponse_1(audioOutputList);
@@ -32335,21 +32335,18 @@ private:
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &
             audioOutputList)
     {
         auto iter = audioOutputList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 0));
         VerifyOrReturn(CheckValue("audioOutputList[0].index", iter.GetValue().index, 1));
-        VerifyOrReturn(CheckValue("audioOutputList[0].outputType", iter.GetValue().outputType, 0));
         VerifyOrReturn(CheckValueAsString("audioOutputList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 1));
         VerifyOrReturn(CheckValue("audioOutputList[1].index", iter.GetValue().index, 2));
-        VerifyOrReturn(CheckValue("audioOutputList[1].outputType", iter.GetValue().outputType, 0));
         VerifyOrReturn(CheckValueAsString("audioOutputList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(audioOutputList)>("audioOutputList", iter, 2));
         VerifyOrReturn(CheckValue("audioOutputList[2].index", iter.GetValue().index, 3));
-        VerifyOrReturn(CheckValue("audioOutputList[2].outputType", iter.GetValue().outputType, 0));
         VerifyOrReturn(CheckValueAsString("audioOutputList[2].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckNoMoreListItems<decltype(audioOutputList)>("audioOutputList", iter, 3));
 
@@ -32544,10 +32541,12 @@ private:
         request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
 
         request.application.catalogVendorId = 123U;
+        request.application.catalogVendorId = 123U;
+        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -32560,9 +32559,9 @@ private:
 
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
+    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
 
@@ -32577,10 +32576,12 @@ private:
         RequestType request;
 
         request.application.catalogVendorId = 123U;
+        request.application.catalogVendorId = 123U;
+        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(data.status, data.data);
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -32593,9 +32594,9 @@ private:
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
 
@@ -32610,10 +32611,12 @@ private:
         RequestType request;
 
         request.application.catalogVendorId = 123U;
+        request.application.catalogVendorId = 123U;
+        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_4(data.status, data.data);
+            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_4(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -32626,9 +32629,9 @@ private:
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
 
@@ -32703,10 +32706,10 @@ private:
         using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type;
 
         RequestType request;
-        request.keyCode = static_cast<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode>(3);
+        request.keyCode = static_cast<chip::app::Clusters::KeypadInput::CecKeyCode>(3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_KeypadInputCluster *>(context))->OnSuccessResponse_1(data.status);
+            (static_cast<TV_KeypadInputCluster *>(context))->OnSuccessResponse_1(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -32719,9 +32722,9 @@ private:
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(chip::app::Clusters::KeypadInput::KeypadInputStatus status)
+    void OnSuccessResponse_1(chip::app::Clusters::KeypadInput::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("status", status, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33077,7 +33080,7 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, uint8_t applicationStatus)
+    static void OnSuccessCallback_5(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_5(applicationStatus);
     }
@@ -33195,7 +33198,7 @@ private:
 
     void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint8_t applicationStatus)
+    void OnSuccessResponse_5(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
     {
         VerifyOrReturn(CheckValue("applicationStatus", applicationStatus, 0));
 
@@ -33343,7 +33346,7 @@ private:
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
     }
 
-    static void OnSuccessCallback_1(void * context, uint8_t playbackState)
+    static void OnSuccessCallback_1(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_1(playbackState);
     }
@@ -33421,7 +33424,7 @@ private:
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(uint8_t playbackState)
+    void OnSuccessResponse_1(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
     {
         VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
 
@@ -33536,7 +33539,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_7(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33549,9 +33552,9 @@ private:
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33564,7 +33567,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_8(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_8(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33577,9 +33580,9 @@ private:
 
     void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_8(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33592,7 +33595,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_9(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_9(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33605,9 +33608,9 @@ private:
 
     void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_9(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33620,7 +33623,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_10(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_10(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33633,9 +33636,9 @@ private:
 
     void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_10(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33648,7 +33651,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_11(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_11(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33661,9 +33664,9 @@ private:
 
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_11(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33676,7 +33679,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_12(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_12(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33689,9 +33692,9 @@ private:
 
     void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_12(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33704,7 +33707,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_13(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_13(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33717,9 +33720,9 @@ private:
 
     void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_13(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33732,7 +33735,7 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_14(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_14(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33745,9 +33748,9 @@ private:
 
     void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_14(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33761,7 +33764,7 @@ private:
         request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_15(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_15(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33774,9 +33777,9 @@ private:
 
     void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_15(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33790,7 +33793,7 @@ private:
         request.deltaPositionMilliseconds = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_16(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_16(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33803,9 +33806,9 @@ private:
 
     void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_16(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33819,7 +33822,7 @@ private:
         request.position = 100ULL;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(data.mediaPlaybackStatus);
+            (static_cast<TV_MediaPlaybackCluster *>(context))->OnSuccessResponse_17(data.statusEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33832,9 +33835,9 @@ private:
 
     void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_17(chip::app::Clusters::MediaPlayback::MediaPlaybackStatus mediaPlaybackStatus)
+    void OnSuccessResponse_17(chip::app::Clusters::MediaPlayback::StatusEnum statusEnum)
     {
-        VerifyOrReturn(CheckValue("mediaPlaybackStatus", mediaPlaybackStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         NextTest();
     }
@@ -33970,7 +33973,7 @@ private:
         request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorType);
+            (static_cast<TV_ChannelCluster *>(context))->OnSuccessResponse_2(data.channelMatch, data.errorTypeEnum);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -33984,7 +33987,7 @@ private:
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2(const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & channelMatch,
-                             chip::app::Clusters::Channel::ChannelErrorType errorType)
+                             chip::app::Clusters::Channel::ErrorTypeEnum errorTypeEnum)
     {
         VerifyOrReturn(CheckValue("channelMatch.majorNumber", channelMatch.majorNumber, 1U));
         VerifyOrReturn(CheckValue("channelMatch.minorNumber", channelMatch.minorNumber, 0U));
@@ -33993,7 +33996,7 @@ private:
         VerifyOrReturn(CheckValueAsString("channelMatch.affiliateCallSign", channelMatch.affiliateCallSign,
                                           chip::CharSpan("affiliateCallSign", 17)));
 
-        VerifyOrReturn(CheckValue("errorType", errorType, 0));
+        VerifyOrReturn(CheckValue("errorTypeEnum", errorTypeEnum, 0));
 
         NextTest();
     }
@@ -34281,10 +34284,10 @@ private:
         request.autoPlay = true;
         request.data     = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
 
-        request.search = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::Type>();
+        request.search = chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::Paramater::Type>();
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_3(data.contentLaunchStatus, data.data);
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_3(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -34297,9 +34300,9 @@ private:
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::ContentLaunchStatus contentLaunchStatus, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ContentLauncher::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("contentLaunchStatus", contentLaunchStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
 
@@ -34316,10 +34319,10 @@ private:
         request.displayString = chip::Span<const char>("exampleDisplayStringgarbage: not in length on purpose", 20);
 
         request.brandingInformation =
-            chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::Type>();
+            chip::app::DataModel::List<chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>();
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_4(data.contentLaunchStatus, data.data);
+            (static_cast<TV_ContentLauncherCluster *>(context))->OnSuccessResponse_4(data.statusEnum, data.data);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -34332,9 +34335,9 @@ private:
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::ContentLaunchStatus contentLaunchStatus, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ContentLauncher::StatusEnum statusEnum, chip::CharSpan data)
     {
-        VerifyOrReturn(CheckValue("contentLaunchStatus", contentLaunchStatus, 0));
+        VerifyOrReturn(CheckValue("statusEnum", statusEnum, 0));
 
         VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("exampleData", 11)));
 
@@ -34420,7 +34423,7 @@ private:
 
     static void OnSuccessCallback_1(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &
             mediaInputList)
     {
         (static_cast<TV_MediaInputCluster *>(context))->OnSuccessResponse_1(mediaInputList);
@@ -34460,19 +34463,17 @@ private:
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> &
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &
             mediaInputList)
     {
         auto iter = mediaInputList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 0));
         VerifyOrReturn(CheckValue("mediaInputList[0].index", iter.GetValue().index, 1));
-        VerifyOrReturn(CheckValue("mediaInputList[0].inputType", iter.GetValue().inputType, 4));
         VerifyOrReturn(CheckValueAsString("mediaInputList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckValueAsString("mediaInputList[0].description", iter.GetValue().description,
                                           chip::CharSpan("exampleDescription", 18)));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(mediaInputList)>("mediaInputList", iter, 1));
         VerifyOrReturn(CheckValue("mediaInputList[1].index", iter.GetValue().index, 2));
-        VerifyOrReturn(CheckValue("mediaInputList[1].inputType", iter.GetValue().inputType, 4));
         VerifyOrReturn(CheckValueAsString("mediaInputList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
         VerifyOrReturn(CheckValueAsString("mediaInputList[1].description", iter.GetValue().description,
                                           chip::CharSpan("exampleDescription", 18)));

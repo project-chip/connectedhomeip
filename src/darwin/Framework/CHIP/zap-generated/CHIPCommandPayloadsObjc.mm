@@ -3275,7 +3275,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _channelMatch = [CHIPChannelClusterChannelInfo new];
 
-        _errorType = @(0);
+        _errorTypeEnum = @(0);
     }
     return self;
 }
@@ -3323,7 +3323,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _statusEnum = @(0);
 
         _data = @"";
     }
@@ -3358,7 +3358,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _mediaPlaybackStatus = @(0);
+        _statusEnum = @(0);
     }
     return self;
 }
@@ -3415,7 +3415,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _statusEnum = @(0);
     }
     return self;
 }
@@ -3456,7 +3456,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _contentLaunchStatus = @(0);
+        _statusEnum = @(0);
 
         _data = @"";
     }
@@ -3495,7 +3495,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = @"";
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3506,7 +3506,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3517,7 +3517,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
@@ -3528,7 +3528,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _statusEnum = @(0);
 
         _data = @"";
     }

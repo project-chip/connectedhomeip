@@ -14815,7 +14815,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(
  */
 bool emberAfChannelClusterChangeChannelResponseCallback(
     chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType);
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorTypeEnum);
 /**
  * @brief Channel Cluster ChangeChannelByNumberRequest Command callback (from client)
  */
@@ -14838,7 +14838,7 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(
  * @brief Target Navigator Cluster NavigateTargetResponse Command callback (from server)
  */
 bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                                 uint8_t status, chip::CharSpan data);
+                                                                 uint8_t statusEnum, chip::CharSpan data);
 /**
  * @brief Media Playback Cluster PlayRequest Command callback (from client)
  */
@@ -14903,7 +14903,7 @@ bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback(
  * @brief Media Playback Cluster PlaybackResponse Command callback (from server)
  */
 bool emberAfMediaPlaybackClusterPlaybackResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t mediaPlaybackStatus);
+                                                         uint8_t statusEnum);
 /**
  * @brief Media Playback Cluster SeekRequest Command callback (from client)
  */
@@ -14949,7 +14949,7 @@ bool emberAfKeypadInputClusterSendKeyRequestCallback(
  * @brief Keypad Input Cluster SendKeyResponse Command callback (from server)
  */
 bool emberAfKeypadInputClusterSendKeyResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                      uint8_t status);
+                                                      uint8_t statusEnum);
 /**
  * @brief Content Launcher Cluster LaunchContentRequest Command callback (from client)
  */
@@ -14966,7 +14966,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
  * @brief Content Launcher Cluster LaunchResponse Command callback (from server)
  */
 bool emberAfContentLauncherClusterLaunchResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                         uint8_t contentLaunchStatus, chip::CharSpan data);
+                                                         uint8_t statusEnum, chip::CharSpan data);
 /**
  * @brief Audio Output Cluster SelectOutputRequest Command callback (from client)
  */
@@ -15001,7 +15001,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(
  * @brief Application Launcher Cluster LauncherResponse Command callback (from server)
  */
 bool emberAfApplicationLauncherClusterLauncherResponseCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
-                                                               uint8_t status, chip::CharSpan data);
+                                                               uint8_t statusEnum, chip::CharSpan data);
 /**
  * @brief Account Login Cluster GetSetupPINRequest Command callback (from client)
  */
