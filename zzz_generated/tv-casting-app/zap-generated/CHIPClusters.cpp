@@ -539,7 +539,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * o
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
-    // type: contentLaunchParameterEnum
+    // type: parameterEnum
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), type));
     // value: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), value));
@@ -629,7 +629,7 @@ CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCa
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // keyCode: keypadInputCecKeyCode
+    // keyCode: cecKeyCode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), keyCode));
 
     SuccessOrExit(err = sender->FinishCommand());

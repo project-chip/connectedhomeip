@@ -157,7 +157,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::LauncherResponse::Id: {
             expectArgumentCount = 2;
-            uint8_t status;
+            uint8_t statusEnum;
             chip::CharSpan data;
             bool argExists[2];
 
@@ -189,7 +189,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(status);
+                    TLVUnpackError = aDataTlv.Get(statusEnum);
                     break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(data);
@@ -213,8 +213,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled =
-                    emberAfApplicationLauncherClusterLauncherResponseCallback(aCommandPath.mEndpointId, apCommandObj, status, data);
+                wasHandled = emberAfApplicationLauncherClusterLauncherResponseCallback(aCommandPath.mEndpointId, apCommandObj,
+                                                                                       statusEnum, data);
             }
             break;
         }
@@ -259,7 +259,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         case Commands::ChangeChannelResponse::Id: {
             expectArgumentCount = 2;
             chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch;
-            uint8_t errorType;
+            uint8_t errorTypeEnum;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -294,7 +294,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     TLVUnpackError = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(errorType);
+                    TLVUnpackError = aDataTlv.Get(errorTypeEnum);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -316,7 +316,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfChannelClusterChangeChannelResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                channelMatch, errorType);
+                                                                                channelMatch, errorTypeEnum);
             }
             break;
         }
@@ -360,7 +360,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::LaunchResponse::Id: {
             expectArgumentCount = 2;
-            uint8_t contentLaunchStatus;
+            uint8_t statusEnum;
             chip::CharSpan data;
             bool argExists[2];
 
@@ -392,7 +392,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(contentLaunchStatus);
+                    TLVUnpackError = aDataTlv.Get(statusEnum);
                     break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(data);
@@ -416,8 +416,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                 contentLaunchStatus, data);
+                wasHandled =
+                    emberAfContentLauncherClusterLaunchResponseCallback(aCommandPath.mEndpointId, apCommandObj, statusEnum, data);
             }
             break;
         }
@@ -1614,7 +1614,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::SendKeyResponse::Id: {
             expectArgumentCount = 1;
-            uint8_t status;
+            uint8_t statusEnum;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -1645,7 +1645,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(status);
+                    TLVUnpackError = aDataTlv.Get(statusEnum);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1666,7 +1666,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(aCommandPath.mEndpointId, apCommandObj, status);
+                wasHandled = emberAfKeypadInputClusterSendKeyResponseCallback(aCommandPath.mEndpointId, apCommandObj, statusEnum);
             }
             break;
         }
@@ -1710,7 +1710,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::PlaybackResponse::Id: {
             expectArgumentCount = 1;
-            uint8_t mediaPlaybackStatus;
+            uint8_t statusEnum;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -1741,7 +1741,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(mediaPlaybackStatus);
+                    TLVUnpackError = aDataTlv.Get(statusEnum);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1762,8 +1762,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
-                wasHandled = emberAfMediaPlaybackClusterPlaybackResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                 mediaPlaybackStatus);
+                wasHandled =
+                    emberAfMediaPlaybackClusterPlaybackResponseCallback(aCommandPath.mEndpointId, apCommandObj, statusEnum);
             }
             break;
         }
@@ -2985,7 +2985,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::NavigateTargetResponse::Id: {
             expectArgumentCount = 2;
-            uint8_t status;
+            uint8_t statusEnum;
             chip::CharSpan data;
             bool argExists[2];
 
@@ -3017,7 +3017,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(status);
+                    TLVUnpackError = aDataTlv.Get(statusEnum);
                     break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(data);
@@ -3042,7 +3042,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfTargetNavigatorClusterNavigateTargetResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                         status, data);
+                                                                                         statusEnum, data);
             }
             break;
         }

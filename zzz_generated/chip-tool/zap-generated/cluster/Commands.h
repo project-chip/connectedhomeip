@@ -109,31 +109,31 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType & value);
+                    const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType & value);
+                    const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaPlayback::Structs::MediaPlaybackPosition::DecodableType & value);
+                    const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType & value);
+                    const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::Paramater::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value);
+                    const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value);
+                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value);
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value);
+                    const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1747,7 +1747,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::Channel::Structs::ChannelLineupInfo::DecodableType & value)
+                    const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1775,10 +1775,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("LineupInfoType", indent + 1, value.lineupInfoType);
+        CHIP_ERROR err = LogValue("LineupInfoTypeEnum", indent + 1, value.lineupInfoTypeEnum);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupInfoType'",
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupInfoTypeEnum'",
                             IndentStr(indent + 1).c_str());
             return err;
         }
@@ -1787,7 +1787,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType & value)
+                    const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1810,7 +1810,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaPlayback::Structs::MediaPlaybackPosition::DecodableType & value)
+                    const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1833,7 +1833,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType & value)
+                    const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1845,10 +1845,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("InputType", indent + 1, value.inputType);
+        CHIP_ERROR err = LogValue("InputTypeEnum", indent + 1, value.inputTypeEnum);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'InputType'", IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'InputTypeEnum'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1872,7 +1872,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1892,10 +1892,11 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
+        CHIP_ERROR err = LogValue("MetricTypeEnum", indent + 1, value.metricTypeEnum);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MetricTypeEnum'",
+                            IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1903,7 +1904,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1926,7 +1927,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::Paramater::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1958,7 +1959,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1989,7 +1990,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2044,7 +2045,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value)
+                    const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2056,10 +2057,11 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("OutputType", indent + 1, value.outputType);
+        CHIP_ERROR err = LogValue("OutputTypeEnum", indent + 1, value.outputTypeEnum);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OutputType'", IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OutputTypeEnum'",
+                            IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -2075,7 +2077,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value)
+                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2099,7 +2101,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value)
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2122,7 +2124,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value)
+                    const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2520,7 +2522,7 @@ static void OnApplicationLauncherLauncherResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = LogValue("statusEnum", 1, data.statusEnum);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2543,7 +2545,7 @@ OnChannelChangeChannelResponseSuccess(void * context,
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorType", 1, data.errorType);
+        err = LogValue("errorTypeEnum", 1, data.errorTypeEnum);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2558,7 +2560,7 @@ OnContentLauncherLaunchResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
+        err = LogValue("statusEnum", 1, data.statusEnum);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2872,7 +2874,7 @@ OnKeypadInputSendKeyResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = LogValue("statusEnum", 1, data.statusEnum);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2887,7 +2889,7 @@ OnMediaPlaybackPlaybackResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("mediaPlaybackStatus", 1, data.mediaPlaybackStatus);
+        err = LogValue("statusEnum", 1, data.statusEnum);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3249,7 +3251,7 @@ static void OnTargetNavigatorNavigateTargetResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = LogValue("statusEnum", 1, data.statusEnum);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -4204,6 +4206,7 @@ private:
 | * ApplicationApp                                                    | 0x0004 |
 | * ApplicationStatus                                                 | 0x0005 |
 | * ApplicationVersion                                                | 0x0006 |
+| * AllowedVendorList                                                 | 0x0007 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4511,7 +4514,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint8_t value)
+    static void OnAttributeResponse(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
     {
         OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationStatus response", value);
     }
@@ -4548,7 +4551,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("ApplicationBasic.ApplicationStatus report", 0, value); }
+    static void OnValueReport(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
+    {
+        LogValue("ApplicationBasic.ApplicationStatus report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -4626,6 +4632,36 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute AllowedVendorList
+ */
+class ReadApplicationBasicAllowedVendorList : public ModelCommand
+{
+public:
+    ReadApplicationBasicAllowedVendorList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "allowed-vendor-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationBasicAllowedVendorList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.AllowedVendorList response", value);
+    }
 };
 
 /*
@@ -5074,8 +5110,7 @@ public:
 
     static void OnAttributeResponse(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
-            value)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "AudioOutput.AudioOutputList response", value);
     }
@@ -5114,8 +5149,7 @@ public:
 
     static void OnValueReport(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
-            value)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
     {
         LogValue("AudioOutput.AudioOutputList report", 0, value);
     }
@@ -22745,7 +22779,7 @@ public:
 
     static void OnAttributeResponse(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "MediaInput.MediaInputList response", value);
     }
@@ -22784,7 +22818,7 @@ public:
 
     static void OnValueReport(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
     {
         LogValue("MediaInput.MediaInputList report", 0, value);
     }
@@ -23246,7 +23280,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint8_t value)
+    static void OnAttributeResponse(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
     {
         OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackState response", value);
     }
@@ -23283,7 +23317,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint8_t value) { LogValue("MediaPlayback.PlaybackState report", 0, value); }
+    static void OnValueReport(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
+    {
+        LogValue("MediaPlayback.PlaybackState report", 0, value);
+    }
 
 private:
     uint16_t mMinInterval;
@@ -32716,10 +32753,9 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void
-    OnAttributeResponse(void * context,
-                        const chip::app::DataModel::DecodableList<
-                            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "TargetNavigator.TargetNavigatorList response", value);
     }
@@ -32756,9 +32792,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
-                              const chip::app::DataModel::DecodableList<
-                                  chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
     {
         LogValue("TargetNavigator.TargetNavigatorList report", 0, value);
     }
@@ -51081,6 +51117,7 @@ void registerClusterApplicationBasic(Commands & commands)
         make_unique<ReportApplicationBasicApplicationStatus>(),  //
         make_unique<ReadApplicationBasicApplicationVersion>(),   //
         make_unique<ReportApplicationBasicApplicationVersion>(), //
+        make_unique<ReadApplicationBasicAllowedVendorList>(),    //
         make_unique<ReadApplicationBasicAttributeList>(),        //
         make_unique<ReadApplicationBasicClusterRevision>(),      //
         make_unique<ReportApplicationBasicClusterRevision>(),    //

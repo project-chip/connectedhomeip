@@ -675,7 +675,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
 
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -717,7 +717,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type request;
 
     request.data        = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -758,7 +758,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, stopAppRequest)
 
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -6708,8 +6708,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
 
     request.autoPlay = static_cast<decltype(request.autoPlay)>(chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
     request.data     = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.search =
-        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::Type>();
+    request.search   = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::Paramater::Type>();
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
@@ -6753,7 +6752,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
     request.contentURL    = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
     request.displayString = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
     request.brandingInformation =
-        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::Type>();
+        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>();
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),

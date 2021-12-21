@@ -649,12 +649,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributeApplicationStatusWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
+            auto successFn = Callback<ApplicationBasicClusterApplicationStatusEnumAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributeApplicationStatusWithMinInterval:(uint16_t)minInterval
@@ -663,14 +664,15 @@ using namespace chip::app::Clusters;
                                              reportHandler:
                                                  (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<ApplicationBasicClusterApplicationStatusEnumAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval,
+                CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }
@@ -702,6 +704,18 @@ using namespace chip::app::Clusters;
                 minInterval, maxInterval, CHIPCharStringAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
+}
+
+- (void)readAttributeAllowedVendorListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
+{
+    new CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = ApplicationBasic::Attributes::AllowedVendorList::TypeInfo;
+            auto successFn = Callback<ApplicationBasicAllowedVendorListListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
@@ -761,6 +775,8 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::HideAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -779,6 +795,8 @@ using namespace chip::app::Clusters;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
     request.data = [self asCharSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -796,6 +814,8 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::StopAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
+    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -5056,11 +5076,11 @@ using namespace chip::app::Clusters;
             }
             listFreer.add(listHolder_0);
             for (size_t i_0 = 0; i_0 < params.search.count; ++i_0) {
-                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterContentLaunchParamater class]]) {
+                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterParamater class]]) {
                     // Wrong kind of value.
                     return;
                 }
-                auto element_0 = (CHIPContentLauncherClusterContentLaunchParamater *) params.search[i_0];
+                auto element_0 = (CHIPContentLauncherClusterParamater *) params.search[i_0];
                 listHolder_0->mList[i_0].type = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(
                     element_0.type.unsignedCharValue);
                 listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
@@ -5074,13 +5094,11 @@ using namespace chip::app::Clusters;
                         }
                         listFreer.add(listHolder_2);
                         for (size_t i_2 = 0; i_2 < element_0.externalIDList.count; ++i_2) {
-                            if (![element_0.externalIDList[i_2]
-                                    isKindOfClass:[CHIPContentLauncherClusterContentLaunchAdditionalInfo class]]) {
+                            if (![element_0.externalIDList[i_2] isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
                                 // Wrong kind of value.
                                 return;
                             }
-                            auto element_2
-                                = (CHIPContentLauncherClusterContentLaunchAdditionalInfo *) element_0.externalIDList[i_2];
+                            auto element_2 = (CHIPContentLauncherClusterAdditionalInfo *) element_0.externalIDList[i_2];
                             listHolder_2->mList[i_2].name = [self asCharSpan:element_2.name];
                             listHolder_2->mList[i_2].value = [self asCharSpan:element_2.value];
                         }
@@ -5122,48 +5140,47 @@ using namespace chip::app::Clusters;
             }
             listFreer.add(listHolder_0);
             for (size_t i_0 = 0; i_0 < params.brandingInformation.count; ++i_0) {
-                if (![params.brandingInformation[i_0]
-                        isKindOfClass:[CHIPContentLauncherClusterContentLaunchBrandingInformation class]]) {
+                if (![params.brandingInformation[i_0] isKindOfClass:[CHIPContentLauncherClusterBrandingInformation class]]) {
                     // Wrong kind of value.
                     return;
                 }
-                auto element_0 = (CHIPContentLauncherClusterContentLaunchBrandingInformation *) params.brandingInformation[i_0];
+                auto element_0 = (CHIPContentLauncherClusterBrandingInformation *) params.brandingInformation[i_0];
                 listHolder_0->mList[i_0].providerName = [self asCharSpan:element_0.providerName];
                 listHolder_0->mList[i_0].background.imageUrl = [self asCharSpan:element_0.background.imageUrl];
                 listHolder_0->mList[i_0].background.color = [self asCharSpan:element_0.background.color];
                 listHolder_0->mList[i_0].background.size.width = element_0.background.size.width.doubleValue;
                 listHolder_0->mList[i_0].background.size.height = element_0.background.size.height.doubleValue;
-                listHolder_0->mList[i_0].background.size.metric
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].background.size.metric)>>(
-                        element_0.background.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].background.size.metricTypeEnum
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].background.size.metricTypeEnum)>>(
+                        element_0.background.size.metricTypeEnum.unsignedCharValue);
                 listHolder_0->mList[i_0].logo.imageUrl = [self asCharSpan:element_0.logo.imageUrl];
                 listHolder_0->mList[i_0].logo.color = [self asCharSpan:element_0.logo.color];
                 listHolder_0->mList[i_0].logo.size.width = element_0.logo.size.width.doubleValue;
                 listHolder_0->mList[i_0].logo.size.height = element_0.logo.size.height.doubleValue;
-                listHolder_0->mList[i_0].logo.size.metric
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].logo.size.metric)>>(
-                        element_0.logo.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].logo.size.metricTypeEnum
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].logo.size.metricTypeEnum)>>(
+                        element_0.logo.size.metricTypeEnum.unsignedCharValue);
                 listHolder_0->mList[i_0].progressBar.imageUrl = [self asCharSpan:element_0.progressBar.imageUrl];
                 listHolder_0->mList[i_0].progressBar.color = [self asCharSpan:element_0.progressBar.color];
                 listHolder_0->mList[i_0].progressBar.size.width = element_0.progressBar.size.width.doubleValue;
                 listHolder_0->mList[i_0].progressBar.size.height = element_0.progressBar.size.height.doubleValue;
-                listHolder_0->mList[i_0].progressBar.size.metric
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].progressBar.size.metric)>>(
-                        element_0.progressBar.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].progressBar.size.metricTypeEnum
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].progressBar.size.metricTypeEnum)>>(
+                        element_0.progressBar.size.metricTypeEnum.unsignedCharValue);
                 listHolder_0->mList[i_0].splash.imageUrl = [self asCharSpan:element_0.splash.imageUrl];
                 listHolder_0->mList[i_0].splash.color = [self asCharSpan:element_0.splash.color];
                 listHolder_0->mList[i_0].splash.size.width = element_0.splash.size.width.doubleValue;
                 listHolder_0->mList[i_0].splash.size.height = element_0.splash.size.height.doubleValue;
-                listHolder_0->mList[i_0].splash.size.metric
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].splash.size.metric)>>(
-                        element_0.splash.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].splash.size.metricTypeEnum
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].splash.size.metricTypeEnum)>>(
+                        element_0.splash.size.metricTypeEnum.unsignedCharValue);
                 listHolder_0->mList[i_0].waterMark.imageUrl = [self asCharSpan:element_0.waterMark.imageUrl];
                 listHolder_0->mList[i_0].waterMark.color = [self asCharSpan:element_0.waterMark.color];
                 listHolder_0->mList[i_0].waterMark.size.width = element_0.waterMark.size.width.doubleValue;
                 listHolder_0->mList[i_0].waterMark.size.height = element_0.waterMark.size.height.doubleValue;
-                listHolder_0->mList[i_0].waterMark.size.metric
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].waterMark.size.metric)>>(
-                        element_0.waterMark.size.metric.unsignedCharValue);
+                listHolder_0->mList[i_0].waterMark.size.metricTypeEnum
+                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].waterMark.size.metricTypeEnum)>>(
+                        element_0.waterMark.size.metricTypeEnum.unsignedCharValue);
             }
             request.brandingInformation = ListType_0(listHolder_0->mList, params.brandingInformation.count);
         } else {
@@ -9745,12 +9762,13 @@ using namespace chip::app::Clusters;
 - (void)readAttributePlaybackStateWithCompletionHandler:(void (^)(
                                                             NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-        using TypeInfo = MediaPlayback::Attributes::PlaybackState::TypeInfo;
-        auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
-        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-    });
+    new CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = MediaPlayback::Attributes::PlaybackState::TypeInfo;
+            auto successFn = Callback<MediaPlaybackClusterPlaybackStateEnumAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)subscribeAttributePlaybackStateWithMinInterval:(uint16_t)minInterval
@@ -9759,14 +9777,15 @@ using namespace chip::app::Clusters;
                                          reportHandler:
                                              (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+    new CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = MediaPlayback::Attributes::PlaybackState::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<MediaPlaybackClusterPlaybackStateEnumAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                minInterval, maxInterval,
+                CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

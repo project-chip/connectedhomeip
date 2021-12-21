@@ -64,6 +64,8 @@ typedef void (*CHIPApplicationBasicClusterApplicationStatusAttributeCallbackType
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationBasicClusterApplicationVersionAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationBasicClusterClusterRevisionAttributeCallbackType)(
