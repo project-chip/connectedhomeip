@@ -32093,8 +32093,8 @@ public:
             err = TestReadAttributeCurrentNavigatorTarget_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Navigate Target Command\n");
-            err = TestNavigateTargetCommand_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Navigate Target Request Command\n");
+            err = TestNavigateTargetRequestCommand_3();
             break;
         }
 
@@ -32192,10 +32192,10 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestNavigateTargetCommand_3()
+    CHIP_ERROR TestNavigateTargetRequestCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type;
+        using RequestType               = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type;
 
         RequestType request;
         request.target = 1;
@@ -32379,7 +32379,7 @@ private:
     CHIP_ERROR TestSelectOutputCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
-        using RequestType               = chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type;
+        using RequestType               = chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::Type;
 
         RequestType request;
         request.index = 1;
@@ -32403,7 +32403,7 @@ private:
     CHIP_ERROR TestRenameOutputCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
-        using RequestType               = chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type;
+        using RequestType               = chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::Type;
 
         RequestType request;
         request.index = 1;
@@ -32538,7 +32538,7 @@ private:
     CHIP_ERROR TestLaunchAppCommand_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
 
         RequestType request;
         request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
@@ -32572,7 +32572,7 @@ private:
     CHIP_ERROR TestStopAppCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type;
 
         RequestType request;
 
@@ -32605,7 +32605,7 @@ private:
     CHIP_ERROR TestHideAppCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type;
+        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type;
 
         RequestType request;
 
@@ -32700,7 +32700,7 @@ private:
     CHIP_ERROR TestSendKeyCommand_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKey::Type;
+        using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type;
 
         RequestType request;
         request.keyCode = static_cast<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode>(3);
@@ -32799,7 +32799,7 @@ private:
     CHIP_ERROR TestGetSetupPinCommand_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Type;
 
         RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
@@ -32823,7 +32823,7 @@ private:
     CHIP_ERROR TestLoginCommand_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::Login::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::LoginRequest::Type;
 
         RequestType request;
         request.tempAccountIdentifier = chip::Span<const char>("asdfgarbage: not in length on purpose", 4);
@@ -32848,7 +32848,7 @@ private:
     CHIP_ERROR TestLogoutCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::AccountLogin::Commands::Logout::Type;
+        using RequestType               = chip::app::Clusters::AccountLogin::Commands::LogoutRequest::Type;
 
         RequestType request;
 
@@ -32996,32 +32996,28 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Change Status Command\n");
-            err = TestChangeStatusCommand_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute vendor name\n");
+            err = TestReadAttributeVendorName_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute vendor name\n");
-            err = TestReadAttributeVendorName_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read attribute vendor id\n");
+            err = TestReadAttributeVendorId_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute vendor id\n");
-            err = TestReadAttributeVendorId_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute application name\n");
+            err = TestReadAttributeApplicationName_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute application name\n");
-            err = TestReadAttributeApplicationName_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute product id\n");
+            err = TestReadAttributeProductId_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute product id\n");
-            err = TestReadAttributeProductId_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Read attribute application status\n");
+            err = TestReadAttributeApplicationStatus_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application status\n");
-            err = TestReadAttributeApplicationStatus_6();
-            break;
-        case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute application version\n");
-            err = TestReadAttributeApplicationVersion_7();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute application version\n");
+            err = TestReadAttributeApplicationVersion_6();
             break;
         }
 
@@ -33034,16 +33030,26 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 8;
+    const uint16_t mTestCount = 7;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, chip::CharSpan vendorName)
+    {
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_1(vendorName);
+    }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, chip::CharSpan vendorName)
+    static void OnSuccessCallback_2(void * context, uint16_t vendorId)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_2(vendorName);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_2(vendorId);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
@@ -33051,9 +33057,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t vendorId)
+    static void OnSuccessCallback_3(void * context, chip::CharSpan applicationName)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_3(vendorId);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_3(applicationName);
     }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
@@ -33061,9 +33067,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, chip::CharSpan applicationName)
+    static void OnSuccessCallback_4(void * context, uint16_t productId)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(applicationName);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(productId);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
@@ -33071,9 +33077,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t productId)
+    static void OnSuccessCallback_5(void * context, uint8_t applicationStatus)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_5(productId);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_5(applicationStatus);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -33081,19 +33087,9 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t applicationStatus)
+    static void OnSuccessCallback_6(void * context, chip::CharSpan applicationVersion)
     {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(applicationStatus);
-    }
-
-    static void OnFailureCallback_7(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_7(status);
-    }
-
-    static void OnSuccessCallback_7(void * context, chip::CharSpan applicationVersion)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_7(applicationVersion);
+        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_6(applicationVersion);
     }
 
     //
@@ -33106,144 +33102,120 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestChangeStatusCommand_1()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type;
-
-        RequestType request;
-        request.status = static_cast<chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus>(1);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_1();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_1(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_1() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeVendorName_2()
+    CHIP_ERROR TestReadAttributeVendorName_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
+            this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(chip::CharSpan vendorName)
+    void OnSuccessResponse_1(chip::CharSpan vendorName)
     {
         VerifyOrReturn(CheckValueAsString("vendorName", vendorName, chip::CharSpan("exampleVendorName1", 18)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeVendorId_3()
+    CHIP_ERROR TestReadAttributeVendorId_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3));
+            this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t vendorId)
+    void OnSuccessResponse_2(uint16_t vendorId)
     {
         VerifyOrReturn(CheckValue("vendorId", vendorId, 1U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeApplicationName_4()
+    CHIP_ERROR TestReadAttributeApplicationName_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+            this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(chip::CharSpan applicationName)
+    void OnSuccessResponse_3(chip::CharSpan applicationName)
     {
         VerifyOrReturn(CheckValueAsString("applicationName", applicationName, chip::CharSpan("exampleName1", 12)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeProductId_5()
+    CHIP_ERROR TestReadAttributeProductId_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
-            this, OnSuccessCallback_5, OnFailureCallback_5));
+            this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint16_t productId)
+    void OnSuccessResponse_4(uint16_t productId)
     {
         VerifyOrReturn(CheckValue("productId", productId, 1U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeApplicationStatus_6()
+    CHIP_ERROR TestReadAttributeApplicationStatus_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
+            this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t applicationStatus)
+    void OnSuccessResponse_5(uint8_t applicationStatus)
     {
         VerifyOrReturn(CheckValue("applicationStatus", applicationStatus, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeApplicationVersion_7()
+    CHIP_ERROR TestReadAttributeApplicationVersion_6()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+            this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(chip::CharSpan applicationVersion)
+    void OnSuccessResponse_6(chip::CharSpan applicationVersion)
     {
         VerifyOrReturn(CheckValueAsString("applicationVersion", applicationVersion, chip::CharSpan("exampleVersion", 14)));
 
@@ -33559,7 +33531,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPlayCommand_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PlayRequest::Type;
 
         RequestType request;
 
@@ -33587,7 +33559,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPauseCommand_8()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PauseRequest::Type;
 
         RequestType request;
 
@@ -33615,7 +33587,7 @@ private:
     CHIP_ERROR TestMediaPlaybackStopCommand_9()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type;
 
         RequestType request;
 
@@ -33643,7 +33615,7 @@ private:
     CHIP_ERROR TestMediaPlaybackStartOverCommand_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::Type;
 
         RequestType request;
 
@@ -33671,7 +33643,7 @@ private:
     CHIP_ERROR TestMediaPlaybackPreviousCommand_11()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::Type;
 
         RequestType request;
 
@@ -33699,7 +33671,7 @@ private:
     CHIP_ERROR TestMediaPlaybackNextCommand_12()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::NextRequest::Type;
 
         RequestType request;
 
@@ -33727,7 +33699,7 @@ private:
     CHIP_ERROR TestMediaPlaybackRewindCommand_13()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::RewindRequest::Type;
 
         RequestType request;
 
@@ -33755,7 +33727,7 @@ private:
     CHIP_ERROR TestMediaPlaybackFastForwardCommand_14()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::Type;
 
         RequestType request;
 
@@ -33783,7 +33755,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipForwardCommand_15()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Type;
 
         RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
@@ -33812,7 +33784,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_16()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Type;
 
         RequestType request;
         request.deltaPositionMilliseconds = 100ULL;
@@ -33841,7 +33813,7 @@ private:
     CHIP_ERROR TestMediaPlaybackSeekCommand_17()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type;
+        using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SeekRequest::Type;
 
         RequestType request;
         request.position = 100ULL;
@@ -33992,7 +33964,7 @@ private:
     CHIP_ERROR TestChangeChannelCommand_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelRequest::Type;
 
         RequestType request;
         request.match = chip::Span<const char>("CNNgarbage: not in length on purpose", 3);
@@ -34029,7 +34001,7 @@ private:
     CHIP_ERROR TestChangeChannelByNumberCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumber::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Type;
 
         RequestType request;
         request.majorNumber = 1U;
@@ -34054,7 +34026,7 @@ private:
     CHIP_ERROR TestSkipChannelCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannel::Type;
+        using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type;
 
         RequestType request;
         request.count = 1U;
@@ -34303,7 +34275,7 @@ private:
     CHIP_ERROR TestLaunchContentCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type;
 
         RequestType request;
         request.autoPlay = true;
@@ -34337,7 +34309,7 @@ private:
     CHIP_ERROR TestLaunchUrlCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type;
+        using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type;
 
         RequestType request;
         request.contentURL    = chip::Span<const char>("exampleUrlgarbage: not in length on purpose", 10);
@@ -34532,7 +34504,7 @@ private:
     CHIP_ERROR TestSelectInputCommand_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::SelectInput::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::SelectInputRequest::Type;
 
         RequestType request;
         request.index = 1;
@@ -34556,7 +34528,7 @@ private:
     CHIP_ERROR TestHideInputStatusCommand_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::Type;
 
         RequestType request;
 
@@ -34579,7 +34551,7 @@ private:
     CHIP_ERROR TestShowInputStatusCommand_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::Type;
 
         RequestType request;
 
@@ -34602,7 +34574,7 @@ private:
     CHIP_ERROR TestRenameInputCommand_6()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::MediaInput::Commands::RenameInput::Type;
+        using RequestType               = chip::app::Clusters::MediaInput::Commands::RenameInputRequest::Type;
 
         RequestType request;
         request.index = 1;

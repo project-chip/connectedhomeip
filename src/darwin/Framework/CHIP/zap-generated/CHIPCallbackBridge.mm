@@ -5040,36 +5040,10 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPApplicationLauncherClusterHideAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+void CHIPApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
 {
-    auto * response = [CHIPApplicationLauncherClusterHideAppResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
-{
-    auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPApplicationLauncherClusterStopAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
-{
-    auto * response = [CHIPApplicationLauncherClusterStopAppResponseParams new];
+    auto * response = [CHIPApplicationLauncherClusterLauncherResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
@@ -5103,23 +5077,10 @@ void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & data)
+void CHIPContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data)
 {
-    auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
-    {
-        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & data)
-{
-    auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
+    auto * response = [CHIPContentLauncherClusterLaunchResponseParams new];
     {
         response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
     }
@@ -5468,110 +5429,10 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & data)
+void CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
 {
-    auto * response = [CHIPMediaPlaybackClusterMediaFastForwardResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaNextResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPauseResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPlayResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPreviousResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaRewindResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSeekResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSkipForwardResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaStartOverResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaStopResponseParams new];
+    auto * response = [CHIPMediaPlaybackClusterPlaybackResponseParams new];
     {
         response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
     }

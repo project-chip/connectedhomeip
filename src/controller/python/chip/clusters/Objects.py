@@ -27418,7 +27418,7 @@ class Channel(Cluster):
 
     class Commands:
         @dataclass
-        class ChangeChannel(ClusterCommand):
+        class ChangeChannelRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -27435,7 +27435,7 @@ class Channel(Cluster):
         @dataclass
         class ChangeChannelResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -27450,9 +27450,9 @@ class Channel(Cluster):
             errorType: 'Channel.Enums.ChannelErrorType' = 0
 
         @dataclass
-        class ChangeChannelByNumber(ClusterCommand):
+        class ChangeChannelByNumberRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
@@ -27467,9 +27467,9 @@ class Channel(Cluster):
             minorNumber: 'uint' = 0
 
         @dataclass
-        class SkipChannel(ClusterCommand):
+        class SkipChannelRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0504
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
@@ -27627,7 +27627,7 @@ class TargetNavigator(Cluster):
 
     class Commands:
         @dataclass
-        class NavigateTarget(ClusterCommand):
+        class NavigateTargetRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0505
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -27646,7 +27646,7 @@ class TargetNavigator(Cluster):
         @dataclass
         class NavigateTargetResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0505
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -27809,7 +27809,7 @@ class MediaPlayback(Cluster):
 
     class Commands:
         @dataclass
-        class MediaPlay(ClusterCommand):
+        class PlayRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -27822,22 +27822,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaPlayResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaPause(ClusterCommand):
+        class PauseRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
@@ -27850,22 +27835,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaPauseResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaStop(ClusterCommand):
+        class StopRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
@@ -27878,22 +27848,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaStopResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0002
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaStartOver(ClusterCommand):
+        class StartOverRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
@@ -27906,22 +27861,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaStartOverResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0003
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaPrevious(ClusterCommand):
+        class PreviousRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0004
             is_client: typing.ClassVar[bool] = True
@@ -27934,22 +27874,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaPreviousResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0004
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaNext(ClusterCommand):
+        class NextRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0005
             is_client: typing.ClassVar[bool] = True
@@ -27962,22 +27887,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaNextResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0005
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaRewind(ClusterCommand):
+        class RewindRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0006
             is_client: typing.ClassVar[bool] = True
@@ -27990,22 +27900,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaRewindResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0006
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaFastForward(ClusterCommand):
+        class FastForwardRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0007
             is_client: typing.ClassVar[bool] = True
@@ -28018,22 +27913,7 @@ class MediaPlayback(Cluster):
 
 
         @dataclass
-        class MediaFastForwardResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0007
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaSkipForward(ClusterCommand):
+        class SkipForwardRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0008
             is_client: typing.ClassVar[bool] = True
@@ -28048,22 +27928,7 @@ class MediaPlayback(Cluster):
             deltaPositionMilliseconds: 'uint' = 0
 
         @dataclass
-        class MediaSkipForwardResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0008
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaSkipBackward(ClusterCommand):
+        class SkipBackwardRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x0009
             is_client: typing.ClassVar[bool] = True
@@ -28078,24 +27943,24 @@ class MediaPlayback(Cluster):
             deltaPositionMilliseconds: 'uint' = 0
 
         @dataclass
-        class MediaSkipBackwardResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x0009
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
-
-        @dataclass
-        class MediaSeek(ClusterCommand):
+        class PlaybackResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0506
             command_id: typing.ClassVar[int] = 0x000A
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
+                    ])
+
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
+
+        @dataclass
+        class SeekRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x0506
+            command_id: typing.ClassVar[int] = 0x000B
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
@@ -28106,21 +27971,6 @@ class MediaPlayback(Cluster):
                     ])
 
             position: 'uint' = 0
-
-        @dataclass
-        class MediaSeekResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x0506
-            command_id: typing.ClassVar[int] = 0x000B
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
-                    ])
-
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
 
     class Attributes:
@@ -28345,7 +28195,7 @@ class MediaInput(Cluster):
 
     class Commands:
         @dataclass
-        class SelectInput(ClusterCommand):
+        class SelectInputRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -28360,7 +28210,7 @@ class MediaInput(Cluster):
             index: 'uint' = 0
 
         @dataclass
-        class ShowInputStatus(ClusterCommand):
+        class ShowInputStatusRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
@@ -28373,7 +28223,7 @@ class MediaInput(Cluster):
 
 
         @dataclass
-        class HideInputStatus(ClusterCommand):
+        class HideInputStatusRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
@@ -28386,7 +28236,7 @@ class MediaInput(Cluster):
 
 
         @dataclass
-        class RenameInput(ClusterCommand):
+        class RenameInputRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0507
             command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
@@ -28686,7 +28536,7 @@ class KeypadInput(Cluster):
 
     class Commands:
         @dataclass
-        class SendKey(ClusterCommand):
+        class SendKeyRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0509
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -28703,7 +28553,7 @@ class KeypadInput(Cluster):
         @dataclass
         class SendKeyResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x0509
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -28898,7 +28748,7 @@ class ContentLauncher(Cluster):
 
     class Commands:
         @dataclass
-        class LaunchContent(ClusterCommand):
+        class LaunchContentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -28917,24 +28767,7 @@ class ContentLauncher(Cluster):
             search: 'typing.List[ContentLauncher.Structs.ContentLaunchParamater]' = field(default_factory=lambda: [])
 
         @dataclass
-        class LaunchContentResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x050A
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="contentLaunchStatus", Tag=0, Type=ContentLauncher.Enums.ContentLaunchStatus),
-                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                    ])
-
-            contentLaunchStatus: 'ContentLauncher.Enums.ContentLaunchStatus' = 0
-            data: 'str' = ""
-
-        @dataclass
-        class LaunchURL(ClusterCommand):
+        class LaunchURLRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
@@ -28953,9 +28786,9 @@ class ContentLauncher(Cluster):
             brandingInformation: 'typing.List[ContentLauncher.Structs.ContentLaunchBrandingInformation]' = field(default_factory=lambda: [])
 
         @dataclass
-        class LaunchURLResponse(ClusterCommand):
+        class LaunchResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050A
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -29104,7 +28937,7 @@ class AudioOutput(Cluster):
 
     class Commands:
         @dataclass
-        class SelectOutput(ClusterCommand):
+        class SelectOutputRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050B
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -29119,7 +28952,7 @@ class AudioOutput(Cluster):
             index: 'uint' = 0
 
         @dataclass
-        class RenameOutput(ClusterCommand):
+        class RenameOutputRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050B
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
@@ -29278,7 +29111,7 @@ class ApplicationLauncher(Cluster):
 
     class Commands:
         @dataclass
-        class LaunchApp(ClusterCommand):
+        class LaunchAppRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -29295,24 +29128,7 @@ class ApplicationLauncher(Cluster):
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
-        class LaunchAppResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
-                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                    ])
-
-            status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
-            data: 'str' = ""
-
-        @dataclass
-        class StopApp(ClusterCommand):
+        class StopAppRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = True
@@ -29327,24 +29143,7 @@ class ApplicationLauncher(Cluster):
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
-        class StopAppResponse(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = False
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.ApplicationLauncherStatus),
-                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                    ])
-
-            status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
-            data: 'str' = ""
-
-        @dataclass
-        class HideApp(ClusterCommand):
+        class HideAppRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
             command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
@@ -29359,9 +29158,9 @@ class ApplicationLauncher(Cluster):
             application: 'ApplicationLauncher.Structs.ApplicationLauncherApp' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApp())
 
         @dataclass
-        class HideAppResponse(ClusterCommand):
+        class LauncherResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050C
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -29474,6 +29273,7 @@ class ApplicationBasic(Cluster):
                 ClusterObjectFieldDescriptor(Label="applicationApp", Tag=0x00000004, Type=ApplicationBasic.Structs.ApplicationBasicApp),
                 ClusterObjectFieldDescriptor(Label="applicationStatus", Tag=0x00000005, Type=uint),
                 ClusterObjectFieldDescriptor(Label="applicationVersion", Tag=0x00000006, Type=str),
+                ClusterObjectFieldDescriptor(Label="allowedVendorList", Tag=0x00000007, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
@@ -29486,6 +29286,7 @@ class ApplicationBasic(Cluster):
     applicationApp: 'ApplicationBasic.Structs.ApplicationBasicApp' = None
     applicationStatus: 'uint' = None
     applicationVersion: 'str' = None
+    allowedVendorList: 'typing.List[uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -29513,22 +29314,6 @@ class ApplicationBasic(Cluster):
             applicationId: 'str' = ""
 
 
-
-    class Commands:
-        @dataclass
-        class ChangeStatus(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0x050D
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields = [
-                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationBasic.Enums.ApplicationBasicStatus),
-                    ])
-
-            status: 'ApplicationBasic.Enums.ApplicationBasicStatus' = 0
 
 
     class Attributes:
@@ -29645,6 +29430,22 @@ class ApplicationBasic(Cluster):
             value: 'str' = ""
 
         @dataclass
+        class AllowedVendorList(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000007
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
+
+        @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -29715,7 +29516,7 @@ class AccountLogin(Cluster):
 
     class Commands:
         @dataclass
-        class GetSetupPIN(ClusterCommand):
+        class GetSetupPINRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
             command_id: typing.ClassVar[int] = 0x0000
             is_client: typing.ClassVar[bool] = True
@@ -29732,7 +29533,7 @@ class AccountLogin(Cluster):
         @dataclass
         class GetSetupPINResponse(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0000
+            command_id: typing.ClassVar[int] = 0x0001
             is_client: typing.ClassVar[bool] = False
 
             @ChipUtility.classproperty
@@ -29745,9 +29546,9 @@ class AccountLogin(Cluster):
             setupPIN: 'str' = ""
 
         @dataclass
-        class Login(ClusterCommand):
+        class LoginRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0001
+            command_id: typing.ClassVar[int] = 0x0002
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty
@@ -29762,9 +29563,9 @@ class AccountLogin(Cluster):
             setupPIN: 'str' = ""
 
         @dataclass
-        class Logout(ClusterCommand):
+        class LogoutRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050E
-            command_id: typing.ClassVar[int] = 0x0002
+            command_id: typing.ClassVar[int] = 0x0003
             is_client: typing.ClassVar[bool] = True
 
             @ChipUtility.classproperty

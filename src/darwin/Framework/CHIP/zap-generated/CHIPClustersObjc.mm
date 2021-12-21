@@ -287,12 +287,12 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)getSetupPINWithParams:(CHIPAccountLoginClusterGetSetupPINParams *)params
-            completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
+- (void)getSetupPINRequestWithParams:(CHIPAccountLoginClusterGetSetupPINRequestParams *)params
+                   completionHandler:(void (^)(CHIPAccountLoginClusterGetSetupPINResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::GetSetupPIN::Type request;
+    AccountLogin::Commands::GetSetupPINRequest::Type request;
     request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
 
     new CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(
@@ -303,10 +303,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)loginWithParams:(CHIPAccountLoginClusterLoginParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)loginRequestWithParams:(CHIPAccountLoginClusterLoginRequestParams *)params
+             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::Login::Type request;
+    AccountLogin::Commands::LoginRequest::Type request;
     request.tempAccountIdentifier = [self asCharSpan:params.tempAccountIdentifier];
     request.setupPIN = [self asCharSpan:params.setupPIN];
 
@@ -322,10 +323,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)logoutWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)logoutRequestWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AccountLogin::Commands::Logout::Type request;
+    AccountLogin::Commands::LogoutRequest::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -530,25 +531,6 @@ using namespace chip::app::Clusters;
 - (chip::Controller::ClusterBase *)getCluster
 {
     return &_cppCluster;
-}
-
-- (void)changeStatusWithParams:(CHIPApplicationBasicClusterChangeStatusParams *)params
-             completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    ApplicationBasic::Commands::ChangeStatus::Type request;
-    request.status = static_cast<std::remove_reference_t<decltype(request.status)>>(params.status.unsignedCharValue);
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable value, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
 }
 
 - (void)readAttributeVendorNameWithCompletionHandler:(void (^)(
@@ -772,53 +754,53 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)hideAppWithParams:(CHIPApplicationLauncherClusterHideAppParams *)params
-        completionHandler:(void (^)(CHIPApplicationLauncherClusterHideAppResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+- (void)hideAppRequestWithParams:(CHIPApplicationLauncherClusterHideAppRequestParams *)params
+               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::HideApp::Type request;
+    ApplicationLauncher::Commands::HideAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-    new CHIPApplicationLauncherClusterHideAppResponseCallbackBridge(
+    new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)launchAppWithParams:(CHIPApplicationLauncherClusterLaunchAppParams *)params
-          completionHandler:(void (^)(CHIPApplicationLauncherClusterLaunchAppResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+- (void)launchAppRequestWithParams:(CHIPApplicationLauncherClusterLaunchAppRequestParams *)params
+                 completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::LaunchApp::Type request;
+    ApplicationLauncher::Commands::LaunchAppRequest::Type request;
     request.data = [self asCharSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-    new CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge(
+    new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)stopAppWithParams:(CHIPApplicationLauncherClusterStopAppParams *)params
-        completionHandler:(void (^)(CHIPApplicationLauncherClusterStopAppResponseParams * _Nullable data,
-                              NSError * _Nullable error))completionHandler
+- (void)stopAppRequestWithParams:(CHIPApplicationLauncherClusterStopAppRequestParams *)params
+               completionHandler:(void (^)(CHIPApplicationLauncherClusterLauncherResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ApplicationLauncher::Commands::StopApp::Type request;
+    ApplicationLauncher::Commands::StopAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
-    new CHIPApplicationLauncherClusterStopAppResponseCallbackBridge(
+    new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -906,11 +888,11 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)renameOutputWithParams:(CHIPAudioOutputClusterRenameOutputParams *)params
-             completionHandler:(StatusCompletion)completionHandler
+- (void)renameOutputRequestWithParams:(CHIPAudioOutputClusterRenameOutputRequestParams *)params
+                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AudioOutput::Commands::RenameOutput::Type request;
+    AudioOutput::Commands::RenameOutputRequest::Type request;
     request.index = params.index.unsignedCharValue;
     request.name = [self asCharSpan:params.name];
 
@@ -926,11 +908,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)selectOutputWithParams:(CHIPAudioOutputClusterSelectOutputParams *)params
-             completionHandler:(StatusCompletion)completionHandler
+- (void)selectOutputRequestWithParams:(CHIPAudioOutputClusterSelectOutputRequestParams *)params
+                    completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    AudioOutput::Commands::SelectOutput::Type request;
+    AudioOutput::Commands::SelectOutputRequest::Type request;
     request.index = params.index.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -2715,27 +2697,11 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)changeChannelWithParams:(CHIPChannelClusterChangeChannelParams *)params
-              completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+- (void)changeChannelByNumberRequestWithParams:(CHIPChannelClusterChangeChannelByNumberRequestParams *)params
+                             completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    Channel::Commands::ChangeChannel::Type request;
-    request.match = [self asCharSpan:params.match];
-
-    new CHIPChannelClusterChangeChannelResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPChannelClusterChangeChannelResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)changeChannelByNumberWithParams:(CHIPChannelClusterChangeChannelByNumberParams *)params
-                      completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    Channel::Commands::ChangeChannelByNumber::Type request;
+    Channel::Commands::ChangeChannelByNumberRequest::Type request;
     request.majorNumber = params.majorNumber.unsignedShortValue;
     request.minorNumber = params.minorNumber.unsignedShortValue;
 
@@ -2751,10 +2717,27 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)skipChannelWithParams:(CHIPChannelClusterSkipChannelParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)changeChannelRequestWithParams:(CHIPChannelClusterChangeChannelRequestParams *)params
+                     completionHandler:(void (^)(CHIPChannelClusterChangeChannelResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    Channel::Commands::SkipChannel::Type request;
+    Channel::Commands::ChangeChannelRequest::Type request;
+    request.match = [self asCharSpan:params.match];
+
+    new CHIPChannelClusterChangeChannelResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPChannelClusterChangeChannelResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)skipChannelRequestWithParams:(CHIPChannelClusterSkipChannelRequestParams *)params
+                   completionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    Channel::Commands::SkipChannelRequest::Type request;
     request.count = params.count.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -5055,12 +5038,12 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)launchContentWithParams:(CHIPContentLauncherClusterLaunchContentParams *)params
-              completionHandler:(void (^)(CHIPContentLauncherClusterLaunchContentResponseParams * _Nullable data,
-                                    NSError * _Nullable error))completionHandler
+- (void)launchContentRequestWithParams:(CHIPContentLauncherClusterLaunchContentRequestParams *)params
+                     completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ContentLauncher::Commands::LaunchContent::Type request;
+    ContentLauncher::Commands::LaunchContentRequest::Type request;
     request.autoPlay = params.autoPlay.boolValue;
     request.data = [self asCharSpan:params.data];
     {
@@ -5113,20 +5096,20 @@ using namespace chip::app::Clusters;
         }
     }
 
-    new CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(
+    new CHIPContentLauncherClusterLaunchResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)launchURLWithParams:(CHIPContentLauncherClusterLaunchURLParams *)params
-          completionHandler:(void (^)(CHIPContentLauncherClusterLaunchURLResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+- (void)launchURLRequestWithParams:(CHIPContentLauncherClusterLaunchURLRequestParams *)params
+                 completionHandler:(void (^)(CHIPContentLauncherClusterLaunchResponseParams * _Nullable data,
+                                       NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    ContentLauncher::Commands::LaunchURL::Type request;
+    ContentLauncher::Commands::LaunchURLRequest::Type request;
     request.contentURL = [self asCharSpan:params.contentURL];
     request.displayString = [self asCharSpan:params.displayString];
     {
@@ -5188,9 +5171,9 @@ using namespace chip::app::Clusters;
         }
     }
 
-    new CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(
+    new CHIPContentLauncherClusterLaunchResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPContentLauncherClusterLaunchURLResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -8522,12 +8505,12 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)sendKeyWithParams:(CHIPKeypadInputClusterSendKeyParams *)params
-        completionHandler:
-            (void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+- (void)sendKeyRequestWithParams:(CHIPKeypadInputClusterSendKeyRequestParams *)params
+               completionHandler:(void (^)(CHIPKeypadInputClusterSendKeyResponseParams * _Nullable data,
+                                     NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    KeypadInput::Commands::SendKey::Type request;
+    KeypadInput::Commands::SendKeyRequest::Type request;
     request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(params.keyCode.unsignedCharValue);
 
     new CHIPKeypadInputClusterSendKeyResponseCallbackBridge(
@@ -9416,10 +9399,10 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)hideInputStatusWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)hideInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::HideInputStatus::Type request;
+    MediaInput::Commands::HideInputStatusRequest::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -9433,10 +9416,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)renameInputWithParams:(CHIPMediaInputClusterRenameInputParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)renameInputRequestWithParams:(CHIPMediaInputClusterRenameInputRequestParams *)params
+                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::RenameInput::Type request;
+    MediaInput::Commands::RenameInputRequest::Type request;
     request.index = params.index.unsignedCharValue;
     request.name = [self asCharSpan:params.name];
 
@@ -9452,10 +9436,11 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)selectInputWithParams:(CHIPMediaInputClusterSelectInputParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)selectInputRequestWithParams:(CHIPMediaInputClusterSelectInputRequestParams *)params
+                   completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::SelectInput::Type request;
+    MediaInput::Commands::SelectInputRequest::Type request;
     request.index = params.index.unsignedCharValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -9470,10 +9455,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)showInputStatusWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)showInputStatusRequestWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    MediaInput::Commands::ShowInputStatus::Type request;
+    MediaInput::Commands::ShowInputStatusRequest::Type request;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -9597,161 +9582,161 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)mediaFastForwardWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaFastForwardResponseParams * _Nullable data,
-                                                  NSError * _Nullable error))completionHandler
+- (void)fastForwardRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaFastForward::Type request;
+    MediaPlayback::Commands::FastForwardRequest::Type request;
 
-    new CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaNextWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaNextResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    MediaPlayback::Commands::MediaNext::Type request;
-
-    new CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)mediaPauseWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaPauseResponseParams * _Nullable data,
-                                            NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    MediaPlayback::Commands::MediaPause::Type request;
-
-    new CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)mediaPlayWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaPlayResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    MediaPlayback::Commands::MediaPlay::Type request;
-
-    new CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)mediaPreviousWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaPreviousResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    MediaPlayback::Commands::MediaPrevious::Type request;
-
-    new CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge(
-        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)mediaRewindWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaRewindResponseParams * _Nullable data,
+- (void)nextRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
                                              NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaRewind::Type request;
+    MediaPlayback::Commands::NextRequest::Type request;
 
-    new CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaSeekWithParams:(CHIPMediaPlaybackClusterMediaSeekParams *)params
-          completionHandler:(void (^)(CHIPMediaPlaybackClusterMediaSeekResponseParams * _Nullable data,
-                                NSError * _Nullable error))completionHandler
+- (void)pauseRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaSeek::Type request;
+    MediaPlayback::Commands::PauseRequest::Type request;
+
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)playRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    MediaPlayback::Commands::PlayRequest::Type request;
+
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)previousRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                                 NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    MediaPlayback::Commands::PreviousRequest::Type request;
+
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)rewindRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    MediaPlayback::Commands::RewindRequest::Type request;
+
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)seekRequestWithParams:(CHIPMediaPlaybackClusterSeekRequestParams *)params
+            completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    MediaPlayback::Commands::SeekRequest::Type request;
     request.position = params.position.unsignedLongLongValue;
 
-    new CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaSkipBackwardWithParams:(CHIPMediaPlaybackClusterMediaSkipBackwardParams *)params
-                  completionHandler:(void (^)(CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler
+- (void)skipBackwardRequestWithParams:(CHIPMediaPlaybackClusterSkipBackwardRequestParams *)params
+                    completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaSkipBackward::Type request;
+    MediaPlayback::Commands::SkipBackwardRequest::Type request;
     request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-    new CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaSkipForwardWithParams:(CHIPMediaPlaybackClusterMediaSkipForwardParams *)params
-                 completionHandler:(void (^)(CHIPMediaPlaybackClusterMediaSkipForwardResponseParams * _Nullable data,
-                                       NSError * _Nullable error))completionHandler
+- (void)skipForwardRequestWithParams:(CHIPMediaPlaybackClusterSkipForwardRequestParams *)params
+                   completionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                         NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaSkipForward::Type request;
+    MediaPlayback::Commands::SkipForwardRequest::Type request;
     request.deltaPositionMilliseconds = params.deltaPositionMilliseconds.unsignedLongLongValue;
 
-    new CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaStartOverWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaStartOverResponseParams * _Nullable data,
-                                                NSError * _Nullable error))completionHandler
+- (void)startOverRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                                  NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaStartOver::Type request;
+    MediaPlayback::Commands::StartOverRequest::Type request;
 
-    new CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)mediaStopWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterMediaStopResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler
+- (void)stopRequestWithCompletionHandler:(void (^)(CHIPMediaPlaybackClusterPlaybackResponseParams * _Nullable data,
+                                             NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    MediaPlayback::Commands::MediaStop::Type request;
+    MediaPlayback::Commands::StopRequest::Type request;
 
-    new CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge(
+    new CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -14090,12 +14075,12 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)navigateTargetWithParams:(CHIPTargetNavigatorClusterNavigateTargetParams *)params
-               completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
-                                     NSError * _Nullable error))completionHandler
+- (void)navigateTargetRequestWithParams:(CHIPTargetNavigatorClusterNavigateTargetRequestParams *)params
+                      completionHandler:(void (^)(CHIPTargetNavigatorClusterNavigateTargetResponseParams * _Nullable data,
+                                            NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    TargetNavigator::Commands::NavigateTarget::Type request;
+    TargetNavigator::Commands::NavigateTargetRequest::Type request;
     request.target = params.target.unsignedCharValue;
     request.data = [self asCharSpan:params.data];
 
@@ -14148,6 +14133,25 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
+}
+
+- (void)subscribeAttributeCurrentNavigatorTargetWithMinInterval:(uint16_t)minInterval
+                                                    maxInterval:(uint16_t)maxInterval
+                                        subscriptionEstablished:
+                                            (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+                                                  reportHandler:
+                                                      (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+{
+    new CHIPInt8uAttributeCallbackSubscriptionBridge(
+        self.callbackQueue, reportHandler,
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
+                minInterval, maxInterval, CHIPInt8uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+        },
+        subscriptionEstablishedHandler);
 }
 
 - (void)readAttributeAttributeListWithCompletionHandler:(void (^)(
