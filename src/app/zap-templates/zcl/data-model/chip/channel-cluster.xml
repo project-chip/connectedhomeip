@@ -26,7 +26,7 @@ limitations under the License.
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the current Channel on a device.</description>
     <attribute side="server" code="0x0000" define="CHANNEL_LIST" type="ARRAY" entryType="ChannelInfo" length="254" writable="false" optional="false">channel list</attribute>
-    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="ChannelLineupInfo" writable="true" optional="false">channel lineup</attribute>
+    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="LineupInfo" writable="true" optional="false">channel lineup</attribute>
     <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo" writable="true" optional="false">current channel</attribute>
 
     <command source="client" code="0x00" name="ChangeChannelRequest" response="ChangeChannelResponse" optional="false">
@@ -48,7 +48,7 @@ limitations under the License.
     <command source="server" code="0x01" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
       <arg name="channelMatch" type="ChannelInfo"/>
-      <arg name="errorType" type="ChannelErrorType"/>
+      <arg name="errorTypeEnum" type="ErrorTypeEnum"/>
     </command>
 
   </cluster>
@@ -62,20 +62,20 @@ limitations under the License.
     <item name="affiliateCallSign" type="CHAR_STRING" length="32"/>
   </struct>
 
-  <struct name="ChannelLineupInfo">
+  <struct name="LineupInfo">
     <cluster code="0x0504"/>
     <item name="operatorName" type="CHAR_STRING"/>
     <item name="lineupName" type="CHAR_STRING"/>
     <item name="postalCode" type="CHAR_STRING"/>
-    <item name="lineupInfoType" type="ChannelLineupInfoType"/>
+    <item name="lineupInfoTypeEnum" type="LineupInfoTypeEnum"/>
   </struct>
 
-  <enum name="ChannelLineupInfoType" type="ENUM8">
+  <enum name="LineupInfoTypeEnum" type="ENUM8">
     <cluster code="0x0504"/>
     <item name="Mso" value="0x00"/>
   </enum>
 
-  <enum name="ChannelErrorType" type="ENUM8">
+  <enum name="ErrorTypeEnum" type="ENUM8">
     <cluster code="0x0504"/>
     <item name="MultipleMatches" value="0x00"/>
     <item name="NoMatches" value="0x01"/>

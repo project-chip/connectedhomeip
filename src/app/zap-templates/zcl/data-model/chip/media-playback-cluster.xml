@@ -26,10 +26,10 @@ limitations under the License.
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
+    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="INT64U" min="0x00"  writable="false" default="0xFF" optional="true">start time</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION" type="INT64U" min="0x00"  writable="false" optional="true">duration</attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="MediaPlaybackPosition" writable="true" optional="false">position</attribute>
+    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPosition" writable="true" optional="false">position</attribute>
     <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" min="0x00"  writable="false" optional="true">playback speed</attribute>
     <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="INT64U" min="0x00"  writable="false" optional="true">seek range end</attribute>
     <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="INT64U" min="0x00"  writable="false" optional="true">seek range start</attribute>
@@ -84,18 +84,18 @@ limitations under the License.
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
+      <arg name="statusEnum" type="StatusEnum"/>
     </command>
 
   </cluster>
 
-  <struct name="MediaPlaybackPosition">
+  <struct name="PlaybackPosition">
     <cluster code="0x0506"/>
     <item name="updatedAt" type="INT64U"/>
     <item name="position" type="INT64U"/>    
   </struct>
 
-  <enum name="MediaPlaybackState" type="ENUM8">
+  <enum name="PlaybackStateEnum" type="ENUM8">
     <cluster code="0x0506"/>
     <item name="Playing" value="0x00"/>
     <item name="Paused" value="0x01"/>
@@ -103,7 +103,7 @@ limitations under the License.
     <item name="Buffering" value="0x03"/>
   </enum>
 
-  <enum name="MediaPlaybackStatus" type="ENUM8">
+  <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x0506"/>
     <item name="Success" value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>
