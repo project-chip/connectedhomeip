@@ -55,8 +55,6 @@ public class MatterServant {
     chipAppServer.startApp();
   }
 
-
-
   public void restart() {
     chipAppServer.stopApp();
     chipAppServer.startApp();

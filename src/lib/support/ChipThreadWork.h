@@ -33,5 +33,5 @@ using WorkCallback = std::function<void()>;
 /// will not be running anymore when this returns).
 void ChipMainThreadScheduleAndWait(WorkCallback callback);
 
-} // namespace python
+} // namespace ThreadWork
 } // namespace chip

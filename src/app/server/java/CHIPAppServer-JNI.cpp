@@ -26,10 +26,10 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/ChipThreadWork.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/ChipThreadWork.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ConnectivityManager.h>
@@ -133,9 +133,7 @@ exit:
 
 JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
 {
-    chip::ThreadWork::ChipMainThreadScheduleAndWait([&] {
-        ChipAndroidAppShutdown();
-    });
+    chip::ThreadWork::ChipMainThreadScheduleAndWait([&] { ChipAndroidAppShutdown(); });
     return JNI_TRUE;
 }
 
