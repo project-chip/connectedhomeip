@@ -29,23 +29,23 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="ChannelLineupInfo" writable="true" optional="false">channel lineup</attribute>
     <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo" writable="true" optional="false">current channel</attribute>
 
-    <command source="client" code="0x00" name="ChangeChannel" optional="false">
+    <command source="client" code="0x00" name="ChangeChannelRequest" response="ChangeChannelResponse" optional="false">
       <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
       <arg name="match" type="CHAR_STRING"/>
     </command>
 
-    <command source="client" code="0x01" name="ChangeChannelByNumber" optional="false">
+    <command source="client" code="0x02" name="ChangeChannelByNumberRequest" optional="false">
       <description>Change the channel on the media plaeyer to the channel with the given Number in the ChannelList attribute.</description>
       <arg name="majorNumber" type="INT16U"/>
       <arg name="minorNumber" type="INT16U"/>
     </command>
 
-    <command source="client" code="0x02" name="SkipChannel" optional="false">
+    <command source="client" code="0x03" name="SkipChannelRequest" optional="false">
       <description>This command provides channel up and channel down functionality, but allows channel index jumps of size Count. When the value of the increase or decrease is larger than the number of channels remaining in the given direction, then the behavior SHALL be to return to the beginning (or end) of the channel list and continue. For example, if the current channel is at index 0 and count value of -1 is given, then the current channel should change to the last channel.</description>
       <arg name="count" type="INT16U"/>
     </command>
 
-    <command source="server" code="0x00" name="ChangeChannelResponse" optional="false">
+    <command source="server" code="0x01" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
       <arg name="channelMatch" type="ChannelInfo"/>
       <arg name="errorType" type="ChannelErrorType"/>

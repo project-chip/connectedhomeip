@@ -24,7 +24,7 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "Get Setup PIN Command"
-      command: "GetSetupPIN"
+      command: "getSetupPINRequest"
       arguments:
           values:
               - name: "tempAccountIdentifier"
@@ -36,7 +36,7 @@ tests:
       #         - name: "setupPIN"
       #           value: "tempPin123"
     - label: "Login Command"
-      command: "Login"
+      command: "loginRequest"
       arguments:
           values:
               - name: "tempAccountIdentifier"
@@ -45,4 +45,4 @@ tests:
                 value: "tempPin123"
 
     - label: "Logout Command"
-      command: "Logout"
+      command: "logoutRequest"
