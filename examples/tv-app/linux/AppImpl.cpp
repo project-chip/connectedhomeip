@@ -206,8 +206,7 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
     return response;
 }
 
-LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Paramater> parameterList, bool autoplay,
-                                                         std::string data)
+LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Paramater> parameterList, bool autoplay, std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
