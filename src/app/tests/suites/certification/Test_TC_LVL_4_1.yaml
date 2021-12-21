@@ -32,9 +32,9 @@ tests:
       arguments:
           values:
               - name: "stepMode"
-                value: 0
+                value: 1
               - name: "stepSize"
-                value: 128
+                value: 126
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
