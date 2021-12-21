@@ -98,7 +98,7 @@ class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
 public:
     virtual ~ApplicationLauncherImpl() {}
 
-    ApplicationLauncherResponse LaunchApp(ApplicationLauncherApp application, std::string data) override;
+    ApplicationLauncherResponse LaunchApp(Application application, std::string data) override;
 
 protected:
 };
@@ -173,7 +173,7 @@ public:
     virtual ~ContentAppFactoryImpl() {}
 
     ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * LoadContentAppByAppId(ApplicationLauncherApp application);
+    ContentApp * LoadContentAppByAppId(Application application);
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),

@@ -53,8 +53,8 @@ exit:
 }
 
 bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::NavigateTargetRequest::DecodableType & commandData)
+                                                                const app::ConcreteCommandPath & commandPath,
+                                                                const Commands::NavigateTargetRequest::DecodableType & commandData)
 {
     auto & target = commandData.target;
     auto & data   = commandData.data;

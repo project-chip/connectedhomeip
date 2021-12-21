@@ -98,8 +98,8 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
     }
 }
 
-EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                        uint64_t deltaPositionMilliseconds)
+chip::app::Clusters::MediaPlayback::StatusEnum
+mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
 {
     return MediaPlaybackMgr().Request(mediaPlaybackRequest, deltaPositionMilliseconds);
 }
@@ -180,8 +180,8 @@ exit:
     return err;
 }
 
-EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest mediaPlaybackRequest,
-                                                         uint64_t deltaPositionMilliseconds)
+chip::app::Clusters::MediaPlayback::StatusEnum MediaPlaybackManager::Request(MediaPlaybackRequest mediaPlaybackRequest,
+                                                                             uint64_t deltaPositionMilliseconds)
 {
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -201,14 +201,14 @@ EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest me
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
         env->ExceptionDescribe();
         env->ExceptionClear();
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND;
+        return chip::app::Clusters::MediaPlayback::StatusEnum::kInvalidStateForCommand;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_INVALID_STATE_FOR_COMMAND;
+        return chip::app::Clusters::MediaPlayback::StatusEnum::kInvalidStateForCommand;
     }
 
-    return static_cast<EmberAfMediaPlaybackStatus>(ret);
+    return static_cast<chip::app::Clusters::MediaPlayback::StatusEnum>(ret);
 }
