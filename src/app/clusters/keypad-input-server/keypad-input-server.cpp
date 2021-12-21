@@ -34,9 +34,9 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::KeypadInput;
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode);
+StatusEnum keypadInputClusterSendKey(CecKeyCode keyCode);
 
-static void sendResponse(app::CommandHandler * command, EmberAfKeypadInputStatus keypadInputStatus)
+static void sendResponse(app::CommandHandler * command, StatusEnum keypadInputStatus)
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), KeypadInput::Id, KeypadInput::Commands::SendKeyResponse::Id };
@@ -60,7 +60,7 @@ bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * comma
 {
     auto & keyCode = commandData.keyCode;
 
-    EmberAfKeypadInputStatus status = keypadInputClusterSendKey(static_cast<EmberAfKeypadInputCecKeyCode>(keyCode));
+    StatusEnum status = keypadInputClusterSendKey(static_cast<CecKeyCode>(keyCode));
     sendResponse(command, status);
     return true;
 }

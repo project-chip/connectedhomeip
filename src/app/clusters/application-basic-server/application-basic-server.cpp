@@ -32,6 +32,6 @@
 using namespace chip;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-bool applicationBasicClusterChangeApplicationStatus(EndpointId endpoint, ApplicationBasicStatus status);
+bool applicationBasicClusterChangeApplicationStatus(EndpointId endpoint, ApplicationStatusEnum status);
 
 void MatterApplicationBasicPluginServerInitCallback() {}
