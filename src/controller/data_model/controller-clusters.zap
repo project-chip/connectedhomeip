@@ -10811,6 +10811,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "SkipChannelRequest",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -10838,7 +10846,16 @@
           "define": "CHANNEL_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "ChangeChannelResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "channel list",
@@ -10974,7 +10991,16 @@
           "define": "TARGET_NAVIGATOR_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "NavigateTargetResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "target navigator list",
@@ -11001,7 +11027,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -11016,6 +11042,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -11055,7 +11096,7 @@
               "outgoing": 1
             },
             {
-              "name": "PauseReques",
+              "name": "PauseRequest",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -11071,7 +11112,7 @@
               "outgoing": 1
             },
             {
-              "name": "StartOver",
+              "name": "StartOverRequest",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -11175,7 +11216,16 @@
           "define": "MEDIA_PLAYBACK_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "PlaybackResponse",
+              "code": 10,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "playback state",
@@ -11607,7 +11657,16 @@
           "define": "KEYPAD_INPUT_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "SendKeyResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "AttributeList",
@@ -11706,7 +11765,16 @@
           "define": "CONTENT_LAUNCH_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "LaunchResponse",
+              "code": 2,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "accept header list",
@@ -11972,7 +12040,16 @@
           "define": "APPLICATION_LAUNCHER_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "LauncherResponse",
+              "code": 3,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "application launcher list",
@@ -12043,16 +12120,7 @@
           "define": "APPLICATION_BASIC_CLUSTER",
           "side": "client",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "ChangeStatus",
-              "code": 0,
-              "mfgCode": null,
-              "source": "client",
-              "incoming": 0,
-              "outgoing": 0
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "FeatureMap",
@@ -12255,6 +12323,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "LogoutRequest",
+              "code": 3,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -12297,7 +12373,16 @@
           "define": "ACCOUNT_LOGIN_CLUSTER",
           "side": "server",
           "enabled": 0,
-          "commands": [],
+          "commands": [
+            {
+              "name": "GetSetupPINResponse",
+              "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            }
+          ],
           "attributes": [
             {
               "name": "AttributeList",
