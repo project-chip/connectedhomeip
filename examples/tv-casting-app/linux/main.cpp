@@ -253,10 +253,10 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             return;
         }
         LaunchURLRequest::Type request;
-        request.contentURL          = chip::CharSpan(kContentUrl, strlen(kContentUrl));
-        request.displayString       = chip::CharSpan(kContentDisplayStr, strlen(kContentDisplayStr));
-        request.brandingInformation = chip::app::DataModel::List<
-            const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>();
+        request.contentURL    = chip::CharSpan(kContentUrl, strlen(kContentUrl));
+        request.displayString = chip::CharSpan(kContentDisplayStr, strlen(kContentDisplayStr));
+        request.brandingInformation =
+            chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>();
         cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     }
 }

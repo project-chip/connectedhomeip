@@ -18,9 +18,9 @@
 
 #include "KeypadInputManager.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
-#include <app-common/zap-generated/cluster-objects.h>
 
 #include <map>
 #include <string>

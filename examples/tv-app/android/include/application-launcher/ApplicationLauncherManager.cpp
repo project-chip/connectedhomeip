@@ -58,8 +58,7 @@ ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, Application application,
-                                                              std::string data)
+ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, Application application, std::string data)
 {
     ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterStopApp");
 
@@ -70,8 +69,7 @@ ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId e
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, Application application,
-                                                              std::string data)
+ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, Application application, std::string data)
 {
     ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterHideApp");
 

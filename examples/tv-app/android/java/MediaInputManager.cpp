@@ -125,8 +125,8 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
             jint index       = env->GetIntField(inputObj, indexId);
             mediaInput.index = static_cast<uint8_t>(index);
 
-            jfieldID typeId      = env->GetFieldID(inputClass, "type", "I");
-            jint type            = env->GetIntField(inputObj, typeId);
+            jfieldID typeId          = env->GetFieldID(inputClass, "type", "I");
+            jint type                = env->GetIntField(inputObj, typeId);
             mediaInput.inputTypeEnum = static_cast<app::Clusters::MediaInput::InputTypeEnum>(type);
 
             jfieldID nameId = env->GetFieldID(inputClass, "name", "Ljava/lang/String;");

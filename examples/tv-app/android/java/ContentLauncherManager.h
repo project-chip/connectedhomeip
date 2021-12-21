@@ -31,8 +31,8 @@ class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Dele
 public:
     void InitializeWithObjects(jobject managerObject);
 
-    LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Paramater> & parameterList,
-                                       bool autoplay, const chip::CharSpan & data) override;
+    LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Paramater> & parameterList, bool autoplay,
+                                       const chip::CharSpan & data) override;
     LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                    const std::list<BrandingInformation> & brandingInformation) override;
     std::list<std::string> HandleGetAcceptHeaderList() override;

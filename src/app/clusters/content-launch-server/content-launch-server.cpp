@@ -195,8 +195,8 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
         LaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.statusEnum          = resp.statusEnum;
-        response.data                = resp.data;
+        response.statusEnum = resp.statusEnum;
+        response.data       = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
@@ -234,8 +234,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
         LaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.statusEnum          = resp.statusEnum;
-        response.data                = resp.data;
+        response.statusEnum = resp.statusEnum;
+        response.data       = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);

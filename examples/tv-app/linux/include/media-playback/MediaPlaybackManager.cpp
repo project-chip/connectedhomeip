@@ -73,8 +73,8 @@ StatusEnum MediaPlaybackManager::proxyMediaPlaybackRequest(MediaPlaybackRequest 
     }
 }
 
-chip::app::Clusters::MediaPlayback::StatusEnum mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                       uint64_t deltaPositionMilliseconds)
+chip::app::Clusters::MediaPlayback::StatusEnum
+mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
 {
     return MediaPlaybackManager().proxyMediaPlaybackRequest(mediaPlaybackRequest, deltaPositionMilliseconds);
 }

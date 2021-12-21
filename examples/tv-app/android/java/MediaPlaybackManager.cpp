@@ -98,8 +98,8 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
     }
 }
 
-chip::app::Clusters::MediaPlayback::StatusEnum mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                        uint64_t deltaPositionMilliseconds)
+chip::app::Clusters::MediaPlayback::StatusEnum
+mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
 {
     return MediaPlaybackMgr().Request(mediaPlaybackRequest, deltaPositionMilliseconds);
 }
@@ -181,7 +181,7 @@ exit:
 }
 
 chip::app::Clusters::MediaPlayback::StatusEnum MediaPlaybackManager::Request(MediaPlaybackRequest mediaPlaybackRequest,
-                                               uint64_t deltaPositionMilliseconds)
+                                                                             uint64_t deltaPositionMilliseconds)
 {
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;

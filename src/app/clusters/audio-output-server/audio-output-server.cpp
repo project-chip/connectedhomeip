@@ -33,8 +33,9 @@ using namespace chip::app::Clusters::AudioOutput;
 bool audioOutputClusterSelectOutput(uint8_t index);
 bool audioOutputClusterRenameOutput(uint8_t index, const CharSpan & name);
 
-bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::RenameOutputRequest::DecodableType & commandData)
+bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::RenameOutputRequest::DecodableType & commandData)
 {
     auto & index = commandData.index;
     auto & name  = commandData.name;
@@ -45,8 +46,9 @@ bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * 
     return true;
 }
 
-bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::SelectOutputRequest::DecodableType & commandData)
+bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::SelectOutputRequest::DecodableType & commandData)
 {
     auto & index = commandData.index;
 

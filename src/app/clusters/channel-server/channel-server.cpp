@@ -53,7 +53,7 @@ bool ChannelClusterChangeChannelByNumber(uint16_t majorNumer, uint16_t minorNumb
 bool ChannelClusterSkipChannel(uint16_t count);
 
 bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::ChangeChannelRequest::DecodableType & commandData)
+                                                       const Commands::ChangeChannelRequest::DecodableType & commandData)
 {
     Commands::ChangeChannelResponse::Type response;
     response.channelMatch.majorNumber       = 1;
@@ -71,8 +71,9 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
     return true;
 }
 
-bool emberAfChannelClusterChangeChannelByNumberRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ChangeChannelByNumberRequest::DecodableType & commandData)
+bool emberAfChannelClusterChangeChannelByNumberRequestCallback(
+    app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+    const Commands::ChangeChannelByNumberRequest::DecodableType & commandData)
 {
     auto & majorNumber = commandData.majorNumber;
     auto & minorNumber = commandData.minorNumber;
@@ -84,7 +85,7 @@ bool emberAfChannelClusterChangeChannelByNumberRequestCallback(app::CommandHandl
 }
 
 bool emberAfChannelClusterSkipChannelRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::SkipChannelRequest::DecodableType & commandData)
+                                                     const Commands::SkipChannelRequest::DecodableType & commandData)
 {
     auto & count = commandData.count;
 

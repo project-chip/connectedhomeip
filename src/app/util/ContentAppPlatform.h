@@ -37,8 +37,8 @@ namespace AppPlatform {
 class DLL_EXPORT ContentAppFactory
 {
 public:
-    virtual ~ContentAppFactory()                                                   = default;
-    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)               = 0;
+    virtual ~ContentAppFactory()                                        = default;
+    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)    = 0;
     virtual ContentApp * LoadContentAppByAppId(Application application) = 0;
 };
 

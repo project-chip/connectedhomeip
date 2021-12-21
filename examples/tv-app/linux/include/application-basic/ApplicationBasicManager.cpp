@@ -105,7 +105,7 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, chip::app::Cluste
 chip::app::Clusters::ApplicationBasic::Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId endpoint)
 {
     chip::app::Clusters::ApplicationBasic::Application app = {};
-    uint16_t size   = static_cast<uint16_t>(sizeof(app.name));
+    uint16_t size                                          = static_cast<uint16_t>(sizeof(app.name));
 
     std::string section = "endpoint" + std::to_string(endpoint);
 

@@ -56,7 +56,7 @@ exit:
 }
 
 bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::SendKeyRequest::DecodableType & commandData)
+                                                     const Commands::SendKeyRequest::DecodableType & commandData)
 {
     auto & keyCode = commandData.keyCode;
 
