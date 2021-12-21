@@ -268,6 +268,13 @@ void DeviceController::ReleaseOperationalDevice(NodeId remoteDeviceId)
     mCASESessionManager->ReleaseSession(mFabricInfo->GetPeerIdForNode(remoteDeviceId));
 }
 
+void DeviceController::EmplaceOperationalDevice(const Transport::PeerAddress & addr,
+                                                const Optional<ReliableMessageProtocolConfig> & config, const PeerId & peerId,
+                                                SessionHolder & session)
+{
+    mCASESessionManager->EmplaceSession(addr, config, peerId, session);
+}
+
 void DeviceController::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
