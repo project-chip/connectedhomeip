@@ -390,6 +390,9 @@ protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mCommissionableNodes); }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
+    void EmplaceOperationalDevice(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config,
+                                  const PeerId & peerId, SessionHolder & session);
+
 private:
     void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 
