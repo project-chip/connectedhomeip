@@ -189,6 +189,9 @@ private:
     uint16_t mServiceAttrHandle;
     uint16_t mRXCharAttrHandle;
     uint16_t mTXCharAttrHandle;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    uint16_t mC3CharAttrHandle;
+#endif
     uint16_t mTXCharCCCDAttrHandle;
     BitFlags<Flags> mFlags;
     char mDeviceName[kMaxDeviceNameLength + 1];
@@ -246,6 +249,11 @@ private:
     static int ble_svr_gap_event(struct ble_gap_event * event, void * arg);
 
     static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static int gatt_svr_chr_access_additional_data(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt,
+                                                   void * arg);
+    void HandleC3CharRead(struct ble_gatt_char_context * param);
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 #endif
 
     static void DriveBLEState(intptr_t arg);
