@@ -1886,9 +1886,12 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         {
             mPairingDelegate->OnCommissioningComplete(proxy->GetDeviceId(), CHIP_NO_ERROR);
         }
+        mCommissioningStage = CommissioningStage::kSecurePairing;
+        break;
+    case CommissioningStage::kError:
+        mCommissioningStage = CommissioningStage::kSecurePairing;
         break;
     case CommissioningStage::kSecurePairing:
-    case CommissioningStage::kError:
         break;
     }
 }
