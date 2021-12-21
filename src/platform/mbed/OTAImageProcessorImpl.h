@@ -28,11 +28,16 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/OTAImageProcessor.h>
 
+#ifdef BOOT_ENABLED
+#include "blockdevice/SlicingBlockDevice.h"
+#endif
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
+    OTAImageProcessorImpl();
     /**
      * Called to prepare for an OTA image download. This may include but not limited to opening the file, finding a block of space
      * in persistent memory, and allocating a buffer. This must not be a blocking call.
@@ -74,8 +79,14 @@ private:
     CHIP_ERROR SetBlock(ByteSpan & block);
     CHIP_ERROR ReleaseBlock();
 
+    void ClearDownloadParams();
+
     OTADownloader * mDownloader = nullptr;
     MutableByteSpan mBlock;
+
+#ifdef BOOT_ENABLED
+    mbed::BlockDevice * mBlockDevice;
+#endif
 };
 
 } // namespace chip
