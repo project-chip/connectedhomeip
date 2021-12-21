@@ -58,26 +58,6 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::Attribu
     {
         return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
     }
-    if (clusterId == ZCL_KEYPAD_INPUT_CLUSTER_ID)
-    {
-        return GetKeypadInput()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
-    if (clusterId == ZCL_APPLICATION_LAUNCHER_CLUSTER_ID)
-    {
-        return GetApplicationLauncher()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
-    if (clusterId == ZCL_MEDIA_PLAYBACK_CLUSTER_ID)
-    {
-        return GetMediaPlayback()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
-    if (clusterId == ZCL_TARGET_NAVIGATOR_CLUSTER_ID)
-    {
-        return GetTargetNavigator()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
-    if (clusterId == ZCL_CHANNEL_CLUSTER_ID)
-    {
-        return GetChannel()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
@@ -94,26 +74,6 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::Attrib
     if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
     {
         return GetAccountLogin()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_KEYPAD_INPUT_CLUSTER_ID)
-    {
-        return GetKeypadInput()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_APPLICATION_LAUNCHER_CLUSTER_ID)
-    {
-        return GetApplicationLauncher()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_MEDIA_PLAYBACK_CLUSTER_ID)
-    {
-        return GetMediaPlayback()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_TARGET_NAVIGATOR_CLUSTER_ID)
-    {
-        return GetTargetNavigator()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_CHANNEL_CLUSTER_ID)
-    {
-        return GetChannel()->HandleWriteAttribute(attributeId, buffer);
     }
     return EMBER_ZCL_STATUS_FAILURE;
 }
