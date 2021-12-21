@@ -82,6 +82,12 @@ public:
     CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
                                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    /**
+     * Instantiate an externally generated session into the session manager.
+     */
+    CHIP_ERROR EmplaceSession(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config,
+                              const PeerId & peerId, SessionHolder & session);
+
     OperationalDeviceProxy * FindExistingSession(PeerId peerId);
 
     void ReleaseSession(PeerId peerId);
