@@ -174,12 +174,12 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::Attri
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfContentLauncherClusterLaunchContentCallback(
+bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & autoplay = commandData.autoPlay;
@@ -213,12 +213,12 @@ exit:
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(
+bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & contentUrl    = commandData.contentURL;
