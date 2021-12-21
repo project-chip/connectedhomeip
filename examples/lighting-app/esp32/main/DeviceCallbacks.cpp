@@ -186,13 +186,13 @@ void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointI
     {
         hue = *value;
         emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                    &saturation, sizeof(uint8_t));
+                                   &saturation, sizeof(uint8_t));
     }
     else
     {
         saturation = *value;
         emberAfReadServerAttribute(endpointId, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID, &hue,
-                                    sizeof(uint8_t));
+                                   sizeof(uint8_t));
     }
     AppLED.SetColor(hue, saturation);
 
