@@ -69,8 +69,6 @@ static_library("support") {
     "CHIPMemString.h",
     "CHIPPlatformMemory.cpp",
     "CHIPPlatformMemory.h",
-    "ChipThreadWork.cpp",
-    "ChipThreadWork.h",
     "CodeUtils.h",
     "DLLUtil.h",
     "Defer.h",
@@ -121,6 +119,8 @@ static_library("support") {
   if (current_os == "android") {
     sources += [
       "CHIPJNIError.h",
+      "ChipThreadWork.cpp",
+      "ChipThreadWork.h",
       "JniReferences.cpp",
       "JniReferences.h",
       "JniTypeWrappers.h",
