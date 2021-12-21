@@ -29,8 +29,8 @@
  */
 
 #include <app-common/zap-generated/att-storage.h>
-#include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/ids/Attributes.h>
 #include <app/MessageDef/AttributeDataIB.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <app/MessageDef/AttributeStatusIB.h>
@@ -42,8 +42,8 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelDelegate.h>
 #include <lib/core/CHIPCore.h>
-#include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/UnitTestRegistration.h>
