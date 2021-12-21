@@ -15,7 +15,7 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 #
- 
+
 # Build script for GN EFT32 examples GitHub workflow.
 
 set -e
@@ -48,7 +48,7 @@ while [ $# -gt 0 ] ; do
 	     fi
 	     shift
 	     shift
-	    
+
 	;;
 	--efr )
 	     if [ -z $2 ] ; then
@@ -67,7 +67,7 @@ while [ $# -gt 0 ] ; do
 	    shift
 	    shift
 	    ;;
-	
+
 	  *)
 		EFR32_BOARD=$1
 		shift
@@ -77,9 +77,9 @@ while [ $# -gt 0 ] ; do
 		fi
     esac
 done
-		    
 
-   
+
+
 if [ X"$EFR32_BOARD" = "X" ] ; then
     echo "EFR32_BOARD not defined"
     exit 1

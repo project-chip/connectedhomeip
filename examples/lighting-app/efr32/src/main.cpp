@@ -183,7 +183,7 @@ int main(void)
 #ifdef RS911X_WIFI
     /*
      * Start up any RSI interface stuff
-     * (Not required) - Note that wfx_wifi_start will deal with 
+     * (Not required) - Note that wfx_wifi_start will deal with
      * starting up a rsi task - which will initialize the SPI interface.
      */
 #endif
