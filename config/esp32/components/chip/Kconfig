@@ -706,6 +706,16 @@ menu "CHIP Device Layer"
                 Setting this to y will cause the commissioner to send commissioning commands to the
                 various clusters after establishing a PASE session.
 
+        config ENABLE_EXTENDED_DATA
+            depends on ENABLE_CHIPOBLE
+            bool "Include extended data during commissioning"
+            default n
+
+        config ENABLE_ROTATING_DEVICE_ID
+            depends on ENABLE_EXTENDED_DATA
+            bool "Enable Rotating Device Identifier Support"
+            default n
+
     endmenu
 
 

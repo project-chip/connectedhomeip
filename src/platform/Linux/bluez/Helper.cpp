@@ -47,6 +47,7 @@
  *    @file
  *          Provides Bluez dbus implementatioon for BLE
  */
+#include <platform/CHIPDeviceConfig.h>
 
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>

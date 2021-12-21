@@ -107,6 +107,13 @@ if (CONFIG_ENABLE_OTA_REQUESTOR)
     chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
+if (CONFIG_ENABLE_EXTENDED_DATA)
+    chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
+    if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
+        chip_gn_arg_append("chip_enable_rotating_device_id"        "true")
+    endif()
+endif()
+
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
 file(GENERATE OUTPUT "${args_gn_input}" CONTENT "${chip_gn_args}")
 

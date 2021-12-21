@@ -34,6 +34,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/BLEManager.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 #include <system/SystemTimer.h>
 
 #include "esp_log.h"
@@ -90,6 +91,17 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
     { BLE_UUID_TYPE_128 }, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
 };
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+const ble_uuid128_t UUID128_CHIPoBLEChar_C3 = {
+    BLE_UUID_TYPE_128, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
+};
+const ChipBleUUID chipUUID_CHIPoBLEChar_C3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21,
+                                                 0x8F, 0x04 } };
+const ble_uuid128_t UUID_CHIPoBLEChar_C3   = {
+    { BLE_UUID_TYPE_128 }, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
+};
+#endif
+
 SemaphoreHandle_t semaphoreHandle = NULL;
 
 } // unnamed namespace
@@ -115,6 +127,14 @@ const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
                   .flags      = BLE_GATT_CHR_F_READ | BLE_GATT_CHR_F_NOTIFY,
                   .val_handle = &sInstance.mTXCharCCCDAttrHandle,
               },
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+              {
+                  .uuid       = (ble_uuid_t *) (&UUID_CHIPoBLEChar_C3),
+                  .access_cb  = gatt_svr_chr_access_additional_data,
+                  .flags      = BLE_GATT_CHR_F_READ,
+                  .val_handle = &sInstance.mC3CharAttrHandle,
+              },
+#endif
               {
                   0, /* No more characteristics in this service */
               },
@@ -134,6 +154,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     SuccessOrExit(err);
 
     mRXCharAttrHandle     = 0;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    mC3CharAttrHandle     = 0;
+#endif
     mTXCharCCCDAttrHandle = 0;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
@@ -683,6 +706,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advData[MAX_ADV_DATA_LEN];
     uint8_t index = 0;
 
+    constexpr uint8_t kServiceDataLenSize  = 1;
+    constexpr uint8_t kServiceDataUUIDSize = 2;
+
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
+
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // bottom digits of the Chip device id.
     uint16_t discriminator;
@@ -706,12 +734,11 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = 0x02;                                                                // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
-    advData[index++] = 0x0A;                                                                // length
+    advData[index++] = kServiceDataLenSize + kServiceDataUUIDSize + sizeof(deviceIdInfo);   // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
     advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
     advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
 
-    chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     if (err != CHIP_NO_ERROR)
     {
@@ -1045,6 +1072,69 @@ exit:
 
     return err.AsInteger();
 }
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+void BLEManagerImpl::HandleC3CharRead(struct ble_gatt_char_context * param)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::System::PacketBufferHandle bufferHandle;
+
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
+    uint16_t lifetimeCounter = 0;
+    BitFlags<AdditionalDataFields> additionalDataFields;
+
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber));
+    SuccessOrExit(err);
+    err = ConfigurationMgr().GetLifetimeCounter(lifetimeCounter);
+    SuccessOrExit(err);
+
+    additionalDataFields.Set(AdditionalDataFields::RotatingDeviceId);
+#endif /* CHIP_ENABLE_ROTATING_DEVICE_ID */
+
+    err = AdditionalDataPayloadGenerator().generateAdditionalDataPayload(lifetimeCounter, serialNumber, strlen(serialNumber),
+                                                                         bufferHandle, additionalDataFields);
+    SuccessOrExit(err);
+
+    os_mbuf_append(param->ctxt->om, bufferHandle->Start(), bufferHandle->DataLength());
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data (%s)", __func__);
+    }
+    return;
+}
+
+int BLEManagerImpl::gatt_svr_chr_access_additional_data(uint16_t conn_handle, uint16_t attr_handle,
+                                                        struct ble_gatt_access_ctxt * ctxt, void * arg)
+{
+    struct ble_gatt_char_context param;
+    int err = 0;
+
+    memset(&param, 0, sizeof(struct ble_gatt_char_context));
+
+    switch (ctxt->op)
+    {
+    case BLE_GATT_ACCESS_OP_READ_CHR:
+
+        param.conn_handle = conn_handle;
+        param.attr_handle = attr_handle;
+        param.ctxt        = ctxt;
+        param.arg         = arg;
+        sInstance.HandleC3CharRead(&param);
+        break;
+
+    default:
+        err = BLE_ATT_ERR_UNLIKELY;
+        break;
+    }
+
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+
+    return err;
+}
+#endif /* CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING */
 
 int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg)
 {
