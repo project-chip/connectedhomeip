@@ -14,20 +14,25 @@ This example demonstrates the Matter Lighting application on ESP platforms.
 
 ## Supported Devices
 
-The demo application is intended to work on following categories of ESP32 devices:
-- [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview)
-- [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview)
-- [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
-- [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html).
+The demo application is intended to work on following categories of ESP32
+devices:
+
+-   [ESP32-DevKitC](https://www.espressif.com/en/products/hardware/esp32-devkitc/overview)
+-   [ESP32-WROVER-KIT_V4.1](https://www.espressif.com/en/products/hardware/esp-wrover-kit/overview)
+-   [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html).
+-   [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html).
 
 ## Building the Example Application
 
-Building the example application requires the use of the Espressif IoT Development Framework ([ESP-IDF](https://github.com/espressif/esp-idf)).
+Building the example application requires the use of the Espressif IoT
+Development Framework ([ESP-IDF](https://github.com/espressif/esp-idf)).
 
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout [v4.4-beta1](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1) pre-release
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.4-beta1](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1)
+    pre-release
 
         $ mkdir ${HOME}/tools
         $ cd ${HOME}/tools
@@ -110,6 +115,11 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
         $ ./out/debug/chip-tool onoff on 12345 1
 
-- On [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html) or [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html) board, there is an on-board RGB-LED. Use ColorControl cluster command to control the color attributes:
+-   On
+    [ESP32C3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32c3/hw-reference/esp32c3/user-guide-devkitm-1.html)
+    or
+    [ESP32S3-DevKitM](https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/hw-reference/esp32s3/user-guide-devkitm-1.html)
+    board, there is an on-board RGB-LED. Use ColorControl cluster command to
+    control the color attributes:
 
-        $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 12345 1
+          $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 12345 1
