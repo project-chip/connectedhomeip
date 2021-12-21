@@ -38,14 +38,7 @@ using namespace chip;
 using namespace chip::Dnssd;
 
 namespace {
-class FakeClock : public System::Clock::ClockImpl
-{
-public:
-    System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mTime; }
-    System::Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return mTime; }
-    System::Clock::Milliseconds64 mTime = System::Clock::kZero;
-};
-FakeClock fakeClock;
+System::Clock::Internal::MockClock fakeClock;
 System::Clock::ClockBase * realClock;
 } // namespace
 
@@ -70,7 +63,7 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     Inet::IPAddress::FromString("1.0.0.1", nodeData.mAddress[nodeData.mNumIPs++]);
 
     nodeData.mInterfaceId = Inet::InterfaceId::Null();
-    nodeData.mExpiryTime  = fakeClock.mTime + ttl;
+    nodeData.mExpiryTime  = fakeClock.GetMonotonicTimestamp() + ttl;
 
     peerId.SetCompressedFabricId(KNOWN_FABRIC);
     nodeData.mPeerId.SetCompressedFabricId(KNOWN_FABRIC);
@@ -93,8 +86,8 @@ void TestInsert(nlTestSuite * inSuite, void * inContext)
     }
 
     tDnssdCache.DumpCache();
-    fakeClock.mTime      = nodeData.mExpiryTime + ttl + System::Clock::Seconds16(1);
-    nodeData.mExpiryTime = fakeClock.mTime + ttl;
+    fakeClock.SetMonotonic(nodeData.mExpiryTime + ttl + System::Clock::Seconds16(1));
+    nodeData.mExpiryTime = fakeClock.GetMonotonicTimestamp() + ttl;
 
     id   = 0x200;
     port = 3000;
