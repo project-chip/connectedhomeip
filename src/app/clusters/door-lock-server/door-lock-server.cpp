@@ -70,7 +70,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
     auto lockState = static_cast<uint8_t>(newLockState);
 
     emberAfDoorLockClusterPrintln("Setting LockState to '%" PRIu8 "'", lockState);
-    EmberAfStatus status = Attributes::LockState::Set(endpointId, lockState);
+    EmberAfStatus status = Attributes::LockState::Set(endpointId, newLockState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
@@ -100,7 +100,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDo
     auto doorState = static_cast<uint8_t>(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting DoorState to '%" PRIu8 "'", doorState);
-    EmberAfStatus status = Attributes::DoorState::Set(endpointId, doorState);
+    EmberAfStatus status = Attributes::DoorState::Set(endpointId, newDoorState);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
