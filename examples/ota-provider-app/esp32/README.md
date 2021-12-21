@@ -38,27 +38,10 @@ idf.py -p <OTAProviderSerialPort> flash
 -   Commissioning the OTA Provider
 
 ```
-./out/debug/chip-tool pairing ble-wifi 12345 <ssid> <passphrase> 0 20202021 3841
+./out/debug/chip-tool pairing ble-wifi 12345 <ssid> <passphrase> 20202021 3841
 ```
 
 ---
 
-Please note down the IP Address and Node ID of OTA Provider, these are required
-for [OTA Requestor Example](../../ota-requestor-app/esp32). Once OTA provider is
-commissioned then head over to
+Once OTA provider is commissioned then head over to
 [OTA Requestor Example](../../ota-requestor-app/esp32).
-
----
-
-## Features
-
--   Can complete full BDX transfer
--   Provide the full OTA image to Requestor
-
-## Limitations
-
--   Synchronous BDX transfer only
--   Does not check VID/PID
--   Only one transfer at a time
--   Does not check incoming UpdateTokens
--   Does not support the header defined in Matter Specification.
