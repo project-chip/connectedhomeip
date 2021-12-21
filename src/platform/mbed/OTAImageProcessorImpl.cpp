@@ -20,13 +20,36 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifdef BOOT_ENABLED
+#include "bootutil/bootutil.h"
+#include "secondary_bd.h"
+#endif
+
+#ifdef BOOT_ENABLED
+mbed::BlockDevice * get_secondary_bd()
+{
+    mbed::BlockDevice * default_bd = mbed::BlockDevice::get_default_instance();
+    static mbed::SlicingBlockDevice sliced_bd(default_bd, 0x0, MCUBOOT_SLOT_SIZE);
+    return &sliced_bd;
+}
+#endif
+
 using namespace ::chip::DeviceLayer::Internal;
 
 namespace chip {
 
+OTAImageProcessorImpl::OTAImageProcessorImpl()
+{
+#ifdef BOOT_ENABLED
+    // Set block device - memory for image update
+    mBlockDevice = get_secondary_bd();
+#endif
+}
+
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
     ChipLogProgress(SoftwareUpdate, "Prepare download");
+    ClearDownloadParams();
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -48,6 +71,7 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
     ChipLogProgress(SoftwareUpdate, "Abort");
+    ClearDownloadParams();
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 };
@@ -79,7 +103,12 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    // TODO mbed partition prepare
+#ifdef BOOT_ENABLED
+    // Initalize block device and erase update block
+    mBlockDevice->init();
+    mBlockDevice->erase(0, mBlockDevice->size());
+#endif
+
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -93,6 +122,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
 
     // TODO finalize image download
+    imageProcessor->mParams.totalFileBytes = imageProcessor->mParams.downloadedBytes;
     imageProcessor->ReleaseBlock();
     // ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
 }
@@ -106,7 +136,11 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    // TODO abort image download
+#ifdef BOOT_ENABLED
+    // Clear update image
+    mBlockDevice->erase(0, mBlockDevice->size());
+#endif
+
     imageProcessor->ReleaseBlock();
 }
 
@@ -123,7 +157,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
-    // TODO write image chunk
+
+#ifdef BOOT_ENABLED
+    // Write data to memory
+    mBlockDevice->program(imageProcessor->mBlock.data(), imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.size());
+#endif
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
     imageProcessor->mDownloader->FetchNextData();
 }
@@ -136,7 +174,14 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    // TODO apply update image
+
+#ifdef BOOT_ENABLED
+    auto ret = boot_set_pending_multi(/*image index*/ 0, /*permanent*/ 0);
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Setting the update candidate as pending failed: %d", ret);
+    }
+#endif
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
@@ -176,6 +221,12 @@ CHIP_ERROR OTAImageProcessorImpl::ReleaseBlock()
     }
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
+}
+
+void OTAImageProcessorImpl::ClearDownloadParams()
+{
+    mParams.downloadedBytes = 0;
+    mParams.totalFileBytes  = 0;
 }
 
 } // namespace chip

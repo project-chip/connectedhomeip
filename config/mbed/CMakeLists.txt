@@ -461,7 +461,7 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
 
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
-        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ClusterInterface.cpp
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     )
 
     list(APPEND CHIP_DEFINES 
