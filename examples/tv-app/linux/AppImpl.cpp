@@ -191,7 +191,7 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -241,7 +241,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
     return nullptr;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApp application)
+ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application application)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,

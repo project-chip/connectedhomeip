@@ -29,8 +29,8 @@ class ApplicationBasicManager
 {
 public:
     CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, Application * application);
-    Application getApplicationForEndpoint(chip::EndpointId endpoint);
+    void store(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Application * application);
+    chip::app::Clusters::ApplicationBasic::Application getApplicationForEndpoint(chip::EndpointId endpoint);
 
     static ApplicationBasicManager & GetInstance()
     {

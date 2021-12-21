@@ -18,6 +18,7 @@
 
 #include "KeypadInputManager.h"
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
@@ -41,8 +42,8 @@ exit:
     return err;
 }
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+chip::app::Clusters::KeypadInput::StatusEnum keypadInputClusterSendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
 {
     // TODO: Insert code here
-    return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
+    return chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
 }

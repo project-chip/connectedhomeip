@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app/util/af-types.h>
@@ -29,8 +30,8 @@ class MediaPlaybackManager
 public:
     CHIP_ERROR Init();
     void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState);
-    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                         uint64_t deltaPositionMilliseconds);
+    chip::app::Clusters::MediaPlayback::StatusEnum proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
+                                                                             uint64_t deltaPositionMilliseconds);
 
 private:
     uint8_t oldPlaybackState;

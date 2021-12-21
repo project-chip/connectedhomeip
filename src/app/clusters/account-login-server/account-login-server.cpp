@@ -51,8 +51,9 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::GetSetupPINRequest::DecodableType & commandData)
+bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::GetSetupPINRequest::DecodableType & commandData)
 {
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
 
@@ -63,7 +64,7 @@ bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * 
 }
 
 bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                             const Commands::LoginRequest::DecodableType & commandData)
+                                                    const Commands::LoginRequest::DecodableType & commandData)
 {
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
     auto & tempSetupPin          = commandData.setupPIN;
@@ -81,7 +82,7 @@ bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * comman
 }
 
 bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::LogoutRequest::DecodableType & commandData)
+                                                     const Commands::LogoutRequest::DecodableType & commandData)
 {
     bool isLoggedOut     = accountLoginClusterLogout();
     EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;

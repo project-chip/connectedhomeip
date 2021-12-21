@@ -186,17 +186,17 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     auto & data     = commandData.data;
     // TODO: Decode the paramater and pass it to delegate
     // auto searchIterator = commandData.search.begin();
-    std::list<ContentLaunchParamater> parameterList;
+    std::list<Paramater> parameterList;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        ContentLaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
+        LaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.contentLaunchStatus = resp.status;
-        response.data                = resp.data;
+        response.statusEnum = resp.statusEnum;
+        response.data       = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
@@ -225,17 +225,17 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     auto & displayString = commandData.displayString;
     // TODO: Decode the paramater and pass it to delegate
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
-    std::list<ContentLaunchBrandingInformation> brandingInformationList;
+    std::list<BrandingInformation> brandingInformationList;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        ContentLaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
+        LaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.contentLaunchStatus = resp.status;
-        response.data                = resp.data;
+        response.statusEnum = resp.statusEnum;
+        response.data       = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
