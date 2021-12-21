@@ -276,7 +276,7 @@ typedef struct _GroupInfo
 // Struct for GroupKey
 typedef struct _GroupKey
 {
-    uint16_t fabricIndex;
+    chip::FabricIndex fabricIndex;
     uint16_t groupId;
     uint16_t groupKeySetID;
 } GroupKey;
