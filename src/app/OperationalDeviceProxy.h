@@ -114,6 +114,13 @@ public:
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                        Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
 
+    /*
+     * Instantiate an operational device proxy with session and peer information
+     * generated elsewhere.
+     */
+    CHIP_ERROR Emplace(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config,
+                       const PeerId & peerId, SessionHolder & session);
+
     bool IsConnected() const { return mState == State::SecureConnected; }
 
     bool IsConnecting() const { return mState == State::Connecting; }
@@ -159,6 +166,14 @@ public:
      *   will load the device settings first, before making the changes.
      */
     CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
+
+    /**
+     *   Update data of the device.
+     *
+     *   Overload of UpdateDeviceData with optional MRP config.  Only stores
+     *   MRP config if that passed is non-empty.
+     */
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const Optional<ReliableMessageProtocolConfig> & config);
 
     PeerId GetPeerId() const { return mPeerId; }
 

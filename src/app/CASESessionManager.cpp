@@ -62,6 +62,21 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
     return err;
 }
 
+CHIP_ERROR CASESessionManager::EmplaceSession(const Transport::PeerAddress & addr,
+                                              const Optional<ReliableMessageProtocolConfig> & config, const PeerId & peerId,
+                                              SessionHolder & session)
+{
+    CHIP_ERROR err;
+    OperationalDeviceProxy * proxy = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId);
+    VerifyOrReturnError(proxy != nullptr, CHIP_ERROR_NO_MEMORY);
+    err = proxy->Emplace(addr, config, peerId, session);
+    if (err != CHIP_NO_ERROR)
+    {
+        ReleaseSession(proxy);
+    }
+    return err;
+}
+
 void CASESessionManager::ReleaseSession(PeerId peerId)
 {
     ReleaseSession(FindExistingSession(peerId));

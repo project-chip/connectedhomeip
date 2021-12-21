@@ -90,21 +90,38 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
     return err;
 }
 
+CHIP_ERROR OperationalDeviceProxy::Emplace(const Transport::PeerAddress & addr,
+                                           const Optional<ReliableMessageProtocolConfig> & config, const PeerId & peerId,
+                                           SessionHolder & session)
+{
+    mPeerId = peerId;
+    mState  = State::Initialized;
+    if (session && mInitParams.sessionManager->GetSecureSession(session.Get()))
+    {
+        mSecureSession.Grab(session.Get());
+        mState = State::SecureConnected;
+    }
+    return UpdateDeviceData(addr, config);
+}
+
 CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
-                                                    const ReliableMessageProtocolConfig & config)
+                                                    const Optional<ReliableMessageProtocolConfig> & config)
 {
     VerifyOrReturnLogError(mState != State::Uninitialized, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     mDeviceAddress = addr;
 
-    mMRPConfig = config;
-
-    // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
-    // It can be overridden by CASE session protocol messages that include MRP parameters.
-    if (mCASEClient)
+    if (config.HasValue())
     {
-        mCASEClient->SetMRPIntervals(mMRPConfig);
+        mMRPConfig = config.Value();
+
+        // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
+        // It can be overridden by CASE session protocol messages that include MRP parameters.
+        if (mCASEClient)
+        {
+            mCASEClient->SetMRPIntervals(mMRPConfig);
+        }
     }
 
     if (mState == State::NeedsAddress)
@@ -131,6 +148,12 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
     }
 
     return err;
+}
+
+CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress & addr,
+                                                    const ReliableMessageProtocolConfig & config)
+{
+    return UpdateDeviceData(addr, Optional<ReliableMessageProtocolConfig>(config));
 }
 
 bool OperationalDeviceProxy::GetAddress(Inet::IPAddress & addr, uint16_t & port) const
