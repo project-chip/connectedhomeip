@@ -116,7 +116,7 @@ CHIP_ERROR TCPEndPointImplLwIP::ConnectImpl(const IPAddress & addr, uint16_t por
         if (!addr.IsIPv6LinkLocal() || mState == State::kBound)
             return CHIP_ERROR_NOT_IMPLEMENTED;
 
-        res = intfId.GetLinkLocalAddr(&intfLLAddr);
+        res = PlatformNetworkInterface::GetLinkLocalAddr(intfId, &intfLLAddr);
         if (res != CHIP_NO_ERROR)
             return res;
 

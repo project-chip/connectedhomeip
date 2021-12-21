@@ -100,7 +100,7 @@ private:
             return true; // not a usable interface
         }
 
-        char name[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char name[chip::Inet::PlatformNetworkInterface::kMaxNameLength];
         if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
         {
             printf("!!!! FAILED TO GET INTERFACE NAME\n");

@@ -84,10 +84,10 @@ CHIP_ERROR IPv6Bind(int socket, const IPAddress & address, uint16_t port, Interf
 {
     struct sockaddr_in6 sa;
     memset(&sa, 0, sizeof(sa));
-    sa.sin6_family                        = AF_INET6;
-    sa.sin6_port                          = htons(port);
-    sa.sin6_addr                          = address.ToIPv6();
-    InterfaceId::PlatformType interfaceId = interface.GetPlatformInterface();
+    sa.sin6_family                             = AF_INET6;
+    sa.sin6_port                               = htons(port);
+    sa.sin6_addr                               = address.ToIPv6();
+    PlatformNetworkInterface::Type interfaceId = PlatformNetworkInterface::FromInterfaceId(interface);
     if (!CanCastTo<decltype(sa.sin6_scope_id)>(interfaceId))
     {
         return CHIP_ERROR_INCORRECT_STATE;
@@ -236,7 +236,7 @@ CHIP_ERROR UDPEndPointImplSockets::BindInterfaceImpl(IPAddressType addressType, 
     {
         // Start filtering on the passed interface.
         char interfaceName[IF_NAMESIZE];
-        if (if_indextoname(interfaceId.GetPlatformInterface(), interfaceName) == nullptr)
+        if (if_indextoname(PlatformNetworkInterface::FromInterfaceId(interfaceId), interfaceName) == nullptr)
         {
             status = CHIP_ERROR_POSIX(errno);
         }
@@ -315,10 +315,10 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
     msgHeader.msg_name = &peerSockAddr;
     if (mAddrType == IPAddressType::kIPv6)
     {
-        peerSockAddr.in6.sin6_family     = AF_INET6;
-        peerSockAddr.in6.sin6_port       = htons(aPktInfo->DestPort);
-        peerSockAddr.in6.sin6_addr       = aPktInfo->DestAddress.ToIPv6();
-        InterfaceId::PlatformType intfId = aPktInfo->Interface.GetPlatformInterface();
+        peerSockAddr.in6.sin6_family          = AF_INET6;
+        peerSockAddr.in6.sin6_port            = htons(aPktInfo->DestPort);
+        peerSockAddr.in6.sin6_addr            = aPktInfo->DestAddress.ToIPv6();
+        PlatformNetworkInterface::Type intfId = PlatformNetworkInterface::FromInterfaceId(aPktInfo->Interface);
         VerifyOrReturnError(CanCastTo<decltype(peerSockAddr.in6.sin6_scope_id)>(intfId), CHIP_ERROR_INCORRECT_STATE);
         peerSockAddr.in6.sin6_scope_id = static_cast<decltype(peerSockAddr.in6.sin6_scope_id)>(intfId);
         msgHeader.msg_namelen          = sizeof(sockaddr_in6);
@@ -355,8 +355,8 @@ CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, Sy
         msgHeader.msg_control    = controlData;
         msgHeader.msg_controllen = sizeof(controlData);
 
-        struct cmsghdr * controlHdr      = CMSG_FIRSTHDR(&msgHeader);
-        InterfaceId::PlatformType intfId = intf.GetPlatformInterface();
+        struct cmsghdr * controlHdr           = CMSG_FIRSTHDR(&msgHeader);
+        PlatformNetworkInterface::Type intfId = PlatformNetworkInterface::FromInterfaceId(intf);
 
 #if INET_CONFIG_ENABLE_IPV4
 
@@ -648,12 +648,13 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
                 if (controlHdr->cmsg_level == IPPROTO_IP && controlHdr->cmsg_type == IP_PKTINFO)
                 {
                     auto * inPktInfo = reinterpret_cast<struct in_pktinfo *> CMSG_DATA(controlHdr);
-                    if (!CanCastTo<InterfaceId::PlatformType>(inPktInfo->ipi_ifindex))
+                    if (!CanCastTo<PlatformNetworkInterface::Type>(inPktInfo->ipi_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
                         break;
                     }
-                    lPacketInfo.Interface   = InterfaceId(static_cast<InterfaceId::PlatformType>(inPktInfo->ipi_ifindex));
+                    lPacketInfo.Interface = PlatformNetworkInterface::ToInterfaceId(
+                        static_cast<PlatformNetworkInterface::Type>(inPktInfo->ipi_ifindex));
                     lPacketInfo.DestAddress = IPAddress(inPktInfo->ipi_addr);
                     continue;
                 }
@@ -664,12 +665,13 @@ void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
                 if (controlHdr->cmsg_level == IPPROTO_IPV6 && controlHdr->cmsg_type == IPV6_PKTINFO)
                 {
                     auto * in6PktInfo = reinterpret_cast<struct in6_pktinfo *> CMSG_DATA(controlHdr);
-                    if (!CanCastTo<InterfaceId::PlatformType>(in6PktInfo->ipi6_ifindex))
+                    if (!CanCastTo<PlatformNetworkInterface::Type>(in6PktInfo->ipi6_ifindex))
                     {
                         lStatus = CHIP_ERROR_INCORRECT_STATE;
                         break;
                     }
-                    lPacketInfo.Interface   = InterfaceId(static_cast<InterfaceId::PlatformType>(in6PktInfo->ipi6_ifindex));
+                    lPacketInfo.Interface = PlatformNetworkInterface::ToInterfaceId(
+                        static_cast<PlatformNetworkInterface::Type>(in6PktInfo->ipi6_ifindex));
                     lPacketInfo.DestAddress = IPAddress(in6PktInfo->ipi6_addr);
                     continue;
                 }
@@ -797,7 +799,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
 #ifdef IPV6_MULTICAST_IMPLEMENTED
-    const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
+    const PlatformNetworkInterface::Type lIfIndex = PlatformNetworkInterface::FromInterfaceId(aInterfaceId);
 
     struct ipv6_mreq lMulticastRequest;
     memset(&lMulticastRequest, 0, sizeof(lMulticastRequest));

@@ -169,7 +169,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     {
         NetworkInterface * ifp = new NetworkInterface();
 
-        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        interfaceIterator.GetInterfaceName(ifp->Name, Inet::PlatformNetworkInterface::kMaxNameLength);
         ifp->name            = CharSpan(ifp->Name, strlen(ifp->Name));
         ifp->fabricConnected = true;
         Inet::InterfaceType interfaceType;

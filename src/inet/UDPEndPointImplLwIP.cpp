@@ -133,9 +133,9 @@ CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, Interfa
 InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
-    return InterfaceId(netif_get_by_index(mUDP->netif_idx));
+    return PlatformNetworkInterface::ToInterfaceId(netif_get_by_index(mUDP->netif_idx));
 #else
-    return InterfaceId(mUDP->intf_filter);
+    return PlatformNetworkInterface::ToInterfaceId(mUDP->intf_filter);
 #endif
 }
 
@@ -208,7 +208,7 @@ CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System
     if (intfId.IsPresent())
     {
         lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort,
-                                intfId.GetPlatformInterface());
+                                PlatformNetworkInterface::FromInterfaceId(intfId));
     }
     else
     {
@@ -366,7 +366,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     {
         pktInfo->SrcAddress  = IPAddress(*addr);
         pktInfo->DestAddress = IPAddress(*ip_current_dest_addr());
-        pktInfo->Interface   = InterfaceId(ip_current_netif());
+        pktInfo->Interface   = PlatformNetworkInterface::ToInterfaceId(ip_current_netif());
         pktInfo->SrcPort     = port;
         pktInfo->DestPort    = pcb->local_port;
     }
@@ -456,13 +456,14 @@ struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterf
 #if defined(NETIF_FOREACH)
     NETIF_FOREACH(lRetval)
     {
-        if (lRetval == aInterfaceId.GetPlatformInterface())
+        if (lRetval == PlatformNetworkInterface::FromInterfaceId(aInterfaceId))
         {
             break;
         }
     }
 #else  // defined(NETIF_FOREACH)
-    for (lRetval = netif_list; lRetval != nullptr && lRetval != aInterfaceId.GetPlatformInterface(); lRetval = lRetval->next)
+    for (lRetval = netif_list; lRetval != nullptr && lRetval != PlatformNetworkInterface::FromInterfaceId(aInterfaceId);
+         lRetval = lRetval->next)
         ;
 #endif // defined(NETIF_FOREACH)
 

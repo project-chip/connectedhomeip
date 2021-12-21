@@ -460,8 +460,9 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service)
     std::string type       = GetFullType(service.mType, service.mProtocol);
     CHIP_ERROR error       = CHIP_NO_ERROR;
     AvahiStringList * text = nullptr;
-    AvahiIfIndex interface =
-        service.mInterface.IsPresent() ? static_cast<AvahiIfIndex>(service.mInterface.GetPlatformInterface()) : AVAHI_IF_UNSPEC;
+    AvahiIfIndex interface = service.mInterface.IsPresent()
+        ? static_cast<AvahiIfIndex>(Inet::PlatformNetworkInterface::FromInterfaceId(service.mInterface))
+        : AVAHI_IF_UNSPEC;
 
     keyBuilder << service.mName << "." << type << service.mPort << "." << interface;
     key = keyBuilder.str();
@@ -530,7 +531,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, DnssdServiceProtocol protocol, c
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = chip::Platform::New<BrowseContext>();
-    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
+    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(Inet::PlatformNetworkInterface::FromInterfaceId(interface));
 
     browseContext->mInstance    = this;
     browseContext->mContext     = context;
@@ -620,7 +621,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             service.mInterface     = Inet::InterfaceId::Null();
             if (interface != AVAHI_IF_UNSPEC)
             {
-                service.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+                service.mInterface = Inet::PlatformNetworkInterface::ToInterfaceId(interface);
             }
             service.mType[kDnssdTypeMaxSize] = 0;
             context->mServices.push_back(service);
@@ -652,7 +653,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
                               void * context)
 {
     AvahiServiceResolver * resolver;
-    AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface.GetPlatformInterface());
+    AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(Inet::PlatformNetworkInterface::FromInterfaceId(interface));
     ResolveContext * resolveContext = chip::Platform::New<ResolveContext>();
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
@@ -730,7 +731,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mTtlSeconds = AVAHI_DEFAULT_TTL_HOST_NAME;
         if (interface != AVAHI_IF_UNSPEC)
         {
-            result.mInterface = static_cast<chip::Inet::InterfaceId>(interface);
+            result.mInterface = Inet::PlatformNetworkInterface::ToInterfaceId(interface);
         }
         Platform::CopyString(result.mHostName, host_name);
         // Returned value is full QName, want only host part.

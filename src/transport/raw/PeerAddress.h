@@ -113,15 +113,15 @@ public:
 
     /// Maximum size of the string outputes by ToString. Format is of the form:
     /// "UDP:<ip>:<port>"
-    static constexpr size_t kMaxToStringSize = 3 // type: UDP/TCP/BLE
-        + 1                                      // splitter :
-        + 2                                      // brackets around address
-        + Inet::IPAddress::kMaxStringLength      // address
-        + 1                                      // splitter %
-        + Inet::InterfaceId::kMaxIfNameLength    // interface
-        + 1                                      // splitter :
-        + 5                                      // port: 16 bit interger
-        + 1;                                     // NullTerminator
+    static constexpr size_t kMaxToStringSize = 3         // type: UDP/TCP/BLE
+        + 1                                              // splitter :
+        + 2                                              // brackets around address
+        + Inet::IPAddress::kMaxStringLength              // address
+        + 1                                              // splitter %
+        + Inet::PlatformNetworkInterface::kMaxNameLength // interface
+        + 1                                              // splitter :
+        + 5                                              // port: 16 bit interger
+        + 1;                                             // NullTerminator
 
     template <size_t N>
     inline void ToString(char (&buf)[N]) const
@@ -133,12 +133,12 @@ public:
     {
         char ip_addr[Inet::IPAddress::kMaxStringLength];
 
-        char interface[Inet::InterfaceId::kMaxIfNameLength + 1] = {}; // +1 to prepend '%'
+        char interface[Inet::PlatformNetworkInterface::kMaxNameLength + 1] = {}; // +1 to prepend '%'
         if (mInterface.IsPresent())
         {
             interface[0]   = '%';
             interface[1]   = 0;
-            CHIP_ERROR err = mInterface.GetInterfaceName(interface + 1, sizeof(interface) - 1);
+            CHIP_ERROR err = Inet::PlatformNetworkInterface::GetInterfaceName(mInterface, interface + 1, sizeof(interface) - 1);
             if (err != CHIP_NO_ERROR)
             {
                 Platform::CopyString(interface, sizeof(interface), "%(err)");
