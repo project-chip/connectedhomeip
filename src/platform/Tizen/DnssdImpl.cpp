@@ -217,7 +217,7 @@ void OnBrowseAdd(BrowseContext * context, dnssd_service_h service, const char * 
 
     char * tokens  = strdup(type);
     char * regtype = strtok(tokens, ".");
-    chip::Inet::InterfaceId platformInterface(interfaceId);
+    chip::Inet::InterfaceId platformInterface(chip::Inet::PlatformNetworkInterface::ToInterfaceId(interfaceId));
 
     DnssdService mdnsService = {};
     g_strlcpy(mdnsService.mType, regtype, sizeof(mdnsService.mType));
@@ -238,7 +238,7 @@ void OnBrowseRemove(BrowseContext * context, dnssd_service_h service, const char
     auto it = std::remove_if(
         context->services.begin(), context->services.end(), [name, type, interfaceId](const DnssdService & mdnsService) {
             return strcmp(name, mdnsService.mName) == 0 && type == GetFullType(mdnsService.mType, mdnsService.mProtocol) &&
-                interfaceId == mdnsService.mInterface.GetPlatformInterface();
+                interfaceId == chip::Inet::PlatformNetworkInterface::FromInterfaceId(mdnsService.mInterface);
         });
 
     context->services.erase(it);
@@ -731,8 +731,9 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 
     std::string regtype = GetFullType(service->mType, service->mProtocol);
 
-    return RegisterService(regtype.c_str(), service->mName, service->mPort, service->mInterface.GetPlatformInterface(),
-                           service->mTextEntries, service->mTextEntrySize);
+    return RegisterService(regtype.c_str(), service->mName, service->mPort,
+                           chip::Inet::PlatformNetworkInterface::FromInterfaceId(service->mInterface), service->mTextEntries,
+                           service->mTextEntrySize);
 }
 
 CHIP_ERROR ChipDnssdRemoveServices()
@@ -754,7 +755,7 @@ CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chi
 
     std::string regtype = GetFullType(type, protocol);
 
-    return Browse(interfaceId.GetPlatformInterface(), regtype.c_str(), protocol, callback, context);
+    return Browse(chip::Inet::PlatformNetworkInterface::FromInterfaceId(interfaceId), regtype.c_str(), protocol, callback, context);
 }
 
 CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId interfaceId, DnssdResolveCallback callback,
@@ -765,7 +766,8 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, chip::Inet::InterfaceId inte
 
     std::string regtype = GetFullType(service->mType, service->mProtocol);
 
-    return Resolve(interfaceId.GetPlatformInterface(), regtype.c_str(), service->mName, callback, context);
+    return Resolve(chip::Inet::PlatformNetworkInterface::FromInterfaceId(interfaceId), regtype.c_str(), service->mName, callback,
+                   context);
 }
 
 void GetDnssdTimeout(timeval & timeout)

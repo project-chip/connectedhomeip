@@ -209,7 +209,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
             struct ::ifreq ifr;
             memset(&ifr, 0, sizeof(ifr));
 
-            ReturnErrorOnFailure(intfId.GetInterfaceName(ifr.ifr_name, sizeof(ifr.ifr_name)));
+            ReturnErrorOnFailure(PlatformNetworkInterface::GetInterfaceName(intfId, ifr.ifr_name, sizeof(ifr.ifr_name)));
 
             // Attempt to bind to the interface using SO_BINDTODEVICE which requires privileged access.
             // If the permission is denied(EACCES) because CHIP is running in a context
@@ -254,7 +254,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         sa.in6.sin6_port     = htons(port);
         sa.in6.sin6_flowinfo = 0;
         sa.in6.sin6_addr     = addr.ToIPv6();
-        sa.in6.sin6_scope_id = intfId.GetPlatformInterface();
+        sa.in6.sin6_scope_id = PlatformNetworkInterface::FromInterfaceId(intfId);
         sockaddrsize         = sizeof(sockaddr_in6);
         sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
@@ -368,7 +368,7 @@ CHIP_ERROR TCPEndPointImplSockets::GetInterfaceId(InterfaceId * retInterface)
     {
         if (IPAddress(sa.in6.sin6_addr).IsIPv6LinkLocal())
         {
-            *retInterface = InterfaceId(sa.in6.sin6_scope_id);
+            *retInterface = PlatformNetworkInterface::ToInterfaceId(sa.in6.sin6_scope_id);
         }
         else
         {

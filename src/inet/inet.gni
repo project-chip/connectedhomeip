@@ -29,7 +29,14 @@ declare_args() {
   # Inet implementation type.
   if (chip_system_config_use_lwip) {
     chip_system_config_inet = "LwIP"
+    chip_system_config_inet_interface = "LwIP"
+    assert(chip_system_config_event_loop == "LwIP", "Unsupported combination")
   } else {
     chip_system_config_inet = "Sockets"
+    if (current_os == "zephyr") {
+      chip_system_config_inet_interface = "Zephyr"
+    } else {
+      chip_system_config_inet_interface = "IFAddrs"
+    }
   }
 }

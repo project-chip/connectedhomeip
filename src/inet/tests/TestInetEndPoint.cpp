@@ -127,7 +127,7 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 {
     InterfaceIterator intIterator;
     InterfaceAddressIterator addrIterator;
-    char intName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intName[chip::Inet::PlatformNetworkInterface::kMaxNameLength];
     InterfaceId intId;
     IPAddress addr;
     InterfaceType intType;
@@ -140,20 +140,20 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 
 #ifndef __MBED__
     // Mbed interface name has different format
-    err = InterfaceId::InterfaceNameToId("0", intId);
+    err = PlatformNetworkInterface::InterfaceNameToId("0", intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 #endif
 
-    err = InterfaceId::Null().GetInterfaceName(intName, 0);
+    err = PlatformNetworkInterface::GetInterfaceName(InterfaceId::Null(), intName, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
+    err = PlatformNetworkInterface::GetInterfaceName(InterfaceId::Null(), intName, sizeof(intName));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR && intName[0] == '\0');
 
     intId = InterfaceId::FromIPAddress(addr);
     NL_TEST_ASSERT(inSuite, !intId.IsPresent());
 
-    err = intId.GetLinkLocalAddr(nullptr);
+    err = PlatformNetworkInterface::GetLinkLocalAddr(intId, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 
     printf("    Interfaces:\n");
@@ -165,15 +165,10 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         err = intIterator.GetInterfaceName(intName, sizeof(intName));
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-               reinterpret_cast<uintptr_t>(intId.GetPlatformInterface()),
-#else
-               static_cast<uintptr_t>(intId.GetPlatformInterface()),
-#endif
-               intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
-               intIterator.HasBroadcastAddress() ? "has" : "no");
+               intId.GetInternalId(), intName, intIterator.IsUp() ? "UP" : "DOWN",
+               intIterator.SupportsMulticast() ? "supports" : "no", intIterator.HasBroadcastAddress() ? "has" : "no");
 
-        intId.GetLinkLocalAddr(&addr);
+        PlatformNetworkInterface::GetLinkLocalAddr(intId, &addr);
         InterfaceId::MatchLocalIPv6Subnet(addr);
 
         // Not all platforms support getting interface type and hardware address
@@ -221,14 +216,8 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
         printf("     %s/%d, interface id: 0x%" PRIxPTR
                ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               addrStr, addrWithPrefix.Length,
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-               reinterpret_cast<uintptr_t>(intId.GetPlatformInterface()),
-#else
-               static_cast<uintptr_t>(intId.GetPlatformInterface()),
-#endif
-               intName, addrIterator.IsUp() ? "UP" : "DOWN", addrIterator.SupportsMulticast() ? "supports" : "no",
-               addrIterator.HasBroadcastAddress() ? "has" : "no");
+               addrStr, addrWithPrefix.Length, intId.GetInternalId(), intName, addrIterator.IsUp() ? "UP" : "DOWN",
+               addrIterator.SupportsMulticast() ? "supports" : "no", addrIterator.HasBroadcastAddress() ? "has" : "no");
     }
     NL_TEST_ASSERT(inSuite, !addrIterator.Next());
     NL_TEST_ASSERT(inSuite, addrIterator.GetAddress(addr) == CHIP_ERROR_SENTINEL);
@@ -264,7 +253,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, SYSTEM_STATS_TEST_IN_USE(System::Stats::kInetLayer_NumUDPEps, 1));
 
-    err = InterfaceId::Null().GetLinkLocalAddr(&addr);
+    err = PlatformNetworkInterface::GetLinkLocalAddr(InterfaceId::Null(), &addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     intId = InterfaceId::FromIPAddress(addr);
     NL_TEST_ASSERT(inSuite, intId.IsPresent());

@@ -187,7 +187,7 @@ public:
         info->SrcAddress.ToString(addr, sizeof(addr));
 
         char ifName[64];
-        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+        VerifyOrDie(Inet::PlatformNetworkInterface::GetInterfaceName(info->Interface, ifName, sizeof(ifName)) == CHIP_NO_ERROR);
 
         printf("QUERY from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("QUERY: ", data);
@@ -199,7 +199,7 @@ public:
         info->SrcAddress.ToString(addr, sizeof(addr));
 
         char ifName[64];
-        VerifyOrDie(info->Interface.GetInterfaceName(ifName, sizeof(ifName)) == CHIP_NO_ERROR);
+        VerifyOrDie(Inet::PlatformNetworkInterface::GetInterfaceName(info->Interface, ifName, sizeof(ifName)) == CHIP_NO_ERROR);
 
         printf("RESPONSE from: %-15s on port %d, via interface %s\n", addr, info->SrcPort, ifName);
         Report("RESPONSE: ", data);

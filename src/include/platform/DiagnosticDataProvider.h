@@ -44,7 +44,7 @@ struct ThreadMetrics : public app::Clusters::SoftwareDiagnostics::Structs::Threa
 
 struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
 {
-    char Name[Inet::InterfaceId::kMaxIfNameLength];
+    char Name[Inet::PlatformNetworkInterface::kMaxNameLength];
     uint8_t MacAddress[kMaxHardwareAddrSize];
     NetworkInterface * Next; /* Pointer to the next structure.  */
 };

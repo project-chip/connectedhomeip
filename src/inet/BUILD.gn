@@ -54,13 +54,36 @@ buildconfig_header("inet_buildconfig") {
         [ "INET_PLATFORM_CONFIG_INCLUDE=${chip_inet_platform_config_include}" ]
   }
 
-  defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
+  defines += [
+    "INET_INTERFACE_IMPL_CONFIG_FILE=<inet/InetInterfaceImpl${chip_system_config_inet_interface}.h>",
+    "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>",
+  ]
   if (chip_system_config_use_open_thread_udp) {
     defines += [
       "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl_OpenThread.h>",
     ]
   } else {
     defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
+  }
+
+  if (chip_system_config_inet_interface == "LwIP") {
+    defines += [
+      "CHIP_SYSTEM_CONFIG_USE_LWIP=1",
+      "CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0",
+      "CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0",
+    ]
+  } else if (chip_system_config_inet_interface == "IFAddrs") {
+    defines += [
+      "CHIP_SYSTEM_CONFIG_USE_LWIP=0",
+      "CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=1",
+      "CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0",
+    ]
+  } else if (chip_system_config_inet_interface == "Zephyr") {
+    defines += [
+      "CHIP_SYSTEM_CONFIG_USE_LWIP=0",
+      "CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS=0",
+      "CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=1",
+    ]
   }
 }
 
@@ -97,6 +120,8 @@ static_library("inet") {
     "InetFaultInjection.h",
     "InetInterface.cpp",
     "InetInterface.h",
+    "InetInterfaceImpl${chip_system_config_inet_interface}.cpp",
+    "InetInterfaceImpl${chip_system_config_inet_interface}.h",
     "InetLayer.h",
     "arpa-inet-compatibility.h",
   ]

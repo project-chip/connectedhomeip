@@ -175,7 +175,7 @@ void ShutdownSystemLayer()
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static void PrintNetworkState()
 {
-    char intfName[chip::Inet::InterfaceId::kMaxIfNameLength];
+    char intfName[chip::Inet::PlatformNetworkInterface::kMaxNameLength];
 
     for (size_t j = 0; j < gNetworkOptions.TapDeviceName.size(); j++)
     {
@@ -188,7 +188,7 @@ static void PrintNetworkState()
 
         TapInterface * tapIF = &(sTapIFs[j]);
 #endif // CHIP_TARGET_STYLE_UNIX
-        InterfaceId(netIF).GetInterfaceName(intfName, sizeof(intfName));
+        chip::Inet::PlatformNetworkInterface::GetInterfaceName(netIF, intfName, sizeof(intfName));
 
         printf("LwIP interface ready\n");
         printf("  Interface Name: %s\n", intfName);

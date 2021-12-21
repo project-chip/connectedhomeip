@@ -1123,7 +1123,7 @@ void ConnectivityManagerImpl::PostNetworkConnect()
     // This should be removed or find a better place once we depercate the rendezvous session.
     for (chip::Inet::InterfaceAddressIterator it; it.HasCurrent(); it.Next())
     {
-        char ifName[chip::Inet::InterfaceId::kMaxIfNameLength];
+        char ifName[chip::Inet::PlatformNetworkInterface::kMaxNameLength];
         if (it.IsUp() && CHIP_NO_ERROR == it.GetInterfaceName(ifName, sizeof(ifName)) &&
             strncmp(ifName, sWiFiIfName, sizeof(ifName)) == 0)
         {

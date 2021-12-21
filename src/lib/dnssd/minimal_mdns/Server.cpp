@@ -236,8 +236,8 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoin
         CHIP_ERROR err = JoinMulticastGroup(interfaceId, listenUdp, addressType);
         if (err != CHIP_NO_ERROR)
         {
-            char interfaceName[chip::Inet::InterfaceId::kMaxIfNameLength];
-            interfaceId.GetInterfaceName(interfaceName, sizeof(interfaceName));
+            char interfaceName[chip::Inet::PlatformNetworkInterface::kMaxNameLength];
+            chip::Inet::PlatformNetworkInterface::GetInterfaceName(interfaceId, interfaceName, sizeof(interfaceName));
 
             // Log only as non-fatal error. Failure to join will mean we reply to unicast queries only.
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,

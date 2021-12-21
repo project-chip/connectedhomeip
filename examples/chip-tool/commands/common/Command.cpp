@@ -123,7 +123,7 @@ static bool ParseAddressWithInterface(const char * addressString, Command::Addre
     {
         struct sockaddr_in6 * addr = reinterpret_cast<struct sockaddr_in6 *>(result->ai_addr);
         address->address           = ::chip::Inet::IPAddress::FromSockAddr(*addr);
-        address->interfaceId       = ::chip::Inet::InterfaceId(addr->sin6_scope_id);
+        address->interfaceId       = ::chip::Inet::PlatformNetworkInterface::ToInterfaceId(addr->sin6_scope_id);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (result->ai_family == AF_INET)
