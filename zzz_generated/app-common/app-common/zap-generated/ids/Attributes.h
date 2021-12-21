@@ -2594,29 +2594,9 @@ namespace InstalledClosedLimitTilt {
 static constexpr AttributeId Id = 0x00000013;
 } // namespace InstalledClosedLimitTilt
 
-namespace VelocityLift {
-static constexpr AttributeId Id = 0x00000014;
-} // namespace VelocityLift
-
-namespace AccelerationTimeLift {
-static constexpr AttributeId Id = 0x00000015;
-} // namespace AccelerationTimeLift
-
-namespace DecelerationTimeLift {
-static constexpr AttributeId Id = 0x00000016;
-} // namespace DecelerationTimeLift
-
 namespace Mode {
 static constexpr AttributeId Id = 0x00000017;
 } // namespace Mode
-
-namespace IntermediateSetpointsLift {
-static constexpr AttributeId Id = 0x00000018;
-} // namespace IntermediateSetpointsLift
-
-namespace IntermediateSetpointsTilt {
-static constexpr AttributeId Id = 0x00000019;
-} // namespace IntermediateSetpointsTilt
 
 namespace SafetyStatus {
 static constexpr AttributeId Id = 0x0000001A;

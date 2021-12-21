@@ -1058,22 +1058,24 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestWindowCovering : CHIPWindowCovering
 
 - (void)writeAttributeTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeConfigStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeOperationalStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeEndProductTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeInstalledOpenLimitLiftWithValue:(NSNumber * _Nonnull)value
                                     completionHandler:(StatusCompletion)completionHandler;
