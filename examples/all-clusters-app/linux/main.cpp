@@ -18,9 +18,15 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 
 #include "AppMain.h"
+
+using namespace chip;
+using namespace chip::app;
+using namespace chip::DeviceLayer;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
@@ -28,17 +34,17 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
     return true;
 }
 
-void OnIdentifyStart(Identify *)
+void OnIdentifyStart(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStart");
 }
 
-void OnIdentifyStop(Identify *)
+void OnIdentifyStop(::Identify *)
 {
     ChipLogProgress(Zcl, "OnIdentifyStop");
 }
 
-void OnTriggerEffect(Identify * identify)
+void OnTriggerEffect(::Identify * identify)
 {
     switch (identify->mCurrentEffectIdentifier)
     {
@@ -67,6 +73,34 @@ static Identify gIdentify0 = {
 static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
+
+// Network commissioning
+namespace {
+// This file is being used by platforms other than Linux, so we need this check to disable related features since we only
+// implemented them on linux.
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+NetworkCommissioning::LinuxThreadDriver sLinuxThreadDriver;
+Clusters::NetworkCommissioning::Instance sThreadNetworkCommissioningInstance(0 /* Endpoint Id */, &sLinuxThreadDriver);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+NetworkCommissioning::LinuxWiFiDriver sLinuxWiFiDriver;
+Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(1 /* Endpoint Id */, &sLinuxWiFiDriver);
+#endif
+#endif
+} // namespace
+
+void ApplicationInit()
+{
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_SERVER)
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    sThreadNetworkCommissioningInstance.Init();
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    sWiFiNetworkCommissioningInstance.Init();
+#endif
+#endif
+}
 
 int main(int argc, char * argv[])
 {

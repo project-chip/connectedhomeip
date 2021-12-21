@@ -21,11 +21,17 @@
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/Linux/NetworkCommissioningDriver.h>
 #include <platform/PlatformManager.h>
 #include <platform/ThreadStackManager.h>
 
+#include <nlbyteorder.hpp>
+#include <nlio-byteorder.hpp>
+#include <nlio.hpp>
+
 using namespace ::chip::app;
 using namespace ::chip::app::Clusters;
+using namespace chip::DeviceLayer::NetworkCommissioning;
 
 namespace chip {
 namespace DeviceLayer {
@@ -232,8 +238,15 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(ByteSpan & netInfo)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
 
     {
+        // TODO: The following code does not works actually, since otbr-posix does not emit signals for properties changes. Which is
+        // required for gdbus to caching properties.
         std::unique_ptr<GVariant, GVariantDeleter> value(
             openthread_io_openthread_border_router_dup_active_dataset_tlvs(mProxy.get()));
+        if (value == nullptr)
+        {
+            netInfo = ByteSpan();
+            return CHIP_ERROR_KEY_NOT_FOUND;
+        }
         GBytes * bytes = g_variant_get_data_as_bytes(value.get());
         gsize size;
         const uint8_t * data = reinterpret_cast<const uint8_t *>(g_bytes_get_data(bytes, &size));
@@ -276,20 +289,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        std::unique_ptr<GError, GErrorDeleter> err;
-        gboolean result =
-            openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
-        if (err)
-        {
-            ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", err->message);
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        if (!result)
-        {
-            ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", "return false");
-            return CHIP_ERROR_INTERNAL;
-        }
+        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadAttachFinished, this);
     }
     else
     {
@@ -309,6 +309,41 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
         }
     }
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+    std::unique_ptr<GVariant, GVariantDeleter> attachRes;
+    std::unique_ptr<GError, GErrorDeleter> err;
+    {
+        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res,
+                                                                                    &MakeUniquePointerReceiver(err).Get());
+        if (!result)
+        {
+            ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
+                         err == nullptr ? "unknown error" : err->message);
+            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+                if (this_->mpConnectCallback != nullptr)
+                {
+                    // TODO: Replace this with actual thread attach result.
+                    this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kUnknownError, CharSpan(), 0);
+                    this_->mpConnectCallback = nullptr;
+                }
+            });
+        }
+        else
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+                if (this_->mpConnectCallback != nullptr)
+                {
+                    // TODO: Replace this with actual thread attach result.
+                    this_->mpConnectCallback->OnResult(NetworkCommissioning::Status::kSuccess, CharSpan(), 0);
+                    this_->mpConnectCallback = nullptr;
+                }
+            });
+        }
+    }
 }
 
 ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceType()
@@ -472,6 +507,109 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::StartThreadScan(ThreadDriver::ScanCallback * callback)
+{
+    // There is another ongoing scan request, reject the new one.
+    VerifyOrReturnError(mpScanCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    mpScanCallback = callback;
+    openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
+    return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+    this_->_OnNetworkScanFinished(res);
+}
+
+void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
+{
+    std::unique_ptr<GVariant, GVariantDeleter> scan_result;
+    std::unique_ptr<GError, GErrorDeleter> err;
+    {
+        gboolean result = openthread_io_openthread_border_router_call_scan_finish(
+            mProxy.get(), &MakeUniquePointerReceiver(scan_result).Get(), res, &MakeUniquePointerReceiver(err).Get());
+        if (!result)
+        {
+            ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
+                         err == nullptr ? "unknown error" : err->message);
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                if (mpScanCallback != nullptr)
+                {
+                    LinuxScanResponseIterator<ThreadScanResponse> iter(nullptr);
+                    mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), &iter);
+                }
+                mpScanCallback = nullptr;
+            });
+        }
+    }
+
+    std::vector<NetworkCommissioning::ThreadScanResponse> * scanResult =
+        new std::vector<NetworkCommissioning::ThreadScanResponse>();
+
+    if (g_variant_n_children(scan_result.get()) > 0)
+    {
+        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
+        if (!iter)
+            return;
+
+        guint64 ext_address;
+        const gchar * network_name;
+        guint64 ext_panid;
+        const gchar * steering_data;
+        guint16 panid;
+        guint16 joiner_udp_port;
+        guint8 channel;
+        guint8 rssi;
+        guint8 lqi;
+        guint8 version;
+        gboolean is_native;
+        gboolean is_joinable;
+
+        while (g_variant_iter_loop(iter.get(), "(tstayqqyyyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
+                                   &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
+        {
+            ChipLogProgress(DeviceLayer,
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %" PRIu8
+                            " Version %" PRIu8,
+                            network_name, ext_address, ext_panid, rssi, lqi, version);
+            NetworkCommissioning::ThreadScanResponse networkScanned;
+            networkScanned.panId         = panid;
+            networkScanned.extendedPanId = ext_panid;
+            size_t networkNameLen        = strlen(network_name);
+            if (networkNameLen > 16)
+            {
+                ChipLogProgress(DeviceLayer, "Network name is too long, ignore it.");
+                continue;
+            }
+            networkScanned.networkNameLen = static_cast<uint8_t>(networkNameLen);
+            memcpy(networkScanned.networkName, network_name, networkNameLen);
+            networkScanned.channel         = channel;
+            networkScanned.version         = version;
+            networkScanned.extendedAddress = 0;
+            networkScanned.rssi            = rssi;
+            networkScanned.lqi             = lqi;
+
+            scanResult->push_back(networkScanned);
+        }
+    }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([this, scanResult]() {
+        // Note: We cannot post a event in ScheduleLambda since std::vector is not trivial copiable. This results in the use of
+        // const_cast but should be fine for almost all cases, since we actually handled the ownership of this element to this
+        // lambda.
+        if (mpScanCallback != nullptr)
+        {
+            LinuxScanResponseIterator<NetworkCommissioning::ThreadScanResponse> iter(
+                const_cast<std::vector<ThreadScanResponse> *>(scanResult));
+            mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+            mpScanCallback = nullptr;
+        }
+        delete const_cast<std::vector<ThreadScanResponse> *>(scanResult);
+    });
+}
+
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
@@ -496,6 +634,19 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     }
 
     return err;
+}
+
+CHIP_ERROR
+ThreadStackManagerImpl::AttachToThreadNetwork(ByteSpan netInfo,
+                                              NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * callback)
+{
+    // There is another ongoing connect request, reject the new one.
+    VerifyOrReturnError(mpConnectCallback == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(netInfo));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+    mpConnectCallback = callback;
+    return CHIP_NO_ERROR;
 }
 
 ThreadStackManager & ThreadStackMgr()

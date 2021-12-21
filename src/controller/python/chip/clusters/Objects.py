@@ -8234,6 +8234,13 @@ class NetworkCommissioning(Cluster):
             kIPBindFailed = 0x0B
             kUnknownError = 0x0C
 
+        class WiFiBand(IntEnum):
+            k2g4 = 0x00
+            k3g65 = 0x01
+            k5g = 0x02
+            k6g = 0x03
+            k60g = 0x04
+
 
     class Structs:
         @dataclass
@@ -8284,7 +8291,7 @@ class NetworkCommissioning(Cluster):
                             ClusterObjectFieldDescriptor(Label="ssid", Tag=2, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="bssid", Tag=3, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="channel", Tag=4, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="wiFiBand", Tag=5, Type=NetworkCommissioning.Enums.WiFiBand),
                             ClusterObjectFieldDescriptor(Label="rssi", Tag=6, Type=int),
                     ])
 
@@ -8292,7 +8299,7 @@ class NetworkCommissioning(Cluster):
             ssid: 'bytes' = b""
             bssid: 'bytes' = b""
             channel: 'uint' = 0
-            wiFiBand: 'uint' = 0
+            wiFiBand: 'NetworkCommissioning.Enums.WiFiBand' = 0
             rssi: 'int' = 0
 
 
