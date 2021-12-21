@@ -51,5 +51,5 @@ tests:
           values:
               - name: "data"
                 value: "data response"
-              - name: "status"
+              - name: "statusEnum"
                 value: 0
