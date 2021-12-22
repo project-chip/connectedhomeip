@@ -22,7 +22,6 @@
 
 #ifdef BOOT_ENABLED
 #include "bootutil/bootutil.h"
-#include "secondary_bd.h"
 #endif
 
 #ifdef BOOT_ENABLED
@@ -103,12 +102,13 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-#ifdef BOOT_ENABLED
-    // Initalize block device and erase update block
-    mBlockDevice->init();
-    mBlockDevice->erase(0, mBlockDevice->size());
-#endif
-
+    auto ret = imageProcessor->PrepareMemory();
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Prepare download memory failed");
+        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_NO_MEMORY);
+        return;
+    }
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -121,10 +121,9 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    // TODO finalize image download
     imageProcessor->mParams.totalFileBytes = imageProcessor->mParams.downloadedBytes;
     imageProcessor->ReleaseBlock();
-    // ChipLogProgress(SoftwareUpdate, "OTA image downloaded to offset 0x%x", imageProcessor->mOTAUpdatePartition->address);
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded size %lldB", imageProcessor->mParams.totalFileBytes);
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -136,10 +135,11 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-#ifdef BOOT_ENABLED
-    // Clear update image
-    mBlockDevice->erase(0, mBlockDevice->size());
-#endif
+    auto ret = imageProcessor->ClearMemory();
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Clear download memory failed");
+    }
 
     imageProcessor->ReleaseBlock();
 }
@@ -158,11 +158,11 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-#ifdef BOOT_ENABLED
-    // Write data to memory
-    mBlockDevice->program(imageProcessor->mBlock.data(), imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.size());
-#endif
-    imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
+    auto ret = imageProcessor->ProgramMemory();
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Program download memory failed");
+    }
     imageProcessor->mDownloader->FetchNextData();
 }
 
@@ -227,6 +227,63 @@ void OTAImageProcessorImpl::ClearDownloadParams()
 {
     mParams.downloadedBytes = 0;
     mParams.totalFileBytes  = 0;
+}
+
+int OTAImageProcessorImpl::PrepareMemory()
+{
+    int ret = 0;
+
+#ifdef BOOT_ENABLED
+    // Initalize block device and erase update block
+    ret = mBlockDevice->init();
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Block device initalization failed [%d]", ret);
+        return ret;
+    }
+    mBlockDevice->erase(0, mBlockDevice->size());
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Erase block device failed [%d]", ret);
+        return ret;
+    }
+#endif
+
+    return ret;
+}
+
+int OTAImageProcessorImpl::ClearMemory()
+{
+    int ret = 0;
+
+#ifdef BOOT_ENABLED
+    mBlockDevice->erase(0, mBlockDevice->size());
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Erase block device failed [%d]", ret);
+        return ret;
+    }
+#endif
+
+    return ret;
+}
+
+int OTAImageProcessorImpl::ProgramMemory()
+{
+    int ret = 0;
+
+#ifdef BOOT_ENABLED
+    // Write data to memory
+    ret = mBlockDevice->program(mBlock.data(), mParams.downloadedBytes, mBlock.size());
+    if (ret)
+    {
+        ChipLogError(SoftwareUpdate, "Block device program failed [%d]", ret);
+        return ret;
+    }
+    mParams.downloadedBytes += mBlock.size();
+#endif
+
+    return ret;
 }
 
 } // namespace chip

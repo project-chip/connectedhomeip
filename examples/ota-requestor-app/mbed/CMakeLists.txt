@@ -54,7 +54,6 @@ target_include_directories(${APP_TARGET} PRIVATE
 
 target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/OTARequestorDriverImpl.cpp
     ${MBED_COMMON}/util/LEDWidget.cpp
@@ -71,6 +70,11 @@ target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-e
 
 if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
+endif()
+
+if("capsense" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ./capsense_build)
+    target_link_libraries(${APP_TARGET} capsense)
 endif()
 
 mbed_set_post_build(${APP_TARGET})

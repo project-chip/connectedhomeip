@@ -28,11 +28,8 @@ struct AppEvent
 {
     enum AppEventTypes
     {
-        kEventType_ota_provider_announce = 0,
-        kEventType_ota_provider_connect,
-        kEventType_ota_provider_response,
-        kEventType_ota_download_completed,
-        kEventType_ota_download_failed,
+        kEventType_ota_update_available = 0,
+        kEventType_ota_apply_download
     };
 
     uint16_t Type;
