@@ -108,6 +108,16 @@ config CHIP_OTA_REQUESTOR
 	  Device Firmware Upgrade by quering and downloading a new firmware image
 	  from an external OTA Provider node.
 
+config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
+	int "Interval of saving node operation time to flash in hours unit"
+	default 10
+	range 1 4294967295
+	help
+	  Interval in hours with which the node operation time is saved to the flash
+	  memory. Selected value is a trade off between performing frequent saves to know
+	  precisely operation time in case of device reboot and maximizing flash memory
+	  lifetime.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y
