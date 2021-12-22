@@ -40,10 +40,6 @@
 #include "Rpc.h"
 #endif
 
-extern "C" {
-void * __dso_handle = 0;
-}
-
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;

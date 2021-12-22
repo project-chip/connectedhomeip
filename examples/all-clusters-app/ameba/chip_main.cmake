@@ -129,6 +129,7 @@ list(
     ${chip_dir}/examples/all-clusters-app/ameba/main/CHIPDeviceManager.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/Globals.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/LEDWidget.cpp
+    ${chip_dir}/examples/all-clusters-app/ameba/main/DsoHack.cpp
 )
 
 add_library(
