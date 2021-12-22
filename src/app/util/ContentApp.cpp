@@ -46,9 +46,8 @@ namespace AppPlatform {
 EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer,
                                               uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer,
-                    "Read Attribute for device %s cluster " ChipLogFormatClusterId " attribute=" ChipLogFormatAttributeId,
-                    GetApplicationBasic()->GetApplicationName(), clusterId, attributeId);
+    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster " ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
+                    GetApplicationBasic()->GetApplicationName(), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
     {

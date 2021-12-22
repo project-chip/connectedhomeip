@@ -396,15 +396,5 @@ bool IsCategoryEnabled(uint8_t category);
  */
 #define ChipLogFormatMessageType "0x%" PRIx8
 
-/**
- * Logging helpers for cluster ids, so we format them consistently.
- */
-#define ChipLogFormatClusterId "%" PRIu32
-
-/**
- * Logging helpers for cluster ids, so we format them consistently.
- */
-#define ChipLogFormatAttributeId "%" PRIu32
-
 } // namespace Logging
 } // namespace chip
