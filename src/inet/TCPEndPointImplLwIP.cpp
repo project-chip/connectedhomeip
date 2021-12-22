@@ -683,14 +683,7 @@ void TCPEndPointImplLwIP::HandleDataSent(uint16_t lenSent)
             if (RemainingToSend() == 0)
             {
                 // If the output queue has been flushed then stop the timer.
-
                 StopTCPUserTimeoutTimer();
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-                // Notify up if all outstanding data has been acknowledged
-
-                SetTCPSendIdleAndNotifyChange(true);
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
             }
             else
             {
