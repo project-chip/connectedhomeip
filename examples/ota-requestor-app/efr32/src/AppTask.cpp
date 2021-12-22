@@ -315,7 +315,7 @@ if (sIsThreadProvisioned && sIsThreadEnabled)
         }
 
         sStatusLED.Animate();
-        sLightLED.Animate();
+        // sLightLED.Animate();
     }
 }
 
@@ -413,10 +413,10 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
-        sLightLED.Set(false);
+        // sLightLED.Set(false);
 
         sStatusLED.Blink(500);
-        sLightLED.Blink(500);
+        // sLightLED.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -454,8 +454,10 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             if (!ConnectivityMgr().IsThreadProvisioned())
             {
                 // Enable BLE advertisements
+                /* TODO: Somehow this crashes the app, disabled for now and follow up. Dec 22, 2021
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
+                */
             }
             else
             {
@@ -465,7 +467,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set Light status LED back to show state of light.
-            sLightLED.Set(LightMgr().IsLightOn());
+            // sLightLED.Set(LightMgr().IsLightOn());
 
             sAppTask.CancelTimer();
 
@@ -515,12 +517,12 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     if (aAction == LightingManager::ON_ACTION)
     {
         EFR32_LOG("Turning light ON")
-        sLightLED.Set(true);
+            // sLightLED.Set(true);
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
         EFR32_LOG("Turning light OFF")
-        sLightLED.Set(false);
+            //sLightLED.Set(false);
     }
 
     if (aActor == AppEvent::kEventType_Button)
