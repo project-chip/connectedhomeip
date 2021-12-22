@@ -111,6 +111,12 @@ jobs:
             - name: Build example IPv6 Only App
               timeout-minutes: 10
               run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
+            - name: Build example OTA Requestor App
+              run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
+              timeout-minutes: 10
+            - name: Build example OTA Provider App
+              run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
+              timeout-minutes: 10
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
