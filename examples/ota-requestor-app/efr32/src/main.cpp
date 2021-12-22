@@ -132,7 +132,7 @@ int main(void)
 #endif
 
     EFR32_LOG("==================================================");
-    EFR32_LOG("chip-efr32-lighting-example starting");
+    EFR32_LOG("chip-efr32-ota-requestor-example starting");
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
@@ -146,7 +146,7 @@ int main(void)
         EFR32_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_LIGHT");
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("EFR32_OTA_REQUESTOR");
 #if CHIP_ENABLE_OPENTHREAD
     EFR32_LOG("Initializing OpenThread stack");
     ret = ThreadStackMgr().InitThreadStack();

@@ -80,7 +80,7 @@ efr32_sdk("sdk") {
 }
 
 efr32_executable("ota_requestor_app") {
-  output_name = "chip-efr32-lighting-example.out"
+  output_name = "chip-efr32-ota-requestor-example.out"
 
   sources = [
     "${examples_plat_dir}/LEDWidget.cpp",
