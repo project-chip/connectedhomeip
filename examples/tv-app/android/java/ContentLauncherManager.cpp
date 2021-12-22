@@ -85,8 +85,8 @@ LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endp
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status  = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data    = dataStr.charSpan();
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        response.data   = dataStr.charSpan();
     }
 
 exit:

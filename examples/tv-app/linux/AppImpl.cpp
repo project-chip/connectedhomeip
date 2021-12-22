@@ -206,14 +206,14 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
     return response;
 }
 
-LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Paramater> parameterList, bool autoplay, std::string data)
+LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
     LaunchResponse response;
-    response.err        = CHIP_NO_ERROR;
-    response.data       = "Example app data";
-    response.statusEnum = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = "Example app data";
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 

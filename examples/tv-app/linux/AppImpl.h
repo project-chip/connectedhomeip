@@ -108,7 +108,7 @@ class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
 public:
     virtual ~ContentLauncherImpl() {}
 
-    LaunchResponse LaunchContent(std::list<Paramater> parameterList, bool autoplay, std::string data) override;
+    LaunchResponse LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data) override;
 
 protected:
 };
