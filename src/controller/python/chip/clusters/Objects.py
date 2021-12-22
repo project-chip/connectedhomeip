@@ -27353,17 +27353,17 @@ class Channel(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.List[Channel.Structs.ChannelInfo]),
-                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=Channel.Structs.LineupInfo),
-                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=Channel.Structs.ChannelInfo),
+                ClusterObjectFieldDescriptor(Label="channelList", Tag=0x00000000, Type=typing.Optional[typing.List[Channel.Structs.ChannelInfo]]),
+                ClusterObjectFieldDescriptor(Label="channelLineup", Tag=0x00000001, Type=typing.Optional[Channel.Structs.LineupInfo]),
+                ClusterObjectFieldDescriptor(Label="currentChannel", Tag=0x00000002, Type=typing.Optional[Channel.Structs.ChannelInfo]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    channelList: 'typing.List[Channel.Structs.ChannelInfo]' = None
-    channelLineup: 'Channel.Structs.LineupInfo' = None
-    currentChannel: 'Channel.Structs.ChannelInfo' = None
+    channelList: 'typing.Optional[typing.List[Channel.Structs.ChannelInfo]]' = None
+    channelLineup: 'typing.Optional[Channel.Structs.LineupInfo]' = None
+    currentChannel: 'typing.Optional[Channel.Structs.ChannelInfo]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -27406,13 +27406,13 @@ class Channel(Cluster):
                             ClusterObjectFieldDescriptor(Label="operatorName", Tag=1, Type=str),
                             ClusterObjectFieldDescriptor(Label="lineupName", Tag=2, Type=str),
                             ClusterObjectFieldDescriptor(Label="postalCode", Tag=3, Type=str),
-                            ClusterObjectFieldDescriptor(Label="lineupInfoTypeEnum", Tag=4, Type=Channel.Enums.LineupInfoTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="lineupInfoType", Tag=4, Type=Channel.Enums.LineupInfoTypeEnum),
                     ])
 
             operatorName: 'str' = ""
             lineupName: 'str' = ""
             postalCode: 'str' = ""
-            lineupInfoTypeEnum: 'Channel.Enums.LineupInfoTypeEnum' = 0
+            lineupInfoType: 'Channel.Enums.LineupInfoTypeEnum' = 0
 
 
 
@@ -27443,11 +27443,11 @@ class Channel(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="channelMatch", Tag=0, Type=Channel.Structs.ChannelInfo),
-                            ClusterObjectFieldDescriptor(Label="errorTypeEnum", Tag=1, Type=Channel.Enums.ErrorTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="errorType", Tag=1, Type=Channel.Enums.ErrorTypeEnum),
                     ])
 
             channelMatch: 'Channel.Structs.ChannelInfo' = field(default_factory=lambda: Channel.Structs.ChannelInfo())
-            errorTypeEnum: 'Channel.Enums.ErrorTypeEnum' = 0
+            errorType: 'Channel.Enums.ErrorTypeEnum' = 0
 
         @dataclass
         class ChangeChannelByNumberRequest(ClusterCommand):
@@ -27495,9 +27495,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[Channel.Structs.ChannelInfo])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[Channel.Structs.ChannelInfo]])
 
-            value: 'typing.List[Channel.Structs.ChannelInfo]' = field(default_factory=lambda: [])
+            value: 'typing.Optional[typing.List[Channel.Structs.ChannelInfo]]' = None
 
         @dataclass
         class ChannelLineup(ClusterAttributeDescriptor):
@@ -27511,9 +27511,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Channel.Structs.LineupInfo)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[Channel.Structs.LineupInfo])
 
-            value: 'Channel.Structs.LineupInfo' = field(default_factory=lambda: Channel.Structs.LineupInfo())
+            value: 'typing.Optional[Channel.Structs.LineupInfo]' = None
 
         @dataclass
         class CurrentChannel(ClusterAttributeDescriptor):
@@ -27527,9 +27527,9 @@ class Channel(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=Channel.Structs.ChannelInfo)
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[Channel.Structs.ChannelInfo])
 
-            value: 'Channel.Structs.ChannelInfo' = field(default_factory=lambda: Channel.Structs.ChannelInfo())
+            value: 'typing.Optional[Channel.Structs.ChannelInfo]' = None
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -27653,11 +27653,11 @@ class TargetNavigator(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusEnum", Tag=0, Type=TargetNavigator.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=TargetNavigator.Enums.StatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
-            statusEnum: 'TargetNavigator.Enums.StatusEnum' = 0
+            status: 'TargetNavigator.Enums.StatusEnum' = 0
             data: 'str' = ""
 
 
@@ -27952,10 +27952,10 @@ class MediaPlayback(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusEnum", Tag=0, Type=MediaPlayback.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaPlayback.Enums.StatusEnum),
                     ])
 
-            statusEnum: 'MediaPlayback.Enums.StatusEnum' = 0
+            status: 'MediaPlayback.Enums.StatusEnum' = 0
 
         @dataclass
         class SeekRequest(ClusterCommand):
@@ -28181,13 +28181,13 @@ class MediaInput(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="index", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="inputTypeEnum", Tag=2, Type=MediaInput.Enums.InputTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="inputType", Tag=2, Type=MediaInput.Enums.InputTypeEnum),
                             ClusterObjectFieldDescriptor(Label="name", Tag=3, Type=str),
                             ClusterObjectFieldDescriptor(Label="description", Tag=4, Type=str),
                     ])
 
             index: 'uint' = 0
-            inputTypeEnum: 'MediaInput.Enums.InputTypeEnum' = 0
+            inputType: 'MediaInput.Enums.InputTypeEnum' = 0
             name: 'str' = ""
             description: 'str' = ""
 
@@ -28560,10 +28560,10 @@ class KeypadInput(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusEnum", Tag=0, Type=KeypadInput.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=KeypadInput.Enums.StatusEnum),
                     ])
 
-            statusEnum: 'KeypadInput.Enums.StatusEnum' = 0
+            status: 'KeypadInput.Enums.StatusEnum' = 0
 
 
     class Attributes:
@@ -28673,12 +28673,12 @@ class ContentLauncher(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="width", Tag=1, Type=float),
                             ClusterObjectFieldDescriptor(Label="height", Tag=2, Type=float),
-                            ClusterObjectFieldDescriptor(Label="metricTypeEnum", Tag=3, Type=ContentLauncher.Enums.MetricTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="metric", Tag=3, Type=ContentLauncher.Enums.MetricTypeEnum),
                     ])
 
             width: 'float' = 0.0
             height: 'float' = 0.0
-            metricTypeEnum: 'ContentLauncher.Enums.MetricTypeEnum' = 0
+            metric: 'ContentLauncher.Enums.MetricTypeEnum' = 0
 
         @dataclass
         class AdditionalInfo(ClusterObject):
@@ -28694,7 +28694,7 @@ class ContentLauncher(Cluster):
             value: 'str' = ""
 
         @dataclass
-        class Paramater(ClusterObject):
+        class Parameter(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -28707,6 +28707,17 @@ class ContentLauncher(Cluster):
             type: 'ContentLauncher.Enums.ParameterEnum' = 0
             value: 'str' = ""
             externalIDList: 'typing.List[ContentLauncher.Structs.AdditionalInfo]' = field(default_factory=lambda: [])
+
+        @dataclass
+        class ContentSearch(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="parameterList", Tag=1, Type=typing.List[ContentLauncher.Structs.Parameter]),
+                    ])
+
+            parameterList: 'typing.List[ContentLauncher.Structs.Parameter]' = field(default_factory=lambda: [])
 
         @dataclass
         class StyleInformation(ClusterObject):
@@ -28759,12 +28770,12 @@ class ContentLauncher(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="autoPlay", Tag=0, Type=bool),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="search", Tag=2, Type=typing.List[ContentLauncher.Structs.Paramater]),
+                            ClusterObjectFieldDescriptor(Label="search", Tag=2, Type=typing.List[ContentLauncher.Structs.ContentSearch]),
                     ])
 
             autoPlay: 'bool' = False
             data: 'str' = ""
-            search: 'typing.List[ContentLauncher.Structs.Paramater]' = field(default_factory=lambda: [])
+            search: 'typing.List[ContentLauncher.Structs.ContentSearch]' = field(default_factory=lambda: [])
 
         @dataclass
         class LaunchURLRequest(ClusterCommand):
@@ -28778,12 +28789,12 @@ class ContentLauncher(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="contentURL", Tag=0, Type=str),
                             ClusterObjectFieldDescriptor(Label="displayString", Tag=1, Type=str),
-                            ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=typing.List[ContentLauncher.Structs.BrandingInformation]),
+                            ClusterObjectFieldDescriptor(Label="brandingInformation", Tag=2, Type=ContentLauncher.Structs.BrandingInformation),
                     ])
 
             contentURL: 'str' = ""
             displayString: 'str' = ""
-            brandingInformation: 'typing.List[ContentLauncher.Structs.BrandingInformation]' = field(default_factory=lambda: [])
+            brandingInformation: 'ContentLauncher.Structs.BrandingInformation' = field(default_factory=lambda: ContentLauncher.Structs.BrandingInformation())
 
         @dataclass
         class LaunchResponse(ClusterCommand):
@@ -28795,11 +28806,11 @@ class ContentLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusEnum", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ContentLauncher.Enums.StatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
-            statusEnum: 'ContentLauncher.Enums.StatusEnum' = 0
+            status: 'ContentLauncher.Enums.StatusEnum' = 0
             data: 'str' = ""
 
 
@@ -28925,12 +28936,12 @@ class AudioOutput(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="index", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="outputTypeEnum", Tag=2, Type=AudioOutput.Enums.OutputTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="outputType", Tag=2, Type=AudioOutput.Enums.OutputTypeEnum),
                             ClusterObjectFieldDescriptor(Label="name", Tag=3, Type=str),
                     ])
 
             index: 'uint' = 0
-            outputTypeEnum: 'AudioOutput.Enums.OutputTypeEnum' = 0
+            outputType: 'AudioOutput.Enums.OutputTypeEnum' = 0
             name: 'str' = ""
 
 
@@ -29167,11 +29178,11 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="statusEnum", Tag=0, Type=ApplicationLauncher.Enums.StatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.StatusEnum),
                             ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
                     ])
 
-            statusEnum: 'ApplicationLauncher.Enums.StatusEnum' = 0
+            status: 'ApplicationLauncher.Enums.StatusEnum' = 0
             data: 'str' = ""
 
 

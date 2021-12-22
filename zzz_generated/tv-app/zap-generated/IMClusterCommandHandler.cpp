@@ -55,6 +55,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
         switch (aCommandPath.mCommandId)
         {
         case Commands::GetSetupPINRequest::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::GetSetupPINRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
@@ -73,6 +78,11 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             break;
         }
         case Commands::LogoutRequest::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
             Commands::LogoutRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)

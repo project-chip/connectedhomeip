@@ -3275,7 +3275,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _channelMatch = [CHIPChannelClusterChannelInfo new];
 
-        _errorTypeEnum = @(0);
+        _errorType = @(0);
     }
     return self;
 }
@@ -3323,7 +3323,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusEnum = @(0);
+        _status = @(0);
 
         _data = @"";
     }
@@ -3358,7 +3358,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusEnum = @(0);
+        _status = @(0);
     }
     return self;
 }
@@ -3415,7 +3415,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusEnum = @(0);
+        _status = @(0);
     }
     return self;
 }
@@ -3445,7 +3445,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _displayString = @"";
 
-        _brandingInformation = [NSArray array];
+        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
     }
     return self;
 }
@@ -3456,7 +3456,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusEnum = @(0);
+        _status = @(0);
 
         _data = @"";
     }
@@ -3528,7 +3528,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _statusEnum = @(0);
+        _status = @(0);
 
         _data = @"";
     }

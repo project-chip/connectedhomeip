@@ -1283,8 +1283,8 @@ CHIPApplicationBasicAllowedVendorListAttributeCallback::~CHIPApplicationBasicAll
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(void * context,
-                                                                        const chip::app::DataModel::DecodableList<uint16_t> & list)
+void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1319,9 +1319,9 @@ void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(void * c
     auto iter = list.begin();
     while (iter.Next())
     {
-        auto & entry        = iter.GetValue();
-        bool entryNull      = false;
-        uint16_t entryValue = entry;
+        auto & entry              = iter.GetValue();
+        bool entryNull            = false;
+        chip::VendorId entryValue = entry;
 
         jobject entryObject = nullptr;
         if (!entryNull)
@@ -1708,19 +1708,19 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
             index                        = env->NewObject(indexEntryCls, indexEntryTypeCtor, indexValue);
         }
 
-        bool outputTypeEnumNull     = false;
-        bool outputTypeEnumHasValue = true;
+        bool outputTypeNull     = false;
+        bool outputTypeHasValue = true;
 
-        chip::app::Clusters::AudioOutput::OutputTypeEnum outputTypeEnumValue = entry.outputTypeEnum;
+        chip::app::Clusters::AudioOutput::OutputTypeEnum outputTypeValue = entry.outputType;
 
-        jobject outputTypeEnum = nullptr;
-        if (!outputTypeEnumNull && outputTypeEnumHasValue)
+        jobject outputType = nullptr;
+        if (!outputTypeNull && outputTypeHasValue)
         {
-            jclass outputTypeEnumEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", outputTypeEnumEntryCls);
-            chip::JniClass outputTypeEnumJniClass(outputTypeEnumEntryCls);
-            jmethodID outputTypeEnumEntryTypeCtor = env->GetMethodID(outputTypeEnumEntryCls, "<init>", "(I)V");
-            outputTypeEnum = env->NewObject(outputTypeEnumEntryCls, outputTypeEnumEntryTypeCtor, outputTypeEnumValue);
+            jclass outputTypeEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", outputTypeEntryCls);
+            chip::JniClass outputTypeJniClass(outputTypeEntryCls);
+            jmethodID outputTypeEntryTypeCtor = env->GetMethodID(outputTypeEntryCls, "<init>", "(I)V");
+            outputType                        = env->NewObject(outputTypeEntryCls, outputTypeEntryTypeCtor, outputTypeValue);
         }
 
         bool nameNull     = false;
@@ -1735,7 +1735,7 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
             name = jstring(nameStr.jniValue());
         }
 
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, outputTypeEnum, name);
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, outputType, name);
         VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create AudioOutputListAttribute object"));
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
@@ -6746,19 +6746,19 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
             index                        = env->NewObject(indexEntryCls, indexEntryTypeCtor, indexValue);
         }
 
-        bool inputTypeEnumNull     = false;
-        bool inputTypeEnumHasValue = true;
+        bool inputTypeNull     = false;
+        bool inputTypeHasValue = true;
 
-        chip::app::Clusters::MediaInput::InputTypeEnum inputTypeEnumValue = entry.inputTypeEnum;
+        chip::app::Clusters::MediaInput::InputTypeEnum inputTypeValue = entry.inputType;
 
-        jobject inputTypeEnum = nullptr;
-        if (!inputTypeEnumNull && inputTypeEnumHasValue)
+        jobject inputType = nullptr;
+        if (!inputTypeNull && inputTypeHasValue)
         {
-            jclass inputTypeEnumEntryCls;
-            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", inputTypeEnumEntryCls);
-            chip::JniClass inputTypeEnumJniClass(inputTypeEnumEntryCls);
-            jmethodID inputTypeEnumEntryTypeCtor = env->GetMethodID(inputTypeEnumEntryCls, "<init>", "(I)V");
-            inputTypeEnum = env->NewObject(inputTypeEnumEntryCls, inputTypeEnumEntryTypeCtor, inputTypeEnumValue);
+            jclass inputTypeEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", inputTypeEntryCls);
+            chip::JniClass inputTypeJniClass(inputTypeEntryCls);
+            jmethodID inputTypeEntryTypeCtor = env->GetMethodID(inputTypeEntryCls, "<init>", "(I)V");
+            inputType                        = env->NewObject(inputTypeEntryCls, inputTypeEntryTypeCtor, inputTypeValue);
         }
 
         bool nameNull     = false;
@@ -6785,7 +6785,7 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
             description = jstring(descriptionStr.jniValue());
         }
 
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, inputTypeEnum, name, description);
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, index, inputType, name, description);
         VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create MediaInputListAttribute object"));
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);

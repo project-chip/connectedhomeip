@@ -442,7 +442,8 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+                        listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                            element_0.unsignedShortValue);
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -662,9 +663,9 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPAudioOutputClusterOutputInfo *) value[i_0];
                         listHolder_0->mList[i_0].index = element_0.index.unsignedCharValue;
-                        listHolder_0->mList[i_0].outputTypeEnum
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].outputTypeEnum)>>(
-                                element_0.outputTypeEnum.unsignedCharValue);
+                        listHolder_0->mList[i_0].outputType
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].outputType)>>(
+                                element_0.outputType.unsignedCharValue);
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
@@ -5463,9 +5464,9 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPMediaInputClusterInputInfo *) value[i_0];
                         listHolder_0->mList[i_0].index = element_0.index.unsignedCharValue;
-                        listHolder_0->mList[i_0].inputTypeEnum
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].inputTypeEnum)>>(
-                                element_0.inputTypeEnum.unsignedCharValue);
+                        listHolder_0->mList[i_0].inputType
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].inputType)>>(
+                                element_0.inputType.unsignedCharValue);
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
                         listHolder_0->mList[i_0].description = [self asCharSpan:element_0.descriptionString];
                     }

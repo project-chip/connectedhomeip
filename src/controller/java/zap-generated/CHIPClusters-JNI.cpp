@@ -101,7 +101,7 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPINRequest)
         chip::Callback::Callback<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -175,7 +175,7 @@ JNI_METHOD(void, AccountLoginCluster, logoutRequest)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6697,8 +6697,7 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 }
 
 JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject type, jstring value,
- jobject externalIDList)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject parameterList)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6708,7 +6707,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
 
     request.autoPlay = static_cast<decltype(request.autoPlay)>(chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
     request.data     = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.search   = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::Paramater::Type>();
+    request.search   = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
@@ -6749,10 +6748,9 @@ JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
 
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type request;
 
-    request.contentURL    = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
-    request.displayString = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
-    request.brandingInformation =
-        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type>();
+    request.contentURL          = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
+    request.displayString       = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
+    request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),

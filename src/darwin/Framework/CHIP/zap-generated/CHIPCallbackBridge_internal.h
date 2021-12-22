@@ -1378,7 +1378,7 @@ public:
         CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value);
 };
 
 class CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge

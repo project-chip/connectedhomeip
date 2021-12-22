@@ -121,7 +121,9 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Paramater::DecodableType & value);
+                    const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1775,10 +1777,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("LineupInfoTypeEnum", indent + 1, value.lineupInfoTypeEnum);
+        CHIP_ERROR err = LogValue("LineupInfoType", indent + 1, value.lineupInfoType);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupInfoTypeEnum'",
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'LineupInfoType'",
                             IndentStr(indent + 1).c_str());
             return err;
         }
@@ -1845,10 +1847,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("InputTypeEnum", indent + 1, value.inputTypeEnum);
+        CHIP_ERROR err = LogValue("InputType", indent + 1, value.inputType);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'InputTypeEnum'", IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'InputType'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1892,11 +1894,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("MetricTypeEnum", indent + 1, value.metricTypeEnum);
+        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'MetricTypeEnum'",
-                            IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1927,7 +1928,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::Paramater::DecodableType & value)
+                    const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1952,6 +1953,21 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExternalIDList'",
                             IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("ParameterList", indent + 1, value.parameterList);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ParameterList'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -2057,11 +2073,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("OutputTypeEnum", indent + 1, value.outputTypeEnum);
+        CHIP_ERROR err = LogValue("OutputType", indent + 1, value.outputType);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OutputTypeEnum'",
-                            IndentStr(indent + 1).c_str());
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OutputType'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -2522,7 +2537,7 @@ static void OnApplicationLauncherLauncherResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusEnum", 1, data.statusEnum);
+        err = LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2545,7 +2560,7 @@ OnChannelChangeChannelResponseSuccess(void * context,
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("errorTypeEnum", 1, data.errorTypeEnum);
+        err = LogValue("errorType", 1, data.errorType);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2560,7 +2575,7 @@ OnContentLauncherLaunchResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusEnum", 1, data.statusEnum);
+        err = LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2874,7 +2889,7 @@ OnKeypadInputSendKeyResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusEnum", 1, data.statusEnum);
+        err = LogValue("status", 1, data.status);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2889,7 +2904,7 @@ OnMediaPlaybackPlaybackResponseSuccess(void * context,
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusEnum", 1, data.statusEnum);
+        err = LogValue("status", 1, data.status);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3251,7 +3266,7 @@ static void OnTargetNavigatorNavigateTargetResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("statusEnum", 1, data.statusEnum);
+        err = LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -4658,7 +4673,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
     {
         OnGeneralAttributeResponse(context, "ApplicationBasic.AllowedVendorList response", value);
     }
@@ -13712,7 +13727,7 @@ public:
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
-        // brandingInformation Array parsing is not supported yet
+        // brandingInformation Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 

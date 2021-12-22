@@ -1385,9 +1385,7 @@ class ChipClusters:
                     "args": {
                         "autoPlay": "bool",
                         "data": "str",
-                        "type": "int",
-                        "value": "str",
-                        "externalIDList": "",
+                        "parameterList": "",
                     },
                 },
             0x00000001: {

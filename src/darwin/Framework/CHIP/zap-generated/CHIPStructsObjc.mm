@@ -638,7 +638,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _postalCode = @"";
 
-        _lineupInfoTypeEnum = @(0);
+        _lineupInfoType = @(0);
     }
     return self;
 }
@@ -677,7 +677,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _index = @(0);
 
-        _inputTypeEnum = @(0);
+        _inputType = @(0);
 
         _name = @"";
 
@@ -696,7 +696,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _height = @(0);
 
-        _metricTypeEnum = @(0);
+        _metric = @(0);
     }
     return self;
 }
@@ -715,7 +715,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterParamater
+@implementation CHIPContentLauncherClusterParameter
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -725,6 +725,17 @@ NS_ASSUME_NONNULL_BEGIN
         _value = @"";
 
         _externalIDList = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPContentLauncherClusterContentSearch
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _parameterList = [NSArray array];
     }
     return self;
 }
@@ -773,7 +784,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _index = @(0);
 
-        _outputTypeEnum = @(0);
+        _outputType = @(0);
 
         _name = @"";
     }

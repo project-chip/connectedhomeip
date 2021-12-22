@@ -102,7 +102,7 @@ public:
 
     // Cluster Commands
     CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    bool autoPlay, chip::CharSpan data, uint8_t type, chip::CharSpan value);
+                                    bool autoPlay, chip::CharSpan data);
     CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                 chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
 };

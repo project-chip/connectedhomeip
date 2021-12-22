@@ -626,7 +626,7 @@ public class ChipClusters {
         String applicationId);
 
     public interface LauncherResponseCallback {
-      void onSuccess(Integer statusEnum, String data);
+      void onSuccess(Integer status, String data);
 
       void onError(Exception error);
     }
@@ -706,12 +706,12 @@ public class ChipClusters {
 
     public static class AudioOutputListAttribute {
       public Integer index;
-      public Integer outputTypeEnum;
+      public Integer outputType;
       public String name;
 
-      public AudioOutputListAttribute(Integer index, Integer outputTypeEnum, String name) {
+      public AudioOutputListAttribute(Integer index, Integer outputType, String name) {
         this.index = index;
-        this.outputTypeEnum = outputTypeEnum;
+        this.outputType = outputType;
         this.name = name;
       }
 
@@ -722,8 +722,8 @@ public class ChipClusters {
         output.append(this.index);
         output.append("\n");
 
-        output.append("int outputTypeEnum: ");
-        output.append(this.outputTypeEnum);
+        output.append("int outputType: ");
+        output.append(this.outputType);
         output.append("\n");
 
         output.append("String name: ");
@@ -1926,7 +1926,7 @@ public class ChipClusters {
     public interface ChangeChannelResponseCallback {
       void onSuccess( // channelMatch: Struct ChannelInfo
           // Conversion from this type to Java is not properly implemented yet
-          Integer errorTypeEnum);
+          Integer errorType);
 
       void onError(Exception error);
     }
@@ -3377,12 +3377,8 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
 
     public void launchContentRequest(
-        LaunchResponseCallback callback,
-        Boolean autoPlay,
-        String data,
-        Integer type,
-        String value) {
-      launchContentRequest(chipClusterPtr, callback, autoPlay, data, type, value);
+        LaunchResponseCallback callback, Boolean autoPlay, String data) {
+      launchContentRequest(chipClusterPtr, callback, autoPlay, data);
     }
 
     public void launchURLRequest(
@@ -3394,12 +3390,7 @@ public class ChipClusters {
     }
 
     private native void launchContentRequest(
-        long chipClusterPtr,
-        LaunchResponseCallback Callback,
-        Boolean autoPlay,
-        String data,
-        Integer type,
-        String value);
+        long chipClusterPtr, LaunchResponseCallback Callback, Boolean autoPlay, String data);
 
     private native void launchURLRequest(
         long chipClusterPtr,
@@ -3409,7 +3400,7 @@ public class ChipClusters {
         String providerName);
 
     public interface LaunchResponseCallback {
-      void onSuccess(Integer statusEnum, String data);
+      void onSuccess(Integer status, String data);
 
       void onError(Exception error);
     }
@@ -5729,7 +5720,7 @@ public class ChipClusters {
         long chipClusterPtr, SendKeyResponseCallback Callback, Integer keyCode);
 
     public interface SendKeyResponseCallback {
-      void onSuccess(Integer statusEnum);
+      void onSuccess(Integer status);
 
       void onError(Exception error);
     }
@@ -6305,14 +6296,14 @@ public class ChipClusters {
 
     public static class MediaInputListAttribute {
       public Integer index;
-      public Integer inputTypeEnum;
+      public Integer inputType;
       public String name;
       public String description;
 
       public MediaInputListAttribute(
-          Integer index, Integer inputTypeEnum, String name, String description) {
+          Integer index, Integer inputType, String name, String description) {
         this.index = index;
-        this.inputTypeEnum = inputTypeEnum;
+        this.inputType = inputType;
         this.name = name;
         this.description = description;
       }
@@ -6324,8 +6315,8 @@ public class ChipClusters {
         output.append(this.index);
         output.append("\n");
 
-        output.append("int inputTypeEnum: ");
-        output.append(this.inputTypeEnum);
+        output.append("int inputType: ");
+        output.append(this.inputType);
         output.append("\n");
 
         output.append("String name: ");
@@ -6485,7 +6476,7 @@ public class ChipClusters {
     private native void stopRequest(long chipClusterPtr, PlaybackResponseCallback Callback);
 
     public interface PlaybackResponseCallback {
-      void onSuccess(Integer statusEnum);
+      void onSuccess(Integer status);
 
       void onError(Exception error);
     }
@@ -9377,7 +9368,7 @@ public class ChipClusters {
         long chipClusterPtr, NavigateTargetResponseCallback Callback, Integer target, String data);
 
     public interface NavigateTargetResponseCallback {
-      void onSuccess(Integer statusEnum, String data);
+      void onSuccess(Integer status, String data);
 
       void onError(Exception error);
     }

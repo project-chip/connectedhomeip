@@ -591,7 +591,7 @@ public:
         }
     }
 
-    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(

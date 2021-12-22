@@ -240,7 +240,7 @@ void AdministratorCommissioningClusterAttributeListListAttributeFilter(TLV::TLVR
 void ApplicationBasicClusterAllowedVendorListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                                  Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<uint16_t> list;
+    chip::app::DataModel::DecodableList<chip::VendorId> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -2282,49 +2282,49 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, 
     return true;
 }
 
-bool emberAfApplicationLauncherClusterLauncherResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               uint8_t statusEnum, chip::CharSpan data)
+bool emberAfApplicationLauncherClusterLauncherResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                               chip::CharSpan data)
 {
     ChipLogProgress(Zcl, "LauncherResponse:");
-    ChipLogProgress(Zcl, "  statusEnum: %" PRIu8 "", statusEnum);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLauncherResponseCallback");
 
     Callback::Callback<ApplicationLauncherClusterLauncherResponseCallback> * cb =
         Callback::Callback<ApplicationLauncherClusterLauncherResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, statusEnum, data);
+    cb->mCall(cb->mContext, status, data);
     return true;
 }
 
 bool emberAfChannelClusterChangeChannelResponseCallback(
     EndpointId endpoint, app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorTypeEnum)
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType)
 {
     ChipLogProgress(Zcl, "ChangeChannelResponse:");
     ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct ChannelInfo");
-    ChipLogProgress(Zcl, "  errorTypeEnum: %" PRIu8 "", errorTypeEnum);
+    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ChannelClusterChangeChannelResponseCallback");
 
     Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
         Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, ChannelInfo(), errorTypeEnum);
+    cb->mCall(cb->mContext, ChannelInfo(), errorType);
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t statusEnum,
+bool emberAfContentLauncherClusterLaunchResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
                                                          chip::CharSpan data)
 {
     ChipLogProgress(Zcl, "LaunchResponse:");
-    ChipLogProgress(Zcl, "  statusEnum: %" PRIu8 "", statusEnum);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchResponseCallback");
 
     Callback::Callback<ContentLauncherClusterLaunchResponseCallback> * cb =
         Callback::Callback<ContentLauncherClusterLaunchResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, statusEnum, data);
+    cb->mCall(cb->mContext, status, data);
     return true;
 }
 
@@ -2554,29 +2554,29 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(EndpointId endpoint, ap
     return true;
 }
 
-bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t statusEnum)
+bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
 {
     ChipLogProgress(Zcl, "SendKeyResponse:");
-    ChipLogProgress(Zcl, "  statusEnum: %" PRIu8 "", statusEnum);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("KeypadInputClusterSendKeyResponseCallback");
 
     Callback::Callback<KeypadInputClusterSendKeyResponseCallback> * cb =
         Callback::Callback<KeypadInputClusterSendKeyResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, statusEnum);
+    cb->mCall(cb->mContext, status);
     return true;
 }
 
-bool emberAfMediaPlaybackClusterPlaybackResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t statusEnum)
+bool emberAfMediaPlaybackClusterPlaybackResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
 {
     ChipLogProgress(Zcl, "PlaybackResponse:");
-    ChipLogProgress(Zcl, "  statusEnum: %" PRIu8 "", statusEnum);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterPlaybackResponseCallback");
 
     Callback::Callback<MediaPlaybackClusterPlaybackResponseCallback> * cb =
         Callback::Callback<MediaPlaybackClusterPlaybackResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, statusEnum);
+    cb->mCall(cb->mContext, status);
     return true;
 }
 
@@ -2837,17 +2837,17 @@ bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::Com
 }
 
 bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t statusEnum, chip::CharSpan data)
+                                                                 uint8_t status, chip::CharSpan data)
 {
     ChipLogProgress(Zcl, "NavigateTargetResponse:");
-    ChipLogProgress(Zcl, "  statusEnum: %" PRIu8 "", statusEnum);
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("TargetNavigatorClusterNavigateTargetResponseCallback");
 
     Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
         Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, statusEnum, data);
+    cb->mCall(cb->mContext, status, data);
     return true;
 }
 

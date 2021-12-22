@@ -1541,7 +1541,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPChannelClusterChangeChannelResponseParams : NSObject
 @property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
-@property (strong, nonatomic) NSNumber * _Nonnull errorTypeEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull errorType;
 - (instancetype)init;
 @end
 
@@ -1563,7 +1563,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPTargetNavigatorClusterNavigateTargetResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull statusEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
@@ -1579,7 +1579,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPMediaPlaybackClusterPlaybackResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull statusEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
@@ -1605,7 +1605,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPKeypadInputClusterSendKeyResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull statusEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
@@ -1619,12 +1619,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPContentLauncherClusterLaunchURLRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull contentURL;
 @property (strong, nonatomic) NSString * _Nonnull displayString;
-@property (strong, nonatomic) NSArray * _Nonnull brandingInformation;
+@property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nonnull brandingInformation;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull statusEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
@@ -1657,7 +1657,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPApplicationLauncherClusterLauncherResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull statusEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end

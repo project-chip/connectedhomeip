@@ -990,7 +990,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
 }
 
 void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
@@ -998,7 +998,7 @@ void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccess
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
         NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+        newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -1157,7 +1157,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
         CHIPAudioOutputClusterOutputInfo * newElement_0;
         newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-        newElement_0.outputTypeEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputTypeEnum)];
+        newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
@@ -2969,7 +2969,7 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
         CHIPMediaInputClusterInputInfo * newElement_0;
         newElement_0 = [CHIPMediaInputClusterInputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-        newElement_0.inputTypeEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputTypeEnum)];
+        newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
@@ -5083,7 +5083,7 @@ void CHIPApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPApplicationLauncherClusterLauncherResponseParams new];
     {
-        response.statusEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusEnum)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
@@ -5110,7 +5110,7 @@ void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
                                                                          encoding:NSUTF8StringEncoding];
     }
     {
-        response.errorTypeEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorTypeEnum)];
+        response.errorType = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
     }
     DispatchSuccess(context, response);
 };
@@ -5120,7 +5120,7 @@ void CHIPContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchResponseParams new];
     {
-        response.statusEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusEnum)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
@@ -5462,7 +5462,7 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPKeypadInputClusterSendKeyResponseParams new];
     {
-        response.statusEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusEnum)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     DispatchSuccess(context, response);
 };
@@ -5472,7 +5472,7 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPMediaPlaybackClusterPlaybackResponseParams new];
     {
-        response.statusEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusEnum)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     DispatchSuccess(context, response);
 };
@@ -5858,7 +5858,7 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
 {
     auto * response = [CHIPTargetNavigatorClusterNavigateTargetResponseParams new];
     {
-        response.statusEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.statusEnum)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];

@@ -511,7 +511,7 @@ exit:
 // ContentLauncher Cluster Commands
 CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, bool autoPlay,
-                                                        chip::CharSpan data, uint8_t type, chip::CharSpan value)
+                                                        chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -539,10 +539,6 @@ CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * o
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
-    // type: parameterEnum
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), type));
-    // value: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), value));
 
     SuccessOrExit(err = sender->FinishCommand());
 

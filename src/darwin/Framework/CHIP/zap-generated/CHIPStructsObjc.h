@@ -314,7 +314,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSString * _Nonnull operatorName;
 @property (strong, nonatomic) NSString * _Nonnull lineupName;
 @property (strong, nonatomic) NSString * _Nonnull postalCode;
-@property (strong, nonatomic) NSNumber * _Nonnull lineupInfoTypeEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull lineupInfoType;
 - (instancetype)init;
 @end
 
@@ -332,7 +332,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPMediaInputClusterInputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
-@property (strong, nonatomic) NSNumber * _Nonnull inputTypeEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull inputType;
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSString * _Nonnull descriptionString;
 - (instancetype)init;
@@ -341,7 +341,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPContentLauncherClusterDimension : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull width;
 @property (strong, nonatomic) NSNumber * _Nonnull height;
-@property (strong, nonatomic) NSNumber * _Nonnull metricTypeEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull metric;
 - (instancetype)init;
 @end
 
@@ -351,10 +351,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterParamater : NSObject
+@interface CHIPContentLauncherClusterParameter : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSString * _Nonnull value;
 @property (strong, nonatomic) NSArray * _Nonnull externalIDList;
+- (instancetype)init;
+@end
+
+@interface CHIPContentLauncherClusterContentSearch : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull parameterList;
 - (instancetype)init;
 @end
 
@@ -377,7 +382,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPAudioOutputClusterOutputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
-@property (strong, nonatomic) NSNumber * _Nonnull outputTypeEnum;
+@property (strong, nonatomic) NSNumber * _Nonnull outputType;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end

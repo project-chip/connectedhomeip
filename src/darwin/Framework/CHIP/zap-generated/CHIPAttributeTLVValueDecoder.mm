@@ -418,7 +418,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
                 NSNumber * newElement_0;
-                newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+                newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named
@@ -564,7 +564,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 CHIPAudioOutputClusterOutputInfo * newElement_0;
                 newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
                 newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-                newElement_0.outputTypeEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputTypeEnum)];
+                newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                              length:entry_0.name.size()
                                                            encoding:NSUTF8StringEncoding];
@@ -4064,7 +4064,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 CHIPMediaInputClusterInputInfo * newElement_0;
                 newElement_0 = [CHIPMediaInputClusterInputInfo new];
                 newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-                newElement_0.inputTypeEnum = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputTypeEnum)];
+                newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                              length:entry_0.name.size()
                                                            encoding:NSUTF8StringEncoding];

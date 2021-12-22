@@ -299,7 +299,7 @@ using namespace chip::app::Clusters;
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, 10000);
         });
 }
 
@@ -336,7 +336,7 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall, 10000);
         });
 }
 
@@ -5076,35 +5076,59 @@ using namespace chip::app::Clusters;
             }
             listFreer.add(listHolder_0);
             for (size_t i_0 = 0; i_0 < params.search.count; ++i_0) {
-                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterParamater class]]) {
+                if (![params.search[i_0] isKindOfClass:[CHIPContentLauncherClusterContentSearch class]]) {
                     // Wrong kind of value.
                     return;
                 }
-                auto element_0 = (CHIPContentLauncherClusterParamater *) params.search[i_0];
-                listHolder_0->mList[i_0].type = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].type)>>(
-                    element_0.type.unsignedCharValue);
-                listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
+                auto element_0 = (CHIPContentLauncherClusterContentSearch *) params.search[i_0];
                 {
-                    using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].externalIDList)>;
+                    using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
                     using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
-                    if (element_0.externalIDList.count != 0) {
-                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.externalIDList.count);
+                    if (element_0.parameterList.count != 0) {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.parameterList.count);
                         if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
                             return;
                         }
                         listFreer.add(listHolder_2);
-                        for (size_t i_2 = 0; i_2 < element_0.externalIDList.count; ++i_2) {
-                            if (![element_0.externalIDList[i_2] isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
+                        for (size_t i_2 = 0; i_2 < element_0.parameterList.count; ++i_2) {
+                            if (![element_0.parameterList[i_2] isKindOfClass:[CHIPContentLauncherClusterParameter class]]) {
                                 // Wrong kind of value.
                                 return;
                             }
-                            auto element_2 = (CHIPContentLauncherClusterAdditionalInfo *) element_0.externalIDList[i_2];
-                            listHolder_2->mList[i_2].name = [self asCharSpan:element_2.name];
+                            auto element_2 = (CHIPContentLauncherClusterParameter *) element_0.parameterList[i_2];
+                            listHolder_2->mList[i_2].type
+                                = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
+                                    element_2.type.unsignedCharValue);
                             listHolder_2->mList[i_2].value = [self asCharSpan:element_2.value];
+                            {
+                                using ListType_4 = std::remove_reference_t<decltype(listHolder_2->mList[i_2].externalIDList)>;
+                                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                                if (element_2.externalIDList.count != 0) {
+                                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2.externalIDList.count);
+                                    if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                                        return;
+                                    }
+                                    listFreer.add(listHolder_4);
+                                    for (size_t i_4 = 0; i_4 < element_2.externalIDList.count; ++i_4) {
+                                        if (![element_2.externalIDList[i_4]
+                                                isKindOfClass:[CHIPContentLauncherClusterAdditionalInfo class]]) {
+                                            // Wrong kind of value.
+                                            return;
+                                        }
+                                        auto element_4 = (CHIPContentLauncherClusterAdditionalInfo *) element_2.externalIDList[i_4];
+                                        listHolder_4->mList[i_4].name = [self asCharSpan:element_4.name];
+                                        listHolder_4->mList[i_4].value = [self asCharSpan:element_4.value];
+                                    }
+                                    listHolder_2->mList[i_2].externalIDList
+                                        = ListType_4(listHolder_4->mList, element_2.externalIDList.count);
+                                } else {
+                                    listHolder_2->mList[i_2].externalIDList = ListType_4();
+                                }
+                            }
                         }
-                        listHolder_0->mList[i_0].externalIDList = ListType_2(listHolder_2->mList, element_0.externalIDList.count);
+                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0.parameterList.count);
                     } else {
-                        listHolder_0->mList[i_0].externalIDList = ListType_2();
+                        listHolder_0->mList[i_0].parameterList = ListType_2();
                     }
                 }
             }
@@ -5130,63 +5154,42 @@ using namespace chip::app::Clusters;
     ContentLauncher::Commands::LaunchURLRequest::Type request;
     request.contentURL = [self asCharSpan:params.contentURL];
     request.displayString = [self asCharSpan:params.displayString];
-    {
-        using ListType_0 = std::remove_reference_t<decltype(request.brandingInformation)>;
-        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-        if (params.brandingInformation.count != 0) {
-            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.brandingInformation.count);
-            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                return;
-            }
-            listFreer.add(listHolder_0);
-            for (size_t i_0 = 0; i_0 < params.brandingInformation.count; ++i_0) {
-                if (![params.brandingInformation[i_0] isKindOfClass:[CHIPContentLauncherClusterBrandingInformation class]]) {
-                    // Wrong kind of value.
-                    return;
-                }
-                auto element_0 = (CHIPContentLauncherClusterBrandingInformation *) params.brandingInformation[i_0];
-                listHolder_0->mList[i_0].providerName = [self asCharSpan:element_0.providerName];
-                listHolder_0->mList[i_0].background.imageUrl = [self asCharSpan:element_0.background.imageUrl];
-                listHolder_0->mList[i_0].background.color = [self asCharSpan:element_0.background.color];
-                listHolder_0->mList[i_0].background.size.width = element_0.background.size.width.doubleValue;
-                listHolder_0->mList[i_0].background.size.height = element_0.background.size.height.doubleValue;
-                listHolder_0->mList[i_0].background.size.metricTypeEnum
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].background.size.metricTypeEnum)>>(
-                        element_0.background.size.metricTypeEnum.unsignedCharValue);
-                listHolder_0->mList[i_0].logo.imageUrl = [self asCharSpan:element_0.logo.imageUrl];
-                listHolder_0->mList[i_0].logo.color = [self asCharSpan:element_0.logo.color];
-                listHolder_0->mList[i_0].logo.size.width = element_0.logo.size.width.doubleValue;
-                listHolder_0->mList[i_0].logo.size.height = element_0.logo.size.height.doubleValue;
-                listHolder_0->mList[i_0].logo.size.metricTypeEnum
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].logo.size.metricTypeEnum)>>(
-                        element_0.logo.size.metricTypeEnum.unsignedCharValue);
-                listHolder_0->mList[i_0].progressBar.imageUrl = [self asCharSpan:element_0.progressBar.imageUrl];
-                listHolder_0->mList[i_0].progressBar.color = [self asCharSpan:element_0.progressBar.color];
-                listHolder_0->mList[i_0].progressBar.size.width = element_0.progressBar.size.width.doubleValue;
-                listHolder_0->mList[i_0].progressBar.size.height = element_0.progressBar.size.height.doubleValue;
-                listHolder_0->mList[i_0].progressBar.size.metricTypeEnum
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].progressBar.size.metricTypeEnum)>>(
-                        element_0.progressBar.size.metricTypeEnum.unsignedCharValue);
-                listHolder_0->mList[i_0].splash.imageUrl = [self asCharSpan:element_0.splash.imageUrl];
-                listHolder_0->mList[i_0].splash.color = [self asCharSpan:element_0.splash.color];
-                listHolder_0->mList[i_0].splash.size.width = element_0.splash.size.width.doubleValue;
-                listHolder_0->mList[i_0].splash.size.height = element_0.splash.size.height.doubleValue;
-                listHolder_0->mList[i_0].splash.size.metricTypeEnum
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].splash.size.metricTypeEnum)>>(
-                        element_0.splash.size.metricTypeEnum.unsignedCharValue);
-                listHolder_0->mList[i_0].waterMark.imageUrl = [self asCharSpan:element_0.waterMark.imageUrl];
-                listHolder_0->mList[i_0].waterMark.color = [self asCharSpan:element_0.waterMark.color];
-                listHolder_0->mList[i_0].waterMark.size.width = element_0.waterMark.size.width.doubleValue;
-                listHolder_0->mList[i_0].waterMark.size.height = element_0.waterMark.size.height.doubleValue;
-                listHolder_0->mList[i_0].waterMark.size.metricTypeEnum
-                    = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].waterMark.size.metricTypeEnum)>>(
-                        element_0.waterMark.size.metricTypeEnum.unsignedCharValue);
-            }
-            request.brandingInformation = ListType_0(listHolder_0->mList, params.brandingInformation.count);
-        } else {
-            request.brandingInformation = ListType_0();
-        }
-    }
+    request.brandingInformation.providerName = [self asCharSpan:params.brandingInformation.providerName];
+    request.brandingInformation.background.imageUrl = [self asCharSpan:params.brandingInformation.background.imageUrl];
+    request.brandingInformation.background.color = [self asCharSpan:params.brandingInformation.background.color];
+    request.brandingInformation.background.size.width = params.brandingInformation.background.size.width.doubleValue;
+    request.brandingInformation.background.size.height = params.brandingInformation.background.size.height.doubleValue;
+    request.brandingInformation.background.size.metric
+        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.metric)>>(
+            params.brandingInformation.background.size.metric.unsignedCharValue);
+    request.brandingInformation.logo.imageUrl = [self asCharSpan:params.brandingInformation.logo.imageUrl];
+    request.brandingInformation.logo.color = [self asCharSpan:params.brandingInformation.logo.color];
+    request.brandingInformation.logo.size.width = params.brandingInformation.logo.size.width.doubleValue;
+    request.brandingInformation.logo.size.height = params.brandingInformation.logo.size.height.doubleValue;
+    request.brandingInformation.logo.size.metric
+        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.metric)>>(
+            params.brandingInformation.logo.size.metric.unsignedCharValue);
+    request.brandingInformation.progressBar.imageUrl = [self asCharSpan:params.brandingInformation.progressBar.imageUrl];
+    request.brandingInformation.progressBar.color = [self asCharSpan:params.brandingInformation.progressBar.color];
+    request.brandingInformation.progressBar.size.width = params.brandingInformation.progressBar.size.width.doubleValue;
+    request.brandingInformation.progressBar.size.height = params.brandingInformation.progressBar.size.height.doubleValue;
+    request.brandingInformation.progressBar.size.metric
+        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.metric)>>(
+            params.brandingInformation.progressBar.size.metric.unsignedCharValue);
+    request.brandingInformation.splash.imageUrl = [self asCharSpan:params.brandingInformation.splash.imageUrl];
+    request.brandingInformation.splash.color = [self asCharSpan:params.brandingInformation.splash.color];
+    request.brandingInformation.splash.size.width = params.brandingInformation.splash.size.width.doubleValue;
+    request.brandingInformation.splash.size.height = params.brandingInformation.splash.size.height.doubleValue;
+    request.brandingInformation.splash.size.metric
+        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.metric)>>(
+            params.brandingInformation.splash.size.metric.unsignedCharValue);
+    request.brandingInformation.waterMark.imageUrl = [self asCharSpan:params.brandingInformation.waterMark.imageUrl];
+    request.brandingInformation.waterMark.color = [self asCharSpan:params.brandingInformation.waterMark.color];
+    request.brandingInformation.waterMark.size.width = params.brandingInformation.waterMark.size.width.doubleValue;
+    request.brandingInformation.waterMark.size.height = params.brandingInformation.waterMark.size.height.doubleValue;
+    request.brandingInformation.waterMark.size.metric
+        = static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.metric)>>(
+            params.brandingInformation.waterMark.size.metric.unsignedCharValue);
 
     new CHIPContentLauncherClusterLaunchResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {

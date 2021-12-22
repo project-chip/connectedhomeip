@@ -33,7 +33,7 @@ typedef struct _Dimension
 {
     double width;
     double height;
-    uint8_t metricTypeEnum;
+    uint8_t metric;
 } Dimension;
 
 // Struct for AdditionalInfo
@@ -42,14 +42,6 @@ typedef struct _AdditionalInfo
     chip::CharSpan name;
     chip::CharSpan value;
 } AdditionalInfo;
-
-// Struct for Paramater
-typedef struct _Paramater
-{
-    uint8_t type;
-    chip::CharSpan value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
-} Paramater;
 
 // Struct for SimpleStruct
 typedef struct _SimpleStruct
@@ -106,6 +98,20 @@ typedef struct _DoubleNestedStructList
 {
     /* TYPE WARNING: array array defaults to */ uint8_t * a;
 } DoubleNestedStructList;
+
+// Struct for Parameter
+typedef struct _Parameter
+{
+    uint8_t type;
+    chip::CharSpan value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
+} Parameter;
+
+// Struct for ContentSearch
+typedef struct _ContentSearch
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * parameterList;
+} ContentSearch;
 
 // Struct for StyleInformation
 typedef struct _StyleInformation
@@ -281,7 +287,7 @@ typedef struct _IasAceZoneStatusResult
 typedef struct _InputInfo
 {
     uint8_t index;
-    uint8_t inputTypeEnum;
+    uint8_t inputType;
     chip::CharSpan name;
     chip::CharSpan description;
 } InputInfo;
@@ -299,7 +305,7 @@ typedef struct _LineupInfo
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    uint8_t lineupInfoTypeEnum;
+    uint8_t lineupInfoType;
 } LineupInfo;
 
 // Struct for ModeOptionStruct
@@ -382,7 +388,7 @@ typedef struct _OperationalDatasetComponents
 typedef struct _OutputInfo
 {
     uint8_t index;
-    uint8_t outputTypeEnum;
+    uint8_t outputType;
     chip::CharSpan name;
 } OutputInfo;
 

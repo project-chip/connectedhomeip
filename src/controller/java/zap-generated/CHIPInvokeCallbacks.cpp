@@ -142,18 +142,18 @@ void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject statusEnum;
+    jobject status;
 
-    std::string statusEnumClassName     = "java/lang/Integer";
-    std::string statusEnumCtorSignature = "(I)V";
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::StatusEnum>(
-        statusEnumClassName.c_str(), statusEnumCtorSignature.c_str(), dataResponse.statusEnum, statusEnum);
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     chip::UtfString dataUtfString(env, dataResponse.data);
     data = dataUtfString.jniValue();
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, statusEnum, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
 CHIPChannelClusterChangeChannelResponseCallback::CHIPChannelClusterChangeChannelResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>(CallbackFn, this)
@@ -209,14 +209,14 @@ void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
     jobject channelMatch;
 
     channelMatch = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
-    jobject errorTypeEnum;
+    jobject errorType;
 
-    std::string errorTypeEnumClassName     = "java/lang/Integer";
-    std::string errorTypeEnumCtorSignature = "(I)V";
+    std::string errorTypeClassName     = "java/lang/Integer";
+    std::string errorTypeCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::Channel::ErrorTypeEnum>(
-        errorTypeEnumClassName.c_str(), errorTypeEnumCtorSignature.c_str(), dataResponse.errorTypeEnum, errorTypeEnum);
+        errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorTypeEnum);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
 }
 CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>(CallbackFn, this)
@@ -270,18 +270,18 @@ void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject statusEnum;
+    jobject status;
 
-    std::string statusEnumClassName     = "java/lang/Integer";
-    std::string statusEnumCtorSignature = "(I)V";
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::StatusEnum>(
-        statusEnumClassName.c_str(), statusEnumCtorSignature.c_str(), dataResponse.statusEnum, statusEnum);
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     chip::UtfString dataUtfString(env, dataResponse.data);
     data = dataUtfString.jniValue();
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, statusEnum, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
 CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(CallbackFn, this)
@@ -1332,14 +1332,14 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject statusEnum;
+    jobject status;
 
-    std::string statusEnumClassName     = "java/lang/Integer";
-    std::string statusEnumCtorSignature = "(I)V";
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::KeypadInput::StatusEnum>(
-        statusEnumClassName.c_str(), statusEnumCtorSignature.c_str(), dataResponse.statusEnum, statusEnum);
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, statusEnum);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
 CHIPMediaPlaybackClusterPlaybackResponseCallback::CHIPMediaPlaybackClusterPlaybackResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>(CallbackFn, this)
@@ -1392,14 +1392,14 @@ void CHIPMediaPlaybackClusterPlaybackResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject statusEnum;
+    jobject status;
 
-    std::string statusEnumClassName     = "java/lang/Integer";
-    std::string statusEnumCtorSignature = "(I)V";
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::StatusEnum>(
-        statusEnumClassName.c_str(), statusEnumCtorSignature.c_str(), dataResponse.statusEnum, statusEnum);
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, statusEnum);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
 CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(
     jobject javaCallback) :
@@ -2619,18 +2619,18 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject statusEnum;
+    jobject status;
 
-    std::string statusEnumClassName     = "java/lang/Integer";
-    std::string statusEnumCtorSignature = "(I)V";
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TargetNavigator::StatusEnum>(
-        statusEnumClassName.c_str(), statusEnumCtorSignature.c_str(), dataResponse.statusEnum, statusEnum);
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     chip::UtfString dataUtfString(env, dataResponse.data);
     data = dataUtfString.jniValue();
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, statusEnum, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
 CHIPTestClusterClusterBooleanResponseCallback::CHIPTestClusterClusterBooleanResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>(CallbackFn, this)
