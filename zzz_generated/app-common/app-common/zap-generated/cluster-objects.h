@@ -6384,9 +6384,9 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::Nullable<uint32_t> cluster;
-    DataModel::Nullable<uint16_t> endpoint;
-    DataModel::Nullable<uint32_t> deviceType;
+    DataModel::Nullable<chip::ClusterId> cluster;
+    DataModel::Nullable<chip::EndpointId> endpoint;
+    DataModel::Nullable<chip::DeviceTypeId> deviceType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
