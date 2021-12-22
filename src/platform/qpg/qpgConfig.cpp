@@ -42,11 +42,11 @@ CHIP_ERROR QPGConfig::Init()
 {
     const qvStatus_t status = qvCHIP_KvsInit();
 
-    if(QV_STATUS_NO_ERROR == status)
+    if (QV_STATUS_NO_ERROR == status)
     {
         return CHIP_NO_ERROR;
     }
-    else if(QV_STATUS_BUFFER_TOO_SMALL == status)
+    else if (QV_STATUS_BUFFER_TOO_SMALL == status)
     {
         return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
