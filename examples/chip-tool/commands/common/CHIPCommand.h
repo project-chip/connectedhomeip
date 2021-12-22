@@ -34,17 +34,16 @@ constexpr const char kIdentityGamma[] = "gamma";
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
-    using ChipDeviceCommissioner = ::chip::Controller::DeviceController;
-    using ChipDeviceController   = ::chip::Controller::DeviceController;
-    using IPAddress              = ::chip::Inet::IPAddress;
-    using NodeId                 = ::chip::NodeId;
-    using PeerId                 = ::chip::PeerId;
-    using PeerAddress            = ::chip::Transport::PeerAddress;
+    using ChipDevice           = ::chip::DeviceProxy;
+    using ChipDeviceController = ::chip::Controller::DeviceController;
+    using IPAddress            = ::chip::Inet::IPAddress;
+    using NodeId               = ::chip::NodeId;
+    using PeerId               = ::chip::PeerId;
+    using PeerAddress          = ::chip::Transport::PeerAddress;
 
     CHIPCommand(const char * commandName) : Command(commandName)
     {
-        AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("commissioner-name", &mControllerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -82,7 +81,7 @@ protected:
     virtual void Shutdown() {}
 
     PersistentStorage mDefaultStorage;
-    PersistentStorage mCommissionerStorage;
+    PersistentStorage mControllerStorage;
     chip::SimpleFabricStorage mFabricStorage;
     ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
     CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
@@ -93,14 +92,14 @@ protected:
     // This method returns the commissioner instance to be used for running the command.
     // The default commissioner instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
-    ChipDeviceCommissioner & CurrentCommissioner();
+    ChipDeviceController & CurrentController();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
-    CHIP_ERROR ShutdownCommissioner(std::string key);
-    uint16_t CurrentCommissionerIndex();
-    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
-    chip::Optional<char *> mCommissionerName;
+    CHIP_ERROR InitializeController(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR ShutdownController(std::string key);
+    uint16_t CurrentControllerIndex();
+    std::map<std::string, std::unique_ptr<ChipDeviceController>> mControllers;
+    chip::Optional<char *> mControllerName;
 
     static void RunQueuedCommand(intptr_t commandArg);
 
