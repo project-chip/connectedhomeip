@@ -86,8 +86,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp

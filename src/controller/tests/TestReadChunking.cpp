@@ -196,7 +196,6 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    app::ReadClient * readClient;
     TestAttrAccess testServer;
 
     // Initialize the ember side server logic
@@ -229,10 +228,10 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
 
-        NL_TEST_ASSERT(apSuite,
-                       engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
-                                             &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Read);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -270,7 +269,6 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    app::ReadClient * readClient;
     TestAttrAccess testServer;
 
     // Initialize the ember side server logic
@@ -303,10 +301,10 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
 
         app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
 
-        NL_TEST_ASSERT(apSuite,
-                       engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
-                                             &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Read);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
 
         //
         // Service the IO + Engine till we get a ReportEnd callback on the client.
@@ -345,7 +343,6 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
     TestContext & ctx                    = *static_cast<TestContext *>(apContext);
     auto sessionHandle                   = ctx.GetSessionBobToAlice();
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
-    app::ReadClient * readClient;
     TestAttrAccess testServer;
 
     // Initialize the ember side server logic
@@ -365,31 +362,30 @@ void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apCon
 
     TestReadCallback readCallback;
 
-    NL_TEST_ASSERT(apSuite,
-                   engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &readCallback.mBufferedCallback) ==
-                       CHIP_NO_ERROR);
-    NL_TEST_ASSERT(apSuite, readClient->SendRequest(readParams) == CHIP_NO_ERROR);
-
-    //
-    // Service the IO + Engine till we get a ReportEnd callback on the client.
-    // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing (then
-    // shuts down the read handler) for the second report.
-    //
-    for (int j = 0; j < 2; j++)
     {
-        ctx.DrainAndServiceIO();
-        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
-        ctx.DrainAndServiceIO();
+        app::ReadClient readClient(engine, &ctx.GetExchangeManager(), readCallback.mBufferedCallback,
+                                   app::ReadClient::InteractionType::Read);
+
+        NL_TEST_ASSERT(apSuite, readClient.SendRequest(readParams) == CHIP_NO_ERROR);
+
+        //
+        // Service the IO + Engine till we get a ReportEnd callback on the client.
+        // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing
+        // (then shuts down the read handler) for the second report.
+        //
+        for (int j = 0; j < 2; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        // Nothing is actually encoded. buffered callback does not handle the message to us.
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
+
+        // The server should shutted down, while the client is still alive (pending for the attribute data.)
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
     }
-
-    // Nothing is actually encoded. buffered callback does not handle the message to us.
-    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
-
-    // The server should shutted down, while the client is still alive (pending for the attribute data.)
-    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
-
-    // On real apps, this is done by a timeout.
-    readClient->Shutdown();
 
     // Sanity check
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);

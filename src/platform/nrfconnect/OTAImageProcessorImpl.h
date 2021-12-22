@@ -21,12 +21,17 @@
 #include <platform/OTAImageProcessor.h>
 
 namespace chip {
+
+class OTADownloader;
+
 namespace DeviceLayer {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
 public:
     static constexpr size_t kBufferSize = CONFIG_CHIP_OTA_REQUESTOR_BUFFER_SIZE;
+
+    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
 
     CHIP_ERROR PrepareDownload() override;
     CHIP_ERROR Finalize() override;
@@ -35,6 +40,9 @@ public:
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 
 private:
+    CHIP_ERROR PrepareDownloadImpl();
+
+    OTADownloader * mDownloader = nullptr;
     uint8_t mBuffer[kBufferSize];
 };
 

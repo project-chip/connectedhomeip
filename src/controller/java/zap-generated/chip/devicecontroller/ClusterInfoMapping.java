@@ -2807,6 +2807,37 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallback
+      implements ChipClusters.OtaSoftwareUpdateRequestorCluster
+              .DefaultOtaProvidersAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(
+        List<ChipClusters.OtaSoftwareUpdateRequestorCluster.DefaultOtaProvidersAttribute>
+            valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo(
+              "valueList",
+              "List<ChipClusters.OtaSoftwareUpdateRequestorCluster.DefaultOtaProvidersAttribute>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallback
       implements ChipClusters.OtaSoftwareUpdateRequestorCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -8094,11 +8125,11 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo =
-            new CommandParameterInfo("providerLocation", long.class);
+        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo =
+            new CommandParameterInfo("providerNodeId", long.class);
     otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
-        "providerLocation",
-        otaSoftwareUpdateRequestorannounceOtaProviderproviderLocationCommandParameterInfo);
+        "providerNodeId",
+        otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo);
 
     CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo =
         new CommandParameterInfo("vendorId", int.class);
@@ -8119,6 +8150,11 @@ public class ClusterInfoMapping {
         "metadataForNode",
         otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo);
 
+    CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo =
+        new CommandParameterInfo("endpoint", int.class);
+    otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put(
+        "endpoint", otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo);
+
     // Populate commands
     InteractionInfo otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo =
         new InteractionInfo(
@@ -8126,10 +8162,11 @@ public class ClusterInfoMapping {
               ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
                   .announceOtaProvider(
                       (DefaultClusterCallback) callback,
-                      (Long) commandArguments.get("providerLocation"),
+                      (Long) commandArguments.get("providerNodeId"),
                       (Integer) commandArguments.get("vendorId"),
                       (Integer) commandArguments.get("announcementReason"),
-                      (Optional<byte[]>) commandArguments.get("metadataForNode"));
+                      (Optional<byte[]>) commandArguments.get("metadataForNode"),
+                      (Integer) commandArguments.get("endpoint"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             otaSoftwareUpdateRequestorannounceOtaProviderCommandParams);

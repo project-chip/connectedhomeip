@@ -216,30 +216,39 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
     VERIFY_BUFFER_STATE(aSuite, test, expected);
 }
 
-void TestEncodeEmptyList(nlTestSuite * aSuite, void * aContext)
+constexpr uint8_t emptyListExpected[] = {
+    // clang-format off
+    0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
+    0x15, // Start anonymous struct
+      0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+        0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
+        0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
+          0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
+          0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
+          0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
+        0x18, // End of container
+        // Intended empty array
+        0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
+        0x18, // End of container
+      0x18, // End of container
+    0x18, // End of container
+    // clang-format on
+};
+
+void TestEncodeEmptyList1(nlTestSuite * aSuite, void * aContext)
 {
     TestSetup test(aSuite);
     CHIP_ERROR err = test.encoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
-    const uint8_t expected[] = {
-        // clang-format off
-        0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
-        0x15, // Start anonymous struct
-          0x35, 0x01, // Start 1 byte tag struct + Tag (01)
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
-            0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
-              0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
-              0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
-              0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
-            0x18, // End of container
-            // Intended empty array
-            0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
-            0x18, // End of container
-          0x18, // End of container
-        0x18, // End of container
-        // clang-format on
-    };
-    VERIFY_BUFFER_STATE(aSuite, test, expected);
+    VERIFY_BUFFER_STATE(aSuite, test, emptyListExpected);
+}
+
+void TestEncodeEmptyList2(nlTestSuite * aSuite, void * aContext)
+{
+    TestSetup test(aSuite);
+    CHIP_ERROR err = test.encoder.EncodeEmptyList();
+    NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+    VERIFY_BUFFER_STATE(aSuite, test, emptyListExpected);
 }
 
 void TestEncodeFabricScoped(nlTestSuite * aSuite, void * aContext)
@@ -375,17 +384,20 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
     }
 }
 
-#undef VERIFY_STATE
+#undef VERIFY_BUFFER_STATE
 
 } // anonymous namespace
 
 namespace {
-const nlTest sTests[] = {
-    NL_TEST_DEF("TestEncodeNothing", TestEncodeNothing),           NL_TEST_DEF("TestEncodeBool", TestEncodeBool),
-    NL_TEST_DEF("TestEncodeEmptyList", TestEncodeEmptyList),       NL_TEST_DEF("TestEncodeListOfBools1", TestEncodeListOfBools1),
-    NL_TEST_DEF("TestEncodeListOfBools2", TestEncodeListOfBools2), NL_TEST_DEF("TestEncodeListChunking", TestEncodeListChunking),
-    NL_TEST_DEF("TestEncodeFabricScoped", TestEncodeFabricScoped), NL_TEST_SENTINEL()
-};
+const nlTest sTests[] = { NL_TEST_DEF("TestEncodeNothing", TestEncodeNothing),
+                          NL_TEST_DEF("TestEncodeBool", TestEncodeBool),
+                          NL_TEST_DEF("TestEncodeEmptyList1", TestEncodeEmptyList1),
+                          NL_TEST_DEF("TestEncodeEmptyList2", TestEncodeEmptyList2),
+                          NL_TEST_DEF("TestEncodeListOfBools1", TestEncodeListOfBools1),
+                          NL_TEST_DEF("TestEncodeListOfBools2", TestEncodeListOfBools2),
+                          NL_TEST_DEF("TestEncodeListChunking", TestEncodeListChunking),
+                          NL_TEST_DEF("TestEncodeFabricScoped", TestEncodeFabricScoped),
+                          NL_TEST_SENTINEL() };
 }
 
 int TestAttributeValueEncoder()

@@ -533,28 +533,6 @@ public:
      */
     OnAcceptErrorFunct OnAcceptError;
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    /**
-     * @brief   Type of TCP SendIdle changed signal handling function.
-     *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     *
-     * @param[in]   isIdle      True if the send channel of the TCP endpoint
-     *                          is Idle, otherwise false.
-     * @details
-     *  Provide a function of this type to the \c OnTCPSendIdleChanged delegate
-     *  member to process the event of the send channel of the TCPEndPoint
-     *  changing state between being idle and not idle.
-     */
-    typedef void (*OnTCPSendIdleChangedFunct)(TCPEndPoint * endPoint, bool isIdle);
-
-    /** The event handling function delegate of the endpoint signaling when the
-     *  idleness of the TCP connection's send channel changes. This is utilized
-     *  by upper layers to take appropriate actions based on whether sent data
-     *  has been reliably delivered to the peer. */
-    OnTCPSendIdleChangedFunct OnTCPSendIdleChanged;
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
     /**
      * Size of the largest TCP packet that can be received.
      */
@@ -571,13 +549,6 @@ protected:
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
         ,
         mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        ,
-        mIsTCPSendIdle(true), mTCPSendQueuePollPeriodMillis(INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC),
-        mTCPSendQueueRemainingPollCount(
-            MaxTCPSendQueuePolls(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC, INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC)),
-        OnTCPSendIdleChanged(nullptr)
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     {}
 
@@ -619,44 +590,17 @@ protected:
                                    // return an error; zero means use system defaults.
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    uint32_t mUserTimeoutMillis; // The configured TCP user timeout value in milliseconds.
-                                 // If 0, assume not set.
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    bool mIsTCPSendIdle; // Indicates whether the send channel of the TCPEndPoint is Idle.
-
-    uint16_t mTCPSendQueueRemainingPollCount; // The current remaining number of TCP SendQueue polls before
-                                              // the TCP User timeout period is reached.
-
-    uint32_t mTCPSendQueuePollPeriodMillis; // The configured period of active polling of the TCP
-                                            // SendQueue. If 0, assume not set.
-    void SetTCPSendIdleAndNotifyChange(bool aIsSendIdle);
-
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
+    uint32_t mUserTimeoutMillis;   // The configured TCP user timeout value in milliseconds.
+                                   // If 0, assume not set.
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
     static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
     virtual void TCPUserTimeoutHandler() = 0;
 
     void StartTCPUserTimeoutTimer();
-
     void StopTCPUserTimeoutTimer();
-
     void RestartTCPUserTimeoutTimer();
-
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    static constexpr uint16_t MaxTCPSendQueuePolls(uint16_t userTimeout, uint16_t pollPeriod)
-    {
-        // If the UserTimeout is configured less than or equal to the poll interval,
-        // return 1 to poll at least once instead of returning zero and timing out
-        // immediately.
-        return (userTimeout > pollPeriod) ? (userTimeout / pollPeriod) : 1;
-    }
-    uint16_t MaxTCPSendQueuePolls(void) { return MaxTCPSendQueuePolls(mUserTimeoutMillis, mTCPSendQueuePollPeriodMillis); }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
     TCPEndPoint(const TCPEndPoint &) = delete;

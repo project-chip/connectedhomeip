@@ -68,7 +68,7 @@ CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeVal
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<Structs::LabelStruct::Type>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;

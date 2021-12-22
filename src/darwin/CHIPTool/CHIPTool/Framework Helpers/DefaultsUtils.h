@@ -35,6 +35,7 @@ BOOL CHIPIsDevicePaired(uint64_t id);
 BOOL CHIPGetConnectedDevice(CHIPDeviceConnectionCallback completionHandler);
 BOOL CHIPGetConnectedDeviceWithID(uint64_t deviceId, CHIPDeviceConnectionCallback completionHandler);
 void CHIPUnpairDeviceWithID(uint64_t deviceId);
+CHIPDevice * CHIPGetDeviceBeingCommissioned(void);
 
 @interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
 

@@ -19,6 +19,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 #import "CHIPLogging.h"
+#include "lib/core/CHIPError.h"
 
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
@@ -116,17 +117,15 @@ private:
     NSMutableArray * _Nullable mReports = nil;
 
     // Our lifetime management is a little complicated.  On error we
-    // attempt to shut down the ReadClient, but asynchronously.  While
+    // attempt to delete the ReadClient, but asynchronously.  While
     // that's pending, someone else (e.g. an error it runs into) could
-    // shut it down.  And if someone else does shut it down we want to
-    // make sure we delete ourselves.
+    // delete it too.  And if someone else does attempt to delete it, we want to
+    // make sure we delete ourselves as well.
     //
     // To handle this, enforce the following rules:
     //
-    // 1) mReadClient becomes null when OnDone is called, since that
-    //    means it has shut down and we should not shut it down.
-    // 2) We guarantee that mReportCallback is only invoked with an error once.
-    // 3) We ensure that we delete ourselves only from OnDone or a queued-up
+    // 1) We guarantee that mReportCallback is only invoked with an error once.
+    // 2) We ensure that we delete ourselves and the passed in ReadClient only from OnDone or a queued-up
     //    error callback, but not both, by tracking whether we have a queued-up
     //    deletion.
     ReadClient * mReadClient = nullptr;
@@ -156,31 +155,22 @@ private:
     params.mAttributePathParamsListSize = 1;
 
     auto callback = new SubscriptionCallback(queue, reportHandler, subscriptionEstablishedHandler);
+    ReadClient * readClient = new ReadClient(InteractionModelEngine::GetInstance(), device->GetExchangeManager(),
+        callback->GetBufferedCallback(), ReadClient::InteractionType::Subscribe);
 
-    ReadClient * readClient;
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->NewReadClient(
-        &readClient, ReadClient::InteractionType::Subscribe, &(callback->GetBufferedCallback()));
+    CHIP_ERROR err = readClient->SendRequest(params);
     if (err != CHIP_NO_ERROR) {
         dispatch_async(queue, ^{
             reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
         });
+
+        delete readClient;
         delete callback;
         return;
     }
 
-    err = readClient->SendRequest(params);
-    if (err != CHIP_NO_ERROR) {
-        dispatch_async(queue, ^{
-            reportHandler(nil, [CHIPError errorForCHIPErrorCode:err]);
-        });
-        readClient->Shutdown();
-        delete callback;
-        return;
-    }
-
-    // Callback will be deleted when OnDone is called or an error is
+    // Callback and ReadClient will be deleted when OnDone is called or an error is
     // encountered.
-
     callback->SetReadClient(readClient);
 }
 @end
@@ -271,11 +261,9 @@ void SubscriptionCallback::OnDone(ReadClient * apReadClient)
 {
     if (!mHaveQueuedDeletion) {
         delete this;
+        delete apReadClient;
         return; // Make sure we touch nothing else.
     }
-
-    // Ensure that we don't try to shut down the already-shut-down ReadClient.
-    mReadClient = nullptr;
 }
 
 void SubscriptionCallback::OnSubscriptionEstablished(const ReadClient * apReadClient)
@@ -302,17 +290,17 @@ void SubscriptionCallback::ReportError(NSError * _Nullable err)
         // Already have an error report pending which will delete us.
         return;
     }
+
     __block ReportCallback callback = mReportCallback;
     __block auto * myself = this;
     mReportCallback = nil;
     dispatch_async(mQueue, ^{
         callback(nil, err);
-        if (mReadClient) {
-            mReadClient->Shutdown(); // This will not delete us, because
-                                     // mHaveQueuedDeletion is set.
-        };
+
+        delete mReadClient;
         delete myself;
     });
+
     mHaveQueuedDeletion = true;
 }
 } // anonymous namespace

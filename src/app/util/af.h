@@ -382,13 +382,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
 
 /**
- * @brief macro that returns true if attribute is saved to token.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsTokenized(metadata) (((metadata)->mask & ATTRIBUTE_MASK_TOKENIZE) != 0)
-
-/**
  * @brief macro that returns true if attribute is saved in external storage.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.

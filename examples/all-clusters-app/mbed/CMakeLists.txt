@@ -68,6 +68,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/ota-requestor-stub.cpp
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
@@ -113,8 +114,8 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-ember.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-old.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp

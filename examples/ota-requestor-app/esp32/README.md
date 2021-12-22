@@ -31,67 +31,41 @@ idf.py -p <OTARequestorSerialPort> flash monitor
 -   Commissioning the OTA Requestor
 
 ```
-./out/debug/chip-tool pairing ble-wifi 12346 <ssid> <passphrase> 0 20202021 3840
+./out/debug/chip-tool pairing ble-wifi 12346 <ssid> <passphrase> 20202021 3840
 ```
 
 ## Query for an OTA Image
 
-After commissioning is successful, query for OTA image. Head over to ESP32
-console and fire the following command. This command creates a CASE session with
-OTA Provider and start the OTA image transfer using BDX protocol.
+After commissioning is successful, announce OTA provider's presence using
+chip-tool. On receiving this command OTA requestor will query for OTA image.
 
 ```
-esp32> QueryImage <OTAProviderIpAddress> <OTAProviderNodeId>
-```
-
-OTA image transfer takes some time and once done it prints following log
-
-```
-I (322620) OTARequesterImpl: Transfer complete!
+./out/debug/chip-tool otasoftwareupdaterequestor announce-ota-provider 12345 0 0 12346 0
 ```
 
 ## Apply update request
 
 Once transfer is complete OTA Requestor should take permission from the OTA
-Provider for applying the OTA image.
+Provider for applying the OTA image. Use the following command from OTA
+requestor prompt
 
 ```
-esp32> ApplyUpdateRequest <OTAProviderIpAddress> <OTAProviderNodeId>
+esp32> ApplyUpdateRequest
 ```
 
-After this step device should reboot and start running hello world example.
+Then reboot the device manually to boot from upgraded OTA image.
 
 ## ESP32 OTA Requestor with Linux OTA Provider
 
 -   Build the [Linux OTA Provider](../../ota-provider-app/linux)
--   Run the Linux OTA Provider with
-    [hello world OTA image](http://shubhamdp.github.io/esp_ota/esp32/hello-world-for-linux-provider.bin).
-    This OTA image is built for ESP32, it will not work on other devices.
+-   Run the Linux OTA Provider with OTA image.
 
 ```
-./out/debug/chip-ota-provider-app -f hello-world-for-linux-provider.bin
+./out/debug/chip-ota-provider-app -f hello-world.bin
 ```
 
 -   Provision the Linux OTA Provider using chip-tool
 
 ```
-./out/debug/chip-tool pairing 12345 20202021
+./out/debug/chip-tool pairing onnetwork 12345 20202021
 ```
-
--   Note down the OTA Provider IP address and Node Id and repeat the steps for
-    ESP32 OTA Requestor app
-
----
-
-## Features
-
--   Can perform the actual OTA if the image provided is valid
--   Code for running a full BDX download exists in BDX
--   Can send QueryImage and ApplyUpdateRequest commands triggered from console
--   Downloads a file over BDX served by an OTA Provider server
-
-## Limitations
-
--   Does not verify QueryImageResponse status
--   Does not support AnnounceOTAProvider command or OTA Requestor attributes
--   Does not support the header defined in Matter Specification.

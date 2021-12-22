@@ -559,8 +559,8 @@ public:
 
     // Cluster Commands
     CHIP_ERROR AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   chip::NodeId providerLocation, chip::VendorId vendorId, uint8_t announcementReason,
-                                   chip::ByteSpan metadataForNode);
+                                   chip::NodeId providerNodeId, chip::VendorId vendorId, uint8_t announcementReason,
+                                   chip::ByteSpan metadataForNode, chip::EndpointId endpoint);
 };
 
 class DLL_EXPORT OccupancySensingCluster : public ClusterBase
@@ -826,11 +826,11 @@ public:
     // Cluster Commands
     CHIP_ERROR DownOrClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR GoToLiftPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t liftPercentageValue, uint16_t liftPercent100thsValue);
+                                  chip::Percent liftPercentageValue, chip::Percent100ths liftPercent100thsValue);
     CHIP_ERROR GoToLiftValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              uint16_t liftValue);
     CHIP_ERROR GoToTiltPercentage(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t tiltPercentageValue, uint16_t tiltPercent100thsValue);
+                                  chip::Percent tiltPercentageValue, chip::Percent100ths tiltPercent100thsValue);
     CHIP_ERROR GoToTiltValue(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                              uint16_t tiltValue);
     CHIP_ERROR StopMotion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
