@@ -50,7 +50,7 @@ static_library("ESP32") {
 
   deps = [
     "${chip_root}/src/lib/dnssd:platform_header",
-    "${chip_root}/src/setup_payload"
+    "${chip_root}/src/setup_payload",
   ]
 
   public_deps = [
