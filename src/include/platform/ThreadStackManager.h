@@ -88,6 +88,7 @@ public:
     bool TryLockThreadStack();
     void UnlockThreadStack();
     bool HaveRouteToAddress(const chip::Inet::IPAddress & destAddr);
+    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
@@ -147,7 +148,6 @@ private:
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
     bool IsThreadAttached();
-    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);

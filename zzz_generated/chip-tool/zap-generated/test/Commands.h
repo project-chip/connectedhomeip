@@ -29776,7 +29776,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_16(status);
     }
 
-    static void OnSuccessCallback_16(void * context, uint16_t targetPositionLiftPercent100ths)
+    static void OnSuccessCallback_16(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_16(targetPositionLiftPercent100ths);
     }
@@ -29793,7 +29794,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_18(status);
     }
 
-    static void OnSuccessCallback_18(void * context, uint16_t targetPositionLiftPercent100ths)
+    static void OnSuccessCallback_18(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_18(targetPositionLiftPercent100ths);
     }
@@ -29803,7 +29805,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_19(status);
     }
 
-    static void OnSuccessCallback_19(void * context, uint16_t targetPositionTiltPercent100ths)
+    static void OnSuccessCallback_19(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_19(targetPositionTiltPercent100ths);
     }
@@ -29820,7 +29823,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_21(status);
     }
 
-    static void OnSuccessCallback_21(void * context, uint16_t targetPositionTiltPercent100ths)
+    static void OnSuccessCallback_21(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_21(targetPositionTiltPercent100ths);
     }
@@ -29830,7 +29834,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_22(status);
     }
 
-    static void OnSuccessCallback_22(void * context, uint16_t currentPositionLiftPercent100ths)
+    static void OnSuccessCallback_22(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_22(currentPositionLiftPercent100ths);
     }
@@ -29847,7 +29852,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_24(status);
     }
 
-    static void OnSuccessCallback_24(void * context, uint16_t currentPositionLiftPercent100ths)
+    static void OnSuccessCallback_24(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_24(currentPositionLiftPercent100ths);
     }
@@ -29857,7 +29863,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_25(status);
     }
 
-    static void OnSuccessCallback_25(void * context, uint16_t currentPositionTiltPercent100ths)
+    static void OnSuccessCallback_25(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_25(currentPositionTiltPercent100ths);
     }
@@ -29874,7 +29881,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_27(status);
     }
 
-    static void OnSuccessCallback_27(void * context, uint16_t currentPositionTiltPercent100ths)
+    static void OnSuccessCallback_27(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_27(currentPositionTiltPercent100ths);
     }
@@ -30019,7 +30027,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_43(status);
     }
 
-    static void OnSuccessCallback_43(void * context, uint16_t currentPositionLift)
+    static void OnSuccessCallback_43(void * context, const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_43(currentPositionLift);
     }
@@ -30036,7 +30044,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_45(status);
     }
 
-    static void OnSuccessCallback_45(void * context, uint16_t currentPositionLift)
+    static void OnSuccessCallback_45(void * context, const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_45(currentPositionLift);
     }
@@ -30046,7 +30054,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_46(status);
     }
 
-    static void OnSuccessCallback_46(void * context, uint16_t currentPositionTilt)
+    static void OnSuccessCallback_46(void * context, const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_46(currentPositionTilt);
     }
@@ -30063,7 +30071,7 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_48(status);
     }
 
-    static void OnSuccessCallback_48(void * context, uint16_t currentPositionTilt)
+    static void OnSuccessCallback_48(void * context, const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_48(currentPositionTilt);
     }
@@ -30073,7 +30081,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_49(status);
     }
 
-    static void OnSuccessCallback_49(void * context, uint8_t currentPositionLiftPercentage)
+    static void OnSuccessCallback_49(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_49(currentPositionLiftPercentage);
     }
@@ -30090,7 +30099,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_51(status);
     }
 
-    static void OnSuccessCallback_51(void * context, uint8_t currentPositionLiftPercentage)
+    static void OnSuccessCallback_51(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_51(currentPositionLiftPercentage);
     }
@@ -30100,7 +30110,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_52(status);
     }
 
-    static void OnSuccessCallback_52(void * context, uint8_t currentPositionTiltPercentage)
+    static void OnSuccessCallback_52(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_52(currentPositionTiltPercentage);
     }
@@ -30117,7 +30128,8 @@ private:
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnFailureResponse_54(status);
     }
 
-    static void OnSuccessCallback_54(void * context, uint8_t currentPositionTiltPercentage)
+    static void OnSuccessCallback_54(void * context,
+                                     const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         (static_cast<Test_TC_WNCV_2_1 *>(context))->OnSuccessResponse_54(currentPositionTiltPercentage);
     }
@@ -30456,11 +30468,11 @@ private:
 
     void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_16(uint16_t targetPositionLiftPercent100ths)
+    void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
+                                                                    targetPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -30470,8 +30482,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t targetPositionLiftPercent100thsArgument;
-        targetPositionLiftPercent100thsArgument = 20000U;
+        chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionLiftPercent100thsArgument;
+        targetPositionLiftPercent100thsArgument.SetNonNull() = 20000U;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
@@ -30501,9 +30513,9 @@ private:
 
     void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_18(uint16_t targetPositionLiftPercent100ths)
+    void OnSuccessResponse_18(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "Percent100ths"));
         VerifyOrReturn(CheckConstraintNotValue("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 20000U));
 
         NextTest();
@@ -30523,11 +30535,11 @@ private:
 
     void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_19(uint16_t targetPositionTiltPercent100ths)
+    void OnSuccessResponse_19(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
+                                                                    targetPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -30537,8 +30549,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t targetPositionTiltPercent100thsArgument;
-        targetPositionTiltPercent100thsArgument = 20000U;
+        chip::app::DataModel::Nullable<chip::Percent100ths> targetPositionTiltPercent100thsArgument;
+        targetPositionTiltPercent100thsArgument.SetNonNull() = 20000U;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
@@ -30568,9 +30580,9 @@ private:
 
     void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_21(uint16_t targetPositionTiltPercent100ths)
+    void OnSuccessResponse_21(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "Percent100ths"));
         VerifyOrReturn(CheckConstraintNotValue("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 20000U));
 
         NextTest();
@@ -30590,11 +30602,11 @@ private:
 
     void OnFailureResponse_22(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_22(uint16_t currentPositionLiftPercent100ths)
+    void OnSuccessResponse_22(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
+                                                                    currentPositionLiftPercent100ths, 10000U));
         NextTest();
     }
 
@@ -30604,8 +30616,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t currentPositionLiftPercent100thsArgument;
-        currentPositionLiftPercent100thsArgument = 20000U;
+        chip::app::DataModel::Nullable<chip::Percent100ths> currentPositionLiftPercent100thsArgument;
+        currentPositionLiftPercent100thsArgument.SetNonNull() = 20000U;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
@@ -30635,9 +30647,9 @@ private:
 
     void OnFailureResponse_24(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_24(uint16_t currentPositionLiftPercent100ths)
+    void OnSuccessResponse_24(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "Percent100ths"));
         VerifyOrReturn(CheckConstraintNotValue("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 20000U));
 
         NextTest();
@@ -30657,11 +30669,11 @@ private:
 
     void OnFailureResponse_25(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_25(uint16_t currentPositionTiltPercent100ths)
+    void OnSuccessResponse_25(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
-        VerifyOrReturn(
-            CheckConstraintMaxValue<uint16_t>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 10000U));
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
+                                                                    currentPositionTiltPercent100ths, 10000U));
         NextTest();
     }
 
@@ -30671,8 +30683,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t currentPositionTiltPercent100thsArgument;
-        currentPositionTiltPercent100thsArgument = 20000U;
+        chip::app::DataModel::Nullable<chip::Percent100ths> currentPositionTiltPercent100thsArgument;
+        currentPositionTiltPercent100thsArgument.SetNonNull() = 20000U;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
@@ -30702,9 +30714,9 @@ private:
 
     void OnFailureResponse_27(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_27(uint16_t currentPositionTiltPercent100ths)
+    void OnSuccessResponse_27(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "Percent100ths"));
         VerifyOrReturn(CheckConstraintNotValue("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 20000U));
 
         NextTest();
@@ -31046,7 +31058,7 @@ private:
 
     void OnFailureResponse_43(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_43(uint16_t currentPositionLift)
+    void OnSuccessResponse_43(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
@@ -31059,8 +31071,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t currentPositionLiftArgument;
-        currentPositionLiftArgument = 255U;
+        chip::app::DataModel::Nullable<uint16_t> currentPositionLiftArgument;
+        currentPositionLiftArgument.SetNonNull() = 255U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
             currentPositionLiftArgument, this, OnSuccessCallback_44, OnFailureCallback_44));
@@ -31088,7 +31100,7 @@ private:
 
     void OnFailureResponse_45(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_45(uint16_t currentPositionLift)
+    void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
@@ -31108,7 +31120,7 @@ private:
 
     void OnFailureResponse_46(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_46(uint16_t currentPositionTilt)
+    void OnSuccessResponse_46(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
@@ -31121,8 +31133,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint16_t currentPositionTiltArgument;
-        currentPositionTiltArgument = 255U;
+        chip::app::DataModel::Nullable<uint16_t> currentPositionTiltArgument;
+        currentPositionTiltArgument.SetNonNull() = 255U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
             currentPositionTiltArgument, this, OnSuccessCallback_47, OnFailureCallback_47));
@@ -31150,7 +31162,7 @@ private:
 
     void OnFailureResponse_48(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_48(uint16_t currentPositionTilt)
+    void OnSuccessResponse_48(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
@@ -31171,10 +31183,10 @@ private:
 
     void OnFailureResponse_49(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_49(uint8_t currentPositionLiftPercentage)
+    void OnSuccessResponse_49(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "Percent"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
 
@@ -31184,8 +31196,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t currentPositionLiftPercentageArgument;
-        currentPositionLiftPercentageArgument = 200;
+        chip::app::DataModel::Nullable<chip::Percent> currentPositionLiftPercentageArgument;
+        currentPositionLiftPercentageArgument.SetNonNull() = 200;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
@@ -31215,9 +31227,9 @@ private:
 
     void OnFailureResponse_51(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_51(uint8_t currentPositionLiftPercentage)
+    void OnSuccessResponse_51(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "Percent"));
         VerifyOrReturn(CheckConstraintNotValue("currentPositionLiftPercentage", currentPositionLiftPercentage, 200));
 
         NextTest();
@@ -31237,10 +31249,10 @@ private:
 
     void OnFailureResponse_52(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_52(uint8_t currentPositionTiltPercentage)
+    void OnSuccessResponse_52(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
-        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "Percent"));
+        VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
 
@@ -31250,8 +31262,8 @@ private:
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        uint8_t currentPositionTiltPercentageArgument;
-        currentPositionTiltPercentageArgument = 200;
+        chip::app::DataModel::Nullable<chip::Percent> currentPositionTiltPercentageArgument;
+        currentPositionTiltPercentageArgument.SetNonNull() = 200;
 
         ReturnErrorOnFailure(
             cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
@@ -31281,9 +31293,9 @@ private:
 
     void OnFailureResponse_54(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_54(uint8_t currentPositionTiltPercentage)
+    void OnSuccessResponse_54(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
-        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "uint8"));
+        VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "Percent"));
         VerifyOrReturn(CheckConstraintNotValue("currentPositionTiltPercentage", currentPositionTiltPercentage, 200));
 
         NextTest();

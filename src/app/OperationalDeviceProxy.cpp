@@ -262,6 +262,12 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     return CHIP_NO_ERROR;
 }
 
+void OperationalDeviceProxy::SetConnectedSession(SessionHandle handle)
+{
+    mSecureSession.Grab(handle);
+    mState = State::SecureConnected;
+}
+
 void OperationalDeviceProxy::Clear()
 {
     if (mCASEClient)

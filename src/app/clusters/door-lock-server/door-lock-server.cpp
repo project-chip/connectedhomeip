@@ -67,7 +67,7 @@ void DoorLockServer::InitServer(chip::EndpointId endpointId)
 
 bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
 {
-    auto lockState = static_cast<uint8_t>(newLockState);
+    auto lockState = chip::to_underlying(newLockState);
 
     emberAfDoorLockClusterPrintln("Setting LockState to '%" PRIu8 "'", lockState);
     EmberAfStatus status = Attributes::LockState::Set(endpointId, newLockState);
@@ -97,7 +97,7 @@ bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newAct
 
 bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState)
 {
-    auto doorState = static_cast<uint8_t>(newDoorState);
+    auto doorState = chip::to_underlying(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting DoorState to '%" PRIu8 "'", doorState);
     EmberAfStatus status = Attributes::DoorState::Set(endpointId, newDoorState);

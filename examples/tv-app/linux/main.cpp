@@ -57,6 +57,8 @@ static ContentLauncherManager contentLauncherManager;
 constexpr chip::EndpointId kContentLauncherEndpoint = 1;
 } // namespace
 
+void ApplicationInit() {}
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

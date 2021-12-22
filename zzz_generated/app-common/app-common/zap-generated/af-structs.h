@@ -416,6 +416,14 @@ typedef struct _PowerProfileRecord
     uint8_t powerProfileState;
 } PowerProfileRecord;
 
+// Struct for ProviderLocation
+typedef struct _ProviderLocation
+{
+    chip::FabricIndex FabricIndex;
+    chip::NodeId ProviderNodeID;
+    chip::EndpointId Endpoint;
+} ProviderLocation;
+
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
 {
@@ -539,8 +547,8 @@ typedef struct _WiFiInterfaceScanResult
     uint8_t Security;
     chip::ByteSpan SSID;
     chip::ByteSpan BSSID;
-    uint8_t Channel;
-    uint32_t WiFiBand;
+    uint16_t Channel;
+    uint8_t WiFiBand;
     int8_t RSSI;
 } WiFiInterfaceScanResult;
 
