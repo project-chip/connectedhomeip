@@ -334,6 +334,13 @@ JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle
     chip::DeviceLayer::StackLock lock;
 
     DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
+
+    //
+    // We should move away from this model of shutting down subscriptions in this manner and instead,
+    // have Java own the ReadClient objects directly and manage their lifetimes.
+    //
+    // #13163 tracks this issue.
+    //
     device->ShutdownSubscriptions();
 }
 
