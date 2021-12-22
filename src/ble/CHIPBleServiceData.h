@@ -45,7 +45,7 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask     = 0xfff;
+    constexpr static uint16_t kDiscriminatorMask = 0xfff;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     constexpr static uint8_t kAdditionalDataFlagMask = 0x1;
 #endif
@@ -82,10 +82,7 @@ struct ChipBLEDeviceIdentificationInfo
     }
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    uint8_t GetAdditionalDataFlag() const
-    {
-        return (AdditionalDataFlag & kAdditionalDataFlagMask);
-    }
+    uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }
 
     void SetAdditionalDataFlag(bool flag)
     {

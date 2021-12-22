@@ -153,9 +153,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &DeviceLayer::SystemLayer());
     SuccessOrExit(err);
 
-    mRXCharAttrHandle     = 0;
+    mRXCharAttrHandle = 0;
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    mC3CharAttrHandle     = 0;
+    mC3CharAttrHandle = 0;
 #endif
     mTXCharCCCDAttrHandle = 0;
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
