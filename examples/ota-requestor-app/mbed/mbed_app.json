@@ -23,6 +23,7 @@
                 "NL_ASSERT_EXPECT_FLAGS=NL_ASSERT_FLAG_LOG",
                 "WHD_PRINT_DISABLE"
             ],
+            "target.components_add": ["capsense"],
             "mcuboot.primary-slot-address": "0x10022000",
             "mcuboot.slot-size": "0x140000",
             "mcuboot.scratch-address": "0x101AF000",
@@ -39,6 +40,14 @@
         "system-state-led": {
             "help": "System status LED.",
             "value": "LED1"
+        },
+        "confirm-button": {
+            "help": "Confirm button pin.",
+            "value": "BUTTON1"
+        },
+        "reject-button": {
+            "help": "Reject botton pin.",
+            "value": "BUTTON2"
         },
         "ble-device-name": {
             "help": "Name used for BLE advertising.",

@@ -20,29 +20,39 @@
 #pragma once
 
 #include "AppEvent.h"
+#include <rtos/EventFlags.h>
 
 class AppTask
 {
 public:
     int StartApp();
 
+    enum AppUserResponse
+    {
+        kUserResponseType_none    = 0,
+        kUserResponseType_confirm = 0x01,
+        kUserResponseType_reject  = 0x02
+    };
+
+    AppUserResponse GetUserResponse(AppEvent::AppEventTypes event);
+
 private:
     friend AppTask & GetAppTask(void);
 
     int Init();
 
+    static AppTask sAppTask;
+
+    AppUserResponse mUserResponse;
+
+    rtos::EventFlags mButtonEventFlag;
+
+public:
     void PostEvent(AppEvent * aEvent);
     void DispatchEvent(const AppEvent * event);
 
-    // #ifdef CHIP_OTA_REQUESTOR
-    //     static void OnOtaEventHandler(AppEvent * aEvent);
-
-    //     static void OnAnnounceProviderCallback();
-    //     static void OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails);
-    //     static void OnDownloadCompletedCallback(chip::MbedOTADownloader::ImageInfo * imageInfo);
-    // #endif
-
-    static AppTask sAppTask;
+    void OnConfirmButtonPressEventHandler(void);
+    void OnRejectButtonPressEventHandler(void);
 };
 
 inline AppTask & GetAppTask(void)

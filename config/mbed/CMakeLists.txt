@@ -462,6 +462,8 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
         ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+
+        ${CHIP_ROOT}/src/platform/mbed/OTAImageProcessorImpl.cpp
     )
 
     list(APPEND CHIP_DEFINES 

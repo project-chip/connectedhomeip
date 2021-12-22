@@ -17,12 +17,14 @@
  */
 
 #include "OTARequestorDriverImpl.h"
-
+#include <AppEvent.h>
+#include <AppTask.h>
+#include <lib/support/logging/CHIPLogging.h>
 namespace chip {
 
 bool OTARequestorDriverImpl::CheckImageDownloadAllowed()
 {
-    return true;
+    return GetAppTask().GetUserResponse(AppEvent::kEventType_ota_update_available) == AppTask::kUserResponseType_confirm;
 }
 
 UserConsentAction OTARequestorDriverImpl::RequestUserConsent()

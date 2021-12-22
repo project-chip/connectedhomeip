@@ -69,6 +69,10 @@ public:
 
     void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; };
 
+#ifdef BOOT_ENABLED
+    mbed::BlockDevice * mBlockDevice;
+#endif
+
 private:
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
@@ -79,14 +83,13 @@ private:
     CHIP_ERROR SetBlock(ByteSpan & block);
     CHIP_ERROR ReleaseBlock();
 
+    int PrepareMemory();
+    int ClearMemory();
+    int ProgramMemory();
     void ClearDownloadParams();
 
     OTADownloader * mDownloader = nullptr;
     MutableByteSpan mBlock;
-
-#ifdef BOOT_ENABLED
-    mbed::BlockDevice * mBlockDevice;
-#endif
 };
 
 } // namespace chip

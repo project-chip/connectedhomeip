@@ -30,6 +30,10 @@
 // mbed-os headers
 #include "events/EventQueue.h"
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 #ifdef CHIP_OTA_REQUESTOR
 #include "OTARequestorDriverImpl.h"
 #include <BDXDownloader.h>
@@ -40,15 +44,6 @@
 #ifdef BOOT_ENABLED
 #include "blockdevice/SlicingBlockDevice.h"
 #include <bootutil/bootutil.h>
-#endif
-
-#ifdef BOOT_ENABLED
-mbed::BlockDevice * get_secondary_bd()
-{
-    mbed::BlockDevice * default_bd = mbed::BlockDevice::get_default_instance();
-    static mbed::SlicingBlockDevice sliced_bd(default_bd, 0x0, MCUBOOT_SLOT_SIZE);
-    return &sliced_bd;
-}
 #endif
 
 static bool sIsWiFiStationProvisioned = false;
@@ -64,6 +59,17 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
+
+#define CONFIRM_BUTTON (MBED_CONF_APP_CONFIRM_BUTTON)
+#define REJECT_BUTTON (MBED_CONF_APP_REJECT_BUTTON)
+
+#ifdef CAPSENSE_ENABLED
+static mbed::CapsenseButton CapConfirmButton(Capsense::getInstance(), 0);
+static mbed::CapsenseButton CapRejectButton(Capsense::getInstance(), 1);
+#else
+static mbed::InterruptIn sConfirmButton(CONFIRM_BUTTON);
+static mbed::InterruptIn sRejectButton(REJECT_BUTTON);
+#endif
 
 AppTask AppTask::sAppTask;
 
@@ -84,6 +90,15 @@ int AppTask::Init()
             }
         },
         0);
+
+#ifdef CAPSENSE_ENABLED
+    Capsense::getInstance().init();
+    CapConfirmButton.fall(mbed::callback(this, &AppTask::OnConfirmButtonPressEventHandler));
+    CapRejectButton.fall(mbed::callback(this, &AppTask::OnRejectButtonPressEventHandler));
+#else
+    sConfirmButton.fall(mbed::callback(this, &AppTask::OnConfirmButtonPressEventHandler));
+    sRejectButton.fall(mbed::callback(this, &AppTask::OnRejectButtonPressEventHandler));
+#endif
 
 #ifdef MBED_CONF_APP_BLE_DEVICE_NAME
     error = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
@@ -257,60 +272,37 @@ void AppTask::DispatchEvent(const AppEvent * aEvent)
     }
 }
 
-// #ifdef CHIP_OTA_REQUESTOR
-// void AppTask::OnOtaEventHandler(AppEvent * aEvent)
-// {
-//     switch (aEvent->Type)
-//     {
-//     case AppEvent::kEventType_ota_provider_announce: {
-//         ChipLogProgress(NotSpecified, "OTA provider announce event");
-//         MbedOTARequestor * requestor = static_cast<MbedOTARequestor *>(GetRequestorInstance());
-//         requestor->ConnectProvider();
-//         break;
-//     }
+void AppTask::OnConfirmButtonPressEventHandler()
+{
+    ChipLogProgress(NotSpecified, "Confirm button pressed");
+    mButtonEventFlag.set(AppTask::kUserResponseType_confirm);
+}
 
-//     case AppEvent::kEventType_ota_provider_response: {
-//         ChipLogProgress(NotSpecified, "OTA provider response event");
-//         MbedOTADownloader * downloader = static_cast<MbedOTADownloader *>(GetDownloaderInstance());
-//         downloader->SetDownloadImageInfo(aEvent->OTAProviderResponseEvent.imageDatails->updateFileName);
-//         downloader->BeginPrepareDownload();
-//         break;
-//     }
-//     case AppEvent::kEventType_ota_download_completed:
-//         ChipLogProgress(NotSpecified, "OTA download completed event");
-//         ChipLogProgress(NotSpecified, "Download %.*s image size %ukB",
-//                         static_cast<int>(aEvent->OTADownloadCompletedEvent.imageInfo->imageName.size()),
-//                         aEvent->OTADownloadCompletedEvent.imageInfo->imageName.data(),
-//                         (static_cast<unsigned>(aEvent->OTADownloadCompletedEvent.imageInfo->imageSize) / 1024u));
-//         break;
-//     default:
-//         ChipLogError(NotSpecified, "OTA event unknown");
-//     }
-// }
+void AppTask::OnRejectButtonPressEventHandler()
+{
+    ChipLogProgress(NotSpecified, "Reject button pressed");
+    mButtonEventFlag.set(AppTask::kUserResponseType_reject);
+}
 
-// void AppTask::OnAnnounceProviderCallback()
-// {
-//     AppEvent ota_announce_provider_event;
-//     ota_announce_provider_event.Type    = AppEvent::kEventType_ota_provider_announce;
-//     ota_announce_provider_event.Handler = OnOtaEventHandler;
-//     sAppTask.PostEvent(&ota_announce_provider_event);
-// }
+AppTask::AppUserResponse AppTask::GetUserResponse(AppEvent::AppEventTypes event)
+{
+    switch (event)
+    {
+    case AppEvent::kEventType_ota_update_available: {
+        ChipLogProgress(NotSpecified, "OTA update available");
+        ChipLogProgress(NotSpecified, "Press BUTTON 0 to confirm or BUTTON 1 to reject update image downloading");
+        break;
+    }
+    case AppEvent::kEventType_ota_apply_download: {
+        ChipLogProgress(NotSpecified, "OTA apply download");
+        ChipLogProgress(NotSpecified, "Press BUTTON 0 to confirm or BUTTON 1 to reject update image applying");
+        break;
+    }
+    default:
+        ChipLogError(NotSpecified, "OTA event unknown");
+        return AppTask::kUserResponseType_none;
+    }
 
-// void AppTask::OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails)
-// {
-//     AppEvent ota_provider_response_event;
-//     ota_provider_response_event.Type                                  = AppEvent::kEventType_ota_provider_response;
-//     ota_provider_response_event.Handler                               = OnOtaEventHandler;
-//     ota_provider_response_event.OTAProviderResponseEvent.imageDatails = updateDetails;
-//     sAppTask.PostEvent(&ota_provider_response_event);
-// }
-
-// void AppTask::OnDownloadCompletedCallback(MbedOTADownloader::ImageInfo * imageInfo)
-// {
-//     AppEvent ota_download_completed_event;
-//     ota_download_completed_event.Type                                = AppEvent::kEventType_ota_download_completed;
-//     ota_download_completed_event.Handler                             = OnOtaEventHandler;
-//     ota_download_completed_event.OTADownloadCompletedEvent.imageInfo = imageInfo;
-//     sAppTask.PostEvent(&ota_download_completed_event);
-// }
-// #endif
+    return (AppTask::AppUserResponse) mButtonEventFlag.wait_any(AppTask::kUserResponseType_confirm |
+                                                                AppTask::kUserResponseType_reject);
+}
