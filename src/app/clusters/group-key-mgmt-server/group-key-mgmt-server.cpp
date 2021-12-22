@@ -148,7 +148,7 @@ struct GroupTableCodec
             {
                 if (mapping.group_id == mInfo.group_id)
                 {
-                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag, static_cast<uint16_t>(mapping.endpoint_id)));
+                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
                 }
             }
             iter->Release();
@@ -508,7 +508,7 @@ struct KeySetReadAllIndicesResponse
         GroupDataProvider::KeySet keyset;
         while (mIterator && mIterator->Next(keyset))
         {
-            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, keyset.keyset_id));
+            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), keyset.keyset_id));
         }
 
         ReturnErrorOnFailure(writer.EndContainer(array));

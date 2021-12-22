@@ -35,7 +35,7 @@ CHIP_ERROR ListBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aCon
 CHIP_ERROR ListBuilder::Init(TLV::TLVWriter * const apWriter)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(TLV::AnonymousTag, TLV::kTLVType_List, mOuterContainerType);
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag(), TLV::kTLVType_List, mOuterContainerType);
 
     return mError;
 }

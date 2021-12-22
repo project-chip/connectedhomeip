@@ -138,7 +138,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TagFirstGroup(), static_cast<uint16_t>(first_group)));
         ReturnErrorOnFailure(writer.Put(TagGroupCount(), static_cast<uint16_t>(group_count)));
@@ -151,7 +151,7 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
         TLV::TLVType container;
@@ -215,7 +215,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, LinkedData
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         size_t name_size = strnlen(name, GroupDataProvider::GroupInfo::kGroupNameMax);
         ReturnErrorOnFailure(writer.Put(TagGroupId(), static_cast<uint16_t>(group_id)));
@@ -227,7 +227,7 @@ struct GroupData : public GroupDataProvider::GroupInfo, LinkedData
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
         TLV::TLVType container;
@@ -342,7 +342,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TagGroupId(), static_cast<uint16_t>(group_id)));
         ReturnErrorOnFailure(writer.Put(TagKeysetId(), static_cast<uint16_t>(keyset_id)));
@@ -352,7 +352,7 @@ struct KeyMapData : public GroupDataProvider::GroupKey, LinkedData
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
         TLV::TLVType container;
@@ -459,7 +459,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, LinkedData
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         ReturnErrorOnFailure(writer.Put(TagEndpoint(), static_cast<uint16_t>(endpoint_id)));
         ReturnErrorOnFailure(writer.Put(TagNext(), static_cast<uint16_t>(next)));
@@ -468,7 +468,7 @@ struct EndpointData : GroupDataProvider::GroupEndpoint, LinkedData
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
         TLV::TLVType container;
@@ -559,7 +559,7 @@ struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistent
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
         TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, container));
 
         // keyset_id
         ReturnErrorOnFailure(writer.Put(TagKeySetId(), static_cast<uint16_t>(keyset_id)));
@@ -573,7 +573,7 @@ struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistent
             ReturnErrorOnFailure(writer.StartContainer(TagEpochKeys(), TLV::kTLVType_Array, array));
             for (auto & epoch : epoch_keys)
             {
-                ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, item));
+                ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, item));
                 ReturnErrorOnFailure(writer.Put(TagStartTime(), static_cast<uint64_t>(epoch.start_time)));
                 ReturnErrorOnFailure(writer.Put(TagKey(), ByteSpan(epoch.key, GroupDataProvider::EpochKey::kLengthBytes)));
                 ReturnErrorOnFailure(writer.EndContainer(item));
@@ -588,7 +588,7 @@ struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistent
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
-        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
         VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
         TLV::TLVType container;
@@ -612,7 +612,7 @@ struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistent
             ReturnErrorOnFailure(reader.EnterContainer(array));
             for (auto & epoch : epoch_keys)
             {
-                ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+                ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag()));
                 VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
                 ReturnErrorOnFailure(reader.EnterContainer(item));

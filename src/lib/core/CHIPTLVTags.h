@@ -143,7 +143,10 @@ inline constexpr Tag CommonTag(uint32_t tagNum)
 /**
  * A value signifying a TLV element that has no tag (i.e. an anonymous element).
  */
-static constexpr Tag AnonymousTag(kSpecialTagMarker | 0x00000000FFFFFFFFULL);
+inline constexpr Tag AnonymousTag()
+{
+    return Tag(kSpecialTagMarker | 0x00000000FFFFFFFFULL);
+}
 // TODO: Move to private namespace
 static constexpr Tag UnknownImplicitTag(kSpecialTagMarker | 0x00000000FFFFFFFEULL);
 
