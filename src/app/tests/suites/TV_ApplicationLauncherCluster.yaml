@@ -49,7 +49,7 @@ tests:
           values:
               - name: "data"
                 value: "data"
-              - name: "statusEnum"
+              - name: "status"
                 value: 0
 
     - label: "Stop App Command"
@@ -62,7 +62,7 @@ tests:
           values:
               - name: "data"
                 value: "data"
-              - name: "statusEnum"
+              - name: "status"
                 value: 0
 
     - label: "Hide App Command"
@@ -75,5 +75,5 @@ tests:
           values:
               - name: "data"
                 value: "data"
-              - name: "statusEnum"
+              - name: "status"
                 value: 0

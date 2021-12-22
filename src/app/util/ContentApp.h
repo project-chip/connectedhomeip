@@ -102,7 +102,7 @@ class DLL_EXPORT ContentLauncher : public ContentAppCluster
 public:
     virtual ~ContentLauncher() = default;
 
-    virtual LaunchResponse LaunchContent(std::list<Paramater> parameterList, bool autoplay, std::string data) = 0;
+    virtual LaunchResponse LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;

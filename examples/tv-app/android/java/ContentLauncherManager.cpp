@@ -45,7 +45,7 @@ using namespace chip;
 
 ContentLauncherManager ContentLauncherManager::sInstance;
 
-LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Paramater> & parameterList,
+LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
                                                            bool autoplay, const chip::CharSpan & data)
 {
     LaunchResponse response;
@@ -85,8 +85,8 @@ LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endp
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.statusEnum = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data       = dataStr.charSpan();
+        response.status  = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        response.data    = dataStr.charSpan();
     }
 
 exit:
@@ -140,8 +140,8 @@ LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & co
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.statusEnum = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
-        response.data       = dataStr.charSpan();
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
+        response.data   = dataStr.charSpan();
     }
 
 exit:

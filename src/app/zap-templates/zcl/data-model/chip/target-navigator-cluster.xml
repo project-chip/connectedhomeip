@@ -36,7 +36,7 @@ limitations under the License.
 
     <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
       <description>This command SHALL be generated in response to NavigateTarget commands.</description>
-      <arg name="statusEnum" type="StatusEnum"/>
+      <arg name="status" type="StatusEnum"/>
       <arg name="data" type="CHAR_STRING"/>
     </command>
   </cluster>

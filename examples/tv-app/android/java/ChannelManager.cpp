@@ -252,9 +252,9 @@ CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & a
             lineupInfo.postalCode = postalCode.charSpan();
         }
 
-        jfieldID lineupInfoTypeFild   = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
-        jint jlineupInfoType          = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
-        lineupInfo.lineupInfoTypeEnum = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
+        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
+        jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
+        lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
 
         ReturnErrorOnFailure(aEncoder.Encode(lineupInfo));
 

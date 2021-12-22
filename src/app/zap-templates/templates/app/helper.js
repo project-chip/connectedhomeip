@@ -611,9 +611,7 @@ async function getResponseCommandName(responseRef, options)
 function isWeaklyTypedEnum(label)
 {
   return [
-    "ApplicationLauncherStatus",
     "AttributeWritePermission",
-    "AudioOutputType",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
     "BootReasonType",
@@ -645,13 +643,8 @@ function isWeaklyTypedEnum(label)
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",
     "InterfaceType",
-    "KeypadInputCecKeyCode",
-    "KeypadInputStatus",
     "KeypadLockout",
     "LevelControlOptions",
-    "MediaInputType",
-    "MediaPlaybackState",
-    "MediaPlaybackStatus",
     "MoveMode",
     "NetworkFaultType",
     "NodeOperationalCertStatus",

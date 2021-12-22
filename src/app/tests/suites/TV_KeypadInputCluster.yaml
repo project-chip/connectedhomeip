@@ -31,5 +31,5 @@ tests:
                 value: 3
       response:
           values:
-              - name: "statusEnum"
+              - name: "status"
                 value: 0

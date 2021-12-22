@@ -25,9 +25,9 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the current Channel on a device.</description>
-    <attribute side="server" code="0x0000" define="CHANNEL_LIST" type="ARRAY" entryType="ChannelInfo" length="254" writable="false" optional="false">channel list</attribute>
-    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="LineupInfo" writable="true" optional="false">channel lineup</attribute>
-    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo" writable="true" optional="false">current channel</attribute>
+    <attribute side="server" code="0x0000" define="CHANNEL_LIST" type="ARRAY" entryType="ChannelInfo" length="254" writable="false" optional="true">channel list</attribute>
+    <attribute side="server" code="0x0001" define="CHANNEL_LINEUP" type="LineupInfo" writable="true" optional="true">channel lineup</attribute>
+    <attribute side="server" code="0x0002" define="CHANNEL_CURRENT_CHANNEL" type="ChannelInfo" writable="true" optional="true">current channel</attribute>
 
     <command source="client" code="0x00" name="ChangeChannelRequest" response="ChangeChannelResponse" optional="false">
       <description>Change the channel on the media player to the channel case-insensitive exact matching the value passed as an argument. </description>
@@ -48,7 +48,7 @@ limitations under the License.
     <command source="server" code="0x01" name="ChangeChannelResponse" optional="false">
       <description>Upon receipt, this SHALL display the active status of the input list on screen.</description>
       <arg name="channelMatch" type="ChannelInfo"/>
-      <arg name="errorTypeEnum" type="ErrorTypeEnum"/>
+      <arg name="errorType" type="ErrorTypeEnum"/>
     </command>
 
   </cluster>
@@ -67,7 +67,7 @@ limitations under the License.
     <item name="operatorName" type="CHAR_STRING"/>
     <item name="lineupName" type="CHAR_STRING"/>
     <item name="postalCode" type="CHAR_STRING"/>
-    <item name="lineupInfoTypeEnum" type="LineupInfoTypeEnum"/>
+    <item name="lineupInfoType" type="LineupInfoTypeEnum"/>
   </struct>
 
   <enum name="LineupInfoTypeEnum" type="ENUM8">

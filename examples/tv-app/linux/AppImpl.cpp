@@ -201,7 +201,7 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = (uint8_t) chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.status       = to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
 
     return response;
 }

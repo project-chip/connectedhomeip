@@ -184,9 +184,9 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
 
     auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
-    // TODO: Decode the paramater and pass it to delegate
+    // TODO: Decode the parameter and pass it to delegate
     // auto searchIterator = commandData.search.begin();
-    std::list<Paramater> parameterList;
+    std::list<Parameter> parameterList;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
@@ -195,8 +195,8 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
         LaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.statusEnum = resp.statusEnum;
-        response.data       = resp.data;
+        response.status  = resp.status;
+        response.data    = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
@@ -223,7 +223,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
 
     auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
-    // TODO: Decode the paramater and pass it to delegate
+    // TODO: Decode the parameter and pass it to delegate
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
     std::list<BrandingInformation> brandingInformationList;
 
@@ -234,8 +234,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
         LaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.statusEnum = resp.statusEnum;
-        response.data       = resp.data;
+        response.status = resp.status;
+        response.data   = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);

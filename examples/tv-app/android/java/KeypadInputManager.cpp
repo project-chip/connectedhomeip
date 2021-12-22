@@ -39,7 +39,7 @@ chip::app::Clusters::KeypadInput::StatusEnum KeypadInputManager::SendKey(chip::a
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %d", (uint8_t) keyCode);
+    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %c", to_underlying(keyCode));
     VerifyOrExit(mKeypadInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSendKeyMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);

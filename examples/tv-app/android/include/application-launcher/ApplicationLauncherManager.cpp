@@ -22,6 +22,7 @@
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <utility>
 
 using namespace std;
 
@@ -50,7 +51,7 @@ ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = (uint8_t) chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     // TODO: Update once storing a structure attribute is supported
     // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
     //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
@@ -65,7 +66,7 @@ ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId e
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = (uint8_t) chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     return response;
 }
 
@@ -76,6 +77,6 @@ ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId e
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = (uint8_t) chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     return response;
 }

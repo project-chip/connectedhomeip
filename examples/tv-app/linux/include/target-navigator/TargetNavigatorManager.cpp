@@ -86,11 +86,11 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId en
     // make sure TV_TargetNavigatorCluster.yaml test suite passes - assumes index starts at 1
     if (target == 0 || target > gTargets.size())
     {
-        response.status = (uint8_t) chip::app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
+        response.status = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable);
     }
     else
     {
-        response.status = (uint8_t) chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
+        response.status = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess);
         gCurrentTarget  = target;
     }
     return response;

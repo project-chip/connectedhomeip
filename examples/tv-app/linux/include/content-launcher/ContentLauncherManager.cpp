@@ -38,7 +38,7 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
-LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Paramater> & parameterList,
+LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
                                                            bool autoplay, const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
@@ -54,9 +54,9 @@ LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endp
 
     // TODO: Insert code here
     LaunchResponse response;
-    response.err        = CHIP_NO_ERROR;
-    response.data       = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.statusEnum = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 
@@ -70,9 +70,9 @@ LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & co
 
     // TODO: Insert code here
     LaunchResponse response;
-    response.err        = CHIP_NO_ERROR;
-    response.data       = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.statusEnum = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
+    response.err    = CHIP_NO_ERROR;
+    response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 

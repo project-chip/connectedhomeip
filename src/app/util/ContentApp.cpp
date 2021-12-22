@@ -246,11 +246,11 @@ TargetNavigatorResponse TargetNavigator::NavigateTarget(uint8_t target, std::str
     response.data         = (uint8_t *) testData;
     if (target >= mTargets.size())
     {
-        response.status = (uint8_t) app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
+        response.status = to_underlying(app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable);
     }
     else
     {
-        response.status = (uint8_t) app::Clusters::TargetNavigator::StatusEnum::kSuccess;
+        response.status = to_underlying(app::Clusters::TargetNavigator::StatusEnum::kSuccess);
         mCurrentTarget  = target;
     }
     return response;

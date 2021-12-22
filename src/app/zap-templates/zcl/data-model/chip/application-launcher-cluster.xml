@@ -46,7 +46,7 @@ limitations under the License.
 
     <command source="server" code="0x03" name="LauncherResponse" optional="false">
       <description>This command SHALL be generated in response to LaunchApp commands.</description>
-      <arg name="statusEnum" type="StatusEnum"/>
+      <arg name="status" type="StatusEnum"/>
       <arg name="data" type="CHAR_STRING"/>
     </command>
 

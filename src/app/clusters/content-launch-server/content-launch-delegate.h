@@ -30,7 +30,7 @@ struct LaunchResponse
 {
     CHIP_ERROR err;
     chip::CharSpan data;
-    chip::app::Clusters::ContentLauncher::StatusEnum statusEnum;
+    chip::app::Clusters::ContentLauncher::StatusEnum status;
 };
 
 namespace chip {
@@ -44,7 +44,7 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Paramater> & parameterList,
+    virtual LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
                                                bool autoplay, const chip::CharSpan & data) = 0;
 
     virtual LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,

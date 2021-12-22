@@ -61,7 +61,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
     response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
     response.channelMatch.callSign          = chip::CharSpan("callSign", strlen("callSign"));
     response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
-    response.errorTypeEnum                  = (ErrorTypeEnum) 0;
+    response.errorType                      = (ErrorTypeEnum) 0;
 
     CHIP_ERROR err = command->AddResponseData(commandPath, response);
     if (err != CHIP_NO_ERROR)

@@ -84,7 +84,7 @@ limitations under the License.
 
     <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
       <description>This command SHALL be generated in response to various Playback Request commands.</description>
-      <arg name="statusEnum" type="StatusEnum"/>
+      <arg name="status" type="StatusEnum"/>
     </command>
 
   </cluster>

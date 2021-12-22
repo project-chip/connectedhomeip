@@ -51,9 +51,9 @@ CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::EndpointId mE
         for (int i = 0; i < maximumVectorSize; ++i)
         {
             chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
-            outputInfo.outputTypeEnum = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-            outputInfo.name           = chip::CharSpan(name, sizeof(name) - 1);
-            outputInfo.index          = static_cast<uint8_t>(1 + i);
+            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+            outputInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
+            outputInfo.index      = static_cast<uint8_t>(1 + i);
             ReturnErrorOnFailure(encoder.Encode(outputInfo));
         }
         return CHIP_NO_ERROR;

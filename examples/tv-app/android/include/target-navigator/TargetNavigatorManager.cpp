@@ -61,6 +61,6 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId en
     TargetNavigatorResponse response;
     const char * testData = "data response";
     response.data         = (uint8_t *) testData;
-    response.status       = (uint8_t) chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess;
+    response.status       = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess);
     return response;
 }
