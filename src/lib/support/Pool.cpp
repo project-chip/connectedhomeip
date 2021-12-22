@@ -84,7 +84,6 @@ size_t StaticAllocatorBitmap::IndexOf(void * element)
     return index;
 }
 
-using Lambda = Loop (*)(void *, void *);
 Loop StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lambda)
 {
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
@@ -117,7 +116,6 @@ HeapObjectListNode * HeapObjectList::FindNode(void * object) const
     return nullptr;
 }
 
-using Lambda = Loop (*)(void *, void *);
 Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
 {
     ++mIterationDepth;

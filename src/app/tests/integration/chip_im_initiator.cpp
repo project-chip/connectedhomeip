@@ -160,6 +160,8 @@ public:
         {
             HandleReadComplete();
         }
+
+        chip::Platform::Delete(apReadClient);
     }
 
     void OnResponse(chip::app::CommandSender * apCommandSender, const chip::app::ConcreteCommandPath & aPath,
@@ -317,8 +319,14 @@ CHIP_ERROR SendReadRequest()
     readPrepareParams.mAttributePathParamsListSize = 1;
     readPrepareParams.mpEventPathParamsList        = eventPathParams;
     readPrepareParams.mEventPathParamsListSize     = 2;
-    err = chip::app::InteractionModelEngine::GetInstance()->SendReadRequest(readPrepareParams, &gMockDelegate);
-    SuccessOrExit(err);
+
+    auto readClient =
+        chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
+                                                          gMockDelegate, chip::app::ReadClient::InteractionType::Read);
+
+    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+
+    readClient.release();
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -329,6 +337,7 @@ exit:
     {
         printf("Send read request failed, err: %s\n", chip::ErrorStr(err));
     }
+
     return err;
 }
 
@@ -394,8 +403,13 @@ CHIP_ERROR SendSubscribeRequest()
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = chip::app::InteractionModelEngine::GetInstance()->SendSubscribeRequest(readPrepareParams, &gMockDelegate);
-    SuccessOrExit(err);
+    auto readClient =
+        chip::Platform::MakeUnique<chip::app::ReadClient>(chip::app::InteractionModelEngine::GetInstance(), &gExchangeManager,
+                                                          gMockDelegate, chip::app::ReadClient::InteractionType::Subscribe);
+
+    SuccessOrExit(readClient->SendRequest(readPrepareParams));
+
+    readClient.release();
 
     gSubCount++;
 
