@@ -26,6 +26,7 @@ class AmebaBoard(Enum):
 class AmebaApp(Enum):
     ALL_CLUSTERS = auto()
     LIGHT = auto()
+    PIGWEED = auto()
 
     @property
     def ExampleName(self):
@@ -33,6 +34,8 @@ class AmebaApp(Enum):
             return 'all-clusters-app'
         elif self == AmebaApp.LIGHT:
             return 'lighting-app'
+        elif self == AmebaApp.PIGWEED:
+            return 'pigweed-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -42,6 +45,8 @@ class AmebaApp(Enum):
             return 'chip-ameba-all-clusters-app'
         elif self == AmebaApp.LIGHT:
             return 'chip-ameba-lighting-app'
+        elif self == AmebaApp.PIGWEED:
+            return 'chip-ameba-pigweed-app'
         else:
             raise Exception('Unknown app type: %r' % self)
 
