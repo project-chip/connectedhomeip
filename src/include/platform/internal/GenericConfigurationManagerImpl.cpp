@@ -484,10 +484,6 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
 
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-    deviceIdInfo.SetAdditionalDataFlag(true);
-#endif
-
 exit:
     return err;
 }

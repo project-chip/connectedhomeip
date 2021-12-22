@@ -45,18 +45,14 @@ enum chipBLEServiceDataType
  */
 struct ChipBLEDeviceIdentificationInfo
 {
-    constexpr static uint16_t kDiscriminatorMask = 0xfff;
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    constexpr static uint16_t kDiscriminatorMask     = 0xfff;
     constexpr static uint8_t kAdditionalDataFlagMask = 0x1;
-#endif
 
     uint8_t OpCode;
     uint8_t DeviceDiscriminator[2];
     uint8_t DeviceVendorId[2];
     uint8_t DeviceProductId[2];
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     uint8_t AdditionalDataFlag;
-#endif
 
     void Init() { memset(this, 0, sizeof(*this)); }
 
@@ -81,7 +77,6 @@ struct ChipBLEDeviceIdentificationInfo
         chip::Encoding::LittleEndian::Put16(DeviceDiscriminator, deviceDiscriminator);
     }
 
-#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     uint8_t GetAdditionalDataFlag() const { return (AdditionalDataFlag & kAdditionalDataFlagMask); }
 
     void SetAdditionalDataFlag(bool flag)
@@ -95,7 +90,6 @@ struct ChipBLEDeviceIdentificationInfo
             AdditionalDataFlag &= static_cast<uint8_t>(~kAdditionalDataFlagMask);
         }
     }
-#endif
 } __attribute__((packed));
 
 } /* namespace Ble */
