@@ -339,7 +339,6 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
     }
 
 #if CHIP_PROGRESS_LOGGING
-
     {
         const char * deviceTypeStr;
         switch (deviceType)
@@ -452,15 +451,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr;
-    const otMacCounters * macCounters;
-    const otIpCounters * ipCounters;
     otOperationalDataset activeDataset;
-    otDeviceRole role;
 
     Impl()->LockThreadStack();
+#if CHIP_PROGRESS_LOGGING
+    {
+        otDeviceRole role;
 
-    role = otThreadGetDeviceRole(mOTInst);
-    ChipLogProgress(DeviceLayer, "Thread Role:                  %d\n", role);
+        role = otThreadGetDeviceRole(mOTInst);
+        ChipLogProgress(DeviceLayer, "Thread Role:                  %d\n", role);
+    }
+#endif // CHIP_PROGRESS_LOGGING
 
     if (otDatasetIsCommissioned(mOTInst))
     {
@@ -473,61 +474,67 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
         }
     }
 
-    macCounters = otLinkGetCounters(mOTInst);
+#if CHIP_PROGRESS_LOGGING
+    {
+        const otIpCounters * ipCounters;
+        const otMacCounters * macCounters;
 
-    ChipLogProgress(DeviceLayer,
-                    "Rx Counters:\n"
-                    "PHY Rx Total:                 %" PRIu32 "\n"
-                    "MAC Rx Unicast:               %" PRIu32 "\n"
-                    "MAC Rx Broadcast:             %" PRIu32 "\n"
-                    "MAC Rx Data:                  %" PRIu32 "\n"
-                    "MAC Rx Data Polls:            %" PRIu32 "\n"
-                    "MAC Rx Beacons:               %" PRIu32 "\n"
-                    "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
-                    "MAC Rx Other:                 %" PRIu32 "\n"
-                    "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
-                    "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
-                    macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
-                    macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
-                    macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
+        macCounters = otLinkGetCounters(mOTInst);
 
-    ChipLogProgress(DeviceLayer,
-                    "Tx Counters:\n"
-                    "PHY Tx Total:                 %" PRIu32 "\n"
-                    "MAC Tx Unicast:               %" PRIu32 "\n"
-                    "MAC Tx Broadcast:             %" PRIu32 "\n"
-                    "MAC Tx Data:                  %" PRIu32 "\n"
-                    "MAC Tx Data Polls:            %" PRIu32 "\n"
-                    "MAC Tx Beacons:               %" PRIu32 "\n"
-                    "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
-                    "MAC Tx Other:                 %" PRIu32 "\n"
-                    "MAC Tx Retry:                 %" PRIu32 "\n"
-                    "MAC Tx CCA Fail:              %" PRIu32 "\n",
-                    macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
-                    macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
-                    macCounters->mTxRetry, macCounters->mTxErrCca);
+        ChipLogProgress(DeviceLayer,
+                        "Rx Counters:\n"
+                        "PHY Rx Total:                 %" PRIu32 "\n"
+                        "MAC Rx Unicast:               %" PRIu32 "\n"
+                        "MAC Rx Broadcast:             %" PRIu32 "\n"
+                        "MAC Rx Data:                  %" PRIu32 "\n"
+                        "MAC Rx Data Polls:            %" PRIu32 "\n"
+                        "MAC Rx Beacons:               %" PRIu32 "\n"
+                        "MAC Rx Beacon Reqs:           %" PRIu32 "\n"
+                        "MAC Rx Other:                 %" PRIu32 "\n"
+                        "MAC Rx Filtered Whitelist:    %" PRIu32 "\n"
+                        "MAC Rx Filtered DestAddr:     %" PRIu32 "\n",
+                        macCounters->mRxTotal, macCounters->mRxUnicast, macCounters->mRxBroadcast, macCounters->mRxData,
+                        macCounters->mRxDataPoll, macCounters->mRxBeacon, macCounters->mRxBeaconRequest, macCounters->mRxOther,
+                        macCounters->mRxAddressFiltered, macCounters->mRxDestAddrFiltered);
 
-    ChipLogProgress(DeviceLayer,
-                    "Failure Counters:\n"
-                    "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
-                    "MAC Rx No Frame Fail:         %" PRIu32 "\n"
-                    "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
-                    "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
-                    "MAC Rx FCS Fail:              %" PRIu32 "\n"
-                    "MAC Rx Other Fail:            %" PRIu32 "\n",
-                    macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
-                    macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
+        ChipLogProgress(DeviceLayer,
+                        "Tx Counters:\n"
+                        "PHY Tx Total:                 %" PRIu32 "\n"
+                        "MAC Tx Unicast:               %" PRIu32 "\n"
+                        "MAC Tx Broadcast:             %" PRIu32 "\n"
+                        "MAC Tx Data:                  %" PRIu32 "\n"
+                        "MAC Tx Data Polls:            %" PRIu32 "\n"
+                        "MAC Tx Beacons:               %" PRIu32 "\n"
+                        "MAC Tx Beacon Reqs:           %" PRIu32 "\n"
+                        "MAC Tx Other:                 %" PRIu32 "\n"
+                        "MAC Tx Retry:                 %" PRIu32 "\n"
+                        "MAC Tx CCA Fail:              %" PRIu32 "\n",
+                        macCounters->mTxTotal, macCounters->mTxUnicast, macCounters->mTxBroadcast, macCounters->mTxData,
+                        macCounters->mTxDataPoll, macCounters->mTxBeacon, macCounters->mTxBeaconRequest, macCounters->mTxOther,
+                        macCounters->mTxRetry, macCounters->mTxErrCca);
 
-    ipCounters = otThreadGetIp6Counters(mOTInst);
+        ChipLogProgress(DeviceLayer,
+                        "Failure Counters:\n"
+                        "MAC Rx Decrypt Fail:          %" PRIu32 "\n"
+                        "MAC Rx No Frame Fail:         %" PRIu32 "\n"
+                        "MAC Rx Unknown Neighbor Fail: %" PRIu32 "\n"
+                        "MAC Rx Invalid Src Addr Fail: %" PRIu32 "\n"
+                        "MAC Rx FCS Fail:              %" PRIu32 "\n"
+                        "MAC Rx Other Fail:            %" PRIu32 "\n",
+                        macCounters->mRxErrSec, macCounters->mRxErrNoFrame, macCounters->mRxErrUnknownNeighbor,
+                        macCounters->mRxErrInvalidSrcAddr, macCounters->mRxErrFcs, macCounters->mRxErrOther);
 
-    ChipLogProgress(DeviceLayer,
-                    "IP Counters:\n"
-                    "IP Tx Success:                %" PRIu32 "\n"
-                    "IP Rx Success:                %" PRIu32 "\n"
-                    "IP Tx Fail:                   %" PRIu32 "\n"
-                    "IP Rx Fail:                   %" PRIu32 "\n",
-                    ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
+        ipCounters = otThreadGetIp6Counters(mOTInst);
 
+        ChipLogProgress(DeviceLayer,
+                        "IP Counters:\n"
+                        "IP Tx Success:                %" PRIu32 "\n"
+                        "IP Rx Success:                %" PRIu32 "\n"
+                        "IP Tx Fail:                   %" PRIu32 "\n"
+                        "IP Rx Fail:                   %" PRIu32 "\n",
+                        ipCounters->mTxSuccess, ipCounters->mRxSuccess, ipCounters->mTxFailure, ipCounters->mRxFailure);
+    }
+#endif // CHIP_PROGRESS_LOGGING
 exit:
     Impl()->UnlockThreadStack();
     return err;
@@ -537,6 +544,8 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyMinimal(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_PROGRESS_LOGGING
     otError otErr;
     const otExtAddress * extAddress;
     uint16_t rloc16;
@@ -589,7 +598,7 @@ exit:
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyMinimul failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
+#endif // CHIP_PROGRESS_LOGGING
     return err;
 }
 
@@ -601,6 +610,8 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_PROGRESS_LOGGING
     otError otErr;
     otIp6Address * leaderAddr    = NULL;
     uint8_t * networkData        = NULL;
@@ -737,13 +748,13 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThread
     }
 
 exit:
-
     Impl()->UnlockThreadStack();
 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "GetAndLogThreadTopologyFull failed: %s", ErrorStr(err));
     }
+#endif // CHIP_PROGRESS_LOGGING
     return err;
 }
 #else // CHIP_DEVICE_CONFIG_THREAD_FTD
@@ -1627,6 +1638,8 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otErr
 template <class ImplClass>
 void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otError aError)
 {
+#if CHIP_PROGRESS_LOGGING
+
     ChipLogProgress(DeviceLayer, "Join Thread network: %s", otThreadErrorToString(aError));
 
     if (aError == OT_ERROR_NONE)
@@ -1635,6 +1648,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnJoinerComplete(otErr
 
         ChipLogProgress(DeviceLayer, "Start Thread network: %s", otThreadErrorToString(error));
     }
+#endif // CHIP_PROGRESS_LOGGING
 }
 
 template <class ImplClass>
