@@ -31,6 +31,7 @@
 
 #include <credentials/FabricTable.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/SessionIDAllocator.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 #if CONFIG_DEVICE_LAYER
@@ -130,6 +131,7 @@ public:
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * BleLayer() { return mBleLayer; };
 #endif
+    SessionIDAllocator * GetSessionIDAllocator() { return &mIDAllocator; }
 
 private:
     DeviceControllerSystemState(){};
@@ -145,6 +147,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr                      = nullptr;
     secure_channel::MessageCounterManager * mMessageCounterManager = nullptr;
     FabricTable * mFabrics                                         = nullptr;
+    SessionIDAllocator mIDAllocator;
 
     std::atomic<uint32_t> mRefCount{ 1 };
 
