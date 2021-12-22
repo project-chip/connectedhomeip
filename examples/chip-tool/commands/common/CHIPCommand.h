@@ -30,32 +30,31 @@ class PersistentStorage;
 constexpr const char kIdentityAlpha[] = "alpha";
 constexpr const char kIdentityBeta[]  = "beta";
 constexpr const char kIdentityGamma[] = "gamma";
-// The null fabric commissioner is a commissioner that isn't on a fabric.
-// This is a legal configuration in which the commissioner delegates
+// The null fabric controller is a controller that isn't on a fabric.
+// This is a legal configuration in which the controller delegates
 // operational communication and invocation of the commssioning complete
 // command to a separate on-fabric administrator node.
 //
-// The null-fabric-commissioner identity is provided here to demonstrate the
-// commissioner portion of such an architecture.  The null-fabric-commissioner
+// The null-fabric-controller identity is provided here to demonstrate the
+// controller portion of such an architecture.  The null-fabric-controller
 // can carry a commissioning flow up until the point of operational channel
 // (CASE) communcation.
-constexpr const char kIdentityNull[] = "null-fabric-commissioner";
+constexpr const char kIdentityNull[] = "null-fabric-controller";
 
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::DeviceProxy;
-    using ChipDeviceCommissioner = ::chip::Controller::DeviceController;
-    using ChipDeviceController   = ::chip::Controller::DeviceController;
-    using IPAddress              = ::chip::Inet::IPAddress;
-    using NodeId                 = ::chip::NodeId;
-    using PeerId                 = ::chip::PeerId;
-    using PeerAddress            = ::chip::Transport::PeerAddress;
+    using ChipDevice           = ::chip::DeviceProxy;
+    using ChipDeviceController = ::chip::Controller::DeviceController;
+    using IPAddress            = ::chip::Inet::IPAddress;
+    using NodeId               = ::chip::NodeId;
+    using PeerId               = ::chip::PeerId;
+    using PeerAddress          = ::chip::Transport::PeerAddress;
 
     CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) :
         Command(commandName), mCredIssuerCmds(credIssuerCmds)
     {
-        AddArgument("commissioner-name", &mCommissionerName);
+        AddArgument("controller-name", &mControllerName);
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
@@ -88,24 +87,24 @@ protected:
     virtual void Shutdown() {}
 
     PersistentStorage mDefaultStorage;
-    PersistentStorage mCommissionerStorage;
+    PersistentStorage mControllerStorage;
     chip::SimpleFabricStorage mFabricStorage;
     CredentialIssuerCommands * mCredIssuerCmds;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);
 
-    // This method returns the commissioner instance to be used for running the command.
-    // The default commissioner instance name is "alpha", but it can be overridden by passing
+    // This method returns the controller instance to be used for running the command.
+    // The default controller instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
-    ChipDeviceCommissioner & CurrentCommissioner();
+    ChipDeviceController & CurrentController();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
-    CHIP_ERROR ShutdownCommissioner(std::string key);
-    chip::FabricId CurrentCommissionerId();
-    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
-    chip::Optional<char *> mCommissionerName;
+    CHIP_ERROR InitializeController(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR ShutdownController(std::string key);
+    chip::FabricId CurrentControllerId();
+    std::map<std::string, std::unique_ptr<ChipDeviceController>> mControllers;
+    chip::Optional<char *> mControllerName;
 
     static void RunQueuedCommand(intptr_t commandArg);
 

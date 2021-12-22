@@ -32,5 +32,5 @@ public:
     void Shutdown() override;
 
 private:
-    chip::Controller::CommissionableNodeController mCommissionableNodeController;
+    chip::Controller::CommissionableNodeController mCommissionableNodeCommissioner;
 };

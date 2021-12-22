@@ -90,8 +90,9 @@ CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
     VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
     auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
-    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
-                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
+                             mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
+                             mOperationalDataset, mSSID, mPassword);
     CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
     {
@@ -106,8 +107,9 @@ CHIP_ERROR PairingCommand::PairWithManualCode(NodeId remoteId)
     VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
     auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
-    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
-                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
+                             mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
+                             mOperationalDataset, mSSID, mPassword);
     CHIP_ERROR err = stateMachine.get()->Commission(mOnboardingPayload, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
     {
@@ -122,8 +124,9 @@ CHIP_ERROR PairingCommand::Pair(NodeId remoteId, PeerAddress address)
     VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
     auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
     auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
-    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
-                             CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+    stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
+                             mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
+                             mOperationalDataset, mSSID, mPassword);
     CHIP_ERROR err =
         stateMachine.get()->Commission(chip::RendezvousInformationFlag::kNone, mDiscriminator, mSetupPINCode, onSuccess, onFailure);
     if (err != CHIP_NO_ERROR)
@@ -146,8 +149,9 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
         VerifyOrReturnError(stateMachine.get() != nullptr, CHIP_ERROR_NO_MEMORY);
         auto onSuccess = [this, stateMachine](Commissionee & commissionee) { OnCommissioningComplete(*stateMachine.get()); };
         auto onFailure = [this, stateMachine](Commissionee & commissionee) { OnCommissioningFailure(*stateMachine.get()); };
-        stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(), mCredIssuerCmds->GetCredentialIssuer(),
-                                 CurrentCommissioner().GetFabricIndex(), mNodeId, mOperationalDataset, mSSID, mPassword);
+        stateMachine.get()->Init(chip::Controller::DeviceControllerFactory::GetInstance().GetSystemState(),
+                                 mCredIssuerCmds->GetCredentialIssuer(), CurrentController().GetFabricIndex(), mNodeId,
+                                 mOperationalDataset, mSSID, mPassword);
         CHIP_ERROR err =
             stateMachine.get()->Commission(chip::RendezvousInformationFlag::kOnNetwork, static_cast<uint16_t>(mDiscoveryFilterCode),
                                            mSetupPINCode, onSuccess, onFailure);
@@ -178,7 +182,7 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
-    CurrentCommissioner().ReleaseOperationalDevice(remoteId);
+    CurrentController().ReleaseOperationalDevice(remoteId);
     CHIP_ERROR err = CHIP_NO_ERROR;
     SetCommandExitStatus(err);
     return err;
@@ -186,7 +190,7 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 
 void PairingCommand::OnCommissioningComplete(CommissioningStateMachine & stateMachine)
 {
-    CHIP_ERROR err = stateMachine.GrabCommissionee(CurrentCommissioner());
+    CHIP_ERROR err = stateMachine.GrabCommissionee(CurrentController());
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Device commissioning completed with success");

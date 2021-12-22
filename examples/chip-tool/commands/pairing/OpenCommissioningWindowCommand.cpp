@@ -22,7 +22,7 @@ using namespace ::chip;
 
 CHIP_ERROR OpenCommissioningWindowCommand::RunCommand()
 {
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return CurrentController().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void OpenCommissioningWindowCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
@@ -52,7 +52,7 @@ void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * co
 
 CHIP_ERROR OpenCommissioningWindowCommand::OpenCommissioningWindow()
 {
-    return CurrentCommissioner().OpenCommissioningWindowWithCallback(
-        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback,
-        /* readVIDPIDAttributes */ true);
+    return CurrentController().OpenCommissioningWindowWithCallback(mNodeId, mTimeout, mIteration, mDiscriminator,
+                                                                   mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback,
+                                                                   /* readVIDPIDAttributes */ true);
 }
