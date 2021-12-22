@@ -26,7 +26,7 @@ using namespace ::chip;
 CHIP_ERROR ModelCommand::RunCommand()
 {
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
-    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return CurrentController().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)

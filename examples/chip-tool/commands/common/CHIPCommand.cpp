@@ -49,13 +49,13 @@ CHIP_ERROR CHIPCommand::Run()
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;
-    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerId());
+    factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentControllerId());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityNull, kIdentityNullFabricId));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId));
-    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId));
+    ReturnLogErrorOnFailure(InitializeController(kIdentityNull, kIdentityNullFabricId));
+    ReturnLogErrorOnFailure(InitializeController(kIdentityAlpha, kIdentityAlphaFabricId));
+    ReturnLogErrorOnFailure(InitializeController(kIdentityBeta, kIdentityBetaFabricId));
+    ReturnLogErrorOnFailure(InitializeController(kIdentityGamma, kIdentityGammaFabricId));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -67,10 +67,10 @@ CHIP_ERROR CHIPCommand::Run()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityNull));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
-    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
+    ReturnLogErrorOnFailure(ShutdownController(kIdentityNull));
+    ReturnLogErrorOnFailure(ShutdownController(kIdentityAlpha));
+    ReturnLogErrorOnFailure(ShutdownController(kIdentityBeta));
+    ReturnLogErrorOnFailure(ShutdownController(kIdentityGamma));
 
     StopTracing();
     return CHIP_NO_ERROR;
@@ -105,21 +105,21 @@ void CHIPCommand::SetIdentity(const char * identity)
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
         name.compare(kIdentityNull) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+        ChipLogError(chipTool, "Unknown controller name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
         chipDie();
     }
 
-    mCommissionerName.SetValue(const_cast<char *>(identity));
+    mControllerName.SetValue(const_cast<char *>(identity));
 }
 
 std::string CHIPCommand::GetIdentity()
 {
-    std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
+    std::string name = mControllerName.HasValue() ? mControllerName.Value() : kIdentityAlpha;
     if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0 &&
         name.compare(kIdentityNull) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+        ChipLogError(chipTool, "Unknown controller name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
                      kIdentityBeta, kIdentityGamma);
         chipDie();
     }
@@ -127,7 +127,7 @@ std::string CHIPCommand::GetIdentity()
     return name;
 }
 
-chip::FabricId CHIPCommand::CurrentCommissionerId()
+chip::FabricId CHIPCommand::CurrentControllerId()
 {
     chip::FabricId id;
 
@@ -150,35 +150,35 @@ chip::FabricId CHIPCommand::CurrentCommissionerId()
     }
     else
     {
-        VerifyOrDieWithMsg(false, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
+        VerifyOrDieWithMsg(false, chipTool, "Unknown controller name: %s. Supported names are [%s, %s, %s]", name.c_str(),
                            kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     }
 
     return id;
 }
 
-chip::Controller::DeviceController & CHIPCommand::CurrentCommissioner()
+chip::Controller::DeviceController & CHIPCommand::CurrentController()
 {
-    auto item = mCommissioners.find(GetIdentity());
+    auto item = mControllers.find(GetIdentity());
     return *item->second.get();
 }
 
-CHIP_ERROR CHIPCommand::ShutdownCommissioner(std::string key)
+CHIP_ERROR CHIPCommand::ShutdownController(std::string key)
 {
-    return mCommissioners[key].get()->Shutdown();
+    return mControllers[key].get()->Shutdown();
 }
 
-CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId fabricId)
+CHIP_ERROR CHIPCommand::InitializeController(std::string key, chip::FabricId fabricId)
 {
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
-    std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
-    chip::Controller::SetupParams commissionerParams;
+    std::unique_ptr<ChipDeviceController> controller = std::make_unique<ChipDeviceController>();
+    chip::Controller::SetupParams controllerParams;
 
-    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams));
-    chip::Credentials::SetDeviceAttestationVerifier(commissionerParams.deviceAttestationVerifier);
+    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(controllerParams));
+    chip::Credentials::SetDeviceAttestationVerifier(controllerParams.deviceAttestationVerifier);
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -192,28 +192,28 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
         // TODO - OpCreds should only be generated for pairing command
         //        store the credentials in persistent storage, and
         //        generate when not available in the storage.
-        ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
-        ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
+        ReturnLogErrorOnFailure(mControllerStorage.Init(key.c_str()));
+        ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mControllerStorage));
 
         chip::MutableByteSpan nocSpan(noc.Get(), chip::Controller::kMaxCHIPDERCertLength);
         chip::MutableByteSpan icacSpan(icac.Get(), chip::Controller::kMaxCHIPDERCertLength);
         chip::MutableByteSpan rcacSpan(rcac.Get(), chip::Controller::kMaxCHIPDERCertLength);
 
         ReturnLogErrorOnFailure(ephemeralKey.Initialize());
-        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+        ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mControllerStorage.GetLocalNodeId(), fabricId,
                                                                             ephemeralKey, rcacSpan, icacSpan, nocSpan));
-        commissionerParams.operationalKeypair = &ephemeralKey;
-        commissionerParams.controllerRCAC     = rcacSpan;
-        commissionerParams.controllerICAC     = icacSpan;
-        commissionerParams.controllerNOC      = nocSpan;
+        controllerParams.operationalKeypair = &ephemeralKey;
+        controllerParams.controllerRCAC     = rcacSpan;
+        controllerParams.controllerICAC     = icacSpan;
+        controllerParams.controllerNOC      = nocSpan;
     }
 
-    commissionerParams.storageDelegate                = &mCommissionerStorage;
-    commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
-    commissionerParams.controllerVendorId             = chip::VendorId::TestVendor1;
+    controllerParams.storageDelegate                = &mControllerStorage;
+    controllerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
+    controllerParams.controllerVendorId             = chip::VendorId::TestVendor1;
 
-    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupController(commissionerParams, *(commissioner.get())));
-    mCommissioners[key] = std::move(commissioner);
+    ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().SetupController(controllerParams, *(controller.get())));
+    mControllers[key] = std::move(controller);
 
     return CHIP_NO_ERROR;
 }

@@ -23,7 +23,7 @@ using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionersCommand::RunCommand()
 {
-    return mCommissionableNodeController.DiscoverCommissioners();
+    return mCommissionableNodeCommissioner.DiscoverCommissioners();
 }
 
 void DiscoverCommissionersCommand::Shutdown()
@@ -31,10 +31,10 @@ void DiscoverCommissionersCommand::Shutdown()
     int commissionerCount = 0;
     for (int i = 0; i < CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES; i++)
     {
-        const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeController.GetDiscoveredCommissioner(i);
+        const Dnssd::DiscoveredNodeData * commissioner = mCommissionableNodeCommissioner.GetDiscoveredCommissioner(i);
         if (commissioner != nullptr)
         {
-            ChipLogProgress(chipTool, "Discovered Commissioner #%d", commissionerCount);
+            ChipLogProgress(chipTool, "Discovered Commissioner#%d", commissionerCount);
             commissioner->LogDetail();
             commissionerCount++;
         }

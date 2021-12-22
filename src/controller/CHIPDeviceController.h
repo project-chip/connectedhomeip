@@ -322,7 +322,7 @@ public:
      * @brief Get the raw Fabric ID assigned to the device.
      */
     uint64_t GetFabricId() const { return mFabricId; }
-    FabricIndex GetFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetFabricIndex() const { return mFabricInfo ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
     /**
      * @brief Get the Node ID of this instance.
