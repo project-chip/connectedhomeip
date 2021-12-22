@@ -163,7 +163,8 @@ exit:
 
 void DeviceCallbacks::OnLevelControlAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
-    VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
+    VerifyOrExit(attributeId == LevelControl::Attributes::CurrentLevel::Id,
+                 ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     AppLED.SetBrightness(*value);
@@ -186,14 +187,13 @@ void DeviceCallbacks::OnColorControlAttributeChangeCallback(EndpointId endpointI
     if (attributeId == ColorControl::Attributes::CurrentHue::Id)
     {
         hue = *value;
-        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id,
-                                   &saturation, sizeof(uint8_t));
+        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentSaturation::Id, &saturation,
+                                   sizeof(uint8_t));
     }
     else
     {
         saturation = *value;
-        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, &hue,
-                                   sizeof(uint8_t));
+        emberAfReadServerAttribute(endpointId, ColorControl::Id, ColorControl::Attributes::CurrentHue::Id, &hue, sizeof(uint8_t));
     }
     AppLED.SetColor(hue, saturation);
 
