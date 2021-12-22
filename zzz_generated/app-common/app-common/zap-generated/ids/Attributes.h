@@ -1060,13 +1060,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProvider {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace DefaultOtaProvider
+namespace DefaultOtaProviders {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace DefaultOtaProviders
 
 namespace UpdatePossible {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace UpdatePossible
+
+namespace UpdateState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UpdateState
+
+namespace UpdateStateProgress {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace UpdateStateProgress
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2586,29 +2594,9 @@ namespace InstalledClosedLimitTilt {
 static constexpr AttributeId Id = 0x00000013;
 } // namespace InstalledClosedLimitTilt
 
-namespace VelocityLift {
-static constexpr AttributeId Id = 0x00000014;
-} // namespace VelocityLift
-
-namespace AccelerationTimeLift {
-static constexpr AttributeId Id = 0x00000015;
-} // namespace AccelerationTimeLift
-
-namespace DecelerationTimeLift {
-static constexpr AttributeId Id = 0x00000016;
-} // namespace DecelerationTimeLift
-
 namespace Mode {
 static constexpr AttributeId Id = 0x00000017;
 } // namespace Mode
-
-namespace IntermediateSetpointsLift {
-static constexpr AttributeId Id = 0x00000018;
-} // namespace IntermediateSetpointsLift
-
-namespace IntermediateSetpointsTilt {
-static constexpr AttributeId Id = 0x00000019;
-} // namespace IntermediateSetpointsTilt
 
 namespace SafetyStatus {
 static constexpr AttributeId Id = 0x0000001A;

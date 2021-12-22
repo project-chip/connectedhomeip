@@ -2939,25 +2939,38 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "AnnounceOtaProvider",
                     "args": {
-                        "providerLocation": "int",
+                        "providerNodeId": "int",
                         "vendorId": "int",
                         "announcementReason": "int",
                         "metadataForNode": "bytes",
+                        "endpoint": "int",
                     },
                 },
             },
             "attributes": {
-                0x00000001: {
-                    "attributeName": "DefaultOtaProvider",
-                    "attributeId": 0x00000001,
-                    "type": "bytes",
+                0x00000000: {
+                    "attributeName": "DefaultOtaProviders",
+                    "attributeId": 0x00000000,
+                    "type": "",
                     "reportable": True,
                     "writable": True,
                 },
-                0x00000002: {
+                0x00000001: {
                     "attributeName": "UpdatePossible",
-                    "attributeId": 0x00000002,
+                    "attributeId": 0x00000001,
                     "type": "bool",
+                    "reportable": True,
+                },
+                0x00000002: {
+                    "attributeName": "UpdateState",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                    "reportable": True,
+                },
+                0x00000003: {
+                    "attributeName": "UpdateStateProgress",
+                    "attributeId": 0x00000003,
+                    "type": "int",
                     "reportable": True,
                 },
                 0x0000FFFB: {

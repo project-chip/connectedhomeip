@@ -18,6 +18,7 @@
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const ListHelper   = require('../../common/ListHelper.js');
 const StringHelper = require('../../common/StringHelper.js');
+const appHelper    = require('../../templates/app/helper.js');
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
@@ -59,8 +60,8 @@ async function accessorGetterType(attr)
     type = "chip::MutableByteSpan";
   } else {
     mayNeedPointer = true;
-    const options  = { 'hash' : {} };
-    type           = await zclHelper.asUnderlyingZclType.call(this, attr.type, options);
+    const options  = { 'hash' : { forceNotNullable : true, forceNotOptional : true, ns : this.parent.name } };
+    type           = await appHelper.zapTypeToEncodableClusterObjectType.call(this, attr.type, options);
   }
 
   if (attr.isNullable) {
@@ -84,7 +85,9 @@ async function accessorTraitType(type)
       return `OddSizedInteger<${size}, ${signed}>`;
     }
   }
-  return zclHelper.asUnderlyingZclType.call(this, type, { 'hash' : {} });
+
+  const options = { 'hash' : { forceNotNullable : true, forceNotOptional : true, ns : this.parent.name } };
+  return appHelper.zapTypeToEncodableClusterObjectType.call(this, type, options);
 }
 
 async function typeAsDelimitedMacro(type)

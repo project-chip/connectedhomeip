@@ -55,8 +55,9 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
 
     WindowApp & app     = WindowApp::Instance();
     EndpointId endpoint = attributePath.mEndpointId;
-    uint16_t current;
-    uint16_t target;
+
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::app::DataModel::Nullable<chip::Percent100ths> target;
 
     switch (attributePath.mAttributeId)
     {
@@ -73,28 +74,34 @@ void MatterPostAttributeChangeCallback(const app::ConcreteAttributePath & attrib
         break;
 
     case Attributes::TargetPositionLiftPercent100ths::Id:
-        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, &target);
-        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, &current);
-        if (current > target)
+        Attributes::TargetPositionLiftPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionLiftPercent100ths::Get(endpoint, current);
+        if (!current.IsNull() && !target.IsNull())
         {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
-        }
-        else if (current < target)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
+            if (current.Value() > target.Value())
+            {
+                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftDown, endpoint));
+            }
+            else if (current.Value() < target.Value())
+            {
+                app.PostEvent(WindowApp::Event(WindowApp::EventId::LiftUp, endpoint));
+            }
         }
         break;
 
     case Attributes::TargetPositionTiltPercent100ths::Id:
-        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, &target);
-        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, &current);
-        if (current > target)
+        Attributes::TargetPositionTiltPercent100ths::Get(endpoint, target);
+        Attributes::CurrentPositionTiltPercent100ths::Get(endpoint, current);
+        if (!current.IsNull() && !target.IsNull())
         {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
-        }
-        else if (current < target)
-        {
-            app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
+            if (current.Value() > target.Value())
+            {
+                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltDown, endpoint));
+            }
+            else if (current.Value() < target.Value())
+            {
+                app.PostEvent(WindowApp::Event(WindowApp::EventId::TiltUp, endpoint));
+            }
         }
         break;
 

@@ -56,6 +56,8 @@ namespace {
 static ContentLauncherManager contentLauncherManager;
 } // namespace
 
+void ApplicationInit() {}
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

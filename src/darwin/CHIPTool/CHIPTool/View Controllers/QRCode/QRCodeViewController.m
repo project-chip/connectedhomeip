@@ -536,66 +536,50 @@
 
 - (void)addOrUpdateWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
-            if (chipDevice) {
-                self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
-                                                                       endpoint:0
-                                                                          queue:dispatch_get_main_queue()];
-                __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
-                params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-                params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
-                params.breadcrumb = @(0);
+    CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
+    if (chipDevice) {
+        self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
+        params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+        params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+        params.breadcrumb = @(0);
 
-                __weak typeof(self) weakSelf = self;
-                [self->_cluster
-                    addOrUpdateWiFiNetworkWithParams:params
-                                   completionHandler:^(
-                                       CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkResponseParams * _Nullable response,
-                                       NSError * _Nullable error) {
-                                       // TODO: addOrUpdateWiFiNetworkWithParams
-                                       // returns status in its response,
-                                       // not via the NSError!
-                                       [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                                   }];
-            } else {
-                NSLog(@"Status: Failed to establish a connection with the device");
-            }
-        })) {
-        NSLog(@"Status: Waiting for connection with the device");
+        __weak typeof(self) weakSelf = self;
+        [self->_cluster
+            addOrUpdateWiFiNetworkWithParams:params
+                           completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
+                               NSError * _Nullable error) {
+                               // TODO: addWiFiNetworkWithParams
+                               // returns status in its response,
+                               // not via the NSError!
+                               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                           }];
     } else {
-        NSLog(@"Status: Failed to trigger the connection with the device");
+        NSLog(@"Status: Failed to find a device being commissioned");
     }
 }
 
 - (void)addOrUpdateThreadNetwork:(NSData *)threadDataSet
 {
-    if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
-            if (chipDevice) {
-                self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice
-                                                                       endpoint:0
-                                                                          queue:dispatch_get_main_queue()];
-                __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
-                params.operationalDataset = threadDataSet;
-                params.breadcrumb = @(0);
+    CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
+    if (chipDevice) {
+        self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
+        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
+        params.operationalDataset = threadDataSet;
+        params.breadcrumb = @(0);
 
-                __weak typeof(self) weakSelf = self;
-                [self->_cluster
-                    addOrUpdateThreadNetworkWithParams:params
-                                     completionHandler:^(
-                                         CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkResponseParams * _Nullable response,
-                                         NSError * _Nullable error) {
-                                         // TODO: addOrUpdateThreadNetworkWithParams
-                                         // returns status in its response,
-                                         // not via the NSError!
-                                         [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                                     }];
-            } else {
-                NSLog(@"Status: Failed to establish a connection with the device");
-            }
-        })) {
-        NSLog(@"Status: Waiting for connection with the device");
+        __weak typeof(self) weakSelf = self;
+        [self->_cluster
+            addOrUpdateThreadNetworkWithParams:params
+                             completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
+                                 NSError * _Nullable error) {
+                                 // TODO: addThreadNetworkWithParams
+                                 // returns status in its response,
+                                 // not via the NSError!
+                                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                             }];
     } else {
-        NSLog(@"Status: Failed to trigger the connection with the device");
+        NSLog(@"Status: Failed to find a device being  commissioned");
     }
 }
 

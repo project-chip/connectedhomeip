@@ -143,6 +143,7 @@ int AppTask::Init()
 void AppTask::InitOTARequestor()
 {
 #if CONFIG_CHIP_OTA_REQUESTOR
+    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
     sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
     sOTARequestor.SetOtaRequestorDriver(&sOTARequestorDriver);
     sOTARequestor.SetBDXDownloader(&sBDXDownloader);

@@ -745,25 +745,6 @@ public class ClusterWriteMapping {
         "otaSoftwareUpdateProvider", writeOtaSoftwareUpdateProviderInteractionInfo);
     Map<String, InteractionInfo> writeOtaSoftwareUpdateRequestorInteractionInfo =
         new LinkedHashMap<>();
-    Map<String, CommandParameterInfo>
-        writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams =
-            new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo otaSoftwareUpdateRequestordefaultOtaProviderCommandParameterInfo =
-        new CommandParameterInfo("value", byte[].class);
-    writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams.put(
-        "value", otaSoftwareUpdateRequestordefaultOtaProviderCommandParameterInfo);
-    InteractionInfo writeOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.OtaSoftwareUpdateRequestorCluster) cluster)
-                  .writeDefaultOtaProviderAttribute(
-                      (DefaultClusterCallback) callback, (byte[]) commandArguments.get("value"));
-            },
-            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeOtaSoftwareUpdateRequestorDefaultOtaProviderCommandParams);
-    writeOtaSoftwareUpdateRequestorInteractionInfo.put(
-        "writeDefaultOtaProviderAttribute",
-        writeOtaSoftwareUpdateRequestorDefaultOtaProviderAttributeInteractionInfo);
     writeAttributeMap.put(
         "otaSoftwareUpdateRequestor", writeOtaSoftwareUpdateRequestorInteractionInfo);
     Map<String, InteractionInfo> writeOccupancySensingInteractionInfo = new LinkedHashMap<>();

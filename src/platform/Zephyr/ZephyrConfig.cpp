@@ -73,8 +73,9 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
 
 // Keys stored in the counters namespace
-const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
-const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason  = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason            = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG_KEY(NAMESPACE_COUNTERS "total-operational-hours");
 
 namespace {
 

@@ -51,7 +51,8 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'MEDIA_INPUT_CLUSTER': ['media-input-server'],
     'MEDIA_PLAYBACK_CLUSTER': ['media-playback-server'],
     'MODE_SELECT_CLUSTER': ['mode-select-server'],
-    'NETWORK_COMMISSIONING_CLUSTER': ['network-commissioning'],
+    # network-commissioning-old is the old, not spec compliant implementation.
+    'NETWORK_COMMISSIONING_CLUSTER': ['network-commissioning', 'network-commissioning-old'],
     'OCCUPANCY_SENSING_CLUSTER': ['occupancy-sensor-server'],
     'ON_OFF_CLUSTER': ['on-off-server'],
     'ON_OFF_SWITCH_CONFIG_CLUSTER': [],
