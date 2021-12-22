@@ -603,8 +603,8 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, co
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecp_point_read_binary(&keypair.CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair.CHIP_CRYPTO_PAL_PRIVATE(Q), Uint8::to_const_uchar(*this),
-                                           Length());
+    result = mbedtls_ecp_point_read_binary(&keypair.CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair.CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                           Uint8::to_const_uchar(*this), Length());
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -662,7 +662,8 @@ CHIP_ERROR P256Keypair::ECDH_derive_secret(const P256PublicKey & remote_public_k
         mbedtls_ecp_point_read_binary(&ecp_grp, &ecp_pubkey, Uint8::to_const_uchar(remote_public_key), remote_public_key.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    result = mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->CHIP_CRYPTO_PAL_PRIVATE(d), CryptoRNG, nullptr);
+    result =
+        mbedtls_ecdh_compute_shared(&ecp_grp, &mpi_secret, &ecp_pubkey, &keypair->CHIP_CRYPTO_PAL_PRIVATE(d), CryptoRNG, nullptr);
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_write_binary(&mpi_secret, Uint8::to_uchar(out_secret), secret_length);
@@ -704,8 +705,8 @@ CHIP_ERROR P256Keypair::Initialize()
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result =
-        mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q), MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                       &pubkey_size, Uint8::to_uchar(mPublicKey), mPublicKey.Length());
+        mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                       MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(mPublicKey), mPublicKey.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(pubkey_size == mPublicKey.Length(), error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -904,9 +905,10 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
 
     // Convert DER signature to raw signature
-    error = EcdsaAsn1SignatureToRaw(
-        kP256_FE_Length, ByteSpan{ csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE(p), csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE(len) },
-        out_raw_sig_span);
+    error = EcdsaAsn1SignatureToRaw(kP256_FE_Length,
+                                    ByteSpan{ csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE(p),
+                                              csr.CHIP_CRYPTO_PAL_PRIVATE(sig).CHIP_CRYPTO_PAL_PRIVATE(len) },
+                                    out_raw_sig_span);
 
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(out_raw_sig_span.size() == (kP256_FE_Length * 2), error = CHIP_ERROR_INTERNAL);
@@ -1346,18 +1348,23 @@ inline bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const 
         (timeA->CHIP_CRYPTO_PAL_PRIVATE(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE(year) &&
          timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) > timeB->CHIP_CRYPTO_PAL_PRIVATE(mon)) ||
         (timeA->CHIP_CRYPTO_PAL_PRIVATE(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) && timeA->CHIP_CRYPTO_PAL_PRIVATE(day) > timeB->CHIP_CRYPTO_PAL_PRIVATE(day)) ||
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(day) > timeB->CHIP_CRYPTO_PAL_PRIVATE(day)) ||
         (timeA->CHIP_CRYPTO_PAL_PRIVATE(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) && timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
          timeA->CHIP_CRYPTO_PAL_PRIVATE(hour) > timeB->CHIP_CRYPTO_PAL_PRIVATE(hour)) ||
         (timeA->CHIP_CRYPTO_PAL_PRIVATE(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) && timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
          timeA->CHIP_CRYPTO_PAL_PRIVATE(hour) == timeB->CHIP_CRYPTO_PAL_PRIVATE(hour) &&
          timeA->CHIP_CRYPTO_PAL_PRIVATE(min) > timeB->CHIP_CRYPTO_PAL_PRIVATE(min)) ||
         (timeA->CHIP_CRYPTO_PAL_PRIVATE(year) == timeB->CHIP_CRYPTO_PAL_PRIVATE(year) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) && timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(mon) == timeB->CHIP_CRYPTO_PAL_PRIVATE(mon) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(day) == timeB->CHIP_CRYPTO_PAL_PRIVATE(day) &&
          timeA->CHIP_CRYPTO_PAL_PRIVATE(hour) == timeB->CHIP_CRYPTO_PAL_PRIVATE(hour) &&
-         timeA->CHIP_CRYPTO_PAL_PRIVATE(min) == timeB->CHIP_CRYPTO_PAL_PRIVATE(min) && timeA->CHIP_CRYPTO_PAL_PRIVATE(sec) >= timeB->CHIP_CRYPTO_PAL_PRIVATE(sec));
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(min) == timeB->CHIP_CRYPTO_PAL_PRIVATE(min) &&
+         timeA->CHIP_CRYPTO_PAL_PRIVATE(sec) >= timeB->CHIP_CRYPTO_PAL_PRIVATE(sec));
 }
 
 CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
@@ -1423,11 +1430,11 @@ CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
     result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-// check if certificate's notBefore timestamp is earlier than or equal to current time.
+    // check if certificate's notBefore timestamp is earlier than or equal to current time.
     result = mbedtls_x509_time_is_past(&mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE(valid_from));
     VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
 
-// check if certificate's notAfter timestamp is later than current time.
+    // check if certificate's notAfter timestamp is later than current time.
     result = mbedtls_x509_time_is_future(&mbedCertificate.CHIP_CRYPTO_PAL_PRIVATE(valid_to));
     VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
 
@@ -1459,8 +1466,8 @@ CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256P
     keypair = mbedtls_pk_ec(mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(pk));
     // Copy the public key from the cert in raw point format
     result =
-        mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q), MBEDTLS_ECP_PF_UNCOMPRESSED,
-                                       &pubkey_size, Uint8::to_uchar(pubkey.Bytes()), pubkey.Length());
+        mbedtls_ecp_point_write_binary(&keypair->CHIP_CRYPTO_PAL_PRIVATE(grp), &keypair->CHIP_CRYPTO_PAL_PRIVATE(Q),
+                                       MBEDTLS_ECP_PF_UNCOMPRESSED, &pubkey_size, Uint8::to_uchar(pubkey.Bytes()), pubkey.Length());
 
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(pubkey_size == pubkey.Length(), error = CHIP_ERROR_INTERNAL);
@@ -1498,7 +1505,8 @@ CHIP_ERROR ExtractKIDFromX509Cert(bool isSKID, const ByteSpan & certificate, Mut
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     p   = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(v3_ext).CHIP_CRYPTO_PAL_PRIVATE(p);
-    end = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(v3_ext).CHIP_CRYPTO_PAL_PRIVATE(p) + mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(v3_ext).CHIP_CRYPTO_PAL_PRIVATE(len);
+    end = mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(v3_ext).CHIP_CRYPTO_PAL_PRIVATE(p) +
+        mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(v3_ext).CHIP_CRYPTO_PAL_PRIVATE(len);
     result = mbedtls_asn1_get_tag(&p, end, &len, MBEDTLS_ASN1_CONSTRUCTED | MBEDTLS_ASN1_SEQUENCE);
     VerifyOrExit(result == 0, error = CHIP_ERROR_WRONG_CERT_TYPE);
 
@@ -1596,7 +1604,8 @@ CHIP_ERROR ExtractDNAttributeFromX509Cert(const uint8_t * oidAttribute, size_t o
     int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    for (dnIterator = &mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(subject); dnIterator != nullptr; dnIterator = dnIterator->CHIP_CRYPTO_PAL_PRIVATE(next))
+    for (dnIterator = &mbed_cert.CHIP_CRYPTO_PAL_PRIVATE(subject); dnIterator != nullptr;
+         dnIterator = dnIterator->CHIP_CRYPTO_PAL_PRIVATE(next))
     {
         if (dnIterator != nullptr && dnIterator->CHIP_CRYPTO_PAL_PRIVATE(oid).CHIP_CRYPTO_PAL_PRIVATE(p) != nullptr &&
             dnIterator->CHIP_CRYPTO_PAL_PRIVATE(oid).CHIP_CRYPTO_PAL_PRIVATE(len) == oidAttributeLen &&
