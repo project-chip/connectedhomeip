@@ -104,10 +104,12 @@ void InteractionModelEngine::Shutdown()
     // at destruction time, they won't attempt to reach back here to remove themselves
     // from this list.
     //
-    for (auto * readClient = mpActiveReadClientList; readClient != nullptr; readClient = readClient->GetNextClient())
+    for (auto * readClient = mpActiveReadClientList; readClient != nullptr;)
     {
         readClient->mpImEngine = nullptr;
+        auto * tmpClient       = readClient->GetNextClient();
         readClient->SetNextClient(nullptr);
+        readClient = tmpClient;
     }
 
     //

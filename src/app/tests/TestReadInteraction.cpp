@@ -22,6 +22,7 @@
  *
  */
 
+#include "lib/support/CHIPMem.h"
 #include <app/AttributeAccessInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/AttributeReportIBs.h>
@@ -240,6 +241,7 @@ public:
     static void TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidIterval(nlTestSuite * apSuite, void * apContext);
+    static void TestReadShutdown(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -1340,6 +1342,44 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
     engine->Shutdown();
 }
 
+void TestReadInteraction::TestReadShutdown(nlTestSuite * apSuite, void * apContext)
+{
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    app::ReadClient * pClients[4];
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    MockInteractionModelApp delegate;
+
+    //
+    // Allocate a number of clients
+    //
+    for (int i = 0; i < 4; i++)
+    {
+        pClients[i] = Platform::New<app::ReadClient>(engine, &ctx.GetExchangeManager(), delegate,
+                                                     chip::app::ReadClient::InteractionType::Subscribe);
+    }
+
+    //
+    // Delete every other client to ensure we test out
+    // deleting clients from the list of clients tracked by the IM
+    //
+    Platform::Delete(pClients[1]);
+    Platform::Delete(pClients[3]);
+
+    //
+    // Shutdown the engine first so that we can
+    // de-activate the internal list.
+    //
+    engine->Shutdown();
+
+    //
+    // Shutdown the read clients. These should
+    // safely destruct without causing any egregious
+    // harm
+    //
+    Platform::Delete(pClients[0]);
+    Platform::Delete(pClients[2]);
+}
+
 void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
@@ -1414,6 +1454,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("TestSubscribeInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestReadInvalidAttributePathRoundtrip", chip::app::TestReadInteraction::TestReadInvalidAttributePathRoundtrip),
     NL_TEST_DEF("TestSubscribeInvalidIterval", chip::app::TestReadInteraction::TestSubscribeInvalidIterval),
+    NL_TEST_DEF("TestReadShutdown", chip::app::TestReadInteraction::TestReadShutdown),
     NL_TEST_SENTINEL()
 };
 // clang-format on
