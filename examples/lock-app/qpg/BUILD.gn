@@ -29,7 +29,6 @@ examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
   sources = [
-    "${examples_plat_dir}/app/include/Service.h",
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
   ]
 

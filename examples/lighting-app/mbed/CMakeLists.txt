@@ -42,6 +42,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CHIP_ROOT}/third_party/nlio/repo/include
 )
 
+# TODO - re-use chip_data_model.cmake to add cluster implementations.
 target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp
@@ -97,6 +98,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

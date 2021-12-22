@@ -21,6 +21,7 @@
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "AppTask.h"
+#include "ota.h"
 
 #include <app/server/OnboardingCodesUtil.h>
 
@@ -42,12 +43,6 @@ using namespace chip::Credentials;
 using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/OpenThread/OpenThreadUtils.h>
-#include <platform/ThreadStackManager.h>
-#include <platform/qpg/ThreadStackManagerImpl.h>
-#define JOINER_START_TRIGGER_TIMEOUT 1500
-#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -120,6 +115,9 @@ CHIP_ERROR AppTask::Init()
 
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();
+
+    // Init OTA engine
+    InitializeOTARequestor();
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -290,17 +288,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     // initiate factory reset
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
-#if CHIP_ENABLE_OPENTHREAD
-        ChipLogProgress(NotSpecified, "Release button now to Start Thread Joiner");
-        ChipLogProgress(NotSpecified, "Hold to trigger Factory Reset");
-        sAppTask.mFunction = kFunction_Joiner;
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-    }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
-    {
-#endif
-        ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
-                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
+                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT/1000);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
@@ -340,11 +329,11 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-#if CHIP_ENABLE_OPENTHREAD
-            sAppTask.StartTimer(JOINER_START_TRIGGER_TIMEOUT);
-#else
+            ChipLogProgress(NotSpecified, "[BTN] Hold to select function:");
+            ChipLogProgress(NotSpecified, "[BTN] - Trigger OTA (0-3s)");
+            ChipLogProgress(NotSpecified, "[BTN] - Factory Reset (>6s)");
+
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-#endif
 
             sAppTask.mFunction = kFunction_SoftwareUpdate;
         }
@@ -359,18 +348,10 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
 
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            ChipLogError(NotSpecified, "Software Update currently not supported.");
+            ChipLogProgress(NotSpecified, "[BTN] Triggering OTA Query");
+            
+            TriggerOTAQuery();
         }
-#if CHIP_ENABLE_OPENTHREAD
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
-        {
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            CHIP_ERROR error = ThreadStackMgr().JoinerStart();
-            ChipLogProgress(NotSpecified, "Thread joiner triggered: %s", chip::ErrorStr(error));
-        }
-#endif
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             sAppTask.CancelTimer();
@@ -379,7 +360,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             // canceled.
             sAppTask.mFunction = kFunction_NoneSelected;
 
-            ChipLogProgress(NotSpecified, "Factory Reset has been Canceled");
+            ChipLogProgress(NotSpecified, "[BTN] Factory Reset has been Canceled");
         }
     }
 }
