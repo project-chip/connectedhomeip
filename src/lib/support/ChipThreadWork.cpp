@@ -16,8 +16,8 @@
  */
 
 #include "ChipThreadWork.h"
-#include <semaphore.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <semaphore.h>
 
 namespace chip {
 namespace ThreadWork {
