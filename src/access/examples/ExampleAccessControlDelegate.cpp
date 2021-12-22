@@ -18,10 +18,7 @@
 
 #include "ExampleAccessControlDelegate.h"
 
-#include <access/AccessControlEntryCodec.h>
 #include <lib/core/CHIPConfig.h>
-#include <lib/core/CHIPTLV.h>
-#include <lib/support/DefaultStorageKeyAllocator.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -1100,125 +1097,10 @@ public:
 
     bool IsTransitional() const override { return false; }
 
-public:
-    void SetStorageDelegate(chip::PersistentStorageDelegate * storageDelegate) { mStorageDelegate = storageDelegate; }
-
 private:
-    chip::PersistentStorageDelegate * mStorageDelegate = nullptr;
+    CHIP_ERROR LoadFromFlash() { return CHIP_NO_ERROR; }
 
-    // The version of the storage data format. Increment this key when the format of the data model changes.
-    static const uint32_t kExampleAclStorageVersion = 1;
-    static const size_t kMetadataStorageBufferSize  = 32;
-    static const size_t kEntryStorageBufferSize     = 192;
-    static const chip::TLV::Tag kTagVersion         = chip::TLV::ContextTag(1);
-    static const chip::TLV::Tag kTagEntryCount      = chip::TLV::ContextTag(2);
-
-    struct Constants : public chip::Access::AccessControlEntryCodecConstants
-    {
-        Constants()
-        {
-            encodedAuthPase            = 1;
-            encodedAuthCase            = 2;
-            encodedAuthGroup           = 3;
-            encodedPrivilegeView       = 4;
-            encodedPrivilegeProxyView  = 5;
-            encodedPrivilegeOperate    = 6;
-            encodedPrivilegeManage     = 7;
-            encodedPrivilegeAdminister = 8;
-            fabricIndexTag             = chip::TLV::ContextTag(1);
-            privilegeTag               = chip::TLV::ContextTag(2);
-            authModeTag                = chip::TLV::ContextTag(3);
-            subjectsTag                = chip::TLV::ContextTag(4);
-            targetsTag                 = chip::TLV::ContextTag(5);
-            targetClusterTag           = chip::TLV::ContextTag(6);
-            targetEndpointTag          = chip::TLV::ContextTag(7);
-            targetDeviceTypeTag        = chip::TLV::ContextTag(8);
-        }
-    };
-
-    CHIP_ERROR LoadFromFlash()
-    {
-        VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        uint8_t buffer[kMetadataStorageBufferSize] = { 0 };
-        uint16_t size                              = static_cast<uint16_t>(sizeof(buffer));
-        chip::DefaultStorageKeyAllocator key;
-        ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlList(), buffer, size));
-
-        chip::TLV::TLVReader reader;
-        reader.Init(buffer, size);
-
-        ReturnErrorOnFailure(reader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag));
-
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(reader.EnterContainer(container));
-
-        // Version
-        ReturnErrorOnFailure(reader.Next(kTagVersion));
-        uint32_t version;
-        ReturnErrorOnFailure(reader.Get(version));
-        VerifyOrReturnError(version == kExampleAclStorageVersion, CHIP_ERROR_VERSION_MISMATCH);
-
-        // Entry count
-        ReturnErrorOnFailure(reader.Next(kTagEntryCount));
-        uint32_t entryCount;
-        ReturnErrorOnFailure(reader.Get(entryCount));
-
-        for (auto & storage : EntryStorage::acl)
-        {
-            storage.Clear();
-        }
-
-        // Entries
-        chip::Access::AccessControlEntryCodec<Constants> codec;
-        for (size_t i = 0; i < entryCount; ++i)
-        {
-            uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
-            uint16_t bufferSize                          = static_cast<uint16_t>(sizeof(buffer));
-            ReturnErrorOnFailure(mStorageDelegate->SyncGetKeyValue(key.AccessControlEntry(i), entryBuffer, bufferSize));
-            chip::TLV::TLVReader entryReader;
-            entryReader.Init(entryBuffer, bufferSize);
-            ReturnErrorOnFailure(entryReader.Next(chip::TLV::kTLVType_Structure, chip::TLV::AnonymousTag));
-            ReturnErrorOnFailure(codec.Decode(entryReader));
-            ReturnErrorOnFailure(CreateEntry(nullptr, codec.entry, nullptr));
-        }
-        return reader.ExitContainer(container);
-    }
-
-    CHIP_ERROR SaveToFlash()
-    {
-        VerifyOrReturnError(mStorageDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-        uint8_t buffer[kMetadataStorageBufferSize] = { 0 };
-        chip::TLV::TLVWriter writer;
-        writer.Init(buffer);
-        chip::DefaultStorageKeyAllocator key;
-        chip::TLV::TLVType container;
-        ReturnErrorOnFailure(writer.StartContainer(chip::TLV::AnonymousTag, chip::TLV::TLVType::kTLVType_Structure, container));
-        ReturnErrorOnFailure(writer.Put(kTagVersion, kExampleAclStorageVersion));
-
-        size_t entryCount;
-        ReturnErrorOnFailure(GetEntryCount(entryCount));
-        ReturnErrorOnFailure(writer.Put(kTagEntryCount, static_cast<uint32_t>(entryCount)));
-
-        ReturnErrorOnFailure(writer.EndContainer(container));
-        ReturnErrorOnFailure(writer.Finalize());
-
-        chip::Access::AccessControlEntryCodec<Constants> codec;
-        for (size_t i = 0; i < entryCount; ++i)
-        {
-            uint8_t entryBuffer[kEntryStorageBufferSize] = { 0 };
-            chip::TLV::TLVWriter entryWriter;
-            entryWriter.Init(entryBuffer);
-            ReturnErrorOnFailure(ReadEntry(i, codec.entry, nullptr));
-            ReturnErrorOnFailure(codec.Encode(entryWriter, chip::TLV::AnonymousTag));
-            ReturnErrorOnFailure(entryWriter.Finalize());
-            ReturnErrorOnFailure(mStorageDelegate->SyncSetKeyValue(key.AccessControlEntry(i), entryBuffer,
-                                                                   static_cast<uint16_t>(entryWriter.GetLengthWritten())));
-        }
-
-        return mStorageDelegate->SyncSetKeyValue(key.AccessControlList(), buffer, static_cast<uint16_t>(writer.GetLengthWritten()));
-    }
+    CHIP_ERROR SaveToFlash() { return CHIP_NO_ERROR; }
 };
 
 static_assert(std::is_pod<SubjectStorage>(), "Storage type must be POD");
@@ -1240,12 +1122,6 @@ AccessControl::Delegate & GetAccessControlDelegate()
 {
     static AccessControlDelegate accessControlDelegate;
     return accessControlDelegate;
-}
-
-void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate)
-{
-    AccessControlDelegate & accessControlDelegate = static_cast<AccessControlDelegate &>(GetAccessControlDelegate());
-    accessControlDelegate.SetStorageDelegate(storageDelegate);
 }
 
 } // namespace Examples
