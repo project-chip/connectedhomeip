@@ -156,10 +156,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * rmMgr, SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    virtual ExchangeMessageDispatch & GetMessageDispatch() override { return mMessageDispatch; }
 
     bool IsOnMessageReceivedCalled = false;
     MockSessionEstablishmentExchangeDispatch mMessageDispatch;
@@ -327,9 +324,6 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MockSessionEstablishmentDelegate mockSender;
-    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     ExchangeContext * exchange = ctx.NewExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -375,19 +369,13 @@ void CheckUnencryptedMessageReceiveFailure(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
-    CHIP_ERROR err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
+    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Expect the received messages to be encrypted
     mockReceiver.mMessageDispatch.mRequireEncryption = true;
 
     MockSessionEstablishmentDelegate mockSender;
-    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
@@ -556,18 +544,12 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     MockSessionEstablishmentDelegate mockReceiver;
-    err = mockReceiver.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest, &mockReceiver);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     mockReceiver.mTestSuite = inSuite;
 
     MockSessionEstablishmentDelegate mockSender;
-    err = mockSender.mMessageDispatch.Init(&ctx.GetSecureSessionManager());
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     ExchangeContext * exchange = ctx.NewUnauthenticatedExchangeToAlice(&mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 

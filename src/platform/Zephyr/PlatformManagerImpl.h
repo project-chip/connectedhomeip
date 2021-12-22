@@ -29,7 +29,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
+ * Concrete implementation of the PlatformManager singleton object for the Zephyr platforms.
  */
 class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>
 {
@@ -46,18 +46,26 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    /* none so far */
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+    uint32_t GetSavedOperationalHoursSinceBoot() { return mSavedOperationalHoursSinceBoot; }
 
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack(void);
 
+    static void OperationalHoursSavingTimerEventHandler(k_timer * timer);
+    static void UpdateOperationalHours(intptr_t arg);
+    static void OnDeviceBoot(intptr_t arg);
+
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);
     friend PlatformManagerImpl & PlatformMgrImpl(void);
     friend class Internal::BLEManagerImpl;
+
+    System::Clock::Timestamp mStartTime      = System::Clock::kZero;
+    uint32_t mSavedOperationalHoursSinceBoot = 0;
 
     explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}
 
@@ -79,7 +87,7 @@ inline PlatformManager & PlatformMgr(void)
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the Zephyr platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl()
 {

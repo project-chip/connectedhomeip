@@ -41,3 +41,6 @@ CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
 DeviceCommissioner * GetDeviceCommissioner();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+// For extra init calls, the function will be called right before running Matter main loop.
+void ApplicationInit();

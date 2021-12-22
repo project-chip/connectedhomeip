@@ -425,9 +425,15 @@ void WindowApp::Cover::Finish()
 
 void WindowApp::Cover::LiftUp()
 {
-    uint16_t percent100ths = 0;
+    EmberAfStatus status;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &percent100ths);
+    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        percent100ths = current.Value();
+
     if (percent100ths < 9000)
     {
         percent100ths += 1000;
@@ -441,9 +447,15 @@ void WindowApp::Cover::LiftUp()
 
 void WindowApp::Cover::LiftDown()
 {
-    uint16_t percent100ths = 0;
+    EmberAfStatus status;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::Percent100ths percent100ths = 5000; // set at middle
 
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &percent100ths);
+    status = Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        percent100ths = current.Value();
+
     if (percent100ths > 1000)
     {
         percent100ths -= 1000;
@@ -457,10 +469,15 @@ void WindowApp::Cover::LiftDown()
 
 void WindowApp::Cover::GotoLift(EventId action)
 {
-    uint16_t current = 0;
-    uint16_t target  = 0;
-    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, &target);
-    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, &current);
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    Attributes::TargetPositionLiftPercent100ths::Get(mEndpoint, target);
+    Attributes::CurrentPositionLiftPercent100ths::Get(mEndpoint, current);
+
+    if (current.IsNull() || target.IsNull())
+    {
+        return;
+    }
 
     if (EventId::None != action)
     {
@@ -469,7 +486,7 @@ void WindowApp::Cover::GotoLift(EventId action)
 
     if (EventId::LiftUp == mLiftAction)
     {
-        if (current < target)
+        if (current.Value() < target.Value())
         {
             LiftUp();
         }
@@ -480,7 +497,7 @@ void WindowApp::Cover::GotoLift(EventId action)
     }
     else
     {
-        if (current > target)
+        if (current.Value() > target.Value())
         {
             LiftDown();
         }
@@ -498,8 +515,15 @@ void WindowApp::Cover::GotoLift(EventId action)
 
 void WindowApp::Cover::TiltUp()
 {
-    uint16_t percent100ths = 0;
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &percent100ths);
+    EmberAfStatus status;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::Percent100ths percent100ths = 5000; // set at middle
+
+    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        percent100ths = current.Value();
+
     if (percent100ths < 9000)
     {
         percent100ths += 1000;
@@ -513,8 +537,15 @@ void WindowApp::Cover::TiltUp()
 
 void WindowApp::Cover::TiltDown()
 {
-    uint16_t percent100ths = 0;
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &percent100ths);
+    EmberAfStatus status;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::Percent100ths percent100ths = 5000; // set at middle
+
+    status = Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
+
+    if ((status == EMBER_ZCL_STATUS_SUCCESS) && !current.IsNull())
+        percent100ths = current.Value();
+
     if (percent100ths > 1000)
     {
         percent100ths -= 1000;
@@ -528,11 +559,15 @@ void WindowApp::Cover::TiltDown()
 
 void WindowApp::Cover::GotoTilt(EventId action)
 {
-    uint16_t current = 0;
-    uint16_t target  = 0;
+    chip::app::DataModel::Nullable<chip::Percent100ths> current;
+    chip::app::DataModel::Nullable<chip::Percent100ths> target;
+    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, target);
+    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, current);
 
-    Attributes::TargetPositionTiltPercent100ths::Get(mEndpoint, &target);
-    Attributes::CurrentPositionTiltPercent100ths::Get(mEndpoint, &current);
+    if (current.IsNull() || target.IsNull())
+    {
+        return;
+    }
 
     if (EventId::None != action)
     {
@@ -541,7 +576,7 @@ void WindowApp::Cover::GotoTilt(EventId action)
 
     if (EventId::TiltUp == mTiltAction)
     {
-        if (current < target)
+        if (current.Value() < target.Value())
         {
             TiltUp();
         }
@@ -552,7 +587,7 @@ void WindowApp::Cover::GotoTilt(EventId action)
     }
     else
     {
-        if (current > target)
+        if (current.Value() > target.Value())
         {
             TiltDown();
         }

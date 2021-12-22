@@ -7920,7 +7920,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionLiftAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster.CurrentPositionLiftAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionLiftCommandParams);
@@ -7934,7 +7935,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionTiltAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster.CurrentPositionTiltAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionTiltCommandParams);
@@ -7960,7 +7962,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionLiftPercentageAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .CurrentPositionLiftPercentageAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionLiftPercentageCommandParams);
@@ -7974,7 +7978,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionTiltPercentageAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .CurrentPositionTiltPercentageAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionTiltPercentageCommandParams);
@@ -8002,7 +8008,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readTargetPositionLiftPercent100thsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .TargetPositionLiftPercent100thsAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringTargetPositionLiftPercent100thsCommandParams);
@@ -8017,7 +8025,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readTargetPositionTiltPercent100thsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .TargetPositionTiltPercent100thsAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringTargetPositionTiltPercent100thsCommandParams);
@@ -8044,7 +8054,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionLiftPercent100thsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .CurrentPositionLiftPercent100thsAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionLiftPercent100thsCommandParams);
@@ -8059,7 +8071,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.WindowCoveringCluster) cluster)
                   .readCurrentPositionTiltPercent100thsAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.WindowCoveringCluster
+                              .CurrentPositionTiltPercent100thsAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readWindowCoveringCurrentPositionTiltPercent100thsCommandParams);

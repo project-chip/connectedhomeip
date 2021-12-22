@@ -1200,7 +1200,7 @@ void emberAfResetAttributes(EndpointId endpoint)
     emAfLoadAttributeDefaults(endpoint, true);
 }
 
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
+void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
 {
     uint16_t ep;
     uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
@@ -1289,9 +1289,9 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
                                              ptr,
                                              0,     // buffer size - unused
                                              true); // write?
-                    if (writeTokens)
+                    if (ignoreStorage)
                     {
-                        emAfSaveAttributeToToken(ptr, de->endpoint, record.clusterId, am);
+                        emAfSaveAttributeToStorageIfNeeded(ptr, de->endpoint, record.clusterId, am);
                     }
                 }
             }
@@ -1302,13 +1302,13 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
         }
     }
 
-    if (!writeTokens)
+    if (!ignoreStorage)
     {
-        emAfLoadAttributesFromTokens(endpoint);
+        emAfLoadAttributesFromStorage(endpoint);
     }
 }
 
-void emAfLoadAttributesFromTokens(EndpointId endpoint)
+void emAfLoadAttributesFromStorage(EndpointId endpoint)
 {
     // On EZSP host we currently do not support this. We need to come up with some
     // callbacks.
@@ -1320,10 +1320,11 @@ void emAfLoadAttributesFromTokens(EndpointId endpoint)
 // 'data' argument may be null, since we changed the ptrToDefaultValue
 // to be null instead of pointing to all zeroes.
 // This function has to be able to deal with that.
-void emAfSaveAttributeToToken(uint8_t * data, EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * metadata)
+void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, ClusterId clusterId,
+                                        EmberAfAttributeMetadata * metadata)
 {
-    // Get out of here if this attribute doesn't have a token.
-    if (!emberAfAttributeIsTokenized(metadata))
+    // Get out of here if this attribute isn't marked non-volatile.
+    if (!metadata->IsNonVolatile())
     {
         return;
     }
