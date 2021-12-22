@@ -279,7 +279,7 @@ public:
      *
      * @return CHIP_ERROR  CHIP Error Code
      */
-    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber);
+    CHIP_ERROR LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions, EventNumber & aEventNumber);
 
     /**
      * @brief
@@ -379,7 +379,7 @@ private:
     CHIP_ERROR ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate, const EventOptions * apOptions);
 
     // Internal function to log event
-    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber);
+    CHIP_ERROR LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions, EventNumber & aEventNumber);
 
     /**
      * @brief copy the event outright to next buffer with higher priority

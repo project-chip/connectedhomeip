@@ -49,11 +49,7 @@ public:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * reliableMessageManager,
-                                                            SessionManager * sessionManager) override
-    {
-        return GetSession().GetMessageDispatch(reliableMessageManager, sessionManager);
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return GetSession().GetMessageDispatch(); }
 
     virtual CASESession & GetSession() { return mPairingSession; }
 

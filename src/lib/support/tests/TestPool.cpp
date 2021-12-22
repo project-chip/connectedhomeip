@@ -35,10 +35,10 @@
 namespace chip {
 
 template <class POOL>
-size_t GetNumObjectsInUse(POOL & pool)
+size_t GetNumObjectsInUse(const POOL & pool)
 {
     size_t count = 0;
-    pool.ForEachActiveObject([&count](void *) {
+    pool.ForEachActiveObject([&count](const void *) {
         ++count;
         return Loop::Continue;
     });

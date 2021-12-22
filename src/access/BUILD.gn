@@ -20,6 +20,7 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
+    "AccessControlEntryCodec.h",
     "AuthMode.h",
     "Privilege.h",
     "RequestPath.h",
