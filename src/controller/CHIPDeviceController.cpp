@@ -1352,6 +1352,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 
+    // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
     ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
                                                                           dacPubkey, device->GetCSRNonce()));
 

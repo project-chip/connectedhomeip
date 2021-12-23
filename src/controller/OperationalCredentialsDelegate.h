@@ -33,6 +33,7 @@ typedef void (*OnNOCChainGeneration)(void * context, CHIP_ERROR status, const By
                                      const ByteSpan & rcac);
 
 constexpr uint32_t kMaxCHIPDERCertLength = 600;
+constexpr size_t kOpCSRNonceLength       = 32;
 
 /// Callbacks for CHIP operational credentials generation
 class DLL_EXPORT OperationalCredentialsDelegate

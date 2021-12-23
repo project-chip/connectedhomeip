@@ -27,13 +27,16 @@ namespace chip {
 namespace Credentials {
 
 // context tag positions
-enum : uint32_t
+enum AttestationInfoId : uint32_t
 {
     kCertificationDeclarationTagId = 1,
     kAttestationNonceTagId         = 2,
     kTimestampTagId                = 3,
     kFirmwareInfoTagId             = 4,
+};
 
+enum OperationalCSRInfoId : uint32_t
+{
     kCsr             = 1,
     kCsrNonce        = 2,
     kVendorReserved1 = 3,

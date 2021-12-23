@@ -16,6 +16,7 @@
  */
 #include "DefaultDeviceAttestationVerifier.h"
 
+#include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -380,6 +381,8 @@ CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpa
     VerifyOrReturnError(!nocsrElementsBuffer.empty() && !attestationChallengeBuffer.empty() &&
                             !attestationSignatureBuffer.empty() && !csrNonce.empty(),
                         CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnError(csrNonce.size() == Controller::kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
 
     ByteSpan csrSpan;
     ByteSpan csrNonceSpan;
