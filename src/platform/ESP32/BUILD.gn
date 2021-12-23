@@ -43,6 +43,7 @@ static_library("ESP32") {
     "LwIPCoreLock.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
+    "NetworkCommissioningDriver.h",
     "SystemTimeSupport.cpp",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
@@ -64,8 +65,7 @@ static_library("ESP32") {
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WiFi.cpp",
-      "WiFiProvisioning.cpp",
-      "WiFiProvisioning.h",
+      "NetworkCommissioningWiFiDriver.cpp",
     ]
   }
 

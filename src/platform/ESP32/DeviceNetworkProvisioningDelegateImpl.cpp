@@ -19,8 +19,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
-#include "WiFiProvisioning.h"
+#include "NetworkCommissioningDriver.h"
 
+using chip::DeviceLayer::NetworkCommissioning::ESPWiFiDriver;
 namespace chip {
 namespace DeviceLayer {
 
@@ -29,7 +30,7 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s", ssid);
-    err = SetWiFiStationProvisioning(ssid, key);
+    err = ESPWiFiDriver::GetInstance().ConnectWiFiNetwork(ssid, strlen(ssid), key, strlen(key));
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
