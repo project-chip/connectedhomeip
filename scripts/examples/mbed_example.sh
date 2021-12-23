@@ -38,33 +38,33 @@ TARGET_MEMORY_ALIGN[CY8CPROTO_062_4343W]=8
 
 for i in "$@"; do
     case $i in
-    -a=* | --app=*)
-        APP="${i#*=}"
-        shift
-        ;;
-    -b=* | --board=*)
-        TARGET_BOARD="${i#*=}"
-        shift
-        ;;
-    -t=* | --toolchain=*)
-        TOOLCHAIN="${i#*=}"
-        shift
-        ;;
-    -p=* | --profile=*)
-        PROFILE="${i#*=}"
-        shift
-        ;;
-    -c=* | --command=*)
-        COMMAND="${i#*=}"
-        shift
-        ;;
-    -T=* | --type=*)
-        TYPE="${i#*=}"
-        shift
-        ;;
-    *)
-        # unknown option
-        ;;
+        -a=* | --app=*)
+            APP="${i#*=}"
+            shift
+            ;;
+        -b=* | --board=*)
+            TARGET_BOARD="${i#*=}"
+            shift
+            ;;
+        -t=* | --toolchain=*)
+            TOOLCHAIN="${i#*=}"
+            shift
+            ;;
+        -p=* | --profile=*)
+            PROFILE="${i#*=}"
+            shift
+            ;;
+        -c=* | --command=*)
+            COMMAND="${i#*=}"
+            shift
+            ;;
+        -T=* | --type=*)
+            TYPE="${i#*=}"
+            shift
+            ;;
+        *)
+            # unknown option
+            ;;
     esac
 done
 
