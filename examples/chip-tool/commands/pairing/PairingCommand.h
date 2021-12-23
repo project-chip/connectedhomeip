@@ -23,6 +23,7 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
+#include <commands/common/CredentialIssuerCommands.h>
 #include <lib/support/Span.h>
 #include <lib/support/ThreadOperationalDataset.h>
 
@@ -51,8 +52,9 @@ class PairingCommand : public CHIPCommand,
 {
 public:
     PairingCommand(const char * commandName, PairingMode mode, PairingNetworkType networkType,
+                   CredentialIssuerCommands * credIssuerCmds,
                    chip::Dnssd::DiscoveryFilterType filterType = chip::Dnssd::DiscoveryFilterType::kNone) :
-        CHIPCommand(commandName),
+        CHIPCommand(commandName, credIssuerCmds),
         mPairingMode(mode), mNetworkType(networkType),
         mFilterType(filterType), mRemoteAddr{ IPAddress::Any, chip::Inet::InterfaceId::Null() }
     {
