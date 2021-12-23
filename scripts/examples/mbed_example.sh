@@ -98,6 +98,11 @@ if [[ ! " ${SUPPORTED_TYPE[@]} " =~ " ${TYPE} " ]]; then
     exit 1
 fi
 
+if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]] && [[ "$PROFILE" == "develop" || "$PROFILE" == "debug" ]]; then
+    echo "ERROR: The $TYPE application type does not supprort "$PROFILE" profile"
+    exit 1
+fi
+
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # Activate Matter environment
@@ -188,20 +193,12 @@ fi
 
 if [[ "$COMMAND" == *"flash"* ]]; then
 
-    echo "Flash $APP app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
+    echo "Flash $TYPE $APP app to $TARGET_BOARD target [$TOOLCHAIN toolchain, $PROFILE profile]"
 
     # Flash scripts path setup
     MBED_FLASH_SCRIPTS_PATH=$CHIP_ROOT/config/mbed/scripts
 
-    if [[ "$APP" == "bootloader" ]]; then
-        APP_PATH="$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.elf
-    else
-        if [[ $BOOTLOADER ]]; then
-            APP_PATH="$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-boot.elf
-        else
-            APP_PATH="$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.elf
-        fi
-    fi
+    APP_PATH="$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.elf
 
     # Flash application
     "$OPENOCD_PATH"/bin/openocd -f "$MBED_FLASH_SCRIPTS_PATH/$TARGET_BOARD".tcl -c "program $APP_PATH verify reset exit"
