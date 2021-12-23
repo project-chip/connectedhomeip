@@ -285,12 +285,11 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable), NL_TEST_DEF_FN(TestVariantCtorDtor),
-    NL_TEST_DEF_FN(TestVariantCopy),       NL_TEST_DEF_FN(TestVariantMove),    NL_TEST_DEF_FN(TestVariantCopyAssign),
-    NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_DEF_FN(TestVariantInPlace), NL_TEST_DEF_FN(TestVariantCompare),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestVariantSimple),     NL_TEST_DEF_FN(TestVariantMovable),
+                                 NL_TEST_DEF_FN(TestVariantCtorDtor),   NL_TEST_DEF_FN(TestVariantCopy),
+                                 NL_TEST_DEF_FN(TestVariantMove),       NL_TEST_DEF_FN(TestVariantCopyAssign),
+                                 NL_TEST_DEF_FN(TestVariantMoveAssign), NL_TEST_DEF_FN(TestVariantInPlace),
+                                 NL_TEST_DEF_FN(TestVariantCompare),    NL_TEST_SENTINEL() };
 
 int TestVariant()
 {
