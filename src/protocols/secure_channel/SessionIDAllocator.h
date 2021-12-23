@@ -46,7 +46,7 @@ private:
     static constexpr uint16_t kMaxSessionID       = UINT16_MAX;
     static constexpr uint16_t kUnsecuredSessionId = 0;
 
-    uint16_t mNextAvailable = 1;
+    static uint16_t mNextAvailable;
 };
 
 } // namespace chip

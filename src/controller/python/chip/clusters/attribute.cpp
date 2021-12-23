@@ -359,19 +359,18 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         SuccessOrExit(err);
     }
 
-    *pReadClient = readClient.get();
-    *pCallback   = callback.get();
-
-    callback.release();
-    readClient.release();
+    *pCallback   = callback.release();
+    *pReadClient = readClient.release();
 
 exit:
     va_end(args);
     return err.AsInteger();
 }
 
-chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, DeviceProxy * device, bool isSubscription,
-                                                          uint32_t minInterval, uint32_t maxInterval, size_t n, ...)
+chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, ReadClient ** pReadClient,
+                                                          ReadClientCallback ** pCallback, DeviceProxy * device,
+                                                          bool isSubscription, uint32_t minInterval, uint32_t maxInterval, size_t n,
+                                                          ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -417,8 +416,8 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
         SuccessOrExit(err);
     }
 
-    callback.release();
-    readClient.release();
+    *pCallback   = callback.release();
+    *pReadClient = readClient.release();
 
 exit:
     va_end(args);

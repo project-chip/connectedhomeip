@@ -339,6 +339,7 @@ void DeviceController::PersistNextKeyId()
     if (mStorageDelegate != nullptr && mState == State::Initialized)
     {
         uint16_t nextKeyID = mIDAllocator.Peek();
+        printf("PersistNextKey %d\n", nextKeyID);
         mStorageDelegate->SyncSetKeyValue(kNextAvailableKeyID, &nextKeyID, sizeof(nextKeyID));
     }
 }
@@ -619,6 +620,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
+#if 0
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
@@ -627,6 +629,8 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
         nextKeyID = 0;
     }
     ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
+#endif
+
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
@@ -660,6 +664,8 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
     VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
+
+    mSystemState->SessionMgr()->UnregisterRecoveryDelegate(*this);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
     if (mUdcTransportMgr != nullptr)
@@ -840,7 +846,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     // Immediately persist the updated mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
-    PersistNextKeyId();
+    // PersistNextKeyId();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -862,6 +868,9 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Invalid device for commissioning" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
     }
+
+    mCommissioningStage = kSecurePairing;
+
     if (mCommissioningStage != CommissioningStage::kSecurePairing)
     {
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
@@ -1530,8 +1539,9 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
 {
-    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentTimeout();
+    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {

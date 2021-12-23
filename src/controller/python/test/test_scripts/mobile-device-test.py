@@ -89,6 +89,10 @@ def main():
                                    nodeid=1),
               "Failed to finish key exchange")
 
+    asyncio.run(test.TestMultiFabric(ip=options.deviceAddress,
+                                     setuppin=20202021,
+                                     nodeid=1))
+
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
 
@@ -146,9 +150,6 @@ def main():
     FailIfNot(test.TestOnOffCluster(nodeid=1,
                                     endpoint=LIGHTING_ENDPOINT_ID,
                                     group=GROUP_ID), "Failed to test on off cluster")
-
-    logger.info("Testing non-controller APIs")
-    FailIfNot(test.TestNonControllerAPIs(), "Non controller API test failed")
 
     timeoutTicker.stop()
 

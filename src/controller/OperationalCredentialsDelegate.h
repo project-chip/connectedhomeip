@@ -43,7 +43,7 @@ public:
 
     /**
      * @brief
-     *   This function generates an operational certificate chain for the device.
+     *   This function generates an operational certificate chain for a remote device that is being commissioned.
      *   The API generates the certificate in X.509 DER format.
      *
      *   The delegate is expected to use the certificate authority whose certificate
