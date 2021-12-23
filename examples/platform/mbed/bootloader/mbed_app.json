@@ -1,5 +1,13 @@
 {
-    "requires": ["bare-metal", "mbedtls", "mcuboot", "flashiap-block-device", "spif-driver", "qspif", "mbed-trace"],
+    "requires": [
+        "bare-metal",
+        "mbedtls",
+        "mcuboot",
+        "flashiap-block-device",
+        "spif-driver",
+        "qspif",
+        "mbed-trace"
+    ],
     "config": {
         "serial-bootloader-enable": {
             "help": "Build bootloader with serial update support",
@@ -17,7 +25,7 @@
             "mbed-trace.fea-ipv6": false
         },
         "CY8CPROTO_062_4343W": {
-            "target.components_remove": [ "WHD" ],
+            "target.components_remove": ["WHD"],
             "mcuboot.primary-slot-address": "0x10022000",
             "mcuboot.slot-size": "0x140000",
             "mcuboot.scratch-address": "0x101A2000",
