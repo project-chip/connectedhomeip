@@ -97,10 +97,9 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChainAfterValidation(NodeI
 
 // TODO Refactor this API to match latest spec, so that GenerateNodeOperationalCertificate receives the full CSR Elements data
 // payload.
-CHIP_ERROR
-AndroidDeviceControllerWrapper::GenerateNOCChain(const chip::ByteSpan & csr, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
-                                                 const chip::ByteSpan & PAA,
-                                                 chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion)
+CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature,
+                                                            const ByteSpan & DAC, const ByteSpan & PAI, const ByteSpan & PAA,
+                                                            Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -123,6 +122,24 @@ AndroidDeviceControllerWrapper::GenerateNOCChain(const chip::ByteSpan & csr, con
         assignedId = mNextAvailableNodeId++;
     }
 
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
+    reader.ExitContainer(containerType);
+
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));
 
@@ -144,8 +161,8 @@ AndroidDeviceControllerWrapper::GenerateNOCChain(const chip::ByteSpan & csr, con
 
     jbyteArray javaCsr;
     JniReferences::GetInstance().GetEnvForCurrentThread()->ExceptionClear();
-    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csr.data(), csr.size(),
-                                               javaCsr);
+    JniReferences::GetInstance().N2J_ByteArray(JniReferences::GetInstance().GetEnvForCurrentThread(), csrElements.data(),
+                                               csrElements.size(), javaCsr);
     JniReferences::GetInstance().GetEnvForCurrentThread()->CallVoidMethod(mJavaObjectRef, method, javaCsr);
     return CHIP_NO_ERROR;
 }

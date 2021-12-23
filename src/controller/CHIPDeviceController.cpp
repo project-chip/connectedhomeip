@@ -1352,16 +1352,16 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
                                         ->GetCryptoContext()
                                         .GetAttestationChallenge();
 
-    ByteSpan csr;
     ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
-                                                                          dacPubkey, device->GetCSRNonce(), csr));
+                                                                          dacPubkey, device->GetCSRNonce()));
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(device->GetDeviceId());
 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
 
-    return mOperationalCredentialsDelegate->GenerateNOCChain(csr, ByteSpan(), ByteSpan(), ByteSpan(), &mDeviceNOCChainCallback);
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, ByteSpan(), ByteSpan(),
+                                                             ByteSpan(), &mDeviceNOCChainCallback);
 }
 
 CHIP_ERROR DeviceCommissioner::SendOperationalCertificate(CommissioneeDeviceProxy * device, const ByteSpan & nocCertBuf,

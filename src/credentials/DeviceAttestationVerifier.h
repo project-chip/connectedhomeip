@@ -252,13 +252,12 @@ public:
      * @param[in]  attestationSignatureBuffer Buffer containing the signature portion of CSR Response
      * @param[in]  dacPublicKey Public Key from the DAC's certificate received from device.
      * @param[in]  csrNonce Buffer containing CSR nonce.
-     * @param[out] csr A Bytespan to hold the CSR content extracted from the NOCSR Elements message.
      */
     virtual CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
                                                            const ByteSpan & attestationChallengeBuffer,
                                                            const ByteSpan & attestationSignatureBuffer,
-                                                           const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce,
-                                                           ByteSpan & csr) = 0;
+                                                           const Crypto::P256PublicKey & dacPublicKey,
+                                                           const ByteSpan & csrNonce) = 0;
 
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,

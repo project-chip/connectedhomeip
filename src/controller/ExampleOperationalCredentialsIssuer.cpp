@@ -126,8 +126,9 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
     return err;
 }
 
-CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csr, const ByteSpan & DAC, const ByteSpan & PAI,
-                                                                 const ByteSpan & PAA,
+CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan & csrElements,
+                                                                 const ByteSpan & attestationSignature, const ByteSpan & DAC,
+                                                                 const ByteSpan & PAI, const ByteSpan & PAA,
                                                                  Callback::Callback<OnNOCChainGeneration> * onCompletion)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INCORRECT_STATE);
@@ -143,6 +144,23 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChain(const ByteSpan 
     }
 
     ChipLogProgress(Controller, "Verifying Certificate Signing Request");
+    TLVReader reader;
+    reader.Init(csrElements);
+
+    if (reader.GetType() == kTLVType_NotSpecified)
+    {
+        ReturnErrorOnFailure(reader.Next());
+    }
+
+    VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+    TLVType containerType;
+    ReturnErrorOnFailure(reader.EnterContainer(containerType));
+    ReturnErrorOnFailure(reader.Next(kTLVType_ByteString, TLV::ContextTag(1)));
+
+    ByteSpan csr(reader.GetReadPoint(), reader.GetLength());
+    reader.ExitContainer(containerType);
 
     P256PublicKey pubkey;
     ReturnErrorOnFailure(VerifyCertificateSigningRequest(csr.data(), csr.size(), pubkey));

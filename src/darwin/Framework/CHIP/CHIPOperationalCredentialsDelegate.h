@@ -35,8 +35,9 @@ public:
 
     CHIP_ERROR init(CHIPPersistentStorageDelegateBridge * storage, ChipP256KeypairPtr nocSigner);
 
-    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csr, const chip::ByteSpan & DAC, const chip::ByteSpan & PAI,
-        const chip::ByteSpan & PAA, chip::Callback::Callback<OnNOCChainGeneration> * onCompletion) override;
+    CHIP_ERROR GenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & attestationSignature,
+        const chip::ByteSpan & DAC, const chip::ByteSpan & PAI, const chip::ByteSpan & PAA,
+        chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * onCompletion) override;
 
     void SetNodeIdForNextNOCRequest(chip::NodeId nodeId) override
     {
