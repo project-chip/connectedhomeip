@@ -26,6 +26,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+
 namespace chip {
 namespace Controller {
 
@@ -75,5 +76,46 @@ CHIP_ERROR PythonPersistentStorageDelegate::SyncDeleteKeyValue(const char * key)
     return CHIP_NO_ERROR;
 }
 
+namespace Python {
+
+CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
+{
+    ChipLogDetail(Controller, "StorageAdapter::GetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+
+    uint16_t tmpSize = size;
+
+    mGetKeyCb(mContext, key, (char *)value, &tmpSize);
+
+    if (tmpSize == 0) {
+        ChipLogDetail(Controller, "Key Not Found\n");
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+    else if (size < tmpSize) {
+        ChipLogDetail(Controller, "Buf not big enough\n");
+        size = tmpSize;
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    else {
+        ChipLogDetail(Controller, "Key Found %d\n", tmpSize);
+        size = tmpSize;
+        return CHIP_NO_ERROR;
+    }
+}
+
+CHIP_ERROR StorageAdapter::SyncSetKeyValue(const char * key, const void * value, uint16_t size)
+{
+    ChipLogDetail(Controller, "StorageAdapter::SetKeyValue: Key = %s, Value = %p (%u)", key, value, size);
+    mStorage[key] = std::string(static_cast<const char *>(value), size);
+    mSetKeyCb(mContext, key, value, size);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR StorageAdapter::SyncDeleteKeyValue(const char * key)
+{
+    mDeleteKeyCb(mContext, key);
+    return CHIP_NO_ERROR;
+}
+
+} // namespace Python
 } // namespace Controller
 } // namespace chip

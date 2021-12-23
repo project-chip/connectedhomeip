@@ -466,6 +466,9 @@ class SubscriptionTransaction:
             self._readTransaction._pReadClient, self._readTransaction._pReadCallback)
         self._isDone = True
 
+    def __del__(self):
+        self.Shutdown()
+
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
 
@@ -854,17 +857,29 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
         path = chip.interaction_model.EventPathIBstruct.build(path)
         readargs.append(ctypes.c_char_p(path))
 
+    readClientObj = ctypes.POINTER(c_void_p)()
+    readCallbackObj = ctypes.POINTER(c_void_p)()
+
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    
     minInterval = 0
     maxInterval = 0
+   
     if subscriptionParameters is not None:
         minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+
     res = handle.pychip_ReadClient_ReadEvents(
-        ctypes.py_object(transaction), device,
+        ctypes.py_object(transaction),
+        ctypes.byref(readClientObj),
+        ctypes.byref(readCallbackObj),
+        device,
         ctypes.c_bool(subscriptionParameters is not None),
         ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
         ctypes.c_size_t(len(events)), *readargs)
+
+    transaction.SetClientObjPointers(readClientObj, readCallbackObj)
+
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res

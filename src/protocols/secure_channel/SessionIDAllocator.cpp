@@ -21,10 +21,13 @@
 
 namespace chip {
 
+uint16_t SessionIDAllocator::mNextAvailable = 1;
+    
 CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 {
     VerifyOrReturnError(mNextAvailable < kMaxSessionID, CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(mNextAvailable > kUnsecuredSessionId, CHIP_ERROR_INTERNAL);
+
     id = mNextAvailable;
 
     // TODO - Update SessionID allocator to use freed session IDs
