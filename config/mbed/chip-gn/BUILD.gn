@@ -40,7 +40,6 @@ group("mbed") {
 
   if (chip_enable_ota_requestor) {
     deps += [ "${chip_root}/examples/ota-requestor-app/ota-requestor-common" ]
-    
   }
 }
 
