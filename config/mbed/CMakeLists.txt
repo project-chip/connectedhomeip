@@ -329,6 +329,12 @@ list(APPEND CHIP_INCLUDES)
 # CHIP defines
 list(APPEND CHIP_DEFINES)
 
+# Target specific configuration
+if("capsense" IN_LIST MBED_TARGET_LABELS)
+    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ${CMAKE_BINARY_DIR}/capsense_build)
+    target_link_libraries(${APP_TARGET} capsense)
+endif()
+
 list(APPEND CHIP_INCLUDES 
     ${CHIP_ROOT}/config/mbed/mbedtls
 )
@@ -472,8 +478,8 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
 endif(CONFIG_CHIP_OTA_REQUESTOR)
 
 if(BOOT_ENABLED)
-    add_subdirectory(${MCUBOOT_PATH}/boot/bootutil/ ./mbed_mcu_boot_util_build)
-    add_subdirectory(${MCUBOOT_PATH}/boot/mbed/ ./mbed_mcu_boot_build)
+    add_subdirectory(${MCUBOOT_PATH}/boot/bootutil/ ${CMAKE_BINARY_DIR}/mbed_mcu_boot_util_build)
+    add_subdirectory(${MCUBOOT_PATH}/boot/mbed/ ${CMAKE_BINARY_DIR}/mbed_mcu_boot_build)
 
     target_include_directories(bootutil PUBLIC
                            ${CHIP_ROOT}/config/mbed/mbedtls
