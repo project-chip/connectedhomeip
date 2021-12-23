@@ -574,6 +574,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPApplicationBasicAllowedVendorListAttributeCallback
+    : public chip::Callback::Callback<CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType>
+{
+public:
+    CHIPApplicationBasicAllowedVendorListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPApplicationBasicAllowedVendorListAttributeCallback();
+
+    static void maybeDestroy(CHIPApplicationBasicAllowedVendorListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPApplicationBasicAllowedVendorListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPApplicationBasicAllowedVendorListAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPApplicationBasicAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>
 {
@@ -683,8 +713,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
-            list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -2327,7 +2356,7 @@ public:
 
     static void CallbackFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
@@ -3239,9 +3268,9 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::DecodableList<
-                               chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list);
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & list);
     static void OnSubscriptionEstablished(void * context)
     {
         CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(

@@ -41,14 +41,14 @@ tests:
           value: 0
 
     - label: "Select Output Command"
-      command: "SelectOutput"
+      command: "selectOutputRequest"
       arguments:
           values:
               - name: "index"
                 value: 1
 
     - label: "Rename Output Command"
-      command: "RenameOutput"
+      command: "renameOutputRequest"
       arguments:
           values:
               - name: "index"

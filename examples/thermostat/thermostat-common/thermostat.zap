@@ -12521,7 +12521,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "NavigateTarget",
+              "name": "NavigateTargetRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",

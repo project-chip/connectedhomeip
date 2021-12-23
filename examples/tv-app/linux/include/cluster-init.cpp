@@ -71,7 +71,7 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
     err                                = aManager.Init();
     if (CHIP_NO_ERROR == err)
     {
-        Application application = aManager.getApplicationForEndpoint(endpoint);
+        chip::app::Clusters::ApplicationBasic::Application application = aManager.getApplicationForEndpoint(endpoint);
         aManager.store(endpoint, &application);
     }
     else

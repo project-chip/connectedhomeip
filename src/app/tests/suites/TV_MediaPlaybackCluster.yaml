@@ -68,90 +68,90 @@ tests:
           value: 0
 
     - label: "Media Playback Play Command"
-      command: "MediaPlay"
+      command: "playRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Pause Command"
-      command: "MediaPause"
+      command: "pauseRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Stop Command"
-      command: "MediaStop"
+      command: "stopRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Start Over Command"
-      command: "MediaStartOver"
+      command: "startOverRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Previous Command"
-      command: "MediaPrevious"
+      command: "previousRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Next Command"
-      command: "MediaNext"
+      command: "nextRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Rewind Command"
-      command: "MediaRewind"
+      command: "rewindRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Fast Forward Command"
-      command: "MediaFastForward"
+      command: "fastForwardRequest"
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Skip Forward Command"
-      command: "MediaSkipForward"
+      command: "skipForwardRequest"
       arguments:
           values:
               - name: "deltaPositionMilliseconds"
                 value: 100
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Skip Backward Command"
-      command: "MediaSkipBackward"
+      command: "skipBackwardRequest"
       arguments:
           values:
               - name: "deltaPositionMilliseconds"
                 value: 100
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0
 
     - label: "Media Playback Seek Command"
-      command: "MediaSeek"
+      command: "seekRequest"
       arguments:
           values:
               - name: "position"
                 value: 100
       response:
           values:
-              - name: "mediaPlaybackStatus"
+              - name: "status"
                 value: 0

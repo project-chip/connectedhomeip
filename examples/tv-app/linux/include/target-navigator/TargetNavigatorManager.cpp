@@ -59,7 +59,7 @@ CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::EndpointId endpo
         {
             // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
 
-            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
+            chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type targetInfo;
             targetInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
             targetInfo.identifier = static_cast<uint8_t>(i++);
             ReturnErrorOnFailure(encoder.Encode(targetInfo));
@@ -86,11 +86,11 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId en
     // make sure TV_TargetNavigatorCluster.yaml test suite passes - assumes index starts at 1
     if (target == 0 || target > gTargets.size())
     {
-        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
+        response.status = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable);
     }
     else
     {
-        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+        response.status = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess);
         gCurrentTarget  = target;
     }
     return response;

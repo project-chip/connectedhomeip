@@ -25,15 +25,15 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the Output on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST" type="ARRAY" entryType="AudioOutputInfo" length="254" writable="false" optional="false">audio output list</attribute>
+    <attribute side="server" code="0x0000" define="AUDIO_OUTPUT_LIST" type="ARRAY" entryType="OutputInfo" length="254" writable="false" optional="false">audio output list</attribute>
     <attribute side="server" code="0x0001" define="AUDIO_OUTPUT_CURRENT_OUTPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current audio output</attribute>
 
-    <command source="client" code="0x00" name="SelectOutput" optional="false">
+    <command source="client" code="0x00" name="SelectOutputRequest" optional="false">
       <description>Upon receipt, this SHALL change the output on the media device to the output at a specific index in the Output List.</description>
       <arg name="index" type="INT8U"/>
     </command>
 
-    <command source="client" code="0x01" name="RenameOutput" optional="false">
+    <command source="client" code="0x01" name="RenameOutputRequest" optional="false">
       <description>Upon receipt, this SHALL rename the output at a specific index in the Output List. Updates to the output name SHALL appear in the TV settings menus.</description>
       <arg name="index" type="INT8U"/>
       <arg name="name" type="CHAR_STRING"/>
@@ -41,14 +41,14 @@ limitations under the License.
 
   </cluster>
 
-  <struct name="AudioOutputInfo">
+  <struct name="OutputInfo">
     <cluster code="0x050b"/>
     <item name="index" type="INT8U"/>
-    <item name="outputType" type="AudioOutputType"/>
+    <item name="outputType" type="OutputTypeEnum"/>
     <item name="name" type="CHAR_STRING" length="32"/>
   </struct>
 
-  <enum name="AudioOutputType" type="ENUM8">
+  <enum name="OutputTypeEnum" type="ENUM8">
     <cluster code="0x050b"/>
     <item name="Hdmi" value="0x00"/>
     <item name="Bt" value="0x01"/>
