@@ -396,7 +396,7 @@ static CHIP_ERROR DecodeConvertExtendedKeyUsageExtension(TLVReader & reader, ASN
 
         ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
-        while ((err = reader.Next(AnonymousTag)) == CHIP_NO_ERROR)
+        while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
         {
             uint8_t keyPurposeId;
             ReturnErrorOnFailure(reader.Get(keyPurposeId));
@@ -666,7 +666,7 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, Chi
         ReturnErrorOnFailure(reader.Next());
     }
     VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
 

@@ -42,10 +42,18 @@ namespace {
 
 struct GroupKeyCodec
 {
-    static const TLV::Tag kTagFabric = TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kFabricIndex));
-    static const TLV::Tag kTagGroup  = TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupId));
-    static const TLV::Tag kTagKeyset =
-        TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupKeySetID));
+    static constexpr TLV::Tag TagFabric()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kFabricIndex));
+    }
+    static constexpr TLV::Tag TagGroup()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupId));
+    }
+    static constexpr TLV::Tag TagKeyset()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupKeySetID));
+    }
 
     chip::FabricIndex mFabric = 0;
     GroupDataProvider::GroupKey mMapping;
@@ -61,11 +69,11 @@ struct GroupKeyCodec
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
         // FabricIndex
-        ReturnErrorOnFailure(DataModel::Encode(writer, kTagFabric, mFabric));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TagFabric(), mFabric));
         // GroupId
-        ReturnErrorOnFailure(DataModel::Encode(writer, kTagGroup, mMapping.group_id));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TagGroup(), mMapping.group_id));
         // GroupKeySetID
-        ReturnErrorOnFailure(DataModel::Encode(writer, kTagKeyset, mMapping.keyset_id));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TagKeyset(), mMapping.keyset_id));
 
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -79,13 +87,13 @@ struct GroupKeyCodec
         ReturnErrorOnFailure(reader.EnterContainer(outer));
 
         // FabricIndex
-        ReturnErrorOnFailure(reader.Next(kTagFabric));
+        ReturnErrorOnFailure(reader.Next(TagFabric()));
         ReturnErrorOnFailure(reader.Get(mFabric));
         // GroupId
-        ReturnErrorOnFailure(reader.Next(kTagGroup));
+        ReturnErrorOnFailure(reader.Next(TagGroup()));
         ReturnErrorOnFailure(reader.Get(mMapping.group_id));
         // GroupKeySetID
-        ReturnErrorOnFailure(reader.Next(kTagKeyset));
+        ReturnErrorOnFailure(reader.Next(TagKeyset()));
         ReturnErrorOnFailure(reader.Get(mMapping.keyset_id));
 
         ReturnErrorOnFailure(reader.ExitContainer(outer));
@@ -95,12 +103,22 @@ struct GroupKeyCodec
 
 struct GroupTableCodec
 {
-    static const TLV::Tag kTagFabric = TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kFabricIndex));
-    static const TLV::Tag kTagGroup  = TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupId));
-    static const TLV::Tag kTagEndpoints =
-        TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kEndpoints));
-    static const TLV::Tag kTagGroupName =
-        TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupName));
+    static constexpr TLV::Tag TagFabric()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kFabricIndex));
+    }
+    static constexpr TLV::Tag TagGroup()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupId));
+    }
+    static constexpr TLV::Tag TagEndpoints()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kEndpoints));
+    }
+    static constexpr TLV::Tag TagGroupName()
+    {
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupName));
+    }
 
     GroupDataProvider * mProvider = nullptr;
     chip::FabricIndex mFabric;
@@ -116,12 +134,12 @@ struct GroupTableCodec
         ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
 
         // FabricIndex
-        ReturnErrorOnFailure(DataModel::Encode(writer, kTagFabric, mFabric));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TagFabric(), mFabric));
         // GroupId
-        ReturnErrorOnFailure(DataModel::Encode(writer, kTagGroup, mInfo.group_id));
+        ReturnErrorOnFailure(DataModel::Encode(writer, TagGroup(), mInfo.group_id));
         // Endpoints
         TLV::TLVType inner;
-        ReturnErrorOnFailure(writer.StartContainer(kTagEndpoints, TLV::kTLVType_Array, inner));
+        ReturnErrorOnFailure(writer.StartContainer(TagEndpoints(), TLV::kTLVType_Array, inner));
         GroupDataProvider::GroupEndpoint mapping;
         auto iter = mProvider->IterateEndpoints(mFabric);
         if (nullptr != iter)
@@ -130,7 +148,7 @@ struct GroupTableCodec
             {
                 if (mapping.group_id == mInfo.group_id)
                 {
-                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag, static_cast<uint16_t>(mapping.endpoint_id)));
+                    ReturnErrorOnFailure(writer.Put(TLV::AnonymousTag(), static_cast<uint16_t>(mapping.endpoint_id)));
                 }
             }
             iter->Release();
@@ -138,7 +156,7 @@ struct GroupTableCodec
         ReturnErrorOnFailure(writer.EndContainer(inner));
         // GroupName
         uint32_t name_size = static_cast<uint32_t>(strnlen(mInfo.name, GroupDataProvider::GroupInfo::kGroupNameMax));
-        ReturnErrorOnFailure(writer.PutString(kTagGroupName, mInfo.name, name_size));
+        ReturnErrorOnFailure(writer.PutString(TagGroupName(), mInfo.name, name_size));
 
         ReturnErrorOnFailure(writer.EndContainer(outer));
         return CHIP_NO_ERROR;
@@ -490,7 +508,7 @@ struct KeySetReadAllIndicesResponse
         GroupDataProvider::KeySet keyset;
         while (mIterator && mIterator->Next(keyset))
         {
-            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag, keyset.keyset_id));
+            ReturnErrorOnFailure(app::DataModel::Encode(writer, TLV::AnonymousTag(), keyset.keyset_id));
         }
 
         ReturnErrorOnFailure(writer.EndContainer(array));
