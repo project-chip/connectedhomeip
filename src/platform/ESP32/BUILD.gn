@@ -41,6 +41,7 @@ static_library("ESP32") {
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "LwIPCoreLock.cpp",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
@@ -64,8 +65,7 @@ static_library("ESP32") {
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WiFi.cpp",
-      "WiFiProvisioning.cpp",
-      "WiFiProvisioning.h",
+      "NetworkCommissioningWiFiDriver.cpp",
     ]
   }
 
