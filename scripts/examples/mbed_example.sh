@@ -99,7 +99,7 @@ if [[ ! " ${SUPPORTED_TYPE[@]} " =~ " ${TYPE} " ]]; then
 fi
 
 if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]] && [[ "$PROFILE" == "develop" || "$PROFILE" == "debug" ]]; then
-    echo "ERROR: The $TYPE application type does not supprort "$PROFILE" profile"
+    echo "ERROR: The $TYPE application type does not supprort ""$PROFILE profile"
     exit 1
 fi
 
@@ -178,12 +178,12 @@ if [[ "$COMMAND" == *"build"* ]]; then
     cmake --build "$BUILD_DIRECTORY"
 
     if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
-        APP_VERSION=$(jq '.config."version-number-str".value' $APP/mbed/mbed_app.json | tr -d '\\"')
-        HEADER_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.header-size"' $APP/mbed/mbed_app.json | tr -d \")
-        SLOT_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.slot-size"' $APP/mbed/mbed_app.json | tr -d \")
+        APP_VERSION=$(jq '.config."version-number-str".value' "$APP"/mbed/mbed_app.json | tr -d '\\"')
+        HEADER_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.header-size"' "$APP"/mbed/mbed_app.json | tr -d \")
+        SLOT_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.slot-size"' "$APP"/mbed/mbed_app.json | tr -d \")
         # Signed the primary application
         "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$BOOTLOADER_ROOT_DIRECTORY"/signing-keys.pem \
-            --align ${TARGET_MEMORY_ALIGN[$TARGET_BOARD]} -v $APP_VERSION --header-size $(($HEADER_SIZE)) --pad-header -S $SLOT_SIZE \
+            --align "${TARGET_MEMORY_ALIGN[$TARGET_BOARD]}" -v "$APP_VERSION" --header-size $(($HEADER_SIZE)) --pad-header -S "$SLOT_SIZE" \
             "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
 
         # Create the factory firmware (bootlaoder + signed primary application)
