@@ -57,7 +57,6 @@ static const int kNameSize = 32;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 static const int kDescriptorAttributeArraySize = 254;
-static const int kFixedLabelAttributeArraySize = 254;
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
 // (taken from chip-devices.xml)
@@ -191,7 +190,7 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -202,7 +201,7 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLaunch
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
 
     return response;
 }
@@ -229,7 +228,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
     return nullptr;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApp application)
+ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application application)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,

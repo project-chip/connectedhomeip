@@ -46,10 +46,10 @@ public:
     inline uint16_t GetVendorId() override { return mVendorId; };
     inline const char * GetApplicationName() override { return mApplicationName; };
     inline uint16_t GetProductId() override { return mProductId; };
-    inline app::Clusters::ApplicationBasic::ApplicationBasicStatus GetApplicationStatus() override { return mApplicationStatus; };
+    inline app::Clusters::ApplicationBasic::ApplicationStatusEnum GetApplicationStatus() override { return mApplicationStatus; };
     inline const char * GetApplicationVersion() override { return mApplicationVersion; };
 
-    inline void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus applicationStatus) override
+    inline void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus) override
     {
         mApplicationStatus = applicationStatus;
     };
@@ -69,8 +69,8 @@ protected:
     uint16_t mVendorId;
     char mApplicationName[kApplicationNameSize];
     uint16_t mProductId;
-    app::Clusters::ApplicationBasic::ApplicationBasicStatus mApplicationStatus =
-        app::Clusters::ApplicationBasic::ApplicationBasicStatus::kStopped;
+    app::Clusters::ApplicationBasic::ApplicationStatusEnum mApplicationStatus =
+        app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped;
     char mApplicationVersion[kApplicationVersionSize];
 };
 
@@ -100,7 +100,7 @@ class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
 public:
     virtual ~ApplicationLauncherImpl() {}
 
-    ApplicationLauncherResponse LaunchApp(ApplicationLauncherApp application, std::string data) override;
+    ApplicationLauncherResponse LaunchApp(Application application, std::string data) override;
 
 protected:
 };
@@ -170,7 +170,7 @@ public:
     virtual ~ContentAppFactoryImpl() {}
 
     ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * LoadContentAppByAppId(ApplicationLauncherApp application);
+    ContentApp * LoadContentAppByAppId(Application application);
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),

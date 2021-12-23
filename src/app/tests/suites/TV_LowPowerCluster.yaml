@@ -24,4 +24,4 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "Sleep Input Status Command"
-      command: "Sleep"
+      command: "sleep"

@@ -45,7 +45,7 @@ exit:
     return err;
 }
 
-void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * application)
+void ApplicationBasicManager::store(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Application * application)
 {
     uint8_t bufferMemory[64];
     MutableByteSpan zclString(bufferMemory);
@@ -102,10 +102,10 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
     }
 }
 
-Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId endpoint)
+chip::app::Clusters::ApplicationBasic::Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId endpoint)
 {
-    Application app = {};
-    uint16_t size   = static_cast<uint16_t>(sizeof(app.name));
+    chip::app::Clusters::ApplicationBasic::Application app = {};
+    uint16_t size                                          = static_cast<uint16_t>(sizeof(app.name));
 
     std::string section = "endpoint" + std::to_string(endpoint);
 
@@ -152,27 +152,4 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     }
 
     return app;
-}
-
-bool applicationBasicClusterChangeApplicationStatus(chip::EndpointId endpoint,
-                                                    app::Clusters::ApplicationBasic::ApplicationBasicStatus status)
-{
-    ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", to_underlying(status), endpoint);
-
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app == NULL)
-    {
-        if (endpoint == 3)
-        {
-            // TODO: Fix hardcoded app endpoints 3-5, fix test cases
-            return true;
-        }
-        ChipLogProgress(Zcl, "No app for endpoint %d", endpoint);
-        return false;
-    }
-    app->GetApplicationBasic()->SetApplicationStatus(status);
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-
-    return true;
 }

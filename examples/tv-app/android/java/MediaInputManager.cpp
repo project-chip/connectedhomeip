@@ -116,7 +116,7 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
         jint size = env->GetArrayLength(inputArray);
         for (int i = 0; i < size; i++)
         {
-            app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
+            app::Clusters::MediaInput::Structs::InputInfo::Type mediaInput;
 
             jobject inputObj  = env->GetObjectArrayElement(inputArray, i);
             jclass inputClass = env->GetObjectClass(inputObj);
@@ -127,7 +127,7 @@ CHIP_ERROR MediaInputManager::GetInputList(app::AttributeValueEncoder & aEncoder
 
             jfieldID typeId      = env->GetFieldID(inputClass, "type", "I");
             jint type            = env->GetIntField(inputObj, typeId);
-            mediaInput.inputType = static_cast<app::Clusters::MediaInput::MediaInputType>(type);
+            mediaInput.inputType = static_cast<app::Clusters::MediaInput::InputTypeEnum>(type);
 
             jfieldID nameId = env->GetFieldID(inputClass, "name", "Ljava/lang/String;");
             jstring jname   = static_cast<jstring>(env->GetObjectField(inputObj, nameId));
@@ -308,7 +308,7 @@ void MediaInputManager::InitializeWithObjects(jobject managerObject)
     jclass MediaInputManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(MediaInputManagerClass != nullptr, ChipLogError(Zcl, "Failed to get MediaInputManager Java class"));
 
-    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/MediaInputInfo;");
+    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/InputInfo;");
     if (mGetInputListMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");

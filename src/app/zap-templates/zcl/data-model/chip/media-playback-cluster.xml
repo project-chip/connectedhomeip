@@ -26,126 +26,76 @@ limitations under the License.
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
+    <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="INT64U" min="0x00"  writable="false" default="0xFF" optional="true">start time</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION" type="INT64U" min="0x00"  writable="false" optional="true">duration</attribute>
-    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="MediaPlaybackPosition" writable="true" optional="false">position</attribute>
+    <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPosition" writable="true" optional="false">position</attribute>
     <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" min="0x00"  writable="false" optional="true">playback speed</attribute>
     <attribute side="server" code="0x0005" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END" type="INT64U" min="0x00"  writable="false" optional="true">seek range end</attribute>
     <attribute side="server" code="0x0006" define="MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START" type="INT64U" min="0x00"  writable="false" optional="true">seek range start</attribute>
 
 
-    <command source="client" code="0x00" name="MediaPlay" optional="false">
+    <command source="client" code="0x00" name="PlayRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL play media.</description>
     </command>
 
-    <command source="client" code="0x01" name="MediaPause" optional="false">
+    <command source="client" code="0x01" name="PauseRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL pause media.</description>
     </command>
 
-    <command source="client" code="0x02" name="MediaStop" optional="false">
+    <command source="client" code="0x02" name="StopRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched.</description>
     </command>
 
-    <command source="client" code="0x03" name="MediaStartOver" optional="false">
+    <command source="client" code="0x03" name="StartOverRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Start Over with the current media playback item.</description>
     </command>
 
-    <command source="client" code="0x04" name="MediaPrevious" optional="false">
+    <command source="client" code="0x04" name="PreviousRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item.</description>
     </command>
 
-    <command source="client" code="0x05" name="MediaNext" optional="false">
+    <command source="client" code="0x05" name="NextRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item.</description>
     </command>
 
-    <command source="client" code="0x06" name="MediaRewind" optional="false">
+    <command source="client" code="0x06" name="RewindRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
     </command>
 
-    <command source="client" code="0x07" name="MediaFastForward" optional="false">
+    <command source="client" code="0x07" name="FastForwardRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
     </command>
 
-    <command source="client" code="0x08" name="MediaSkipForward" optional="false">
+    <command source="client" code="0x08" name="SkipForwardRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="deltaPositionMilliseconds" type="INT64U"/>
     </command>
 
-    <command source="client" code="0x09" name="MediaSkipBackward" optional="false">
+    <command source="client" code="0x09" name="SkipBackwardRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="deltaPositionMilliseconds" type="INT64U"/>
     </command>
 
-    <command source="client" code="0x0A" name="MediaSeek" optional="false">
+    <command source="client" code="0x0B" name="SeekRequest" response="PlaybackResponse" optional="false">
       <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
       <arg name="position" type="INT64U"/>
     </command>
 
-    <command source="server" code="0x00" name="MediaPlayResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL play media.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x01" name="MediaPauseResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL pause media.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x02" name="MediaStopResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back to the location where media was originally launched.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x03" name="MediaStartOverResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL Start Over with the current media playback item.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x04" name="MediaPreviousResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific. This will often Go back to the previous media playback item.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x05" name="MediaNextResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This will often Go forward to the next media playback item.</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x06" name="MediaRewindResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x07" name="MediaFastForwardResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow motion, etc).</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x08" name="MediaSkipForwardResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x09" name="MediaSkipBackwardResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
-    </command>
-
-    <command source="server" code="0x0B" name="MediaSeekResponse" optional="false" disableDefaultResponse="true">
-      <description>Upon receipt, this SHALL change the playback position in the media to the given position using data as follows:</description>
-      <arg name="mediaPlaybackStatus" type="MediaPlaybackStatus"/>
+    <command source="server" code="0x0A" name="PlaybackResponse" optional="false">
+      <description>This command SHALL be generated in response to various Playback Request commands.</description>
+      <arg name="status" type="StatusEnum"/>
     </command>
 
   </cluster>
 
-  <struct name="MediaPlaybackPosition">
+  <struct name="PlaybackPosition">
     <cluster code="0x0506"/>
     <item name="updatedAt" type="INT64U"/>
     <item name="position" type="INT64U"/>    
   </struct>
 
-  <enum name="MediaPlaybackState" type="ENUM8">
+  <enum name="PlaybackStateEnum" type="ENUM8">
     <cluster code="0x0506"/>
     <item name="Playing" value="0x00"/>
     <item name="Paused" value="0x01"/>
@@ -153,7 +103,7 @@ limitations under the License.
     <item name="Buffering" value="0x03"/>
   </enum>
 
-  <enum name="MediaPlaybackStatus" type="ENUM8">
+  <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x0506"/>
     <item name="Success" value="0x00"/>
     <item name="InvalidStateForCommand" value="0x01"/>

@@ -50,20 +50,20 @@ tests:
           value: 0
 
     - label: "Select Input Command"
-      command: "SelectInput"
+      command: "selectInputRequest"
       arguments:
           values:
               - name: "index"
                 value: 1
 
     - label: "Hide Input Status Command"
-      command: "HideInputStatus"
+      command: "hideInputStatusRequest"
 
     - label: "Show Input Status Command"
-      command: "ShowInputStatus"
+      command: "showInputStatusRequest"
 
     - label: "Rename Input Command"
-      command: "RenameInput"
+      command: "renameInputRequest"
       arguments:
           values:
               - name: "index"

@@ -88,75 +88,9 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, setupPIN);
 }
-CHIPApplicationLauncherClusterHideAppResponseCallback::CHIPApplicationLauncherClusterHideAppResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPApplicationLauncherClusterHideAppResponseCallback::~CHIPApplicationLauncherClusterHideAppResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPApplicationLauncherClusterHideAppResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPApplicationLauncherClusterHideAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterHideAppResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPApplicationLauncherClusterHideAppResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPApplicationLauncherClusterHideAppResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject status;
-
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
-    jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
-}
-CHIPApplicationLauncherClusterLaunchAppResponseCallback::CHIPApplicationLauncherClusterLaunchAppResponseCallback(
+CHIPApplicationLauncherClusterLauncherResponseCallback::CHIPApplicationLauncherClusterLauncherResponseCallback(
     jobject javaCallback) :
-    Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>(CallbackFn, this)
+    Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -172,7 +106,7 @@ CHIPApplicationLauncherClusterLaunchAppResponseCallback::CHIPApplicationLauncher
     }
 }
 
-CHIPApplicationLauncherClusterLaunchAppResponseCallback::~CHIPApplicationLauncherClusterLaunchAppResponseCallback()
+CHIPApplicationLauncherClusterLauncherResponseCallback::~CHIPApplicationLauncherClusterLauncherResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -183,8 +117,8 @@ CHIPApplicationLauncherClusterLaunchAppResponseCallback::~CHIPApplicationLaunche
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPApplicationLauncherClusterLaunchAppResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & dataResponse)
+void CHIPApplicationLauncherClusterLauncherResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -194,10 +128,10 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPApplicationLauncherClusterLaunchAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterLaunchAppResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPApplicationLauncherClusterLaunchAppResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPApplicationLauncherClusterLaunchAppResponseCallback>);
+    std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPApplicationLauncherClusterLauncherResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPApplicationLauncherClusterLauncherResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -212,73 +146,7 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus>(
-        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
-    jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
-}
-CHIPApplicationLauncherClusterStopAppResponseCallback::CHIPApplicationLauncherClusterStopAppResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPApplicationLauncherClusterStopAppResponseCallback::~CHIPApplicationLauncherClusterStopAppResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPApplicationLauncherClusterStopAppResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPApplicationLauncherClusterStopAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterStopAppResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPApplicationLauncherClusterStopAppResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPApplicationLauncherClusterStopAppResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject status;
-
-    std::string statusClassName     = "java/lang/Integer";
-    std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus>(
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::StatusEnum>(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
@@ -345,14 +213,13 @@ void CHIPChannelClusterChangeChannelResponseCallback::CallbackFn(
 
     std::string errorTypeClassName     = "java/lang/Integer";
     std::string errorTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::Channel::ChannelErrorType>(
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::Channel::ErrorTypeEnum>(
         errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
 }
-CHIPContentLauncherClusterLaunchContentResponseCallback::CHIPContentLauncherClusterLaunchContentResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>(CallbackFn, this)
+CHIPContentLauncherClusterLaunchResponseCallback::CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -368,7 +235,7 @@ CHIPContentLauncherClusterLaunchContentResponseCallback::CHIPContentLauncherClus
     }
 }
 
-CHIPContentLauncherClusterLaunchContentResponseCallback::~CHIPContentLauncherClusterLaunchContentResponseCallback()
+CHIPContentLauncherClusterLaunchResponseCallback::~CHIPContentLauncherClusterLaunchResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -379,8 +246,8 @@ CHIPContentLauncherClusterLaunchContentResponseCallback::~CHIPContentLauncherClu
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & dataResponse)
+void CHIPContentLauncherClusterLaunchResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -390,10 +257,9 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPContentLauncherClusterLaunchContentResponseCallback,
-                    void (*)(CHIPContentLauncherClusterLaunchContentResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPContentLauncherClusterLaunchContentResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPContentLauncherClusterLaunchContentResponseCallback>);
+    std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPContentLauncherClusterLaunchResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPContentLauncherClusterLaunchResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -404,86 +270,18 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject contentLaunchStatus;
+    jobject status;
 
-    std::string contentLaunchStatusClassName     = "java/lang/Integer";
-    std::string contentLaunchStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
-        contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
-        contentLaunchStatus);
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::StatusEnum>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     chip::UtfString dataUtfString(env, dataResponse.data);
     data = dataUtfString.jniValue();
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, contentLaunchStatus, data);
-}
-CHIPContentLauncherClusterLaunchURLResponseCallback::CHIPContentLauncherClusterLaunchURLResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPContentLauncherClusterLaunchURLResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPContentLauncherClusterLaunchURLResponseCallback::~CHIPContentLauncherClusterLaunchURLResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPContentLauncherClusterLaunchURLResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPContentLauncherClusterLaunchURLResponseCallback,
-                    void (*)(CHIPContentLauncherClusterLaunchURLResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPContentLauncherClusterLaunchURLResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPContentLauncherClusterLaunchURLResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
-                                                  &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject contentLaunchStatus;
-
-    std::string contentLaunchStatusClassName     = "java/lang/Integer";
-    std::string contentLaunchStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
-        contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
-        contentLaunchStatus);
-    jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, contentLaunchStatus, data);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
 CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(CallbackFn, this)
@@ -1538,14 +1336,13 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::KeypadInput::KeypadInputStatus>(
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::KeypadInput::StatusEnum>(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
-CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CHIPMediaPlaybackClusterMediaFastForwardResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>(CallbackFn, this)
+CHIPMediaPlaybackClusterPlaybackResponseCallback::CHIPMediaPlaybackClusterPlaybackResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>(CallbackFn, this)
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1561,7 +1358,7 @@ CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CHIPMediaPlaybackClust
     }
 }
 
-CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::~CHIPMediaPlaybackClusterMediaFastForwardResponseCallback()
+CHIPMediaPlaybackClusterPlaybackResponseCallback::~CHIPMediaPlaybackClusterPlaybackResponseCallback()
 {
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr)
@@ -1572,8 +1369,8 @@ CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::~CHIPMediaPlaybackClus
     env->DeleteGlobalRef(javaCallbackRef);
 };
 
-void CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & dataResponse)
+void CHIPMediaPlaybackClusterPlaybackResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & dataResponse)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1583,10 +1380,9 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CallbackFn(
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaFastForwardResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterPlaybackResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
 
     javaCallbackRef = cppCallback->javaCallbackRef;
@@ -1596,638 +1392,14 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject mediaPlaybackStatus;
+    jobject status;
 
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
+    std::string statusClassName     = "java/lang/Integer";
+    std::string statusCtorSignature = "(I)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::StatusEnum>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaNextResponseCallback::CHIPMediaPlaybackClusterMediaNextResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaNextResponseCallback::~CHIPMediaPlaybackClusterMediaNextResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaNextResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaNextResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaNextResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaNextResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaNextResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaPauseResponseCallback::CHIPMediaPlaybackClusterMediaPauseResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaPauseResponseCallback::~CHIPMediaPlaybackClusterMediaPauseResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaPauseResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPauseResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPauseResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaPauseResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaPauseResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaPlayResponseCallback::CHIPMediaPlaybackClusterMediaPlayResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaPlayResponseCallback::~CHIPMediaPlaybackClusterMediaPlayResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaPlayResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPlayResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPlayResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaPlayResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaPlayResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaPreviousResponseCallback::CHIPMediaPlaybackClusterMediaPreviousResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaPreviousResponseCallback::~CHIPMediaPlaybackClusterMediaPreviousResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaPreviousResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPreviousResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPreviousResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaPreviousResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaPreviousResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaRewindResponseCallback::CHIPMediaPlaybackClusterMediaRewindResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaRewindResponseCallback::~CHIPMediaPlaybackClusterMediaRewindResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaRewindResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaRewindResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaRewindResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaRewindResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaRewindResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaSeekResponseCallback::CHIPMediaPlaybackClusterMediaSeekResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaSeekResponseCallback::~CHIPMediaPlaybackClusterMediaSeekResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaSeekResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSeekResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSeekResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaSeekResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaSeekResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback::CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback::~CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback::CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback::~CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaStartOverResponseCallback::CHIPMediaPlaybackClusterMediaStartOverResponseCallback(
-    jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaStartOverResponseCallback::~CHIPMediaPlaybackClusterMediaStartOverResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaStartOverResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaStartOverResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaStartOverResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaStartOverResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaStartOverResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
-}
-CHIPMediaPlaybackClusterMediaStopResponseCallback::CHIPMediaPlaybackClusterMediaStopResponseCallback(jobject javaCallback) :
-    Callback::Callback<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>(CallbackFn, this)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-        return;
-    }
-
-    javaCallbackRef = env->NewGlobalRef(javaCallback);
-    if (javaCallbackRef == nullptr)
-    {
-        ChipLogError(Zcl, "Could not create global reference for Java callback");
-    }
-}
-
-CHIPMediaPlaybackClusterMediaStopResponseCallback::~CHIPMediaPlaybackClusterMediaStopResponseCallback()
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    if (env == nullptr)
-    {
-        ChipLogError(Zcl, "Could not delete global reference for Java callback");
-        return;
-    }
-    env->DeleteGlobalRef(javaCallbackRef);
-};
-
-void CHIPMediaPlaybackClusterMediaStopResponseCallback::CallbackFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & dataResponse)
-{
-    chip::DeviceLayer::StackUnlock unlock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    jobject javaCallbackRef;
-    jmethodID javaMethod;
-
-    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
-
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaStopResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaStopResponseCallback *)>
-        cppCallback(reinterpret_cast<CHIPMediaPlaybackClusterMediaStopResponseCallback *>(context),
-                    chip::Platform::Delete<CHIPMediaPlaybackClusterMediaStopResponseCallback>);
-    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
-
-    javaCallbackRef = cppCallback->javaCallbackRef;
-    // Java callback is allowed to be null, exit early if this is the case.
-    VerifyOrReturn(javaCallbackRef != nullptr);
-
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
-    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
-
-    jobject mediaPlaybackStatus;
-
-    std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
-    std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
-        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
-        mediaPlaybackStatus);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
 CHIPNetworkCommissioningClusterConnectNetworkResponseCallback::CHIPNetworkCommissioningClusterConnectNetworkResponseCallback(
     jobject javaCallback) :
@@ -3451,7 +2623,7 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TargetNavigator::NavigateTargetStatus>(
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TargetNavigator::StatusEnum>(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
