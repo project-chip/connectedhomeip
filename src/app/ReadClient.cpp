@@ -182,7 +182,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         ReturnErrorOnFailure(writer.Finalize(&msgBuf));
     }
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
@@ -190,8 +190,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
+    mPeerNodeId  = aReadPrepareParams.mSessionHolder.Get().GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHolder.Get().GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -699,7 +699,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
@@ -712,8 +712,8 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
+    mPeerNodeId  = aReadPrepareParams.mSessionHolder.Get().GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHolder.Get().GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 

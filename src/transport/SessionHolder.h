@@ -41,12 +41,7 @@ public:
     SessionHolder(SessionHolder && that);
     SessionHolder operator=(SessionHolder && that);
 
-    void Grab(const SessionHandle & sessionHandle)
-    {
-        Release();
-        mSession.SetValue(sessionHandle);
-    }
-
+    void Grab(const SessionHandle & sessionHandle) { mSession.SetValue(sessionHandle); }
     void Release() { mSession.ClearValue(); }
 
     // TODO: call this function when the underlying session is released
