@@ -42,6 +42,7 @@ alloc
 Ameba
 amebad
 amebaiot
+announcementReason
 AnnounceOTAProvider
 APIs
 apk
@@ -722,6 +723,7 @@ OTA
 OTADownloader
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
@@ -774,6 +776,7 @@ pre
 preprocessor
 Presetup
 prj
+providerNodeId
 ProductID
 ProductLabel
 ProductName

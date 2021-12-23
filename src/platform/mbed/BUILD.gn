@@ -50,7 +50,7 @@ static_library("mbed") {
   if (chip_enable_ota_requestor) {
     sources += [
       "OTAImageProcessorImpl.cpp",
-      "OTAImageProcessorImpl.h"
+      "OTAImageProcessorImpl.h",
     ]
   }
 }

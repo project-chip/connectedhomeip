@@ -65,7 +65,7 @@ int main()
     err = MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Memory initalization failed: %s", err.AsString());
+        ChipLogError(SoftwareUpdate, "Memory initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -73,7 +73,7 @@ int main()
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Chip stack initalization failed: %s", err.AsString());
+        ChipLogError(SoftwareUpdate, "Chip stack initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }

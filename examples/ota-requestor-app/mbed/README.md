@@ -24,22 +24,22 @@ paired into an existing Matter network and can be controlled by this network.
 
 <hr>
 
-- [Overview](#overview)
-  - [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
-  - [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
-  - [WiFi provisioning](#wifi-provisioning)
-- [Run application](#run-application)
-  - [Environment setup](#environment-setup)
-  - [Building](#building)
-  - [Flashing](#flashing)
-  - [Debugging](#debugging)
-  - [Testing](#testing)
-    - [Serial port terminal](#serial-port-terminal)
-    - [CHIP Tools](#chip-tools)
-      - [Notes](#notes)
-  - [Supported devices](#supported-devices)
-      - [Notes](#notes-1)
-  - [Device UI](#device-ui)
+-   [Overview](#overview)
+    -   [Bluetooth Low Energy advertising](#bluetooth-low-energy-advertising)
+    -   [Bluetooth Low Energy rendezvous](#bluetooth-low-energy-rendezvous)
+    -   [WiFi provisioning](#wifi-provisioning)
+-   [Run application](#run-application)
+    -   [Environment setup](#environment-setup)
+    -   [Building](#building)
+    -   [Flashing](#flashing)
+    -   [Debugging](#debugging)
+    -   [Testing](#testing)
+        -   [Serial port terminal](#serial-port-terminal)
+        -   [CHIP Tools](#chip-tools)
+            -   [Notes](#notes)
+    -   [Supported devices](#supported-devices)
+        -   [Notes](#notes-1)
+    -   [Device UI](#device-ui)
 
 <hr>
 
@@ -196,7 +196,7 @@ It is possible to connect to an external gdb-server session by using specific
 
 ## Testing
 
-The provider application is required to transfer image file to OTA reuqestor.
+The provider application is required to transfer image file to OTA requestor.
 Mbed example is compatible with Linux version of OTA provider example. Read the
 [OTAProvider](../../ota-provider-app/linux/README.md) to see how to build and
 run the OTA provider.

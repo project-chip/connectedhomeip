@@ -127,7 +127,7 @@ int AppTask::Init()
     error = Server::GetInstance().Init();
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(NotSpecified, "Server initalization failed: %s", error.AsString());
+        ChipLogError(NotSpecified, "Server initialization failed: %s", error.AsString());
         return EXIT_FAILURE;
     }
 

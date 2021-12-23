@@ -234,11 +234,11 @@ int OTAImageProcessorImpl::PrepareMemory()
     int ret = 0;
 
 #ifdef BOOT_ENABLED
-    // Initalize block device and erase update block
+    // Initialize block device and erase update block
     ret = mBlockDevice->init();
     if (ret)
     {
-        ChipLogError(SoftwareUpdate, "Block device initalization failed [%d]", ret);
+        ChipLogError(SoftwareUpdate, "Block device initialization failed [%d]", ret);
         return ret;
     }
     mBlockDevice->erase(0, mBlockDevice->size());

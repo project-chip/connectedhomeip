@@ -38,33 +38,33 @@ TARGET_MEMORY_ALIGN[CY8CPROTO_062_4343W]=8
 
 for i in "$@"; do
     case $i in
-    -a=* | --app=*)
-        APP="${i#*=}"
-        shift
-        ;;
-    -b=* | --board=*)
-        TARGET_BOARD="${i#*=}"
-        shift
-        ;;
-    -t=* | --toolchain=*)
-        TOOLCHAIN="${i#*=}"
-        shift
-        ;;
-    -p=* | --profile=*)
-        PROFILE="${i#*=}"
-        shift
-        ;;
-    -c=* | --command=*)
-        COMMAND="${i#*=}"
-        shift
-        ;;
-    -T=* | --type=*)
-        TYPE="${i#*=}"
-        shift
-        ;;
-    *)
-        # unknown option
-        ;;
+        -a=* | --app=*)
+            APP="${i#*=}"
+            shift
+            ;;
+        -b=* | --board=*)
+            TARGET_BOARD="${i#*=}"
+            shift
+            ;;
+        -t=* | --toolchain=*)
+            TOOLCHAIN="${i#*=}"
+            shift
+            ;;
+        -p=* | --profile=*)
+            PROFILE="${i#*=}"
+            shift
+            ;;
+        -c=* | --command=*)
+            COMMAND="${i#*=}"
+            shift
+            ;;
+        -T=* | --type=*)
+            TYPE="${i#*=}"
+            shift
+            ;;
+        *)
+            # unknown option
+            ;;
     esac
 done
 
@@ -99,7 +99,7 @@ if [[ ! " ${SUPPORTED_TYPE[@]} " =~ " ${TYPE} " ]]; then
 fi
 
 if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]] && [[ "$PROFILE" == "develop" || "$PROFILE" == "debug" ]]; then
-    echo "ERROR: The $TYPE application type does not supprort "$PROFILE" profile"
+    echo "ERROR: The $TYPE application type does not supprort ""$PROFILE profile"
     exit 1
 fi
 
@@ -178,15 +178,15 @@ if [[ "$COMMAND" == *"build"* ]]; then
     cmake --build "$BUILD_DIRECTORY"
 
     if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
-        APP_VERSION=$(jq '.config."version-number-str".value' $APP/mbed/mbed_app.json | tr -d '\\"')
-        HEADER_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.header-size"' $APP/mbed/mbed_app.json | tr -d \")
-        SLOT_SIZE=$(jq '.target_overrides.'\"${TARGET_BOARD}\"'."mcuboot.slot-size"' $APP/mbed/mbed_app.json | tr -d \")
+        APP_VERSION=$(jq '.config."version-number-str".value' "$APP"/mbed/mbed_app.json | tr -d '\\"')
+        HEADER_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.header-size"' "$APP"/mbed/mbed_app.json | tr -d \")
+        SLOT_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.slot-size"' "$APP"/mbed/mbed_app.json | tr -d \")
         # Signed the primary application
         "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$BOOTLOADER_ROOT_DIRECTORY"/signing-keys.pem \
-            --align ${TARGET_MEMORY_ALIGN[$TARGET_BOARD]} -v $APP_VERSION --header-size $(($HEADER_SIZE)) --pad-header -S $SLOT_SIZE \
+            --align "${TARGET_MEMORY_ALIGN[$TARGET_BOARD]}" -v "$APP_VERSION" --header-size $(($HEADER_SIZE)) --pad-header -S "$SLOT_SIZE" \
             "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
 
-        # Create the factory firmware (bootlaoder + signed primary application)
+        # Create the factory firmware (bootloader + signed primary application)
         hexmerge.py -o "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex --no-start-addr "$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
     fi
 fi
