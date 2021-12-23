@@ -73,12 +73,12 @@ ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const
 std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
-    return { "image/*", "video/*" };
+    return { "example", "image/*", "video/*" };
 }
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
-    uint32_t streamingProtocols = 0;
+    uint32_t streamingProtocols = 3;
     return streamingProtocols;
 }
