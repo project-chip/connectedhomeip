@@ -22,11 +22,11 @@
  *
  */
 #include "AndroidAppServerWrapper.h"
+#include "ChipThreadWork.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMem.h>
-#include <lib/support/ChipThreadWork.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>

@@ -119,8 +119,6 @@ static_library("support") {
   if (current_os == "android") {
     sources += [
       "CHIPJNIError.h",
-      "ChipThreadWork.cpp",
-      "ChipThreadWork.h",
       "JniReferences.cpp",
       "JniReferences.h",
       "JniTypeWrappers.h",
