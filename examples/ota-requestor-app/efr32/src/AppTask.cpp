@@ -454,10 +454,8 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             if (!ConnectivityMgr().IsThreadProvisioned())
             {
                 // Enable BLE advertisements
-                /* TODO: Somehow this crashes the app, disabled for now and follow up. Dec 22, 2021
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
-                */
             }
             else
             {

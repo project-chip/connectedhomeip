@@ -156,7 +156,12 @@ int main(void)
         appError(ret);
     }
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
+#else
+    ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif // CHIP_DEVICE_CONFIG_THREAD_FTD
+
     if (ret != CHIP_NO_ERROR)
     {
         EFR32_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
