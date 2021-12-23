@@ -135,6 +135,7 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                    const char * szApplicationVersion);
+    //        mContentLauncherDelegate({ "image/*", "video/*" }){};
     virtual ~ContentAppImpl() {}
 
     inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };

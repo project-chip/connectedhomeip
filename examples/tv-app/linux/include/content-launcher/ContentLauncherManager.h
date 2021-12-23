@@ -30,10 +30,22 @@
 class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
+    ContentLauncherManager() : ContentLauncherManager({ "example", "example" }){};
+    ContentLauncherManager(std::list<std::string> acceptHeaderList) :
+        ContentLauncherManager(
+            acceptHeaderList,
+            //                               chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kDash |
+            static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kHls)){};
+    ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
+
     LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
                                        const chip::CharSpan & data) override;
     LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                                    const std::list<BrandingInformation> & brandingInformation) override;
     std::list<std::string> HandleGetAcceptHeaderList() override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
+
+protected:
+    std::list<std::string> mAcceptHeaderList;
+    uint32_t mSupportedStreamingProtocols;
 };

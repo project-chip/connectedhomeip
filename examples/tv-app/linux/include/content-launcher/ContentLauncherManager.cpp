@@ -38,6 +38,12 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
+ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
+{
+    mAcceptHeaderList            = acceptHeaderList;
+    mSupportedStreamingProtocols = supportedStreamingProtocols;
+}
+
 LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
                                                            bool autoplay, const chip::CharSpan & data)
 {
@@ -71,12 +77,11 @@ LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & co
 std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
-    return { "example", "example", "image/*", "video/*" };
+    return mAcceptHeaderList;
 }
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetSupportedStreamingProtocols");
-    uint32_t streamingProtocols = 3;
-    return streamingProtocols;
+    return mSupportedStreamingProtocols;
 }
