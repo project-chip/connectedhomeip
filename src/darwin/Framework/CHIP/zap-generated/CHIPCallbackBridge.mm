@@ -2119,6 +2119,49 @@ void CHIPBinaryInputBasicAttributeListListAttributeCallbackSubscriptionBridge::O
     }
 }
 
+void CHIPBindingBindingListListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::BindingEntry::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPBindingClusterBindingEntry * newElement_0;
+        newElement_0 = [CHIPBindingClusterBindingEntry new];
+        newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        newElement_0.endpointId = [NSNumber numberWithUnsignedShort:entry_0.endpointId];
+        newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, err);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPBindingBindingListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPBindingBindingListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPBindingServerGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
 {

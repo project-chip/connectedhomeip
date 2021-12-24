@@ -51,7 +51,7 @@ public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
@@ -135,7 +135,8 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
 
 GeneralDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralDiagosticsAttrAccess::Read(FabricIndex fabricIndex, const ConcreteReadAttributePath & aPath,
+                                             AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralDiagnostics::Id)
     {

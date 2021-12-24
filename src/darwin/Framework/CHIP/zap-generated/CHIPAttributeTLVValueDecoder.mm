@@ -1544,6 +1544,36 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
     case Clusters::Binding::Id: {
         using namespace Clusters::Binding;
         switch (aPath.mAttributeId) {
+        case Attributes::BindingList::Id: {
+            using TypeInfo = Attributes::BindingList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                CHIPBindingClusterBindingEntry * newElement_0;
+                newElement_0 = [CHIPBindingClusterBindingEntry new];
+                newElement_0.nodeId = [NSNumber numberWithUnsignedLongLong:entry_0.nodeId];
+                newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+                newElement_0.endpointId = [NSNumber numberWithUnsignedShort:entry_0.endpointId];
+                newElement_0.clusterId = [NSNumber numberWithUnsignedInt:entry_0.clusterId];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
+            return value;
+        }
         case Attributes::ServerGeneratedCommandList::Id: {
             using TypeInfo = Attributes::ServerGeneratedCommandList::TypeInfo;
             TypeInfo::DecodableType cppValue;

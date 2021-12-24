@@ -786,10 +786,9 @@ private:
 | Cluster Binding                                                     | 0x001E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * Bind                                                              |   0x00 |
-| * Unbind                                                            |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * BindingList                                                       | 0x0000 |
 | * ServerGeneratedCommandList                                        | 0xFFF8 |
 | * ClientGeneratedCommandList                                        | 0xFFF9 |
 | * AttributeList                                                     | 0xFFFB |
@@ -798,56 +797,27 @@ private:
 | Events:                                                             |        |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command Bind
- */
-class BindingBind : public ClusterCommand
+class WriteBindingBindingList : public WriteAttribute
 {
 public:
-    BindingBind(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("bind", credsIssuerConfig)
+    WriteBindingBindingList(CredentialIssuerCommands * credsIssuerConfig) :
+        WriteAttribute("BindingList", credsIssuerConfig), mComplex(&mValue)
     {
-        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId);
-        ClusterCommand::AddArguments();
+        AddArgument("attr-name", "binding-list");
+        AddArgument("attr-value", &mComplex);
+        WriteAttribute::AddArguments();
     }
+
+    ~WriteBindingBindingList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x0000001E, 0x00000000, mRequest);
+        return WriteAttribute::SendCommand(device, endpointId, 0x0000001E, 0x00000000, mValue);
     }
 
 private:
-    chip::app::Clusters::Binding::Commands::Bind::Type mRequest;
-};
-
-/*
- * Command Unbind
- */
-class BindingUnbind : public ClusterCommand
-{
-public:
-    BindingUnbind(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("unbind", credsIssuerConfig)
-    {
-        AddArgument("NodeId", 0, UINT64_MAX, &mRequest.nodeId);
-        AddArgument("GroupId", 0, UINT16_MAX, &mRequest.groupId);
-        AddArgument("EndpointId", 0, UINT16_MAX, &mRequest.endpointId);
-        AddArgument("ClusterId", 0, UINT32_MAX, &mRequest.clusterId);
-        ClusterCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu16, endpointId);
-
-        return ClusterCommand::SendCommand(device, endpointId, 0x0000001E, 0x00000001, mRequest);
-    }
-
-private:
-    chip::app::Clusters::Binding::Commands::Unbind::Type mRequest;
+    chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::BindingEntry::Type> mValue;
+    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Binding::Structs::BindingEntry::Type>> mComplex;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -9839,12 +9809,11 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         // Commands
         //
         make_unique<ClusterCommand>(Id, credsIssuerConfig), //
-        make_unique<BindingBind>(credsIssuerConfig),        //
-        make_unique<BindingUnbind>(credsIssuerConfig),      //
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                              //
+        make_unique<ReadAttribute>(Id, "binding-list", Attributes::BindingList::Id, credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                    credsIssuerConfig), //
         make_unique<ReadAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
@@ -9852,7 +9821,9 @@ void registerClusterBinding(Commands & commands, CredentialIssuerCommands * cred
         make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),     //
         make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig), //
         make_unique<WriteAttribute>(Id, credsIssuerConfig),                                                     //
+        make_unique<WriteBindingBindingList>(credsIssuerConfig),                                                //
         make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                 //
+        make_unique<SubscribeAttribute>(Id, "binding-list", Attributes::BindingList::Id, credsIssuerConfig),    //
         make_unique<SubscribeAttribute>(Id, "server-generated-command-list", Attributes::ServerGeneratedCommandList::Id,
                                         credsIssuerConfig), //
         make_unique<SubscribeAttribute>(Id, "client-generated-command-list", Attributes::ClientGeneratedCommandList::Id,
