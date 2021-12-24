@@ -22,6 +22,7 @@
 #import "DefaultsUtils.h"
 #import "DeviceSelector.h"
 #import <CHIP/CHIP.h>
+#import <CHIP/CHIPSetupPayload.h>
 
 // system imports
 #import <AVFoundation/AVFoundation.h>
@@ -65,6 +66,13 @@
 @property (strong, nonatomic) UILabel * productID;
 @property (strong, nonatomic) UILabel * serialNumber;
 
+@property (strong, nonatomic) UIButton * readFromLedgerButton;
+@property (strong, nonatomic) UIButton * redirectButton;
+@property (strong, nonatomic) UILabel * commissioningFlowLabel;
+@property (strong, nonatomic) UILabel * commissioningCustomFlowUrl;
+@property (strong, nonatomic) UIView * deviceModelInfoView;
+@property (strong, nonatomic) NSDictionary * ledgerRespond;
+
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
 
@@ -105,6 +113,9 @@
     // Setup nav bar button
     [self changeNavBarButtonToCamera];
 
+    // Initialize all Labels
+    [self initializeAllLabels];
+
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
 
@@ -113,7 +124,7 @@
     stackView.axis = UILayoutConstraintAxisVertical;
     stackView.distribution = UIStackViewDistributionFill;
     stackView.alignment = UIStackViewAlignmentLeading;
-    stackView.spacing = 15;
+    stackView.spacing = 10;
     [self.view addSubview:stackView];
 
     stackView.translatesAutoresizingMaskIntoConstraints = false;
@@ -170,9 +181,29 @@
     [_setupPayloadView.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:10].active = YES;
     [_setupPayloadView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [_setupPayloadView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+    [_setupPayloadView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active = YES;
 
-    [self addViewsToSetupPayloadView];
+    _deviceModelInfoView = [UIView new];
+    [self.view addSubview:_deviceModelInfoView];
+
+    _deviceModelInfoView.translatesAutoresizingMaskIntoConstraints = false;
+    [_deviceModelInfoView.topAnchor constraintEqualToAnchor:stackView.bottomAnchor constant:10].active = YES;
+    [_deviceModelInfoView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
+    [_deviceModelInfoView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    [_deviceModelInfoView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-60].active
+        = YES;
+
+    // manual entry field
+    _manualCodeLabel = [UILabel new];
+    _manualCodeLabel.text = @"00000000000000000000";
+    _manualCodeLabel.textColor = UIColor.systemBlueColor;
+    _manualCodeLabel.font = [UIFont systemFontOfSize:17];
+    _manualCodeLabel.textAlignment = NSTextAlignmentRight;
+    [_setupPayloadView addSubview:_manualCodeLabel];
+
+    _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
+    [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
+    [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
 
     // activity indicator
     _activityIndicator = [UIActivityIndicatorView new];
@@ -219,51 +250,45 @@
     [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
     [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
+    // Read from Ledger button
+    _readFromLedgerButton = [UIButton new];
+    [_readFromLedgerButton setTitle:@"Read from Ledger" forState:UIControlStateNormal];
+    [_readFromLedgerButton addTarget:self action:@selector(readFromLedgerApi:) forControlEvents:UIControlEventTouchUpInside];
+    _readFromLedgerButton.backgroundColor = UIColor.systemBlueColor;
+    _readFromLedgerButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _readFromLedgerButton.titleLabel.textColor = [UIColor whiteColor];
+    _readFromLedgerButton.layer.cornerRadius = 5;
+    _readFromLedgerButton.clipsToBounds = YES;
+    _readFromLedgerButton.hidden = YES;
+    [self.view addSubview:_readFromLedgerButton];
+
+    _readFromLedgerButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_readFromLedgerButton.widthAnchor constraintEqualToConstant:200].active = YES;
+    [_readFromLedgerButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active
+        = YES;
+    [_readFromLedgerButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+
+    // Redirect Custom Flow button
+    _redirectButton = [UIButton new];
+    [_redirectButton setTitle:@"Redirect" forState:UIControlStateNormal];
+    [_redirectButton addTarget:self action:@selector(redirectToUrl:) forControlEvents:UIControlEventTouchUpInside];
+    _redirectButton.backgroundColor = UIColor.systemBlueColor;
+    _redirectButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _redirectButton.titleLabel.textColor = [UIColor whiteColor];
+    _redirectButton.layer.cornerRadius = 5;
+    _redirectButton.clipsToBounds = YES;
+    _redirectButton.hidden = YES;
+    [self.view addSubview:_redirectButton];
+
+    _redirectButton.translatesAutoresizingMaskIntoConstraints = false;
+    [_redirectButton.widthAnchor constraintEqualToConstant:200].active = YES;
+    [_redirectButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+    [_redirectButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 }
 
-- (void)addViewsToSetupPayloadView
+- (void)initializeAllLabels
 {
-    // manual entry field
-    _manualCodeLabel = [UILabel new];
-    _manualCodeLabel.text = @"00000000000000000000";
-    _manualCodeLabel.textColor = UIColor.systemBlueColor;
-    _manualCodeLabel.font = [UIFont systemFontOfSize:17];
-    _manualCodeLabel.textAlignment = NSTextAlignmentRight;
-    [_setupPayloadView addSubview:_manualCodeLabel];
-
-    _manualCodeLabel.translatesAutoresizingMaskIntoConstraints = false;
-    [_manualCodeLabel.topAnchor constraintEqualToAnchor:_setupPayloadView.topAnchor].active = YES;
-    [_manualCodeLabel.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
-
-    // Results scroll view
-    UIScrollView * resultsScrollView = [UIScrollView new];
-    [_setupPayloadView addSubview:resultsScrollView];
-
-    resultsScrollView.translatesAutoresizingMaskIntoConstraints = false;
-    [resultsScrollView.topAnchor constraintEqualToAnchor:_manualCodeLabel.bottomAnchor constant:10].active = YES;
-    [resultsScrollView.leadingAnchor constraintEqualToAnchor:_setupPayloadView.leadingAnchor].active = YES;
-    [resultsScrollView.trailingAnchor constraintEqualToAnchor:_setupPayloadView.trailingAnchor].active = YES;
-    [resultsScrollView.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-20].active = YES;
-
-    UIStackView * parserResultsView = [UIStackView new];
-    parserResultsView.axis = UILayoutConstraintAxisVertical;
-    parserResultsView.distribution = UIStackViewDistributionEqualSpacing;
-    parserResultsView.alignment = UIStackViewAlignmentLeading;
-    parserResultsView.spacing = 15;
-    [resultsScrollView addSubview:parserResultsView];
-
-    parserResultsView.translatesAutoresizingMaskIntoConstraints = false;
-    [parserResultsView.topAnchor constraintEqualToAnchor:resultsScrollView.topAnchor].active = YES;
-    [parserResultsView.leadingAnchor constraintEqualToAnchor:resultsScrollView.leadingAnchor].active = YES;
-    [parserResultsView.trailingAnchor constraintEqualToAnchor:resultsScrollView.trailingAnchor].active = YES;
-    [parserResultsView.bottomAnchor constraintEqualToAnchor:resultsScrollView.bottomAnchor].active = YES;
-    [self addResultsUIToStackView:parserResultsView];
-}
-
-- (void)addResultsUIToStackView:(UIStackView *)stackView
-{
-    NSArray<NSString *> * resultLabelTexts =
-        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #" ];
     _versionLabel = [UILabel new];
     _discriminatorLabel = [UILabel new];
     _setupPinCodeLabel = [UILabel new];
@@ -271,17 +296,86 @@
     _vendorID = [UILabel new];
     _productID = [UILabel new];
     _serialNumber = [UILabel new];
-    NSArray<UILabel *> * resultLabels =
-        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber ];
-    for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
+    _commissioningFlowLabel = [UILabel new];
+    _commissioningCustomFlowUrl = [UILabel new];
+}
+
+- (void)addDetailSubview:(UIView *)superView
+{
+    // Results scroll view
+    UIScrollView * resultsScrollView = [UIScrollView new];
+    [superView addSubview:resultsScrollView];
+
+    resultsScrollView.translatesAutoresizingMaskIntoConstraints = false;
+    [resultsScrollView.topAnchor constraintEqualToAnchor:superView.topAnchor constant:10].active = YES;
+    [resultsScrollView.leadingAnchor constraintEqualToAnchor:superView.leadingAnchor].active = YES;
+    [resultsScrollView.trailingAnchor constraintEqualToAnchor:superView.trailingAnchor].active = YES;
+    [resultsScrollView.bottomAnchor constraintEqualToAnchor:superView.bottomAnchor constant:-20].active = YES;
+
+    UIStackView * parserResultsView = [UIStackView new];
+    parserResultsView.axis = UILayoutConstraintAxisVertical;
+    parserResultsView.distribution = UIStackViewDistributionEqualSpacing;
+    parserResultsView.alignment = UIStackViewAlignmentLeading;
+    parserResultsView.spacing = 5;
+    [resultsScrollView addSubview:parserResultsView];
+
+    parserResultsView.translatesAutoresizingMaskIntoConstraints = false;
+    [parserResultsView.topAnchor constraintEqualToAnchor:resultsScrollView.topAnchor].active = YES;
+    [parserResultsView.leadingAnchor constraintEqualToAnchor:resultsScrollView.leadingAnchor].active = YES;
+    [parserResultsView.trailingAnchor constraintEqualToAnchor:resultsScrollView.trailingAnchor].active = YES;
+    [parserResultsView.bottomAnchor constraintEqualToAnchor:resultsScrollView.bottomAnchor].active = YES;
+
+    if (superView == _setupPayloadView) {
+        [superView addSubview:_manualCodeLabel];
+        [self addResultsUIToStackView:parserResultsView];
+    } else if (superView == _deviceModelInfoView) {
+        [self addDeviceInfoUIToStackView:parserResultsView];
+    }
+}
+
+- (void)addResultsUIToStackView:(UIStackView *)stackView
+{
+    NSArray<NSString *> * resultLabelTexts = @[
+        @"Version", @"Vendor ID", @"Product ID", @"Discriminator", @"Setup PIN Code", @"Rendez Vous Information", @"Serial #",
+        @"Commissioning Flow"
+    ];
+    NSArray<UILabel *> * resultLabels = @[
+        _versionLabel, _vendorID, _productID, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _serialNumber,
+        _commissioningFlowLabel
+    ];
+    [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
+}
+
+- (void)addDeviceInfoUIToStackView:(UIStackView *)stackView
+{
+    NSArray<NSString *> * resultLabelTexts = @[ @"Vendor ID", @"Product ID", @"Commissioning URL" ];
+    NSArray<UILabel *> * resultLabels = @[ _vendorID, _productID, _commissioningCustomFlowUrl ];
+    [self addItemToStackView:stackView resultLabels:resultLabels resultLabelTexts:resultLabelTexts];
+}
+
+- (void)addItemToStackView:(UIStackView *)stackView
+              resultLabels:(NSArray<UILabel *> *)resultLabels
+          resultLabelTexts:(NSArray<NSString *> *)resultLabelTexts
+{
+    for (int i = 0; i < resultLabels.count && i < resultLabelTexts.count; i++) {
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
         UILabel * result = [resultLabels objectAtIndex:i];
-        result.text = @"N/A";
+        if (!result.text)
+            result.text = @"N/A";
         UIStackView * labelStackView = [CHIPUIViewUtils stackViewWithLabel:label result:result];
         labelStackView.translatesAutoresizingMaskIntoConstraints = false;
         [stackView addArrangedSubview:labelStackView];
     }
+}
+
+- (void)updateResultViewUI:(UIView *)superView
+{
+    NSArray * viewsToRemove = [superView subviews];
+    for (UIView * v in viewsToRemove) {
+        [v removeFromSuperview];
+    }
+    [self addDetailSubview:superView];
 }
 
 // MARK: UIViewController methods
@@ -396,6 +490,9 @@
 
 - (void)manualCodeInitialState
 {
+    _deviceModelInfoView.hidden = YES;
+    _readFromLedgerButton.hidden = YES;
+    _redirectButton.hidden = YES;
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
     _activityIndicator.hidden = YES;
@@ -423,6 +520,9 @@
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
     _errorLabel.hidden = YES;
+    _deviceModelInfoView.hidden = YES;
+    _redirectButton.hidden = YES;
+    _readFromLedgerButton.hidden = YES;
 }
 
 - (void)manualCodeEnteredStartState
@@ -654,6 +754,13 @@
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
+    _commissioningFlowLabel.text = [NSString stringWithFormat:@"%lu", payload.commissioningFlow];
+
+    [self updateResultViewUI:_setupPayloadView];
+
+    if (payload.commissioningFlow == kCommissioningFlowCustom) {
+        _readFromLedgerButton.hidden = NO;
+    }
 }
 
 - (void)parseOptionalData:(CHIPSetupPayload *)payload
@@ -867,6 +974,126 @@
         [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
+}
+
+// Ledger
+
+- (IBAction)readFromLedgerApi:(id)sender
+{
+    NSLog(@"Clicked readFromLedger...");
+    _readFromLedgerButton.hidden = YES;
+    _setupPayloadView.hidden = YES;
+    _activityIndicator.hidden = NO;
+    [_activityIndicator startAnimating];
+
+    [self updateResultViewUI:_deviceModelInfoView];
+    [self updateLedgerFields];
+}
+
+- (void)updateLedgerFields
+{
+    // check vendor Id and product Id
+    NSLog(@"Validating Vender Id and Product Id...");
+    if ([_vendorID.text isEqual:@"N/A"] || [_productID.text isEqual:@"N/A"]) {
+        NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.customflow"
+                                                     code:1
+                                                 userInfo:@{ NSLocalizedDescriptionKey : @"Vendor ID or Product Id is invalid." }];
+        [self showError:error];
+        return;
+    }
+    // make API call
+    NSLog(@"Making API call...");
+    [self getRequest:[[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"]
+                         objectForKey:@"CommissioningCustomFlowLedgerUrl"]
+            vendorId:self->_vendorID.text
+           productId:self->_productID.text];
+}
+
+- (void)getRequest:(NSString *)url vendorId:(NSString *)vendorId productId:(NSString *)productId
+{
+    [_activityIndicator startAnimating];
+    _activityIndicator.hidden = NO;
+    NSString * targetUrl = [NSString stringWithFormat:@"%@/%@/%@", url, vendorId, productId];
+    NSMutableURLRequest * request = [[NSMutableURLRequest alloc] init];
+    [request setHTTPMethod:@"GET"];
+    [request setURL:[NSURL URLWithString:targetUrl]];
+
+    [[[NSURLSession sharedSession]
+        dataTaskWithRequest:request
+          completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+              NSString * myString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+              NSLog(@"Data received: %@", myString);
+              self->_ledgerRespond = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+              [self getRequestCallback];
+          }] resume];
+}
+
+- (void)getRequestCallback
+{
+    BOOL commissioningCustomFlowUseMockFlag = (BOOL)
+        [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowUseMockFlag"];
+    // use mock respond if useMockFlag is TRUE
+    if (commissioningCustomFlowUseMockFlag) {
+        NSLog(@"Using mock respond");
+        _ledgerRespond = @{
+            @"height" : @"mockHeight",
+            @"result" : @ {
+                @"vid" : @1,
+                @"pid" : @1,
+                @"cid" : @1,
+                @"name" : @"mockName",
+                @"owner" : @"mockOwner",
+                @"description" : @"mockDescription",
+                @"sku" : @"mockSku",
+                @"firmware_version" : @"mockFirmware",
+                @"hardware_version" : @"mockHardware",
+                @"tis_or_trp_testing_completed" : @TRUE,
+                @"CommissioningCustomFlowUrl" : @"https://lijusankar.github.io/commissioning-react-app/"
+            }
+        };
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->_commissioningCustomFlowUrl.text =
+            [[self->_ledgerRespond objectForKey:@"result"] objectForKey:@"CommissioningCustomFlowUrl"];
+        [self->_activityIndicator stopAnimating];
+        self->_activityIndicator.hidden = YES;
+        self->_deviceModelInfoView.hidden = NO;
+        self->_redirectButton.hidden = NO;
+    });
+}
+
+// redirect
+- (IBAction)redirectToUrl:(id)sender
+{
+    [self redirectToUrl];
+}
+
+- (void)redirectToUrl
+{
+    NSArray * redirectPayload = @[ @{
+        @"version" : _versionLabel.text,
+        @"vendorID" : _vendorID.text,
+        @"productID" : _productID.text,
+        @"commissioingFlow" : _commissioningFlowLabel.text,
+        @"discriminator" : _discriminatorLabel.text,
+        @"setupPinCode" : _setupPinCodeLabel.text,
+        @"serialNumber" : _serialNumber.text,
+        @"rendezvousInformation" : _rendezVousInformation.text
+    } ];
+    NSString * returnUrl =
+        [[[NSBundle mainBundle] objectForInfoDictionaryKey:@"LSEnvironment"] objectForKey:@"CommissioningCustomFlowReturnUrl"];
+    NSString * base64EncodedString = [self encodeStringTo64:redirectPayload];
+    NSString * urlString =
+        [NSString stringWithFormat:@"%@?payload=%@&returnUrl=%@", _commissioningCustomFlowUrl.text, base64EncodedString, returnUrl];
+    NSURL * url = [NSURL URLWithString:urlString];
+    [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+}
+
+- (NSString *)encodeStringTo64:(NSArray *)fromArray
+{
+    NSData * jsonData = [NSJSONSerialization dataWithJSONObject:fromArray options:NSJSONWritingWithoutEscapingSlashes error:nil];
+    NSString * base64String = [jsonData base64EncodedStringWithOptions:kNilOptions];
+    return base64String;
 }
 
 @synthesize description;

@@ -20,9 +20,13 @@
 
 #include <app-common/zap-generated/cluster-objects.h>
 
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ApplicationBasic {
 struct Application
 {
-    using ApplicationBasicStatus   = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
+    using ApplicationBasicStatus   = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
     char vendorName[32]            = "";
     char name[32]                  = "";
     char id[32]                    = "";
@@ -33,3 +37,7 @@ struct Application
     uint16_t allowedVendorList[32] = { 123, 456 };
     ApplicationBasicStatus status  = ApplicationBasicStatus::kStopped;
 };
+} // namespace ApplicationBasic
+} // namespace Clusters
+} // namespace app
+} // namespace chip

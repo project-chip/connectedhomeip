@@ -371,9 +371,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPApplicationBasicClusterApplicationBasicApp * _Nonnull value;
-            value = [CHIPApplicationBasicClusterApplicationBasicApp new];
+            CHIPApplicationBasicClusterApplication * _Nonnull value;
+            value = [CHIPApplicationBasicClusterApplication new];
             value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
+            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
+            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
+                                                           length:cppValue.applicationId.size()
+                                                         encoding:NSUTF8StringEncoding];
             value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
                                                            length:cppValue.applicationId.size()
                                                          encoding:NSUTF8StringEncoding];
@@ -387,7 +391,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::ApplicationVersion::Id: {
@@ -399,6 +403,32 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSString * _Nonnull value;
             value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::AllowedVendorList::Id: {
+            using TypeInfo = Attributes::AllowedVendorList::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSNumber * newElement_0;
+                newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -531,8 +561,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPAudioOutputClusterAudioOutputInfo * newElement_0;
-                newElement_0 = [CHIPAudioOutputClusterAudioOutputInfo new];
+                CHIPAudioOutputClusterOutputInfo * newElement_0;
+                newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
                 newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
                 newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
@@ -4031,8 +4061,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPMediaInputClusterMediaInputInfo * newElement_0;
-                newElement_0 = [CHIPMediaInputClusterMediaInputInfo new];
+                CHIPMediaInputClusterInputInfo * newElement_0;
+                newElement_0 = [CHIPMediaInputClusterInputInfo new];
                 newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
                 newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
@@ -4118,7 +4148,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 return nil;
             }
             NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(cppValue)];
             return value;
         }
         case Attributes::StartTime::Id: {
@@ -6103,8 +6133,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPTargetNavigatorClusterNavigateTargetTargetInfo * newElement_0;
-                newElement_0 = [CHIPTargetNavigatorClusterNavigateTargetTargetInfo new];
+                CHIPTargetNavigatorClusterTargetInfo * newElement_0;
+                newElement_0 = [CHIPTargetNavigatorClusterTargetInfo new];
                 newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
                 newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                              length:entry_0.name.size()

@@ -395,7 +395,7 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
 
     switch (attributePath.mAttributeId)
     {
-    case chip::app::Clusters::DoorLock::Attributes::Language::Id: {
+    case chip::app::Clusters::DoorLock::Attributes::Language::Id:
         if (value[0] <= 3)
         {
             char lang[3 + 1] = { 0 };
@@ -407,10 +407,9 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
             res = chip::Protocols::InteractionModel::Status::InvalidValue;
         }
         break;
-    }
 
-    case chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::Id: {
-        if (size == 4)
+    case chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::Id:
+        if (sizeof(uint32_t) == size)
         {
             uint32_t newRelockTime = *(reinterpret_cast<uint32_t *>(value));
             res                    = emberAfPluginDoorLockOnAutoRelockTimeChange(attributePath.mEndpointId, newRelockTime);
@@ -420,38 +419,77 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
             res = chip::Protocols::InteractionModel::Status::InvalidValue;
         }
         break;
-    }
 
     case chip::app::Clusters::DoorLock::Attributes::SoundVolume::Id:
-        res = emberAfPluginDoorLockOnSoundVolumeChange(attributePath.mEndpointId, *value);
+        if (sizeof(uint8_t) == size)
+        {
+            res = emberAfPluginDoorLockOnSoundVolumeChange(attributePath.mEndpointId, *value);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
 
     case chip::app::Clusters::DoorLock::Attributes::OperatingMode::Id:
-        res = emberAfPluginDoorLockOnOperatingModeChange(attributePath.mEndpointId, *value);
+        if (sizeof(uint8_t) == size)
+        {
+            res = emberAfPluginDoorLockOnOperatingModeChange(attributePath.mEndpointId, *value);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
 
-    case chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::Id: {
-        bool enable = *reinterpret_cast<bool *>(value);
-        res         = emberAfPluginDoorLockOnEnableOneTouchLockingChange(attributePath.mEndpointId, enable);
+    case chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::Id:
+        if (sizeof(bool) == size)
+        {
+            bool enable = *reinterpret_cast<bool *>(value);
+            res         = emberAfPluginDoorLockOnEnableOneTouchLockingChange(attributePath.mEndpointId, enable);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
-    }
 
-    case chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::Id: {
-        bool enable = *reinterpret_cast<bool *>(value);
-        res         = emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(attributePath.mEndpointId, enable);
+    case chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::Id:
+        if (sizeof(bool) == size)
+        {
+            bool enable = *reinterpret_cast<bool *>(value);
+            res         = emberAfPluginDoorLockOnEnablePrivacyModeButtonChange(attributePath.mEndpointId, enable);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
-    }
 
     case chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::Id:
-        res = emberAfPluginDoorLockOnWrongCodeEntryLimitChange(attributePath.mEndpointId, *value);
+        if (sizeof(uint8_t) == size)
+        {
+            res = emberAfPluginDoorLockOnWrongCodeEntryLimitChange(attributePath.mEndpointId, *value);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
 
     case chip::app::Clusters::DoorLock::Attributes::UserCodeTemporaryDisableTime::Id:
-        res = emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(attributePath.mEndpointId, *value);
+        if (sizeof(uint8_t) == size)
+        {
+            res = emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(attributePath.mEndpointId, *value);
+        }
+        else
+        {
+            res = chip::Protocols::InteractionModel::Status::InvalidValue;
+        }
         break;
 
     default:
-        res = emberAfPluginDoorLockOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, value);
+        res = emberAfPluginDoorLockOnUnhandledAttributeChange(attributePath.mEndpointId, attributeType, size, value);
         break;
     }
 
@@ -522,7 +560,8 @@ emberAfPluginDoorLockOnUserCodeTemporaryDisableTimeChange(chip::EndpointId Endpo
 }
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint8_t * attrValue)
+emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint16_t attrSize,
+                                                uint8_t * attrValue)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }

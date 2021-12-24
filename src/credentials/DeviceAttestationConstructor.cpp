@@ -42,14 +42,14 @@ CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements,
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
     tlvReader.Init(attestationElements);
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     size_t count = 0;
     CHIP_ERROR error;
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
-        uint64_t tag = tlvReader.GetTag();
+        TLV::Tag tag = tlvReader.GetTag();
         if (TLV::IsProfileTag(tag))
         {
             count++;
@@ -77,7 +77,7 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     firmwareInfo = ByteSpan();
 
     tlvReader.Init(attestationElements);
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     CHIP_ERROR error;
@@ -156,7 +156,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), certificationDeclaration));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), attestationNonce));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), timestamp));
@@ -191,7 +191,7 @@ CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonc
 
     tlvWriter.Init(nocsrElements.data(), static_cast<uint32_t>(nocsrElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), csr));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), csrNonce));
     if (!vendor_reserved1.empty())

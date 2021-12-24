@@ -427,7 +427,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     writer.Init(buf);
 
     TLVType containerType;
-    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
     uint8_t initiatorRandom[Params::initiatorRandomLen] = { 1 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorRandomTag), ByteSpan(initiatorRandom)));
 

@@ -51,8 +51,9 @@ exit:
     }
 }
 
-bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::GetSetupPIN::DecodableType & commandData)
+bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * command,
+                                                          const app::ConcreteCommandPath & commandPath,
+                                                          const Commands::GetSetupPINRequest::DecodableType & commandData)
 {
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
 
@@ -62,8 +63,8 @@ bool emberAfAccountLoginClusterGetSetupPINCallback(app::CommandHandler * command
     return true;
 }
 
-bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                             const Commands::Login::DecodableType & commandData)
+bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::LoginRequest::DecodableType & commandData)
 {
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
     auto & tempSetupPin          = commandData.setupPIN;
@@ -80,8 +81,8 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
     return true;
 }
 
-bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::Logout::DecodableType & commandData)
+bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::LogoutRequest::DecodableType & commandData)
 {
     bool isLoggedOut     = accountLoginClusterLogout();
     EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;

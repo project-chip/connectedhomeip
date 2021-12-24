@@ -49,7 +49,7 @@ public:
         mAttestationData       = attestationElements;
 
         mTlvReader.Init(mAttestationData);
-        ReturnErrorOnFailure(mTlvReader.Next(containerType, TLV::AnonymousTag));
+        ReturnErrorOnFailure(mTlvReader.Next(containerType, TLV::AnonymousTag()));
         ReturnErrorOnFailure(mTlvReader.EnterContainer(containerType));
 
         // position to first ProfileTag

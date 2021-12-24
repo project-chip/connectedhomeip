@@ -25,30 +25,30 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for UX navigation within a set of targets on a device or endpoint.</description>
-    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST" type="ARRAY" entryType="NavigateTargetTargetInfo" length="254" writable="false" optional="false">target navigator list</attribute>
+    <attribute side="server" code="0x0000" define="TARGET_NAVIGATOR_LIST" type="ARRAY" entryType="TargetInfo" length="254" writable="false" optional="false">target navigator list</attribute>
     <attribute side="server" code="0x0001" define="TARGET_NAVIGATOR_CURRENT_TARGET" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current navigator target</attribute>
 
-    <command source="client" code="0x00" name="NavigateTarget" optional="false">
+    <command source="client" code="0x00" name="NavigateTargetRequest" response="NavigateTargetResponse" optional="false">
       <description>Upon receipt, this SHALL navigation the UX to the target identified.</description>
       <arg name="target" type="INT8U"/>
       <arg name="data" type="CHAR_STRING"/>
     </command>
 
-    <command source="server" code="0x00" name="NavigateTargetResponse" optional="false">
+    <command source="server" code="0x01" name="NavigateTargetResponse" optional="false">
       <description>This command SHALL be generated in response to NavigateTarget commands.</description>
-      <arg name="status" type="NavigateTargetStatus"/>
+      <arg name="status" type="StatusEnum"/>
       <arg name="data" type="CHAR_STRING"/>
     </command>
   </cluster>
 
-  <enum name="NavigateTargetStatus" type="ENUM8">
+  <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x0505"/>
     <item name="Success" value="0x00"/>
     <item name="AppNotAvailable" value="0x01"/>
     <item name="SystemBusy" value="0x02"/>
   </enum>
 
-  <struct name="NavigateTargetTargetInfo">
+  <struct name="TargetInfo">
     <cluster code="0x0505"/>
     <item name="identifier" type="INT8U"/>
     <item name="name" type="CHAR_STRING" length="32"/>

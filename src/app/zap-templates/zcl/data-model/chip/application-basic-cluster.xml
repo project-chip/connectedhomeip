@@ -28,24 +28,19 @@ limitations under the License.
     <attribute side="server" code="0x0001" define="APPLICATION_VENDOR_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">vendor id</attribute>
     <attribute side="server" code="0x0002" define="APPLICATION_NAME" type="CHAR_STRING" length="32" writable="false" optional="false">application name</attribute>
     <attribute side="server" code="0x0003" define="APPLICATION_PRODUCT_ID" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false">product id</attribute>
-    <attribute side="server" code="0x0004" define="APPLICATION_APP" type="ApplicationBasicApp" writable="true" optional="false">application app</attribute>
-    <attribute side="server" code="0x0005" define="APPLICATION_STATUS" type="ENUM8" min="0x00" max="0xFF" default="0x01" writable="false" optional="false">application status</attribute>
+    <attribute side="server" code="0x0004" define="APPLICATION_APP" type="Application" writable="true" optional="false">application app</attribute>
+    <attribute side="server" code="0x0005" define="APPLICATION_STATUS" type="ApplicationStatusEnum" min="0x00" max="0xFF" default="0x01" writable="false" optional="false">application status</attribute>
     <attribute side="server" code="0x0006" define="APPLICATION_VERSION" type="CHAR_STRING" length="32" writable="false" optional="false">application version</attribute>
-    <!-- <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="ARRAY" entryType="INT16U" length="32" writable="false" optional="false">allowed vendor list</attribute> -->
-
-    <command source="client" code="0x00" name="ChangeStatus" optional="false">
-      <description>Upon receipt, this SHALL change the running status of the application.</description>
-      <arg name="status" type="ApplicationBasicStatus"/>
-    </command>
+    <attribute side="server" code="0x0007" define="APPLICATION_ALLOWED_VENDOR_LIST" type="ARRAY" entryType="vendor_id" length="32" writable="false" optional="false">allowed vendor list</attribute>
   </cluster>
 
-  <struct name="ApplicationBasicApp">
+  <struct name="Application">
     <cluster code="0x050d"/>
     <item name="catalogVendorId" type="INT16U"/>
     <item name="applicationId" type="CHAR_STRING"/>
   </struct>
 
-  <enum name="ApplicationBasicStatus" type="ENUM8">
+  <enum name="ApplicationStatusEnum" type="ENUM8">
     <cluster code="0x050d"/>
     <item name="Stopped" value="0x00"/>
     <item name="ActiveVisibleFocus" value="0x01"/>

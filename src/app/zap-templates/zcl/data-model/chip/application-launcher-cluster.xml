@@ -26,57 +26,45 @@ limitations under the License.
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
     <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST" type="ARRAY" entryType="INT16U" length="254" writable="false" optional="false">application launcher list</attribute>
-    <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationLauncherEndpoint" writable="true" optional="false">application launcher app</attribute>
+    <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP" type="ApplicationEP" writable="true" optional="false">application launcher app</attribute>
 
-    <command source="client" code="0x00" name="LaunchApp" optional="false">
+    <command source="client" code="0x00" name="LaunchAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt, this SHALL launch the specified app with optional data. The TV Device SHALL launch and bring to foreground the identified application in the command if the application is not already launched and in foreground. The TV Device SHALL update state attribute on the Application Basic cluster of the Endpoint corresponding to the launched application. This command returns a Launch Response.</description>
       <arg name="data" type="CHAR_STRING"/>
-      <arg name="application" type="ApplicationLauncherApp"/>
+      <arg name="application" type="Application"/>
     </command>
 
-    <command source="client" code="0x01" name="StopApp" optional="false">
+    <command source="client" code="0x01" name="StopAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL stop the specified application if it is running.</description>
-      <arg name="application" type="ApplicationLauncherApp"/>
+      <arg name="application" type="Application"/>
     </command>
 
-    <command source="client" code="0x02" name="HideApp" optional="false">
+    <command source="client" code="0x02" name="HideAppRequest" response="LauncherResponse" optional="false">
       <description>Upon receipt on a Video Player endpoint this SHALL hide the specified application if it is running and visible.</description>
-      <arg name="application" type="ApplicationLauncherApp"/>
+      <arg name="application" type="Application"/>
     </command>
 
-    <command source="server" code="0x00" name="LaunchAppResponse" optional="false">
+    <command source="server" code="0x03" name="LauncherResponse" optional="false">
       <description>This command SHALL be generated in response to LaunchApp commands.</description>
-      <arg name="status" type="ApplicationLauncherStatus"/>
-      <arg name="data" type="CHAR_STRING"/>
-    </command>
-
-    <command source="server" code="0x01" name="StopAppResponse" optional="false">
-      <description>This command SHALL be generated in response to StopApp commands.</description>
-      <arg name="status" type="ApplicationLauncherStatus"/>
-      <arg name="data" type="CHAR_STRING"/>
-    </command>
-
-    <command source="server" code="0x02" name="HideAppResponse" optional="false">
-      <description>This command SHALL be generated in response to HideApp commands.</description>
-      <arg name="status" type="ApplicationLauncherStatus"/>
+      <arg name="status" type="StatusEnum"/>
       <arg name="data" type="CHAR_STRING"/>
     </command>
 
   </cluster>
 
-  <struct name="ApplicationLauncherEndpoint">
+  <struct name="ApplicationEP">
     <cluster code="0x050c"/>
-    <item name="application" type="ApplicationLauncherApp"/>
+    <item name="application" type="Application"/>
     <item name="endpoint" type="CHAR_STRING"/>
   </struct>
       
-  <struct name="ApplicationLauncherApp">
+  <struct name="Application">
     <cluster code="0x050c"/>
     <item name="catalogVendorId" type="INT16U"/>
     <item name="applicationId" type="CHAR_STRING"/>
   </struct>
 
-  <enum name="ApplicationLauncherStatus" type="ENUM8">
+  <enum name="StatusEnum" type="ENUM8">
     <cluster code="0x050c"/>
     <item name="Success" value="0x00"/>
     <item name="AppNotAvailable" value="0x01"/>
