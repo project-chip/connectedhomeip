@@ -152,10 +152,12 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUserCodeTempora
  *
  * @param  EndpointId      endpoint for which attribute is changing
  * @param  attrType        attribute that is going to be changed
+ * @param  attrSize        attribute value storage size
  * @param  attrValue       attribute value to set
  *
  * @retval InteractionModel::Status::Success if attribute change is possible
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
-chip::Protocols::InteractionModel::Status
-emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, EmberAfAttributeType attrType, uint8_t * attrValue);
+chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId,
+                                                                                          EmberAfAttributeType attrType,
+                                                                                          uint16_t attrSize, uint8_t * attrValue);
