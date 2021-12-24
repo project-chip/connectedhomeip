@@ -249,10 +249,11 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
     // currently existing in the field.
     bindingEntry.type      = EMBER_UNICAST_BINDING;
     bindingEntry.local     = endpoint;
-    bindingEntry.clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
+    bindingEntry.clusterId = Optional<ClusterId>(ZCL_IAS_ZONE_CLUSTER_ID);
     bindingEntry.remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
     bindingEntry.nodeId    = destNodeId;
 
+    bool foundSameEntry = false;
     // Cycle through the binding table until we find a valid entry that is not
     // being used, then use the created entry to make the bind.
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -269,16 +270,15 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
             if ((currentBind.local == bindingEntry.local) && (currentBind.clusterId == bindingEntry.clusterId) &&
                 (currentBind.remote == bindingEntry.remote) && (currentBind.type == bindingEntry.type))
             {
+                foundSameEntry = true;
                 break;
             }
-            // If this spot in the binding table already exists, move on to the next
-            continue;
         }
-        else
-        {
-            emberSetBinding(i, &bindingEntry);
-            break;
-        }
+    }
+
+    if (!foundSameEntry)
+    {
+        emberAppendBinding(&bindingEntry);
     }
 
     zeroAddress = true;

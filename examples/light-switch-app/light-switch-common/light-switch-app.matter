@@ -142,24 +142,16 @@ server cluster Basic = 40 {
 }
 
 server cluster Binding = 30 {
+  struct TargetStruct {
+    FABRIC_IDX fabricIdx = 0;
+    optional NODE_ID nodeId = 1;
+    optional GROUP_ID groupId = 2;
+    optional ENDPOINT_NO endpointId = 3;
+    optional CLUSTER_ID clusterId = 4;
+  }
+
+  attribute TargetStruct bindingList[] = 0;
   readonly global attribute int16u clusterRevision = 65533;
-
-  request struct BindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  request struct UnbindRequest {
-    NODE_ID nodeId = 0;
-    GROUP_ID groupId = 1;
-    ENDPOINT_NO endpointId = 2;
-    CLUSTER_ID clusterId = 3;
-  }
-
-  command Bind(BindRequest): DefaultSuccess = 0;
-  command Unbind(UnbindRequest): DefaultSuccess = 1;
 }
 
 client cluster ColorControl = 768 {

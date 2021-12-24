@@ -77,7 +77,8 @@ static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, ch
         return;
     }
 
-    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId == Clusters::OnOff::Id)
+    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId.HasValue() &&
+        binding->clusterId.Value() == Clusters::OnOff::Id)
     {
         auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");

@@ -67,13 +67,19 @@ public:
      * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry);
+    CHIP_ERROR UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId);
 
     /*
      * Notifies the BindingManager that a unicast binding is about to be removed from the given index.
      *
      */
     CHIP_ERROR UnicastBindingRemoved(uint8_t bindingEntryId);
+
+    /*
+     * Notifies the BindingManager that a unicast binding is about to moved to a new entry index.
+     *
+     */
+    void UnicastBindingMoved(uint8_t oldEntryId, uint8_t newEntryId);
 
     /*
      * Notifies the BindingManager that a fabric is removed from the device
