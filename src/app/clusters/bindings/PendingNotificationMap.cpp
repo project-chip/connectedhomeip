@@ -113,6 +113,19 @@ void PendingNotificationMap::RemoveEntry(uint8_t bindingEntryId)
     mNumEntries = newEntryCount;
 }
 
+void PendingNotificationMap::ReplaceBindingEntryId(uint8_t oldEntryId, uint8_t newEntryId)
+{
+    uint8_t newEntryCount = 0;
+    for (int i = 0; i < mNumEntries; i++)
+    {
+        if (mPendingBindingEntries[i] == oldEntryId)
+        {
+            mPendingBindingEntries[i] = newEntryId;
+        }
+    }
+    mNumEntries = newEntryCount;
+}
+
 void PendingNotificationMap::RemoveAllEntriesForNode(FabricIndex fabric, NodeId node)
 {
     uint8_t newEntryCount = 0;

@@ -225,6 +225,50 @@ public class ChipStructs {
     }
   }
 
+  public static class BindingClusterTargetStruct {
+    public Integer fabricIdx;
+    public Optional<Long> nodeId;
+    public Optional<Integer> groupId;
+    public Optional<Integer> endpointId;
+    public Optional<Long> clusterId;
+
+    public BindingClusterTargetStruct(
+        Integer fabricIdx,
+        Optional<Long> nodeId,
+        Optional<Integer> groupId,
+        Optional<Integer> endpointId,
+        Optional<Long> clusterId) {
+      this.fabricIdx = fabricIdx;
+      this.nodeId = nodeId;
+      this.groupId = groupId;
+      this.endpointId = endpointId;
+      this.clusterId = clusterId;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder output = new StringBuilder();
+      output.append("BindingClusterTargetStruct {\n");
+      output.append("\tfabricIdx: ");
+      output.append(fabricIdx);
+      output.append("\n");
+      output.append("\tnodeId: ");
+      output.append(nodeId);
+      output.append("\n");
+      output.append("\tgroupId: ");
+      output.append(groupId);
+      output.append("\n");
+      output.append("\tendpointId: ");
+      output.append(endpointId);
+      output.append("\n");
+      output.append("\tclusterId: ");
+      output.append(clusterId);
+      output.append("\n");
+      output.append("}\n");
+      return output.toString();
+    }
+  }
+
   public static class BridgedActionsClusterActionStruct {
     public Integer actionID;
     public String name;

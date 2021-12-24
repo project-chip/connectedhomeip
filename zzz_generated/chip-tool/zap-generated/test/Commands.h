@@ -91840,28 +91840,36 @@ private:
         chip::Controller::AccessControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+        ListFreer listFreer;
         chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> aclArgument;
 
-        chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type aclList_0[2];
+        {
+            auto * listHolder_0 = new ListHolder<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(2);
+            listFreer.add(listHolder_0);
 
-        aclList_0[0].fabricIndex = 1;
-        aclList_0[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
-        aclList_0[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
-        aclList_0[0].subjects.SetNull();
-        aclList_0[0].targets.SetNull();
+            listHolder_0->mList[0].fabricIndex = 1;
+            listHolder_0->mList[0].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(5);
+            listHolder_0->mList[0].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(2);
+            listHolder_0->mList[0].subjects.SetNull();
+            listHolder_0->mList[0].targets.SetNull();
 
-        aclList_0[1].fabricIndex = 1;
-        aclList_0[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
-        aclList_0[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
-        aclList_0[1].subjects.SetNonNull();
+            listHolder_0->mList[1].fabricIndex = 1;
+            listHolder_0->mList[1].privilege   = static_cast<chip::app::Clusters::AccessControl::Privilege>(3);
+            listHolder_0->mList[1].authMode    = static_cast<chip::app::Clusters::AccessControl::AuthMode>(3);
+            listHolder_0->mList[1].subjects.SetNonNull();
 
-        uint64_t subjectsList_3[2];
-        subjectsList_3[0]             = 257ULL;
-        subjectsList_3[1]             = 258ULL;
-        aclList_0[1].subjects.Value() = subjectsList_3;
-        aclList_0[1].targets.SetNull();
+            {
+                auto * listHolder_3 = new ListHolder<uint64_t>(2);
+                listFreer.add(listHolder_3);
+                listHolder_3->mList[0]                  = 257ULL;
+                listHolder_3->mList[1]                  = 258ULL;
+                listHolder_0->mList[1].subjects.Value() = chip::app::DataModel::List<uint64_t>(listHolder_3->mList, 2);
+            }
+            listHolder_0->mList[1].targets.SetNull();
 
-        aclArgument = aclList_0;
+            aclArgument = chip::app::DataModel::List<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>(
+                listHolder_0->mList, 2);
+        }
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
             aclArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
