@@ -100,6 +100,25 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBindingClusterTargetStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIdx = @(0);
+
+        _nodeId = nil;
+
+        _groupId = nil;
+
+        _endpointId = nil;
+
+        _clusterId = nil;
+    }
+    return self;
+}
+@end
+
 @implementation CHIPAccessControlClusterTarget
 - (instancetype)init
 {

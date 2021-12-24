@@ -69,6 +69,8 @@ public:
 
     void RemoveEntry(uint8_t bindingEntryId);
 
+    void ReplaceBindingEntryId(uint8_t oldEntryId, uint8_t newEntryId);
+
     void RemoveAllEntriesForNode(FabricTable * fabricTable, PeerId peer);
 
     void RemoveAllEntriesForNode(FabricIndex fabric, NodeId node);

@@ -1052,6 +1052,31 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedBindingClusterBindingListAttributeCallback
+      implements ChipClusters.BindingCluster.BindingListAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<ChipStructs.BindingClusterTargetStruct> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<ChipStructs.BindingClusterTargetStruct>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedBindingClusterServerGeneratedCommandListAttributeCallback
       implements ChipClusters.BindingCluster.ServerGeneratedCommandListAttributeCallback,
           DelegatedClusterCallback {
@@ -7732,70 +7757,6 @@ public class ClusterInfoMapping {
     Map<String, InteractionInfo> binaryInputBasicClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("binaryInputBasic", binaryInputBasicClusterInteractionInfoMap);
     Map<String, InteractionInfo> bindingClusterInteractionInfoMap = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> bindingbindCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bindingbindnodeIdCommandParameterInfo =
-        new CommandParameterInfo("nodeId", Long.class);
-    bindingbindCommandParams.put("nodeId", bindingbindnodeIdCommandParameterInfo);
-
-    CommandParameterInfo bindingbindgroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class);
-    bindingbindCommandParams.put("groupId", bindingbindgroupIdCommandParameterInfo);
-
-    CommandParameterInfo bindingbindendpointIdCommandParameterInfo =
-        new CommandParameterInfo("endpointId", Integer.class);
-    bindingbindCommandParams.put("endpointId", bindingbindendpointIdCommandParameterInfo);
-
-    CommandParameterInfo bindingbindclusterIdCommandParameterInfo =
-        new CommandParameterInfo("clusterId", Long.class);
-    bindingbindCommandParams.put("clusterId", bindingbindclusterIdCommandParameterInfo);
-
-    InteractionInfo bindingbindInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BindingCluster) cluster)
-                  .bind(
-                      (DefaultClusterCallback) callback,
-                      (Long) commandArguments.get("nodeId"),
-                      (Integer) commandArguments.get("groupId"),
-                      (Integer) commandArguments.get("endpointId"),
-                      (Long) commandArguments.get("clusterId"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            bindingbindCommandParams);
-    bindingClusterInteractionInfoMap.put("bind", bindingbindInteractionInfo);
-    Map<String, CommandParameterInfo> bindingunbindCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bindingunbindnodeIdCommandParameterInfo =
-        new CommandParameterInfo("nodeId", Long.class);
-    bindingunbindCommandParams.put("nodeId", bindingunbindnodeIdCommandParameterInfo);
-
-    CommandParameterInfo bindingunbindgroupIdCommandParameterInfo =
-        new CommandParameterInfo("groupId", Integer.class);
-    bindingunbindCommandParams.put("groupId", bindingunbindgroupIdCommandParameterInfo);
-
-    CommandParameterInfo bindingunbindendpointIdCommandParameterInfo =
-        new CommandParameterInfo("endpointId", Integer.class);
-    bindingunbindCommandParams.put("endpointId", bindingunbindendpointIdCommandParameterInfo);
-
-    CommandParameterInfo bindingunbindclusterIdCommandParameterInfo =
-        new CommandParameterInfo("clusterId", Long.class);
-    bindingunbindCommandParams.put("clusterId", bindingunbindclusterIdCommandParameterInfo);
-
-    InteractionInfo bindingunbindInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BindingCluster) cluster)
-                  .unbind(
-                      (DefaultClusterCallback) callback,
-                      (Long) commandArguments.get("nodeId"),
-                      (Integer) commandArguments.get("groupId"),
-                      (Integer) commandArguments.get("endpointId"),
-                      (Long) commandArguments.get("clusterId"));
-            },
-            () -> new DelegatedDefaultClusterCallback(),
-            bindingunbindCommandParams);
-    bindingClusterInteractionInfoMap.put("unbind", bindingunbindInteractionInfo);
     commandMap.put("binding", bindingClusterInteractionInfoMap);
     Map<String, InteractionInfo> booleanStateClusterInteractionInfoMap = new LinkedHashMap<>();
     commandMap.put("booleanState", booleanStateClusterInteractionInfoMap);

@@ -25,6 +25,8 @@
 
 EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
 
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result);
+EmberStatus emberAppendBinding(EmberBindingTableEntry * result);
 
-EmberStatus emberDeleteBinding(uint8_t index);
+EmberStatus emberClearBinding(void);
+
+uint8_t emberGetBindingTableSize(void);

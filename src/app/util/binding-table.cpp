@@ -23,6 +23,7 @@
 #include <zap-generated/gen_config.h>
 
 static EmberBindingTableEntry bindingTable[EMBER_BINDING_TABLE_SIZE];
+static uint8_t sBindingTableSize;
 
 EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
 {
@@ -35,24 +36,29 @@ EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
     return EMBER_SUCCESS;
 }
 
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result)
+EmberStatus emberAppendBinding(EmberBindingTableEntry * result)
 {
-    if (index >= EMBER_BINDING_TABLE_SIZE)
+    if (sBindingTableSize >= EMBER_BINDING_TABLE_SIZE)
     {
-        return EMBER_BAD_ARGUMENT;
+        return EMBER_NO_BUFFERS;
     }
 
-    bindingTable[index] = *result;
+    bindingTable[sBindingTableSize++] = *result;
     return EMBER_SUCCESS;
 }
 
-EmberStatus emberDeleteBinding(uint8_t index)
+EmberStatus emberClearBinding(void)
 {
-    if (index >= EMBER_BINDING_TABLE_SIZE)
+    for (uint8_t i = 0; i < sBindingTableSize; i++)
     {
-        return EMBER_BAD_ARGUMENT;
+        bindingTable[i].type = EMBER_UNUSED_BINDING;
     }
+    sBindingTableSize = 0;
 
-    bindingTable[index].type = EMBER_UNUSED_BINDING;
     return EMBER_SUCCESS;
+}
+
+uint8_t emberGetBindingTableSize(void)
+{
+    return sBindingTableSize;
 }
