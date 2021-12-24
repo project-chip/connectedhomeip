@@ -68,9 +68,6 @@ struct ESP32ChipServiceData
     ChipBLEDeviceIdentificationInfo DeviceIdInfo;
 };
 
-const ble_uuid128_t UUID_CHIPoBLEService = {
-    BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xF6, 0xFF, 0x00, 0x00 }
-};
 const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFFF6 };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
@@ -78,13 +75,7 @@ const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
 };
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
-const ble_uuid128_t UUID_CHIPoBLEChar_RX   = {
-    { BLE_UUID_TYPE_128 }, { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F, 0x9D, 0x11 }
-};
 
-const ble_uuid128_t UUID128_CHIPoBLEChar_TX = {
-    BLE_UUID_TYPE_128, { 0x12, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
-};
 const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
@@ -92,11 +83,6 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 };
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-const ble_uuid128_t UUID128_CHIPoBLEChar_C3 = {
-    BLE_UUID_TYPE_128, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
-};
-const ChipBleUUID chipUUID_CHIPoBLEChar_C3 = { { 0x64, 0x63, 0x02, 0x38, 0x87, 0x72, 0x45, 0xF2, 0xB8, 0x7D, 0x74, 0x8A, 0x83, 0x21,
-                                                 0x8F, 0x04 } };
 const ble_uuid128_t UUID_CHIPoBLEChar_C3   = {
     { BLE_UUID_TYPE_128 }, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
 };
@@ -706,8 +692,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advData[MAX_ADV_DATA_LEN];
     uint8_t index = 0;
 
-    constexpr uint8_t kServiceDataLenSize  = 1;
-    constexpr uint8_t kServiceDataUUIDSize = 2;
+    constexpr uint8_t kServiceDataTypeSize  = 1;
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
 
@@ -734,7 +719,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     advData[index++] = 0x02;                                                                // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
-    advData[index++] = kServiceDataLenSize + kServiceDataUUIDSize + sizeof(deviceIdInfo);   // length
+    advData[index++] = kServiceDataTypeSize + sizeof(ESP32ChipServiceData);                 // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
     advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
     advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
