@@ -201,7 +201,6 @@ config("strict_warnings") {
     "-Wextra",
     "-Wshadow",
     "-Wunreachable-code",
-    "-Wvla",
   ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]

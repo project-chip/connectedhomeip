@@ -1,0 +1,38 @@
+{{#if isOptional}}
+  VerifyOrReturn(CheckValuePresent("{{label}}", {{actual}}));
+  {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isOptional=false}}
+{{else if isNullable}}
+  {{#if (isLiteralNull expected)}}
+    VerifyOrReturn(CheckValueNull("{{label}}", {{actual}}));
+  {{else}}
+    VerifyOrReturn(CheckValueNonNull("{{label}}", {{actual}}));
+    {{>valueEquals label=(concat label ".Value()") actual=(concat actual ".Value()") expected=expected isNullable=false}}
+  {{/if}}
+{{else if isArray}}
+    auto iter = {{actual}}.begin();
+    {{#each expected}}
+      VerifyOrReturn(CheckNextListItemDecodes<decltype({{../actual}})>("{{../label}}", iter, {{@index}}));
+      {{>valueEquals label=(concat ../label "[" @index "]") actual="iter.GetValue()" expected=this isArray=false type=../type chipType=../chipType}}
+    {{/each}}
+    VerifyOrReturn(CheckNoMoreListItems<decltype({{actual}})>("{{label}}", iter, {{expected.length}}));
+{{else}}
+  {{#if_is_struct type}}
+    {{! Iterate over the actual types in the struct, so we pick up the right
+        type/optionality/nullability information for them for our recursive
+        call. }}
+    {{#zcl_struct_items_by_struct_name type}}
+      {{#if (expectedValueHasProp ../expected (asLowerCamelCase label))}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected (asLowerCamelCase label))}}
+      {{/if}}
+    {{/zcl_struct_items_by_struct_name}}
+    {{! Maybe we should add a check for properties in the expected object (other
+        than "global") that are not present in the struct ? }}
+  {{else}}
+    VerifyOrReturn(CheckValue
+      {{~#if (isOctetString type)}}AsString("{{label}}", {{actual}}, chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral expected}}"), {{expected.length}}))
+      {{else if (isCharString type)}}AsString("{{label}}", {{actual}}, chip::CharSpan("{{expected}}", {{utf8StringLength expected}}))
+      {{else}}("{{label}}", {{actual}}, {{asTypedLiteral expected type}})
+      {{/if}}
+    );
+  {{/if_is_struct}}
+{{/if}}

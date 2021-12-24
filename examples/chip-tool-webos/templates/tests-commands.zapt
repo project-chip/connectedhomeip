@@ -1,0 +1,38 @@
+{{> header}}
+
+#pragma once
+
+#include <commands/tests/TestCommand.h>
+#include <commands/common/CommandInvoker.h>
+#include <lib/core/Optional.h>
+#include <system/SystemClock.h>
+
+#include <math.h> // For INFINITY
+
+class TestList : public Command
+{
+public:
+    TestList() : Command("list") {};
+    CHIP_ERROR Run() override
+    {
+        {{#chip_tests (getTests)}}printf("{{filename}}\n");{{/chip_tests}}
+
+        return CHIP_NO_ERROR;
+    }
+};
+
+{{>test_cluster tests=(getTests)}}
+
+void registerCommandsTests(Commands & commands)
+{
+    const char * clusterName = "Tests";
+
+    commands_list clusterCommands = {
+        make_unique<TestList>(),
+      {{#chip_tests (getTests)}}
+        make_unique<{{filename}}>(),
+      {{/chip_tests}}
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
