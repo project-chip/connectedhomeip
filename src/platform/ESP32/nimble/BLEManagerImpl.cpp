@@ -83,7 +83,7 @@ const ble_uuid128_t UUID_CHIPoBLEChar_TX   = {
 };
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
-const ble_uuid128_t UUID_CHIPoBLEChar_C3   = {
+const ble_uuid128_t UUID_CHIPoBLEChar_C3 = {
     { BLE_UUID_TYPE_128 }, { 0x04, 0x8F, 0x21, 0x83, 0x8A, 0x74, 0x7D, 0xB8, 0xF2, 0x45, 0x72, 0x87, 0x38, 0x02, 0x63, 0x64 }
 };
 #endif
@@ -692,7 +692,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     uint8_t advData[MAX_ADV_DATA_LEN];
     uint8_t index = 0;
 
-    constexpr uint8_t kServiceDataTypeSize  = 1;
+    constexpr uint8_t kServiceDataTypeSize = 1;
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
 
