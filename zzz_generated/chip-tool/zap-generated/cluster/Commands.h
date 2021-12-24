@@ -19,9 +19,12 @@
 
 #pragma once
 
+#include <charconv>
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
@@ -35,119 +38,300 @@
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
-// Value logging functions.  The non-generated ones depend on the
+#define SKIP_SPACE(iter)                                                                                                           \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        while (isspace(*iter))                                                                                                     \
+        {                                                                                                                          \
+            iter++;                                                                                                                \
+        }                                                                                                                          \
+    } while (0)
+
+// Value logging and parsing functions. The non-generated ones depend on the
 // generated ones, so are placed here.
 namespace {
 
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::PowerProfile::Structs::TransferredPhase::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AccessControl::Structs::Target::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR
 LogValue(const char * label, size_t indent,
          const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::FixedLabel::Structs::LabelStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ModeSelect::Structs::SemanticTag::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::DoorLock::Structs::DlCredential::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::Dimension::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::Parameter::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::StyleInformation::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationBasic::Structs::Application::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::NestedStruct::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::NestedStructList::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::vector<std::function<void(void)>> & freeFunctions);
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+template <typename ListEntryType>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<ListEntryType> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::CharSpan & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
 
 #if CHIP_PROGRESS_LOGGING
 std::string IndentStr(size_t indent)
@@ -2479,6 +2663,6943 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 }
 #pragma GCC diagnostic pop
 
+bool IsTokenEnd(char ch)
+{
+    return ch == '\0' || ch == ',' || ch == ')' || ch == ']';
+}
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (strncmp("true", iter, 4) == 0)
+    {
+        value = true;
+        iter += 4;
+        return CHIP_NO_ERROR;
+    }
+    if (strncmp("false", iter, 4) == 0)
+    {
+        value = false;
+        iter += 5;
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_INVALID_ARGUMENT;
+}
+
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+{
+    char * nextIter;
+    double converted = strtod(iter, &nextIter);
+    if (nextIter == iter)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = static_cast<X>(converted);
+    iter  = nextIter;
+    return CHIP_NO_ERROR;
+}
+
+template <typename X,
+          typename std::enable_if_t<
+              std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+{
+    while (isspace(*iter))
+    {
+        iter++;
+    }
+    std::from_chars_result result = std::from_chars(iter, end, value);
+    if (result.ec == std::errc())
+    {
+        iter += (result.ptr - iter);
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int>>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+{
+    using StorageType    = std::remove_cv_t<std::remove_reference_t<X>>;
+    using UnderlyingType = std::underlying_type_t<StorageType>;
+    UnderlyingType data;
+    CHIP_ERROR error = ParseValue(iter, end, data, freeFunctions);
+    if (error == CHIP_NO_ERROR)
+    {
+        value = static_cast<StorageType>(data);
+    }
+    return error;
+}
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    return ParseValue(iter, end, *value.RawStorage(), freeFunctions);
+}
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    SKIP_SPACE(iter);
+    if (IsTokenEnd(*iter))
+    {
+        value = chip::Optional<T>();
+        return CHIP_NO_ERROR;
+    }
+    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
+    StorageType entry;
+    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    value.SetValue(entry);
+    return CHIP_NO_ERROR;
+}
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    SKIP_SPACE(iter);
+    if (strncmp("null", iter, 4) == 0)
+    {
+        iter += 4;
+        value = chip::app::DataModel::Nullable<T>();
+        return CHIP_NO_ERROR;
+    }
+    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
+    StorageType entry;
+    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    value.SetNonNull(entry);
+    return CHIP_NO_ERROR;
+}
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter != '[')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    std::vector<StorageType> entries;
+    entries.clear();
+    while (iter < end)
+    {
+        if (*iter == ']')
+        {
+            iter++;
+            break;
+        }
+        StorageType entryValue;
+        SKIP_SPACE(iter);
+        CHIP_ERROR error = ParseValue(iter, end, entryValue, freeFunctions);
+        if (error != CHIP_NO_ERROR)
+        {
+            return error;
+        }
+        if (iter >= end || (*iter != ']' && *iter != ','))
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        entries.push_back(entryValue);
+        if (*iter == ']')
+        {
+            iter++;
+            break;
+        }
+        iter++;
+    }
+    if (!entries.empty())
+    {
+        StorageType * storage = new StorageType[entries.size()];
+        std::copy(entries.begin(), entries.end(), storage);
+        value = chip::app::DataModel::List<T>(storage, entries.size());
+        freeFunctions.push_back([storage]() { delete[] storage; });
+    }
+    else
+    {
+        value = chip::app::DataModel::List<T>();
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::CharSpan & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    const char * begin = iter;
+    for (; iter != end && !IsTokenEnd(*iter); iter++)
+        ;
+    value = chip::CharSpan(begin, static_cast<size_t>(iter - begin));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    std::vector<uint8_t> data;
+    for (; iter + 1 < end && *iter != ','; iter += 2)
+    {
+        uint8_t converted;
+        CHIP_ERROR error = chip::Encoding::MakeU8FromAsciiHex(iter, &converted);
+        if (error != CHIP_NO_ERROR)
+        {
+            return error;
+        }
+        data.push_back(converted);
+    }
+    if (IsTokenEnd(*iter))
+    {
+        if (!data.empty())
+        {
+            uint8_t * data_storage = new uint8_t[data.size()];
+            std::copy(std::begin(data), std::end(data), data_storage);
+            value = chip::ByteSpan(data_storage, data.size());
+            freeFunctions.push_back([data_storage]() { delete[] data_storage; });
+        }
+        else
+        {
+            value = chip::ByteSpan();
+        }
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.clusterId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.length, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.powerProfileId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.powerProfileRemoteControl, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.powerProfileState, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.scheduledTime, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.macroPhaseId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.expectedDuration, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.peakPower, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.energy, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.maxActivationDelay, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::Descriptor::Structs::DeviceType::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.type, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.revision, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::AccessControl::Structs::Target::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.cluster, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.deviceType, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.privilege, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.authMode, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.subjects, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.targets, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.data, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.actionID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.type, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpointListID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.supportedCommands, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.status, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpointListID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.type, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpoints, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.providerNodeID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.failSafeExpiryLengthMs, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.networkID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.connected, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.panId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.extendedPanId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.networkName, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.channel, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.version, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.extendedAddress, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rssi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.lqi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.security, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.ssid, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.bssid, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.channel, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.wiFiBand, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rssi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricConnected, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.offPremiseServicesReachableIPv4, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.offPremiseServicesReachableIPv6, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.hardwareAddress, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.type, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.id, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.faultRecording, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.id, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.stackFreeCurrent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.stackFreeMinimum, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.stackSize, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.extAddress, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.age, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rloc16, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.linkFrameCounter, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.mleFrameCounter, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.lqi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.averageRssi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.lastRssi, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.frameErrorRate, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.messageErrorRate, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rxOnWhenIdle, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fullThreadDevice, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fullNetworkData, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.isChild, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.activeTimestampPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.pendingTimestampPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.masterKeyPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.networkNamePresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.extendedPanIdPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.meshLocalPrefixPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.delayPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.panIdPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.channelPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.pskcPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.securityPolicyPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.channelMaskPresent, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.extAddress, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rloc16, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.routerId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nextHop, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.pathCost, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.LQIIn, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.LQIOut, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.age, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.allocated, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.linkEstablished, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rotationTime, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.flags, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.rootPublicKey, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.vendorId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nodeId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.label, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.noc, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.groupId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpoints, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.groupName, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.groupId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.groupKeySetID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.groupKeySetID, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.securityPolicy, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochKey0, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochStartTime0, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochKey1, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochStartTime1, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochKey2, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.epochStartTime2, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::FixedLabel::Structs::LabelStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::FixedLabel::Structs::LabelStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.label, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::UserLabel::Structs::LabelStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.label, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.label, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.mode, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.semanticTag, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.mfgCode, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::DoorLock::Structs::DlCredential::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.credentialType, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.credentialIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.zoneId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.zoneStatus, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::Channel::Structs::ChannelInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.majorNumber, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.minorNumber, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.callSign, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.affiliateCallSign, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::Channel::Structs::LineupInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.operatorName, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.lineupName, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.postalCode, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.lineupInfoType, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.identifier, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.updatedAt, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.position, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::MediaInput::Structs::InputInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.index, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.inputType, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.description, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::Dimension::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.width, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.height, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.metric, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::Parameter::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.type, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.value, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.externalIDList, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.parameterList, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.imageUrl, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.color, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.size, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.providerName, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.background, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.logo, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.progressBar, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.splash, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.waterMark, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.index, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.outputType, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.name, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.catalogVendorId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.applicationId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.application, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::ApplicationBasic::Structs::Application::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::ApplicationBasic::Structs::Application::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.catalogVendorId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.applicationId, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.a, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.b, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.c, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.d, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.e, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.f, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.g, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.h, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableInt, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.optionalInt, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableOptionalInt, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableString, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.optionalString, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableOptionalString, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableStruct, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.optionalStruct, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableOptionalStruct, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableList, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.optionalList, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.nullableOptionalList, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::NestedStruct::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.a, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.b, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.c, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::NestedStructList::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.a, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.b, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.c, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.d, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.e, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.f, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.g, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.a, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+CHIP_ERROR ParseValue(const char *& iter, const char * end,
+                      chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    if (end - iter < 2)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    value = chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type();
+    if (*iter != '(')
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter++;
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR error;
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    SKIP_SPACE(iter);
+    error = ParseValue(iter, end, value.operationalCert, freeFunctions);
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+    if (iter >= end)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else if (*iter == ',')
+    {
+        iter++;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    if (*iter == ')')
+    {
+        iter++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+#pragma GCC diagnostic pop
+
 } // anonymous namespace
 
 static void OnDefaultSuccessResponseWithoutExit(void * context)
@@ -3563,6 +10684,54 @@ public:
     }
 };
 
+class WriteAccessControlAcl : public ModelCommand
+{
+public:
+    WriteAccessControlAcl() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "acl");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteAccessControlAcl() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>");
+            return error;
+        }
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type> mValue;
+};
+
 class ReportAccessControlAcl : public ModelCommand
 {
 public:
@@ -3639,6 +10808,54 @@ public:
     {
         OnGeneralAttributeResponse(context, "AccessControl.Extension response", value);
     }
+};
+
+class WriteAccessControlExtension : public ModelCommand
+{
+public:
+    WriteAccessControlExtension() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "extension");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteAccessControlExtension() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type>");
+            return error;
+        }
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type> mValue;
 };
 
 class ReportAccessControlExtension : public ModelCommand
@@ -6218,11 +13435,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -6313,11 +13537,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -7029,11 +14260,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0028) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -7335,11 +14573,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x000F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -7430,11 +14675,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x000F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -10306,11 +17558,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -11712,11 +18971,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -11807,11 +19073,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -11902,11 +19175,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -11997,11 +19277,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12092,11 +19379,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12187,11 +19481,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12282,11 +19583,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12377,11 +19685,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12472,11 +19787,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12567,11 +19889,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -12662,11 +19991,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -13525,11 +20861,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0300) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -13860,11 +21203,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15181,11 +22531,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15276,11 +22633,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15371,11 +22735,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15466,11 +22837,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15594,11 +22972,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15689,11 +23074,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -15784,11 +23176,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0101) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -18344,11 +25743,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -20208,11 +27614,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0003) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -21802,11 +29215,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -21897,11 +29317,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -21992,11 +29419,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -22090,11 +29524,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -22188,11 +29629,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -22286,11 +29734,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -22384,11 +29839,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0008) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -23980,11 +31442,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0050) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -24611,11 +32080,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0031) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -25122,6 +32598,54 @@ public:
     {
         OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProviders response", value);
     }
+};
+
+class WriteOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
+{
+public:
+    WriteOtaSoftwareUpdateRequestorDefaultOtaProviders() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "default-ota-providers");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteOtaSoftwareUpdateRequestorDefaultOtaProviders() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>");
+            return error;
+        }
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type> mValue;
 };
 
 class ReportOtaSoftwareUpdateRequestorDefaultOtaProviders : public ModelCommand
@@ -26150,11 +33674,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -26245,11 +33776,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -26340,11 +33878,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0006) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -26684,11 +34229,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0007) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -30151,11 +37703,19 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
-            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        error =
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -30320,12 +37880,19 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster
-            .WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+        error =
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
                 mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -30420,11 +37987,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -30518,11 +38092,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -33929,11 +41510,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34024,11 +41612,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34119,11 +41714,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34214,11 +41816,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34309,11 +41918,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34404,11 +42020,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34499,11 +42122,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34594,11 +42224,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34689,11 +42326,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34784,11 +42428,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34879,11 +42530,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -34974,11 +42632,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35069,11 +42734,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35164,11 +42836,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35259,11 +42938,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35354,11 +43040,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35449,11 +43142,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35544,11 +43244,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35639,11 +43346,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35734,11 +43448,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35829,11 +43550,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -35924,11 +43652,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36019,11 +43754,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36114,11 +43856,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36209,11 +43958,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36304,11 +44060,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36384,6 +44147,52 @@ public:
     }
 };
 
+class WriteTestClusterListInt8u : public ModelCommand
+{
+public:
+    WriteTestClusterListInt8u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "list-int8u");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListInt8u() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Failed to parse argument to type chip::app::DataModel::List<const uint8_t>");
+            return error;
+        }
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const uint8_t> mValue;
+};
+
 class ReportTestClusterListInt8u : public ModelCommand
 {
 public:
@@ -36454,6 +44263,52 @@ public:
     {
         OnGeneralAttributeResponse(context, "TestCluster.ListOctetString response", value);
     }
+};
+
+class WriteTestClusterListOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterListOctetString() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "list-octet-string");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool, "Failed to parse argument to type chip::app::DataModel::List<const chip::ByteSpan>");
+            return error;
+        }
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::ByteSpan> mValue;
 };
 
 class ReportTestClusterListOctetString : public ModelCommand
@@ -36529,6 +44384,54 @@ public:
     {
         OnGeneralAttributeResponse(context, "TestCluster.ListStructOctetString response", value);
     }
+};
+
+class WriteTestClusterListStructOctetString : public ModelCommand
+{
+public:
+    WriteTestClusterListStructOctetString() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "list-struct-octet-string");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListStructOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>");
+            return error;
+        }
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type> mValue;
 };
 
 class ReportTestClusterListStructOctetString : public ModelCommand
@@ -36621,11 +44524,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36716,11 +44626,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36811,11 +44728,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -36906,11 +44830,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37001,11 +44932,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37096,11 +45034,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37268,11 +45213,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37366,11 +45318,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37461,11 +45420,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37556,11 +45522,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37651,11 +45624,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37776,11 +45756,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37832,11 +45819,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -37927,11 +45921,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38025,11 +46026,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38123,11 +46131,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38221,11 +46236,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38319,11 +46341,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38417,11 +46446,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38515,11 +46551,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38613,11 +46656,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38711,11 +46761,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38809,11 +46866,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -38907,11 +46971,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39005,11 +47076,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39103,11 +47181,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39201,11 +47286,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39299,11 +47391,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39397,11 +47496,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39495,11 +47601,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39593,11 +47706,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39691,11 +47811,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39789,11 +47916,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39887,11 +48021,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -39985,11 +48126,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40083,11 +48231,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40181,11 +48336,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40279,11 +48441,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40377,11 +48546,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40475,11 +48651,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40574,11 +48757,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40673,11 +48863,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40771,11 +48968,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40869,11 +49073,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -40967,11 +49178,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -41666,11 +49884,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -41761,11 +49986,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -41856,11 +50088,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -41951,11 +50190,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42046,11 +50292,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42141,11 +50394,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42236,11 +50496,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42331,11 +50598,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42426,11 +50700,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0201) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -42910,12 +51191,19 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<
+        error = cluster.WriteAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -43011,12 +51299,19 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+        error =
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
                 mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -43112,12 +51407,19 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0204) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<
+        error = cluster.WriteAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -48093,6 +56395,54 @@ public:
     }
 };
 
+class WriteUserLabelLabelList : public ModelCommand
+{
+public:
+    WriteUserLabelLabelList() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "label-list");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteUserLabelLabelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>");
+            return error;
+        }
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type> mValue;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -50779,11 +59129,18 @@ public:
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0102) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
+        error = cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
             mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
     }
 
 private:
@@ -51075,7 +59432,9 @@ void registerClusterAccessControl(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadAccessControlAcl>(),             //
+        make_unique<WriteAccessControlAcl>(),            //
         make_unique<ReadAccessControlExtension>(),       //
+        make_unique<WriteAccessControlExtension>(),      //
         make_unique<ReadAccessControlAttributeList>(),   //
         make_unique<ReadAccessControlClusterRevision>(), //
     };
@@ -52032,6 +60391,7 @@ void registerClusterOtaSoftwareUpdateRequestor(Commands & commands)
     commands_list clusterCommands = {
         make_unique<OtaSoftwareUpdateRequestorAnnounceOtaProvider>(),       //
         make_unique<ReadOtaSoftwareUpdateRequestorDefaultOtaProviders>(),   //
+        make_unique<WriteOtaSoftwareUpdateRequestorDefaultOtaProviders>(),  //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdatePossible>(),        //
         make_unique<ReportOtaSoftwareUpdateRequestorUpdatePossible>(),      //
         make_unique<ReadOtaSoftwareUpdateRequestorUpdateState>(),           //
@@ -52496,8 +60856,11 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterOctetString>(),                        //
         make_unique<ReportTestClusterOctetString>(),                       //
         make_unique<ReadTestClusterListInt8u>(),                           //
+        make_unique<WriteTestClusterListInt8u>(),                          //
         make_unique<ReadTestClusterListOctetString>(),                     //
+        make_unique<WriteTestClusterListOctetString>(),                    //
         make_unique<ReadTestClusterListStructOctetString>(),               //
+        make_unique<WriteTestClusterListStructOctetString>(),              //
         make_unique<ReadTestClusterLongOctetString>(),                     //
         make_unique<WriteTestClusterLongOctetString>(),                    //
         make_unique<ReportTestClusterLongOctetString>(),                   //
@@ -52865,6 +61228,7 @@ void registerClusterUserLabel(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<ReadUserLabelLabelList>(),       //
+        make_unique<WriteUserLabelLabelList>(),      //
         make_unique<ReadUserLabelClusterRevision>(), //
     };
 

@@ -38,40 +38,6 @@ char NibbleToHex(uint8_t nibble, bool uppercase)
     }
 }
 
-CHIP_ERROR MakeU8FromAsciiHex(const char * src, const size_t srcLen, uint8_t * val)
-{
-    if (srcLen != 2)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    uint8_t ret = 0;
-    for (size_t i = 0; i < srcLen; ++i)
-    {
-        ret          = static_cast<uint8_t>(ret << 4);
-        char c       = src[i];
-        uint8_t cval = static_cast<uint8_t>(c);
-        if (c >= '0' && c <= '9')
-        {
-            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('0'));
-        }
-        // Only uppercase is supported according to spec.
-        else if (c >= 'A' && c <= 'F')
-        {
-            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('A') + 0xA);
-        }
-        else if (c >= 'a' && c <= 'f')
-        {
-            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('a') + 0xA);
-        }
-        else
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-    }
-    *val = ret;
-    return CHIP_NO_ERROR;
-}
-
 } // namespace
 
 CHIP_ERROR BytesToHex(const uint8_t * src_bytes, size_t src_size, char * dest_hex, size_t dest_size_max, BitFlags<HexFlags> flags)
@@ -123,6 +89,40 @@ CHIP_ERROR BytesToHex(uint64_t src, char * dest_hex, size_t dest_size_max, BitFl
     return BytesToHex(buf, 8, dest_hex, dest_size_max, flags);
 }
 
+CHIP_ERROR MakeU8FromAsciiHex(const char * src, uint8_t * val)
+{
+    if (src == nullptr || val == nullptr)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    uint8_t ret = 0;
+    for (size_t i = 0; i < 2; ++i)
+    {
+        ret          = static_cast<uint8_t>(ret << 4);
+        char c       = src[i];
+        uint8_t cval = static_cast<uint8_t>(c);
+        if (c >= '0' && c <= '9')
+        {
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('0'));
+        }
+        // Only uppercase is supported according to spec.
+        else if (c >= 'A' && c <= 'F')
+        {
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('A') + 0xA);
+        }
+        else if (c >= 'a' && c <= 'f')
+        {
+            ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('a') + 0xA);
+        }
+        else
+        {
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+    }
+    *val = ret;
+    return CHIP_NO_ERROR;
+}
+
 size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes, size_t destMaxLen)
 {
     if ((srcHex == nullptr) || (destBytes == nullptr))
@@ -141,7 +141,7 @@ size_t HexToBytes(const char * srcHex, const size_t srcLen, uint8_t * destBytes,
 
     for (size_t i = 0; i < srcLen; i += 2)
     {
-        if (MakeU8FromAsciiHex(srcHex + i, 2, &destBytes[i / 2]) != CHIP_NO_ERROR)
+        if (MakeU8FromAsciiHex(srcHex + i, &destBytes[i / 2]) != CHIP_NO_ERROR)
         {
             memset(destBytes, 0, destMaxLen);
             return 0;

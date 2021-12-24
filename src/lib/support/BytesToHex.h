@@ -126,6 +126,18 @@ inline CHIP_ERROR BytesToLowercaseHexString(const uint8_t * src_bytes, size_t sr
 }
 
 /**
+ * Convert two hex characters to its hex value. Supported input is [0-9a-fA-F]
+ * E.g. "00"->0 "ff"-> 255
+ *
+ * @param src The hex string, should be at least 2 characters long.
+ * @param val The output value.
+ *
+ * @retval CHIP_NO_ERROR                The conversion succeeds.
+ * @retval CHIP_ERROR_INVALID_ARGUMENT  src or val is NULL or src contains invalid hex characters.
+ */
+CHIP_ERROR MakeU8FromAsciiHex(const char * src, uint8_t * val);
+
+/**
  * Convert a buffer of hexadecimal characters to bytes.  Supports both lowercase
  * and uppercase (or a mix of cases) hexadecimal characters. Supported input is
  * [0-9a-fA-F].
