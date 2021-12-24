@@ -147,16 +147,6 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
-ContentAppImpl::ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                               const char * szApplicationVersion)
-{
-    mApplicationBasic.SetApplicationName(szApplicationName);
-    mApplicationBasic.SetVendorName(szApplicationName);
-    mApplicationBasic.SetVendorId(vendorId);
-    mApplicationBasic.SetProductId(productId);
-    mApplicationBasic.SetApplicationVersion(szApplicationVersion);
-}
-
 void ApplicationBasicImpl::SetApplicationName(const char * szApplicationName)
 {
     ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationName, szApplicationName);

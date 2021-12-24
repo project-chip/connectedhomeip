@@ -134,8 +134,17 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion);
-    //        mContentLauncherDelegate({ "image/*", "video/*" }){};
+                   const char * szApplicationVersion) :
+        mContentLauncherDelegate({ "image/*", "video/*" },
+                                 static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kDash) |
+                                     static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kHls))
+    {
+        mApplicationBasic.SetApplicationName(szApplicationName);
+        mApplicationBasic.SetVendorName(szApplicationName);
+        mApplicationBasic.SetVendorId(vendorId);
+        mApplicationBasic.SetProductId(productId);
+        mApplicationBasic.SetApplicationVersion(szApplicationVersion);
+    };
     virtual ~ContentAppImpl() {}
 
     inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };
