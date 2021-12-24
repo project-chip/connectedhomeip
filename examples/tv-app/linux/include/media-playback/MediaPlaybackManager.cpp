@@ -24,6 +24,7 @@
 #include <string>
 
 using namespace std;
+using namespace chip::app::Clusters::MediaPlayback;
 
 CHIP_ERROR MediaPlaybackManager::Init()
 {
@@ -38,8 +39,8 @@ exit:
     return err;
 }
 
-EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                           uint64_t deltaPositionMilliseconds)
+StatusEnum MediaPlaybackManager::proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
+                                                           uint64_t deltaPositionMilliseconds)
 {
     switch (mediaPlaybackRequest)
     {
@@ -64,16 +65,16 @@ EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(Media
     case MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD:
     // TODO: Insert code here
     case MEDIA_PLAYBACK_REQUEST_SEEK:
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS;
+        return chip::app::Clusters::MediaPlayback::StatusEnum::kSuccess;
         break;
     default: {
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS;
+        return chip::app::Clusters::MediaPlayback::StatusEnum::kSuccess;
     }
     }
 }
 
-EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                        uint64_t deltaPositionMilliseconds)
+chip::app::Clusters::MediaPlayback::StatusEnum
+mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
 {
     return MediaPlaybackManager().proxyMediaPlaybackRequest(mediaPlaybackRequest, deltaPositionMilliseconds);
 }

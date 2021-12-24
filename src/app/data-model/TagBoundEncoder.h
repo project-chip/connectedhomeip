@@ -61,7 +61,7 @@ public:
         VerifyOrReturnError(mWriter != nullptr, CHIP_ERROR_INCORRECT_STATE);
         TLV::TLVType outerType;
         ReturnErrorOnFailure(mWriter->StartContainer(mTag, TLV::kTLVType_Array, outerType));
-        ReturnErrorOnFailure(aCallback(TagBoundEncoder(mWriter, TLV::AnonymousTag)));
+        ReturnErrorOnFailure(aCallback(TagBoundEncoder(mWriter, TLV::AnonymousTag())));
         return mWriter->EndContainer(outerType);
     }
 

@@ -90,7 +90,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     mUpdaterReader.mLenRead       = readDataLen;
     mUpdaterReader.mMaxLen        = aReader.mMaxLen;
     mUpdaterReader.mControlByte   = kTLVControlByte_NotSpecified;
-    mUpdaterReader.mElemTag       = AnonymousTag;
+    mUpdaterReader.mElemTag       = AnonymousTag();
     mUpdaterReader.mElemLenOrVal  = 0;
     mUpdaterReader.mContainerType = aReader.mContainerType;
     mUpdaterReader.SetContainerOpen(false);
@@ -189,7 +189,7 @@ void TLVUpdater::MoveUntilEnd()
     mUpdaterReader.mReadPoint += copyLen;
     mUpdaterReader.mLenRead += copyLen;
     mUpdaterReader.mControlByte   = kTLVControlByte_NotSpecified;
-    mUpdaterReader.mElemTag       = AnonymousTag;
+    mUpdaterReader.mElemTag       = AnonymousTag();
     mUpdaterReader.mElemLenOrVal  = 0;
     mUpdaterReader.mContainerType = kTLVType_NotSpecified;
     mUpdaterReader.SetContainerOpen(false);

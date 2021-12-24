@@ -31,6 +31,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <credentials/DeviceAttestationVerifier.h>
 
 namespace chip {
 
@@ -61,6 +62,8 @@ struct SetupParams
 
     // The Device Pairing Delegated used to initialize a Commissioner
     DevicePairingDelegate * pairingDelegate = nullptr;
+
+    Credentials::DeviceAttestationVerifier * deviceAttestationVerifier = nullptr;
 };
 
 // TODO everything other than the fabric storage here should be removed.

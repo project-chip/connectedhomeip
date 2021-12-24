@@ -199,7 +199,7 @@ void InitCommissioningFlow(intptr_t commandArg)
     }
 }
 
-void OnContentLauncherSuccessResponse(void * context, const LaunchURLResponse::DecodableType & response)
+void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
 {
     ChipLogProgress(AppServer, "ContentLauncher: Default Success Response");
 }
@@ -252,11 +252,10 @@ void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t ar
             ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
             return;
         }
-        LaunchURL::Type request;
+        LaunchURLRequest::Type request;
         request.contentURL          = chip::CharSpan(kContentUrl, strlen(kContentUrl));
         request.displayString       = chip::CharSpan(kContentDisplayStr, strlen(kContentDisplayStr));
-        request.brandingInformation = chip::app::DataModel::List<
-            const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::Type>();
+        request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
         cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
     }
 }

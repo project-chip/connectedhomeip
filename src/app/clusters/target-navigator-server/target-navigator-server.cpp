@@ -52,9 +52,9 @@ exit:
     }
 }
 
-bool emberAfTargetNavigatorClusterNavigateTargetCallback(app::CommandHandler * command,
-                                                         const app::ConcreteCommandPath & commandPath,
-                                                         const Commands::NavigateTarget::DecodableType & commandData)
+bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHandler * command,
+                                                                const app::ConcreteCommandPath & commandPath,
+                                                                const Commands::NavigateTargetRequest::DecodableType & commandData)
 {
     auto & target = commandData.target;
     auto & data   = commandData.data;

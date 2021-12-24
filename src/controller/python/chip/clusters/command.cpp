@@ -70,7 +70,7 @@ public:
             // Python need to read from full TLV data the TLVReader may contain some unclean states.
             TLV::TLVWriter writer;
             writer.Init(buffer);
-            CHIP_ERROR err = writer.CopyContainer(TLV::AnonymousTag, *aData);
+            CHIP_ERROR err = writer.CopyContainer(TLV::AnonymousTag(), *aData);
             if (err != CHIP_NO_ERROR)
             {
                 app::StatusIB status;

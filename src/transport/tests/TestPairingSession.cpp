@@ -60,7 +60,8 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     writer.Init(buf.Retain());
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, PairingSession::EncodeMRPParameters(TLV::ContextTag(1), config, writer) == CHIP_NO_ERROR);
 
@@ -71,7 +72,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
     reader.Init(std::move(buf));
-    NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
@@ -90,7 +91,8 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     writer.Init(buf.Retain());
 
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
-    NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Put(TLV::ContextTag(1), static_cast<uint16_t>(0x1234)) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, writer.Finalize(&buf) == CHIP_NO_ERROR);
@@ -99,7 +101,7 @@ void PairingSessionTryDecodeMissingMRPParams(nlTestSuite * inSuite, void * inCon
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
     reader.Init(std::move(buf));
-    NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, reader.Next(containerType, TLV::AnonymousTag()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.EnterContainer(containerType) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, reader.Next() == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, session.DecodeMRPParametersIfPresent(TLV::ContextTag(2), reader) == CHIP_NO_ERROR);

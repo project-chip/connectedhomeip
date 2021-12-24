@@ -186,7 +186,7 @@ public:
         gLastCommandResult = TestCommandResult::kFailure;
         printf("CommandResponseError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
-    void OnDone(chip::app::CommandSender * apCommandSender) override {}
+    void OnDone(chip::app::CommandSender * apCommandSender) override { delete apCommandSender; }
 
     void OnResponse(const chip::app::WriteClient * apWriteClient, const chip::app::ConcreteAttributePath & path,
                     chip::app::StatusIB status) override
@@ -444,6 +444,10 @@ exit:
     else
     {
         printf("Establish secure session succeeded\n");
+    }
+    if (testSecurePairingSecret)
+    {
+        chip::Platform::Delete(testSecurePairingSecret);
     }
 
     return err;

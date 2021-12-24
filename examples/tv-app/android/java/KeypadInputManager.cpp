@@ -28,18 +28,18 @@ using namespace chip;
 
 KeypadInputManager KeypadInputManager::sInstance;
 
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+chip::app::Clusters::KeypadInput::StatusEnum keypadInputClusterSendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
 {
     return KeypadInputMgr().SendKey(keyCode);
 }
 
-EmberAfKeypadInputStatus KeypadInputManager::SendKey(EmberAfKeypadInputCecKeyCode keyCode)
+chip::app::Clusters::KeypadInput::StatusEnum KeypadInputManager::SendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
 {
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
-    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %d", keyCode);
+    ChipLogProgress(Zcl, "Received keypadInputClusterSendKey: %c", to_underlying(keyCode));
     VerifyOrExit(mKeypadInputManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSendKeyMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
@@ -51,10 +51,10 @@ EmberAfKeypadInputStatus KeypadInputManager::SendKey(EmberAfKeypadInputCecKeyCod
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
+        return chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
     }
 
-    return static_cast<EmberAfKeypadInputStatus>(ret);
+    return static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
 }
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)

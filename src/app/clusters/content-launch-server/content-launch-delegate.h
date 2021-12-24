@@ -26,11 +26,11 @@
 #include <lib/core/Optional.h>
 #include <list>
 
-struct ContentLaunchResponse
+struct LaunchResponse
 {
     CHIP_ERROR err;
     chip::CharSpan data;
-    chip::app::Clusters::ContentLauncher::ContentLaunchStatus status;
+    chip::app::Clusters::ContentLauncher::StatusEnum status;
 };
 
 namespace chip {
@@ -44,12 +44,11 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId,
-                                                      const std::list<ContentLaunchParamater> & parameterList, bool autoplay,
-                                                      const chip::CharSpan & data) = 0;
+    virtual LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
+                                               bool autoplay, const chip::CharSpan & data) = 0;
 
-    virtual ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                  const std::list<ContentLaunchBrandingInformation> & brandingInformation) = 0;
+    virtual LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                           const std::list<BrandingInformation> & brandingInformation) = 0;
 
     virtual std::list<std::string> HandleGetAcceptHeaderList() = 0;
 

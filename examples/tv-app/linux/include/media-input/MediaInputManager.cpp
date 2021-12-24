@@ -46,12 +46,12 @@ CHIP_ERROR MediaInputManager::proxyGetInputList(chip::EndpointId mEndpointId, ch
 
         for (int i = 0; i < maximumVectorSize; ++i)
         {
-            chip::app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
-            mediaInput.description = chip::CharSpan(description, sizeof(description) - 1);
-            mediaInput.name        = chip::CharSpan(name, sizeof(name) - 1);
-            mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-            mediaInput.index       = static_cast<uint8_t>(1 + i);
-            ReturnErrorOnFailure(encoder.Encode(mediaInput));
+            chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
+            inputInfo.description = chip::CharSpan(description, sizeof(description) - 1);
+            inputInfo.name        = chip::CharSpan(name, sizeof(name) - 1);
+            inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
+            inputInfo.index       = static_cast<uint8_t>(1 + i);
+            ReturnErrorOnFailure(encoder.Encode(inputInfo));
         }
 
         return CHIP_NO_ERROR;

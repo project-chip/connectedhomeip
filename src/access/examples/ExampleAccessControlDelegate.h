@@ -17,15 +17,12 @@
 #pragma once
 
 #include "access/AccessControl.h"
-#include <lib/core/CHIPPersistentStorageDelegate.h>
 
 namespace chip {
 namespace Access {
 namespace Examples {
 
 AccessControl::Delegate & GetAccessControlDelegate();
-
-void SetAccessControlDelegateStorage(chip::PersistentStorageDelegate * storageDelegate);
 
 } // namespace Examples
 } // namespace Access

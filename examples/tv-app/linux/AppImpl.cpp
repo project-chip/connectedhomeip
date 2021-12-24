@@ -57,7 +57,6 @@ static const int kNameSize = 32;
 
 // Current ZCL implementation of Struct uses a max-size array of 254 bytes
 static const int kDescriptorAttributeArraySize = 254;
-static const int kFixedLabelAttributeArraySize = 254;
 
 // Device types for dynamic endpoints: TODO Need a generated file from ZAP to define these!
 // (taken from chip-devices.xml)
@@ -191,7 +190,7 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -202,20 +201,19 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLaunch
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
 
     return response;
 }
 
-ContentLaunchResponse ContentLauncherImpl::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                         std::string data)
+LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
-    ContentLaunchResponse response;
+    LaunchResponse response;
     response.err    = CHIP_NO_ERROR;
     response.data   = "Example app data";
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 
@@ -241,7 +239,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
     return nullptr;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApp application)
+ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application application)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,

@@ -480,7 +480,7 @@ static CHIP_ERROR ConvertExtension(ASN1Reader & reader, TLVWriter & writer)
                         VerifyOrExit(keyPurposeOID != kOID_Unknown, err = ASN1_ERROR_UNSUPPORTED_ENCODING);
                         VerifyOrExit(GetOIDCategory(keyPurposeOID) == kOIDCategory_KeyPurpose, err = ASN1_ERROR_INVALID_ENCODING);
 
-                        err = writer.Put(AnonymousTag, GetOIDEnum(keyPurposeOID));
+                        err = writer.Put(AnonymousTag(), GetOIDEnum(keyPurposeOID));
                         SuccessOrExit(err);
                     }
                     if (err != ASN1_END)
@@ -715,7 +715,7 @@ CHIP_ERROR ConvertX509CertToChipCert(const ByteSpan x509Cert, MutableByteSpan & 
 
     writer.Init(chipCert);
 
-    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag, issuer, subject, fabric));
+    ReturnErrorOnFailure(ConvertCertificate(reader, writer, AnonymousTag(), issuer, subject, fabric));
 
     ReturnErrorOnFailure(writer.Finalize());
 

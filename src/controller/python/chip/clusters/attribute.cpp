@@ -98,7 +98,7 @@ public:
             // at the end.)
             TLV::TLVWriter writer;
             writer.Init(buffer.get(), bufferLen);
-            CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
                 app::StatusIB status;
@@ -133,7 +133,7 @@ public:
             // at the end.)
             TLV::TLVWriter writer;
             writer.Init(buffer);
-            err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
                 this->OnError(apReadClient, err);

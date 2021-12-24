@@ -22,6 +22,7 @@
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <utility>
 
 using namespace std;
 
@@ -43,14 +44,14 @@ CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::Attrib
     });
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, Application application,
                                                                 std::string data)
 {
     // TODO: Insert your code
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     // TODO: Update once storing a structure attribute is supported
     // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
     //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
@@ -58,26 +59,24 @@ ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
-                                                              std::string data)
+ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, Application application, std::string data)
 {
     ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterStopApp");
 
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
-                                                              std::string data)
+ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, Application application, std::string data)
 {
     ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterHideApp");
 
     ApplicationLauncherResponse response;
     const char * testData = "data";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
     return response;
 }

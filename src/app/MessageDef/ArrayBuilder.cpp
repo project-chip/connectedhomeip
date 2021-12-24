@@ -33,7 +33,7 @@ CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aCo
 CHIP_ERROR ArrayBuilder::Init(TLV::TLVWriter * const apWriter)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag(), chip::TLV::kTLVType_Array, mOuterContainerType);
 
     return mError;
 }
