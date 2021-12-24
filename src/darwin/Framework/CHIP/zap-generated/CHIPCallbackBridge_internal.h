@@ -2267,6 +2267,34 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPBindingBindingListListAttributeCallbackBridge : public CHIPCallbackBridge<BindingBindingListListAttributeCallback>
+{
+public:
+    CHIPBindingBindingListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                      bool keepAlive = false) :
+        CHIPCallbackBridge<BindingBindingListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Binding::Structs::TargetStruct::DecodableType> & value);
+};
+
+class CHIPBindingBindingListListAttributeCallbackSubscriptionBridge : public CHIPBindingBindingListListAttributeCallbackBridge
+{
+public:
+    CHIPBindingBindingListListAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action,
+                                                                  SubscriptionEstablishedHandler establishedHandler) :
+        CHIPBindingBindingListListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPBindingServerGeneratedCommandListListAttributeCallbackBridge
     : public CHIPCallbackBridge<BindingServerGeneratedCommandListListAttributeCallback>
 {

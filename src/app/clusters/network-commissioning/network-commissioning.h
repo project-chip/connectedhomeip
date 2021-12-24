@@ -50,8 +50,8 @@ public:
     void InvokeCommand(HandlerContext & ctx) override;
 
     // AttributeAccessInterface
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write( const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
     // WirelessDriver::ConnectCallback
     void OnResult(DeviceLayer::NetworkCommissioning::Status commissioningError, CharSpan errorText,

@@ -61,6 +61,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPBindingClusterTargetStruct : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIdx;
+@property (strong, nonatomic) NSNumber * _Nullable nodeId;
+@property (strong, nonatomic) NSNumber * _Nullable groupId;
+@property (strong, nonatomic) NSNumber * _Nullable endpointId;
+@property (strong, nonatomic) NSNumber * _Nullable clusterId;
+- (instancetype)init;
+@end
+
 @interface CHIPAccessControlClusterTarget : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable cluster;
 @property (strong, nonatomic) NSNumber * _Nullable endpoint;

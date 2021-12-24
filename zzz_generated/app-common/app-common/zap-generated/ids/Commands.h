@@ -403,20 +403,6 @@ static constexpr CommandId Id = 0x00000005;
 } // namespace Commands
 } // namespace ApplianceControl
 
-namespace Binding {
-namespace Commands {
-
-namespace Bind {
-static constexpr CommandId Id = 0x00000000;
-} // namespace Bind
-
-namespace Unbind {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Unbind
-
-} // namespace Commands
-} // namespace Binding
-
 namespace PollControl {
 namespace Commands {
 

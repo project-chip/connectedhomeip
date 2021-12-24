@@ -45,6 +45,7 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 
 #include <transport/raw/MessageHeader.h>
@@ -498,7 +499,7 @@ struct EmberBindingTableEntry
     EmberBindingTableEntry() = default;
 
     static EmberBindingTableEntry ForNode(chip::FabricIndex fabric, chip::NodeId node, chip::EndpointId localEndpoint,
-                                          chip::EndpointId remoteEndpoint, chip::ClusterId cluster)
+                                          chip::EndpointId remoteEndpoint, chip::app::DataModel::Nullable<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
             .type        = EMBER_UNICAST_BINDING,
@@ -512,7 +513,7 @@ struct EmberBindingTableEntry
     }
 
     static EmberBindingTableEntry ForGroup(chip::FabricIndex fabric, chip::GroupId group, chip::EndpointId localEndpoint,
-                                           chip::ClusterId cluster)
+                                           chip::app::DataModel::Nullable<chip::ClusterId> cluster)
     {
         EmberBindingTableEntry entry = {
             .type        = EMBER_MULTICAST_BINDING,
@@ -538,7 +539,7 @@ struct EmberBindingTableEntry
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    chip::ClusterId clusterId;
+    chip::app::DataModel::Nullable<chip::ClusterId> clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:

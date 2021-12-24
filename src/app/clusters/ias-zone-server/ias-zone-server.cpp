@@ -249,7 +249,7 @@ MatterIasZoneClusterServerPreAttributeChangedCallback(const app::ConcreteAttribu
     // currently existing in the field.
     bindingEntry.type      = EMBER_UNICAST_BINDING;
     bindingEntry.local     = endpoint;
-    bindingEntry.clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
+    bindingEntry.clusterId = app::DataModel::Nullable<ClusterId>(ZCL_IAS_ZONE_CLUSTER_ID);
     bindingEntry.remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
     bindingEntry.nodeId    = destNodeId;
 

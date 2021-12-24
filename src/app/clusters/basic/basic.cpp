@@ -49,8 +49,8 @@ public:
     // Register for the Basic cluster on all endpoints.
     BasicAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Basic::Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write( const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 
 private:
     CHIP_ERROR ReadDataModelRevision(AttributeValueEncoder & aEncoder);
@@ -66,7 +66,7 @@ CHIP_ERROR EncodeStringOnSuccess(CHIP_ERROR status, AttributeValueEncoder & enco
     return encoder.Encode(chip::CharSpan(buf, strnlen(buf, maxBufSize)));
 }
 
-CHIP_ERROR BasicAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR BasicAttrAccess::Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != Basic::Id)
     {
@@ -297,7 +297,8 @@ CHIP_ERROR BasicAttrAccess::ReadLocation(AttributeValueEncoder & aEncoder)
     return aEncoder.Encode(chip::CharSpan(location, codeLen));
 }
 
-CHIP_ERROR BasicAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR BasicAttrAccess::Write( const ConcreteDataAttributePath & aPath,
+                                  AttributeValueDecoder & aDecoder)
 {
     VerifyOrDie(aPath.mClusterId == Basic::Id);
 

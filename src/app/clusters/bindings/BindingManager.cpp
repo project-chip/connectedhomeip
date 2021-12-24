@@ -67,9 +67,9 @@ namespace chip {
 
 BindingManager BindingManager::sBindingManager;
 
-CHIP_ERROR BindingManager::UnicastBindingCreated(const EmberBindingTableEntry & bindingEntry)
+CHIP_ERROR BindingManager::UnicastBindingCreated(uint8_t fabricIndex, NodeId nodeId)
 {
-    return EstablishConnection(bindingEntry.fabricIndex, bindingEntry.nodeId);
+    return EstablishConnection(fabricIndex, nodeId);
 }
 
 CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
@@ -78,6 +78,11 @@ CHIP_ERROR BindingManager::UnicastBindingRemoved(uint8_t bindingEntryId)
     emberGetBinding(bindingEntryId, &entry);
     mPendingNotificationMap.RemoveEntry(bindingEntryId);
     return CHIP_NO_ERROR;
+}
+
+void BindingManager::UnicastBindingMoved(uint8_t oldEntryId, uint8_t newEntryId)
+{
+    mPendingNotificationMap.ReplaceBindingEntryId(oldEntryId, newEntryId);
 }
 
 void BindingManager::SetAppServer(Server * appServer)
@@ -171,7 +176,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
         EmberBindingTableEntry entry;
 
         if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING && entry.local == endpoint &&
-            entry.clusterId == cluster)
+            (entry.clusterId.IsNull() || entry.clusterId.Value() == cluster))
         {
             if (entry.type == EMBER_UNICAST_BINDING)
             {
@@ -179,7 +184,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
                 PeerId peer                         = fabricInfo->GetPeerIdForNode(entry.nodeId);
                 OperationalDeviceProxy * peerDevice = mAppServer->GetCASESessionManager()->FindExistingSession(peer);
-                if (peerDevice != nullptr && mBoundDeviceChangedHandler)
+                if (peerDevice != nullptr && peerDevice->IsConnected() && mBoundDeviceChangedHandler)
                 {
                     // We already have an active connection
                     mBoundDeviceChangedHandler(&entry, peerDevice, context);
@@ -187,7 +192,10 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
                 else
                 {
                     mPendingNotificationMap.AddPendingNotification(i, context);
-                    ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    if (peerDevice == nullptr || !peerDevice->IsConnecting())
+                    {
+                        ReturnErrorOnFailure(EstablishConnection(entry.fabricIndex, entry.nodeId));
+                    }
                 }
             }
             else if (entry.type == EMBER_MULTICAST_BINDING)

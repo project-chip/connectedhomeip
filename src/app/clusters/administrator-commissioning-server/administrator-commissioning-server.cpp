@@ -47,7 +47,7 @@ public:
         AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
     {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
     // Vendor ID and Fabric Index of the admin that has opened the commissioning window
     uint16_t mVendorId;
@@ -56,7 +56,8 @@ public:
 
 AdministratorCommissioningAttrAccess gAdminCommissioningAttrAccess;
 
-CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR AdministratorCommissioningAttrAccess::Read( const ConcreteReadAttributePath & aPath,
+                                                      AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
 

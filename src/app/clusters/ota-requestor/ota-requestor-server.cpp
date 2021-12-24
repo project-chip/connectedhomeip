@@ -43,13 +43,14 @@ public:
     {}
 
     // TODO: Implement Read/Write for OtaSoftwareUpdateRequestorAttrAccess
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
-    CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Write( const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
 };
 
 OtaSoftwareUpdateRequestorAttrAccess gAttrAccess;
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read( const ConcreteReadAttributePath & aPath,
+                                                      AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
@@ -62,7 +63,8 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Read(const ConcreteReadAttribut
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
+CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write( const ConcreteDataAttributePath & aPath,
+                                                       AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {

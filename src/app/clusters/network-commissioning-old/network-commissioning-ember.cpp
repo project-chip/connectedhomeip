@@ -53,7 +53,7 @@ class NetworkCommissioningAttributeAccess : public AttributeAccessInterface
 public:
     NetworkCommissioningAttributeAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Id) {}
 
-    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read( const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override
     {
         switch (aPath.mAttributeId)
         {
