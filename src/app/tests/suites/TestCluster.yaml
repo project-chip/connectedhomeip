@@ -3029,7 +3029,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int8s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -20
 
     - label: "Write min value to a range-restricted signed 8-bit integer"
       command: "writeAttribute"
@@ -3072,7 +3072,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int8s"
       response:
-          value: 0
+          value: -20
 
     - label: "Write min valid value to a range-restricted signed 8-bit integer"
       command: "writeAttribute"
@@ -3118,7 +3118,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int16s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -100
 
     - label: "Write min value to a range-restricted signed 16-bit integer"
       command: "writeAttribute"
@@ -3161,7 +3161,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int16s"
       response:
-          value: 0
+          value: -100
 
     - label: "Write min valid value to a range-restricted signed 16-bit integer"
       command: "writeAttribute"
@@ -3441,7 +3441,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int8s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -20
 
     - label:
           "Write min value to a nullable range-restricted signed 8-bit integer"
@@ -3487,7 +3487,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int8s"
       response:
-          value: 0
+          value: -20
 
     - label:
           "Write min valid value to a nullable range-restricted signed 8-bit
@@ -3556,7 +3556,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int16s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -100
 
     - label:
           "Write min value to a nullable range-restricted signed 16-bit integer"
@@ -3602,7 +3602,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int16s"
       response:
-          value: 0
+          value: -100
 
     - label:
           "Write min valid value to a nullable range-restricted signed 16-bit
