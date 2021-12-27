@@ -28,6 +28,7 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -55,6 +56,7 @@ namespace {
 
 constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr int kExtDiscoveryTimeoutSecs	       = 200;
 constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVendorID                 = 0xabcd;
 constexpr uint8_t kButtonPushEvent             = 1;
@@ -130,6 +132,10 @@ int AppTask::Init()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
+
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY)
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+#endif
 
 #if defined(CONFIG_CHIP_NFC_COMMISSIONING)
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
