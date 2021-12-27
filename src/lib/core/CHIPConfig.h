@@ -1694,6 +1694,64 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 #define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
 #endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the max wait time.
+ *    This value was chosen so that the average wait time is 3600000
+ *    ((100 - CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP) % of CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS) / 2 +
+ *    (CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP % of CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS) = average wait is
+ * 3600000
+ */
+#ifndef CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+#define CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS 5538000
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the max fibonacci step index.
+ *    This index must satisfy below conditions:
+ *    1 . Fibonacci(CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX + 1) * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS >
+ * CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS 2 . Fibonacci(CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX) *
+ * CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS < CHIP_RESUBSCRIBE_MAX_RETRY_WAIT_INTERVAL_MS
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX
+#define CHIP_RESUBSCRIBE_MAX_FIBONACCI_STEP_INDEX 14
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the minimum wait
+ *    time as a percentage of the max wait interval for that step.
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP
+#define CHIP_RESUBSCRIBE_MIN_WAIT_TIME_INTERVAL_PERCENT_PER_STEP 30
+#endif
+
+/**
+ *  @def CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
+ *
+ *  @brief
+ *    If auto resubscribe is enabled & default resubscription policy is used,
+ *    specify the multiplier that multiplies the result of a fibonacci computation
+ *    based on a specific index to provide a max wait time for
+ *    a step.
+ *
+ */
+#ifndef CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS
+#define CHIP_RESUBSCRIBE_WAIT_TIME_MULTIPLIER_MS 10000
+#endif
 /**
  * @}
  */

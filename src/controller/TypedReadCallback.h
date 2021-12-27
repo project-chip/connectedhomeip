@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
 #include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
@@ -106,6 +107,18 @@ private:
         }
     }
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            for (size_t i = 0; i < aReadPrepareParams.mAttributePathParamsListSize; i++)
+            {
+                chip::Platform::Delete<app::AttributePathParams>(&aReadPrepareParams.mpAttributePathParamsList[i]);
+            }
+
+        }
+    }
+
     ClusterId mClusterId;
     AttributeId mAttributeId;
     OnSuccessCallbackType mOnSuccess;
@@ -158,6 +171,17 @@ private:
     void OnError(CHIP_ERROR aError) override { mOnError(nullptr, aError); }
 
     void OnDone() override { mOnDone(this); }
+
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            for (size_t i = 0; i < aReadPrepareParams.mEventPathParamsListSize; i++)
+            {
+                chip::Platform::Delete<app::EventPathParams>(&aReadPrepareParams.mpEventPathParamsList[i]);
+            }
+        }
+    }
 
     void OnSubscriptionEstablished(uint64_t aSubscriptionId) override
     {
