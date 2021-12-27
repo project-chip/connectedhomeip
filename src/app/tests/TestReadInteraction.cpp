@@ -157,6 +157,19 @@ public:
 
     void OnDone() override {}
 
+    void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override
+    {
+        if (aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpAttributePathParamsList;
+        }
+
+        if (aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            delete[] aReadPrepareParams.mpEventPathParamsList;
+        }
+    }
+
     int mNumDataElementIndex               = 0;
     bool mGotEventResponse                 = false;
     int mNumAttributeResponse              = 0;
@@ -240,6 +253,7 @@ public:
     static void TestReadInvalidAttributePathRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestSubscribeInvalidIterval(nlTestSuite * apSuite, void * apContext);
     static void TestReadShutdown(nlTestSuite * apSuite, void * apContext);
+    static void TestResubscribeRoundtrip(nlTestSuite * apSuite, void * apContext);
 
 private:
     static void GenerateReportData(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
@@ -1195,7 +1209,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
     ReadPrepareParams readPrepareParams(ctx.GetSessionBobToAlice());
     readPrepareParams.mEventPathParamsListSize = 0;
 
-    chip::app::AttributePathParams attributePathParams[2];
+    chip::app::AttributePathParams * attributePathParams = new chip::app::AttributePathParams[2];
     // Subscribe to full wildcard paths, repeat twice to ensure chunking.
     readPrepareParams.mpAttributePathParamsList    = attributePathParams;
     readPrepareParams.mAttributePathParamsListSize = 2;
@@ -1210,7 +1224,7 @@ void TestReadInteraction::TestSubscribeWildcard(nlTestSuite * apSuite, void * ap
 
         delegate.mGotReport = false;
 
-        err = readClient.SendRequest(readPrepareParams);
+        err = readClient.SendAutoResubscribeRequest(std::move(readPrepareParams));
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         for (int i = 0; i < 20 && delegate.mNumAttributeResponse < 70; i++)
