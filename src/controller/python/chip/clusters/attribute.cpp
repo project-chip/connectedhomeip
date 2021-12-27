@@ -213,7 +213,7 @@ public:
     void OnDone(WriteClient * apWriteClient) override
     {
         gOnWriteDoneCallback(mAppContext);
-        // delete apWriteClient;
+        delete apWriteClient;
         delete this;
     };
 
@@ -256,14 +256,14 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::unique_ptr<WriteClientCallback> callback = std::make_unique<WriteClientCallback>(appContext);
-    app::WriteClientHandle client;
+    std::unique_ptr<WriteClient> client           = std::make_unique<WriteClient>();
 
     va_list args;
     va_start(args, n);
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewWriteClient(
-                      client, callback.get(),
-                      timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing()));
+    VerifyOrExit(device != nullptr && device->GetSecureSession().HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+    SuccessOrExit(client->Init(app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(),
+                               timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing()));
 
     {
         for (size_t i = 0; i < n; i++)
@@ -292,8 +292,9 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
         }
     }
 
-    SuccessOrExit(err = device->SendWriteAttributeRequest(std::move(client), nullptr, nullptr));
+    SuccessOrExit(err = client->SendWriteRequest(device->GetSecureSession().Value()));
 
+    client.release();
     callback.release();
 
 exit:
