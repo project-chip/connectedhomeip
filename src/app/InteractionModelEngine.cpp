@@ -117,14 +117,6 @@ void InteractionModelEngine::Shutdown()
     //
     mpActiveReadClientList = nullptr;
 
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            writeClient.Shutdown();
-        }
-    }
-
     for (auto & writeHandler : mWriteHandlers)
     {
         VerifyOrDie(writeHandler.IsFree());
@@ -149,21 +141,6 @@ uint32_t InteractionModelEngine::GetNumActiveReadHandlers() const
     for (auto & readHandler : mReadHandlers)
     {
         if (!readHandler.IsFree())
-        {
-            numActive++;
-        }
-    }
-
-    return numActive;
-}
-
-uint32_t InteractionModelEngine::GetNumActiveWriteClients() const
-{
-    uint32_t numActive = 0;
-
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
         {
             numActive++;
         }
@@ -213,25 +190,6 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricInde
     }
 
     return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
-                                                  const Optional<uint16_t> & aTimedWriteTimeoutMs)
-{
-    apWriteClient.SetWriteClient(nullptr);
-
-    for (auto & writeClient : mWriteClients)
-    {
-        if (!writeClient.IsFree())
-        {
-            continue;
-        }
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback, aTimedWriteTimeoutMs));
-        apWriteClient.SetWriteClient(&writeClient);
-        return CHIP_NO_ERROR;
-    }
-
-    return CHIP_ERROR_NO_MEMORY;
 }
 
 void InteractionModelEngine::OnDone(CommandHandler & apCommandObj)
@@ -436,11 +394,6 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogProgress(InteractionModel, "Time out! Failed to receive IM response from Exchange: " ChipLogFormatExchange,
                     ChipLogValueExchange(ec));
-}
-
-uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const
-{
-    return static_cast<uint16_t>(apWriteClient - mWriteClients);
 }
 
 uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const

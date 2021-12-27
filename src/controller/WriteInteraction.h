@@ -100,29 +100,36 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr)
 {
-    app::WriteClientHandle handle;
-
-    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb);
+    auto client   = Platform::MakeUnique<app::WriteClient>();
+    auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, [onDoneCb](app::WriteClient * apWriteClient) {
+        if (onDoneCb != nullptr)
+        {
+            onDoneCb(apWriteClient);
+        }
+        chip::Platform::Delete(apWriteClient);
+    });
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, callback.get(), aTimedWriteTimeoutMs));
-
-    // At this point the handle will ensure our callback's OnDone is always
-    // called.
-    callback.release();
+    client->Init(app::InteractionModelEngine::GetInstance()->GetExchangeManager(), callback.get(), aTimedWriteTimeoutMs);
 
     if (sessionHandle.IsGroupSession())
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else
     {
         ReturnErrorOnFailure(
-            handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
+            client->EncodeAttributeWritePayload(chip::app::AttributePathParams(endpointId, clusterId, attributeId), requestData));
     }
 
-    ReturnErrorOnFailure(handle.SendWriteRequest(sessionHandle));
+    ReturnErrorOnFailure(client->SendWriteRequest(sessionHandle));
+
+    // At this point the handle will ensure our callback's OnDone is always
+    // called.
+    client.release();
+    callback.release();
 
     return CHIP_NO_ERROR;
 }

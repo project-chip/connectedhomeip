@@ -111,28 +111,9 @@ public:
      */
     CHIP_ERROR ShutdownSubscriptions(FabricIndex aFabricIndex, NodeId aPeerNodeId);
 
-    /**
-     *  Retrieve a WriteClient that the SDK consumer can use to send a write.  If the call succeeds,
-     *  see WriteClient documentation for lifetime handling.
-     *
-     *  The Write interaction is more like Invoke interaction (cluster specific commands) since it will include cluster specific
-     * payload, and may have the need to encode non-scalar values (like structs and arrays). Thus we use WriteClientHandle to
-     * prevent user's code from leaking WriteClients.
-     *
-     *  @param[out]    apWriteClient    A pointer to the WriteClient object.
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback,
-                              const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional);
-
     uint32_t GetNumActiveReadHandlers() const;
 
     uint32_t GetNumActiveWriteHandlers() const;
-    uint32_t GetNumActiveWriteClients() const;
-
-    uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
     uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
     /**
@@ -264,7 +245,6 @@ private:
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
     BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
-    WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
     ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
