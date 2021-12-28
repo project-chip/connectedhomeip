@@ -313,7 +313,7 @@ CHIP_ERROR CASESession::SendSigma1()
     VerifyOrReturnError(!msg_R1.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     tlvWriter.Init(std::move(msg_R1));
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mInitiatorRandom)));
     // Retrieve Session Identifier
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
@@ -356,15 +356,11 @@ CHIP_ERROR CASESession::SendSigma1()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R1->Start(), msg_R1->DataLength() }));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma1;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma1, std::move(msg_R1),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma1;
 
     ChipLogDetail(SecureChannel, "Sent Sigma1 msg");
 
@@ -475,7 +471,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     // Generate a new resumption ID
     ReturnErrorOnFailure(DRBG_get_bytes(mResumptionId, sizeof(mResumptionId)));
 
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), ByteSpan(mResumptionId)));
 
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
@@ -496,15 +492,11 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&msg_R2_resume));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma2Resume;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume, std::move(msg_R2_resume),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma2Resume;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2Resume msg");
 
@@ -577,7 +569,7 @@ CHIP_ERROR CASESession::SendSigma2()
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     tlvWriter.Init(msg_R2_Encrypted.Get(), msg_r2_signed_enc_len);
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderNOC), nocCert));
     if (!icaCert.empty())
     {
@@ -613,7 +605,7 @@ CHIP_ERROR CASESession::SendSigma2()
     outerContainerType = TLV::kTLVType_NotSpecified;
 
     tlvWriterMsg2.Init(std::move(msg_R2));
-    ReturnErrorOnFailure(tlvWriterMsg2.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriterMsg2.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriterMsg2.PutBytes(TLV::ContextTag(1), &msg_rand[0], sizeof(msg_rand)));
     ReturnErrorOnFailure(tlvWriterMsg2.Put(TLV::ContextTag(2), GetLocalSessionId()));
     ReturnErrorOnFailure(
@@ -630,15 +622,11 @@ CHIP_ERROR CASESession::SendSigma2()
 
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ msg_R2->Start(), msg_R2->DataLength() }));
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma2;
-
     // Call delegate to send the msg to peer
     ReturnErrorOnFailure(mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma2, std::move(msg_R2),
                                                     SendFlags(SendMessageFlags::kExpectResponse)));
+
+    mState = kSentSigma2;
 
     ChipLogDetail(SecureChannel, "Sent Sigma2 msg");
 
@@ -660,7 +648,7 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     uint8_t sigma2ResumeMIC[CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES];
 
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
+    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
     SuccessOrExit(err = tlvReader.Next());
@@ -755,7 +743,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     ChipLogDetail(SecureChannel, "Received Sigma2 msg");
 
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
+    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
     // Retrieve Responder's Random value
@@ -809,7 +797,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 
     decryptedDataTlvReader.Init(msg_R2_Encrypted.Get(), msg_r2_encrypted_len);
     containerType = TLV::kTLVType_Structure;
-    SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag));
+    SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
 
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_SenderNOC)));
@@ -926,7 +914,7 @@ CHIP_ERROR CASESession::SendSigma3()
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
         tlvWriter.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
-        SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+        SuccessOrExit(err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
         SuccessOrExit(err = tlvWriter.Put(TLV::ContextTag(kTag_TBEData_SenderNOC), nocCert));
         if (!icaCert.empty())
         {
@@ -968,7 +956,7 @@ CHIP_ERROR CASESession::SendSigma3()
         TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
         tlvWriter.Init(std::move(msg_R3));
-        err = tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType);
+        err = tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
         err = tlvWriter.PutBytes(TLV::ContextTag(1), msg_R3_Encrypted.Get(),
                                  static_cast<uint32_t>(msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
@@ -982,12 +970,6 @@ CHIP_ERROR CASESession::SendSigma3()
     err = mCommissioningHash.AddData(ByteSpan{ msg_R3->Start(), msg_R3->DataLength() });
     SuccessOrExit(err);
 
-    // The state is being updated here before the message is successfully sent.
-    // This is done here due to limitation in unit test harness, where the SendMessage() immediately calls
-    // the OnMessageReceived(). If mState was updated after SendMessage, the receive will fail in unit tests.
-    // TODO: Update secure session SendMessage() unit test harness to do asynchronous send and receives.
-    mState = kSentSigma3;
-
     // Call delegate to send the Msg3 to peer
     err = mExchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::CASE_Sigma3, std::move(msg_R3),
                                      SendFlags(SendMessageFlags::kExpectResponse));
@@ -997,6 +979,8 @@ CHIP_ERROR CASESession::SendSigma3()
 
     err = mCommissioningHash.Finish(messageDigestSpan);
     SuccessOrExit(err);
+
+    mState = kSentSigma3;
 
 exit:
 
@@ -1041,7 +1025,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     ChipLogDetail(SecureChannel, "Received Sigma3 msg");
 
     tlvReader.Init(std::move(msg));
-    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag));
+    SuccessOrExit(err = tlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = tlvReader.EnterContainer(containerType));
 
     // Fetch encrypted data
@@ -1075,7 +1059,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     decryptedDataTlvReader.Init(msg_R3_Encrypted.Get(), msg_r3_encrypted_len);
     containerType = TLV::kTLVType_Structure;
-    SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag));
+    SuccessOrExit(err = decryptedDataTlvReader.Next(containerType, TLV::AnonymousTag()));
     SuccessOrExit(err = decryptedDataTlvReader.EnterContainer(containerType));
 
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_SenderNOC)));
@@ -1275,7 +1259,7 @@ CHIP_ERROR CASESession::ConstructTBSData(const ByteSpan & senderNOC, const ByteS
     };
 
     tlvWriter.Init(tbsData, tbsDataLen);
-    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(kTag_TBSData_SenderNOC), senderNOC));
     if (!senderICAC.empty())
     {
@@ -1366,7 +1350,7 @@ CHIP_ERROR CASESession::ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, 
     constexpr uint8_t kResume1MICTag         = 7;
 
     TLVType containerType = kTLVType_Structure;
-    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     ReturnErrorOnFailure(tlvReader.Next(ContextTag(kInitiatorRandomTag)));

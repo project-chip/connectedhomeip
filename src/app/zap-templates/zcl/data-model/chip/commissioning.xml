@@ -32,6 +32,14 @@ limitations under the License.
         <item name="IPBindFailed" value="0xb"/>
         <item name="UnknownError" value="0xc"/>
     </enum>
+    <enum name="WiFiBand" type="ENUM8">
+        <cluster code="0x0031"/>
+        <item name="2G4" value="0x0"/>
+        <item name="3G65" value="0x1"/>
+        <item name="5G" value="0x2"/>
+        <item name="6G" value="0x3"/>
+        <item name="60G" value="0x4"/>
+    </enum>
     <bitmap name="SecurityType" type="BITMAP8">
         <field name="Unencrypted" mask="0x1"/>
         <field name="WEP-PERSONAL" mask="0x2"/>
@@ -44,8 +52,8 @@ limitations under the License.
         <item name="Security" type="BITMAP8"/>
         <item name="SSID" type="OCTET_STRING"/>
         <item name="BSSID" type="OCTET_STRING"/>
-        <item name="Channel" type="INT8U"/>
-        <item name="WiFiBand" type="INT32U"/>
+        <item name="Channel" type="INT16U"/>
+        <item name="WiFiBand" type="WiFiBand"/>
         <item name="RSSI" type="INT8S"/>
     </struct>
     <struct name="ThreadInterfaceScanResult">

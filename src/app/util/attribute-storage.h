@@ -208,19 +208,19 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
 void emberAfResetAttributes(chip::EndpointId endpoint);
 
-// Loads the attributes from built-in default and / or tokens
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool writeTokens);
+// Loads the attributes from built-in default and / or storage.  If
+// ignoreStorage is true, only defaults will be read, and the storage for
+// non-volatile attributes will be overwritten with those defaults.
+void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage);
 
-// This function loads from tokens all the attributes that
-// are defined to be stored in tokens.
-void emAfLoadAttributesFromTokens(chip::EndpointId endpoint);
+// This function loads from storage all the attributes that
+// are defined to be non-volatile.
+void emAfLoadAttributesFromStorage(chip::EndpointId endpoint);
 
-// After the RAM value has changed, code should call this
-// function. If this attribute has been
-// tagged as stored-to-token, then code will store
-// the attribute to token.
-void emAfSaveAttributeToToken(uint8_t * data, chip::EndpointId endpoint, chip::ClusterId clusterId,
-                              EmberAfAttributeMetadata * metadata);
+// After the RAM value has changed, code should call this function. If this
+// attribute has been tagged as non-volatile, its value will be stored.
+void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                        EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);

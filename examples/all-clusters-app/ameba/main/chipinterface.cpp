@@ -36,9 +36,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 
-extern "C" {
-void * __dso_handle = 0;
-}
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -189,6 +189,10 @@ extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "All Clusters Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     initPref();
 

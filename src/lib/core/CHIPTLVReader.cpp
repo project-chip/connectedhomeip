@@ -576,7 +576,7 @@ CHIP_ERROR TLVReader::Skip()
  */
 void TLVReader::ClearElementState()
 {
-    mElemTag      = AnonymousTag;
+    mElemTag      = AnonymousTag();
     mControlByte  = kTLVControlByte_NotSpecified;
     mElemLenOrVal = 0;
 }
@@ -737,7 +737,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     {
         if (mContainerType == kTLVType_NotSpecified)
             return CHIP_ERROR_INVALID_TLV_ELEMENT;
-        if (mElemTag != AnonymousTag)
+        if (mElemTag != AnonymousTag())
             return CHIP_ERROR_INVALID_TLV_TAG;
     }
     else
@@ -751,11 +751,11 @@ CHIP_ERROR TLVReader::VerifyElement()
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Structure:
-            if (mElemTag == AnonymousTag)
+            if (mElemTag == AnonymousTag())
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Array:
-            if (mElemTag != AnonymousTag)
+            if (mElemTag != AnonymousTag())
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
@@ -815,7 +815,7 @@ Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
         return ProfileTag(vendorId, profileNum, LittleEndian::Read32(p));
     case TLVTagControl::Anonymous:
     default:
-        return AnonymousTag;
+        return AnonymousTag();
     }
 }
 

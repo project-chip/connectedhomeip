@@ -269,7 +269,7 @@ public:
      * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
-     * @param[out] payload        The generated setup payload.
+     * @param[in,out] payload     The generated setup payload.
      *                            - The payload is generated only if the user didn't ask for using the original setup code.
      *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
      *                              this payload
@@ -279,7 +279,10 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
-        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+        mSuggestedSetUpPINCode = payload.setUpPINCode;
+        ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
+        payload = mSetupPayload;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -405,6 +408,7 @@ private:
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+    uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
     uint16_t mCommissioningWindowIteration;

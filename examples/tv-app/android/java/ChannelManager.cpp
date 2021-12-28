@@ -223,7 +223,7 @@ CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & a
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        chip::app::Clusters::Channel::Structs::ChannelLineupInfo::Type channelLineupInfo;
+        chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
 
         jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
         jclass channelLineupClazz   = env->GetObjectClass(channelLineupObject);
@@ -233,7 +233,7 @@ CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & a
         if (joperatorName != NULL)
         {
             JniUtfString operatorName(env, joperatorName);
-            channelLineupInfo.operatorName = operatorName.charSpan();
+            lineupInfo.operatorName = operatorName.charSpan();
         }
 
         jfieldID lineupNameFild = env->GetFieldID(channelLineupClazz, "lineupName", "Ljava/lang/String;");
@@ -241,7 +241,7 @@ CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & a
         if (jlineupName != NULL)
         {
             JniUtfString lineupName(env, jlineupName);
-            channelLineupInfo.lineupName = lineupName.charSpan();
+            lineupInfo.lineupName = lineupName.charSpan();
         }
 
         jfieldID postalCodeFild = env->GetFieldID(channelLineupClazz, "postalCode", "Ljava/lang/String;");
@@ -249,14 +249,14 @@ CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & a
         if (jpostalCode != NULL)
         {
             JniUtfString postalCode(env, jpostalCode);
-            channelLineupInfo.postalCode = postalCode.charSpan();
+            lineupInfo.postalCode = postalCode.charSpan();
         }
 
-        jfieldID lineupInfoTypeFild      = env->GetFieldID(channelLineupClazz, "lineupInfoType", "I");
-        jint jlineupInfoType             = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
-        channelLineupInfo.lineupInfoType = static_cast<app::Clusters::Channel::ChannelLineupInfoType>(jlineupInfoType);
+        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
+        jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
+        lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
 
-        ReturnErrorOnFailure(aEncoder.Encode(channelLineupInfo));
+        ReturnErrorOnFailure(aEncoder.Encode(lineupInfo));
 
         return CHIP_NO_ERROR;
     }

@@ -25,7 +25,17 @@ declare_args() {
   config_use_separate_eventloop = true
 }
 
-executable("chip-tool") {
+config("config") {
+  include_dirs = [
+    ".",
+    "${chip_root}/zzz_generated/chip-tool",
+    "${chip_root}/src/lib",
+  ]
+
+  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
+}
+
+static_library("chip-tool-utils") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
     "commands/common/CHIPCommand.cpp",
@@ -33,6 +43,7 @@ executable("chip-tool") {
     "commands/common/Command.cpp",
     "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
+    "commands/common/CredentialIssuerCommands.h",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
@@ -48,10 +59,7 @@ executable("chip-tool") {
     "commands/payload/SetupPayloadVerhoeff.cpp",
     "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
-    "main.cpp",
   ]
-
-  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop}" ]
 
   deps = [
     "${chip_root}/src/app/server",
@@ -64,11 +72,31 @@ executable("chip-tool") {
 
   cflags = [ "-Wconversion" ]
 
-  include_dirs = [
-    ".",
-    "${chip_root}/zzz_generated/chip-tool",
+  public_configs = [ ":config" ]
+
+  if (chip_enable_transport_trace) {
+    deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+executable("chip-tool") {
+  sources = [ "main.cpp" ]
+
+  deps = [
+    ":chip-tool-utils",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/app/tests/suites/pics",
+    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
+    "${chip_root}/src/platform",
+    "${chip_root}/third_party/inipp",
   ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_configs = [ ":config" ]
 
   if (chip_enable_transport_trace) {
     deps += [ "${chip_root}/examples/common/tracing:trace_handlers" ]

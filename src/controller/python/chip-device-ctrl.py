@@ -920,7 +920,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-thread-credential")
                 return
-            self.devCtrl.SetThreadOperationalDataset(args[0].encode("utf-8"))
+            self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
         except Exception as ex:
             print(str(ex))
             return

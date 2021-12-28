@@ -657,8 +657,3 @@ ChipError::StorageType pychip_DeviceController_PostTaskOnChipThread(ChipThreadTa
     PlatformMgr().ScheduleWork(callback, reinterpret_cast<intptr_t>(pythonContext));
     return CHIP_NO_ERROR.AsInteger();
 }
-
-chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64_t subscriptionId)
-{
-    return chip::app::InteractionModelEngine::GetInstance()->ShutdownSubscription(subscriptionId).AsInteger();
-}

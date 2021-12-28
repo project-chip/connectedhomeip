@@ -4068,7 +4068,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "groups",
+              "name": "groupKeyMap",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4083,7 +4083,7 @@
               "reportableChange": 0
             },
             {
-              "name": "group keys",
+              "name": "groupTable",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8938,7 +8938,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "groups",
+              "name": "groupKeyMap",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8953,7 +8953,7 @@
               "reportableChange": 0
             },
             {
-              "name": "group keys",
+              "name": "groupTable",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -12521,7 +12521,7 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "NavigateTarget",
+              "name": "NavigateTargetRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",

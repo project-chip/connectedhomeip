@@ -441,7 +441,8 @@ void EventManagement::VendEventNumber()
     mLastEventNumber = static_cast<EventNumber>(mpEventNumberCounter->GetValue());
 }
 
-CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions, EventNumber & aEventNumber)
+CHIP_ERROR EventManagement::LogEvent(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
+                                     EventNumber & aEventNumber)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     {
@@ -456,7 +457,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, EventOptions & aEventOptions,
+CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, const EventOptions & aEventOptions,
                                             EventNumber & aEventNumber)
 {
     CircularTLVWriter writer;
@@ -559,7 +560,7 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
 
     reader.Init(aReader);
     ReturnErrorOnFailure(reader.EnterContainer(containerType));
-    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag, kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(aWriter.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
 
     ReturnErrorOnFailure(reader.Next());
     ReturnErrorOnFailure(reader.EnterContainer(containerType1));

@@ -38,9 +38,8 @@
 using namespace std;
 using namespace chip::AppPlatform;
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList,
-                                                                  bool autoplay, const chip::CharSpan & data)
+LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
+                                                           bool autoplay, const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
     string dataString(data.data(), data.size());
@@ -54,16 +53,15 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     // TODO: Insert code here
-    ContentLaunchResponse response;
+    LaunchResponse response;
     response.err    = CHIP_NO_ERROR;
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 
-ContentLaunchResponse
-ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
+LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                       const std::list<BrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -71,10 +69,10 @@ ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const
     string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
-    ContentLaunchResponse response;
+    LaunchResponse response;
     response.err    = CHIP_NO_ERROR;
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
-    response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
+    response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 

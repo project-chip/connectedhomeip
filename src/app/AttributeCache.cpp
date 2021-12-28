@@ -36,7 +36,7 @@ CHIP_ERROR AttributeCache::UpdateCache(const ConcreteDataAttributePath & aPath, 
 
         writer.Init(std::move(handle), false);
 
-        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag, *apData));
+        ReturnErrorOnFailure(writer.CopyElement(TLV::AnonymousTag(), *apData));
         ReturnErrorOnFailure(writer.Finalize(&handle));
 
         //

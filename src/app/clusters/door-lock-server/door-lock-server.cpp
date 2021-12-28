@@ -100,7 +100,7 @@ bool DoorLockServer::SetActuatorEnabled(chip::EndpointId endpointId, bool newAct
     return status == EMBER_ZCL_STATUS_SUCCESS;
 }
 
-bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDoorState)
+bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState)
 {
     auto doorState = static_cast<uint8_t>(newDoorState);
 

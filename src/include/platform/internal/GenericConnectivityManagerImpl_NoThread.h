@@ -152,7 +152,7 @@ inline CHIP_ERROR GenericConnectivityManagerImpl_NoThread<ImplClass>::_WriteThre
     case app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::Id:
     case app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::Id:
     case app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::Id: {
-        err = encoder.Encode(app::DataModel::List<EndpointId>());
+        err = encoder.EncodeEmptyList();
         break;
     }
     default: {

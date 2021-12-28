@@ -45,11 +45,10 @@ using namespace chip;
 
 ContentLauncherManager ContentLauncherManager::sInstance;
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList,
-                                                                  bool autoplay, const chip::CharSpan & data)
+LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
+                                                           bool autoplay, const chip::CharSpan & data)
 {
-    ContentLaunchResponse response;
+    LaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -86,7 +85,7 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
     }
 
@@ -100,11 +99,10 @@ exit:
     return response;
 }
 
-ContentLaunchResponse
-ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
+LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                       const std::list<BrandingInformation> & brandingInformation)
 {
-    ContentLaunchResponse response;
+    LaunchResponse response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -142,7 +140,7 @@ ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
     }
 
@@ -260,7 +258,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
 
     mLaunchContentMethod = env->GetMethodID(
         ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/LaunchResponse;");
     if (mLaunchContentMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaInputManager 'launchContent' method");
@@ -269,7 +267,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
 
     mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
                                         "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/LaunchResponse;");
     if (mLaunchUrlMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");

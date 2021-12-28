@@ -149,7 +149,7 @@ static void resetCurrentQueueRetryParams(void)
 // Forward declarations
 
 static void setZoneId(EndpointId endpoint, uint8_t zoneId);
-static bool areZoneServerAttributesTokenized(EndpointId endpoint);
+static bool areZoneServerAttributesNonVolatile(EndpointId endpoint);
 static bool isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method);
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
 static uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry);
@@ -540,7 +540,7 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfIasZoneType zoneType;
-    if (!areZoneServerAttributesTokenized(endpoint))
+    if (!areZoneServerAttributesNonVolatile(endpoint))
     {
         emberAfAppPrint("WARNING: ATTRIBUTES ARE NOT BEING STORED IN FLASH! ");
         emberAfAppPrintln("DEVICE WILL NOT FUNCTION PROPERLY AFTER REBOOTING!!");
@@ -587,37 +587,37 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 //
 // This function will verify that all attributes necessary for the IAS zone
 // server to properly retain functionality through a power failure are
-// tokenized.
+// non-volatile.
 //
 //------------------------------------------------------------------------------
-static bool areZoneServerAttributesTokenized(EndpointId endpoint)
+static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 
     metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID,
                                               CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
     metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                               EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
     metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                               EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
     metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ID_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                               EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }
