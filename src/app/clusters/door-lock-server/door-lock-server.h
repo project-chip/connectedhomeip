@@ -42,7 +42,7 @@ public:
 
     bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
-    bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newDoorState);
+    bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlDoorState newDoorState);
 
     bool SetLanguage(chip::EndpointId endpointId, const char * newLanguage);
     bool SetAutoRelockTime(chip::EndpointId, uint32_t newAutoRelockTimeSec);

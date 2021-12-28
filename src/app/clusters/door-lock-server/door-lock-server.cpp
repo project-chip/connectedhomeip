@@ -77,7 +77,7 @@ bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLo
 
     emberAfDoorLockClusterPrintln("Setting Lock State to '%hhu'", lockState);
 
-    auto status = Attributes::LockState::Set(endpointId, lockState);
+    auto status = Attributes::LockState::Set(endpointId, newLockState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(Zcl, "Unable to set the Lock State to %hhu: internal error", lockState);
@@ -106,7 +106,7 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDo
     auto doorState = static_cast<uint8_t>(newDoorState);
 
     emberAfDoorLockClusterPrintln("Setting Door State to '%hhu'", doorState);
-    auto status = Attributes::DoorState::Set(endpointId, doorState);
+    auto status = Attributes::DoorState::Set(endpointId, newDoorState);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
@@ -123,12 +123,12 @@ bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLa
 
 bool DoorLockServer::SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec)
 {
-    emberAfDoorLockClusterPrintln("Setting Auto Relock Time to '" PRIu32 "'", newAutoRelockTimeSec);
+    emberAfDoorLockClusterPrintln("Setting Auto Relock Time to '%" PRIu32 "'", newAutoRelockTimeSec);
     auto status = Attributes::AutoRelockTime::Set(endpointId, newAutoRelockTimeSec);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(Zcl, "Unable to set the Auto Relock Time to " PRIu32 ": internal error", newAutoRelockTimeSec);
+        ChipLogError(Zcl, "Unable to set the Auto Relock Time to %" PRIu32 ": internal error", newAutoRelockTimeSec);
     }
 
     return status == EMBER_ZCL_STATUS_SUCCESS;
