@@ -34571,7 +34571,8 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 0);
+            XCTAssertEqual([actualValue count], 1);
+            XCTAssertEqual([actualValue[0] unsignedIntValue], 41UL);
         }
 
         [expectation fulfill];
