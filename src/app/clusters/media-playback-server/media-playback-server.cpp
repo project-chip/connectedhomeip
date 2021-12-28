@@ -484,7 +484,7 @@ exit:
     return true;
 }
 
-void MatterMediaPlaybackPluginServerInitCallback() 
+void MatterMediaPlaybackPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gMediaPlaybackAttrAccess);
 }

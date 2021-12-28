@@ -201,7 +201,7 @@ bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * 
     return true;
 }
 
-void MatterAudioOutputPluginServerInitCallback() 
+void MatterAudioOutputPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAudioOutputAttrAccess);
 }

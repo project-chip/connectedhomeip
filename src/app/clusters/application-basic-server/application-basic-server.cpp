@@ -213,7 +213,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::Attri
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterApplicationBasicPluginServerInitCallback() 
+void MatterApplicationBasicPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gApplicationBasicAttrAccess);
 }

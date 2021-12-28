@@ -267,4 +267,3 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 }
-

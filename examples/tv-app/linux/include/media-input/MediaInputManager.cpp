@@ -20,7 +20,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList() 
+std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList()
 {
     std::list<Structs::InputInfo::Type> list;
     // TODO: Insert code here
@@ -38,30 +38,30 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInput
     return list;
 }
 
-uint8_t MediaInputManager::HandleGetCurrentInput() 
+uint8_t MediaInputManager::HandleGetCurrentInput()
 {
     return 0;
 }
 
-bool MediaInputManager::HandleSelectInput(const uint8_t index) 
+bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     // TODO: Insert code here
     return true;
 }
 
-bool MediaInputManager::HandleShowInputStatus() 
+bool MediaInputManager::HandleShowInputStatus()
 {
     // TODO: Insert code here
     return true;
 }
 
-bool MediaInputManager::HandleHideInputStatus() 
+bool MediaInputManager::HandleHideInputStatus()
 {
     // TODO: Insert code here
     return true;
 }
 
-bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name) 
+bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
     return true;

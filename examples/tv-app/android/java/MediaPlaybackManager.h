@@ -74,5 +74,3 @@ inline MediaPlaybackManager & MediaPlaybackMgr()
 {
     return MediaPlaybackManager::sInstance;
 }
-
-

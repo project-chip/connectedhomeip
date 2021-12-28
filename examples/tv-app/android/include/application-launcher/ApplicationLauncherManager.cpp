@@ -21,7 +21,7 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp() 
+Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
 {
     Structs::ApplicationEP::Type currentApp;
     currentApp.application.catalogVendorId = 123;
@@ -30,13 +30,13 @@ Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
     return currentApp;
 }
 
-std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList() 
+std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
 {
     return { 123, 456 };
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(const chip::CharSpan & data, 
-                                                                             const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) 
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(const chip::CharSpan & data,
+                                                                             const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
@@ -45,7 +45,7 @@ Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(con
     return response;
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) 
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
@@ -54,7 +54,7 @@ Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(const
     return response;
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) 
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;

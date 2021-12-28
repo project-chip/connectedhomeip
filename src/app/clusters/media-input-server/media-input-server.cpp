@@ -249,7 +249,7 @@ bool emberAfMediaInputClusterRenameInputRequestCallback(app::CommandHandler * co
     return true;
 }
 
-void MatterMediaInputPluginServerInitCallback() 
+void MatterMediaInputPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gMediaInputAttrAccess);
 }

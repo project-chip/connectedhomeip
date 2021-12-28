@@ -47,7 +47,7 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 }
 
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList() 
+std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList()
 {
     std::list<Structs::InputInfo::Type> list;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -116,7 +116,7 @@ exit:
     return list;
 }
 
-uint8_t MediaInputManager::HandleGetCurrentInput() 
+uint8_t MediaInputManager::HandleGetCurrentInput()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     jint index     = -1;
@@ -147,7 +147,7 @@ exit:
     return uint8_t(index);
 }
 
-bool MediaInputManager::HandleSelectInput(const uint8_t index) 
+bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -171,7 +171,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool MediaInputManager::HandleShowInputStatus() 
+bool MediaInputManager::HandleShowInputStatus()
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -195,7 +195,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool MediaInputManager::HandleHideInputStatus() 
+bool MediaInputManager::HandleHideInputStatus()
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -219,7 +219,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name) 
+bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

@@ -135,7 +135,7 @@ CHIP_ERROR WakeOnLanAttrAccess::ReadMacAddressAttribute(app::AttributeValueEncod
 
 } // anonymous namespace
 
-void MatterWakeOnLanPluginServerInitCallback() 
+void MatterWakeOnLanPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gWakeOnLanAttrAccess);
 }

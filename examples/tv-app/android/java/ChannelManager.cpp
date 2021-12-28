@@ -28,7 +28,7 @@ namespace {
 static ChannelManager channelManager;
 } // namespace
 
-std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList() 
+std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
     std::list<Structs::ChannelInfo::Type> list;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -93,7 +93,7 @@ exit:
     return list;
 }
 
-chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup() 
+chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup()
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -147,7 +147,7 @@ exit:
     return lineupInfo;
 }
 
-chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel() 
+chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel()
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -203,8 +203,8 @@ exit:
     return channelInfo;
 }
 
-Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match) 
-{   
+Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match)
+{
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -268,7 +268,7 @@ exit:
     return response;
 }
 
-bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) 
+bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -295,7 +295,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool ChannelManager::HandleSkipChannel(const uint16_t & count) 
+bool ChannelManager::HandleSkipChannel(const uint16_t & count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();

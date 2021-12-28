@@ -182,7 +182,7 @@ exit:
     return true;
 }
 
-void MatterTargetNavigatorPluginServerInitCallback() 
+void MatterTargetNavigatorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
 }

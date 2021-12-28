@@ -252,7 +252,7 @@ bool emberAfChannelClusterSkipChannelRequestCallback(app::CommandHandler * comma
     return true;
 }
 
-void MatterChannelPluginServerInitCallback() 
+void MatterChannelPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gChannelAttrAccess);
 }

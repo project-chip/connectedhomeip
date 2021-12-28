@@ -36,11 +36,11 @@ class Delegate
 {
 public:
     virtual Commands::LaunchResponse::Type HandleLaunchContent(chip::EndpointId endpointId,
-                                                               const std::list<Parameter> & parameterList, 
+                                                               const std::list<Parameter> & parameterList,
                                                                bool autoplay,
                                                                const chip::CharSpan & data) = 0;
 
-    virtual Commands::LaunchResponse::Type HandleLaunchUrl(const chip::CharSpan & contentUrl, 
+    virtual Commands::LaunchResponse::Type HandleLaunchUrl(const chip::CharSpan & contentUrl,
                                                            const chip::CharSpan & displayString,
                                                            const std::list<BrandingInformation> & brandingInformation) = 0;
 

@@ -137,7 +137,7 @@ bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * comman
 }
 
 
-bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj, 
+bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj,
                                                      const app::ConcreteCommandPath & commandPath,
                                                      const Commands::LogoutRequest::DecodableType & commandData)
 {
