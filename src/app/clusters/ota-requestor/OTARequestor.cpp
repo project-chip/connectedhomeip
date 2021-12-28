@@ -352,8 +352,8 @@ OTARequestorInterface::OTATriggerResult OTARequestor::TriggerImmediateQuery()
 // Called whenever FindOrEstablishSession fails
 void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
 {
-    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT, ChipLogValueX64(peerId.GetNodeId()),
-                 error.Format());
+    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueX64(peerId.GetNodeId()), error.Format());
 }
 
 void OTARequestor::ApplyUpdate()
