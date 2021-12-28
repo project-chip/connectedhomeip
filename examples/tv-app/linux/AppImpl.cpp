@@ -190,7 +190,8 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
+chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
+ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -199,13 +200,14 @@ chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type Appli
                     application.catalogVendorId, appId.c_str(), data.c_str());
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
-    response.data         = chip::CharSpan("data", strlen("data"));
-    response.status       = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
 }
 
-chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
+chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
