@@ -28,7 +28,6 @@
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/identify-server/identify-server.h>
-//#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
@@ -84,66 +83,6 @@ StaticQueue_t sAppEventQueueStruct;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
-
-/**********************************************************
- * Identify Callbacks
- *********************************************************/
-
-/*
-namespace {
-void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
-{
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-}
-} // namespace
-*/
-
-/*
-void OnTriggerIdentifyEffect(Identify * identify)
-{
-
-sIdentifyEffect = identify->mCurrentEffectIdentifier;
-
-if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
-{
-    ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                    identify->mEffectVariant);
-    sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
-}
-
-switch (sIdentifyEffect)
-{
-case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                       identify);
-    break;
-case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-    (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                       identify);
-    break;
-case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-    (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-    break;
-default:
-    ChipLogProgress(Zcl, "No identifier effect");
-}
-
-}
-*/
-
-/*
-Identify gIdentify = {
-chip::EndpointId{ 1 },
-[](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-[](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-OnTriggerIdentifyEffect,
-};
-*/
 
 } // namespace
 
@@ -277,29 +216,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         // Otherwise, blink the LED ON for a very short time.
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
-
-            /*
-            if (gIdentify.mActive)
-            {
-                sStatusLED.Blink(250, 250);
-            }
-            if (sIdentifyEffect != EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT)
-            {
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK)
-                {
-                    sStatusLED.Blink(50, 50);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE)
-                {
-                    sStatusLED.Blink(1000, 1000);
-                }
-                if (sIdentifyEffect == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY)
-                {
-                    sStatusLED.Blink(300, 700);
-                }
-            }
-            else */
-
             if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
@@ -315,7 +231,6 @@ void AppTask::AppTaskMain(void * pvParameter)
         }
 
         sStatusLED.Animate();
-        // sLightLED.Animate();
     }
 }
 
@@ -413,10 +328,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
         sStatusLED.Set(false);
-        // sLightLED.Set(false);
 
         sStatusLED.Blink(500);
-        // sLightLED.Blink(500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -464,9 +377,6 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
-            // Set Light status LED back to show state of light.
-            // sLightLED.Set(LightMgr().IsLightOn());
-
             sAppTask.CancelTimer();
 
             // Change the function to none selected since factory reset has been
@@ -515,12 +425,10 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     if (aAction == LightingManager::ON_ACTION)
     {
         EFR32_LOG("Turning light ON")
-        // sLightLED.Set(true);
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
         EFR32_LOG("Turning light OFF")
-        // sLightLED.Set(false);
     }
 
     if (aActor == AppEvent::kEventType_Button)
