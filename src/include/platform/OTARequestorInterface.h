@@ -58,6 +58,9 @@ public:
     // Send QueryImage command
     virtual OTATriggerResult TriggerImmediateQuery() = 0;
 
+    // Download image
+    virtual void DownloadUpdate() = 0;
+
     // Send ApplyImage command
     virtual void ApplyUpdate() = 0;
 
