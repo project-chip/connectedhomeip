@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.webos.service.matter
+Exec="/home/root/chip-tool-webos
+Type=static
