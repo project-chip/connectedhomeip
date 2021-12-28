@@ -83,7 +83,7 @@ Done
 
 The nRF Connect examples let you use several Matter-specific CLI commands.
 
-These commands are not included in the default Zephyr CLI, you need to set the
+These commands are not included in the default Zephyr CLI, set the
 `CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
 example to enable them.
 
