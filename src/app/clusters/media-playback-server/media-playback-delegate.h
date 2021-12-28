@@ -34,25 +34,25 @@ namespace MediaPlayback {
 class Delegate
 {
 public:
-    virtual PlaybackStateEnum HandleGetCurrentState() = 0;
-    virtual uint64_t HandleGetStartTime() = 0;
-    virtual uint64_t HandleGetDuration() = 0;
+    virtual PlaybackStateEnum HandleGetCurrentState()                  = 0;
+    virtual uint64_t HandleGetStartTime()                              = 0;
+    virtual uint64_t HandleGetDuration()                               = 0;
     virtual Structs::PlaybackPosition::Type HandleGetSampledPosition() = 0;
-    virtual float HandleGetPlaybackSpeed() = 0;
-    virtual uint64_t HandleGetSeekRangeStart() = 0;
-    virtual uint64_t HandleGetSeekRangeEnd() = 0;
+    virtual float HandleGetPlaybackSpeed()                             = 0;
+    virtual uint64_t HandleGetSeekRangeStart()                         = 0;
+    virtual uint64_t HandleGetSeekRangeEnd()                           = 0;
 
-    virtual Commands::PlaybackResponse::Type HandlePlay() = 0;
-    virtual Commands::PlaybackResponse::Type HandlePause() = 0;
-    virtual Commands::PlaybackResponse::Type HandleStop() = 0;
-    virtual Commands::PlaybackResponse::Type HandleFastForward() = 0;
-    virtual Commands::PlaybackResponse::Type HandlePrevious() = 0;
-    virtual Commands::PlaybackResponse::Type HandleRewind() = 0;
+    virtual Commands::PlaybackResponse::Type HandlePlay()                                                   = 0;
+    virtual Commands::PlaybackResponse::Type HandlePause()                                                  = 0;
+    virtual Commands::PlaybackResponse::Type HandleStop()                                                   = 0;
+    virtual Commands::PlaybackResponse::Type HandleFastForward()                                            = 0;
+    virtual Commands::PlaybackResponse::Type HandlePrevious()                                               = 0;
+    virtual Commands::PlaybackResponse::Type HandleRewind()                                                 = 0;
     virtual Commands::PlaybackResponse::Type HandleSkipBackward(const uint64_t & deltaPositionMilliseconds) = 0;
-    virtual Commands::PlaybackResponse::Type HandleSkipForward(const uint64_t & deltaPositionMilliseconds) = 0;
-    virtual Commands::PlaybackResponse::Type HandleSeekRequest(const uint64_t & positionMilliseconds) = 0;
-    virtual Commands::PlaybackResponse::Type HandleNext() = 0;
-    virtual Commands::PlaybackResponse::Type HandleStartOverRequest() = 0;
+    virtual Commands::PlaybackResponse::Type HandleSkipForward(const uint64_t & deltaPositionMilliseconds)  = 0;
+    virtual Commands::PlaybackResponse::Type HandleSeekRequest(const uint64_t & positionMilliseconds)       = 0;
+    virtual Commands::PlaybackResponse::Type HandleNext()                                                   = 0;
+    virtual Commands::PlaybackResponse::Type HandleStartOverRequest()                                       = 0;
 
     virtual ~Delegate() = default;
 };

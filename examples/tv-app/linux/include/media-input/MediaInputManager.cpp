@@ -20,7 +20,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList()
+std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()
 {
     std::list<Structs::InputInfo::Type> list;
     // TODO: Insert code here

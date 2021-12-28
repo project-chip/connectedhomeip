@@ -27,7 +27,6 @@ using namespace chip::app::Clusters::MediaPlayback;
 
 MediaPlaybackManager MediaPlaybackManager::sInstance;
 
-
 namespace {
 static MediaPlaybackManager mediaPlaybackManager;
 } // namespace
@@ -66,7 +65,7 @@ Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
 {
     Structs::PlaybackPosition::Type sampledPosition;
     sampledPosition.updatedAt = 0;
-    sampledPosition.position = 0;
+    sampledPosition.position  = 0;
     return sampledPosition;
 }
 
@@ -84,7 +83,6 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 {
     return 0;
 }
-
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
 {
@@ -141,7 +139,8 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
     return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
 }
 
-Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest,
+                                                                          uint64_t deltaPositionMilliseconds)
 {
     Commands::PlaybackResponse::Type response;
 

@@ -33,9 +33,9 @@ namespace AccountLogin {
 class Delegate
 {
 public:
-    virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString,  const chip::CharSpan & setupPinString) = 0;
-    virtual bool HandleLogout() = 0;
-    virtual Commands::GetSetupPINResponse::Type HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifierString) = 0;
+    virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) = 0;
+    virtual bool HandleLogout()                                                                                         = 0;
+    virtual Commands::GetSetupPINResponse::Type HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifierString)   = 0;
 
     virtual ~Delegate() = default;
 };

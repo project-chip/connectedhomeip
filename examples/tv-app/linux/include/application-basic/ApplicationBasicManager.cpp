@@ -21,37 +21,45 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-chip::CharSpan ApplicationBasicManager::HandleGetVendorName() {
+chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
+{
     return chip::CharSpan("exampleVendorName1", strlen("exampleVendorName1"));
 }
 
-uint16_t ApplicationBasicManager::HandleGetVendorId() {
+uint16_t ApplicationBasicManager::HandleGetVendorId()
+{
     return 1;
 }
 
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationName() {
+chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
+{
     return chip::CharSpan("exampleName1", strlen("exampleName1"));
 }
 
-uint16_t ApplicationBasicManager::HandleGetProductId() {
+uint16_t ApplicationBasicManager::HandleGetProductId()
+{
     return 1;
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication() {
+chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication()
+{
     chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
     application.catalogVendorId = 123;
-    application.applicationId = chip::CharSpan("applicationId", strlen("applicationId"));
+    application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
     return application;
 }
 
-ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus() {
+ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
+{
     return ApplicationStatusEnum::kStopped;
 }
 
-chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion() {
+chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
+{
     return chip::CharSpan("exampleVersion", strlen("exampleVersion"));
 }
 
-std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList() {
+std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()
+{
     return { 123, 456 };
 }

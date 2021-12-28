@@ -24,5 +24,6 @@ class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Dele
 public:
     std::list<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type> HandleGetTargetList() override;
     uint8_t HandleGetCurrentTarget() override;
-    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) override;
+    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type
+    HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) override;
 };

@@ -46,8 +46,7 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
     chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
 }
 
-
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInputManager::HandleGetInputList()
+std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()
 {
     std::list<Structs::InputInfo::Type> list;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -105,7 +104,6 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  MediaInput
             list.push_back(mediaInput);
         }
     }
-
 
 exit:
     if (err != CHIP_NO_ERROR)

@@ -34,12 +34,12 @@ namespace MediaInput {
 class Delegate
 {
 public:
-    virtual std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  HandleGetInputList() = 0;
-    virtual uint8_t HandleGetCurrentInput() = 0;
-    virtual bool HandleSelectInput(const uint8_t index) = 0;
-    virtual bool HandleShowInputStatus() = 0;
-    virtual bool HandleHideInputStatus() = 0;
-    virtual bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) = 0;
+    virtual std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> HandleGetInputList() = 0;
+    virtual uint8_t HandleGetCurrentInput()                                                           = 0;
+    virtual bool HandleSelectInput(const uint8_t index)                                               = 0;
+    virtual bool HandleShowInputStatus()                                                              = 0;
+    virtual bool HandleHideInputStatus()                                                              = 0;
+    virtual bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name)                  = 0;
 
     virtual ~Delegate() = default;
 };

@@ -34,11 +34,11 @@ namespace AudioOutput {
 class Delegate
 {
 public:
-    virtual uint8_t HandleGetCurrentOutput() = 0;
+    virtual uint8_t HandleGetCurrentOutput()                                                             = 0;
     virtual std::list<chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type> HandleGetOutputList() = 0;
 
     virtual bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) = 0;
-    virtual bool HandleSelectOutput(const uint8_t & index) = 0;
+    virtual bool HandleSelectOutput(const uint8_t & index)                              = 0;
 
     virtual ~Delegate() = default;
 };

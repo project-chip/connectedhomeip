@@ -25,7 +25,7 @@ class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type>  HandleGetInputList() override;
+    std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> HandleGetInputList() override;
     uint8_t HandleGetCurrentInput() override;
     bool HandleSelectInput(const uint8_t index) override;
     bool HandleShowInputStatus() override;

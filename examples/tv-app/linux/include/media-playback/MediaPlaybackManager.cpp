@@ -20,7 +20,6 @@
 using namespace std;
 using namespace chip::app::Clusters::MediaPlayback;
 
-
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
     return PlaybackStateEnum::kPlaying;
@@ -40,7 +39,7 @@ Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
 {
     Structs::PlaybackPosition::Type sampledPosition;
     sampledPosition.updatedAt = 0;
-    sampledPosition.position = 0;
+    sampledPosition.position  = 0;
     return sampledPosition;
 }
 
@@ -58,7 +57,6 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 {
     return 0;
 }
-
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
 {

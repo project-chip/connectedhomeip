@@ -46,7 +46,8 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
     chip::app::Clusters::WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
 }
 
-chip::CharSpan WakeOnLanManager::HandleGetMacAddress() {
+chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
+{
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -60,7 +61,8 @@ chip::CharSpan WakeOnLanManager::HandleGetMacAddress() {
     {
         env->ExceptionClear();
         jobject javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod, static_cast<jint>(1));
-        if (env->ExceptionCheck()) {
+        if (env->ExceptionCheck())
+        {
             ChipLogError(DeviceLayer, "Java exception in WakeOnLanManager::getMac");
             env->ExceptionDescribe();
             env->ExceptionClear();
@@ -68,7 +70,6 @@ chip::CharSpan WakeOnLanManager::HandleGetMacAddress() {
         }
 
         macValue = chip::JniUtfString(env, static_cast<jstring>(javaMac)).charSpan();
-
     }
 
 exit:

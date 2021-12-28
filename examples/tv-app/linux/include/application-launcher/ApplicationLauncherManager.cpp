@@ -25,8 +25,8 @@ Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
 {
     Structs::ApplicationEP::Type currentApp;
     currentApp.application.catalogVendorId = 123;
-    currentApp.application.applicationId = chip::CharSpan("applicationId", strlen("applicationId"));
-    currentApp.endpoint =  chip::CharSpan("endpointId", strlen("endpointId"));
+    currentApp.application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
+    currentApp.endpoint                    = chip::CharSpan("endpointId", strlen("endpointId"));
     return currentApp;
 }
 
@@ -35,30 +35,32 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
     return { 123, 456 };
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(const chip::CharSpan & data,
-                                                                             const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
+    const chip::CharSpan & data, const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data = chip::CharSpan("data", strlen("data"));
+    response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type
+ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data = chip::CharSpan("data", strlen("data"));
+    response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;
 }
 
-Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type
+ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
-    response.data = chip::CharSpan("data", strlen("data"));
+    response.data   = chip::CharSpan("data", strlen("data"));
     response.status = StatusEnum::kSuccess;
     return response;
 }

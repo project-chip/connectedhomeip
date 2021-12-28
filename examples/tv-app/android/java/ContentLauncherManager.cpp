@@ -40,8 +40,9 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
     chip::app::Clusters::ContentLauncher::SetDelegate(endpoint, &contentLauncherManager);
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
-                                                           bool autoplay, const chip::CharSpan & data)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                           const std::list<Parameter> & parameterList,
+                                                                           bool autoplay, const chip::CharSpan & data)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -93,8 +94,9 @@ exit:
     return response;
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                       const std::list<BrandingInformation> & brandingInformation)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
+                                                                       const chip::CharSpan & displayString,
+                                                                       const std::list<BrandingInformation> & brandingInformation)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;

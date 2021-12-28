@@ -16,19 +16,18 @@
  *    limitations under the License.
  */
 
+#include "include/tv-callbacks.h"
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
-#include "include/tv-callbacks.h"
 
 #include "AppMain.h"
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
-
 
 namespace {
 static LowPowerManager lowPowerManager;

@@ -21,6 +21,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
 
-chip::CharSpan WakeOnLanManager::HandleGetMacAddress() {
+chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
+{
     return chip::CharSpan("00:00:00:00:00", strlen("00:00:00:00:00"));
 }

@@ -21,11 +21,13 @@
 using namespace std;
 using namespace chip::app::Clusters::AudioOutput;
 
-uint8_t AudioOutputManager::HandleGetCurrentOutput() {
+uint8_t AudioOutputManager::HandleGetCurrentOutput()
+{
     return 0;
 }
 
-std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList() {
+std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList()
+{
     std::list<Structs::OutputInfo::Type> list;
     // TODO: Insert code here
     int maximumVectorSize = 3;
@@ -41,12 +43,14 @@ std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList() {
     return list;
 }
 
-bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) {
+bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
+{
     // TODO: Insert code here
     return true;
 }
 
-bool AudioOutputManager::HandleSelectOutput(const uint8_t & index) {
+bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
+{
     // TODO: Insert code here
     return true;
 }

@@ -21,8 +21,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/account-login-server/account-login-server.h>
 #include <app/clusters/account-login-server/account-login-delegate.h>
+#include <app/clusters/account-login-server/account-login-server.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
@@ -88,8 +88,8 @@ bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * 
                                                           const app::ConcreteCommandPath & commandPath,
                                                           const Commands::GetSetupPINRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -97,7 +97,7 @@ bool emberAfAccountLoginClusterGetSetupPINRequestCallback(app::CommandHandler * 
 
     {
         Commands::GetSetupPINResponse::Type response = delegate->HandleGetSetupPin(tempAccountIdentifier);
-        err = command->AddResponseData(commandPath, response);
+        err                                          = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -115,37 +115,35 @@ exit:
 bool emberAfAccountLoginClusterLoginRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::LoginRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    EndpointId endpoint          = commandPath.mEndpointId;
     auto & tempAccountIdentifier = commandData.tempAccountIdentifier;
-    auto & setupPin          = commandData.setupPIN;
+    auto & setupPin              = commandData.setupPIN;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    exit:
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLoginRequestCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    bool isLoggedIn = delegate->HandleLogin(tempAccountIdentifier, setupPin);
+    bool isLoggedIn      = delegate->HandleLogin(tempAccountIdentifier, setupPin);
     EmberAfStatus status = isLoggedIn ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-
-bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj,
-                                                     const app::ConcreteCommandPath & commandPath,
+bool emberAfAccountLoginClusterLogoutRequestCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::LogoutRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-    exit:
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAccountLoginClusterLogoutRequestCallback error: %s", err.AsString());

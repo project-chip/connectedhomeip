@@ -237,12 +237,13 @@ CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder &
     });
 }
 
-app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNavigator::NavigateTarget(uint8_t target, std::string data)
+app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNavigator::NavigateTarget(uint8_t target,
+                                                                                                       std::string data)
 {
     ChipLogProgress(DeviceLayer, "TargetNavigator: NavigateTarget target=%d data=\"%s\"", target, data.c_str());
 
     app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type response;
-    response.data   = chip::CharSpan("data response", strlen("data response"));
+    response.data = chip::CharSpan("data response", strlen("data response"));
 
     if (target >= mTargets.size())
     {

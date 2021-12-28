@@ -23,5 +23,6 @@
 class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
 public:
-    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
+    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 };
