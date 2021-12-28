@@ -101,7 +101,7 @@ void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * 
     /*
 void OnTriggerIdentifyEffect(Identify * identify)
 {
-    
+
     sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
     if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
@@ -131,7 +131,7 @@ void OnTriggerIdentifyEffect(Identify * identify)
     default:
         ChipLogProgress(Zcl, "No identifier effect");
     }
-    
+
 }
     */
 
@@ -278,7 +278,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (sAppTask.mFunction != kFunction_FactoryReset)
         {
 
-            /*  
+            /*
             if (gIdentify.mActive)
             {
                 sStatusLED.Blink(250, 250);
@@ -604,7 +604,7 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState(void)
 {
- 
 
-   
+
+
 }
