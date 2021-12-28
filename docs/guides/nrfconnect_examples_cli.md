@@ -83,9 +83,9 @@ Done
 
 The nRF Connect examples let you use several Matter-specific CLI commands.
 
-These commands are not available by default and to enable using them, set the
+These commands are not included in the default Zephyr CLI, you need to set the
 `CONFIG_CHIP_LIB_SHELL=y` Kconfig option in the `prj.conf` file of the given
-example.
+example to enable them.
 
 Every invoked command must be preceded by the `matter` prefix.
 
@@ -103,7 +103,7 @@ Performs device factory reset that is hardware reset preceded by erasing of the
 whole Matter settings stored in a non-volatile memory.
 
 ```shell
-uart:~$ matter factoryreset
+uart:~$ matter device factoryreset
 Performing factory reset ...
 ```
 
