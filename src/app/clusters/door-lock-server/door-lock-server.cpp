@@ -31,6 +31,7 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/time-util.h>
+#include <cinttypes>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
@@ -122,14 +123,12 @@ bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLa
 
 bool DoorLockServer::SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec)
 {
-    auto autoRelockTimeSec = static_cast<uint32_t>(newAutoRelockTimeSec);
-
-    emberAfDoorLockClusterPrintln("Setting Auto Relock Time to '%u'", autoRelockTimeSec);
-    auto status = Attributes::AutoRelockTime::Set(endpointId, autoRelockTimeSec);
+    emberAfDoorLockClusterPrintln("Setting Auto Relock Time to '" PRIu32 "'", newAutoRelockTimeSec);
+    auto status = Attributes::AutoRelockTime::Set(endpointId, newAutoRelockTimeSec);
 
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        ChipLogError(Zcl, "Unable to set the Auto Relock Time to %u: internal error", autoRelockTimeSec);
+        ChipLogError(Zcl, "Unable to set the Auto Relock Time to " PRIu32 ": internal error", newAutoRelockTimeSec);
     }
 
     return status == EMBER_ZCL_STATUS_SUCCESS;
