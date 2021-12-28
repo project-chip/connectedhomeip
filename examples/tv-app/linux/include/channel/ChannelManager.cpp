@@ -20,7 +20,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::Channel;
 
-std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList() 
+std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
     std::list<Structs::ChannelInfo::Type> list;
     // TODO: Insert code here
@@ -39,7 +39,7 @@ std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManag
     return list;
 }
 
-chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup() 
+chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup()
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineup;
     lineup.operatorName   = chip::CharSpan("operatorName", strlen("operatorName"));
@@ -49,7 +49,7 @@ chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGe
     return lineup;
 }
 
-chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel() 
+chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel()
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type currentChannel;
     currentChannel.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
@@ -60,7 +60,7 @@ chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleG
     return currentChannel;
 }
 
-Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match) 
+Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match)
 {
     Commands::ChangeChannelResponse::Type response;
     response.channelMatch.majorNumber       = 1;
@@ -72,12 +72,12 @@ Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const 
     return response;
 }
 
-bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) 
+bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
     // TODO: Insert code here
     return true;
 }
-bool ChannelManager::HandleSkipChannel(const uint16_t & count) 
+bool ChannelManager::HandleSkipChannel(const uint16_t & count)
 {
     // TODO: Insert code here
     return true;

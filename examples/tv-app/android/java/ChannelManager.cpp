@@ -28,7 +28,7 @@ namespace {
 static ChannelManager channelManager;
 } // namespace
 
-std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList() 
+std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
     std::list<Structs::ChannelInfo::Type> list;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -93,7 +93,7 @@ exit:
     return list;
 }
 
-chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup() 
+chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup()
 {
     chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -135,7 +135,6 @@ chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGe
         jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
         jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
         lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
-
     }
 
 exit:
@@ -147,7 +146,7 @@ exit:
     return lineupInfo;
 }
 
-chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel() 
+chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel()
 {
     chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -203,14 +202,14 @@ exit:
     return channelInfo;
 }
 
-Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match) 
-{   
+Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match)
+{
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     Commands::ChangeChannelResponse::Type response;
-    response.channelMatch.majorNumber       = 0;
-    response.channelMatch.minorNumber       = 0;
+    response.channelMatch.majorNumber = 0;
+    response.channelMatch.minorNumber = 0;
 
     ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
     VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
@@ -254,12 +253,12 @@ Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const 
             response.channelMatch.callSign = affiliateCallSign.charSpan();
         }
 
-        jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
-        jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
+        jfieldID majorNumField            = env->GetFieldID(channelClass, "majorNumber", "I");
+        jint jmajorNum                    = env->GetIntField(channelObject, majorNumField);
         response.channelMatch.majorNumber = static_cast<uint16_t>(jmajorNum);
 
-        jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
-        jint jminorNum          = env->GetIntField(channelObject, minorNumField);
+        jfieldID minorNumField            = env->GetFieldID(channelClass, "minorNumber", "I");
+        jint jminorNum                    = env->GetIntField(channelObject, minorNumField);
         response.channelMatch.majorNumber = static_cast<uint16_t>(jminorNum);
     }
 
@@ -268,7 +267,7 @@ exit:
     return response;
 }
 
-bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) 
+bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -295,7 +294,7 @@ exit:
     return static_cast<bool>(ret);
 }
 
-bool ChannelManager::HandleSkipChannel(const uint16_t & count) 
+bool ChannelManager::HandleSkipChannel(const uint16_t & count)
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -374,9 +373,7 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
     }
 }
 
-
 ChannelManager ChannelManager::sInstance;
-
 
 /** @brief Channel  Cluster Init
  *

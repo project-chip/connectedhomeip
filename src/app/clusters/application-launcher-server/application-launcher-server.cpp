@@ -22,8 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -153,22 +153,21 @@ CHIP_ERROR ApplicationLauncherAttrAccess::ReadCurrentAppAttribute(app::Attribute
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-
 bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandler * command,
                                                                const app::ConcreteCommandPath & commandPath,
                                                                const Commands::LaunchAppRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & data        = commandData.data;
-    auto & application = commandData.application;
+    auto & data         = commandData.data;
+    auto & application  = commandData.application;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Commands::LauncherResponse::Type response = delegate->HandleLaunchApp(data, application);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -189,16 +188,16 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::StopAppRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & application = commandData.application;
+    auto & application  = commandData.application;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Commands::LauncherResponse::Type response = delegate->HandleStopApp(application);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -219,16 +218,16 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
                                                              const app::ConcreteCommandPath & commandPath,
                                                              const Commands::HideAppRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & application = commandData.application;
+    auto & application  = commandData.application;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Commands::LauncherResponse::Type response = delegate->HandleHideApp(application);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -241,7 +240,6 @@ exit:
 
     return true;
 }
-
 
 // -----------------------------------------------------------------------------
 // Plugin initialization

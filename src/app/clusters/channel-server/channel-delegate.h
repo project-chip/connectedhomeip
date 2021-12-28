@@ -35,12 +35,12 @@ class Delegate
 {
 public:
     virtual std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> HandleGetChannelList() = 0;
-    virtual chip::app::Clusters::Channel::Structs::LineupInfo::Type HandleGetLineup() = 0;
-    virtual chip::app::Clusters::Channel::Structs::ChannelInfo::Type HandleGetCurrentChannel() = 0;
+    virtual chip::app::Clusters::Channel::Structs::LineupInfo::Type HandleGetLineup()                  = 0;
+    virtual chip::app::Clusters::Channel::Structs::ChannelInfo::Type HandleGetCurrentChannel()         = 0;
 
-    virtual Commands::ChangeChannelResponse::Type HandleChangeChannel(const chip::CharSpan & match) = 0;
+    virtual Commands::ChangeChannelResponse::Type HandleChangeChannel(const chip::CharSpan & match)      = 0;
     virtual bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) = 0;
-    virtual bool HandleSkipChannel(const uint16_t & count) = 0;
+    virtual bool HandleSkipChannel(const uint16_t & count)                                               = 0;
 
     virtual ~Delegate() = default;
 };

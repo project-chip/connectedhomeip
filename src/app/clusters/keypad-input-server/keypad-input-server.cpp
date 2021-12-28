@@ -21,8 +21,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/keypad-input-server/keypad-input-server.h>
 #include <app/clusters/keypad-input-server/keypad-input-delegate.h>
+#include <app/clusters/keypad-input-server/keypad-input-server.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -80,23 +80,21 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace app
 } // namespace chip
 
-
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * command, 
-                                                     const app::ConcreteCommandPath & commandPath,
+bool emberAfKeypadInputClusterSendKeyRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::SendKeyRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & keyCode = commandData.keyCode;
+    auto & keyCode      = commandData.keyCode;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
         Commands::SendKeyResponse::Type response = delegate->HandleSendKey(keyCode);
-        err = command->AddResponseData(commandPath, response);
+        err                                      = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 

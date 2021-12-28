@@ -22,8 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/application-basic-server/application-basic-server.h>
 #include <app/clusters/application-basic-server/application-basic-delegate.h>
+#include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/data-model/Encode.h>
@@ -153,7 +153,6 @@ CHIP_ERROR ApplicationBasicAttrAccess::Read(const app::ConcreteReadAttributePath
     return CHIP_NO_ERROR;
 }
 
-
 CHIP_ERROR ApplicationBasicAttrAccess::ReadVendorNameAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
     chip::CharSpan vendorName = delegate->HandleGetVendorName();
@@ -213,7 +212,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::Attri
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
-void MatterApplicationBasicPluginServerInitCallback() 
+void MatterApplicationBasicPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gApplicationBasicAttrAccess);
 }

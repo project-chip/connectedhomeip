@@ -22,8 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/target-navigator-server/target-navigator-server.h>
 #include <app/clusters/target-navigator-server/target-navigator-delegate.h>
+#include <app/clusters/target-navigator-server/target-navigator-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -82,7 +82,6 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
 
 // -----------------------------------------------------------------------------
 // Attribute Accessor Implementation
@@ -158,17 +157,17 @@ bool emberAfTargetNavigatorClusterNavigateTargetRequestCallback(app::CommandHand
                                                                 const app::ConcreteCommandPath & commandPath,
                                                                 const Commands::NavigateTargetRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & target = commandData.target;
-    auto & data   = commandData.data;
+    auto & target       = commandData.target;
+    auto & data         = commandData.data;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
         Commands::NavigateTargetResponse::Type response = delegate->HandleNavigateTarget(target, data);
-        err = command->AddResponseData(commandPath, response);
+        err                                             = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -182,7 +181,7 @@ exit:
     return true;
 }
 
-void MatterTargetNavigatorPluginServerInitCallback() 
+void MatterTargetNavigatorPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
 }

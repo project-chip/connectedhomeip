@@ -51,12 +51,13 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
-    } else {
+    }
+    else
+    {
         response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
     }
     return response;
 }
-
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 {
@@ -76,7 +77,6 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 }
-
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {

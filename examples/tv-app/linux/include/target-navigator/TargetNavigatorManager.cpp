@@ -29,7 +29,7 @@ std::list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList
     for (int i = 0; i < maximumVectorSize; ++i)
     {
         Structs::TargetInfo::Type outputInfo;
-        outputInfo.identifier = static_cast<uint8_t>(i+1);
+        outputInfo.identifier = static_cast<uint8_t>(i + 1);
         outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
         list.push_back(outputInfo);
     }
@@ -41,7 +41,8 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return 0;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data)
+Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target,
+                                                                                    const chip::CharSpan & data)
 {
     // TODO: Insert code here
     Commands::NavigateTargetResponse::Type response;

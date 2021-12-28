@@ -21,8 +21,9 @@
 using namespace std;
 using namespace chip::app::Clusters::ContentLauncher;
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
-                                                           bool autoplay, const chip::CharSpan & data)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                           const std::list<Parameter> & parameterList,
+                                                                           bool autoplay, const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
     string dataString(data.data(), data.size());
@@ -42,8 +43,9 @@ Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip:
     return response;
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                       const std::list<BrandingInformation> & brandingInformation)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
+                                                                       const chip::CharSpan & displayString,
+                                                                       const std::list<BrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 

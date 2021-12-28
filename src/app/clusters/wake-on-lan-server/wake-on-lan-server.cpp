@@ -22,9 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-
-#include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 #include <app/clusters/wake-on-lan-server/wake-on-lan-delegate.h>
+#include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -92,9 +91,7 @@ namespace {
 class WakeOnLanAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    WakeOnLanAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::WakeOnLan::Id)
-    {}
+    WakeOnLanAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::WakeOnLan::Id) {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
 
@@ -135,7 +132,7 @@ CHIP_ERROR WakeOnLanAttrAccess::ReadMacAddressAttribute(app::AttributeValueEncod
 
 } // anonymous namespace
 
-void MatterWakeOnLanPluginServerInitCallback() 
+void MatterWakeOnLanPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gWakeOnLanAttrAccess);
 }

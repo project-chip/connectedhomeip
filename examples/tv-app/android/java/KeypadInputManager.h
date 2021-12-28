@@ -25,7 +25,8 @@ class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
+    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 
 private:
     friend KeypadInputManager & KeypadInputMgr();

@@ -22,8 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app/clusters/media-playback-server/media-playback-delegate.h>
+#include <app/clusters/media-playback-server/media-playback-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -194,15 +194,13 @@ CHIP_ERROR MediaPlaybackAttrAccess::ReadSeekRangeEndAttribute(app::AttributeValu
 
 } // anonymous namespace
 
-
-
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
 bool emberAfMediaPlaybackClusterPlayRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::PlayRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -210,7 +208,7 @@ bool emberAfMediaPlaybackClusterPlayRequestCallback(app::CommandHandler * comman
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandlePlay();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -224,11 +222,10 @@ exit:
     return true;
 }
 
-
 bool emberAfMediaPlaybackClusterPauseRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::PauseRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -236,7 +233,7 @@ bool emberAfMediaPlaybackClusterPauseRequestCallback(app::CommandHandler * comma
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandlePause();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -253,7 +250,7 @@ exit:
 bool emberAfMediaPlaybackClusterStopRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::StopRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -261,7 +258,7 @@ bool emberAfMediaPlaybackClusterStopRequestCallback(app::CommandHandler * comman
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleStop();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -279,7 +276,7 @@ bool emberAfMediaPlaybackClusterFastForwardRequestCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::FastForwardRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -287,7 +284,7 @@ bool emberAfMediaPlaybackClusterFastForwardRequestCallback(app::CommandHandler *
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleFastForward();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -304,7 +301,7 @@ exit:
 bool emberAfMediaPlaybackClusterPreviousRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::PreviousRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -312,7 +309,7 @@ bool emberAfMediaPlaybackClusterPreviousRequestCallback(app::CommandHandler * co
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandlePrevious();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -329,7 +326,7 @@ exit:
 bool emberAfMediaPlaybackClusterRewindRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                       const Commands::RewindRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -337,7 +334,7 @@ bool emberAfMediaPlaybackClusterRewindRequestCallback(app::CommandHandler * comm
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleRewind();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -351,12 +348,11 @@ exit:
     return true;
 }
 
-
 bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback(app::CommandHandler * command,
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::SkipBackwardRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & deltaPositionMilliseconds = commandData.deltaPositionMilliseconds;
@@ -366,7 +362,7 @@ bool emberAfMediaPlaybackClusterSkipBackwardRequestCallback(app::CommandHandler 
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleSkipBackward(deltaPositionMilliseconds);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -384,8 +380,8 @@ bool emberAfMediaPlaybackClusterSkipForwardRequestCallback(app::CommandHandler *
                                                            const app::ConcreteCommandPath & commandPath,
                                                            const Commands::SkipForwardRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    EndpointId endpoint              = commandPath.mEndpointId;
     auto & deltaPositionMilliseconds = commandData.deltaPositionMilliseconds;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -393,7 +389,7 @@ bool emberAfMediaPlaybackClusterSkipForwardRequestCallback(app::CommandHandler *
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleSkipForward(deltaPositionMilliseconds);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -410,8 +406,8 @@ exit:
 bool emberAfMediaPlaybackClusterSeekRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::SeekRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    EndpointId endpoint = commandPath.mEndpointId;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    EndpointId endpoint         = commandPath.mEndpointId;
     auto & positionMilliseconds = commandData.position;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -419,7 +415,7 @@ bool emberAfMediaPlaybackClusterSeekRequestCallback(app::CommandHandler * comman
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleSeekRequest(positionMilliseconds);
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -436,7 +432,7 @@ exit:
 bool emberAfMediaPlaybackClusterNextRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::NextRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -444,7 +440,7 @@ bool emberAfMediaPlaybackClusterNextRequestCallback(app::CommandHandler * comman
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleNext();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -462,7 +458,7 @@ bool emberAfMediaPlaybackClusterStartOverRequestCallback(app::CommandHandler * c
                                                          const app::ConcreteCommandPath & commandPath,
                                                          const Commands::StartOverRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     Delegate * delegate = GetDelegate(endpoint);
@@ -470,7 +466,7 @@ bool emberAfMediaPlaybackClusterStartOverRequestCallback(app::CommandHandler * c
 
     {
         Commands::PlaybackResponse::Type response = delegate->HandleStartOverRequest();
-        err = command->AddResponseData(commandPath, response);
+        err                                       = command->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -484,7 +480,7 @@ exit:
     return true;
 }
 
-void MatterMediaPlaybackPluginServerInitCallback() 
+void MatterMediaPlaybackPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gMediaPlaybackAttrAccess);
 }

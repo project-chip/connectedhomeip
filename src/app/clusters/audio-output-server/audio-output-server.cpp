@@ -22,8 +22,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/audio-output-server/audio-output-server.h>
 #include <app/clusters/audio-output-server/audio-output-delegate.h>
+#include <app/clusters/audio-output-server/audio-output-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -90,8 +90,7 @@ namespace {
 class AudioOutputAttrAccess : public app::AttributeAccessInterface
 {
 public:
-    AudioOutputAttrAccess() :
-        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::AudioOutput::Id)
+    AudioOutputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::AudioOutput::Id)
     {}
 
     CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
@@ -156,22 +155,22 @@ bool emberAfAudioOutputClusterRenameOutputRequestCallback(app::CommandHandler * 
                                                           const app::ConcreteCommandPath & commandPath,
                                                           const Commands::RenameOutputRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & index = commandData.index;
-    auto & name  = commandData.name;
+    auto & index        = commandData.index;
+    auto & name         = commandData.name;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    exit:
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAudioOutputClusterRenameOutputRequestCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    bool success = delegate->HandleRenameOutput(index, name);
+    bool success         = delegate->HandleRenameOutput(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
@@ -181,27 +180,27 @@ bool emberAfAudioOutputClusterSelectOutputRequestCallback(app::CommandHandler * 
                                                           const app::ConcreteCommandPath & commandPath,
                                                           const Commands::SelectOutputRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
-    auto & index = commandData.index;
+    auto & index        = commandData.index;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
-    exit:
+exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfAudioOutputClusterSelectOutputRequestCallback error: %s", err.AsString());
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
-    bool success = delegate->HandleSelectOutput(index);
+    bool success         = delegate->HandleSelectOutput(index);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-void MatterAudioOutputPluginServerInitCallback() 
+void MatterAudioOutputPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAudioOutputAttrAccess);
 }

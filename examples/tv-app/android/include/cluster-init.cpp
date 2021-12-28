@@ -38,7 +38,6 @@ static AudioOutputManager audioOutputManager;
 static TargetNavigatorManager targetNavigatorManager;
 } // namespace
 
-
 /** @brief Application Basic Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -53,7 +52,6 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
     ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
     chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
-
 
 /** @brief Application Launcher  Cluster Init
  *
@@ -70,7 +68,6 @@ void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
     chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
 
-
 /** @brief Audio Output Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -85,7 +82,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
     ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
     chip::app::Clusters::AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
 }
-
 
 /** @brief Target Navigator Cluster Init
  *

@@ -38,8 +38,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/content-launch-server/content-launch-server.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
@@ -160,7 +160,8 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptHeaderAttribute(app::AttributeVa
     });
 }
 
-CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder,
+                                                                               Delegate * delegate)
 {
     uint32_t streamingProtocols = delegate->HandleGetSupportedStreamingProtocols();
     return aEncoder.Encode(streamingProtocols);
@@ -175,7 +176,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & autoplay = commandData.autoPlay;
@@ -189,7 +190,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
 
     {
         Commands::LaunchResponse::Type response = delegate->HandleLaunchContent(endpoint, parameterList, autoplay, data);
-        err = commandObj->AddResponseData(commandPath, response);
+        err                                     = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
@@ -208,7 +209,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & contentUrl    = commandData.contentURL;
@@ -222,7 +223,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
 
     {
         Commands::LaunchResponse::Type response = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
-        err = commandObj->AddResponseData(commandPath, response);
+        err                                     = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 

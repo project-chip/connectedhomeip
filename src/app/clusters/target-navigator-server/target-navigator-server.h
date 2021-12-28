@@ -16,8 +16,8 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
+ * @brief Routines for the Target Navigator plugin, the
+ *server implementation of the Target Navigator cluster.
  *******************************************************************************
  ******************************************************************************/
 

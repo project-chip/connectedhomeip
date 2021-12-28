@@ -75,7 +75,6 @@ exit:
     return static_cast<bool>(ret);
 }
 
-
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App: LowPower::SetDefaultDelegate");

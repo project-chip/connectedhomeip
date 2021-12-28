@@ -54,12 +54,16 @@ public:
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleFastForward() override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePrevious() override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleRewind() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleSkipBackward(const uint64_t & deltaPositionMilliseconds) override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleSkipForward(const uint64_t & deltaPositionMilliseconds) override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleSeekRequest(const uint64_t & positionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSkipBackward(const uint64_t & deltaPositionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSkipForward(const uint64_t & deltaPositionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSeekRequest(const uint64_t & positionMilliseconds) override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleNext() override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStartOverRequest() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
 private:
     friend MediaPlaybackManager & MediaPlaybackMgr();
@@ -74,5 +78,3 @@ inline MediaPlaybackManager & MediaPlaybackMgr()
 {
     return MediaPlaybackManager::sInstance;
 }
-
-

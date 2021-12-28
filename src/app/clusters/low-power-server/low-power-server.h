@@ -16,8 +16,8 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Keypad Input plugin, the
- *server implementation of the Keypad Input cluster.
+ * @brief Routines for the Low Power plugin, the
+ *server implementation of the Low Power cluster.
  *******************************************************************************
  ******************************************************************************/
 
