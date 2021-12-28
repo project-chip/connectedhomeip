@@ -16,24 +16,23 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
+ * @brief Routines for the Wake on LAN plugin, the
+ *server implementation of the Wake on LAN cluster.
  *******************************************************************************
  ******************************************************************************/
 
 #pragma once
 
-#include "target-navigator-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include "wake-on-lan-delegate.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TargetNavigator {
+namespace WakeOnLan {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-} // namespace TargetNavigator
+} // namespace WakeOnLan
 } // namespace Clusters
 } // namespace app
 } // namespace chip

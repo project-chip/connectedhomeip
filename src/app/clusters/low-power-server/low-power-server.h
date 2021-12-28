@@ -16,24 +16,23 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
+ * @brief Routines for the Keypad Input plugin, the
+ *server implementation of the Keypad Input cluster.
  *******************************************************************************
  ******************************************************************************/
 
 #pragma once
 
-#include "target-navigator-delegate.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include "low-power-delegate.h"
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TargetNavigator {
+namespace LowPower {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-} // namespace TargetNavigator
+} // namespace LowPower
 } // namespace Clusters
 } // namespace app
 } // namespace chip

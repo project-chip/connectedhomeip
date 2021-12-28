@@ -19,7 +19,6 @@
 
 #include "content-launch-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
-#include <lib/support/Span.h>
 
 namespace chip {
 namespace app {

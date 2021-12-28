@@ -16,24 +16,24 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
+ * @brief Routines for the Media Input plugin, the
+ *server implementation of the Media Input cluster.
  *******************************************************************************
  ******************************************************************************/
 
 #pragma once
 
-#include "target-navigator-delegate.h"
+#include "media-input-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TargetNavigator {
+namespace MediaInput {
 
 void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-} // namespace TargetNavigator
+} // namespace MediaInput
 } // namespace Clusters
 } // namespace app
 } // namespace chip

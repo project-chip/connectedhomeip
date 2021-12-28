@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,26 +15,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/****************************************************************************
- * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
- *******************************************************************************
- ******************************************************************************/
 
 #pragma once
 
-#include "target-navigator-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/util/af.h>
+#include <list>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TargetNavigator {
+namespace ApplicationBasic {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+/** @brief
+ *    Defines methods for implementing application-specific logic for the Application Basic Cluster.
+ */
+class Delegate
+{
+public:
+    virtual chip::CharSpan HandleGetVendorName() = 0;
+    virtual uint16_t HandleGetVendorId() = 0;
+    virtual chip::CharSpan HandleGetApplicationName() = 0;
+    virtual uint16_t HandleGetProductId() = 0;
+    virtual chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication() = 0;
+    virtual ApplicationStatusEnum HandleGetStatus() = 0;
+    virtual chip::CharSpan HandleGetApplicationVersion() = 0;
+    virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;
 
-} // namespace TargetNavigator
+    virtual ~Delegate() = default;
+};
+
+} // namespace ApplicationBasic
 } // namespace Clusters
 } // namespace app
 } // namespace chip

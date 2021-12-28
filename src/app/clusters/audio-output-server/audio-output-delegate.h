@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -14,26 +15,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/****************************************************************************
- * @file
- * @brief Routines for the Media Playback plugin, the
- *server implementation of the Media Playback cluster.
- *******************************************************************************
- ******************************************************************************/
 
 #pragma once
 
-#include "target-navigator-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
+
+#include <app/util/af.h>
+#include <list>
 
 namespace chip {
 namespace app {
 namespace Clusters {
-namespace TargetNavigator {
+namespace AudioOutput {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+/** @brief
+ *    Defines methods for implementing application-specific logic for the Audio Output Cluster.
+ */
+class Delegate
+{
+public:
+    virtual uint8_t HandleGetCurrentOutput() = 0;
+    virtual std::list<chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type> HandleGetOutputList() = 0;
 
-} // namespace TargetNavigator
+    virtual bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) = 0;
+    virtual bool HandleSelectOutput(const uint8_t & index) = 0;
+
+    virtual ~Delegate() = default;
+};
+
+} // namespace AudioOutput
 } // namespace Clusters
 } // namespace app
 } // namespace chip
