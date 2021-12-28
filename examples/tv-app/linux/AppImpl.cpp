@@ -190,7 +190,8 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
+chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
+ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -198,21 +199,20 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
                     "application.applicationId=%s data=%s",
                     application.catalogVendorId, appId.c_str(), data.c_str());
 
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
 }
 
-LaunchResponse ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
+chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+ContentLauncherImpl::LaunchContent(std::list<Parameter> parameterList, bool autoplay, std::string data)
 {
     ChipLogProgress(DeviceLayer, "ContentLauncherImpl: LaunchContent autoplay=%d data=\"%s\"", autoplay ? 1 : 0, data.c_str());
 
-    LaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
-    response.data   = "Example app data";
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
