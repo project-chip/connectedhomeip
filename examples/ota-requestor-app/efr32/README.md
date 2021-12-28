@@ -63,27 +63,33 @@ See examples/lighting-app/efr32/README.md
 
 ## Running the OTA Download scenario
 
-Bring up the Open Thread Border Router as discussed in examples/lighting-app/efr32/README.md
+-   Bring up the Open Thread Border Router as discussed in examples/lighting-app/efr32/README.md
 and get its operational dataset.
 
-On a Linux or Darwin platform build the chip-tool and the ota-provider-app as follows:
+-   On a Linux or Darwin platform build the chip-tool and the ota-provider-app as follows:
+
            scripts/examples/gn_build_example.sh examples/chip-tool out/
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 
-In a terminal start the provider app passing to it the path to the image file that the Requestor is
+-   In a terminal start the provider app passing to it the path to the image file that the Requestor is
 supposed to download (for example /tmp/ota.out):
+
             ./out/debug/chip-ota-provider-app -f /tmp/ota.out
 
-In a separate terminal run the chip-tool commands to provision the Provider:
-            rm -r /tmp/chip_*  
+-  In a separate terminal run the chip-tool commands to provision the Provider:
+
+            rm -r /tmp/chip_*
             ./out/chip-tool pairing onnetwork 1 20202021
 
-If the Requestor had been previously commissioned hold Button 0 for six seconds to factory-reset
-the device.
+-   If the Requestor had been previously commissioned hold Button 0 for six seconds to factory-reset the device.
 
-In the chip-tool terminal enter:
+-   In the chip-tool terminal enter:
+
             ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 73141520   3840
+
 where operationalDataset is obtained from the  Open Thread Border Router.
-Once the commissioning process completes enter:
+-   Once the commissioning process completes enter:
+
             ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
-The Requestor will connect to the Provider and start the image download.
+
+-   The Requestor will connect to the Provider and start the image download.
