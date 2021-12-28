@@ -65,7 +65,7 @@ static_library("EFR32") {
       "OTARequestorDriverImpl.h",
     ]
   }
-  
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   # Add pigweed KVS
