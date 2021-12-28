@@ -33,7 +33,7 @@ tests:
       command: "readAttribute"
       attribute: "start time"
       response:
-          value: 255
+          value: 0
 
     - label: "Read attribute duration"
       command: "readAttribute"
