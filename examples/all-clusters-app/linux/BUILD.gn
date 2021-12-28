@@ -20,8 +20,8 @@ executable("chip-all-clusters-app") {
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/ota-requestor-stub.cpp",
     "${chip_root}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp",
-    "include/tv-callbacks.h",
     "include/tv-callbacks.cpp",
+    "include/tv-callbacks.h",
     "main.cpp",
   ]
 
