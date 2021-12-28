@@ -22,9 +22,10 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "tv-callbacks.h"
+#include <app/clusters/low-power-server/low-power-server.h>
 
-bool LowPowerManager::HandleSleep() 
+class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
-    return true;
-}
+public:
+    bool HandleSleep() override;
+};

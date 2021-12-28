@@ -29831,7 +29831,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value)
     Traits::StorageType storageValue;
     Traits::WorkingToStorage(value, storageValue);
     uint8_t * writable = Traits::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_INT64U_ATTRIBUTE_TYPE);
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_EPOCH_US_ATTRIBUTE_TYPE);
 }
 
 } // namespace StartTime

@@ -21,12 +21,18 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/util/af.h>
 #include <platform/Linux/NetworkCommissioningDriver.h>
+#include "include/tv-callbacks.h"
 
 #include "AppMain.h"
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
+
+
+namespace {
+static LowPowerManager lowPowerManager;
+} // namespace
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
@@ -107,4 +113,10 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }
