@@ -36,7 +36,7 @@ tests:
           value: 0
 
     - label: "Launch Content Command"
-      command: "LaunchContent"
+      command: "launchContentRequest"
       arguments:
           values:
               - name: "autoPlay"
@@ -54,11 +54,11 @@ tests:
           values:
               - name: "data"
                 value: "exampleData"
-              - name: "contentLaunchStatus"
+              - name: "status"
                 value: 0
 
     - label: "Launch URL Command"
-      command: "LaunchURL"
+      command: "launchURLRequest"
       arguments:
           values:
               - name: "contentURL"
@@ -104,5 +104,5 @@ tests:
           values:
               - name: "data"
                 value: "exampleData"
-              - name: "contentLaunchStatus"
+              - name: "status"
                 value: 0

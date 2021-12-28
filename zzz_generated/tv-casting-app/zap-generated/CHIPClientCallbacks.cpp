@@ -156,7 +156,7 @@ void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::T
 void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -219,7 +219,7 @@ void ContentLauncherClusterAcceptHeaderListListAttributeFilter(TLV::TLVReader * 
 void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -241,8 +241,7 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
                                                                   Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType>
-        list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -258,247 +257,4 @@ void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader
     Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * cb =
         Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
-}
-
-bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                           chip::CharSpan setupPIN)
-{
-    ChipLogProgress(Zcl, "GetSetupPINResponse:");
-    ChipLogProgress(Zcl, "  setupPIN: %.*s", static_cast<int>(setupPIN.size()), setupPIN.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("AccountLoginClusterGetSetupPINResponseCallback");
-
-    Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback> * cb =
-        Callback::Callback<AccountLoginClusterGetSetupPINResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, setupPIN);
-    return true;
-}
-
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "LaunchAppResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLaunchAppResponseCallback");
-
-    Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback> * cb =
-        Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status, data);
-    return true;
-}
-
-bool emberAfChannelClusterChangeChannelResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj,
-    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType)
-{
-    ChipLogProgress(Zcl, "ChangeChannelResponse:");
-    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct ChannelInfo");
-    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ChannelClusterChangeChannelResponseCallback");
-
-    Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
-        Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, ChannelInfo(), errorType);
-    return true;
-}
-
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t contentLaunchStatus, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "LaunchContentResponse:");
-    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
-
-    Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> * cb =
-        Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, contentLaunchStatus, data);
-    return true;
-}
-
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            uint8_t contentLaunchStatus, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "LaunchURLResponse:");
-    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
-
-    Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> * cb =
-        Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, contentLaunchStatus, data);
-    return true;
-}
-
-bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SendKeyResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("KeypadInputClusterSendKeyResponseCallback");
-
-    Callback::Callback<KeypadInputClusterSendKeyResponseCallback> * cb =
-        Callback::Callback<KeypadInputClusterSendKeyResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaFastForwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaFastForwardResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaNextResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaNextResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaNextResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                           uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPauseResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPauseResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPlayResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPlayResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPreviousResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPreviousResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaRewindResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaRewindResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                  uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSkipBackwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipBackwardResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSkipForwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipForwardResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaStartOverResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStartOverResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaStopResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaStopResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStopResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfTargetNavigatorClusterNavigateTargetResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t status, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "NavigateTargetResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("TargetNavigatorClusterNavigateTargetResponseCallback");
-
-    Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback> * cb =
-        Callback::Callback<TargetNavigatorClusterNavigateTargetResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status, data);
-    return true;
 }

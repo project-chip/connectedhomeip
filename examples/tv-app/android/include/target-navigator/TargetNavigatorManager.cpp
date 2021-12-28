@@ -46,7 +46,7 @@ CHIP_ERROR TargetNavigatorManager::proxyGetTargetInfoList(chip::app::AttributeVa
 
         for (int i = 0; i < maximumVectorSize; ++i)
         {
-            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
+            chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type targetInfo;
             targetInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
             targetInfo.identifier = static_cast<uint8_t>(1 + i);
             ReturnErrorOnFailure(encoder.Encode(targetInfo));
@@ -61,6 +61,6 @@ TargetNavigatorResponse targetNavigatorClusterNavigateTarget(chip::EndpointId en
     TargetNavigatorResponse response;
     const char * testData = "data response";
     response.data         = (uint8_t *) testData;
-    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+    response.status       = chip::to_underlying(chip::app::Clusters::TargetNavigator::StatusEnum::kSuccess);
     return response;
 }

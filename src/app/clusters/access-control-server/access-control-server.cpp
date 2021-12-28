@@ -163,7 +163,7 @@ struct AccessControlEntryCodec
                 {
                     NodeId subject;
                     ReturnErrorOnFailure(entry.GetSubject(i, subject));
-                    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::AnonymousTag, subject));
+                    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::AnonymousTag(), subject));
                 }
                 ReturnErrorOnFailure(aWriter.EndContainer(subjectsContainer));
             }
@@ -180,7 +180,7 @@ struct AccessControlEntryCodec
                 for (size_t i = 0; i < count; ++i)
                 {
                     TLV::TLVType targetContainer;
-                    ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, targetContainer));
+                    ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, targetContainer));
                     AccessControl::Entry::Target target;
                     ReturnErrorOnFailure(entry.GetTarget(i, target));
                     if (target.flags & AccessControl::Entry::Target::kCluster)

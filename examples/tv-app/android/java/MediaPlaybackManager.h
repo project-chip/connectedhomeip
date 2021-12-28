@@ -30,7 +30,8 @@ class MediaPlaybackManager
 public:
     void InitializeWithObjects(jobject managerObject);
     CHIP_ERROR GetAttribute(chip::app::AttributeValueEncoder & aEncoder, int attributeId);
-    EmberAfMediaPlaybackStatus Request(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
+    chip::app::Clusters::MediaPlayback::StatusEnum Request(MediaPlaybackRequest mediaPlaybackRequest,
+                                                           uint64_t deltaPositionMilliseconds);
 
 private:
     friend MediaPlaybackManager & MediaPlaybackMgr();

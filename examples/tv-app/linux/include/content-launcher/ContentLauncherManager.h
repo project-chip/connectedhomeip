@@ -30,10 +30,10 @@
 class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
-    ContentLaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<ContentLaunchParamater> & parameterList,
-                                              bool autoplay, const chip::CharSpan & data) override;
-    ContentLaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                          const std::list<ContentLaunchBrandingInformation> & brandingInformation) override;
+    LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
+                                       const chip::CharSpan & data) override;
+    LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                   const std::list<BrandingInformation> & brandingInformation) override;
     std::list<std::string> HandleGetAcceptHeaderList() override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 };

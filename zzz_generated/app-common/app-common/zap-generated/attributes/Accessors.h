@@ -5241,8 +5241,8 @@ namespace MediaPlayback {
 namespace Attributes {
 
 namespace PlaybackState {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum * value); // PlaybackStateEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value);
 } // namespace PlaybackState
 
 namespace StartTime {
@@ -5418,8 +5418,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ProductId
 
 namespace ApplicationStatus {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint,
+                  chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum * value); // ApplicationStatusEnum
+EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value);
 } // namespace ApplicationStatus
 
 namespace ApplicationVersion {

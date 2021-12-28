@@ -23,13 +23,6 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "Change Status Command"
-      command: "ChangeStatus"
-      arguments:
-          values:
-              - name: "status"
-                value: 1
-
     # TODO: Support chars validation
     - label: "Read attribute vendor name"
       command: "readAttribute"

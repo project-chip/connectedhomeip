@@ -43,7 +43,7 @@ exit:
     return err;
 }
 
-void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * application)
+void ApplicationBasicManager::store(chip::EndpointId endpoint, chip::app::Clusters::ApplicationBasic::Application * application)
 {
     uint8_t bufferMemory[64];
     MutableByteSpan zclString(bufferMemory);
@@ -100,10 +100,10 @@ void ApplicationBasicManager::store(chip::EndpointId endpoint, Application * app
     }
 }
 
-Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId endpoint)
+chip::app::Clusters::ApplicationBasic::Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId endpoint)
 {
-    Application app = {};
-    uint16_t size   = static_cast<uint16_t>(sizeof(app.name));
+    chip::app::Clusters::ApplicationBasic::Application app = {};
+    uint16_t size                                          = static_cast<uint16_t>(sizeof(app.name));
 
     std::string section = "endpoint" + std::to_string(endpoint);
 
@@ -147,7 +147,7 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
 }
 
 bool applicationBasicClusterChangeApplicationStatus(chip::EndpointId endpoint,
-                                                    app::Clusters::ApplicationBasic::ApplicationBasicStatus status)
+                                                    app::Clusters::ApplicationBasic::ApplicationStatusEnum status)
 {
     // TODO: Insert code here
     ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", to_underlying(status), endpoint);

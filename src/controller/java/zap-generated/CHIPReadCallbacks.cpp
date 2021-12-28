@@ -1253,6 +1253,96 @@ void CHIPAdministratorCommissioningAttributeListAttributeCallback::CallbackFn(
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPApplicationBasicAllowedVendorListAttributeCallback::CHIPApplicationBasicAllowedVendorListAttributeCallback(jobject javaCallback,
+                                                                                                               bool keepAlive) :
+    chip::Callback::Callback<CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPApplicationBasicAllowedVendorListAttributeCallback::~CHIPApplicationBasicAllowedVendorListAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPApplicationBasicAllowedVendorListAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPApplicationBasicAllowedVendorListAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPApplicationBasicAllowedVendorListAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jclass arrayListClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+    chip::JniClass arrayListJniClass(arrayListClass);
+    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & entry              = iter.GetValue();
+        bool entryNull            = false;
+        chip::VendorId entryValue = entry;
+
+        jobject entryObject = nullptr;
+        if (!entryNull)
+        {
+            jclass entryTypeCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", entryTypeCls);
+            chip::JniClass jniClass(entryTypeCls);
+            jmethodID entryTypeCtor = env->GetMethodID(entryTypeCls, "<init>", "(I)V");
+            entryObject             = env->NewObject(entryTypeCls, entryTypeCtor, entryValue);
+        }
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+    }
+    VerifyOrReturn(
+        iter.GetStatus() == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Error decoding AllowedVendorListAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPApplicationBasicAttributeListAttributeCallback::CHIPApplicationBasicAttributeListAttributeCallback(jobject javaCallback,
                                                                                                        bool keepAlive) :
     chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>(CallbackFn, this),
@@ -1555,7 +1645,7 @@ CHIPAudioOutputAudioOutputListAttributeCallback::~CHIPAudioOutputAudioOutputList
 
 void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1621,7 +1711,7 @@ void CHIPAudioOutputAudioOutputListAttributeCallback::CallbackFn(
         bool outputTypeNull     = false;
         bool outputTypeHasValue = true;
 
-        chip::app::Clusters::AudioOutput::AudioOutputType outputTypeValue = entry.outputType;
+        chip::app::Clusters::AudioOutput::OutputTypeEnum outputTypeValue = entry.outputType;
 
         jobject outputType = nullptr;
         if (!outputTypeNull && outputTypeHasValue)
@@ -6593,7 +6683,7 @@ CHIPMediaInputMediaInputListAttributeCallback::~CHIPMediaInputMediaInputListAttr
 
 void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6659,7 +6749,7 @@ void CHIPMediaInputMediaInputListAttributeCallback::CallbackFn(
         bool inputTypeNull     = false;
         bool inputTypeHasValue = true;
 
-        chip::app::Clusters::MediaInput::MediaInputType inputTypeValue = entry.inputType;
+        chip::app::Clusters::MediaInput::InputTypeEnum inputTypeValue = entry.inputType;
 
         jobject inputType = nullptr;
         if (!inputTypeNull && inputTypeHasValue)
@@ -9513,8 +9603,7 @@ CHIPTargetNavigatorTargetNavigatorListAttributeCallback::~CHIPTargetNavigatorTar
 
 void CHIPTargetNavigatorTargetNavigatorListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;

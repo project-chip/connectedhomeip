@@ -251,7 +251,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, u
     }
 
     TLV::ContiguousBufferTLVReader innerStructureReader;
-    ReturnErrorOnFailure(openTLVContainer(rootReader, TLV::kTLVType_Structure, TLV::AnonymousTag, innerStructureReader));
+    ReturnErrorOnFailure(openTLVContainer(rootReader, TLV::kTLVType_Structure, TLV::AnonymousTag(), innerStructureReader));
     ReturnErrorOnFailure(innerStructureReader.Next());
     err = retrieveOptionalInfos(outPayload, innerStructureReader);
 

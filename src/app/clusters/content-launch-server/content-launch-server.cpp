@@ -174,29 +174,29 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::Attri
 // -----------------------------------------------------------------------------
 // Matter Framework Callbacks Implementation
 
-bool emberAfContentLauncherClusterLaunchContentCallback(
+bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
-    // TODO: Decode the paramater and pass it to delegate
+    // TODO: Decode the parameter and pass it to delegate
     // auto searchIterator = commandData.search.begin();
-    std::list<ContentLaunchParamater> parameterList;
+    std::list<Parameter> parameterList;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        ContentLaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
+        LaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.contentLaunchStatus = resp.status;
-        response.data                = resp.data;
+        response.status = resp.status;
+        response.data   = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
@@ -213,29 +213,29 @@ exit:
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(
+bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
-    // TODO: Decode the paramater and pass it to delegate
+    // TODO: Decode the parameter and pass it to delegate
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
-    std::list<ContentLaunchBrandingInformation> brandingInformationList;
+    std::list<BrandingInformation> brandingInformationList;
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        ContentLaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
+        LaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
         VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
 
-        response.contentLaunchStatus = resp.status;
-        response.data                = resp.data;
+        response.status = resp.status;
+        response.data   = resp.data;
 
         err = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);

@@ -267,6 +267,23 @@ public class ClusterReadMapping {
     readApplicationBasicInteractionInfo.put(
         "readApplicationVersionAttribute",
         readApplicationBasicApplicationVersionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readApplicationBasicAllowedVendorListCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readApplicationBasicAllowedVendorListAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ApplicationBasicCluster) cluster)
+                  .readAllowedVendorListAttribute(
+                      (ChipClusters.ApplicationBasicCluster.AllowedVendorListAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedApplicationBasicClusterAllowedVendorListAttributeCallback(),
+            readApplicationBasicAllowedVendorListCommandParams);
+    readApplicationBasicInteractionInfo.put(
+        "readAllowedVendorListAttribute",
+        readApplicationBasicAllowedVendorListAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readApplicationBasicAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readApplicationBasicAttributeListAttributeInteractionInfo =

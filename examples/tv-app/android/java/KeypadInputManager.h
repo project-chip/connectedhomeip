@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 
@@ -26,7 +27,7 @@ class KeypadInputManager
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    EmberAfKeypadInputStatus SendKey(EmberAfKeypadInputCecKeyCode keyCode);
+    chip::app::Clusters::KeypadInput::StatusEnum SendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode);
 
 private:
     friend KeypadInputManager & KeypadInputMgr();

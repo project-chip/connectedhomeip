@@ -37,10 +37,11 @@ public:
     ~AccountLoginCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR GetSetupPIN(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                           chip::CharSpan tempAccountIdentifier);
-    CHIP_ERROR Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                     chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
+    CHIP_ERROR GetSetupPINRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::CharSpan tempAccountIdentifier);
+    CHIP_ERROR LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN);
+    CHIP_ERROR LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT ApplicationBasicCluster : public ClusterBase
@@ -57,8 +58,12 @@ public:
     ~ApplicationLauncherCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::CharSpan data,
-                         uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
+    CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              uint16_t catalogVendorId, chip::CharSpan applicationId);
 };
 
 class DLL_EXPORT AudioOutputCluster : public ClusterBase
@@ -68,9 +73,10 @@ public:
     ~AudioOutputCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
-                            chip::CharSpan name);
-    CHIP_ERROR SelectOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index);
+    CHIP_ERROR RenameOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t index, chip::CharSpan name);
+    CHIP_ERROR SelectOutputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint8_t index);
 };
 
 class DLL_EXPORT ChannelCluster : public ClusterBase
@@ -80,11 +86,12 @@ public:
     ~ChannelCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::CharSpan match);
-    CHIP_ERROR ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t majorNumber, uint16_t minorNumber);
-    CHIP_ERROR SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t count);
+    CHIP_ERROR ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint16_t majorNumber, uint16_t minorNumber);
+    CHIP_ERROR ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    chip::CharSpan match);
+    CHIP_ERROR SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint16_t count);
 };
 
 class DLL_EXPORT ContentLauncherCluster : public ClusterBase
@@ -94,10 +101,10 @@ public:
     ~ContentLauncherCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, bool autoPlay,
-                             chip::CharSpan data, uint8_t type, chip::CharSpan value);
-    CHIP_ERROR LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                         chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
+    CHIP_ERROR LaunchContentRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    bool autoPlay, chip::CharSpan data);
+    CHIP_ERROR LaunchURLRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName);
 };
 
 class DLL_EXPORT KeypadInputCluster : public ClusterBase
@@ -107,7 +114,7 @@ public:
     ~KeypadInputCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR SendKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
+    CHIP_ERROR SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t keyCode);
 };
 
 class DLL_EXPORT MediaInputCluster : public ClusterBase
@@ -117,11 +124,12 @@ public:
     ~MediaInputCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR HideInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR RenameInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
-                           chip::CharSpan name);
-    CHIP_ERROR SelectInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index);
-    CHIP_ERROR ShowInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR HideInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t index,
+                                  chip::CharSpan name);
+    CHIP_ERROR SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t index);
+    CHIP_ERROR ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT MediaPlaybackCluster : public ClusterBase
@@ -131,19 +139,19 @@ public:
     ~MediaPlaybackCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR MediaFastForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaNext(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaPause(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
-    CHIP_ERROR MediaSkipBackward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR MediaSkipForward(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                uint64_t deltaPositionMilliseconds);
-    CHIP_ERROR MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR FastForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint64_t position);
+    CHIP_ERROR SkipBackwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                   uint64_t deltaPositionMilliseconds);
+    CHIP_ERROR SkipForwardRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint64_t deltaPositionMilliseconds);
+    CHIP_ERROR StartOverRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
 class DLL_EXPORT TargetNavigatorCluster : public ClusterBase
@@ -153,8 +161,8 @@ public:
     ~TargetNavigatorCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR NavigateTarget(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t target,
-                              chip::CharSpan data);
+    CHIP_ERROR NavigateTargetRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                     uint8_t target, chip::CharSpan data);
 };
 
 } // namespace Controller

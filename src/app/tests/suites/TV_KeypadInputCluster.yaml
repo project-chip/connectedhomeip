@@ -24,7 +24,7 @@ tests:
       command: "WaitForCommissionee"
 
     - label: "Send Key Command"
-      command: "SendKey"
+      command: "sendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
