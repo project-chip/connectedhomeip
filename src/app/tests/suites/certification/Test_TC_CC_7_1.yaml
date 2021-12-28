@@ -66,6 +66,102 @@ tests:
       response:
           value: 1025
 
+    - label: "Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1025
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 300
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1025
+
+    - label: "Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1025
+              - name: "direction"
+                value: 1
+              - name: "transitionTime"
+                value: 300
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1025
+
+    - label: "Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1025
+              - name: "direction"
+                value: 2
+              - name: "transitionTime"
+                value: 300
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1025
+
+    - label: "Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 1025
+              - name: "direction"
+                value: 3
+              - name: "transitionTime"
+                value: 300
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label:
+          "Check EnhancedCurrentHue attribute value matched the value sent by
+          the last command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 1025
+
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
       command: "off"

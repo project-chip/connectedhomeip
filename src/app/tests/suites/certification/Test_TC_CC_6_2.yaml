@@ -59,31 +59,7 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read current color temprature"
-      disabled: true
-      command: "readAttribute"
-      attribute: "color temperature"
-      response:
-          value: -1
-
-    - label: "Stop Color Temperature command"
-      command: "MoveColorTemperature"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 10
-              - name: "colorTemperatureMinimum"
-                value: 1
-              - name: "colorTemperatureMaximum"
-                value: 255
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Read current color temprature"
+    - label: "Read current color temprature attribute from DUT several times"
       disabled: true
       command: "readAttribute"
       attribute: "color temperature"
@@ -107,7 +83,89 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Read current color temprature"
+    - label: "Read current color temprature attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Move up color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 10
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Stop Color Temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 10
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: -1
+
+    - label: "Move down color temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 3
+              - name: "rate"
+                value: 20
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Stop Color Temperature command"
+      command: "MoveColorTemperature"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 10
+              - name: "colorTemperatureMinimum"
+                value: 1
+              - name: "colorTemperatureMaximum"
+                value: 255
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read current color temprature attribute from DUT several times"
       disabled: true
       command: "readAttribute"
       attribute: "color temperature"
