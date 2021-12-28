@@ -169,7 +169,6 @@ int main(void)
     }
 #endif // CHIP_ENABLE_OPENTHREAD
 
-
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 

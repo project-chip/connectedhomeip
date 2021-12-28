@@ -77,7 +77,7 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
 
-    // EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+// EmberAfIdentifyEffectIdentifier sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
@@ -98,52 +98,52 @@ void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * 
 } // namespace
 */
 
-    /*
+/*
 void OnTriggerIdentifyEffect(Identify * identify)
 {
 
-    sIdentifyEffect = identify->mCurrentEffectIdentifier;
+sIdentifyEffect = identify->mCurrentEffectIdentifier;
 
-    if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
-    {
-        ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
-                        identify->mEffectVariant);
-        sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
-    }
+if (identify->mCurrentEffectIdentifier == EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE)
+{
+    ChipLogProgress(Zcl, "IDENTIFY_EFFECT_IDENTIFIER_CHANNEL_CHANGE - Not supported, use effect varriant %d",
+                    identify->mEffectVariant);
+    sIdentifyEffect = static_cast<EmberAfIdentifyEffectIdentifier>(identify->mEffectVariant);
+}
 
-    switch (sIdentifyEffect)
-    {
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
-                                                           identify);
-        break;
-    case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
-        (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
-        sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-    }
+switch (sIdentifyEffect)
+{
+case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BLINK:
+case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_BREATHE:
+case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_OKAY:
+    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(5), OnTriggerIdentifyEffectCompleted,
+                                                       identify);
+    break;
+case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_FINISH_EFFECT:
+    (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
+    (void) chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), OnTriggerIdentifyEffectCompleted,
+                                                       identify);
+    break;
+case EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT:
+    (void) chip::DeviceLayer::SystemLayer().CancelTimer(OnTriggerIdentifyEffectCompleted, identify);
+    sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
+    break;
+default:
+    ChipLogProgress(Zcl, "No identifier effect");
+}
 
 }
-    */
+*/
 
-    /*
+/*
 Identify gIdentify = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
-    OnTriggerIdentifyEffect,
+chip::EndpointId{ 1 },
+[](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
+[](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
+EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED,
+OnTriggerIdentifyEffect,
 };
-    */
+*/
 
 } // namespace
 
@@ -300,7 +300,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             }
             else */
 
-if (sIsThreadProvisioned && sIsThreadEnabled)
+            if (sIsThreadProvisioned && sIsThreadEnabled)
             {
                 sStatusLED.Blink(950, 50);
             }
@@ -515,12 +515,12 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     if (aAction == LightingManager::ON_ACTION)
     {
         EFR32_LOG("Turning light ON")
-            // sLightLED.Set(true);
+        // sLightLED.Set(true);
     }
     else if (aAction == LightingManager::OFF_ACTION)
     {
         EFR32_LOG("Turning light OFF")
-            //sLightLED.Set(false);
+        // sLightLED.Set(false);
     }
 
     if (aActor == AppEvent::kEventType_Button)
@@ -602,9 +602,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState(void)
-{
-
-
-
-}
+void AppTask::UpdateClusterState(void) {}
