@@ -442,7 +442,7 @@ tests:
           constraints:
               type: map16
               minValue: 0
-              maxValue: 65279
+              maxValue: 31
 
     - label:
           "Write the default values to mandatory attribute: ColorCapabilities"
@@ -528,6 +528,8 @@ tests:
       response:
           constraints:
               type: uint16
+              minValue: 0
+              maxValue: 65279
 
     - label:
           "Write the default values to optional attribute:

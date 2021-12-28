@@ -34,6 +34,15 @@ tests:
       response:
           value: 1
 
+    - label:
+          "Check current hue attribute value matched the value sent by the last
+          command"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          value: 150
+
     - label: "Move to hue shortest distance command"
       command: "MoveToHue"
       arguments:

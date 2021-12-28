@@ -42,40 +42,7 @@ tests:
       attribute: "enhanced current hue"
       response:
           value: 1025
-
-    - label: "Enhanced Move Hue Down command "
-      command: "EnhancedMoveHue"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 3
-              - name: "rate"
-                value: 5
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Enhanced Move Hue Stop command"
-      command: "EnhancedMoveHue"
-      arguments:
-          values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
-                value: 0
-              - name: "optionsMask"
-                value: 0
-              - name: "optionsOverride"
-                value: 0
-
-    - label: "Check EnhancedCurrentHue attribute value changed to a lower Hue"
-      disabled: true
-      command: "readAttribute"
-      attribute: "enhanced current hue"
-      response:
-          value: -1
-
+    
     - label: "Enhanced Move Hue Up command"
       command: "EnhancedMoveHue"
       arguments:
@@ -89,6 +56,53 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Read EnhancedCurrentHue attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: -1
+
+    - label: "Enhanced Move Hue Stop command"
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+     
+    - label: "Read EnhancedCurrentHue attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: -1
+
+    - label: "Enhanced Move Hue Down command "
+      command: "EnhancedMoveHue"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 3
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+    
+    - label: "Read EnhancedCurrentHue attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: -1
+
     - label: "Enhanced Move Hue Stop command"
       command: "EnhancedMoveHue"
       arguments:
@@ -102,7 +116,7 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
-    - label: "Check EnhancedCurrentHue attribute value changed to a higher Hue"
+    - label: "Read EnhancedCurrentHue attribute from DUT several times"
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"

@@ -63,7 +63,6 @@ tests:
           value: 0
 
     - label: "Read the global attribute constraints: AttributeList"
-      disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
       response:
@@ -84,38 +83,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "AttributeList"
-      response:
-          value: 0
-
-    - label: "Read the mandatory global attribute: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
-      response:
-          value: 0
-
-    - label: "Read the global attribute constraints: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
-      response:
-          constraints:
-              type: list
-
-    - label:
-          "Write the default values to mandatory global attribute: CommandList"
-      disabled: true
-      command: "writeAttribute"
-      attribute: "CommandList"
-      arguments:
-          value: 0
-      response:
-          error: UNSUPPORTED_WRITE
-
-    - label: "Reads back mandatory global attribute: CommandList"
-      disabled: true
-      command: "readAttribute"
-      attribute: "CommandList"
       response:
           value: 0
 
