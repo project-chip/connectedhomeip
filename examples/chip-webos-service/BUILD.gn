@@ -25,7 +25,7 @@ declare_args() {
   config_use_separate_eventloop_webos = true
 }
 
-executable("chip-tool-webos") {
+executable("chip-webos-service") {
   sources = [
     "commands/clusters/ModelCommand.cpp",
     "commands/common/CHIPCommand.cpp",
@@ -93,5 +93,5 @@ executable("chip-tool-webos") {
 }
 
 group("default") {
-  deps = [ ":chip-tool-webos" ]
+  deps = [ ":chip-webos-service" ]
 }
