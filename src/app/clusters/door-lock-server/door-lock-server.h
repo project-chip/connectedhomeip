@@ -40,10 +40,11 @@
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters;
 
-static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE    = 10;
-static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
+static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
+static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
+    DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
 
-static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5;
+static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5; /**< Maximum number of supported credentials by a single user. */
 
 /**
  * @brief Door Lock Server Plugin class.
@@ -159,30 +160,40 @@ private:
     static DoorLockServer instance;
 };
 
+/**
+ * @brief Status of the credential slot in the credentials database.
+ */
 enum class DlCredentialStatus : uint8_t
 {
-    kAvailable = 0x00,
-    kOccupied  = 0x01,
+    kAvailable = 0x00, /**< Indicates if credential slot is available. */
+    kOccupied  = 0x01, /**< Indicates if credential slot is already occupied. */
 };
 
+/**
+ * @brief Structure that holds the credential information.
+ */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;
-    DoorLock::DlCredentialType credentialType;
-    chip::ByteSpan credentialData;
+    DlCredentialStatus status;                 /**< Indicates if credential slot is occupied or not. */
+    DoorLock::DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;             /**< Credential data bytes. */
 };
 
+/**
+ * @brief Structure that holds user information.
+ */
 struct EmberAfPluginDoorLockUserInfo
 {
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
-    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-    size_t totalCredentials;
-    uint32_t userUniqueId;
-    DoorLock::DlUserStatus userStatus;
-    DoorLock::DlUserType userType;
-    DoorLock::DlCredentialRule credentialRule;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex lastModifiedBy;
+    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE]; /**< Name of the user. */
+    // TODO: Consider using a span to save memory and guarantee immutability
+    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER]; /**< Credentials that are associated with user (without data).*/
+    size_t totalCredentials;                                      /**< Total number of credentials associated with user. */
+    uint32_t userUniqueId;                                        /**< Unique user identifier. */
+    DoorLock::DlUserStatus userStatus;                            /**< Status of the user slot (available/occupied). */
+    DoorLock::DlUserType userType;                                /**< Type of the user. */
+    DoorLock::DlCredentialRule credentialRule;                    /**< Number of supported credentials. */
+    chip::FabricIndex createdBy;                                  /**< ID of the fabric that created the user. */
+    chip::FabricIndex lastModifiedBy;                             /**< ID of the fabric that modified the user. */
 };
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
@@ -296,15 +307,86 @@ chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnUnhandledAttrib
                                                                                           EmberAfAttributeType attrType,
                                                                                           uint16_t attrSize, uint8_t * attrValue);
 
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the users database.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param userIndex Index of the user to access. It is guaranteed to be within limits declared in the spec (from 1 up to the value
+ *                  of NumberOfUsersSupported attribute).
+ * @param[out] user Reference to the user information variable which will hold user info upon successful function call.
+ *
+ * @retval true, if \p userIndex was found in the database and \p user parameter was written with valid data.
+ * @retval false, if error occurred.
+ */
 bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the user in users database.
+ *
+ * @note This function is used for creating, modifying and clearing users. It is not guaranteed that the parameters always differ
+ *       from current user state. For example, when modifying a single field (say, uniqueId) the user information that is passed
+ *       to a function will be the same as the user record except this field.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param userIndex Index of the user to create/modify. It is guaranteed to be within limits declared in the spec (from 1 up to the
+ *                  value of NumberOfUsersSupported attribute).
+ * @param creator Fabric ID that created the user. Could be kUndefinedFabricIndex (0).
+ * @param modifier Fabric ID that was last to modify the user. Could be kUndefinedFabricIndex (0).
+ * @param[in] userName Pointer to the user name. Could be an empty string, guaranteed not to be a nullptr.
+ * @param uniqueId New Unique ID of the user.
+ * @param userStatus New status of the user.
+ * @param usertype New type of the user.
+ * @param credentialRule New credential rule (how many credentials are allowed for user).
+ * @param[in] credentials Array of credentials. Size of this array is determined by totalCredentials variable. Could be nullptr
+ *            which means that the credentials should be deleted.
+ * @param totalCredentials Size of \p credentials array. Could be 0.
+ *
+ * @retval true, if user pointed by \p userIndex was successfully changed in the database.
+ * @retval false, if error occurred while changing the user.
+ */
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
                                   DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials,
                                   size_t totalCredentials);
 
+/**
+ * @brief This callback is called when Door Lock cluster needs to access the credential in credentials database.
+ *
+ * @note The door lock cluster does not assume in any way underlying implementation of the database. Different credential types
+ *       may be stored in the single data structure with shared index or separately. Door lock cluster guarantees that the
+ *       credentialIndex will always be within the range for a particular credential type.
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
+ *                        particular credential type. Starts from 1.
+ * @param credentialType Type of the accessing credential.
+ * @param[out] credential Reference to the credential information which will be filled upon successful function call.
+ *
+ * @retval true, if the credential pointed by \p credentialIndex was found and \p credential parameter was written with valid data.
+ * @retval false, if error occurred.
+ */
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
                                         DoorLock::DlCredentialType credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential);
+
+/**
+ * @brief This callback is called when Door Lock cluster needs to create, modify or clear the credential in credentials database.
+ *
+ * @note It is guaranteed that the call to this function will not cause any duplicated entries in the database (e.g. entries that
+ *       share the same \p credentialType and \p credentialData).
+ *
+ * @param endpointId ID of the endpoint which contains the lock.
+ * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
+*                         particular credential type. Starts from 1.
+ * @param credentialStatus New status of the credential slot (occupied/available). DlCredentialStatus::kAvailable means that the
+ *                         credential must be deleted.
+ * @param credentialType Type of the credential (PIN, RFID, etc.).
+ * @param[in] credentialData Data attached to a credential. Can contain nullptr as data which indicates that the data for credential
+ *                           should be removed.
+ *
+ * @retval true, if credential pointed by \p credentialIndex of type \p credentialType was successfully changed in the database.
+ * @retval false, if error occurred.
+ */
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                         DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData);

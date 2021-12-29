@@ -1017,8 +1017,9 @@ EmberAfStatus DoorLockServer::modifyUser(EndpointId endpointId, FabricIndex modi
 
 EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, uint16_t userIndex)
 {
-    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, 0, 0, "", 0, DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser,
-                                      DlCredentialRule::kSingle, nullptr, 0))
+    if (!emberAfPluginDoorLockSetUser(endpointId, userIndex, kUndefinedFabricIndex, kUndefinedFabricIndex, "", 0,
+                                      DlUserStatus::kAvailable, DlUserType::kUnrestrictedUser, DlCredentialRule::kSingle, nullptr,
+                                      0))
     {
         return EMBER_ZCL_STATUS_FAILURE;
     }
