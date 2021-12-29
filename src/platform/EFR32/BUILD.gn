@@ -57,6 +57,15 @@ static_library("EFR32") {
     "gatt_db.h",
   ]
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+      "OTARequestorDriverImpl.cpp",
+      "OTARequestorDriverImpl.h",
+    ]
+  }
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   # Add pigweed KVS
