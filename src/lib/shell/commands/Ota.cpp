@@ -21,7 +21,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <platform/OTARequestorDriver.h>
 #include <platform/OTARequestorInterface.h>
 
 using namespace chip::DeviceLayer;

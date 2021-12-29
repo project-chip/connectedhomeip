@@ -33,7 +33,7 @@
 namespace chip {
 
 // This class implements all of the core logic of the OTA Requestor
-class OTARequestor : public OTARequestorInterface
+class OTARequestor : public OTARequestorInterface, public BDXDownloader::StateDelegate
 {
 public:
     // Various actions to take when OnConnected callback is called
@@ -52,8 +52,14 @@ public:
     // and download the new image if available
     OTATriggerResult TriggerImmediateQuery() override;
 
+    // Initiate download of the new image
+    void DownloadUpdate() override;
+
     // Send ApplyImage
     void ApplyUpdate() override;
+
+    // Handle download state change
+    void OnDownloadStateChanged(OTADownloader::State state) override;
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
@@ -121,7 +127,6 @@ public:
     }
 
 private:
-    struct QueryImageRequest;
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 
@@ -195,19 +200,24 @@ private:
     };
 
     /**
-     * Create a QueryImage request using values from the Basic cluster attributes
+     * Send QueryImage request using values matching Basic cluster
      */
-    CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & request);
+    CHIP_ERROR SendQueryImageRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
-     * Verify all required fields are present in the QueryImageResponse
+     * Validate and extract mandatory information from QueryImageResponse
      */
-    bool ValidateQueryImageResponse(const QueryImageResponseDecodableType & response) const;
+    CHIP_ERROR ExtractUpdateDescription(const QueryImageResponseDecodableType & response, UpdateDescription & update) const;
 
     /**
-     * Create a ApplyUpdate request using values obtained from QueryImageResponse
+     * Start download of the software image returned in QueryImageResponse
      */
-    CHIP_ERROR BuildApplyUpdateRequest(app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type & args);
+    CHIP_ERROR StartDownload(OperationalDeviceProxy & deviceProxy);
+
+    /**
+     * Send ApplyUpdate request using values obtained from QueryImageResponse
+     */
+    CHIP_ERROR SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
      * Session connection callbacks
