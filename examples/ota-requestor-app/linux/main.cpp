@@ -24,8 +24,8 @@
 
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/GenericOTARequestorDriver.h"
 #include "platform/Linux/OTAImageProcessorImpl.h"
-#include "platform/Linux/OTARequestorDriverImpl.h"
 
 using chip::BDXDownloader;
 using chip::ByteSpan;
@@ -52,7 +52,7 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 OTARequestor gRequestorCore;
-OTARequestorDriverImpl gRequestorUser;
+DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
@@ -201,6 +201,7 @@ int main(int argc, char * argv[])
 
     // Connect the Requestor and Requestor Driver objects
     gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
     // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.

@@ -106,8 +106,6 @@ static_library("Linux") {
     sources += [
       "OTAImageProcessorImpl.cpp",
       "OTAImageProcessorImpl.h",
-      "OTARequestorDriverImpl.cpp",
-      "OTARequestorDriverImpl.h",
     ]
   }
 
