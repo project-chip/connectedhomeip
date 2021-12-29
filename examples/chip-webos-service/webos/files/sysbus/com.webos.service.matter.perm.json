@@ -1,12 +1,5 @@
 {
     "com.webos.service.matter": [
-        "settings",
-        "tv.management",
-        "devices",
-        "networking.internal",
-        "tv.settings",
-        "private",
-        "public",
         "all"
     ]
 }

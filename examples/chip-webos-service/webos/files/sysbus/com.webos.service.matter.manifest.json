@@ -1,5 +1,5 @@
 {
-    "id": "chip-tool-webos",
+    "id": "com.webos.service.matter",
     "version": "1.0.0",
     "roleFiles": [
         "/usr/share/luna-service2/roles.d/com.webos.service.matter.role.json"
