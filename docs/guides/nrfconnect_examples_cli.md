@@ -111,8 +111,8 @@ Performing factory reset ...
 
 Handles a group of commands that are used to view information about device
 onboarding codes. The `onboardingcodes` command takes one required parameter for
-the rendezvous type, then an optional parameter for printing a specific type
-of onboarding code.
+the rendezvous type, then an optional parameter for printing a specific type of
+onboarding code.
 
 The full format of the command is:
 
@@ -121,7 +121,6 @@ onboardingcodes none|softap|ble|onnetwork [qrcode|qrcodeurl|manualpairingcode]
 ```
 
 To print all the onboardingcodes:
-
 
 ```shell
 uart:~$ matter onboardingcodes none
