@@ -147,7 +147,247 @@ tests:
       # So far there's no way to verify cluster-specific error codes so we're just checking generic failure here
       error: 0x01
 
-  - label: "Modify existing user"
+  - label: "Modify userName for existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: 0xFFFFFFFF
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Modify userUniqueId for existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: 0x1234ABCD
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: 0x1234ABCD
+        - name: "userStatus"
+          value: 1
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Modify userStatus for existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: 0x03 # Occupied, Disabled
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: 0x1234ABCD
+        - name: "userStatus"
+          value: 3
+        - name: "userType"
+          value: 0
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Modify userType for existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: 0x06 # Disposable user
+        - name: "credentialRule"
+          value: null
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: 0x1234ABCD
+        - name: "userStatus"
+          value: 3
+        - name: "userType"
+          value: 6
+        - name: "credentialRule"
+          value: 0
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Modify credentialRule for existing user"
+    command: "SetUser"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: null
+        - name: "userUniqueId"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+        - name: "credentialRule"
+          value: 2
+
+  - label: "Read the modified user back and verify its fields"
+    command: "GetUser"
+    arguments:
+      values:
+        - name: "userIndex"
+          value: 1
+    response:
+      values:
+        - name: "userIndex"
+          value: 1
+        - name: "userName"
+          value: "new_user"
+        - name: "userUniqueId"
+          value: 0x1234ABCD
+        - name: "userStatus"
+          value: 3
+        - name: "userType"
+          value: 6
+        - name: "credentialRule"
+          value: 2
+        - name: "credentials"
+          value: null
+        - name: "creatorFabricIndex"
+          value: 1
+        - name: "lastModifiedFabricIndex"
+          value: 1
+        - name: "nextUserIndex"
+          value: 2
+
+  - label: "Modify all fields for existing user"
     command: "SetUser"
     arguments:
       values:
@@ -158,11 +398,11 @@ tests:
         - name: "userName"
           value: "test_user"
         - name: "userUniqueId"
-          value: 0x12345678
+          value: 0x1BCDA0A0
         - name: "userStatus"
-          value: null
+          value: 1
         - name: "userType"
-          value: null
+          value: 0
         - name: "credentialRule"
           value: 1
 
@@ -179,7 +419,7 @@ tests:
         - name: "userName"
           value: "test_user"
         - name: "userUniqueId"
-          value: 0x12345678
+          value: 0x1BCDA0A0
         - name: "userStatus"
           value: 1
         - name: "userType"
@@ -519,18 +759,18 @@ tests:
     command: "SetCredential"
     arguments:
       values:
-          - name: "operationType"
-            value: 0
-          - name: "credential"
-            value: { CredentialType: 1, CredentialIndex: 1 }
-          - name: "credentialData"
-            value: "000000"
-          - name: "userIndex"
-            value: null
-          - name: "userStatus"
-            value: null
-          - name: "userType"
-            value: null
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 1 }
+        - name: "credentialData"
+          value: "000000"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
     response:
       values:
         - name: "status"
