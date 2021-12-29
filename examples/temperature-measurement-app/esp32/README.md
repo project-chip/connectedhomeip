@@ -138,8 +138,8 @@ your network configuration. To erase it, simply run.
 
 ## Setting up chip-tool
 
-See [the build guide](../../../docs/guides/BUILDING.md#prerequisites) for general
-background on build prerequisites.
+See [the build guide](../../../docs/guides/BUILDING.md#prerequisites) for
+general background on build prerequisites.
 
 Building the example application is quite straightforward. It can either be done
 as part of an overall "build everything" build:
@@ -148,8 +148,7 @@ as part of an overall "build everything" build:
 ./gn_build.sh
 ```
 
-which puts the binary at `out/debug/standalone/chip-tool` 
-
+which puts the binary at `out/debug/standalone/chip-tool`
 
 #### Commission a device using chip-tool
 
@@ -182,11 +181,9 @@ devices log when they start up) and try to pair with the first one it discovers.
 
     $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
 
-
 ### Forget the currently-commissioned device
 
     $ chip-tool pairing unpair
-
 
 ### Cluster control
 
