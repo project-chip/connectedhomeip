@@ -26,12 +26,12 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
+    MatterDoorLockPluginServerInitCallback();                                                                                      \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
-    MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterPowerSourcePluginServerInitCallback();                                                                                   \
     MatterPowerSourceConfigurationPluginServerInitCallback();                                                                      \

@@ -41,6 +41,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_DIAGNOSTIC_LOGS_CLUSTER_ID:
         emberAfDiagnosticLogsClusterInitCallback(endpoint);
         break;
+    case ZCL_DOOR_LOCK_CLUSTER_ID:
+        emberAfDoorLockClusterInitCallback(endpoint);
+        break;
     case ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID:
         emberAfEthernetNetworkDiagnosticsClusterInitCallback(endpoint);
         break;
@@ -55,9 +58,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_NETWORK_COMMISSIONING_CLUSTER_ID:
         emberAfNetworkCommissioningClusterInitCallback(endpoint);
-        break;
-    case ZCL_ON_OFF_CLUSTER_ID:
-        emberAfOnOffClusterInitCallback(endpoint);
         break;
     case ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID:
         emberAfOperationalCredentialsClusterInitCallback(endpoint);
@@ -106,6 +106,11 @@ void __attribute__((weak)) emberAfDiagnosticLogsClusterInitCallback(EndpointId e
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfDoorLockClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfEthernetNetworkDiagnosticsClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -127,11 +132,6 @@ void __attribute__((weak)) emberAfGeneralDiagnosticsClusterInitCallback(Endpoint
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfNetworkCommissioningClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

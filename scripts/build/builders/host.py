@@ -44,7 +44,7 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
         elif self == HostApp.LOCK:
-            return 'lock-app/linux'
+            return 'door-lock-app/linux'
         elif self == HostApp.TESTS:
             return '../'
         else:

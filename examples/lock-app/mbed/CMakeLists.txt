@@ -90,7 +90,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/door-lock-server/door-lock-server.cpp
                ${CHIP_ROOT}/src/app/clusters/power-source-configuration-server/power-source-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp
 )
