@@ -1597,8 +1597,8 @@
             }, /* Endpoint: 1, Cluster: Fixed Label (server) */                                                                    \
             { 0x0101,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(232),                                                                                            \
-              19,                                                                                                                  \
-              29,                                                                                                                  \
+              28,                                                                                                                  \
+              49,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
                   ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
