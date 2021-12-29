@@ -110,12 +110,10 @@ bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlDoorState newDo
     return (EMBER_ZCL_STATUS_SUCCESS == status);
 }
 
-bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLanguage)
+bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, chip::CharSpan newLanguage)
 {
-    auto lang = chip::CharSpan(newLanguage, strlen(newLanguage));
-
-    emberAfDoorLockClusterPrintln("Setting Language to '%s'", newLanguage);
-    EmberAfStatus status = Attributes::Language::Set(endpointId, lang);
+    emberAfDoorLockClusterPrintln("Setting Language to '%.*s'", static_cast<int>(newLanguage.size()), newLanguage.data());
+    EmberAfStatus status = Attributes::Language::Set(endpointId, newLanguage);
 
     if (EMBER_ZCL_STATUS_SUCCESS != status)
     {
@@ -398,9 +396,8 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
     case chip::app::Clusters::DoorLock::Attributes::Language::Id:
         if (value[0] <= 3)
         {
-            char lang[3 + 1] = { 0 };
-            memcpy(lang, &value[1], value[0]);
-            res = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, lang);
+            auto lang = chip::CharSpan(reinterpret_cast<const char *>(&value[1]), static_cast<size_t>(value[0]));
+            res       = emberAfPluginDoorLockOnLanguageChange(attributePath.mEndpointId, lang);
         }
         else
         {
@@ -512,7 +509,7 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 // =============================================================================
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
-emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, const char * newLanguage)
+emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId, chip::CharSpan newLanguage)
 {
     return chip::Protocols::InteractionModel::Status::Success;
 }

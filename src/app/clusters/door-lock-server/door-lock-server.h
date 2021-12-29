@@ -42,7 +42,7 @@ class DoorLockServer
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
     bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlDoorState newDoorState);
 
-    bool SetLanguage(chip::EndpointId endpointId, const char * newLanguage);
+    bool SetLanguage(chip::EndpointId endpointId, chip::CharSpan newLanguage);
     bool SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec);
     bool SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoundVolume);
 
@@ -53,9 +53,10 @@ private:
     static DoorLockServer instance;
 };
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCOde);
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
-bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, const char * PINCode, uint16_t timeout);
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode,
+                                                         uint16_t timeout);
 
 // =============================================================================
 // Pre-change callbacks for cluster attributes
@@ -70,7 +71,7 @@ bool emberAfPluginDoorLockOnDoorUnlockWithTimeoutCommand(chip::EndpointId endpoi
  * @retval any other InteractionModel::Status value to forbid attribute change
  */
 chip::Protocols::InteractionModel::Status emberAfPluginDoorLockOnLanguageChange(chip::EndpointId EndpointId,
-                                                                                const char * newLanguage);
+                                                                                chip::CharSpan newLanguage);
 
 /** @brief 'AutoRelockTime' attribute pre-change callback
  *
