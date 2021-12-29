@@ -203,6 +203,12 @@ config("strict_warnings") {
     "-Wunreachable-code",
   ]
 
+  if (target_os == "webos") {
+    cflags -= [
+      "-Wshadow",
+    ]
+  }
+
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
