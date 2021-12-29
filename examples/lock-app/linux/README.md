@@ -1,10 +1,12 @@
 # Door Lock Application for Linux
 
-This application is quite different from regular lock-app and later should be moved to a separate example.
-The app showcases the current implementation of the Door Lock cluster.
+This application is quite different from regular lock-app and later should be
+moved to a separate example. The app showcases the current implementation of the
+Door Lock cluster.
 
-For now it is not possible to change lock parameters from the app, the functionality should be probably presented either
-as CLI or something that could be controlled from tests (like RPC in lighting-app).
+For now it is not possible to change lock parameters from the app, the
+functionality should be probably presented either as CLI or something that could
+be controlled from tests (like RPC in lighting-app).
 
 ## Building
 
