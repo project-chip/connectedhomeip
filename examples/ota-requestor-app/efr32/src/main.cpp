@@ -43,7 +43,7 @@
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
 #include "platform/EFR32/OTAImageProcessorImpl.h"
-#include "platform/EFR32/OTARequestorDriverImpl.h"
+#include "platform/GenericOTARequestorDriver.h"
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -83,7 +83,7 @@ using namespace ::chip::DeviceLayer;
 
 // Global OTA objects
 OTARequestor gRequestorCore;
-OTARequestorDriverImpl gRequestorUser;
+DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
