@@ -421,31 +421,33 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
 
     if (!credentialTypeSupported(commandPath.mEndpointId, credentialType))
     {
-        emberAfDoorLockClusterPrintln("[GetCredentialStatus] Credential type is not supported [endpointId=%d,credentialType=%hhu]",
+        emberAfDoorLockClusterPrintln("[SetCredential] Credential type is not supported [endpointId=%d,credentialType=%hhu]",
                                       commandPath.mEndpointId, credentialType);
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND);
         return;
     }
 
-    if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex))
+    uint16_t maxNumberOfCredentials = 0;
+    if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
         emberAfDoorLockClusterPrintln(
-            "[GetCredentialStatus] Credential index is out of range [endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
+            "[SetCredential] Credential index is out of range [endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
             commandPath.mEndpointId, credentialType, credentialIndex);
         sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, 0);
         return;
     }
 
+    // TODO: move to a separate function
+    // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     size_t minSize, maxSize;
     if (!getCredentialRange(commandPath.mEndpointId, credentialType, minSize, maxSize))
     {
         emberAfDoorLockClusterPrintln(
-            "[SetCredential] Unable to set min/max range for credential: internal error [endpointId=%d,credentialIndex=%d]",
+            "[SetCredential] Unable to get min/max range for credential: internal error [endpointId=%d,credentialIndex=%d]",
             commandPath.mEndpointId, credentialIndex);
         sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, 0);
         return;
     }
-
     if (credentialData.size() < minSize || credentialData.size() > maxSize)
     {
         emberAfDoorLockClusterPrintln("[SetCredential] Credential data size is out of range "
@@ -455,21 +457,40 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         return;
     }
 
+    // appclusters, 5.2.4.41.1: we should return DUPLICATE in the response if we're trying to create duplicated credential entry
+    for (uint16_t i = 1; i <= maxNumberOfCredentials; ++i)
+    {
+        EmberAfPluginDoorLockCredentialInfo currentCredential;
+        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialType, currentCredential))
+        {
+            if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
+                currentCredential.credentialData.data_equal(credentialData))
+            {
+                emberAfDoorLockClusterPrintln(
+                    "[SetCredential] Credential with the same data and type already exist "
+                    "[endpointId=%d,credentialType=%hhu,dataLength=%zu,existingCredentialIndex=%d,credentialIndex=%d]",
+                    commandPath.mEndpointId, credentialType, credentialData.size(), i, credentialIndex);
+                sendSetCredentialResponse(commandObj, DlStatus::kDuplicate, 0, 0);
+                return;
+            }
+        }
+    }
+
+    EmberAfPluginDoorLockCredentialInfo existingCredential;
+    if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialType, existingCredential))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
+            commandPath.mEndpointId, credentialIndex);
+
+        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, 0);
+        return;
+    }
+
     switch (operationType)
     {
     case DlDataOperationType::kAdd: {
         uint16_t nextAvailableCredentialSlot = 0;
-
-        EmberAfPluginDoorLockCredentialInfo existingCredential;
-        if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, existingCredential))
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
-
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, 0);
-            return;
-        }
 
         // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
         if (DlCredentialStatus::kAvailable != existingCredential.status)
@@ -482,8 +503,6 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
             sendSetCredentialResponse(commandObj, DlStatus::kOccupied, 0, nextAvailableCredentialSlot);
             return;
         }
-
-        // TODO: Check if credential exists with the same data
 
         DlCredential credential{ to_underlying(credentialType), credentialIndex };
         // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
@@ -557,7 +576,7 @@ void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler
     }
 
     EmberAfPluginDoorLockCredentialInfo credentialInfo;
-    if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialInfo))
+    if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, credentialIndex, credentialType, credentialInfo))
     {
         emberAfDoorLockClusterPrintln("[GetCredentialStatus] Unable to get the credential: app error "
                                       "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
@@ -804,10 +823,10 @@ bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, D
         return false;
     }
 
-    for (uint16_t i = startIndex; i < maxNumberOfCredentials; ++i)
+    for (uint16_t i = startIndex; i <= maxNumberOfCredentials; ++i)
     {
         EmberAfPluginDoorLockCredentialInfo info;
-        if (!emberAfPluginDoorLockGetCredential(endpointId, i, info))
+        if (!emberAfPluginDoorLockGetCredential(endpointId, i, credentialType, info))
         {
             ChipLogError(Zcl, "Unable to get credential: app error [endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
                          endpointId, credentialType, i);
@@ -1768,7 +1787,7 @@ struct CredentialInfo
 static CredentialInfo gs_credentials[10];
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
-                                        EmberAfPluginDoorLockCredentialInfo & credential)
+                                        DoorLock::DlCredentialType credentialType, EmberAfPluginDoorLockCredentialInfo & credential)
 {
     auto & credentialInStorage = gs_credentials[credentialIndex];
 

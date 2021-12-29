@@ -304,6 +304,7 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
                                   size_t totalCredentials);
 
 bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
+                                        DoorLock::DlCredentialType credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential);
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                         DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData);
