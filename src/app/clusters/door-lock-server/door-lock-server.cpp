@@ -47,7 +47,8 @@ EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 DoorLockServer DoorLockServer::instance;
 
 // TODO: Remove hardcoded pin when SetCredential command is implemented.
-chip::ByteSpan mPin({ 1, 2, 3, 4 });
+static const uint8_t HARD_CODED_PIN_CODE[] = { 1, 2, 3, 4 };
+chip::ByteSpan mPin(HARD_CODED_PIN_CODE);
 
 /**********************************************************
  * DoorLockServer Implementation
