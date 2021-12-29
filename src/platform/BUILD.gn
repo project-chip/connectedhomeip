@@ -296,6 +296,13 @@ if (chip_device_platform != "none") {
       "PlatformEventSupport.cpp",
     ]
 
+    if (chip_enable_ota_requestor) {
+      sources += [
+        "GenericOTARequestorDriver.cpp",
+        "GenericOTARequestorDriver.h",
+      ]
+    }
+
     cflags = [ "-Wconversion" ]
 
     public_deps = [

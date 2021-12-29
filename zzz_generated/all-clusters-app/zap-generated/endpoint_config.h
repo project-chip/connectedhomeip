@@ -1424,15 +1424,15 @@
             { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* start up color temperature mireds */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Test Cluster (server) */                                                                      \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },  /* range_restricted_int8u */                                   \
-            { (uint16_t) 0x0, (uint16_t) -0x28, (uint16_t) 0x32 },  /* range_restricted_int8s */                                   \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 }, /* range_restricted_int16u */                                  \
-            { (uint16_t) 0x0, (uint16_t) -0x96, (uint16_t) 0xC8 },  /* range_restricted_int16s */                                  \
-            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },  /* nullable_range_restricted_int8u */                          \
-            { (uint16_t) 0x0, (uint16_t) -0x28, (uint16_t) 0x32 },  /* nullable_range_restricted_int8s */                          \
-            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 }, /* nullable_range_restricted_int16u */                         \
+            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* range_restricted_int8u */                                  \
+            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* range_restricted_int8s */                                  \
+            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* range_restricted_int16u */                                 \
+            { (uint16_t) -0x64, (uint16_t) -0x96, (uint16_t) 0xC8 }, /* range_restricted_int16s */                                 \
+            { (uint16_t) 0x46, (uint16_t) 0x14, (uint16_t) 0x64 },   /* nullable_range_restricted_int8u */                         \
+            { (uint16_t) -0x14, (uint16_t) -0x28, (uint16_t) 0x32 }, /* nullable_range_restricted_int8s */                         \
+            { (uint16_t) 0xC8, (uint16_t) 0x64, (uint16_t) 0x3E8 },  /* nullable_range_restricted_int16u */                        \
         {                                                                                                                          \
-            (uint16_t) 0x0, (uint16_t) -0x96, (uint16_t) 0xC8                                                                      \
+            (uint16_t) - 0x64, (uint16_t) -0x96, (uint16_t) 0xC8                                                                   \
         } /* nullable_range_restricted_int16s */                                                                                   \
     }
 
@@ -2516,8 +2516,8 @@
             }, /* Endpoint: 1, Cluster: Mode Select (server) */                                                                    \
             { 0x0101,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(276),                                                                                            \
-              28,                                                                                                                  \
-              49,                                                                                                                  \
+              19,                                                                                                                  \
+              29,                                                                                                                  \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
                   ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
               chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \

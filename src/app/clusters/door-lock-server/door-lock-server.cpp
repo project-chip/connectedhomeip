@@ -508,7 +508,7 @@ void MatterDoorLockPluginServerInitCallback()
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
 
 // =============================================================================
-// Cluster attributes pre-change callbacks
+// Pre-change callbacks for cluster attributes
 // =============================================================================
 
 chip::Protocols::InteractionModel::Status __attribute__((weak))
