@@ -84,7 +84,7 @@ using namespace ::chip::DeviceLayer;
 
 // Global OTA objects
 OTARequestor gRequestorCore;
-//OTARequestorDriverImpl gRequestorUser;
+// OTARequestorDriverImpl gRequestorUser;
 DeviceLayer::GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
