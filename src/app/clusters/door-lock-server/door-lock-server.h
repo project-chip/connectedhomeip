@@ -184,16 +184,14 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE]; /**< Name of the user. */
-    // TODO: Consider using a span to save memory and guarantee immutability
-    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER]; /**< Credentials that are associated with user (without data).*/
-    size_t totalCredentials;                                      /**< Total number of credentials associated with user. */
-    uint32_t userUniqueId;                                        /**< Unique user identifier. */
-    DoorLock::DlUserStatus userStatus;                            /**< Status of the user slot (available/occupied). */
-    DoorLock::DlUserType userType;                                /**< Type of the user. */
-    DoorLock::DlCredentialRule credentialRule;                    /**< Number of supported credentials. */
-    chip::FabricIndex createdBy;                                  /**< ID of the fabric that created the user. */
-    chip::FabricIndex lastModifiedBy;                             /**< ID of the fabric that modified the user. */
+    chip::CharSpan userName;                    /**< Name of the user. */
+    chip::Span<const DlCredential> credentials; /**< Credentials that are associated with user (without data).*/
+    uint32_t userUniqueId;                      /**< Unique user identifier. */
+    DoorLock::DlUserStatus userStatus;          /**< Status of the user slot (available/occupied). */
+    DoorLock::DlUserType userType;              /**< Type of the user. */
+    DoorLock::DlCredentialRule credentialRule;  /**< Number of supported credentials. */
+    chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
+    chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
@@ -332,7 +330,7 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
  *                  value of NumberOfUsersSupported attribute).
  * @param creator Fabric ID that created the user. Could be kUndefinedFabricIndex (0).
  * @param modifier Fabric ID that was last to modify the user. Could be kUndefinedFabricIndex (0).
- * @param[in] userName Pointer to the user name. Could be an empty string, guaranteed not to be a nullptr.
+ * @param[in] userName Pointer to the user name. Could be an empty string, data is guaranteed not to be a nullptr.
  * @param uniqueId New Unique ID of the user.
  * @param userStatus New status of the user.
  * @param usertype New type of the user.
@@ -345,7 +343,7 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
  * @retval false, if error occurred while changing the user.
  */
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
-                                  chip::FabricIndex modifier, const char * userName, uint32_t uniqueId,
+                                  chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
                                   DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
                                   DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials,
                                   size_t totalCredentials);
@@ -378,7 +376,7 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
  *
  * @param endpointId ID of the endpoint which contains the lock.
  * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
-*                         particular credential type. Starts from 1.
+ *                         particular credential type. Starts from 1.
  * @param credentialStatus New status of the credential slot (occupied/available). DlCredentialStatus::kAvailable means that the
  *                         credential must be deleted.
  * @param credentialType Type of the credential (PIN, RFID, etc.).
