@@ -1006,7 +1006,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: null
+          value: 4
 
   - label: "Create new PIN with too long data"
     command: "SetCredential"
@@ -1031,7 +1031,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: null
+          value: 4
 
   - label: "Create new RFID with too short data"
     command: "SetCredential"
@@ -1056,7 +1056,7 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
-          value: null
+          value: 4
 
   - label: "Create new RFID with too short data"
     command: "SetCredential"
@@ -1081,4 +1081,129 @@ tests:
         - name: "userIndex"
           value: null
         - name: "nextCredentialIndex"
+          value: 4
+
+  - label: "Create new PIN credential with data the would cause duplicate"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 4 }
+        - name: "credentialData"
+          value: "000000"
+        - name: "userIndex"
           value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x02
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 5
+
+  - label: "Create new RFID credential with data the would cause duplicate"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 4 }
+        - name: "credentialData"
+          value: "rfid_data_123456"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x02
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 5
+
+  - label: "Modify credentialData of existing PIN credential"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 1 }
+        - name: "credentialData"
+          value: "123456"
+        - name: "userIndex"
+          value: 1
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 3
+
+  - label: "Verify that credential was changed by creating new credential with old data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "000000"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: 2
+        - name: "nextCredentialIndex"
+          value: 4
+
+  - label: "Verify that credential was changed by creating new credential with new data"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 4 }
+        - name: "credentialData"
+          value: "123456"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x02
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 5
