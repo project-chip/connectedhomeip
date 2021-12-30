@@ -39,4 +39,9 @@ source "../scripts/activate.sh"
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR"
 env
 
-west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$@"
+OVERLAY_CONF_FLAG=""
+if [[ -f "$APP/nrfconnect/boards/$BOARD.conf" ]]; then
+	OVERLAY_CONF_FLAG="-DOVERLAY_CONFIG=boards/$BOARD.conf"
+fi
+
+west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- $OVERLAY_CONF_FLAG "$@"

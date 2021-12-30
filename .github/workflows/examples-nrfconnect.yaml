@@ -83,8 +83,7 @@ jobs:
             - name: Build example nRF Connect SDK Lighting App on nRF52840 Dongle
               timeout-minutes: 10
               run: |
-                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840 \
-                    -DOVERLAY_CONFIG=boards/nrf52840dongle_nrf52840.conf
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dongle_nrf52840 lighting-app \
                     examples/lighting-app/nrfconnect/build/nrf52840dongle_nrf52840/zephyr/zephyr.elf \
