@@ -119,8 +119,6 @@ that are currently supported include `ESP32-DevKitC` (default),
 
           $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
 
-
-
 ## Commissioning and cluster control
 
 Commissioning can be carried out using WiFi, BLE or Bypass.
@@ -200,11 +198,9 @@ the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
     $ .out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
 
-Parameters:
-    1. Discriminator: 3840 (configurable through menuconfig)
-    2. Setup-pin-code: 20202021 (configurable through menuconfig)
-    3. Node-id: 12344321 (you can assign any node id)
-
+Parameters: 1. Discriminator: 3840 (configurable through menuconfig) 2.
+Setup-pin-code: 20202021 (configurable through menuconfig) 3. Node-id: 12344321
+(you can assign any node id)
 
 ### Cluster control
 
@@ -212,7 +208,6 @@ Parameters:
 
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
-
 
     $ .out/debug/chip-tool onoff on 12344321 1
 

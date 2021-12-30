@@ -151,7 +151,6 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
           $ idf.py -p /dev/tty.SLAB_USBtoUART monitor
 
-
 ## Commissioning and cluster control
 
 Commissioning can be carried out using WiFi, BLE or Bypass.
@@ -231,11 +230,9 @@ the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
     $ .out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
 
-Parameters:
-    1. Discriminator: 3840 (configurable through menuconfig)
-    2. Setup-pin-code: 20202021 (configurable through menuconfig)
-    3. Node-id: 12344321 (you can assign any node id)
-
+Parameters: 1. Discriminator: 3840 (configurable through menuconfig) 2.
+Setup-pin-code: 20202021 (configurable through menuconfig) 3. Node-id: 12344321
+(you can assign any node id)
 
 ### Cluster control
 
