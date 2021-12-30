@@ -67,8 +67,8 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
 #include <app/clusters/door-lock-server/door-lock-server.h>
-#include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#include <app/clusters/on-off-server/on-off-server.h>
 
 #if CONFIG_ENABLE_PW_RPC
 #include "Rpc.h"
@@ -136,8 +136,8 @@ typedef std::vector<Device> Devices;
 Devices devices;
 
 namespace {
-app::Clusters::NetworkCommissioning::Instance sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */,
-                                                                                &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
 } // namespace
 
 void NetWorkCommissioningInstInit()

@@ -22,7 +22,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 namespace {
-constexpr uint16_t kMaxScanResultsNum     = 15;
+constexpr uint16_t kMaxScanResultsNum = 15;
 }
 template <typename T>
 class ESPScanResponseIterator : public Iterator<T>
@@ -50,6 +50,7 @@ public:
         scanResponse[size++] = scanResult;
         return true;
     }
+
 private:
     size_t size = 0;
     T scanResponse[kMaxScanResultsNum];
@@ -111,6 +112,7 @@ public:
         static ESPWiFiDriver instance;
         return instance;
     }
+
 private:
     bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
     CHIP_ERROR StartScanWiFiNetworks(ByteSpan ssid);
