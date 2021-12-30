@@ -18,7 +18,7 @@ SRC_URI = " \
 DEPENDS = "openssl avahi glib-2.0 glib-2.0-native libpbnjson pmloglib luna-service2"
 
 S = "${WORKDIR}/git"
-SRCREV_main = "accb0ba7ea9198e8d2c04a18e76cf1c13403ff58"
+SRCREV_main = "f07886c4a54830c8c135766210c85084dfb7d9a1"
 B = "${WORKDIR}/build"
 PR = "r0"
 
@@ -80,12 +80,12 @@ do_install() {
     install -d ${D}${datadir}/luna-service2/manifests.d
     install -d ${D}${datadir}/luna-service2/groups.d
 
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.service ${D}${datadir}/luna-service2/services.d
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.role.json ${D}${datadir}/luna-service2/roles.d
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.perm.json ${D}${datadir}/luna-service2/client-permissions.d
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.api.json ${D}${datadir}/luna-service2/api-permissions.d
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.manifest.json ${D}${datadir}/luna-service2/manifests.d
-    install -c -m 555 ${S}/examples/chip-webos-service/webos/files/sysbus/com.webos.service.matter.groups.json ${D}${datadir}/luna-service2/groups.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.service ${D}${datadir}/luna-service2/services.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.role.json ${D}${datadir}/luna-service2/roles.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.perm.json ${D}${datadir}/luna-service2/client-permissions.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.api.json ${D}${datadir}/luna-service2/api-permissions.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.manifest.json ${D}${datadir}/luna-service2/manifests.d
+    install -c -m 555 ${S}/examples/chip-tool-webos/webos/files/sysbus/com.webos.service.matter.groups.json ${D}${datadir}/luna-service2/groups.d
 
     rm -rf ${S}/third_party/efr32_sdk
     rm -rf ${S}/third_party/p6
@@ -117,7 +117,8 @@ do_install() {
     copy_file_recursive ${S}/zzz_generated ${D}/connectedhomeip/zzz_generated
 
     install -d ${D}${sbindir}
-    install -c -m 555 ${OUT_DIR}/chip-webos-service ${D}${sbindir}
+    mv ${OUT_DIR}/chip-tool-webos ${OUT_DIR}/chip-service
+    install -c -m 555 ${OUT_DIR}/chip-service ${D}${sbindir}
 }
 
 sysroot_stage_all_append() {

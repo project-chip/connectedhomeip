@@ -19,6 +19,8 @@
 #include "DiscoverCommissionablesCommand.h"
 #include <lib/support/BytesToHex.h>
 
+#include "../../webos/src/mattermanagerservice.h"
+
 using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
@@ -31,4 +33,5 @@ CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)
 {
     nodeData.LogDetail();
+    MatterManagerService::GetInstance()->updateDiscoverCommissionableNodes(nodeData);
 }
