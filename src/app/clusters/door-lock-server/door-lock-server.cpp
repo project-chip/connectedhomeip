@@ -433,6 +433,10 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         return;
     }
 
+    // appclusters, 5.2.4.41: response should contain next available credential slot
+    uint16_t nextAvailableCredentialSlot = 0;
+    findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
+
     // TODO: move to a separate function
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     size_t minSize, maxSize;
@@ -441,7 +445,7 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         emberAfDoorLockClusterPrintln(
             "[SetCredential] Unable to get min/max range for credential: internal error [endpointId=%d,credentialIndex=%d]",
             commandPath.mEndpointId, credentialIndex);
-        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, 0);
+        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
         return;
     }
     if (credentialData.size() < minSize || credentialData.size() > maxSize)
@@ -449,7 +453,7 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         emberAfDoorLockClusterPrintln("[SetCredential] Credential data size is out of range "
                                       "[endpointId=%d,credentialType=%hhu,minLength=%zu,maxLength=%zu,length=%zu]",
                                       commandPath.mEndpointId, credentialType, minSize, maxSize, credentialData.size());
-        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, 0);
+        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
 
@@ -459,16 +463,24 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         EmberAfPluginDoorLockCredentialInfo currentCredential;
         if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialType, currentCredential))
         {
-            if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
-                currentCredential.credentialData.data_equal(credentialData))
-            {
-                emberAfDoorLockClusterPrintln(
-                    "[SetCredential] Credential with the same data and type already exist "
-                    "[endpointId=%d,credentialType=%hhu,dataLength=%zu,existingCredentialIndex=%d,credentialIndex=%d]",
-                    commandPath.mEndpointId, credentialType, credentialData.size(), i, credentialIndex);
-                sendSetCredentialResponse(commandObj, DlStatus::kDuplicate, 0, 0);
-                return;
-            }
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to get the credential to exclude duplicated entry "
+                                          "[endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
+                                          commandPath.mEndpointId, credentialType, i);
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+            return;
+        }
+        emberAfDoorLockClusterPrintln("comparing credentials (%d) type=%hhu,data_size=%zu (looking for type=%hhu,data_size=%zu)", i,
+                                      currentCredential.credentialType, currentCredential.credentialData.size(), credentialType,
+                                      credentialData.size());
+        if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
+            currentCredential.credentialData.data_equal(credentialData))
+        {
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] Credential with the same data and type already exist "
+                "[endpointId=%d,credentialType=%hhu,dataLength=%zu,existingCredentialIndex=%d,credentialIndex=%d]",
+                commandPath.mEndpointId, credentialType, credentialData.size(), i, credentialIndex);
+            sendSetCredentialResponse(commandObj, DlStatus::kDuplicate, 0, nextAvailableCredentialSlot);
+            return;
         }
     }
 
@@ -479,15 +491,13 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
             "[SetCredential] Unable to check if credential exists: app error [endpointId=%d,credentialIndex=%d]",
             commandPath.mEndpointId, credentialIndex);
 
-        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, 0);
+        sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
         return;
     }
 
     switch (operationType)
     {
     case DlDataOperationType::kAdd: {
-        uint16_t nextAvailableCredentialSlot = 0;
-
         // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
         if (DlCredentialStatus::kAvailable != existingCredential.status)
         {
@@ -495,7 +505,6 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
                 "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
                 commandPath.mEndpointId, credentialIndex);
 
-            findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
             sendSetCredentialResponse(commandObj, DlStatus::kOccupied, 0, nextAvailableCredentialSlot);
             return;
         }
@@ -524,17 +533,80 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
         {
             nextAvailableCredentialSlot = credentialIndex;
         }
-        else
-        {
-            findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
-        }
-
         sendSetCredentialResponse(commandObj, status, createdUserIndex, nextAvailableCredentialSlot);
         return;
     }
-    case DlDataOperationType::kModify:
-        // TODO: Modify the credential if possible
-        break;
+    case DlDataOperationType::kModify: {
+        // appclusters, 5.2.4.41.1: should send the INVALID_COMMAND in the response when the credential is in use
+        if (DlCredentialStatus::kAvailable == existingCredential.status)
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: credential slot is not occupied "
+                                          "[endpointId=%d,credentialIndex=%d]",
+                                          commandPath.mEndpointId, credentialIndex);
+
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
+        // if userIndex is NULL then we're changing the programming user PIN
+        if (userIndex.IsNull())
+        {
+            if (DlCredentialType::kProgrammingPIN != credentialType || 0 != credentialIndex || !userStatus.IsNull() ||
+                userType.IsNull() || DlUserType::kProgrammingUser != userType.Value())
+            {
+                emberAfDoorLockClusterPrintln(
+                    "[SetCredential] Unable to modify programming PIN: invalid argument [endpointId=%d,credentialIndex=%d]",
+                    commandPath.mEndpointId, credentialIndex);
+
+                sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+                return;
+            }
+
+            emberAfDoorLockClusterPrintln(
+                "[SetCredential] Modifying the programming PIN (not implemented yet) [endpointId=%d,credentialIndex=%d]",
+                commandPath.mEndpointId, credentialIndex);
+
+            // TODO: Change the programming PIN
+            sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
+        // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
+        if (!userStatus.IsNull() || !userType.IsNull())
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
+                                          commandPath.mEndpointId, credentialIndex, credentialType);
+
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
+        DlCredential credential{ to_underlying(credentialType), credentialIndex };
+        auto status = modifyCredentialForUser(commandPath.mEndpointId, fabricIdx, userIndex.Value(), credential);
+
+        if (DlStatus::kSuccess == status)
+        {
+            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, existingCredential.status,
+                                                    existingCredential.credentialType, credentialData))
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
+                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
+
+                status = DlStatus::kFailure;
+            }
+            else
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
+                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
+            }
+        }
+
+        sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
+        return;
+    }
     case DlDataOperationType::kClear:
         // appclusters, 5.2.4.40: set credential command supports only Add and Modify operational type.
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
@@ -1837,6 +1909,7 @@ bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t cr
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
+    credentialInStorage.credentialDataSize = credentialData.size();
 
     return true;
 }
