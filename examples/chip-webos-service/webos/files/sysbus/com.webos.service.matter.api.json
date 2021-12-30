@@ -1,5 +1,0 @@
-{
-    "matter.operation": [
-        "com.webos.service.matter/sendCommand"
-    ]
-}
