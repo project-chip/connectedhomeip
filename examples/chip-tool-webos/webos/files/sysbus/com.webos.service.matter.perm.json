@@ -1,5 +1,3 @@
 {
-    "com.webos.service.matter": [
-        "all"
-    ]
+    "com.webos.service.matter": ["all"]
 }

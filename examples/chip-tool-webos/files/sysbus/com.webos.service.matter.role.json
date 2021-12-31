@@ -1,11 +1,11 @@
 {
-    "exeName":"/home/root/chip-tool-webos",
-    "type":"regular",
-    "allowedNames":["com.webos.service.matter"],
+    "exeName": "/home/root/chip-tool-webos",
+    "type": "regular",
+    "allowedNames": ["com.webos.service.matter"],
     "permissions": [
         {
-            "service":"com.webos.service.matter",
-            "outbound":[
+            "service": "com.webos.service.matter",
+            "outbound": [
                 "com.webos.service.tvpower",
                 "com.webos.service.pdm",
                 "com.webos.service.tv.systemproperty",

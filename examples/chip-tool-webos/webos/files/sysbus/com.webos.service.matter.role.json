@@ -1,12 +1,12 @@
 {
-    "exeName":"/usr/sbin/chip-service",
-    "type":"regular",
+    "exeName": "/usr/sbin/chip-service",
+    "type": "regular",
     "trustLevel": "oem",
-    "allowedNames":["com.webos.service.matter"],
+    "allowedNames": ["com.webos.service.matter"],
     "permissions": [
         {
-            "service":"com.webos.service.matter",
-            "outbound":[]
+            "service": "com.webos.service.matter",
+            "outbound": []
         }
     ]
 }
