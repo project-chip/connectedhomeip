@@ -35,11 +35,8 @@ IP_ADDRESS_OF_YOUR_RASPBERRYPI4:
 ## Build Instructions
 Step 1: Build and Flash the webOS OSE
 
-- Set up a webOS OSE build as explained at:
-
-        webOS OSE build instruction: http://webosose.org/discover/setting/building-webos-ose.
-        Next, flash the build image to your Raspberry Pi 4 by the webOS flash instruction:
-            http://webosose.org/discover/setting/flashing-webos-OSE
+- Set up a webOS OSE build as explained on [webOS OSE build instruction](http://webosose.org/discover/setting/building-webos-ose)
+- Then flash the build image to your Raspberry Pi 4 exaplained on [webOS flash instruction](http://webosose.org/discover/setting/flashing-webos-OSE)
 
 - After going through webOS OSE build and flash instruction, you are ready to start building Matter client example for webOS OSE.
 - Here is a brief commands used for webOS OSE build.
@@ -67,7 +64,6 @@ Step 3: Build Matter client example for webOS OSE
         $ bitbake chip
 
 
-
 Step 4: Get installation package
 - Go to the location where installation package file is generated after Step 3, and copy it to your local.
 
@@ -87,18 +83,19 @@ Step 5: Install the package on your raspberrypi4
         # opkg install chip_1.0-r0_raspberrypi4.ipk
 
 Step 6: Reboot your raspberrypi4
+- Power off and on your raspberrypi4
 
 
 Step 7: Launch all-clusters-app on other machine on the same subnet.
 - On the second raspberrypi4 where all-clusters-app is built, launch all-clusters-app so that controlee can discover ghe neighborhood.
 
+
 Step 8: Test if discover works using luna-send command
 - Go into the raspberrypi4 shell using ssh. Launch below command on the raspberrypi4 shell.
 - Discover API works successfully if you see below json return.
 
-$ ssh root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}
-
 <pre><code>
+$ ssh root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}
 root@raspberrypi4:/var/rootdirs/home/root# luna-send -f -n 1 luna://com.webos.service.matter/sendCommand '{"clusterName":"discover", "commandName":"commissionables"}'
 {
     "returnValue": true,
