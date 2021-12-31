@@ -1,504 +1,124 @@
-# Matter Client Example
+# Guide for building Matter example for webOS OSE
 
-An example application that uses Matter to send messages to a Matter server.
+## Purpose
 
----
+This doc provides the build and test guide of Matter client example for webOS OSE.
 
--   [Building the Example Application](#building-the-example-application)
--   [Using the Client to Request an Echo](#using-the-client-to-request-an-echo)
+## Tested on:
+- [webOS OSE 2.0](https://www.webosose.org/)
 
----
+## Prerequisite
 
-## Building the Example Application
+Before budiling and testing Matter example for webOS, you need following items.
 
-See [the build guide](../../docs/guides/BUILDING.md#prerequisites) for general
-background on build prerequisites.
+: Ubuntu 18.04 machine (used for building webOS OSE)
+: Network router
+: 2 raspberrypi4 H/W (First rpi4 used for controller, and second used for controlee)
+: Flash webOS OSE image on the first raspberrypi4 referring to Step 1 of "Build Instructions" below.
+: Flash Ubuntu 20.04 or higher on the second raspberrypi4 by referring https://ubuntu.com/download/raspberry-pi
+: Then, checkout the project-chip/connectedhomeip and build all-clusters-app on examples/all-clusters-app.
 
-Building the example application is quite straightforward. It can either be done
-as part of an overall "build everything" build:
 
-```
-./gn_build.sh
-```
+## Definition
+WEBOS_BUILD_ROOT:
+- Build root path of your webOS OSE build set up on your build machine. ex) /home/cabin15/build-webos
 
-which puts the binary at `out/debug/standalone/chip-tool` or directly via:
+CHIP_ROOT:
+- Root path of the connectedhomeip repository. ex) /home/cabin15/connectedhomeip
 
-```
-scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
-```
+IP_ADDRESS_OF_YOUR_RASPBERRYPI4:
+- IP address of other raspberrypi device connected on your router. ex) 192.168.0.120
 
-which puts the binary at `SOME-PATH/chip-tool`.
 
-### Building with message tracing
+## Build Instructions
+Step 1: Build and Flash the webOS OSE
 
-Message tracing allows capture of the secure messages which can be used for test
-automation.
+Set up a webOS OSE build as explained at:
 
-```
-gn gen out/with_trace/ --args='import("//with_pw_trace.gni")'
-ninja -C out/with_trace chip-tool
-```
+webOS OSE build instruction: http://webosose.org/discover/setting/building-webos-ose
+Next, flash the build image to your Raspberry Pi 4 by the webOS flash instruction:
+http://webosose.org/discover/setting/flashing-webos-OSE
 
-This enables tracing and adds additional flags to chip-tool to control where the
-traces should go:
+After going through webOS OSE build and flash instruction, you are ready to start building Matter client example for webOS OSE.
 
--   --trace_file <file> Outputs trace data to the specified file.
--   --trace_log Outputs trace data to the chip log stream.
+Here is a brief commands used for webOS OSE build.
 
-For example:
+$ git clone https://github.com/webosose/build-webos.git
+$ sudo scripts/prerequisites.sh
+$ ./mcf -p 16 -b 16 raspberrypi4
+$ make webos-image
 
-```
-out/with_trace/chip-tool pairing <pairing_args> --trace_file trace.log
-```
 
-## Using the Client to commission a device
+Step 2: Setting recipe of Matter client example for webOS OSE
+Checkout cabin15/connectedhomeip on github and move the chip recipe files located under ${CHIP_ROOT}/examples/chip-tool-webos/recipe
+to your webOS OSE build tree by using below command.
 
-In order to send commands to a device, it must be commissioned with the client.
-chip-tool currently only supports commissioning and remembering one device at a
-time. The configuration state is stored in `/tmp/chip_tool_config.ini`; deleting
-this and other `.ini` files in `/tmp` can sometimes resolve issues due to stale
-configuration.
+$ cp -r ${CHIP_ROOT}/examples/chip-tool-webos/recipe/chip ${WEBOS_BUILD_ROOT}/meta-webosose/meta-webos/recipes-connectivity
 
-#### Commission a device
+ex) cp -r /home/worker/connectedhomeip/examples/chip-tool-webos/recipe/chip /home/worker/ose/build-webos/meta-webosose/meta-webos/recipes-connectivity
 
-To initiate a client commissioning request to a device, run the built executable
-and choose the pairing mode.
 
-#### Commission a device over BLE
+Step 3: Build Matter client example for webOS OSE
+Go to your webOS OSE build root and build the Matter client example for webOS OSE.
 
-Run the built executable and pass it the discriminator and pairing code of the
-remote device, as well as the network credentials to use.
+$ cd ${WEBOS_BUILD_ROOT}
+$ source oe-init-build-env
+$ bitbake chip
 
-The command below uses the default values hard-coded into the debug versions of
-the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ chip-tool pairing ble-wifi ${NODE_ID_TO_ASSIGN} ${SSID} ${PASSWORD} 0 20202021 3840
 
-where:
+Step 4: Get installation package
+Go to the location where installation package file is generated after Step 3, and copy it to your local.
 
--   \${NODE_ID_TO_ASSIGN} (which must be a decimal number or a 0x-prefixed hex
-    number) is the node id to assign to the node being commissioned.
--   \${SSID} is the Wi-Fi SSID either as a string, or in the form hex:XXXXXXXX
-    where the bytes of the SSID are encoded as two-digit hex numbers.
--   \${PASSWORD} is the Wi-Fi password, again either as a string or as hex data
--   The 0 is the fabric id, until more complete support for multiple fabrics is
-    implemented in our commissioning process.
+$ cd ${WEBOS_BUILD_ROOT}/BUILD/work/raspberrypi4-webos-linux-gnueabi/chip/1.0-r0/deploy-ipks/raspberrypi4
+$ scp chip_1.0-r0_raspberrypi4.ipk root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}:/home/root
 
-For example:
 
-    $ chip-tool pairing ble-wifi 0x11 xyz secret 0 20202021 3840
 
-or equivalently:
+ex) cd ~/ose/build-webos/BUILD/work/raspberrypi4-webos-linux-gnueabi/chip/1.0-r0/deploy-ipks/raspberrypi4
 
-    $ chip-tool pairing ble-wifi 17 hex:787980 hex:736563726574 0 20202021 3840
+      scp chip_1.0-r0_raspberrypi4.ipk root@192.168.0.120
 
-#### Pair a device over IP
 
-The command below will discover devices and try to pair with the first one it
-discovers using the provided setup code.
+Step 5: Install the package on your raspberrypi4
+Go into the raspberrypi4 shell using ssh and install the package.
 
-    $ chip-tool pairing onnetwork ${NODE_ID_TO_ASSIGN} 20202021
+$ ssh root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}
+# cd /home/root
+# opkg install chip_1.0-r0_raspberrypi4.ipk
 
-The command below will discover devices with long discriminator 3840 and try to
-pair with the first one it discovers using the provided setup code.
+Step 6: Reboot your raspberrypi4
 
-    $ chip-tool pairing onnetwork-long ${NODE_ID_TO_ASSIGN} 20202021 3840
+Step 7: Launch all-clusters-app on other machine on the same subnet.
+On the second raspberrypi4 where all-clusters-app is built, launch all-clusters-app so that controlee can discover ghe neighborhood.
 
-The command below will discover devices based on the given QR code (which
-devices log when they start up) and try to pair with the first one it discovers.
+Step 8: Test if discover works using luna-send command
+Go into the raspberrypi4 shell using ssh. Launch below command on the raspberrypi4 shell.
+Discover API works successfully if you see below json return.
 
-    $ chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:#######
-
-In all these cases, the device will be assigned node id `${NODE_ID_TO_ASSIGN}`
-(which must be a decimal number or a 0x-prefixed hex number).
-
-### Forget the currently-commissioned device
-
-    $ chip-tool pairing unpair
-
-## Using the Client to Send Matter Commands
-
-To use the Client to send Matter commands, run the built executable and pass it
-the target cluster name, the target command name as well as an endpoint id.
-
-The endpoint id must be between 1 and 240.
-
-    $ chip-tool onoff on 1
-
-The client will send a single command packet and then exit.
-
-### How to get the list of supported clusters
-
-To get the list of supported clusters, run the built executable without any
-arguments.
-
-    $ chip-tool
-
-Example output:
-
-```bash
-Usage:
-  ./chip-tool cluster_name command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Clusters:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * barriercontrol                                                                    |
-  | * basic                                                                             |
-  | * colorcontrol                                                                      |
-  | * doorlock                                                                          |
-  | * groups                                                                            |
-  | * iaszone                                                                           |
-  | * identify                                                                          |
-  | * levelcontrol                                                                      |
-  | * onoff                                                                             |
-  | * pairing                                                                           |
-  | * payload                                                                           |
-  | * scenes                                                                            |
-  | * temperaturemeasurement                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### How to get the list of supported commands for a specific cluster
-
-To get the list of commands for a specific cluster, run the built executable
-with the target cluster name.
-
-    $ chip-tool onoff
-
-### How to get the list of supported attributes for a specific cluster
-
-To the the list of attributes for a specific cluster, run the built executable
-with the target cluster name and the `read` command name.
-
-    $ chip-tool onoff read
-
-### How to get the list of parameters for a command
-
-To get the list of parameters for a specific command, run the built executable
-with the target cluster name and the target command name
-
-    $ chip-tool onoff on
-
-### Run a test suite against a paired peer device
-
-    $ chip-tool tests Test_TC_OO_1_1
-
-## Using the Client for Setup Payload
-
-### How to parse a setup code
-
-To parse a setup code, run the built executable with the `payload` cluster name
-and the `parse-setup-payload` command
-
-    $ chip-tool payload parse-setup-payload code
-
-#### QR Code
-
-    $ chip-tool payload parse-setup-payload "MT:#####"
-
-#### QR Code with optional Vendor Info
-
-    $ chip-tool payload parse-setup-payload "MT:#####"
-
-#### Manual Setup Code
-
-    $ chip-tool payload parse-setup-payload "#####"
-
-# Using the Client for Additional Data Payload
-
-To parse an additional data payload, run the built executable with the `payload`
-cluster name and the `parse-additional-data-payload` command
-
-    $ chip-tool payload parse-additional-data-payload "#####"
-
-# Command Reference
-
-## Command List
-
--   [barriercontrol](#barriercontrol)
--   [basic](#basic)
--   [colorcontrol](#colorcontrol)
--   [doorlock](#doorlock)
--   [groups](#groups)
--   [iaszone](#iaszone)
--   [identify](#identify)
--   [levelcontrol](#levelcontrol)
--   [onoff](#onoff)
--   [pairing](#pairing)
--   [payload](#payload)
--   [scenes](#scenes)
--   [temperaturemeasurement](#temperaturemeasurement)
-
-## Command Details
-
-### barriercontrol
-
-```bash
-Usage:
-  ./chip-tool barriercontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * barrier-control-go-to-percent                                                     |
-  | * barrier-control-stop                                                              |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### basic
-
-```bash
-Usage:
-  ./chip-tool basic command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * reset-to-factory-defaults                                                         |
-  | * ping                                                                              |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### colorcontrol
-
-```bash
-Usage:
-  ./chip-tool colorcontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * move-color                                                                        |
-  | * move-color-temperature                                                            |
-  | * move-hue                                                                          |
-  | * move-saturation                                                                   |
-  | * move-to-color                                                                     |
-  | * move-to-color-temperature                                                         |
-  | * move-to-hue                                                                       |
-  | * move-to-hue-and-saturation                                                        |
-  | * move-to-saturation                                                                |
-  | * step-color                                                                        |
-  | * step-color-temperature                                                            |
-  | * step-hue                                                                          |
-  | * step-saturation                                                                   |
-  | * stop-move-step                                                                    |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### doorlock
-
-```bash
-Usage:
-  ./chip-tool doorlock command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * clear-all-pins                                                                    |
-  | * clear-all-rfids                                                                   |
-  | * clear-holiday-schedule                                                            |
-  | * clear-pin                                                                         |
-  | * clear-rfid                                                                        |
-  | * clear-weekday-schedule                                                            |
-  | * clear-yearday-schedule                                                            |
-  | * get-holiday-schedule                                                              |
-  | * get-pin                                                                           |
-  | * get-rfid                                                                          |
-  | * get-user-type                                                                     |
-  | * get-weekday-schedule                                                              |
-  | * get-yearday-schedule                                                              |
-  | * lock-door                                                                         |
-  | * set-holiday-schedule                                                              |
-  | * set-pin                                                                           |
-  | * set-rfid                                                                          |
-  | * set-user-type                                                                     |
-  | * set-weekday-schedule                                                              |
-  | * set-yearday-schedule                                                              |
-  | * unlock-door                                                                       |
-  | * unlock-with-timeout                                                               |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### groups
-
-```bash
-Usage:
-  ./chip-tool groups command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * add-group                                                                         |
-  | * add-group-if-identifying                                                          |
-  | * get-group-membership                                                              |
-  | * remove-all-groups                                                                 |
-  | * remove-group                                                                      |
-  | * view-group                                                                        |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### iaszone
-
-```bash
-Usage:
-  ./chip-tool iaszone command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * write                                                                             |
-  +-------------------------------------------------------------------------------------+
-```
-
-### identify
-
-```bash
-Usage:
-  ./chip-tool identify command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * identify                                                                          |
-  | * identify-query                                                                    |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### levelcontrol
-
-```bash
-Usage:
-  ./chip-tool levelcontrol command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * move                                                                              |
-  | * move-to-level                                                                     |
-  | * move-to-level-with-on-off                                                         |
-  | * move-with-on-off                                                                  |
-  | * step                                                                              |
-  | * step-with-on-off                                                                  |
-  | * stop                                                                              |
-  | * stop-with-on-off                                                                  |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### onoff
-
-```bash
-Usage:
-  ./chip-tool onoff command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * off                                                                               |
-  | * on                                                                                |
-  | * toggle                                                                            |
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### onoff off [endpoint-id]
-
-Send the OFF command to the ONOFF cluster on the given endpoint.
-
-### onoff on [endpoint-id]
-
-Send the ON command to the ONOFF cluster on the given endpoint.
-
-### onoff toggle [endpoint-id]
-
-Send the TOGGLE command to the ONOFF cluster on the given endpoint.
-
-### onoff discover [endpoint-id]
-
-Send the DISCOVER command to the ONOFF cluster on the given endpoint.
-
-### pairing
-
-```bash
-Usage:
-  ./chip-tool pairing command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * unpair                                                                            |
-  | * ble                                                                               |
-  | * softap                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
-
-### payload
-
-```bash
-Usage:
-  ./chip-tool payload command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * parse-setup-payload                                                               |
-  | * parse-additional-data-payload                                                     |
-  +-------------------------------------------------------------------------------------+
-```
-
-### scenes
-
-```bash
-Usage:
-  ./chip-tool scenes command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * add-scene                                                                         |
-  | * get-scene-membership                                                              |
-  | * recall-scene                                                                      |
-  | * remove-all-scenes                                                                 |
-  | * remove-scene                                                                      |
-  | * store-scene                                                                       |
-  | * view-scene                                                                        |
-  | * discover                                                                          |
-  | * read                                                                              |
-  +-------------------------------------------------------------------------------------+
-```
-
-### temperaturemeasurement
-
-```bash
-Usage:
-  ./chip-tool temperaturemeasurement command_name [param1 param2 ...]
-
-  +-------------------------------------------------------------------------------------+
-  | Commands:                                                                           |
-  +-------------------------------------------------------------------------------------+
-  | * discover                                                                          |
-  | * read                                                                              |
-  | * report                                                                            |
-  +-------------------------------------------------------------------------------------+
-```
+$ ssh root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}
+root@raspberrypi4:/var/rootdirs/home/root#
+root@raspberrypi4:/var/rootdirs/home/root# luna-send -f -n 1 luna://com.webos.service.matter/sendCommand '{"clusterName":"discover", "commandName":"commissionables"}'
+{
+    "returnValue": true,
+    "nodes": [
+        {
+            "hostName": "EEAABADABAD0DDCA",
+    	    "rotatingId": "",
+	    "deviceName": "",
+	    "productId": "65279",
+	    "longDiscriminator": "3840",
+	    "deviceType": "0",
+  	    "vendorId": "9050",
+	    "pairingHint": "33",
+	    "pairingInstruction": "",
+	    "port": "5540",
+	    "commissioningMode": "1",
+	    "address": [
+	        "fe80::870:daaf:910d:24ba",
+	        "192.168.0.112"
+    	    ]
+        }
+    ]
+}
+root@raspberrypi4:/var/rootdirs/home/root#
