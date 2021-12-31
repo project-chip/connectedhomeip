@@ -2,12 +2,12 @@
 
 ## Purpose
 
-This doc provides the build and test guide of Matter client example for webOS OSE.
-
+This doc provides the build and test guide of Matter client example for webOS
+OSE.
 
 ## Tested on:
--   [webOS OSE 2.0](https://www.webosose.org/)
 
+-   [webOS OSE 2.0](https://www.webosose.org/)
 
 ## Prerequisite
 
@@ -24,22 +24,25 @@ Before budiling and testing Matter example for webOS, you need following items.
 -   Then, checkout the project-chip/connectedhomeip and build all-clusters-app
     on examples/all-clusters-app.
 
-
 ## Definition
+
 WEBOS_BUILD_ROOT:
+
 -   Build root path of your webOS OSE build set up on your build machine. ex)
     /home/cabin15/build-webos
 
 CHIP_ROOT:
+
 -   Root path of the connectedhomeip repository. ex)
     /home/cabin15/connectedhomeip
 
 IP_ADDRESS_OF_YOUR_RASPBERRYPI4:
+
 -   IP address of other raspberrypi device connected on your router. ex)
     192.168.0.120
 
-
 ## Build Instructions
+
 Step 1: Build and Flash the webOS OSE
 
 -   Set up a webOS OSE build as explained on
@@ -56,8 +59,8 @@ Step 1: Build and Flash the webOS OSE
           $ ./mcf -p 16 -b 16 raspberrypi4
           $ make webos-image
 
-
 Step 2: Setting recipe of Matter client example for webOS OSE
+
 -   Checkout cabin15/connectedhomeip on github and move the chip recipe files
     located under \${CHIP_ROOT}/examples/chip-tool-webos/recipe to your webOS
     OSE build tree by using below command.
@@ -67,8 +70,8 @@ Step 2: Setting recipe of Matter client example for webOS OSE
           ex)
           cp -r /home/worker/connectedhomeip/examples/chip-tool-webos/recipe/chip /home/worker/ose/build-webos/meta-webosose/meta-webos/recipes-connectivity
 
-
 Step 3: Build Matter client example for webOS OSE
+
 -   Go to your webOS OSE build root and build the Matter client example for
     webOS OSE.
 
@@ -76,8 +79,8 @@ Step 3: Build Matter client example for webOS OSE
           $ source oe-init-build-env
           $ bitbake chip
 
-
 Step 4: Get installation package
+
 -   Go to the location where installation package file is generated after Step
     3, and copy it to your local.
 
@@ -88,25 +91,25 @@ Step 4: Get installation package
           cd ~/ose/build-webos/BUILD/work/raspberrypi4-webos-linux-gnueabi/chip/1.0-r0/deploy-ipks/raspberrypi4
           scp chip_1.0-r0_raspberrypi4.ipk root@192.168.0.120
 
-
 Step 5: Install the package on your raspberrypi4
+
 -   Go into the raspberrypi4 shell using ssh and install the package.
 
           $ ssh root@${IP_ADDRESS_OF_YOUR_RASPBERRYPI4}
           # cd /home/root
           # opkg install chip_1.0-r0_raspberrypi4.ipk
 
-
 Step 6: Reboot your raspberrypi4
+
 -   Power off and on your raspberrypi4
 
-
 Step 7: Launch all-clusters-app on other machine on the same subnet.
+
 -   On the second raspberrypi4 where all-clusters-app is built, launch
     all-clusters-app so that controlee can discover ghe neighborhood.
 
-
 Step 8: Test if discover works using luna-send command
+
 -   Go into the raspberrypi4 shell using ssh. Launch below command on the
     raspberrypi4 shell.
 -   Discover API works successfully if you see below json return.
