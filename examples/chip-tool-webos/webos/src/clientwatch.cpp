@@ -120,4 +120,3 @@ void ClientWatch::notifyClientCanceled(const char *clientToken)
 }
 
 } // namespace LS
-
