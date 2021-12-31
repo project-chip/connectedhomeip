@@ -48,35 +48,36 @@ executable("chip-tool-webos") {
     "commands/payload/SetupPayloadVerhoeff.cpp",
     "commands/tests/TestCommand.cpp",
     "config/PersistentStorage.cpp",
+    "webos/src/clientwatch.cpp",
+    "webos/src/lsutils.cpp",
     "webos/src/main.cpp",
     "webos/src/mattermanagerservice.cpp",
-    "webos/src/lsutils.cpp",
-    "webos/src/clientwatch.cpp",
   ]
 
-  defines = [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop_webos}" ]
+  defines =
+      [ "CONFIG_USE_SEPARATE_EVENTLOOP=${config_use_separate_eventloop_webos}" ]
   defines += [ "CHIP_TOOL_MODE=false" ]
 
   deps = [
+    "${chip_root}/src/app/server",
     "${chip_root}/src/app/server",
     "${chip_root}/src/app/tests/suites/pics",
     "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform",
     "${chip_root}/third_party/inipp",
-    "${chip_root}/src/app/server",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  cflags_cc = [ "-fexceptions"]
+  cflags_cc = [ "-fexceptions" ]
 
   include_dirs = [
     ".",
     "./webos/src",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
-    "/home/worker/tv_reference/build-starfish/BUILD/work/o20-starfishmllib32-linux-gnueabi/lib32-chip/1.0-r0/lib32-recipe-sysroot/usr/include"
+    "/home/worker/tv_reference/build-starfish/BUILD/work/o20-starfishmllib32-linux-gnueabi/lib32-chip/1.0-r0/lib32-recipe-sysroot/usr/include",
   ]
 
   if (chip_enable_transport_trace) {
@@ -88,7 +89,7 @@ executable("chip-tool-webos") {
   libs = [
     "luna-service2",
     "pbnjson_cpp",
-    "PmLogLib"
+    "PmLogLib",
   ]
 }
 

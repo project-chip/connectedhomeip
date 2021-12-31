@@ -15,7 +15,7 @@
 
 import("webos_toolchain.gni")
 
-print (target_os)
+print(target_os)
 
 webos_toolchain("webos") {
   toolchain_args = {

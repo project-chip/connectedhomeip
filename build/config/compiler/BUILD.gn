@@ -204,9 +204,7 @@ config("strict_warnings") {
   ]
 
   if (target_os == "webos") {
-    cflags -= [
-      "-Wshadow",
-    ]
+    cflags -= [ "-Wshadow" ]
   }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
