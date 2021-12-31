@@ -1,13 +1,13 @@
 #if !CHIP_TOOL_MODE
-#include <luna-service2/lunaservice.h>
 #include <PmLogLib.h>
+#include <luna-service2/lunaservice.h>
 
-#include "mattermanagerservice.h"
 #include "logging.h"
+#include "mattermanagerservice.h"
 
 PmLogContext logContext;
-static const char* const logContextName = "chip-service";
-static GMainLoop *mainLoop = NULL;
+static const char * const logContextName = "chip-service";
+static GMainLoop * mainLoop              = NULL;
 
 #else
 #include "commands/common/Commands.h"
@@ -21,27 +21,27 @@ static GMainLoop *mainLoop = NULL;
 #include <zap-generated/test/Commands.h>
 #endif // CHIP_TOOL_MODE
 
-int main(int argc, char **argv)
+int main(int argc, char ** argv)
 {
 #if !CHIP_TOOL_MODE
-	PmLogErr error = PmLogGetContext(logContextName, &logContext);
-	if (error != kPmLogErr_None)
-	{
-		fprintf(stderr, "Failed to setup up log context %s\n", logContextName);
-		abort();
-	}
+    PmLogErr error = PmLogGetContext(logContextName, &logContext);
+    if (error != kPmLogErr_None)
+    {
+        fprintf(stderr, "Failed to setup up log context %s\n", logContextName);
+        abort();
+    }
 
-	mainLoop = g_main_loop_new(NULL, FALSE);
+    mainLoop = g_main_loop_new(NULL, FALSE);
 
-	MATTER_DEBUG("Starting chip-tool service");
+    MATTER_DEBUG("Starting chip-tool service");
 
-	MatterManagerService::GetInstance()->attachToLoop(mainLoop);
-	MatterManagerService::GetInstance()->setMainLoop(mainLoop);
-	g_main_loop_run(mainLoop);
+    MatterManagerService::GetInstance()->attachToLoop(mainLoop);
+    MatterManagerService::GetInstance()->setMainLoop(mainLoop);
+    g_main_loop_run(mainLoop);
 
-	g_main_loop_unref(mainLoop);
+    g_main_loop_unref(mainLoop);
 
-	return 0;
+    return 0;
 #else
     Commands commands;
     registerCommandsDiscover(commands);
@@ -53,5 +53,4 @@ int main(int argc, char **argv)
 
     return commands.Run(argc, argv);
 #endif // CHIP_TOOL_MODE
-
 }
