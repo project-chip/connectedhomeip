@@ -228,7 +228,7 @@ void Discoverer::SetDelegate(Delegate * delegate)
 
 CHIP_ERROR Discoverer::Discover()
 {
-    CHIP_ERROR err     = CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
 #if CONFIG_NETWORK_LAYER_BLE
     bool searchAllOver = this->mPayload.get()->rendezvousInformation == RendezvousInformationFlag::kNone;
     if (searchAllOver || this->mPayload.get()->rendezvousInformation == RendezvousInformationFlag::kBLE)
