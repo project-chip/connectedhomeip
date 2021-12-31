@@ -69,7 +69,7 @@ void MatterManagerService::updateDiscoverCommissionableNodes(const chip::Dnssd::
 
 	if (!mSendCommandWatch)
 	{
-		MATTER_DEBUG("Ignore updateDiscoverCommissionablesNodes becasue mSendCommandWatch is NULL");
+		MATTER_DEBUG("Ignore updateDiscoverCommissionablesNodes because mSendCommandWatch is NULL");
 		return ;
 	}
 
@@ -121,7 +121,7 @@ void MatterManagerService::receivePairingResult(bool ret)
 
 	if (!mSendCommandWatch)
 	{
-		MATTER_DEBUG("Ignore receivePairingResult becasue mSendCommandWatch is NULL");
+		MATTER_DEBUG("Ignore receivePairingResult because mSendCommandWatch is NULL");
 		return ;
 	}
 
@@ -145,7 +145,7 @@ void MatterManagerService::receiveOpenCommissioningWindowResult(bool ret)
 
 	if (!mSendCommandWatch)
 	{
-		MATTER_DEBUG("Ignore updateDiscoverCommissionablesNodes becasue mSendCommandWatch is NULL");
+		MATTER_DEBUG("Ignore updateDiscoverCommissionablesNodes because mSendCommandWatch is NULL");
 		return ;
 	}
 
@@ -187,7 +187,7 @@ void MatterManagerService::receiveParseSetupPayloadResult(chip::SetupPayload & p
 
 	if (!mSendCommandWatch)
 	{
-		MATTER_DEBUG("Ignore receiveParseSetupPayloadResult becasue mSendCommandWatch is NULL");
+		MATTER_DEBUG("Ignore receiveParseSetupPayloadResult because mSendCommandWatch is NULL");
 		return ;
 	}
 
