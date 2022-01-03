@@ -39,7 +39,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 {
     UDPEndPointImplOT * ep = static_cast<UDPEndPointImplOT *>(aContext);
     IPPacketInfo pktInfo;
-    uint16_t msgLen                  = otMessageGetLength(aMessage);
+    uint16_t msgLen = otMessageGetLength(aMessage);
     System::PacketBufferHandle payload;
 #if CHIP_DETAIL_LOGGING
     static uint16_t msgReceivedCount = 0;
@@ -66,7 +66,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
         return;
     }
 
-    #if CHIP_DETAIL_LOGGING
+#if CHIP_DETAIL_LOGGING
     pktInfo.SrcAddress.ToString(sourceStr, Inet::IPAddress::kMaxStringLength);
     pktInfo.DestAddress.ToString(destStr, Inet::IPAddress::kMaxStringLength);
 
@@ -75,7 +75,7 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
                   ": %s\r\nDest Port %d\r\nPayload Length %d",
                   ++msgReceivedCount, sourceStr, pktInfo.SrcPort, destStr, pktInfo.DestPort, msgLen);
 
-    #endif
+#endif
 
     memcpy(payload->Start(), &pktInfo, sizeof(IPPacketInfo));
 
