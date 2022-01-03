@@ -114,13 +114,11 @@ static_library("inet") {
 
   if (chip_system_config_use_ot_udp) {
     if (chip_openthread_ftd) {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
-      ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
     } else {
-      public_deps += [
-        "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
-      ]
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
     }
   }
 
