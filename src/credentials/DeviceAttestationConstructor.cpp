@@ -236,7 +236,7 @@ CHIP_ERROR DeconstructNOCSRElements(const ByteSpan & nocsrElements, ByteSpan & c
     vendor_reserved1 = vendor_reserved2 = vendor_reserved3 = ByteSpan();
 
     tlvReader.Init(nocsrElements);
-    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag()));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
     CHIP_ERROR error;
