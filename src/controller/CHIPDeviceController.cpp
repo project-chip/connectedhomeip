@@ -1344,6 +1344,21 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
 
     ChipLogProgress(Controller, "Getting certificate chain for the device from the issuer");
 
+    DeviceAttestationVerifier * dacVerifier = GetDeviceAttestationVerifier();
+
+    P256PublicKey dacPubkey;
+    ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(device->GetDAC(), dacPubkey));
+
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge = mSystemState->SessionMgr()
+                                        ->GetSecureSession(device->GetSecureSession().Value())
+                                        ->GetCryptoContext()
+                                        .GetAttestationChallenge();
+
+    // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
+    ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
+                                                                          dacPubkey, device->GetCSRNonce()));
+
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(device->GetDeviceId());
 
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
