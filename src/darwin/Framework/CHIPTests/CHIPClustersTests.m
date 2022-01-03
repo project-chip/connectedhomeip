@@ -35482,16 +35482,16 @@ uint16_t readAttributeVendorIdDefaultValue;
     params.groupKeySet = [[CHIPGroupKeyManagementClusterGroupKeySet alloc] init];
     ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).groupKeySetID = [NSNumber numberWithUnsignedShort:101U];
     ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).securityPolicy = [NSNumber numberWithUnsignedChar:0];
-    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey0 = [[NSData alloc] initWithBytes:" ¡¢£¤¥¦§¨©ª«¬­®¯"
-                                                                                                         length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey0 =
+        [[NSData alloc] initWithBytes:"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochStartTime0 =
         [NSNumber numberWithUnsignedLongLong:1110000ULL];
-    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey1 = [[NSData alloc] initWithBytes:" ¡¢£¤¥¦§¨©ª«¬­®¯"
-                                                                                                         length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey1 =
+        [[NSData alloc] initWithBytes:"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochStartTime1 =
         [NSNumber numberWithUnsignedLongLong:1110001ULL];
-    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey2 = [[NSData alloc] initWithBytes:"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ"
-                                                                                                         length:16];
+    ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochKey2 =
+        [[NSData alloc] initWithBytes:"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf" length:16];
     ((CHIPGroupKeyManagementClusterGroupKeySet *) params.groupKeySet).epochStartTime2 =
         [NSNumber numberWithUnsignedLongLong:1110002ULL];
 
@@ -35530,17 +35530,23 @@ uint16_t readAttributeVendorIdDefaultValue;
                        [((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).groupKeySetID unsignedShortValue], 101U);
                    XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).securityPolicy unsignedCharValue], 0);
                    XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochKey0
-                       isEqualToData:[[NSData alloc] initWithBytes:" ¡¢£¤¥¦§¨©ª«¬­®¯" length:16]]);
+                       isEqualToData:[[NSData alloc]
+                                         initWithBytes:"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
+                                                length:16]]);
                    XCTAssertEqual(
                        [((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochStartTime0 unsignedLongLongValue],
                        1110000ULL);
                    XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochKey1
-                       isEqualToData:[[NSData alloc] initWithBytes:" ¡¢£¤¥¦§¨©ª«¬­®¯" length:16]]);
+                       isEqualToData:[[NSData alloc]
+                                         initWithBytes:"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
+                                                length:16]]);
                    XCTAssertEqual(
                        [((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochStartTime1 unsignedLongLongValue],
                        1110001ULL);
                    XCTAssertTrue([((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochKey2
-                       isEqualToData:[[NSData alloc] initWithBytes:"ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏ" length:16]]);
+                       isEqualToData:[[NSData alloc]
+                                         initWithBytes:"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
+                                                length:16]]);
                    XCTAssertEqual(
                        [((CHIPGroupKeyManagementClusterGroupKeySet *) actualValue).epochStartTime2 unsignedLongLongValue],
                        1110002ULL);
@@ -35590,7 +35596,7 @@ uint16_t readAttributeVendorIdDefaultValue;
     {
         NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
         temp_0[0] = [[CHIPGroupKeyManagementClusterGroupKey alloc] init];
-        ((CHIPGroupKeyManagementClusterGroupKey *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedShort:1U];
+        ((CHIPGroupKeyManagementClusterGroupKey *) temp_0[0]).fabricIndex = [NSNumber numberWithUnsignedChar:1];
         ((CHIPGroupKeyManagementClusterGroupKey *) temp_0[0]).groupId = [NSNumber numberWithUnsignedShort:11U];
         ((CHIPGroupKeyManagementClusterGroupKey *) temp_0[0]).groupKeySetID = [NSNumber numberWithUnsignedShort:101U];
 
@@ -35624,7 +35630,7 @@ uint16_t readAttributeVendorIdDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKey *) actualValue[0]).fabricIndex unsignedShortValue], 1U);
+            XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKey *) actualValue[0]).fabricIndex unsignedCharValue], 1);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKey *) actualValue[0]).groupId unsignedShortValue], 11U);
             XCTAssertEqual([((CHIPGroupKeyManagementClusterGroupKey *) actualValue[0]).groupKeySetID unsignedShortValue], 101U);
         }
@@ -35720,31 +35726,28 @@ uint16_t readAttributeVendorIdDefaultValue;
            completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
                NSLog(@"KeySet Read (removed) Error: %@", err);
 
-               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 139);
+               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_NOT_FOUND);
                [expectation fulfill];
            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupKeyManagementCluster_000011_KeySetRead
+- (void)testSendClusterTestGroupKeyManagementCluster_000011_RemoveAllGroups
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySet Read (removed)"];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetReadParams alloc] init];
-    params.groupKeySetID = [NSNumber numberWithUnsignedShort:101U];
-    [cluster
-        keySetReadWithParams:params
-           completionHandler:^(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable values, NSError * _Nullable err) {
-               NSLog(@"KeySet Read (removed) Error: %@", err);
+    [cluster removeAllGroupsWithCompletionHandler:^(NSError * _Nullable err) {
+        NSLog(@"Remove All Error: %@", err);
 
-               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 139);
-               [expectation fulfill];
-           }];
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }

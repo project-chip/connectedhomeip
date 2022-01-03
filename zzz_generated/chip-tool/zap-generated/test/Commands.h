@@ -57575,8 +57575,8 @@ public:
             err = TestKeySetReadRemoved_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : KeySet Read (removed)\n");
-            err = TestKeySetReadRemoved_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Remove All\n");
+            err = TestRemoveAll_11();
             break;
         }
 
@@ -57695,7 +57695,7 @@ private:
         request.groupKeySet.epochStartTime0 = 1110000ULL;
         request.groupKeySet.epochKey1 =
             chip::ByteSpan(chip::Uint8::from_const_char(
-                               "\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xafgarbage: not in length on purpose"),
+                               "\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbfgarbage: not in length on purpose"),
                            16);
         request.groupKeySet.epochStartTime1 = 1110001ULL;
         request.groupKeySet.epochKey2 =
@@ -57752,7 +57752,7 @@ private:
         VerifyOrReturn(CheckValue("groupKeySet.epochStartTime0", groupKeySet.epochStartTime0, 1110000ULL));
         VerifyOrReturn(CheckValueAsString(
             "groupKeySet.epochKey1", groupKeySet.epochKey1,
-            chip::ByteSpan(chip::Uint8::from_const_char("\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf"), 16)));
+            chip::ByteSpan(chip::Uint8::from_const_char("\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"), 16)));
         VerifyOrReturn(CheckValue("groupKeySet.epochStartTime1", groupKeySet.epochStartTime1, 1110001ULL));
         VerifyOrReturn(CheckValueAsString(
             "groupKeySet.epochKey2", groupKeySet.epochKey2,
@@ -57937,7 +57937,7 @@ private:
 
     void OnFailureResponse_10(EmberAfStatus status)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_NOT_FOUND));
         NextTest();
     }
 
@@ -57946,16 +57946,15 @@ private:
         ThrowSuccessResponse();
     }
 
-    CHIP_ERROR TestKeySetReadRemoved_11()
+    CHIP_ERROR TestRemoveAll_11()
     {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
-        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
 
         RequestType request;
-        request.groupKeySetID = 101U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_11(data.groupKeySet);
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -57966,16 +57965,9 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_11(EmberAfStatus status)
-    {
-        VerifyOrReturn(CheckValue("status", status, 139));
-        NextTest();
-    }
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & groupKeySet)
-    {
-        ThrowSuccessResponse();
-    }
+    void OnSuccessResponse_11() { NextTest(); }
 };
 
 class TestOperationalCredentialsCluster : public TestCommand
