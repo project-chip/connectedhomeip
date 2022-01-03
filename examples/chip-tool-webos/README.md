@@ -11,7 +11,7 @@ OSE.
 
 ## Prerequisite
 
-Before budiling and testing Matter example for webOS, you need following items.
+Before building and testing Matter example for webOS, you need following items.
 
 -   Ubuntu 18.04 machine (used for building webOS OSE)
 -   Network router
@@ -47,7 +47,7 @@ Step 1: Build and Flash the webOS OSE
 
 -   Set up a webOS OSE build as explained on
     [webOS OSE build instruction](http://webosose.org/discover/setting/building-webos-ose)
--   Then flash the build image to your Raspberry Pi 4 exaplained on
+-   Then flash the build image to your Raspberry Pi 4 explained on
     [webOS flash instruction](http://webosose.org/discover/setting/flashing-webos-OSE)
 
 -   After going through webOS OSE build and flash instruction, you are ready to
