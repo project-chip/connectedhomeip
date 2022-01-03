@@ -156,7 +156,6 @@ def main():
         if options.debug:
             sys.stderr.write('PKG_CONFIG_LIBDIR=%s\n' % libdir)
         prefix = GetPkgConfigPrefixToStrip(options, args)
-
     else:
         prefix = ''
 

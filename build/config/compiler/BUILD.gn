@@ -201,10 +201,14 @@ config("strict_warnings") {
     "-Wextra",
     "-Wshadow",
     "-Wunreachable-code",
+    "-Wvla",
   ]
 
   if (target_os == "webos") {
-    cflags -= [ "-Wshadow" ]
+    cflags -= [
+      "-Wshadow",
+      "-Wvla",
+    ]
   }
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]

@@ -77,7 +77,6 @@ executable("chip-tool-webos") {
     "./webos/src",
     "${chip_root}/zzz_generated/chip-tool",
     "${chip_root}/src/lib",
-    "/home/worker/tv_reference/build-starfish/BUILD/work/o20-starfishmllib32-linux-gnueabi/lib32-chip/1.0-r0/lib32-recipe-sysroot/usr/include",
   ]
 
   if (chip_enable_transport_trace) {
