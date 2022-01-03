@@ -39,28 +39,34 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
 {
     UDPEndPointImplOT * ep = static_cast<UDPEndPointImplOT *>(aContext);
     IPPacketInfo pktInfo;
-    static uint16_t msgReceivedCount = 0;
     uint16_t msgLen                  = otMessageGetLength(aMessage);
     System::PacketBufferHandle payload;
+#if CHIP_DETAIL_LOGGING
+    static uint16_t msgReceivedCount = 0;
     char sourceStr[Inet::IPAddress::kMaxStringLength];
     char destStr[Inet::IPAddress::kMaxStringLength];
+#endif
 
     if (msgLen > System::PacketBuffer::kMaxSizeWithoutReserve)
     {
+        ChipLogError(Inet, "UDP message too long, discarding. Size received %d", msgLen);
         return;
     }
-
-    payload = System::PacketBufferHandle::New(msgLen, 0);
 
     pktInfo.SrcAddress  = chip::DeviceLayer::Internal::ToIPAddress(aMessageInfo->mPeerAddr);
     pktInfo.DestAddress = chip::DeviceLayer::Internal::ToIPAddress(aMessageInfo->mSockAddr);
     pktInfo.SrcPort     = aMessageInfo->mPeerPort;
     pktInfo.DestPort    = aMessageInfo->mSockPort;
 
+    payload = System::PacketBufferHandle::New(msgLen, 0);
+
     if (payload.IsNull())
     {
+        ChipLogError(Inet, "Failed to allocate a System buffer of size %d for UDP Message reception.", msgLen);
         return;
     }
+
+    #if CHIP_DETAIL_LOGGING
     pktInfo.SrcAddress.ToString(sourceStr, Inet::IPAddress::kMaxStringLength);
     pktInfo.DestAddress.ToString(destStr, Inet::IPAddress::kMaxStringLength);
 
@@ -69,10 +75,13 @@ void UDPEndPointImplOT::handleUdpReceive(void * aContext, otMessage * aMessage, 
                   ": %s\r\nDest Port %d\r\nPayload Length %d",
                   ++msgReceivedCount, sourceStr, pktInfo.SrcPort, destStr, pktInfo.DestPort, msgLen);
 
+    #endif
+
     memcpy(payload->Start(), &pktInfo, sizeof(IPPacketInfo));
 
     if (otMessageRead(aMessage, 0, payload->Start() + sizeof(IPPacketInfo), msgLen) != msgLen)
     {
+        ChipLogError(Inet, "Failed to copy OpenThread buffer into System Packet buffer");
         return;
     }
     payload->SetDataLength(msgLen + sizeof(IPPacketInfo));
