@@ -17,7 +17,7 @@
 
 FROM connectedhomeip/chip-cirque-device-base:latest
 
-COPY out/debug/chip-tool /usr/bin/
+COPY out/debug/chip-tool-webos /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "tool"]
