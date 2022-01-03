@@ -113,7 +113,13 @@ static_library("inet") {
   }
 
   if (chip_system_config_use_ot_udp) {
-    public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    if (chip_openthread_ftd) {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+    }
   }
 
   if (chip_inet_config_enable_tcp_endpoint) {

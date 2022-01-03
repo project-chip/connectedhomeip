@@ -36,7 +36,7 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_OT_UDP
 struct otInstance;
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
 
 namespace chip {
 namespace Transport {
@@ -94,7 +94,7 @@ public:
 private:
     otInstance * mOtInstance = nullptr;
 
-#endif
+#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
 };
 
 /** Implements a transport using UDP. */
