@@ -480,6 +480,8 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
     BootloaderStorageInformation_t bootInfo;
     bootloader_getStorageInfo(&bootInfo);
     EFR32_LOG("Boot info: storageType %d, numStorageSlots %d info 0x%x", bootInfo.storageType, bootInfo.numStorageSlots,bootInfo.info );
+
+    EFR32_LOG("Sorage info: descr: %s version: %d size %d", bootInfo.info->partDescription, bootInfo.info->version, bootInfo.info->partSize);
 }
 
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)

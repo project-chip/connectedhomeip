@@ -54,10 +54,11 @@ private:
      * Called to release allocated memory for mBlock
      */
     CHIP_ERROR ReleaseBlock();
-
-    std::ofstream mOfs;
+    
+    uint16_t        mWriteOffset = 0; // End of last written block
+    uint8_t         mSlotId = 0;      // Bootloader storage slot
     MutableByteSpan mBlock;
-    OTADownloader * mDownloader;
+    OTADownloader  *mDownloader;
 };
 
 } // namespace chip
