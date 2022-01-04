@@ -43,7 +43,7 @@
 #include <lib/support/ErrorStr.h>
 
 #include "OTAImageProcessorImpl.h"
-#include "OTARequestorDriverImpl.h"
+#include "platform/GenericOTARequestorDriver.h"
 #include "platform/OTARequestorInterface.h"
 #include <argtable3/argtable3.h>
 #include <esp_console.h>
@@ -65,7 +65,7 @@ static DeviceCallbacks EchoCallbacks;
 CmdArgs applyUpdateCmdArgs;
 
 OTARequestor gRequestorCore;
-OTARequestorDriverImpl gRequestorUser;
+GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 } // namespace
@@ -149,6 +149,7 @@ extern "C" void app_main()
 
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     gRequestorCore.SetBDXDownloader(&gDownloader);
 }

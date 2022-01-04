@@ -18,13 +18,11 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
+#include <app/clusters/keypad-input-server/keypad-input-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <list>
-
-class KeypadInputManager
+class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
 public:
-    CHIP_ERROR Init();
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
+    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 };

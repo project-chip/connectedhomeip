@@ -45,9 +45,8 @@
 
 /**
  *    @file
- *          Provides Bluez dbus implementatioon for BLE
+ *          Provides Bluez dbus implementation for BLE
  */
-
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/BitFlags.h>
@@ -1519,6 +1518,10 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
 
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
     SuccessOrExit(err);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    apEndpoint->mDeviceIdInfo.SetAdditionalDataFlag(true);
+#endif
 
 exit:
     if (nullptr != msg)

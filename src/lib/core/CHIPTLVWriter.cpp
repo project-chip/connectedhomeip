@@ -512,7 +512,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
     // Reset the container writer so that it can't accidentally be used again.
     containerWriter.Init(static_cast<uint8_t *>(nullptr), 0);
 
-    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag(), 0);
 }
 
 CHIP_ERROR TLVWriter::StartContainer(Tag tag, TLVType containerType, TLVType & outerContainerType)
@@ -554,7 +554,7 @@ CHIP_ERROR TLVWriter::EndContainer(TLVType outerContainerType)
     if (IsCloseContainerReserved())
         mMaxLen += kEndOfContainerMarkerSize;
 
-    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag, 0);
+    return WriteElementHead(TLVElementType::EndOfContainer, AnonymousTag(), 0);
 }
 
 CHIP_ERROR TLVWriter::PutPreEncodedContainer(Tag tag, TLVType containerType, const uint8_t * data, uint32_t dataLen)

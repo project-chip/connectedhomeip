@@ -727,6 +727,7 @@ OTARequesterImpl
 OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
+otasoftwareupdaterequestor
 OTBR
 otcli
 PAA
@@ -995,6 +996,7 @@ TransportMgrBase
 TrustedRootCertificates
 TSG
 tsv
+TTL
 tty
 ttyACM
 ttyACMx

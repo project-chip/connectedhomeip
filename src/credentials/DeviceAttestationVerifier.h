@@ -244,10 +244,24 @@ public:
 
     // TODO: Validate Firmware Information
 
+    /**
+     * @brief Verify an operational certificate signing request payload against the DAC's public key.
+     *
+     * @param[in]  nocsrElementsBuffer Buffer containing CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in]  attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
+     * @param[in]  attestationSignatureBuffer Buffer containing the signature portion of CSR Response
+     * @param[in]  dacPublicKey Public Key from the DAC's certificate received from device.
+     * @param[in]  csrNonce Buffer containing CSR nonce.
+     */
+    virtual CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                           const ByteSpan & attestationChallengeBuffer,
+                                                           const ByteSpan & attestationSignatureBuffer,
+                                                           const Crypto::P256PublicKey & dacPublicKey,
+                                                           const ByteSpan & csrNonce) = 0;
+
 protected:
-    CHIP_ERROR ValidateAttestationSignature(const chip::Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
-                                            const ByteSpan & attestationChallenge,
-                                            const chip::Crypto::P256ECDSASignature & signature);
+    CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
+                                            const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 };
 
 /**

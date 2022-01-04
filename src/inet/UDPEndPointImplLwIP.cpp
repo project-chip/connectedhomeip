@@ -72,22 +72,14 @@ CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddr
     CHIP_ERROR res = GetPCB(addressType);
 
     // Bind the PCB to the specified address/port.
+    ip_addr_t ipAddr;
     if (res == CHIP_NO_ERROR)
     {
-        ip_addr_t ipAddr = address.ToLwIPAddr();
+        res = address.ToLwIPAddr(addressType, ipAddr);
+    }
 
-        // TODO: IPAddress ANY has only one constant state, however addressType
-        // has separate IPV4 and IPV6 'any' settings. This tries to correct
-        // for this as LWIP default if IPv4 is compiled in is to consider
-        // 'any == any_v4'
-        //
-        // We may want to consider having separate AnyV4 and AnyV6 constants
-        // inside CHIP to resolve this ambiguity
-        if ((address.Type() == IPAddressType::kAny) && (addressType == IPAddressType::kIPv6))
-        {
-            ipAddr = *IP6_ADDR_ANY;
-        }
-
+    if (res == CHIP_NO_ERROR)
+    {
         res = chip::System::MapErrorLwIP(udp_bind(mUDP, &ipAddr, port));
     }
 

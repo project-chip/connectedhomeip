@@ -18,15 +18,14 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
+#include <app/clusters/wake-on-lan-server/wake-on-lan-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
 
-class WakeOnLanManager
+class WakeOnLanManager : public chip::app::Clusters::WakeOnLan::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    void InitWakeOnLanCluster(chip::EndpointId endpoint);
+    chip::CharSpan HandleGetMacAddress() override;
 
 private:
     friend WakeOnLanManager & WakeOnLanMgr();

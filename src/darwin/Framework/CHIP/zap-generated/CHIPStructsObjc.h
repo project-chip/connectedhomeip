@@ -310,7 +310,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPChannelClusterChannelLineupInfo : NSObject
+@interface CHIPChannelClusterLineupInfo : NSObject
 @property (strong, nonatomic) NSString * _Nonnull operatorName;
 @property (strong, nonatomic) NSString * _Nonnull lineupName;
 @property (strong, nonatomic) NSString * _Nonnull postalCode;
@@ -318,19 +318,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPTargetNavigatorClusterNavigateTargetTargetInfo : NSObject
+@interface CHIPTargetNavigatorClusterTargetInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull identifier;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaPlaybackPosition : NSObject
+@interface CHIPMediaPlaybackClusterPlaybackPosition : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull updatedAt;
 @property (strong, nonatomic) NSNumber * _Nonnull position;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaInputClusterMediaInputInfo : NSObject
+@interface CHIPMediaInputClusterInputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 @property (strong, nonatomic) NSNumber * _Nonnull inputType;
 @property (strong, nonatomic) NSString * _Nonnull name;
@@ -338,63 +338,68 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterContentLaunchDimension : NSObject
+@interface CHIPContentLauncherClusterDimension : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull width;
 @property (strong, nonatomic) NSNumber * _Nonnull height;
 @property (strong, nonatomic) NSNumber * _Nonnull metric;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterContentLaunchAdditionalInfo : NSObject
+@interface CHIPContentLauncherClusterAdditionalInfo : NSObject
 @property (strong, nonatomic) NSString * _Nonnull name;
 @property (strong, nonatomic) NSString * _Nonnull value;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterContentLaunchParamater : NSObject
+@interface CHIPContentLauncherClusterParameter : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull type;
 @property (strong, nonatomic) NSString * _Nonnull value;
 @property (strong, nonatomic) NSArray * _Nonnull externalIDList;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterContentLaunchStyleInformation : NSObject
+@interface CHIPContentLauncherClusterContentSearch : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull parameterList;
+- (instancetype)init;
+@end
+
+@interface CHIPContentLauncherClusterStyleInformation : NSObject
 @property (strong, nonatomic) NSString * _Nonnull imageUrl;
 @property (strong, nonatomic) NSString * _Nonnull color;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchDimension * _Nonnull size;
+@property (strong, nonatomic) CHIPContentLauncherClusterDimension * _Nonnull size;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterContentLaunchBrandingInformation : NSObject
+@interface CHIPContentLauncherClusterBrandingInformation : NSObject
 @property (strong, nonatomic) NSString * _Nonnull providerName;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchStyleInformation * _Nonnull background;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchStyleInformation * _Nonnull logo;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchStyleInformation * _Nonnull progressBar;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchStyleInformation * _Nonnull splash;
-@property (strong, nonatomic) CHIPContentLauncherClusterContentLaunchStyleInformation * _Nonnull waterMark;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull background;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull logo;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull progressBar;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull splash;
+@property (strong, nonatomic) CHIPContentLauncherClusterStyleInformation * _Nonnull waterMark;
 - (instancetype)init;
 @end
 
-@interface CHIPAudioOutputClusterAudioOutputInfo : NSObject
+@interface CHIPAudioOutputClusterOutputInfo : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 @property (strong, nonatomic) NSNumber * _Nonnull outputType;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherApp : NSObject
+@interface CHIPApplicationLauncherClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterApplicationLauncherEndpoint : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
+@interface CHIPApplicationLauncherClusterApplicationEP : NSObject
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 @property (strong, nonatomic) NSString * _Nonnull endpoint;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationBasicClusterApplicationBasicApp : NSObject
+@interface CHIPApplicationBasicClusterApplication : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
 @property (strong, nonatomic) NSString * _Nonnull applicationId;
 - (instancetype)init;

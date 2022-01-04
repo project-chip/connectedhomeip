@@ -109,7 +109,7 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
@@ -611,9 +611,7 @@ async function getResponseCommandName(responseRef, options)
 function isWeaklyTypedEnum(label)
 {
   return [
-    "ApplicationLauncherStatus",
     "AttributeWritePermission",
-    "AudioOutputType",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
     "BootReasonType",
@@ -645,13 +643,8 @@ function isWeaklyTypedEnum(label)
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",
     "InterfaceType",
-    "KeypadInputCecKeyCode",
-    "KeypadInputStatus",
     "KeypadLockout",
     "LevelControlOptions",
-    "MediaInputType",
-    "MediaPlaybackState",
-    "MediaPlaybackStatus",
     "MoveMode",
     "NetworkFaultType",
     "NodeOperationalCertStatus",

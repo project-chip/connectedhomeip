@@ -132,11 +132,11 @@ EmberAfStatus ApplicationBasic::HandleWriteAttribute(chip::AttributeId attribute
     {
         if (*buffer)
         {
-            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus::kActiveVisibleFocus);
+            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus);
         }
         else
         {
-            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus::kActiveVisibleNotFocus);
+            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus);
         }
     }
     else
@@ -228,7 +228,7 @@ CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder &
         {
             // ReturnErrorOnFailure(encoder.Encode(chip::CharSpan(entry.c_str(), entry.length())));
 
-            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::Type targetInfo;
+            chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type targetInfo;
             targetInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
             targetInfo.identifier = static_cast<uint8_t>(i++);
             ReturnErrorOnFailure(encoder.Encode(targetInfo));
@@ -237,20 +237,21 @@ CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder &
     });
 }
 
-TargetNavigatorResponse TargetNavigator::NavigateTarget(uint8_t target, std::string data)
+app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNavigator::NavigateTarget(uint8_t target,
+                                                                                                       std::string data)
 {
     ChipLogProgress(DeviceLayer, "TargetNavigator: NavigateTarget target=%d data=\"%s\"", target, data.c_str());
 
-    TargetNavigatorResponse response;
-    const char * testData = "data response";
-    response.data         = (uint8_t *) testData;
+    app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type response;
+    response.data = chip::CharSpan("data response", strlen("data response"));
+
     if (target >= mTargets.size())
     {
-        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE;
+        response.status = app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
     }
     else
     {
-        response.status = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+        response.status = app::Clusters::TargetNavigator::StatusEnum::kSuccess;
         mCurrentTarget  = target;
     }
     return response;

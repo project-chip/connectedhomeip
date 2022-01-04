@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -14,18 +14,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+/****************************************************************************
+ * @file
+ * @brief Routines for the Low Power plugin, the
+ *server implementation of the Low Power cluster.
+ *******************************************************************************
+ ******************************************************************************/
 
 #pragma once
 
-#include <platform/OTARequestorDriver.h>
+#include "low-power-delegate.h"
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace LowPower {
 
-class OTARequestorDriverImpl : public OTARequestorDriver
-{
-public:
-    bool CheckImageDownloadAllowed() override;
-    void ImageDownloadComplete() override;
-    UserConsentAction RequestUserConsent() override;
-};
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace LowPower
+} // namespace Clusters
+} // namespace app
 } // namespace chip

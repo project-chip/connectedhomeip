@@ -163,14 +163,12 @@ struct DiscoveredNodeData
 
     void LogDetail() const
     {
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
         if (rotatingIdLen > 0)
         {
             char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
             Encoding::BytesToUppercaseHexString(rotatingId, rotatingIdLen, rotatingIdString, sizeof(rotatingIdString));
-            ChipLogDetail(Discovery, "Rotating ID: %s", rotatingIdString);
+            ChipLogDetail(Discovery, "\tRotating ID: %s", rotatingIdString);
         }
-#endif // CHIP_ENABLE_ROTATING_DEVICE_ID
         if (strlen(deviceName) != 0)
         {
             ChipLogDetail(Discovery, "\tDevice Name: %s", deviceName);

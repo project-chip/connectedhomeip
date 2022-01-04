@@ -173,7 +173,6 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     FabricInfo * fabric = gCommissionerFabrics.FindFabricWithIndex(gCommissionerFabricIndex);
     NL_TEST_ASSERT(inSuite, fabric != nullptr);
 
-    NL_TEST_ASSERT(inSuite, pairing.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
     ExchangeContext * context = ctx.NewUnauthenticatedExchangeToBob(&pairing);
 
     NL_TEST_ASSERT(inSuite,
@@ -201,7 +200,6 @@ void CASE_SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
 
     CASESession pairing1;
-    NL_TEST_ASSERT(inSuite, pairing1.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     gLoopback.mSentMessageCount = 0;
     gLoopback.mMessageSendError = CHIP_ERROR_BAD_REQUEST;
@@ -227,8 +225,6 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     CASESessionCachable serializableAccessory;
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::CASE_Sigma1,
@@ -365,8 +361,6 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
     gLoopback.mSentMessageCount = 0;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, gPairingServer.GetSession().MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
 
     SessionIDAllocator idAllocator;
 
@@ -388,8 +382,7 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, gLoopback.mSentMessageCount == 5);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    auto * pairingCommissioner1 = chip::Platform::New<TestCASESessionIPK>();
-    NL_TEST_ASSERT(inSuite, pairingCommissioner1->MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
+    auto * pairingCommissioner1            = chip::Platform::New<TestCASESessionIPK>();
     ExchangeContext * contextCommissioner1 = ctx.NewUnauthenticatedExchangeToBob(pairingCommissioner1);
 
     NL_TEST_ASSERT(inSuite,
@@ -434,7 +427,7 @@ static CHIP_ERROR EncodeSigma1(MutableByteSpan & buf)
     writer.Init(buf);
 
     TLVType containerType;
-    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType));
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, containerType));
     uint8_t initiatorRandom[Params::initiatorRandomLen] = { 1 };
     ReturnErrorOnFailure(writer.Put(Params::NumToTag(Params::initiatorRandomTag), ByteSpan(initiatorRandom)));
 

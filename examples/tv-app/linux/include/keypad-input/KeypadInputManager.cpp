@@ -18,31 +18,13 @@
 
 #include "KeypadInputManager.h"
 
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+using namespace chip;
+using namespace chip::app::Clusters::KeypadInput;
 
-#include <map>
-#include <string>
-
-using namespace std;
-
-CHIP_ERROR KeypadInputManager::Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NV"] = true;
-    featureMap["LK"] = true;
-    featureMap["NK"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-EmberAfKeypadInputStatus keypadInputClusterSendKey(EmberAfKeypadInputCecKeyCode keyCode)
+Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keycCode)
 {
     // TODO: Insert code here
-    return EMBER_ZCL_KEYPAD_INPUT_STATUS_SUCCESS;
+    Commands::SendKeyResponse::Type response;
+    response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+    return response;
 }

@@ -25,40 +25,24 @@
 #pragma once
 
 #include <messaging/ExchangeMessageDispatch.h>
-#include <transport/TransportMgr.h>
 
 namespace chip {
 
 class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    SessionEstablishmentExchangeDispatch() {}
-
-    virtual ~SessionEstablishmentExchangeDispatch() {}
-
-    CHIP_ERROR Init(SessionManager * sessionManager)
+    static ExchangeMessageDispatch & Instance()
     {
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mSessionManager = sessionManager;
-        return ExchangeMessageDispatch::Init();
+        static SessionEstablishmentExchangeDispatch instance;
+        return instance;
     }
 
-    CHIP_ERROR PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                              EncryptedPacketBufferHandle & out) override;
-    CHIP_ERROR SendPreparedMessage(const SessionHandle & session,
-                                   const EncryptedPacketBufferHandle & preparedMessage) const override;
-
-    CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
-                                 const Transport::PeerAddress & peerAddress, Messaging::MessageFlags msgFlags,
-                                 Messaging::ReliableMessageContext * reliableMessageContext) override;
+    SessionEstablishmentExchangeDispatch() {}
+    virtual ~SessionEstablishmentExchangeDispatch() {}
 
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
-
     bool IsEncryptionRequired() const override { return false; }
-
-private:
-    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace chip

@@ -35,9 +35,9 @@ limitations under the License.
 
   <struct name="Target">
     <cluster code="0x001F"/>
-    <item fieldId="0" name="Cluster" type="INT32U" isNullable="true"/>
-    <item fieldId="1" name="Endpoint" type="INT16U" isNullable="true"/>
-    <item fieldId="2" name="DeviceType" type="INT32U" isNullable="true"/>
+    <item fieldId="0" name="Cluster" type="cluster_id" isNullable="true"/>
+    <item fieldId="1" name="Endpoint" type="endpoint_no" isNullable="true"/>
+    <item fieldId="2" name="DeviceType" type="devtype_id" isNullable="true"/>
   </struct>
 
   <struct name="AccessControlEntry">

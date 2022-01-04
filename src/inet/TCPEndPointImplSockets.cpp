@@ -556,12 +556,6 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
             OnDataSent(this, lenSent);
         }
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // TCP Send is not Idle; Set state and notify if needed
-
-        SetTCPSendIdleAndNotifyChange(false);
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
         mBytesWrittenSinceLastProbe += lenSent;
 
@@ -675,27 +669,12 @@ void TCPEndPointImplSockets::TCPUserTimeoutHandler()
     // Set the timer running flag to false
     mUserTimeoutTimerRunning = false;
 
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     bool isProgressing = false;
-    err                = CheckConnectionProgress(isProgressing);
-    SuccessOrExit(err);
+    CHIP_ERROR err     = CheckConnectionProgress(isProgressing);
 
-    if (mLastTCPKernelSendQueueLen == 0)
+    if (err == CHIP_NO_ERROR && mLastTCPKernelSendQueueLen != 0)
     {
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // If the kernel TCP send queue as well as the TCPEndPoint
-        // send queue have been flushed then notify application
-        // that all data has been acknowledged.
-
-        if (mSendQueue.IsNull())
-        {
-            SetTCPSendIdleAndNotifyChange(true);
-        }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    }
-    else
-    // There is data in the TCP Send Queue
-    {
+        // There is data in the TCP Send Queue
         if (isProgressing)
         {
             // Data is flowing, so restart the UserTimeout timer
@@ -706,31 +685,14 @@ void TCPEndPointImplSockets::TCPUserTimeoutHandler()
         }
         else
         {
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-            // Data flow is not progressing.
-            // Decrement the remaining max TCP send queue polls.
-
-            mTCPSendQueueRemainingPollCount--;
-
-            VerifyOrExit(mTCPSendQueueRemainingPollCount != 0, err = INET_ERROR_TCP_USER_TIMEOUT);
-
-            // Restart timer to poll again
-
-            ScheduleNextTCPUserTimeoutPoll(mTCPSendQueuePollPeriodMillis);
-#else
             // Close the connection as the TCP UserTimeout has expired
-
-            ExitNow(err = INET_ERROR_TCP_USER_TIMEOUT);
-#endif // !INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+            err = INET_ERROR_TCP_USER_TIMEOUT;
         }
     }
-
-exit:
 
     if (err != CHIP_NO_ERROR)
     {
         // Close the connection as the TCP UserTimeout has expired
-
         DoClose(err, false);
     }
 }
@@ -963,15 +925,6 @@ void TCPEndPointImplSockets::ReceiveData()
         // If the output queue has been flushed then stop the timer.
 
         StopTCPUserTimeoutTimer();
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // Notify up if all outstanding data has been acknowledged
-
-        if (mSendQueue.IsNull())
-        {
-            SetTCPSendIdleAndNotifyChange(true);
-        }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
     }
     else if (isProgressing && mUserTimeoutTimerRunning)
     {

@@ -151,6 +151,7 @@ def HostTargets():
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
+        app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
@@ -336,6 +337,7 @@ def AmebaTargets():
 
     yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
+    yield ameba_target.Extend('amebad-pigweed', board=AmebaBoard.AMEBAD, app=AmebaApp.PIGWEED)
 
 
 def K32WTargets():

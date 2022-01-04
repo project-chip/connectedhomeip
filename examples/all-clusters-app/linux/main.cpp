@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "include/tv-callbacks.h"
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -27,6 +28,10 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;
+
+namespace {
+static LowPowerManager lowPowerManager;
+} // namespace
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
@@ -107,4 +112,10 @@ int main(int argc, char * argv[])
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
     ChipLinuxAppMainLoop();
     return 0;
+}
+
+void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Linux App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }

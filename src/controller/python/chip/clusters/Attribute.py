@@ -417,6 +417,7 @@ class SubscriptionTransaction:
         self._readTransaction = transaction
         self._subscriptionId = subscriptionId
         self._devCtrl = devCtrl
+        self._isDone = False
 
     def GetAttributes(self):
         ''' Returns the attribute value cache tracking the latest state on the publisher.
@@ -456,7 +457,14 @@ class SubscriptionTransaction:
         return self._onEventChangeCb
 
     def Shutdown(self):
-        self._devCtrl.ZCLShutdownSubscription(self._subscriptionId)
+        if (self._isDone):
+            print("Subscription was already terminated previously!")
+            return
+
+        handle = chip.native.GetLibraryHandle()
+        handle.pychip_ReadClient_Abort(
+            self._readTransaction._pReadClient, self._readTransaction._pReadCallback)
+        self._isDone = True
 
     def __repr__(self):
         return f'<Subscription (Id={self._subscriptionId})>'
@@ -517,6 +525,12 @@ class AsyncReadTransaction:
         self._transactionType = transactionType
         self._cache = AttributeCache(returnClusterObject=returnClusterObject)
         self._changedPathSet = set()
+        self._pReadClient = None
+        self._pReadCallback = None
+
+    def SetClientObjPointers(self, pReadClient, pReadCallback):
+        self._pReadClient = pReadClient
+        self._pReadCallback = pReadCallback
 
     def GetAllEventValues(self):
         return self._events
@@ -795,14 +809,25 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     minInterval = 0
     maxInterval = 0
+
+    readClientObj = ctypes.POINTER(c_void_p)()
+    readCallbackObj = ctypes.POINTER(c_void_p)()
+
     if subscriptionParameters is not None:
         minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
+
     res = handle.pychip_ReadClient_ReadAttributes(
-        ctypes.py_object(transaction), device,
+        ctypes.py_object(transaction),
+        ctypes.byref(readClientObj),
+        ctypes.byref(readCallbackObj),
+        device,
         ctypes.c_bool(subscriptionParameters is not None),
         ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
         ctypes.c_size_t(len(attributes)), *readargs)
+
+    transaction.SetClientObjPointers(readClientObj, readCallbackObj)
+
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res

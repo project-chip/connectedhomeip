@@ -392,11 +392,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
@@ -650,12 +650,6 @@ class ChipDeviceController(object):
             raise UnknownAttribute(cluster, attribute)
         return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], False, reportInterval=(minInterval, maxInterval)))
 
-    def ZCLShutdownSubscription(self, subscriptionId: int):
-        res = self._ChipStack.Call(
-            lambda: self._dmLib.pychip_InteractionModel_ShutdownSubscription(subscriptionId))
-        if res != 0:
-            raise self._ChipStack.ErrorToException(res)
-
     def ZCLCommandList(self):
         return self._Cluster.ListClusterCommands()
 
@@ -797,7 +791,3 @@ class ChipDeviceController(object):
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.argtypes = [
                 c_void_p, c_uint64, c_uint16, c_uint16, c_uint16, c_uint8]
             self._dmLib.pychip_DeviceController_OpenCommissioningWindow.restype = c_uint32
-
-            self._dmLib.pychip_InteractionModel_ShutdownSubscription.argtypes = [
-                c_uint64]
-            self._dmLib.pychip_InteractionModel_ShutdownSubscription.restype = c_uint32

@@ -300,7 +300,6 @@ void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
-void MatterWakeOnLanPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}

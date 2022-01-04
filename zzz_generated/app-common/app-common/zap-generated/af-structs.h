@@ -28,6 +28,21 @@
 
 #include "enums.h"
 
+// Struct for Dimension
+typedef struct _Dimension
+{
+    double width;
+    double height;
+    uint8_t metric;
+} Dimension;
+
+// Struct for AdditionalInfo
+typedef struct _AdditionalInfo
+{
+    chip::CharSpan name;
+    chip::CharSpan value;
+} AdditionalInfo;
+
 // Struct for SimpleStruct
 typedef struct _SimpleStruct
 {
@@ -84,68 +99,59 @@ typedef struct _DoubleNestedStructList
     /* TYPE WARNING: array array defaults to */ uint8_t * a;
 } DoubleNestedStructList;
 
-// Struct for ContentLaunchDimension
-typedef struct _ContentLaunchDimension
-{
-    double width;
-    double height;
-    uint8_t metric;
-} ContentLaunchDimension;
-
-// Struct for ContentLaunchAdditionalInfo
-typedef struct _ContentLaunchAdditionalInfo
-{
-    chip::CharSpan name;
-    chip::CharSpan value;
-} ContentLaunchAdditionalInfo;
-
-// Struct for ContentLaunchParamater
-typedef struct _ContentLaunchParamater
+// Struct for Parameter
+typedef struct _Parameter
 {
     uint8_t type;
     chip::CharSpan value;
     /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
-} ContentLaunchParamater;
+} Parameter;
 
-// Struct for ContentLaunchStyleInformation
-typedef struct _ContentLaunchStyleInformation
+// Struct for ContentSearch
+typedef struct _ContentSearch
+{
+    /* TYPE WARNING: array array defaults to */ uint8_t * parameterList;
+} ContentSearch;
+
+// Struct for StyleInformation
+typedef struct _StyleInformation
 {
     chip::CharSpan imageUrl;
     chip::CharSpan color;
-    ContentLaunchDimension size;
-} ContentLaunchStyleInformation;
+    Dimension size;
+} StyleInformation;
 
-// Struct for ContentLaunchBrandingInformation
-typedef struct _ContentLaunchBrandingInformation
+// Struct for BrandingInformation
+typedef struct _BrandingInformation
 {
     chip::CharSpan providerName;
-    ContentLaunchStyleInformation background;
-    ContentLaunchStyleInformation logo;
-    ContentLaunchStyleInformation progressBar;
-    ContentLaunchStyleInformation splash;
-    ContentLaunchStyleInformation waterMark;
-} ContentLaunchBrandingInformation;
+    StyleInformation background;
+    StyleInformation logo;
+    StyleInformation progressBar;
+    StyleInformation splash;
+    StyleInformation waterMark;
+} BrandingInformation;
 
-// Struct for ApplicationLauncherApp
-typedef struct _ApplicationLauncherApp
+// Struct for Application
+typedef struct _Application
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} ApplicationLauncherApp;
+} Application;
 
-// Struct for ApplicationLauncherEndpoint
-typedef struct _ApplicationLauncherEndpoint
+// Struct for ApplicationEP
+typedef struct _ApplicationEP
 {
-    ApplicationLauncherApp application;
+    Application application;
     chip::CharSpan endpoint;
-} ApplicationLauncherEndpoint;
+} ApplicationEP;
 
 // Struct for Target
 typedef struct _Target
 {
-    uint32_t Cluster;
-    uint16_t Endpoint;
-    uint32_t DeviceType;
+    chip::ClusterId Cluster;
+    chip::EndpointId Endpoint;
+    chip::DeviceTypeId DeviceType;
 } Target;
 
 // Struct for AccessControlEntry
@@ -168,21 +174,6 @@ typedef struct _ActionStruct
     uint16_t SupportedCommands;
     uint8_t Status;
 } ActionStruct;
-
-// Struct for ApplicationBasicApp
-typedef struct _ApplicationBasicApp
-{
-    uint16_t catalogVendorId;
-    chip::CharSpan applicationId;
-} ApplicationBasicApp;
-
-// Struct for AudioOutputInfo
-typedef struct _AudioOutputInfo
-{
-    uint8_t index;
-    uint8_t outputType;
-    chip::CharSpan name;
-} AudioOutputInfo;
 
 // Struct for BasicCommissioningInfoType
 typedef struct _BasicCommissioningInfoType
@@ -213,15 +204,6 @@ typedef struct _ChannelInfo
     chip::CharSpan callSign;
     chip::CharSpan affiliateCallSign;
 } ChannelInfo;
-
-// Struct for ChannelLineupInfo
-typedef struct _ChannelLineupInfo
-{
-    chip::CharSpan operatorName;
-    chip::CharSpan lineupName;
-    chip::CharSpan postalCode;
-    uint8_t lineupInfoType;
-} ChannelLineupInfo;
 
 // Struct for DeviceType
 typedef struct _DeviceType
@@ -301,6 +283,15 @@ typedef struct _IasAceZoneStatusResult
     uint16_t zoneStatus;
 } IasAceZoneStatusResult;
 
+// Struct for InputInfo
+typedef struct _InputInfo
+{
+    uint8_t index;
+    uint8_t inputType;
+    chip::CharSpan name;
+    chip::CharSpan description;
+} InputInfo;
+
 // Struct for LabelStruct
 typedef struct _LabelStruct
 {
@@ -308,21 +299,14 @@ typedef struct _LabelStruct
     chip::CharSpan value;
 } LabelStruct;
 
-// Struct for MediaInputInfo
-typedef struct _MediaInputInfo
+// Struct for LineupInfo
+typedef struct _LineupInfo
 {
-    uint8_t index;
-    uint8_t inputType;
-    chip::CharSpan name;
-    chip::CharSpan description;
-} MediaInputInfo;
-
-// Struct for MediaPlaybackPosition
-typedef struct _MediaPlaybackPosition
-{
-    uint64_t updatedAt;
-    uint64_t position;
-} MediaPlaybackPosition;
+    chip::CharSpan operatorName;
+    chip::CharSpan lineupName;
+    chip::CharSpan postalCode;
+    uint8_t lineupInfoType;
+} LineupInfo;
 
 // Struct for ModeOptionStruct
 typedef struct _ModeOptionStruct
@@ -338,13 +322,6 @@ typedef struct _NOCStruct
     uint8_t FabricIndex;
     chip::ByteSpan NOC;
 } NOCStruct;
-
-// Struct for NavigateTargetTargetInfo
-typedef struct _NavigateTargetTargetInfo
-{
-    uint8_t identifier;
-    chip::CharSpan name;
-} NavigateTargetTargetInfo;
 
 // Struct for NeighborTable
 typedef struct _NeighborTable
@@ -406,6 +383,21 @@ typedef struct _OperationalDatasetComponents
     bool SecurityPolicyPresent;
     bool ChannelMaskPresent;
 } OperationalDatasetComponents;
+
+// Struct for OutputInfo
+typedef struct _OutputInfo
+{
+    uint8_t index;
+    uint8_t outputType;
+    chip::CharSpan name;
+} OutputInfo;
+
+// Struct for PlaybackPosition
+typedef struct _PlaybackPosition
+{
+    uint64_t updatedAt;
+    uint64_t position;
+} PlaybackPosition;
 
 // Struct for PowerProfileRecord
 typedef struct _PowerProfileRecord
@@ -499,6 +491,13 @@ typedef struct _SoftwareFault
     chip::CharSpan Name;
     chip::ByteSpan FaultRecording;
 } SoftwareFault;
+
+// Struct for TargetInfo
+typedef struct _TargetInfo
+{
+    uint8_t identifier;
+    chip::CharSpan name;
+} TargetInfo;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

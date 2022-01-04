@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,20 +15,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+/****************************************************************************
+ * @file
+ * @brief Routines for TV stubs
+ *server stub implementation of TV cluster code.
+ *******************************************************************************
+ ******************************************************************************/
 
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/low-power-server/low-power-server.h>
 
-struct Application
+class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
-    using ApplicationBasicStatus   = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
-    char vendorName[32]            = "";
-    char name[32]                  = "";
-    char id[32]                    = "";
-    char version[32]               = "";
-    uint16_t vendorId              = 0;
-    uint16_t productId             = 0;
-    uint16_t catalogVendorId       = 0;
-    uint16_t allowedVendorList[32] = { 123, 456 };
-    ApplicationBasicStatus status  = ApplicationBasicStatus::kStopped;
+public:
+    bool HandleSleep() override;
 };

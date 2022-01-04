@@ -52,13 +52,13 @@ class DLL_EXPORT ApplicationBasic : public ContentAppCluster
 public:
     virtual ~ApplicationBasic() = default;
 
-    virtual const char * GetVendorName()                                                                         = 0;
-    virtual uint16_t GetVendorId()                                                                               = 0;
-    virtual const char * GetApplicationName()                                                                    = 0;
-    virtual uint16_t GetProductId()                                                                              = 0;
-    virtual app::Clusters::ApplicationBasic::ApplicationBasicStatus GetApplicationStatus()                       = 0;
-    virtual const char * GetApplicationVersion()                                                                 = 0;
-    virtual void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus applicationStatus) = 0;
+    virtual const char * GetVendorName()                                                                        = 0;
+    virtual uint16_t GetVendorId()                                                                              = 0;
+    virtual const char * GetApplicationName()                                                                   = 0;
+    virtual uint16_t GetProductId()                                                                             = 0;
+    virtual app::Clusters::ApplicationBasic::ApplicationStatusEnum GetApplicationStatus()                       = 0;
+    virtual const char * GetApplicationVersion()                                                                = 0;
+    virtual void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
@@ -91,7 +91,8 @@ class DLL_EXPORT ApplicationLauncher : public ContentAppCluster
 public:
     virtual ~ApplicationLauncher() = default;
 
-    virtual ApplicationLauncherResponse LaunchApp(ApplicationLauncherApp application, std::string data) = 0;
+    virtual app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(Application application,
+                                                                                           std::string data) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
@@ -102,8 +103,8 @@ class DLL_EXPORT ContentLauncher : public ContentAppCluster
 public:
     virtual ~ContentLauncher() = default;
 
-    virtual ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                std::string data) = 0;
+    virtual app::Clusters::ContentLauncher::Commands::LaunchResponse::Type LaunchContent(std::list<Parameter> parameterList,
+                                                                                         bool autoplay, std::string data) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
@@ -124,7 +125,7 @@ public:
     TargetNavigator(std::list<std::string> targets, uint8_t currentTarget);
     virtual ~TargetNavigator() = default;
 
-    TargetNavigatorResponse NavigateTarget(uint8_t target, std::string data);
+    app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type NavigateTarget(uint8_t target, std::string data);
     CHIP_ERROR GetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
