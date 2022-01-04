@@ -7116,61 +7116,6 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
@@ -7228,18 +7173,19 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttribute
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7253,8 +7199,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscr
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7265,11 +7211,68 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(
+        context);
     if (!self->mQueue) {
         return;
     }

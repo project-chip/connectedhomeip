@@ -10752,10 +10752,11 @@ using namespace chip::app::Clusters;
 - (void)readAttributeUpdateStateWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge(
+    new CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo;
-            auto successFn = Callback<OtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>::FromCancelable(success);
+            auto successFn
+                = Callback<OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -10766,15 +10767,17 @@ using namespace chip::app::Clusters;
                              subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
                                        reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    new CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge(
+    new CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge(
         self.callbackQueue, reportHandler,
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo;
-            auto successFn = Callback<OtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallback>::FromCancelable(success);
+            auto successFn
+                = Callback<OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
                 minInterval, maxInterval,
-                CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
+                CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::
+                    OnSubscriptionEstablished);
         },
         subscriptionEstablishedHandler);
 }

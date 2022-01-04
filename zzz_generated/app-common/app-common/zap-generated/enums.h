@@ -64,16 +64,6 @@ enum EmberAfBootReasonType : uint8_t
     EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET            = 6,
 };
 
-// Enum for ChangeReasonEnum
-enum EmberAfChangeReasonEnum : uint8_t
-{
-    EMBER_ZCL_CHANGE_REASON_ENUM_UNKNOWN           = 0,
-    EMBER_ZCL_CHANGE_REASON_ENUM_SUCCESS           = 1,
-    EMBER_ZCL_CHANGE_REASON_ENUM_FAILURE           = 2,
-    EMBER_ZCL_CHANGE_REASON_ENUM_TIME_OUT          = 3,
-    EMBER_ZCL_CHANGE_REASON_ENUM_DELAY_BY_PROVIDER = 4,
-};
-
 // Enum for ColorControlOptions
 enum EmberAfColorControlOptions : uint8_t
 {
@@ -375,31 +365,6 @@ enum EmberAfNodeOperationalCertStatus : uint8_t
     EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_INVALID_FABRIC_INDEX   = 11,
 };
 
-// Enum for OTAAnnouncementReason
-enum EmberAfOTAAnnouncementReason : uint8_t
-{
-    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_SIMPLE_ANNOUNCEMENT     = 0,
-    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_UPDATE_AVAILABLE        = 1,
-    EMBER_ZCL_OTA_ANNOUNCEMENT_REASON_URGENT_UPDATE_AVAILABLE = 2,
-};
-
-// Enum for OTAApplyUpdateAction
-enum EmberAfOTAApplyUpdateAction : uint8_t
-{
-    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED           = 0,
-    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_AWAIT_NEXT_ACTION = 1,
-    EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_DISCONTINUE       = 2,
-};
-
-// Enum for OTADownloadProtocol
-enum EmberAfOTADownloadProtocol : uint8_t
-{
-    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS  = 0,
-    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_ASYNCHRONOUS = 1,
-    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_HTTPS            = 2,
-    EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_VENDOR_SPECIFIC  = 3,
-};
-
 // Enum for OnOffDelayedAllOffEffectVariant
 enum EmberAfOnOffDelayedAllOffEffectVariant : uint8_t
 {
@@ -562,20 +527,6 @@ enum EmberAfThermostatSystemMode : uint8_t
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_EMERGENCY_HEATING = 5,
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_PRECOOLING        = 6,
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY          = 7,
-};
-
-// Enum for UpdateStateEnum
-enum EmberAfUpdateStateEnum : uint8_t
-{
-    EMBER_ZCL_UPDATE_STATE_ENUM_UNKNOWN                 = 0,
-    EMBER_ZCL_UPDATE_STATE_ENUM_IDLE                    = 1,
-    EMBER_ZCL_UPDATE_STATE_ENUM_QUERYING                = 2,
-    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_QUERY        = 3,
-    EMBER_ZCL_UPDATE_STATE_ENUM_DOWNLOADING             = 4,
-    EMBER_ZCL_UPDATE_STATE_ENUM_APPLYING                = 5,
-    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_APPLY        = 6,
-    EMBER_ZCL_UPDATE_STATE_ENUM_ROLLING_BACK            = 7,
-    EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_USER_CONSENT = 8,
 };
 
 // Enum for WcEndProductType

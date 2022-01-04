@@ -192,7 +192,7 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto protocolIter = protocolsSupported.begin();
     while (protocolIter.Next())
     {
-        ChipLogDetail(Zcl, "    %" PRIu8, protocolIter.GetValue());
+        ChipLogDetail(Zcl, "    %" PRIu8, to_underlying(protocolIter.GetValue()));
     }
     ChipLogDetail(Zcl, "  ]");
     if (hardwareVersion.HasValue())

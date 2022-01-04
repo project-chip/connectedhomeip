@@ -8137,9 +8137,6 @@ public:
 } // namespace Events
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -8147,12 +8144,6 @@ enum class OTAApplyUpdateAction : uint8_t
     kAwaitNextAction = 0x01,
     kDiscontinue     = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAApplyUpdateAction            = EmberAfOTAApplyUpdateAction;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
@@ -8161,9 +8152,6 @@ enum class OTADownloadProtocol : uint8_t
     kHttps           = 0x02,
     kVendorSpecific  = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
-#endif
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
@@ -8472,24 +8460,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ChangeReasonEnum
-enum class ChangeReasonEnum : uint8_t
-{
-    kUnknown         = 0x00,
-    kSuccess         = 0x01,
-    kFailure         = 0x02,
-    kTimeOut         = 0x03,
-    kDelayByProvider = 0x04,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ChangeReasonEnum                = EmberAfChangeReasonEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -8497,14 +8467,17 @@ enum class OTAAnnouncementReason : uint8_t
     kUpdateAvailable       = 0x01,
     kUrgentUpdateAvailable = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAAnnouncementReason           = EmberAfOTAAnnouncementReason;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for UpdateStateEnum
-enum class UpdateStateEnum : uint8_t
+// Enum for OTAChangeReasonEnum
+enum class OTAChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+// Enum for OTAUpdateStateEnum
+enum class OTAUpdateStateEnum : uint8_t
 {
     kUnknown              = 0x00,
     kIdle                 = 0x01,
@@ -8516,9 +8489,6 @@ enum class UpdateStateEnum : uint8_t
     kRollingBack          = 0x07,
     kDelayedOnUserConsent = 0x08,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using UpdateStateEnum                 = EmberAfUpdateStateEnum;
-#endif
 
 namespace Structs {
 namespace ProviderLocation {
@@ -8634,9 +8604,9 @@ struct TypeInfo
 namespace UpdateState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
-    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
-    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
@@ -8730,9 +8700,9 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<UpdateStateEnum> previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8745,9 +8715,9 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<UpdateStateEnum> previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
