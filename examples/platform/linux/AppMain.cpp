@@ -372,30 +372,31 @@ void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Device commissioning completed with success");
+        /* pending PR 13306
+                PeerId peerId;
+                peerId.SetNodeId(nodeId);
+                peerId.SetCompressedFabricId(gCommissioner.GetCompressedFabricId());
 
-        PeerId peerId;
-        peerId.SetNodeId(nodeId);
-        peerId.SetCompressedFabricId(gCommissioner.GetCompressedFabricId());
+                OperationalDeviceProxy * device = gCommissioner.GetOperationalDeviceProxy(peerId);
+                if (device == nullptr)
+                {
+                    ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from device commissioner");
+                    return;
+                }
 
-        OperationalDeviceProxy * device = gCommissioner.GetOperationalDeviceProxy(peerId);
-        if (device == nullptr)
-        {
-            ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from device commissioner");
-            return;
-        }
+                constexpr EndpointId kBindingClusterEndpoint = 0;
+                chip::Controller::BindingCluster cluster;
+                cluster.Associate(device, kBindingClusterEndpoint);
 
-        constexpr EndpointId kBindingClusterEndpoint = 0;
-        chip::Controller::BindingCluster cluster;
-        cluster.Associate(device, kBindingClusterEndpoint);
+                Callback::Cancelable * successCallback = mSuccessCallback.Cancel();
+                Callback::Cancelable * failureCallback = mFailureCallback.Cancel();
 
-        Callback::Cancelable * successCallback = mSuccessCallback.Cancel();
-        Callback::Cancelable * failureCallback = mFailureCallback.Cancel();
+                chip::GroupId groupId       = kUndefinedGroupId;
+                chip::EndpointId endpointId = 1; // TODO: populate with ContentApp endpoint id
+                chip::ClusterId clusterId   = kInvalidClusterId;
 
-        chip::GroupId groupId       = kUndefinedGroupId;
-        chip::EndpointId endpointId = 1; // TODO: populate with ContentApp endpoint id
-        chip::ClusterId clusterId   = kInvalidClusterId;
-
-        cluster.Bind(successCallback, failureCallback, gLocalId, groupId, endpointId, clusterId);
+                cluster.Bind(successCallback, failureCallback, gLocalId, groupId, endpointId, clusterId);
+                */
     }
     else
     {

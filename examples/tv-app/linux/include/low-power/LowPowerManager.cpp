@@ -18,7 +18,7 @@
 
 #include "LowPowerManager.h"
 
-bool lowPowerClusterSleep()
+bool LowPowerManager::HandleSleep()
 {
     // TODO: Insert code here
     return true;

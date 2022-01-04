@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -15,17 +15,17 @@
  *    limitations under the License.
  */
 
-#pragma once
+/****************************************************************************
+ * @file
+ * @brief Routines for TV stubs
+ *server stub implementation of TV cluster code.
+ *******************************************************************************
+ ******************************************************************************/
 
-#include <platform/OTARequestorDriver.h>
+#include <app/clusters/low-power-server/low-power-server.h>
 
-namespace chip {
-
-class OTARequestorDriverImpl : public OTARequestorDriver
+class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
 public:
-    bool CheckImageDownloadAllowed() override;
-    void ImageDownloadComplete() override;
-    UserConsentAction RequestUserConsent() override;
+    bool HandleSleep() override;
 };
-} // namespace chip

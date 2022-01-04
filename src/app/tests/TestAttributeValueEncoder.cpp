@@ -55,7 +55,7 @@ struct LimitedTestSetup
         writer.Init(buf);
         {
             TLVType ignored;
-            CHIP_ERROR err = writer.StartContainer(AnonymousTag, kTLVType_Structure, ignored);
+            CHIP_ERROR err = writer.StartContainer(AnonymousTag(), kTLVType_Structure, ignored);
             NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
         }
         {

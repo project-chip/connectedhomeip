@@ -18,14 +18,7 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app/AttributeAccessInterface.h>
-#include <app/clusters/content-launch-server/content-launch-delegate.h>
-
-#include <lib/core/CHIPError.h>
-#include <list>
-#include <string>
-#include <vector>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 
 class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
@@ -33,10 +26,13 @@ public:
     ContentLauncherManager() : ContentLauncherManager({ "example", "example" }, 0){};
     ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols);
 
-    LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
-                                       const chip::CharSpan & data) override;
-    LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                   const std::list<BrandingInformation> & brandingInformation) override;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+    HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
+                        const chip::CharSpan & data) override;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+    HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                    const std::list<BrandingInformation> & brandingInformation) override;
+
     std::list<std::string> HandleGetAcceptHeaderList() override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 

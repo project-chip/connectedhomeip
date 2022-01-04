@@ -30,12 +30,10 @@ tests:
           values:
               - name: "tempAccountIdentifier"
                 value: "asdf"
-
-      # TODO: Enable these once they are able to work
-      # response:
-      #     values:
-      #         - name: "setupPIN"
-      #           value: "tempPin123"
+      response:
+          values:
+              - name: "setupPIN"
+                value: "tempPin123"
     - label: "Login Command"
       command: "loginRequest"
       timedInteractionTimeoutMs: 10000

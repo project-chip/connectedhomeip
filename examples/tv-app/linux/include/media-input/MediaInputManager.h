@@ -18,15 +18,15 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/clusters/media-input-server/media-input-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
-
-class MediaInputManager
+class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetInputList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
+    std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> HandleGetInputList() override;
+    uint8_t HandleGetCurrentInput() override;
+    bool HandleSelectInput(const uint8_t index) override;
+    bool HandleShowInputStatus() override;
+    bool HandleHideInputStatus() override;
+    bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
 };

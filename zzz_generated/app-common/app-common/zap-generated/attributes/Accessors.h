@@ -5246,7 +5246,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::app::Clusters::MediaPlayback:
 } // namespace PlaybackState
 
 namespace StartTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
+EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // epoch_us
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
 } // namespace StartTime
 

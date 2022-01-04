@@ -6384,9 +6384,9 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::Nullable<uint32_t> cluster;
-    DataModel::Nullable<uint16_t> endpoint;
-    DataModel::Nullable<uint32_t> deviceType;
+    DataModel::Nullable<chip::ClusterId> cluster;
+    DataModel::Nullable<chip::EndpointId> endpoint;
+    DataModel::Nullable<chip::DeviceTypeId> deviceType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10156,8 +10156,8 @@ public:
 
     NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::List<const Structs::WiFiInterfaceScanResult::Type> wiFiScanResults;
-    DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
+    Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
+    Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10174,8 +10174,8 @@ public:
 
     NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wiFiScanResults;
-    DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
+    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
+    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -31416,6 +31416,12 @@ enum class InputTypeEnum : uint8_t
     kOther     = 0x0B,
 };
 
+// Bitmap for MediaInputFeature
+enum class MediaInputFeature : uint32_t
+{
+    kNameUpdates = 0x1,
+};
+
 namespace Structs {
 namespace InputInfo {
 enum class Fields
@@ -31871,6 +31877,14 @@ enum class StatusEnum : uint8_t
     kInvalidKeyInCurrentState = 0x02,
 };
 
+// Bitmap for KeypadInputFeature
+enum class KeypadInputFeature : uint32_t
+{
+    kNavigationKeyCodes = 0x1,
+    kLocationKeys       = 0x2,
+    kNumberKeys         = 0x4,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -32037,6 +32051,13 @@ enum class StatusEnum : uint8_t
     kSuccess         = 0x00,
     kUrlNotAvailable = 0x01,
     kAuthFailed      = 0x02,
+};
+
+// Bitmap for ContentLauncherFeature
+enum class ContentLauncherFeature : uint32_t
+{
+    kContentSearch = 0x1,
+    kURLPlayback   = 0x2,
 };
 
 // Bitmap for SupportedStreamingProtocol
@@ -32417,6 +32438,12 @@ enum class OutputTypeEnum : uint8_t
     kOther     = 0x05,
 };
 
+// Bitmap for AudiouOutputFeature
+enum class AudiouOutputFeature : uint32_t
+{
+    kNameUpdates = 0x1,
+};
+
 namespace Structs {
 namespace OutputInfo {
 enum class Fields
@@ -32615,6 +32642,19 @@ enum class StatusEnum : uint8_t
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
     kSystemBusy      = 0x02,
+};
+
+// Bitmap for ApplicationLauncherFeature
+enum class ApplicationLauncherFeature : uint32_t
+{
+    kApplicationPlatform = 0x1,
+};
+
+// Bitmap for ChannelFeature
+enum class ChannelFeature : uint32_t
+{
+    kChannelList = 0x1,
+    kLineupInfo  = 0x2,
 };
 
 namespace Structs {

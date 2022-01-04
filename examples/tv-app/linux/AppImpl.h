@@ -100,7 +100,8 @@ class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
 public:
     virtual ~ApplicationLauncherImpl() {}
 
-    ApplicationLauncherResponse LaunchApp(Application application, std::string data) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(Application application,
+                                                                                         std::string data) override;
 
 protected:
 };

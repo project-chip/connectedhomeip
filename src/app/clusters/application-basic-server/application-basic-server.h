@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *
@@ -15,26 +15,19 @@
  *    limitations under the License.
  */
 
-#include "OTARequestorDriverImpl.h"
-#include "esp_log.h"
+#pragma once
 
-#define TAG "OTARequestorDriver"
+#include "application-basic-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
+namespace app {
+namespace Clusters {
+namespace ApplicationBasic {
 
-bool OTARequestorDriverImpl::CheckImageDownloadAllowed()
-{
-    return true;
-}
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-void OTARequestorDriverImpl::ImageDownloadComplete()
-{
-    ESP_LOGI(TAG, "Image download complete");
-}
-
-UserConsentAction OTARequestorDriverImpl::RequestUserConsent()
-{
-    return ImmediateYes;
-}
-
+} // namespace ApplicationBasic
+} // namespace Clusters
+} // namespace app
 } // namespace chip

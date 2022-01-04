@@ -18,16 +18,15 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/keypad-input-server/keypad-input-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
 
-class KeypadInputManager
+class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    chip::app::Clusters::KeypadInput::StatusEnum SendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode);
+    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
+    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 
 private:
     friend KeypadInputManager & KeypadInputMgr();

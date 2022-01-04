@@ -18,7 +18,7 @@
 #define LOG_MESSAGE(msg) (msg)
 #endif
 
-LOG_MODULE_REGISTER(chip, LOG_LEVEL_DBG);
+LOG_MODULE_REGISTER(chip, CONFIG_MATTER_LOG_LEVEL);
 
 namespace chip {
 namespace DeviceLayer {

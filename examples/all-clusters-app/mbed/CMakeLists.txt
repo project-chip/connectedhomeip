@@ -131,6 +131,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${APP_CLUSTERS}/software-diagnostics-server/software-diagnostics-server.cpp
                ${APP_CLUSTERS}/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
+               ${APP_CLUSTERS}/wake-on-lan-server/wake-on-lan-server.cpp
                ${APP_CLUSTERS}/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${APP_CLUSTERS}/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
                ${APP_CLUSTERS}/administrator-commissioning-server/administrator-commissioning-server.cpp

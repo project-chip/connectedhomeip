@@ -17,24 +17,23 @@
  */
 
 #include "KeypadInputManager.h"
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <cstddef>
+
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::KeypadInput;
 
 KeypadInputManager KeypadInputManager::sInstance;
 
-chip::app::Clusters::KeypadInput::StatusEnum keypadInputClusterSendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
-{
-    return KeypadInputMgr().SendKey(keyCode);
-}
+namespace {
+static KeypadInputManager keypadInputManager;
+} // namespace
 
-chip::app::Clusters::KeypadInput::StatusEnum KeypadInputManager::SendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
+Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keyCode)
 {
+    Commands::SendKeyResponse::Type response;
+
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -51,10 +50,13 @@ chip::app::Clusters::KeypadInput::StatusEnum KeypadInputManager::SendKey(chip::a
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        return chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
     }
-
-    return static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
+    else
+    {
+        response.status = static_cast<chip::app::Clusters::KeypadInput::StatusEnum>(ret);
+    }
+    return response;
 }
 
 void KeypadInputManager::InitializeWithObjects(jobject managerObject)
@@ -74,4 +76,10 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access KeypadInputManager 'sendKey' method");
         env->ExceptionClear();
     }
+}
+
+void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Android App: KeypadInput::SetDefaultDelegate");
+    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
 }

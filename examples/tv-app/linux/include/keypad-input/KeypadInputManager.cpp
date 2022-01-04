@@ -18,32 +18,13 @@
 
 #include "KeypadInputManager.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
+using namespace chip;
+using namespace chip::app::Clusters::KeypadInput;
 
-#include <map>
-#include <string>
-
-using namespace std;
-
-CHIP_ERROR KeypadInputManager::Init()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NV"] = true;
-    featureMap["LK"] = true;
-    featureMap["NK"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-chip::app::Clusters::KeypadInput::StatusEnum keypadInputClusterSendKey(chip::app::Clusters::KeypadInput::CecKeyCode keyCode)
+Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keycCode)
 {
     // TODO: Insert code here
-    return chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+    Commands::SendKeyResponse::Type response;
+    response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+    return response;
 }

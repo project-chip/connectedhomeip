@@ -24,13 +24,13 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip;
+using namespace chip::app::Clusters::LowPower;
 
 LowPowerManager LowPowerManager::sInstance;
 
-bool lowPowerClusterSleep()
-{
-    return LowPowerMgr().Sleep();
-}
+namespace {
+static LowPowerManager lowPowerManager;
+} // namespace
 
 void LowPowerManager::InitializeWithObjects(jobject managerObject)
 {
@@ -51,7 +51,7 @@ void LowPowerManager::InitializeWithObjects(jobject managerObject)
     }
 }
 
-bool LowPowerManager::Sleep()
+bool LowPowerManager::HandleSleep()
 {
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -73,4 +73,10 @@ bool LowPowerManager::Sleep()
 
 exit:
     return static_cast<bool>(ret);
+}
+
+void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Android App: LowPower::SetDefaultDelegate");
+    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }

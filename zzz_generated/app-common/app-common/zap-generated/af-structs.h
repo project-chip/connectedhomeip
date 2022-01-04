@@ -149,9 +149,9 @@ typedef struct _ApplicationEP
 // Struct for Target
 typedef struct _Target
 {
-    uint32_t Cluster;
-    uint16_t Endpoint;
-    uint32_t DeviceType;
+    chip::ClusterId Cluster;
+    chip::EndpointId Endpoint;
+    chip::DeviceTypeId DeviceType;
 } Target;
 
 // Struct for AccessControlEntry

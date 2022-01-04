@@ -45,12 +45,18 @@ public:
         virtual ~MessagingDelegate() {}
     };
 
-    BDXDownloader() : chip::OTADownloader() {}
+    class StateDelegate
+    {
+    public:
+        virtual void OnDownloadStateChanged(State state) = 0;
+        virtual ~StateDelegate()                         = default;
+    };
 
     // To be called when there is an incoming message to handle (of any protocol type)
     void OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg);
 
     void SetMessageDelegate(MessagingDelegate * delegate) { mMsgDelegate = delegate; }
+    void SetStateDelegate(StateDelegate * delegate) { mStateDelegate = delegate; }
 
     // Initialize a BDX transfer session but will not proceed until OnPreparedForDownload() is called.
     CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData);
@@ -68,9 +74,11 @@ public:
 private:
     void PollTransferSession();
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
+    void SetState(State state);
 
     chip::bdx::TransferSession mBdxTransfer;
-    MessagingDelegate * mMsgDelegate;
+    MessagingDelegate * mMsgDelegate = nullptr;
+    StateDelegate * mStateDelegate   = nullptr;
 };
 
 } // namespace chip

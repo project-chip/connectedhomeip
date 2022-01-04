@@ -180,7 +180,8 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
-ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
+chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
+ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,
@@ -188,10 +189,9 @@ ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(Application appli
                     "application.applicationId=%s data=%s",
                     application.catalogVendorId, appId.c_str(), data.c_str());
 
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
 }

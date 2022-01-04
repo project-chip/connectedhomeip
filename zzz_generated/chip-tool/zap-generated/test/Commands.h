@@ -32825,7 +32825,12 @@ private:
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(chip::CharSpan setupPIN) { NextTest(); }
+    void OnSuccessResponse_1(chip::CharSpan setupPIN)
+    {
+        VerifyOrReturn(CheckValueAsString("setupPIN", setupPIN, chip::CharSpan("tempPin123", 10)));
+
+        NextTest();
+    }
 
     CHIP_ERROR TestLoginCommand_2()
     {
@@ -33452,7 +33457,7 @@ private:
 
     void OnSuccessResponse_2(uint64_t startTime)
     {
-        VerifyOrReturn(CheckValue("startTime", startTime, 255ULL));
+        VerifyOrReturn(CheckValue("startTime", startTime, 0ULL));
 
         NextTest();
     }
@@ -48917,7 +48922,7 @@ private:
 
     void OnSuccessResponse_389(int8_t rangeRestrictedInt8s)
     {
-        VerifyOrReturn(CheckValue("rangeRestrictedInt8s", rangeRestrictedInt8s, 0));
+        VerifyOrReturn(CheckValue("rangeRestrictedInt8s", rangeRestrictedInt8s, -20));
 
         NextTest();
     }
@@ -49025,7 +49030,7 @@ private:
 
     void OnSuccessResponse_394(int8_t rangeRestrictedInt8s)
     {
-        VerifyOrReturn(CheckValue("rangeRestrictedInt8s", rangeRestrictedInt8s, 0));
+        VerifyOrReturn(CheckValue("rangeRestrictedInt8s", rangeRestrictedInt8s, -20));
 
         NextTest();
     }
@@ -49159,7 +49164,7 @@ private:
 
     void OnSuccessResponse_401(int16_t rangeRestrictedInt16s)
     {
-        VerifyOrReturn(CheckValue("rangeRestrictedInt16s", rangeRestrictedInt16s, 0));
+        VerifyOrReturn(CheckValue("rangeRestrictedInt16s", rangeRestrictedInt16s, -100));
 
         NextTest();
     }
@@ -49267,7 +49272,7 @@ private:
 
     void OnSuccessResponse_406(int16_t rangeRestrictedInt16s)
     {
-        VerifyOrReturn(CheckValue("rangeRestrictedInt16s", rangeRestrictedInt16s, 0));
+        VerifyOrReturn(CheckValue("rangeRestrictedInt16s", rangeRestrictedInt16s, -100));
 
         NextTest();
     }
@@ -50001,7 +50006,7 @@ private:
     void OnSuccessResponse_441(const chip::app::DataModel::Nullable<int8_t> & nullableRangeRestrictedInt8s)
     {
         VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8s", nullableRangeRestrictedInt8s));
-        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", nullableRangeRestrictedInt8s.Value(), 0));
+        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", nullableRangeRestrictedInt8s.Value(), -20));
 
         NextTest();
     }
@@ -50115,7 +50120,7 @@ private:
     void OnSuccessResponse_446(const chip::app::DataModel::Nullable<int8_t> & nullableRangeRestrictedInt8s)
     {
         VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt8s", nullableRangeRestrictedInt8s));
-        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", nullableRangeRestrictedInt8s.Value(), 0));
+        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt8s.Value()", nullableRangeRestrictedInt8s.Value(), -20));
 
         NextTest();
     }
@@ -50300,7 +50305,7 @@ private:
     void OnSuccessResponse_455(const chip::app::DataModel::Nullable<int16_t> & nullableRangeRestrictedInt16s)
     {
         VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt16s", nullableRangeRestrictedInt16s));
-        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", nullableRangeRestrictedInt16s.Value(), 0));
+        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", nullableRangeRestrictedInt16s.Value(), -100));
 
         NextTest();
     }
@@ -50414,7 +50419,7 @@ private:
     void OnSuccessResponse_460(const chip::app::DataModel::Nullable<int16_t> & nullableRangeRestrictedInt16s)
     {
         VerifyOrReturn(CheckValueNonNull("nullableRangeRestrictedInt16s", nullableRangeRestrictedInt16s));
-        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", nullableRangeRestrictedInt16s.Value(), 0));
+        VerifyOrReturn(CheckValue("nullableRangeRestrictedInt16s.Value()", nullableRangeRestrictedInt16s.Value(), -100));
 
         NextTest();
     }

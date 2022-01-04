@@ -1606,11 +1606,27 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
     chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
     DebugText = DebugTextUtfString.jniValue();
     jobject WiFiScanResults;
+    if (!dataResponse.wiFiScanResults.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, WiFiScanResults);
+    }
+    else
+    {
 
-    WiFiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+        WiFiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+        chip::JniReferences::GetInstance().CreateOptional(WiFiScanResults, WiFiScanResults);
+    }
     jobject ThreadScanResults;
+    if (!dataResponse.threadScanResults.HasValue())
+    {
+        chip::JniReferences::GetInstance().CreateOptional(nullptr, ThreadScanResults);
+    }
+    else
+    {
 
-    ThreadScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+        ThreadScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+        chip::JniReferences::GetInstance().CreateOptional(ThreadScanResults, ThreadScanResults);
+    }
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NetworkingStatus, DebugText, WiFiScanResults, ThreadScanResults);
 }
