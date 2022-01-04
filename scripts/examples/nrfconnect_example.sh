@@ -41,7 +41,7 @@ env
 
 OVERLAY_CONF_FLAG=""
 if [[ -f "$APP/nrfconnect/boards/$BOARD.conf" ]]; then
-	OVERLAY_CONF_FLAG="-DOVERLAY_CONFIG=boards/$BOARD.conf"
+    OVERLAY_CONF_FLAG="-DOVERLAY_CONFIG=boards/$BOARD.conf"
 fi
 
-west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- $OVERLAY_CONF_FLAG "$@"
+west build -b "$BOARD" -d "$APP/nrfconnect/build/$BOARD" "$APP/nrfconnect" -- "$OVERLAY_CONF_FLAG" "$@"
