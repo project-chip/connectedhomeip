@@ -190,6 +190,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 {
     auto & providerNodeId     = commandData.providerNodeId;
     auto & announcementReason = commandData.announcementReason;
+    auto & providerEndpoint   = commandData.endpoint;
 
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
     {
@@ -199,6 +200,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
 
     mProviderNodeId      = providerNodeId;
     mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+    mProviderEndpointId  = providerEndpoint;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogDetail(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
@@ -209,6 +211,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     {
         ChipLogDetail(SoftwareUpdate, "  MetadataForNode: %zu", commandData.metadataForNode.Value().size());
     }
+    ChipLogDetail(SoftwareUpdate, "  Endpoint: %" PRIu16, commandData.endpoint);
 
     // If reason is URGENT_UPDATE_AVAILABLE, we start OTA immediately. Otherwise, respect the timer value set in mOtaStartDelayMs.
     // This is done to exemplify what a real-world OTA Requestor might do while also being configurable enough to use as a test app.
