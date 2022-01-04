@@ -16,8 +16,8 @@
  */
 
 #pragma once
-#include <platform/NetworkCommissioning.h>
 #include <esp_wifi.h>
+#include <platform/NetworkCommissioning.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -36,7 +36,7 @@ public:
         }
 
         item.security = mpscanResults[iternum].authmode;
-        item.ssidLen  = strnlen((const char *)mpscanResults[iternum].ssid, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        item.ssidLen  = strnlen((const char *) mpscanResults[iternum].ssid, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpscanResults[iternum].primary;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpscanResults[iternum].rssi;
@@ -47,6 +47,7 @@ public:
         return true;
     }
     void Release() override {}
+
 private:
     size_t mSize;
     wifi_ap_record_t * mpscanResults;
