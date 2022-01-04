@@ -227,10 +227,6 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
         }
         return;
     }
-    if (ap_number > kMaxScanResultsNum)
-    {
-        ap_number = kMaxScanResultsNum;
-    }
     wifi_ap_record_t * ap_list_buffer;
     ap_list_buffer = (wifi_ap_record_t *) malloc(ap_number * sizeof(wifi_ap_record_t));
     if (ap_list_buffer == NULL)
@@ -245,20 +241,13 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
     }
     if (esp_wifi_scan_get_ap_records(&ap_number, (wifi_ap_record_t *) ap_list_buffer) == ESP_OK)
     {
-        ESPScanResponseIterator<WiFiScanResponse> * iter = new ESPScanResponseIterator<WiFiScanResponse>();
-        WiFiScanResponse scanResponse;
-        for (uint8_t idx = 0; idx < ap_number; idx++)
-        {
-            GetWiFiScanRespFromAPRecord(&ap_list_buffer[idx], scanResponse);
-            iter->Add(scanResponse);
-        }
-        DeviceLayer::SystemLayer().ScheduleLambda([iter]() {
+        DeviceLayer::SystemLayer().ScheduleLambda([ap_number, ap_list_buffer]() {
+            ESPScanResponseIterator iter(ap_number, const_cast<wifi_ap_record_t *>(ap_list_buffer));
             if (GetInstance().mpScanCallback)
             {
-                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(),
-                                                         const_cast<ESPScanResponseIterator<WiFiScanResponse> *>(iter));
+                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
                 GetInstance().mpScanCallback = nullptr;
-                delete const_cast<ESPScanResponseIterator<WiFiScanResponse> *>(iter);
+                free(ap_list_buffer);
             }
         });
     }
@@ -271,7 +260,6 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
             mpScanCallback = nullptr;
         }
     }
-    free(ap_list_buffer);
 }
 
 void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
