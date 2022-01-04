@@ -33,6 +33,8 @@ namespace AccountLogin {
 class Delegate
 {
 public:
+    virtual void SetSetupPIN(uint32_t setupPIN) = 0;
+
     virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) = 0;
     virtual bool HandleLogout()                                                                                         = 0;
     virtual Commands::GetSetupPINResponse::Type HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifierString)   = 0;

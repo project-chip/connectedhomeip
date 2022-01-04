@@ -53,10 +53,6 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::Attribu
     {
         return GetApplicationBasic()->HandleReadAttribute(attributeId, buffer, maxReadLength);
     }
-    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
-    {
-        return GetAccountLogin()->HandleReadAttribute(attributeId, buffer, maxReadLength);
-    }
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
@@ -69,10 +65,6 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::Attrib
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
     {
         return GetApplicationBasic()->HandleWriteAttribute(attributeId, buffer);
-    }
-    if (clusterId == ZCL_ACCOUNT_LOGIN_CLUSTER_ID)
-    {
-        return GetAccountLogin()->HandleWriteAttribute(attributeId, buffer);
     }
     return EMBER_ZCL_STATUS_FAILURE;
 }
@@ -141,19 +133,6 @@ EmberAfStatus ApplicationBasic::HandleWriteAttribute(chip::AttributeId attribute
     }
 
     return EMBER_ZCL_STATUS_SUCCESS;
-}
-
-EmberAfStatus AccountLogin::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin::HandleReadAttribute: attrId=%d, maxReadLength=%d",
-                    static_cast<uint16_t>(attributeId), maxReadLength);
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
-EmberAfStatus AccountLogin::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
-    return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus KeypadInput::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)

@@ -168,18 +168,6 @@ void ApplicationBasicImpl::SetApplicationVersion(const char * szApplicationVersi
     strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
 }
 
-bool AccountLoginImpl::Login(const char * tempAccountId, uint32_t setupPin)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin: Login TempAccountId=\"%s\" SetupPIN=\"%d\"", tempAccountId, setupPin);
-    return (setupPin == mSetupPIN);
-}
-
-uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
-{
-    ChipLogProgress(DeviceLayer, "AccountLogin: GetSetupPIN TempAccountId=\"%s\" returning setuppin=%d", tempAccountId, mSetupPIN);
-    return mSetupPIN;
-}
-
 chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
 ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 {
@@ -196,11 +184,7 @@ ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
     return response;
 }
 
-ContentAppFactoryImpl::ContentAppFactoryImpl()
-{
-    mContentApps[1].GetAccountLogin()->SetSetupPIN(34567890);
-    mContentApps[2].GetAccountLogin()->SetSetupPIN(20202021);
-}
+ContentAppFactoryImpl::ContentAppFactoryImpl() {}
 
 ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
 {

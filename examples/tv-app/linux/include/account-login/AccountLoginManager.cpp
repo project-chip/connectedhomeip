@@ -23,6 +23,11 @@
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
 
+AccountLoginManager::AccountLoginManager(uint32_t setupPIN)
+{
+    mSetupPIN = setupPIN;
+}
+
 bool AccountLoginManager::HandleLogin(const chip::CharSpan & tempAccountIdentifier, const chip::CharSpan & setupPin)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
@@ -43,9 +48,12 @@ bool AccountLoginManager::HandleLogout()
 Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifier)
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
-    ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
-    // TODO: Insert your code here to handle get setup pin
+
+    std::string pin = std::to_string(mSetupPIN);
+
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), pin.c_str());
+
     Commands::GetSetupPINResponse::Type response;
-    response.setupPIN = chip::CharSpan("tempPin123", strlen("tempPin123"));
+    response.setupPIN = chip::CharSpan(pin.c_str(), pin.length());
     return response;
 }

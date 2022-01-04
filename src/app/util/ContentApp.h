@@ -25,6 +25,7 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
+#include <app/clusters/account-login-server/account-login-delegate.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-server.h>
@@ -60,19 +61,6 @@ public:
     virtual app::Clusters::ApplicationBasic::ApplicationStatusEnum GetApplicationStatus()                       = 0;
     virtual const char * GetApplicationVersion()                                                                = 0;
     virtual void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus) = 0;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
-class DLL_EXPORT AccountLogin : public ContentAppCluster
-{
-public:
-    virtual ~AccountLogin() = default;
-
-    virtual void SetSetupPIN(uint32_t setupPIN)                       = 0;
-    virtual uint32_t GetSetupPIN(const char * tempAccountId)          = 0;
-    virtual bool Login(const char * tempAccountId, uint32_t setupPin) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
@@ -143,13 +131,13 @@ public:
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
 
     virtual ApplicationBasic * GetApplicationBasic()       = 0;
-    virtual AccountLogin * GetAccountLogin()               = 0;
     virtual KeypadInput * GetKeypadInput()                 = 0;
     virtual ApplicationLauncher * GetApplicationLauncher() = 0;
     virtual MediaPlayback * GetMediaPlayback()             = 0;
     virtual TargetNavigator * GetTargetNavigator()         = 0;
     virtual Channel * GetChannel()                         = 0;
 
+    virtual chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate()       = 0;
     virtual chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() = 0;
 
     EmberAfStatus HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);

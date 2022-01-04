@@ -30,7 +30,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "include/account-login/AccountLoginManager.h"
 #include "include/content-launcher/ContentLauncherManager.h"
+#include <app/clusters/account-login-server/account-login-delegate.h>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
@@ -72,19 +74,6 @@ protected:
     app::Clusters::ApplicationBasic::ApplicationStatusEnum mApplicationStatus =
         app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped;
     char mApplicationVersion[kApplicationVersionSize];
-};
-
-class DLL_EXPORT AccountLoginImpl : public AccountLogin
-{
-public:
-    virtual ~AccountLoginImpl() {}
-
-    inline void SetSetupPIN(uint32_t setupPIN) override { mSetupPIN = setupPIN; };
-    uint32_t GetSetupPIN(const char * tempAccountId) override;
-    bool Login(const char * tempAccountId, uint32_t setupPin) override;
-
-protected:
-    uint32_t mSetupPIN = 0;
 };
 
 class DLL_EXPORT KeypadInputImpl : public KeypadInput
@@ -135,7 +124,8 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion) :
+                   const char * szApplicationVersion, uint32_t setupPIN) :
+        mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate({ "image/*", "video/*" },
                                  static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kDash) |
                                      static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kHls))
@@ -149,12 +139,13 @@ public:
     virtual ~ContentAppImpl() {}
 
     inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };
-    inline AccountLogin * GetAccountLogin() override { return &mAccountLogin; };
     inline KeypadInput * GetKeypadInput() override { return &mKeypadInput; };
     inline ApplicationLauncher * GetApplicationLauncher() override { return &mApplicationLauncher; };
     inline MediaPlayback * GetMediaPlayback() override { return &mMediaPlayback; };
     inline TargetNavigator * GetTargetNavigator() override { return &mTargetNavigator; };
     inline Channel * GetChannel() override { return &mChannel; };
+
+    inline chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate() override { return &mAccountLoginDelegate; };
 
     inline chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() override
     {
@@ -163,13 +154,13 @@ public:
 
 protected:
     ApplicationBasicImpl mApplicationBasic;
-    AccountLoginImpl mAccountLogin;
     KeypadInputImpl mKeypadInput;
     ApplicationLauncherImpl mApplicationLauncher;
     MediaPlaybackImpl mMediaPlayback;
     TargetNavigatorImpl mTargetNavigator;
     ChannelImpl mChannel;
 
+    AccountLoginManager mAccountLoginDelegate;
     ContentLauncherManager mContentLauncherDelegate;
 };
 
@@ -184,10 +175,11 @@ public:
     ContentApp * LoadContentAppByAppId(Application application);
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1"),
-                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2"),
-                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3"),
-                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2") };
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", 34567890),
+                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2", 34567890),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", 20202021),
+                                                      ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2",
+                                                                     20202021) };
 };
 
 } // namespace AppPlatform

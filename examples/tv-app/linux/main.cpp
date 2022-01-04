@@ -107,7 +107,7 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: AccountLogin::SetDefaultDelegate");
-    chip::app::Clusters::AccountLogin::SetDefaultDelegate(endpoint, &accountLoginManager);
+    chip::app::Clusters::AccountLogin::SetDefaultDelegate(&accountLoginManager);
 }
 
 void emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)

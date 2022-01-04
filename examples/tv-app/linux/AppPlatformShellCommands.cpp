@@ -65,7 +65,7 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
             return CHIP_ERROR_BAD_REQUEST;
         }
 
-        if (app->GetAccountLogin() == nullptr)
+        if (app->GetAccountLoginDelegate() == nullptr)
         {
             streamer_printf(sout, "no AccountLogin cluster for app with vendor id=%d \r\n", state->GetVendorId());
             return CHIP_ERROR_BAD_REQUEST;
@@ -75,7 +75,13 @@ static CHIP_ERROR pairApp(bool printHeader, size_t index)
         Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
                                             sizeof(rotatingIdString));
 
-        uint32_t pincode = app->GetAccountLogin()->GetSetupPIN(rotatingIdString);
+        CharSpan rotatingIdSpan = chip::CharSpan(rotatingIdString, sizeof(rotatingIdString));
+        chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type responseType =
+            app->GetAccountLoginDelegate()->HandleGetSetupPin(rotatingIdSpan);
+        std::string pinString(responseType.setupPIN.data(), responseType.setupPIN.size());
+
+        char * eptr;
+        uint32_t pincode = (uint32_t) strtol(pinString.c_str(), &eptr, 10);
         if (pincode == 0)
         {
             streamer_printf(sout, "udc no pin returned for vendor id=%d rotating ID=%s \r\n", state->GetVendorId(),
@@ -158,12 +164,12 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
             ChipLogProgress(DeviceLayer, "no app found for vendor id=%d ", vid);
             return CHIP_ERROR_BAD_REQUEST;
         }
-        if (app->GetAccountLogin() == nullptr)
+        if (app->GetAccountLoginDelegate() == nullptr)
         {
             ChipLogProgress(DeviceLayer, "no AccountLogin cluster for app with vendor id=%d ", vid);
             return CHIP_ERROR_BAD_REQUEST;
         }
-        app->GetAccountLogin()->SetSetupPIN(pincode);
+        app->GetAccountLoginDelegate()->SetSetupPIN(pincode);
 
         ChipLogProgress(DeviceLayer, "set pin success");
 
