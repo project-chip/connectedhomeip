@@ -107,7 +107,7 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(uint16_t discriminator, bool isShort)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    currentFilter.type = isShort ? Dnssd::DiscoveryFilterType::kShort : Dnssd::DiscoveryFilterType::kLong;
+    currentFilter.type = isShort ? Dnssd::DiscoveryFilterType::kShortDiscriminator : Dnssd::DiscoveryFilterType::kLongDiscriminator;
     currentFilter.code = discriminator;
     return mCommissioner->DiscoverCommissionableNodes(currentFilter);
 #else
@@ -166,9 +166,9 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
 {
     switch (currentFilter.type)
     {
-    case Dnssd::DiscoveryFilterType::kShort:
+    case Dnssd::DiscoveryFilterType::kShortDiscriminator:
         return ((nodeData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
-    case Dnssd::DiscoveryFilterType::kLong:
+    case Dnssd::DiscoveryFilterType::kLongDiscriminator:
         return nodeData.longDiscriminator == currentFilter.code;
     default:
         return false;

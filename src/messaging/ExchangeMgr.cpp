@@ -87,7 +87,6 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
     sessionManager->SetMessageDelegate(this);
 
     mReliableMessageMgr.Init(sessionManager->SystemLayer());
-    ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
 
@@ -116,7 +115,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate)
 {
     return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
@@ -188,8 +187,8 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(Protocols::Id protocolId, int16_t msgT
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SessionHandle session, const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
-                                        System::PacketBufferHandle && msgBuf)
+                                        const SessionHandle & session, const Transport::PeerAddress & source,
+                                        DuplicateMessage isDuplicate, System::PacketBufferHandle && msgBuf)
 {
     UnsolicitedMessageHandler * matchingUMH = nullptr;
 
@@ -314,12 +313,12 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 }
 
-void ExchangeManager::OnSessionReleased(SessionHandle session)
+void ExchangeManager::OnSessionReleased(const SessionHandle & session)
 {
     ExpireExchangesForSession(session);
 }
 
-void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
+void ExchangeManager::ExpireExchangesForSession(const SessionHandle & session)
 {
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSession.Contains(session))

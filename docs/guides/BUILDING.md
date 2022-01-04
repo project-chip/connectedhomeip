@@ -280,7 +280,7 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-Note: Some platforms that can be build as part of the unified build require
+Note: Some platforms that can be built as part of the unified build require
 downloading additional SDKs. To add these to the build, the location of the SDK
 installation must be provided as a build argument. For example, to add the
 Simplelink cc13x2_26x2 examples to the unified build, install the

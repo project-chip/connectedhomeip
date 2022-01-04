@@ -106,7 +106,7 @@ void SessionManager::Shutdown()
     mCB           = nullptr;
 }
 
-CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHeader & payloadHeader,
+CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, PayloadHeader & payloadHeader,
                                           System::PacketBufferHandle && message, EncryptedPacketBufferHandle & preparedMessage)
 {
     PacketHeader packetHeader;
@@ -189,7 +189,8 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, const EncryptedPacketBufferHandle & preparedMessage)
+CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHandle,
+                                               const EncryptedPacketBufferHandle & preparedMessage)
 {
     VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!preparedMessage.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -225,7 +226,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
             }
 
             // This marks any connection where we send data to as 'active'
-            mSecureSessions.MarkSessionActive(session);
+            session->MarkActive();
 
             destination = &session->GetPeerAddress();
 
@@ -240,7 +241,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
     else
     {
         auto unauthenticated = sessionHandle.GetUnauthenticatedSession();
-        mUnauthenticatedSessions.MarkSessionActive(unauthenticated);
+        unauthenticated->MarkActive();
         destination = &unauthenticated->GetPeerAddress();
 
         ChipLogProgress(Inet,
@@ -265,7 +266,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
     }
 }
 
-void SessionManager::ExpirePairing(SessionHandle sessionHandle)
+void SessionManager::ExpirePairing(const SessionHandle & sessionHandle)
 {
     SecureSession * session = GetSecureSession(sessionHandle);
     if (session != nullptr)
@@ -438,7 +439,7 @@ void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Tr
     }
     VerifyOrDie(err == CHIP_NO_ERROR);
 
-    mUnauthenticatedSessions.MarkSessionActive(session);
+    session->MarkActive();
 
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
@@ -501,7 +502,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
         return;
     }
 
-    mSecureSessions.MarkSessionActive(session);
+    session->MarkActive();
 
     if (isDuplicate == SessionMessageDelegate::DuplicateMessage::Yes && !payloadHeader.NeedsAck())
     {
@@ -627,12 +628,13 @@ void SessionManager::ExpiryTimerCallback(System::Layer * layer, void * param)
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
     mgr->mSecureSessions.ExpireInactiveSessions(
-        CHIP_PEER_CONNECTION_TIMEOUT_MS, [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
+        System::SystemClock().GetMonotonicTimestamp(), System::Clock::Milliseconds32(CHIP_PEER_CONNECTION_TIMEOUT_MS),
+        [this](const Transport::SecureSession & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }
 
-SecureSession * SessionManager::GetSecureSession(SessionHandle session)
+SecureSession * SessionManager::GetSecureSession(const SessionHandle & session)
 {
     if (session.mLocalSessionId.HasValue())
     {

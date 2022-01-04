@@ -161,4 +161,4 @@
 	branch  = stable
 [submodule "p6/lwip"]
 	path = third_party/p6/p6_sdk/libs/lwip
-	url = https://git.savannah.nongnu.org/git/lwip
+	url = https://github.com/lwip-tcpip/lwip.git

@@ -75,9 +75,7 @@ Server Server::sServer;
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
 static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
 static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter sCritEventIdCounter;
-static ::chip::PersistedCounter sInfoEventIdCounter;
-static ::chip::PersistedCounter sDebugEventIdCounter;
+static ::chip::PersistedCounter sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -171,21 +169,18 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
     {
-        ::chip::Platform::PersistedStorage::Key debugEventIdCounterStorageKey = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY;
-        ::chip::Platform::PersistedStorage::Key critEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY;
-        ::chip::Platform::PersistedStorage::Key infoEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY;
+        ::chip::Platform::PersistedStorage::Key globalEventIdCounterStorageKey =
+            CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY;
 
         ::chip::app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), &debugEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sDebugEventIdCounter, ::chip::app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), &infoEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sInfoEventIdCounter, ::chip::app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), &critEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sCritEventIdCounter, ::chip::app::PriorityLevel::Critical }
+            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
+            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
+            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0]);
+                                                       &logStorageResources[0], &globalEventIdCounterStorageKey,
+                                                       CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sGlobalEventIdCounter);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -265,7 +260,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    char nameBuffer[chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {

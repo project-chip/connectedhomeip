@@ -26,26 +26,29 @@
 #include <lib/core/CHIPError.h>
 #include <list>
 
-class ContentLauncherManager
+class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR GetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
-    ContentLaunchResponse LaunchContent(chip::EndpointId endpointId, std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                        const chip::CharSpan & data);
-    ContentLaunchResponse LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                    ContentLaunchBrandingInformation & brandingInformation);
+
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+    HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
+                        const chip::CharSpan & data) override;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
+    HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                    const std::list<BrandingInformation> & brandingInformation) override;
+    std::list<std::string> HandleGetAcceptHeaderList() override;
+    uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
     friend ContentLauncherManager & ContentLauncherMgr();
 
     static ContentLauncherManager sInstance;
-    jobject mContentLauncherManagerObject       = nullptr;
-    jmethodID mGetAcceptsHeaderMethod           = nullptr;
-    jmethodID mGetSupportedStreamingTypesMethod = nullptr;
-    jmethodID mLaunchContentMethod              = nullptr;
-    jmethodID mLaunchUrlMethod                  = nullptr;
+    jobject mContentLauncherManagerObject           = nullptr;
+    jmethodID mGetAcceptHeaderMethod                = nullptr;
+    jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
+    jmethodID mLaunchContentMethod                  = nullptr;
+    jmethodID mLaunchUrlMethod                      = nullptr;
 };
 
 inline ContentLauncherManager & ContentLauncherMgr()

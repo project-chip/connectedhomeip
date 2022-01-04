@@ -80,17 +80,11 @@ typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t c
 
 typedef void (*PythonInteractionModelDelegate_OnWriteResponseStatusFunct)(void * writeStatusBuf, uint32_t writeStatusBufLen);
 
-typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
-                                                                 uint64_t subscriptionId, void * attributePathBuf,
-                                                                 size_t attributePathBufLen, uint8_t * readTlvData,
-                                                                 size_t readTlvDataLen, uint16_t statusCode);
-
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f);
 void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct f);
 void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f);
-void pychip_InteractionModelDelegate_SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f);
 void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f);
 }
 
@@ -100,13 +94,6 @@ public:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                     TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
-
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
-                         TLV::TLVReader * apData, const app::StatusIB & status) override;
-
-    void OnEventData(const app::ReadClient * apReadClient, const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB * apStatus) override
-    {}
 
     static PythonInteractionModelDelegate & Instance();
 
@@ -124,13 +111,10 @@ public:
 
     void SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f) { onWriteResponseFunct = f; }
 
-    void SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f) { onReportDataFunct = f; }
-
 private:
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct commandResponseStatusFunct   = nullptr;
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct commandResponseProtocolErrorFunct = nullptr;
     PythonInteractionModelDelegate_OnCommandResponseFunct commandResponseErrorFunct                      = nullptr;
-    PythonInteractionModelDelegate_OnReportDataFunct onReportDataFunct                                   = nullptr;
     PythonInteractionModelDelegate_OnWriteResponseStatusFunct onWriteResponseFunct                       = nullptr;
 };
 

@@ -7,7 +7,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   private final String TAG = ContentLaunchManagerStub.class.getSimpleName();
 
   @Override
-  public String[] getAcceptsHeader() {
+  public String[] getAcceptHeader() {
     String[] headers =
         new String[] {
           "application/dash+xml", "application/vnd.apple.mpegurl", "text/html",
@@ -17,7 +17,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   }
 
   @Override
-  public int[] getSupportedStreamingTypes() {
+  public int[] getSupportedStreamingProtocols() {
     int[] types = new int[] {STREAMING_TYPE_DASH, STREAMING_TYPE_HLS};
     return types;
   }

@@ -1,5 +1,5 @@
 {
-  "featureLevel": 63,
+  "featureLevel": 67,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -32,9 +32,9 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Base Application Example",
-      "deviceTypeCode": 65280,
-      "deviceTypeProfileId": 259,
+      "deviceTypeName": null,
+      "deviceTypeCode": null,
+      "deviceTypeProfileId": null,
       "clusters": [
         {
           "name": "Descriptor",
@@ -181,32 +181,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -344,6 +319,36 @@
               "reportableChange": 0
             },
             {
+              "name": "SoftwareVersion",
+              "code": 9,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "SoftwareVersionString",
+              "code": 10,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 1,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ManufacturingDate",
               "code": 11,
               "mfgCode": null,
@@ -358,7 +363,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             },
-             {
+            {
               "name": "PartNumber",
               "code": 12,
               "mfgCode": null,
@@ -388,7 +393,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             },
-             {
+            {
               "name": "ProductLabel",
               "code": 14,
               "mfgCode": null,
@@ -461,36 +466,6 @@
               "reportable": 0,
               "minInterval": 0,
               "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "SoftwareVersion",
-              "code": 9,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 1,
-              "bounded": 0,
-              "defaultValue": "0",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "SoftwareVersionString",
-              "code": 10,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 1,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -1630,32 +1605,7 @@
           "define": "BASIC_CLUSTER",
           "side": "server",
           "enabled": 1,
-          "commands": [
-            {
-              "name": "StartUp",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "ShutDown",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            },
-            {
-              "name": "Leave",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 1
-            }
-          ],
+          "commands": [],
           "attributes": [
             {
               "name": "InteractionModelVersion",
@@ -1837,7 +1787,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             },
-             {
+            {
               "name": "PartNumber",
               "code": 12,
               "mfgCode": null,
@@ -1867,7 +1817,7 @@
               "maxInterval": 65344,
               "reportableChange": 0
             },
-             {
+            {
               "name": "ProductLabel",
               "code": 14,
               "mfgCode": null,
@@ -2178,6 +2128,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 258
     }
-  ],
-  "log": []
+  ]
 }

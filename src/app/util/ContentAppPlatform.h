@@ -37,9 +37,9 @@ namespace AppPlatform {
 class DLL_EXPORT ContentAppFactory
 {
 public:
-    virtual ~ContentAppFactory()                                                   = default;
-    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)               = 0;
-    virtual ContentApp * LoadContentAppByAppId(ApplicationLauncherApp application) = 0;
+    virtual ~ContentAppFactory()                                        = default;
+    virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)    = 0;
+    virtual ContentApp * LoadContentAppByAppId(Application application) = 0;
 };
 
 class DLL_EXPORT AppPlatform
@@ -63,7 +63,7 @@ public:
     // load and unload by vendor id
     void UnloadContentAppByVendorId(uint16_t vendorId);
     ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * GetLoadContentAppByAppId(ApplicationLauncherApp application);
+    ContentApp * GetLoadContentAppByAppId(Application application);
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
     ContentApp * GetContentAppByEndpointId(chip::EndpointId id);

@@ -294,16 +294,12 @@ void emberAfTick(void)
 void MatterBooleanStatePluginServerInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback() {}
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
-void MatterGroupKeyManagementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
-void MatterSwitchPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
-void MatterWakeOnLanPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}

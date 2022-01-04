@@ -68,6 +68,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/ota-requestor-stub.cpp
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
@@ -113,15 +114,16 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
-               ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-ember.cpp
+               ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-old.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
                ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
+               ${APP_CLUSTERS}/switch-server/switch-server.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
                ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
                ${APP_CLUSTERS}/thermostat-user-interface-configuration-server/thermostat-user-interface-configuration-server.cpp
-               ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
+               ${APP_CLUSTERS}/channel-server/channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
                ${APP_CLUSTERS}/occupancy-sensor-server/occupancy-sensor-server.cpp
@@ -129,12 +131,14 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
                ${APP_CLUSTERS}/software-diagnostics-server/software-diagnostics-server.cpp
                ${APP_CLUSTERS}/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
+               ${APP_CLUSTERS}/wake-on-lan-server/wake-on-lan-server.cpp
                ${APP_CLUSTERS}/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${APP_CLUSTERS}/pump-configuration-and-control-server/pump-configuration-and-control-server.cpp
                ${APP_CLUSTERS}/administrator-commissioning-server/administrator-commissioning-server.cpp
                ${APP_CLUSTERS}/identify-server/identify-server.cpp
                ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
+               ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
 )
 

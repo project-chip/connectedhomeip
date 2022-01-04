@@ -55,7 +55,7 @@ CHIP_ERROR AttributeReportBuilder::FinishAttribute(AttributeReportIBs::Builder &
     return aAttributeReportIBsBuilder.GetAttributeReport().EndOfAttributeReportIB().GetError();
 }
 
-CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
+CHIP_ERROR AttributeValueEncoder::EnsureListStarted()
 {
     if (mCurrentEncodingListIndex == kInvalidListIndex)
     {

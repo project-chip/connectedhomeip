@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
 #include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
@@ -97,6 +98,9 @@ void SignalHandler(int signum)
         break;
     case SIGVTALRM:
         PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::kEventId);
+        break;
+    case SIGIO:
+        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::kEventId);
         break;
     default:
         break;
@@ -298,6 +302,14 @@ CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
 }
 
 CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(EndpointId endpoint,
+                                       LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
 PlatformManagerImpl::_GetUserLabelList(EndpointId endpoint,
                                        LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
@@ -429,6 +441,89 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
         softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
 
         delegate->OnSoftwareFaultDetected(softwareFault);
+    }
+}
+
+void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
+{
+    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
+
+    if (delegate == nullptr)
+    {
+        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
+        return;
+    }
+
+    if (EventId == Switch::Events::SwitchLatched::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnSwitchLatched(newPosition);
+    }
+    else if (EventId == Switch::Events::InitialPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnInitialPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::LongPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnLongPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::ShortRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnShortReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::LongRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnLongReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::MultiPressOngoing::kEventId)
+    {
+        uint8_t newPosition                   = 0;
+        uint8_t currentNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                   = 10;
+        currentNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
+    }
+    else if (EventId == Switch::Events::MultiPressComplete::kEventId)
+    {
+        uint8_t newPosition                 = 0;
+        uint8_t totalNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                 = 10;
+        totalNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
     }
 }
 

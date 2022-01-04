@@ -24,7 +24,7 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -135,19 +135,30 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         {{#if expectedConstraints.minValue}}
         {
           {{> actualValue}}
-          XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+          if (actualValue != nil) {
+            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}});
+          }
         }
         {{/if}}
         {{#if expectedConstraints.maxValue}}
         {
           {{> actualValue}}
-          XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+          if (actualValue != nil) {
+            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}});
+          }
         }
         {{/if}}
         {{#if expectedConstraints.notValue}}
         {
           {{> actualValue}}
-          XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+          if (actualValue != nil) {
+            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
+          }
+        }
+        {{else if (isLiteralNull expectedConstraints.notValue)}}
+        {
+          {{> actualValue}}
+          XCTAssertFalse(actualValue == nil);
         }
         {{/if}}
         {{/if}}

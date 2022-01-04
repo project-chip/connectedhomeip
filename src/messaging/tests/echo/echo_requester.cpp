@@ -180,6 +180,10 @@ exit:
     {
         printf("Establish secure session succeeded\n");
     }
+    if (testSecurePairingSecret)
+    {
+        chip::Platform::Delete(testSecurePairingSecret);
+    }
 
     return err;
 }

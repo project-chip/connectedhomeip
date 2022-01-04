@@ -31,7 +31,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/DeviceControlServer.h>
+#include <platform/DeviceControlServer.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -104,17 +104,26 @@ bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler *
 {
     auto expiryLengthSeconds = System::Clock::Seconds16(commandData.expiryLengthSeconds);
 
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
+    CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().ArmFailSafe(expiryLengthSeconds);
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
     return true;
 }
 
+/**
+ * Pass fabric and nodeId of commissioner to DeviceControlSvr.
+ * This allows device to send messages back to commissioner.
+ * Once bindings are implemented, this may no longer be needed.
+ */
 bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
     const Commands::CommissioningComplete::DecodableType & commandData)
 {
-    CHIP_ERROR err = DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetFabricIndex(handle.GetFabricIndex());
+    DeviceLayer::DeviceControlServer::DeviceControlSvr().SetPeerNodeId(handle.GetPeerNodeId());
+
+    CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().CommissioningComplete();
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 
     return true;
@@ -128,8 +137,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     auto & countryCode = commandData.countryCode;
     auto & breadcrumb  = commandData.breadcrumb;
 
-    CHIP_ERROR err =
-        DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(location, countryCode, breadcrumb);
+    CHIP_ERROR err = DeviceLayer::DeviceControlServer::DeviceControlSvr().SetRegulatoryConfig(location, countryCode, breadcrumb);
 
     emberAfSendImmediateDefaultResponse(err == CHIP_NO_ERROR ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
 

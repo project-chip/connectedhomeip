@@ -591,18 +591,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
-- (instancetype)init;
-@end
-
-@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull updateToken;
-@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
-- (instancetype)init;
-@end
-
 @interface CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nullable delayedActionTime;
@@ -615,17 +603,30 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic, getter=getNewVersion) NSNumber * _Nonnull newVersion;
+- (instancetype)init;
+@end
+
 @interface CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull action;
 @property (strong, nonatomic) NSNumber * _Nonnull delayedActionTime;
 - (instancetype)init;
 @end
 
+@interface CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams : NSObject
+@property (strong, nonatomic) NSData * _Nonnull updateToken;
+@property (strong, nonatomic) NSNumber * _Nonnull softwareVersion;
+- (instancetype)init;
+@end
+
 @interface CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull providerLocation;
+@property (strong, nonatomic) NSNumber * _Nonnull providerNodeId;
 @property (strong, nonatomic) NSNumber * _Nonnull vendorId;
 @property (strong, nonatomic) NSNumber * _Nonnull announcementReason;
 @property (strong, nonatomic) NSData * _Nullable metadataForNode;
+@property (strong, nonatomic) NSNumber * _Nonnull endpoint;
 - (instancetype)init;
 @end
 
@@ -671,8 +672,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterScanNetworksResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
 @property (strong, nonatomic) NSString * _Nonnull debugText;
-@property (strong, nonatomic) NSArray * _Nonnull wiFiScanResults;
-@property (strong, nonatomic) NSArray * _Nonnull threadScanResults;
+@property (strong, nonatomic) NSArray * _Nullable wiFiScanResults;
+@property (strong, nonatomic) NSArray * _Nullable threadScanResults;
 - (instancetype)init;
 @end
 
@@ -822,6 +823,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPOperationalCredentialsClusterRemoveTrustedRootCertificateParams : NSObject
 @property (strong, nonatomic) NSData * _Nonnull trustedRootIdentifier;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetRemoveParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
 - (instancetype)init;
 @end
 
@@ -1503,29 +1534,29 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelParams : NSObject
+@interface CHIPChannelClusterChangeChannelRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull match;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelResponseParams : NSObject
-@property (strong, nonatomic) CHIPTvChannelClusterTvChannelInfo * _Nonnull channelMatch;
+@interface CHIPChannelClusterChangeChannelResponseParams : NSObject
+@property (strong, nonatomic) CHIPChannelClusterChannelInfo * _Nonnull channelMatch;
 @property (strong, nonatomic) NSNumber * _Nonnull errorType;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterChangeChannelByNumberParams : NSObject
+@interface CHIPChannelClusterChangeChannelByNumberRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull majorNumber;
 @property (strong, nonatomic) NSNumber * _Nonnull minorNumber;
 - (instancetype)init;
 @end
 
-@interface CHIPTvChannelClusterSkipChannelParams : NSObject
+@interface CHIPChannelClusterSkipChannelRequestParams : NSObject
 @property (strong, nonatomic, getter=getCount) NSNumber * _Nonnull count;
 - (instancetype)init;
 @end
 
-@interface CHIPTargetNavigatorClusterNavigateTargetParams : NSObject
+@interface CHIPTargetNavigatorClusterNavigateTargetRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull target;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
@@ -1537,88 +1568,38 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaPlayResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaPauseResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaStopResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaStartOverResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaPreviousResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaNextResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaRewindResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaFastForwardResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaSkipForwardParams : NSObject
+@interface CHIPMediaPlaybackClusterSkipForwardRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaSkipForwardResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaPlaybackClusterMediaSkipBackwardParams : NSObject
+@interface CHIPMediaPlaybackClusterSkipBackwardRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull deltaPositionMilliseconds;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
+@interface CHIPMediaPlaybackClusterPlaybackResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaSeekParams : NSObject
+@interface CHIPMediaPlaybackClusterSeekRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull position;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaPlaybackClusterMediaSeekResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull mediaPlaybackStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPMediaInputClusterSelectInputParams : NSObject
+@interface CHIPMediaInputClusterSelectInputRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 - (instancetype)init;
 @end
 
-@interface CHIPMediaInputClusterRenameInputParams : NSObject
+@interface CHIPMediaInputClusterRenameInputRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
 
-@interface CHIPKeypadInputClusterSendKeyParams : NSObject
+@interface CHIPKeypadInputClusterSendKeyRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull keyCode;
 - (instancetype)init;
 @end
@@ -1628,83 +1609,60 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterLaunchContentParams : NSObject
+@interface CHIPContentLauncherClusterLaunchContentRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
 @property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) NSArray * _Nonnull search;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterLaunchContentResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull contentLaunchStatus;
-@property (strong, nonatomic) NSString * _Nonnull data;
-- (instancetype)init;
-@end
-
-@interface CHIPContentLauncherClusterLaunchURLParams : NSObject
+@interface CHIPContentLauncherClusterLaunchURLRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull contentURL;
 @property (strong, nonatomic) NSString * _Nonnull displayString;
-@property (strong, nonatomic) NSArray * _Nonnull brandingInformation;
+@property (strong, nonatomic) CHIPContentLauncherClusterBrandingInformation * _Nonnull brandingInformation;
 - (instancetype)init;
 @end
 
-@interface CHIPContentLauncherClusterLaunchURLResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull contentLaunchStatus;
+@interface CHIPContentLauncherClusterLaunchResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 
-@interface CHIPAudioOutputClusterSelectOutputParams : NSObject
+@interface CHIPAudioOutputClusterSelectOutputRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 - (instancetype)init;
 @end
 
-@interface CHIPAudioOutputClusterRenameOutputParams : NSObject
+@interface CHIPAudioOutputClusterRenameOutputRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull index;
 @property (strong, nonatomic) NSString * _Nonnull name;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterLaunchAppParams : NSObject
+@interface CHIPApplicationLauncherClusterLaunchAppRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull data;
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterLaunchAppResponseParams : NSObject
+@interface CHIPApplicationLauncherClusterStopAppRequestParams : NSObject
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterHideAppRequestParams : NSObject
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterLauncherResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 
-@interface CHIPApplicationLauncherClusterStopAppParams : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
-- (instancetype)init;
-@end
-
-@interface CHIPApplicationLauncherClusterStopAppResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
-- (instancetype)init;
-@end
-
-@interface CHIPApplicationLauncherClusterHideAppParams : NSObject
-@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
-- (instancetype)init;
-@end
-
-@interface CHIPApplicationLauncherClusterHideAppResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
-- (instancetype)init;
-@end
-
-@interface CHIPApplicationBasicClusterChangeStatusParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPAccountLoginClusterGetSetupPINParams : NSObject
+@interface CHIPAccountLoginClusterGetSetupPINRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
 - (instancetype)init;
 @end
@@ -1714,7 +1672,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPAccountLoginClusterLoginParams : NSObject
+@interface CHIPAccountLoginClusterLoginRequestParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull tempAccountIdentifier;
 @property (strong, nonatomic) NSString * _Nonnull setupPIN;
 - (instancetype)init;

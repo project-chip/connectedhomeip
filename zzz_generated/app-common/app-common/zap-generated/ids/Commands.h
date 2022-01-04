@@ -514,21 +514,21 @@ namespace QueryImage {
 static constexpr CommandId Id = 0x00000000;
 } // namespace QueryImage
 
-namespace ApplyUpdateRequest {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ApplyUpdateRequest
-
-namespace NotifyUpdateApplied {
-static constexpr CommandId Id = 0x00000002;
-} // namespace NotifyUpdateApplied
-
 namespace QueryImageResponse {
-static constexpr CommandId Id = 0x00000003;
+static constexpr CommandId Id = 0x00000001;
 } // namespace QueryImageResponse
 
+namespace ApplyUpdateRequest {
+static constexpr CommandId Id = 0x00000002;
+} // namespace ApplyUpdateRequest
+
 namespace ApplyUpdateResponse {
-static constexpr CommandId Id = 0x00000004;
+static constexpr CommandId Id = 0x00000003;
 } // namespace ApplyUpdateResponse
+
+namespace NotifyUpdateApplied {
+static constexpr CommandId Id = 0x00000004;
+} // namespace NotifyUpdateApplied
 
 } // namespace Commands
 } // namespace OtaSoftwareUpdateProvider
@@ -766,6 +766,36 @@ static constexpr CommandId Id = 0x0000000C;
 
 } // namespace Commands
 } // namespace OperationalCredentials
+
+namespace GroupKeyManagement {
+namespace Commands {
+
+namespace KeySetWrite {
+static constexpr CommandId Id = 0x00000000;
+} // namespace KeySetWrite
+
+namespace KeySetRead {
+static constexpr CommandId Id = 0x00000001;
+} // namespace KeySetRead
+
+namespace KeySetReadResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace KeySetReadResponse
+
+namespace KeySetRemove {
+static constexpr CommandId Id = 0x00000003;
+} // namespace KeySetRemove
+
+namespace KeySetReadAllIndices {
+static constexpr CommandId Id = 0x00000004;
+} // namespace KeySetReadAllIndices
+
+namespace KeySetReadAllIndicesResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace KeySetReadAllIndicesResponse
+
+} // namespace Commands
+} // namespace GroupKeyManagement
 
 namespace ModeSelect {
 namespace Commands {
@@ -1253,37 +1283,37 @@ static constexpr CommandId Id = 0x00000001;
 } // namespace Commands
 } // namespace IasWd
 
-namespace TvChannel {
+namespace Channel {
 namespace Commands {
 
-namespace ChangeChannel {
+namespace ChangeChannelRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeChannel
+} // namespace ChangeChannelRequest
 
 namespace ChangeChannelResponse {
-static constexpr CommandId Id = 0x00000000;
+static constexpr CommandId Id = 0x00000001;
 } // namespace ChangeChannelResponse
 
-namespace ChangeChannelByNumber {
-static constexpr CommandId Id = 0x00000001;
-} // namespace ChangeChannelByNumber
-
-namespace SkipChannel {
+namespace ChangeChannelByNumberRequest {
 static constexpr CommandId Id = 0x00000002;
-} // namespace SkipChannel
+} // namespace ChangeChannelByNumberRequest
+
+namespace SkipChannelRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace SkipChannelRequest
 
 } // namespace Commands
-} // namespace TvChannel
+} // namespace Channel
 
 namespace TargetNavigator {
 namespace Commands {
 
-namespace NavigateTarget {
+namespace NavigateTargetRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace NavigateTarget
+} // namespace NavigateTargetRequest
 
 namespace NavigateTargetResponse {
-static constexpr CommandId Id = 0x00000000;
+static constexpr CommandId Id = 0x00000001;
 } // namespace NavigateTargetResponse
 
 } // namespace Commands
@@ -1292,93 +1322,53 @@ static constexpr CommandId Id = 0x00000000;
 namespace MediaPlayback {
 namespace Commands {
 
-namespace MediaPlay {
+namespace PlayRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace MediaPlay
+} // namespace PlayRequest
 
-namespace MediaPlayResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace MediaPlayResponse
-
-namespace MediaPause {
+namespace PauseRequest {
 static constexpr CommandId Id = 0x00000001;
-} // namespace MediaPause
+} // namespace PauseRequest
 
-namespace MediaPauseResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace MediaPauseResponse
-
-namespace MediaStop {
+namespace StopRequest {
 static constexpr CommandId Id = 0x00000002;
-} // namespace MediaStop
+} // namespace StopRequest
 
-namespace MediaStopResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace MediaStopResponse
-
-namespace MediaStartOver {
+namespace StartOverRequest {
 static constexpr CommandId Id = 0x00000003;
-} // namespace MediaStartOver
+} // namespace StartOverRequest
 
-namespace MediaStartOverResponse {
-static constexpr CommandId Id = 0x00000003;
-} // namespace MediaStartOverResponse
-
-namespace MediaPrevious {
+namespace PreviousRequest {
 static constexpr CommandId Id = 0x00000004;
-} // namespace MediaPrevious
+} // namespace PreviousRequest
 
-namespace MediaPreviousResponse {
-static constexpr CommandId Id = 0x00000004;
-} // namespace MediaPreviousResponse
-
-namespace MediaNext {
+namespace NextRequest {
 static constexpr CommandId Id = 0x00000005;
-} // namespace MediaNext
+} // namespace NextRequest
 
-namespace MediaNextResponse {
-static constexpr CommandId Id = 0x00000005;
-} // namespace MediaNextResponse
-
-namespace MediaRewind {
+namespace RewindRequest {
 static constexpr CommandId Id = 0x00000006;
-} // namespace MediaRewind
+} // namespace RewindRequest
 
-namespace MediaRewindResponse {
-static constexpr CommandId Id = 0x00000006;
-} // namespace MediaRewindResponse
-
-namespace MediaFastForward {
+namespace FastForwardRequest {
 static constexpr CommandId Id = 0x00000007;
-} // namespace MediaFastForward
+} // namespace FastForwardRequest
 
-namespace MediaFastForwardResponse {
-static constexpr CommandId Id = 0x00000007;
-} // namespace MediaFastForwardResponse
-
-namespace MediaSkipForward {
+namespace SkipForwardRequest {
 static constexpr CommandId Id = 0x00000008;
-} // namespace MediaSkipForward
+} // namespace SkipForwardRequest
 
-namespace MediaSkipForwardResponse {
-static constexpr CommandId Id = 0x00000008;
-} // namespace MediaSkipForwardResponse
-
-namespace MediaSkipBackward {
+namespace SkipBackwardRequest {
 static constexpr CommandId Id = 0x00000009;
-} // namespace MediaSkipBackward
+} // namespace SkipBackwardRequest
 
-namespace MediaSkipBackwardResponse {
-static constexpr CommandId Id = 0x00000009;
-} // namespace MediaSkipBackwardResponse
-
-namespace MediaSeek {
+namespace PlaybackResponse {
 static constexpr CommandId Id = 0x0000000A;
-} // namespace MediaSeek
+} // namespace PlaybackResponse
 
-namespace MediaSeekResponse {
+namespace SeekRequest {
 static constexpr CommandId Id = 0x0000000B;
-} // namespace MediaSeekResponse
+} // namespace SeekRequest
 
 } // namespace Commands
 } // namespace MediaPlayback
@@ -1386,21 +1376,21 @@ static constexpr CommandId Id = 0x0000000B;
 namespace MediaInput {
 namespace Commands {
 
-namespace SelectInput {
+namespace SelectInputRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectInput
+} // namespace SelectInputRequest
 
-namespace ShowInputStatus {
+namespace ShowInputStatusRequest {
 static constexpr CommandId Id = 0x00000001;
-} // namespace ShowInputStatus
+} // namespace ShowInputStatusRequest
 
-namespace HideInputStatus {
+namespace HideInputStatusRequest {
 static constexpr CommandId Id = 0x00000002;
-} // namespace HideInputStatus
+} // namespace HideInputStatusRequest
 
-namespace RenameInput {
+namespace RenameInputRequest {
 static constexpr CommandId Id = 0x00000003;
-} // namespace RenameInput
+} // namespace RenameInputRequest
 
 } // namespace Commands
 } // namespace MediaInput
@@ -1418,12 +1408,12 @@ static constexpr CommandId Id = 0x00000000;
 namespace KeypadInput {
 namespace Commands {
 
-namespace SendKey {
+namespace SendKeyRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SendKey
+} // namespace SendKeyRequest
 
 namespace SendKeyResponse {
-static constexpr CommandId Id = 0x00000000;
+static constexpr CommandId Id = 0x00000001;
 } // namespace SendKeyResponse
 
 } // namespace Commands
@@ -1432,21 +1422,17 @@ static constexpr CommandId Id = 0x00000000;
 namespace ContentLauncher {
 namespace Commands {
 
-namespace LaunchContent {
+namespace LaunchContentRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchContent
+} // namespace LaunchContentRequest
 
-namespace LaunchContentResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchContentResponse
-
-namespace LaunchURL {
+namespace LaunchURLRequest {
 static constexpr CommandId Id = 0x00000001;
-} // namespace LaunchURL
+} // namespace LaunchURLRequest
 
-namespace LaunchURLResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace LaunchURLResponse
+namespace LaunchResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace LaunchResponse
 
 } // namespace Commands
 } // namespace ContentLauncher
@@ -1454,13 +1440,13 @@ static constexpr CommandId Id = 0x00000001;
 namespace AudioOutput {
 namespace Commands {
 
-namespace SelectOutput {
+namespace SelectOutputRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace SelectOutput
+} // namespace SelectOutputRequest
 
-namespace RenameOutput {
+namespace RenameOutputRequest {
 static constexpr CommandId Id = 0x00000001;
-} // namespace RenameOutput
+} // namespace RenameOutputRequest
 
 } // namespace Commands
 } // namespace AudioOutput
@@ -1468,61 +1454,43 @@ static constexpr CommandId Id = 0x00000001;
 namespace ApplicationLauncher {
 namespace Commands {
 
-namespace LaunchApp {
+namespace LaunchAppRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchApp
+} // namespace LaunchAppRequest
 
-namespace LaunchAppResponse {
-static constexpr CommandId Id = 0x00000000;
-} // namespace LaunchAppResponse
-
-namespace StopApp {
+namespace StopAppRequest {
 static constexpr CommandId Id = 0x00000001;
-} // namespace StopApp
+} // namespace StopAppRequest
 
-namespace StopAppResponse {
-static constexpr CommandId Id = 0x00000001;
-} // namespace StopAppResponse
-
-namespace HideApp {
+namespace HideAppRequest {
 static constexpr CommandId Id = 0x00000002;
-} // namespace HideApp
+} // namespace HideAppRequest
 
-namespace HideAppResponse {
-static constexpr CommandId Id = 0x00000002;
-} // namespace HideAppResponse
+namespace LauncherResponse {
+static constexpr CommandId Id = 0x00000003;
+} // namespace LauncherResponse
 
 } // namespace Commands
 } // namespace ApplicationLauncher
 
-namespace ApplicationBasic {
-namespace Commands {
-
-namespace ChangeStatus {
-static constexpr CommandId Id = 0x00000000;
-} // namespace ChangeStatus
-
-} // namespace Commands
-} // namespace ApplicationBasic
-
 namespace AccountLogin {
 namespace Commands {
 
-namespace GetSetupPIN {
+namespace GetSetupPINRequest {
 static constexpr CommandId Id = 0x00000000;
-} // namespace GetSetupPIN
+} // namespace GetSetupPINRequest
 
 namespace GetSetupPINResponse {
-static constexpr CommandId Id = 0x00000000;
+static constexpr CommandId Id = 0x00000001;
 } // namespace GetSetupPINResponse
 
-namespace Login {
-static constexpr CommandId Id = 0x00000001;
-} // namespace Login
-
-namespace Logout {
+namespace LoginRequest {
 static constexpr CommandId Id = 0x00000002;
-} // namespace Logout
+} // namespace LoginRequest
+
+namespace LogoutRequest {
+static constexpr CommandId Id = 0x00000003;
+} // namespace LogoutRequest
 
 } // namespace Commands
 } // namespace AccountLogin

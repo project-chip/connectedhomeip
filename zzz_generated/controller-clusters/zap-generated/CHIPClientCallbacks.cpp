@@ -237,6 +237,27 @@ void AdministratorCommissioningClusterAttributeListListAttributeFilter(TLV::TLVR
     cb->mCall(cb->mContext, list);
 }
 
+void ApplicationBasicClusterAllowedVendorListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::VendorId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ApplicationBasicAllowedVendorListListAttributeCallback> * cb =
+        Callback::Callback<ApplicationBasicAllowedVendorListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void ApplicationBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback)
 {
@@ -304,7 +325,7 @@ void ApplicationLauncherClusterAttributeListListAttributeFilter(TLV::TLVReader *
 void AudioOutputClusterAudioOutputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                           Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -532,6 +553,48 @@ void BridgedDeviceBasicClusterAttributeListListAttributeFilter(TLV::TLVReader * 
     cb->mCall(cb->mContext, list);
 }
 
+void ChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ChannelChannelListListAttributeCallback> * cb =
+        Callback::Callback<ChannelChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void ChannelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::AttributeId> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<ChannelAttributeListListAttributeCallback> * cb =
+        Callback::Callback<ChannelAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void ColorControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -553,10 +616,10 @@ void ColorControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
     cb->mCall(cb->mContext, list);
 }
 
-void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+void ContentLauncherClusterAcceptHeaderListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::ByteSpan> list;
+    chip::app::DataModel::DecodableList<chip::CharSpan> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -569,8 +632,8 @@ void ContentLauncherClusterAcceptsHeaderListListAttributeFilter(TLV::TLVReader *
         return;
     }
 
-    Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * cb =
-        Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherAcceptHeaderListListAttributeCallback> * cb =
+        Callback::Callback<ContentLauncherAcceptHeaderListListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
@@ -1003,29 +1066,8 @@ void GeneralDiagnosticsClusterAttributeListListAttributeFilter(TLV::TLVReader * 
     cb->mCall(cb->mContext, list);
 }
 
-void GroupKeyManagementClusterGroupsListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * cb =
-        Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
-void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
+void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
 {
     chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
@@ -1040,8 +1082,29 @@ void GroupKeyManagementClusterGroupKeysListAttributeFilter(TLV::TLVReader * tlvD
         return;
     }
 
-    Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * cb =
-        Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<GroupKeyManagementGroupKeyMapListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupKeyMapListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void GroupKeyManagementClusterGroupTableListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<GroupKeyManagementGroupTableListAttributeCallback> * cb =
+        Callback::Callback<GroupKeyManagementGroupTableListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
@@ -1196,7 +1259,7 @@ void LowPowerClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, C
 void MediaInputClusterMediaInputListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -1338,6 +1401,29 @@ void OtaSoftwareUpdateProviderClusterAttributeListListAttributeFilter(TLV::TLVRe
 
     Callback::Callback<OtaSoftwareUpdateProviderAttributeListListAttributeCallback> * cb =
         Callback::Callback<OtaSoftwareUpdateProviderAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void OtaSoftwareUpdateRequestorClusterDefaultOtaProvidersListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                             Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>
+        list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 
@@ -1726,54 +1812,11 @@ void SwitchClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Cal
     cb->mCall(cb->mContext, list);
 }
 
-void TvChannelClusterChannelListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<TvChannelChannelListListAttributeCallback> * cb =
-        Callback::Callback<TvChannelChannelListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
-void TvChannelClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    chip::app::DataModel::DecodableList<chip::AttributeId> list;
-    CHIP_ERROR err = Decode(*tlvData, list);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (onFailureCallback != nullptr)
-        {
-            Callback::Callback<DefaultFailureCallback> * cb =
-                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    Callback::Callback<TvChannelAttributeListListAttributeCallback> * cb =
-        Callback::Callback<TvChannelAttributeListListAttributeCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, list);
-}
-
 void TargetNavigatorClusterTargetNavigatorListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                   Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback)
 {
-    chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType>
-        list;
+    chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> list;
     CHIP_ERROR err = Decode(*tlvData, list);
     if (err != CHIP_NO_ERROR)
     {
@@ -2239,78 +2282,49 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, 
     return true;
 }
 
-bool emberAfApplicationLauncherClusterHideAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                              chip::CharSpan data)
+bool emberAfApplicationLauncherClusterLauncherResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                               chip::CharSpan data)
 {
-    ChipLogProgress(Zcl, "HideAppResponse:");
+    ChipLogProgress(Zcl, "LauncherResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterHideAppResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLauncherResponseCallback");
 
-    Callback::Callback<ApplicationLauncherClusterHideAppResponseCallback> * cb =
-        Callback::Callback<ApplicationLauncherClusterHideAppResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ApplicationLauncherClusterLauncherResponseCallback> * cb =
+        Callback::Callback<ApplicationLauncherClusterLauncherResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, data);
     return true;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status, chip::CharSpan data)
+bool emberAfChannelClusterChangeChannelResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType channelMatch, uint8_t errorType)
 {
-    ChipLogProgress(Zcl, "LaunchAppResponse:");
+    ChipLogProgress(Zcl, "ChangeChannelResponse:");
+    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct ChannelInfo");
+    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("ChannelClusterChangeChannelResponseCallback");
+
+    Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
+        Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, ChannelInfo(), errorType);
+    return true;
+}
+
+bool emberAfContentLauncherClusterLaunchResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
+                                                         chip::CharSpan data)
+{
+    ChipLogProgress(Zcl, "LaunchResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLaunchAppResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchResponseCallback");
 
-    Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback> * cb =
-        Callback::Callback<ApplicationLauncherClusterLaunchAppResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<ContentLauncherClusterLaunchResponseCallback> * cb =
+        Callback::Callback<ContentLauncherClusterLaunchResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, data);
-    return true;
-}
-
-bool emberAfApplicationLauncherClusterStopAppResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                              chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "StopAppResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterStopAppResponseCallback");
-
-    Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback> * cb =
-        Callback::Callback<ApplicationLauncherClusterStopAppResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status, data);
-    return true;
-}
-
-bool emberAfContentLauncherClusterLaunchContentResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t contentLaunchStatus, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "LaunchContentResponse:");
-    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchContentResponseCallback");
-
-    Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback> * cb =
-        Callback::Callback<ContentLauncherClusterLaunchContentResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, contentLaunchStatus, data);
-    return true;
-}
-
-bool emberAfContentLauncherClusterLaunchURLResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            uint8_t contentLaunchStatus, chip::CharSpan data)
-{
-    ChipLogProgress(Zcl, "LaunchURLResponse:");
-    ChipLogProgress(Zcl, "  contentLaunchStatus: %" PRIu8 "", contentLaunchStatus);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("ContentLauncherClusterLaunchURLResponseCallback");
-
-    Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback> * cb =
-        Callback::Callback<ContentLauncherClusterLaunchURLResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, contentLaunchStatus, data);
     return true;
 }
 
@@ -2437,6 +2451,35 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigResponseCallback(Endpo
     return true;
 }
 
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj, /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs)
+{
+    ChipLogProgress(Zcl, "KeySetReadAllIndicesResponse:");
+    ChipLogProgress(Zcl, "  groupKeySetIDs: %p", groupKeySetIDs);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback");
+
+    Callback::Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback> * cb =
+        Callback::Callback<GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, groupKeySetIDs);
+    return true;
+}
+
+bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet)
+{
+    ChipLogProgress(Zcl, "KeySetReadResponse:");
+    ChipLogProgress(Zcl, "  groupKeySet: Not sure how to log struct GroupKeySet");
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("GroupKeyManagementClusterKeySetReadResponseCallback");
+
+    Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback> * cb =
+        Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, GroupKeySet());
+    return true;
+}
+
 bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
                                                   uint16_t groupId)
 {
@@ -2524,157 +2567,16 @@ bool emberAfKeypadInputClusterSendKeyResponseCallback(EndpointId endpoint, app::
     return true;
 }
 
-bool emberAfMediaPlaybackClusterMediaFastForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
+bool emberAfMediaPlaybackClusterPlaybackResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
 {
-    ChipLogProgress(Zcl, "MediaFastForwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
+    ChipLogProgress(Zcl, "PlaybackResponse:");
+    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaFastForwardResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterPlaybackResponseCallback");
 
-    Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaFastForwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaNextResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaNextResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaNextResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaNextResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPauseResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                           uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPauseResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPauseResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPauseResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPlayResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPlayResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPlayResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPlayResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaPreviousResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaPreviousResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaPreviousResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaPreviousResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaRewindResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                            uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaRewindResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaRewindResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaRewindResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSeekResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSeekResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSeekResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSeekResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSkipBackwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                  uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSkipBackwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipBackwardResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSkipBackwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaSkipForwardResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                 uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaSkipForwardResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaSkipForwardResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaSkipForwardResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaStartOverResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                               uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaStartOverResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStartOverResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaStartOverResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
-    return true;
-}
-
-bool emberAfMediaPlaybackClusterMediaStopResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                          uint8_t mediaPlaybackStatus)
-{
-    ChipLogProgress(Zcl, "MediaStopResponse:");
-    ChipLogProgress(Zcl, "  mediaPlaybackStatus: %" PRIu8 "", mediaPlaybackStatus);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("MediaPlaybackClusterMediaStopResponseCallback");
-
-    Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback> * cb =
-        Callback::Callback<MediaPlaybackClusterMediaStopResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, mediaPlaybackStatus);
+    Callback::Callback<MediaPlaybackClusterPlaybackResponseCallback> * cb =
+        Callback::Callback<MediaPlaybackClusterPlaybackResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, status);
     return true;
 }
 
@@ -2931,22 +2833,6 @@ bool emberAfScenesClusterViewSceneResponseCallback(EndpointId endpoint, app::Com
     Callback::Callback<ScenesClusterViewSceneResponseCallback> * cb =
         Callback::Callback<ScenesClusterViewSceneResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, status, groupId, sceneId, transitionTime, sceneName, extensionFieldSets);
-    return true;
-}
-
-bool emberAfTvChannelClusterChangeChannelResponseCallback(
-    EndpointId endpoint, app::CommandSender * commandObj,
-    chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType channelMatch, uint8_t errorType)
-{
-    ChipLogProgress(Zcl, "ChangeChannelResponse:");
-    ChipLogProgress(Zcl, "  channelMatch: Not sure how to log struct TvChannelInfo");
-    ChipLogProgress(Zcl, "  errorType: %" PRIu8 "", errorType);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("TvChannelClusterChangeChannelResponseCallback");
-
-    Callback::Callback<TvChannelClusterChangeChannelResponseCallback> * cb =
-        Callback::Callback<TvChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, TvChannelInfo(), errorType);
     return true;
 }
 

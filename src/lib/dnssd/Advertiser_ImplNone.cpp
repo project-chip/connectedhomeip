@@ -48,7 +48,7 @@ public:
 
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override
     {
-        ChipLogError(Discovery, "DNS-SD advertising not available. Commisioning Advertisement failed.");
+        ChipLogError(Discovery, "DNS-SD advertising not available. Commissioning Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

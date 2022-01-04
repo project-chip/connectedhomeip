@@ -39,76 +39,46 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPApplicationLauncherClusterHideAppResponseCallback
-    : public Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>
+class CHIPApplicationLauncherClusterLauncherResponseCallback
+    : public Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>
 {
 public:
-    CHIPApplicationLauncherClusterHideAppResponseCallback(jobject javaCallback);
+    CHIPApplicationLauncherClusterLauncherResponseCallback(jobject javaCallback);
 
-    ~CHIPApplicationLauncherClusterHideAppResponseCallback();
+    ~CHIPApplicationLauncherClusterLauncherResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data);
+                           const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPApplicationLauncherClusterLaunchAppResponseCallback
-    : public Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
+class CHIPChannelClusterChangeChannelResponseCallback
+    : public Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>
 {
 public:
-    CHIPApplicationLauncherClusterLaunchAppResponseCallback(jobject javaCallback);
+    CHIPChannelClusterChangeChannelResponseCallback(jobject javaCallback);
 
-    ~CHIPApplicationLauncherClusterLaunchAppResponseCallback();
+    ~CHIPChannelClusterChangeChannelResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
+                           const chip::app::Clusters::Channel::Commands::ChangeChannelResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPApplicationLauncherClusterStopAppResponseCallback
-    : public Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>
+class CHIPContentLauncherClusterLaunchResponseCallback
+    : public Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>
 {
 public:
-    CHIPApplicationLauncherClusterStopAppResponseCallback(jobject javaCallback);
+    CHIPContentLauncherClusterLaunchResponseCallback(jobject javaCallback);
 
-    ~CHIPApplicationLauncherClusterStopAppResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPContentLauncherClusterLaunchContentResponseCallback
-    : public Callback::Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>
-{
-public:
-    CHIPContentLauncherClusterLaunchContentResponseCallback(jobject javaCallback);
-
-    ~CHIPContentLauncherClusterLaunchContentResponseCallback();
+    ~CHIPContentLauncherClusterLaunchResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPContentLauncherClusterLaunchURLResponseCallback
-    : public Callback::Callback<CHIPContentLauncherClusterLaunchURLResponseCallbackType>
-{
-public:
-    CHIPContentLauncherClusterLaunchURLResponseCallback(jobject javaCallback);
-
-    ~CHIPContentLauncherClusterLaunchURLResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & data);
+                           const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -219,6 +189,37 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback
+    : public Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(jobject javaCallback);
+
+    ~CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadResponseCallback
+    : public Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadResponseCallback(jobject javaCallback);
+
+    ~CHIPGroupKeyManagementClusterKeySetReadResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPGroupsClusterAddGroupResponseCallback : public Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>
 {
 public:
@@ -301,166 +302,16 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPMediaPlaybackClusterMediaFastForwardResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>
+class CHIPMediaPlaybackClusterPlaybackResponseCallback
+    : public Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>
 {
 public:
-    CHIPMediaPlaybackClusterMediaFastForwardResponseCallback(jobject javaCallback);
+    CHIPMediaPlaybackClusterPlaybackResponseCallback(jobject javaCallback);
 
-    ~CHIPMediaPlaybackClusterMediaFastForwardResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaNextResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaNextResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaNextResponseCallback();
+    ~CHIPMediaPlaybackClusterPlaybackResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaPauseResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaPauseResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaPauseResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaPlayResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaPlayResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaPlayResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaPreviousResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaPreviousResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaPreviousResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaRewindResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaRewindResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaRewindResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaSeekResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaSeekResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaSeekResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaStartOverResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaStartOverResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaStartOverResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPMediaPlaybackClusterMediaStopResponseCallback
-    : public Callback::Callback<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>
-{
-public:
-    CHIPMediaPlaybackClusterMediaStopResponseCallback(jobject javaCallback);
-
-    ~CHIPMediaPlaybackClusterMediaStopResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data);
+                           const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
@@ -681,21 +532,6 @@ public:
     ~CHIPScenesClusterViewSceneResponseCallback();
 
     static void CallbackFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPTvChannelClusterChangeChannelResponseCallback
-    : public Callback::Callback<CHIPTvChannelClusterChangeChannelResponseCallbackType>
-{
-public:
-    CHIPTvChannelClusterChangeChannelResponseCallback(jobject javaCallback);
-
-    ~CHIPTvChannelClusterChangeChannelResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

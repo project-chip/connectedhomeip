@@ -156,17 +156,11 @@ public:
      **/
     CHIP_ERROR FromCachable(const CASESessionCachable & output);
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
@@ -249,7 +243,6 @@ private:
     uint8_t mIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     FabricTable * mFabricsTable = nullptr;
     FabricInfo * mFabricInfo    = nullptr;

@@ -418,10 +418,13 @@ public:
      *
      * @brief   Get the current interface address.
      *
-     * @return  the current interface address or \c IPAddress::Any if the iterator
-     *          is positioned beyond the end of the address list.
+     * @param[out] outIPAddress     The current interface address
+     *
+     * @return CHIP_NO_ERROR        if the result IPAddress is valid.
+     * @return CHIP_ERROR_SENTINEL  if the iterator is positioned beyond the end of the address list.
+     * @return other error from lower-level code
      */
-    IPAddress GetAddress();
+    CHIP_ERROR GetAddress(IPAddress & outIPAddress);
 
     /**
      * @fn      uint8_t InterfaceAddressIterator::GetPrefixLength(void)
@@ -441,14 +444,6 @@ public:
      *     structure can represent arbitrary prefix lengths between 0 and 128.
      */
     uint8_t GetPrefixLength();
-
-    /**
-     * @fn       void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
-     *
-     * @brief    Returns an IPPrefix containing the address and prefix length
-     *           for the current address.
-     */
-    void GetAddressWithPrefix(IPPrefix & addrWithPrefix);
 
     /**
      * @fn      InterfaceId InterfaceAddressIterator::GetInterfaceId(void)

@@ -39,8 +39,8 @@ tests:
       response:
           value: 0
 
-    - label: "Navigate Target Command"
-      command: "NavigateTarget"
+    - label: "Navigate Target Request Command"
+      command: "navigateTargetRequest"
       arguments:
           values:
               - name: "target"

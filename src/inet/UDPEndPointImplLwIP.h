@@ -79,11 +79,7 @@ private:
     static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
 
     CHIP_ERROR GetPCB(IPAddressType addrType4);
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);
-#else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-    static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port);
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
     udp_pcb * mUDP; // LwIP User datagram protocol (UDP) control block.
 };

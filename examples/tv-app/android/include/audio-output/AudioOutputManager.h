@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/clusters/audio-output-server/audio-output-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <vector>
-class AudioOutputManager
+class AudioOutputManager : public chip::app::Clusters::AudioOutput::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder);
+    uint8_t HandleGetCurrentOutput() override;
+    std::list<chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type> HandleGetOutputList() override;
+    bool HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name) override;
+    bool HandleSelectOutput(const uint8_t & index) override;
 };

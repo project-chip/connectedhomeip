@@ -165,7 +165,7 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param session     Referene to the secure session that will be
+     * @param session     Reference to the secure session that will be
      *                    initialized once pairing is complete
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
@@ -201,8 +201,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     /**
      * @brief
@@ -229,11 +227,7 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -299,8 +293,6 @@ private:
     uint8_t * mSalt          = nullptr;
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 

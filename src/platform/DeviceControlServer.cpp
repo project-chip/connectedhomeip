@@ -20,13 +20,12 @@
  *          Provides the implementation of the DeviceControlServer object.
  */
 
-#include <platform/internal/DeviceControlServer.h>
+#include <platform/DeviceControlServer.h>
 
 #include <platform/ConfigurationManager.h>
 
 namespace chip {
 namespace DeviceLayer {
-namespace Internal {
 
 void HandleArmFailSafe(System::Layer * layer, void * aAppState)
 {
@@ -108,6 +107,5 @@ CHIP_ERROR DeviceControlServer::ConnectNetworkForOperational(ByteSpan networkID)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

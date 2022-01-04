@@ -19,13 +19,14 @@
 #include "CHIPCommand.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <core/CHIPBuildConfig.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+#include "TraceHandlers.h"
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
@@ -35,6 +36,8 @@ constexpr chip::FabricId kIdentityGammaFabricId = 3;
 
 CHIP_ERROR CHIPCommand::Run()
 {
+    StartTracing();
+
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
@@ -48,7 +51,9 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerIndex());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    ReturnLogErrorOnFailure(InitializeCommissioner(GetIdentity(), CurrentCommissionerIndex()));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityAlpha, kIdentityAlphaFabricId));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityBeta, kIdentityBetaFabricId));
+    ReturnLogErrorOnFailure(InitializeCommissioner(kIdentityGamma, kIdentityGammaFabricId));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -60,9 +65,35 @@ CHIP_ERROR CHIPCommand::Run()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(GetIdentity()));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityAlpha));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityBeta));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(kIdentityGamma));
 
+    StopTracing();
     return CHIP_NO_ERROR;
+}
+
+void CHIPCommand::StartTracing()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::InitTrace();
+
+    if (mTraceFile.HasValue())
+    {
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamFile(mTraceFile.Value()));
+    }
+    else if (mTraceLog.HasValue() && mTraceLog.Value() == true)
+    {
+        chip::trace::SetTraceStream(new chip::trace::TraceStreamLog());
+    }
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+}
+
+void CHIPCommand::StopTracing()
+{
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::trace::DeInitTrace();
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 }
 
 void CHIPCommand::SetIdentity(const char * identity)
@@ -131,11 +162,11 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
-    chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
+    std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
+    chip::Controller::SetupParams commissionerParams;
 
-    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+    ReturnLogErrorOnFailure(mCredIssuerCmds->SetupDeviceAttestation(commissionerParams));
+    chip::Credentials::SetDeviceAttestationVerifier(commissionerParams.deviceAttestationVerifier);
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -152,14 +183,13 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
     ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
-    ReturnLogErrorOnFailure(mOpCredsIssuer.Initialize(mCommissionerStorage));
-    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                           ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    ReturnLogErrorOnFailure(mCredIssuerCmds->InitializeCredentialsIssuer(mCommissionerStorage));
+    ReturnLogErrorOnFailure(mCredIssuerCmds->GenerateControllerNOCChain(mCommissionerStorage.GetLocalNodeId(), fabricId,
+                                                                        ephemeralKey, rcacSpan, icacSpan, nocSpan));
 
-    std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
-    chip::Controller::SetupParams commissionerParams;
     commissionerParams.storageDelegate                = &mCommissionerStorage;
-    commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+    commissionerParams.fabricIndex                    = static_cast<chip::FabricIndex>(fabricId);
+    commissionerParams.operationalCredentialsDelegate = mCredIssuerCmds->GetCredentialIssuer();
     commissionerParams.ephemeralKeypair               = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;

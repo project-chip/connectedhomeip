@@ -45,10 +45,10 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     command->NextTest();
 }
 
-void TestCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
+void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connection Failure [deviceId=%" PRIu64 ". Error %" CHIP_ERROR_FORMAT "\n]",
-                    deviceId, error.Format());
+                    peerId.GetNodeId(), error.Format());
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
     command->SetCommandExitStatus(error);

@@ -1668,7 +1668,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NetworkDisabled",
+              "name": "InterfaceEnabled",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -5703,6 +5703,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 10
     }
-  ],
-  "log": []
+  ]
 }

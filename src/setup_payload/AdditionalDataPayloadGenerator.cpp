@@ -55,7 +55,7 @@ AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t lifetimeC
     // Initialize TLVWriter
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
 
-    ReturnErrorOnFailure(writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter));
+    ReturnErrorOnFailure(writer.OpenContainer(AnonymousTag(), kTLVType_Structure, innerWriter));
 
     if (additionalDataFields.Has(AdditionalDataFields::RotatingDeviceId))
     {

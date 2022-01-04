@@ -15,6 +15,10 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
 	soc {
 		/* Add a flash controller which has the compatible
 		 * 'zephyr,sim-flash'. This will ensure that the flash

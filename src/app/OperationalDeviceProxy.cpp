@@ -84,7 +84,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
-        onFailure->mCall(onFailure->mContext, mPeerId.GetNodeId(), err);
+        onFailure->mCall(onFailure->mContext, mPeerId, err);
     }
 
     return err;
@@ -205,7 +205,7 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
         cb->Cancel();
         if (executeCallback)
         {
-            cb->mCall(cb->mContext, mPeerId.GetNodeId(), error);
+            cb->mCall(cb->mContext, mPeerId, error);
         }
     }
 }
@@ -262,6 +262,12 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     return CHIP_NO_ERROR;
 }
 
+void OperationalDeviceProxy::SetConnectedSession(SessionHandle handle)
+{
+    mSecureSession.Grab(handle);
+    mState = State::SecureConnected;
+}
+
 void OperationalDeviceProxy::Clear()
 {
     if (mCASEClient)
@@ -290,7 +296,7 @@ void OperationalDeviceProxy::DeferCloseCASESession()
     mSystemLayer->ScheduleWork(CloseCASESessionTask, this);
 }
 
-void OperationalDeviceProxy::OnSessionReleased(SessionHandle session)
+void OperationalDeviceProxy::OnSessionReleased(const SessionHandle & session)
 {
     VerifyOrReturn(mSecureSession.Contains(session),
                    ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));

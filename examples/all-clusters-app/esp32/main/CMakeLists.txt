@@ -48,7 +48,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/barrier-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/window-covering-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-commissioning-server"
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/network-commissioning-old"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/groups-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/color-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/content-launch-server"
@@ -63,10 +63,12 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thermostat-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thermostat-user-interface-configuration-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/thread-network-diagnostics-server" 
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/tv-channel-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/channel-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/scenes"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/software-diagnostics-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/switch-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/general-diagnostics-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/group-key-mgmt-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/basic"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/bindings"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/diagnostic-logs-server"
@@ -75,6 +77,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ias-zone-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet-network-diagnostics-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi-network-diagnostics-server"                      
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wake-on-lan-server"                      
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/pump-configuration-and-control-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-configuration-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
@@ -229,6 +232,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
-                       "-DPW_RPC_LOCKING_SERVICE=1")
+                       "-DPW_RPC_LOCKING_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

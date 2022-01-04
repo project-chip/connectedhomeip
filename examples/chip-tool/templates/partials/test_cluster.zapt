@@ -60,6 +60,15 @@ class {{filename}}: public TestCommand
     {{/chip_tests_item_response_parameters}}
     {{/chip_tests_items}}
 
+    {{! Helper around zapTypeToDecodableClusterObjectType that lets us set the
+        array/nullable/etc context appropriately.}}
+    {{~#*inline "subscribeResponseDataArgument"~}}
+      {{zapTypeToDecodableClusterObjectType type ns=cluster isArgument=true}} value
+    {{~/inline~}}
+    {{~#*inline "subscribeResponseArguments"~}}
+    {{> subscribeResponseDataArgument type=attr.type isArray=attr.isArray isNullable=attr.isNullable}}
+    {{~/inline~}}
+
     {{~#*inline "subscribeDataCallback"}}
     mTest_{{parent.filename}}_{{attribute}}_Reported
     {{/inline}}
@@ -68,7 +77,7 @@ class {{filename}}: public TestCommand
     {{/inline}}
     {{#chip_tests_items}}
     {{#if allocateSubscribeDataCallback}}
-    typedef void (*{{> subscribeDataCallbackType}})(void * context, {{zapTypeToDecodableClusterObjectType attributeObject.type ns=parent.cluster isArgument=true}} value);
+    typedef void (*{{> subscribeDataCallbackType}})(void * context, {{> subscribeResponseArguments attr=attributeObject}});
     {{> subscribeDataCallbackType}} {{> subscribeDataCallback}} = nullptr;
     {{/if}}
     {{/chip_tests_items}}
@@ -260,7 +269,7 @@ class {{filename}}: public TestCommand
     }
 
     {{#if isSubscribeAttribute}}
-    void {{>successResponse}}({{zapTypeToDecodableClusterObjectType attributeObject.type ns=parent.cluster isArgument=true}} value)
+    void {{>successResponse}}({{> subscribeResponseArguments attr=attributeObject}})
     {
         {{#if response.error}}
           ThrowSuccessResponse();
@@ -309,9 +318,13 @@ class {{filename}}: public TestCommand
               {{~#if expectedConstraints.endsWith}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
               {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
               {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
-              {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.minValue}}));{{/if}}
-              {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.maxValue}}));{{/if}}
-              {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
+              {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
+              {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
+              {{~#if expectedConstraints.notValue}}
+                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+              {{else if (isLiteralNull expectedConstraints.notValue)}}
+                VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>item}}));
+              {{/if}}
             {{/if}}
 
             {{#if saveAs}}

@@ -5835,82 +5835,6 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace QueryImage.
-namespace ApplyUpdateRequest {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUpdateToken)), updateToken));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNewVersion)), newVersion));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kUpdateToken):
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
-            break;
-        case to_underlying(Fields::kNewVersion):
-            ReturnErrorOnFailure(DataModel::Decode(reader, newVersion));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace ApplyUpdateRequest.
-namespace NotifyUpdateApplied {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUpdateToken)), updateToken));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)), softwareVersion));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kUpdateToken):
-            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
-            break;
-        case to_underlying(Fields::kSoftwareVersion):
-            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace NotifyUpdateApplied.
 namespace QueryImageResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -5975,6 +5899,44 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace QueryImageResponse.
+namespace ApplyUpdateRequest {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUpdateToken)), updateToken));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kNewVersion)), newVersion));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kUpdateToken):
+            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
+            break;
+        case to_underlying(Fields::kNewVersion):
+            ReturnErrorOnFailure(DataModel::Decode(reader, newVersion));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace ApplyUpdateRequest.
 namespace ApplyUpdateResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -6013,6 +5975,44 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace ApplyUpdateResponse.
+namespace NotifyUpdateApplied {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kUpdateToken)), updateToken));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSoftwareVersion)), softwareVersion));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kUpdateToken):
+            ReturnErrorOnFailure(DataModel::Decode(reader, updateToken));
+            break;
+        case to_underlying(Fields::kSoftwareVersion):
+            ReturnErrorOnFailure(DataModel::Decode(reader, softwareVersion));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace NotifyUpdateApplied.
 } // namespace Commands
 
 namespace Attributes {
@@ -6042,6 +6042,52 @@ namespace Events {
 
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
+namespace Structs {
+namespace ProviderLocation {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeID)), providerNodeID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            break;
+        case to_underlying(Fields::kProviderNodeID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeID));
+            break;
+        case to_underlying(Fields::kEndpoint):
+            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ProviderLocation
+} // namespace Structs
 
 namespace Commands {
 namespace AnnounceOtaProvider {
@@ -6049,11 +6095,12 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderLocation)), providerLocation));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kProviderNodeId)), providerNodeId));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
     ReturnErrorOnFailure(
         DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kAnnouncementReason)), announcementReason));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMetadataForNode)), metadataForNode));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoint)), endpoint));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -6069,8 +6116,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kProviderLocation):
-            ReturnErrorOnFailure(DataModel::Decode(reader, providerLocation));
+        case to_underlying(Fields::kProviderNodeId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, providerNodeId));
             break;
         case to_underlying(Fields::kVendorId):
             ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
@@ -6080,6 +6127,9 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
             break;
         case to_underlying(Fields::kMetadataForNode):
             ReturnErrorOnFailure(DataModel::Decode(reader, metadataForNode));
+            break;
+        case to_underlying(Fields::kEndpoint):
+            ReturnErrorOnFailure(DataModel::Decode(reader, endpoint));
             break;
         default:
             break;
@@ -6098,11 +6148,17 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::DefaultOtaProvider::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, defaultOtaProvider));
+    case Attributes::DefaultOtaProviders::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, defaultOtaProviders));
         break;
     case Attributes::UpdatePossible::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, updatePossible));
+        break;
+    case Attributes::UpdateState::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, updateState));
+        break;
+    case Attributes::UpdateStateProgress::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, updateStateProgress));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -10160,18 +10216,15 @@ namespace Events {
 } // namespace OperationalCredentials
 namespace GroupKeyManagement {
 namespace Structs {
-namespace GroupKey {
+namespace GroupInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeyIndex)), groupKeyIndex));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeyRoot)), groupKeyRoot));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeyEpochStartTime)), groupKeyEpochStartTime));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySecurityPolicy)), groupKeySecurityPolicy));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEndpoints)), endpoints));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupName)), groupName));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10188,20 +10241,61 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
             break;
-        case to_underlying(Fields::kGroupKeyIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyIndex));
+        case to_underlying(Fields::kGroupId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
             break;
-        case to_underlying(Fields::kGroupKeyRoot):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyRoot));
+        case to_underlying(Fields::kEndpoints):
+            ReturnErrorOnFailure(DataModel::Decode(reader, endpoints));
             break;
-        case to_underlying(Fields::kGroupKeyEpochStartTime):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyEpochStartTime));
+        case to_underlying(Fields::kGroupName):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupName));
             break;
-        case to_underlying(Fields::kGroupKeySecurityPolicy):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySecurityPolicy));
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace GroupInfo
+namespace GroupKey {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupId)), groupId));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kFabricIndex):
+            ReturnErrorOnFailure(DataModel::Decode(reader, fabricIndex));
+            break;
+        case to_underlying(Fields::kGroupId):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupId));
+            break;
+        case to_underlying(Fields::kGroupKeySetID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
             break;
         default:
             break;
@@ -10214,14 +10308,19 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace GroupKey
-namespace GroupState {
+namespace GroupKeySet {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorId)), vendorId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kVendorGroupId)), vendorGroupId));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetIndex)), groupKeySetIndex));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSecurityPolicy)), securityPolicy));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochKey0)), epochKey0));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochStartTime0)), epochStartTime0));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochKey1)), epochKey1));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochStartTime1)), epochStartTime1));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochKey2)), epochKey2));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochStartTime2)), epochStartTime2));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10238,14 +10337,29 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kVendorId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorId));
+        case to_underlying(Fields::kGroupKeySetID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
             break;
-        case to_underlying(Fields::kVendorGroupId):
-            ReturnErrorOnFailure(DataModel::Decode(reader, vendorGroupId));
+        case to_underlying(Fields::kSecurityPolicy):
+            ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicy));
             break;
-        case to_underlying(Fields::kGroupKeySetIndex):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIndex));
+        case to_underlying(Fields::kEpochKey0):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey0));
+            break;
+        case to_underlying(Fields::kEpochStartTime0):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime0));
+            break;
+        case to_underlying(Fields::kEpochKey1):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey1));
+            break;
+        case to_underlying(Fields::kEpochStartTime1):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime1));
+            break;
+        case to_underlying(Fields::kEpochKey2):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochKey2));
+            break;
+        case to_underlying(Fields::kEpochStartTime2):
+            ReturnErrorOnFailure(DataModel::Decode(reader, epochStartTime2));
             break;
         default:
             break;
@@ -10257,10 +10371,214 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace GroupState
+} // namespace GroupKeySet
 } // namespace Structs
 
 namespace Commands {
+namespace KeySetWrite {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySet)), groupKeySet));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySet):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetWrite.
+namespace KeySetRead {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySetID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetRead.
+namespace KeySetReadResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySet)), groupKeySet));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySet):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetReadResponse.
+namespace KeySetRemove {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySetID):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetRemove.
+namespace KeySetReadAllIndices {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetIDs)), groupKeySetIDs));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySetIDs):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIDs));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetReadAllIndices.
+namespace KeySetReadAllIndicesResponse {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetIDs)), groupKeySetIDs));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    ReturnErrorOnFailure(reader.EnterContainer(outer));
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kGroupKeySetIDs):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetIDs));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+} // namespace KeySetReadAllIndicesResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -10268,11 +10586,17 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::Groups::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, groups));
+    case Attributes::GroupKeyMap::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, groupKeyMap));
         break;
-    case Attributes::GroupKeys::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, groupKeys));
+    case Attributes::GroupTable::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, groupTable));
+        break;
+    case Attributes::MaxGroupsPerFabric::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxGroupsPerFabric));
+        break;
+    case Attributes::MaxGroupKeysPerFabric::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, maxGroupKeysPerFabric));
         break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
@@ -13426,23 +13750,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::InstalledClosedLimitTilt::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, installedClosedLimitTilt));
         break;
-    case Attributes::VelocityLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, velocityLift));
-        break;
-    case Attributes::AccelerationTimeLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, accelerationTimeLift));
-        break;
-    case Attributes::DecelerationTimeLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, decelerationTimeLift));
-        break;
     case Attributes::Mode::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, mode));
-        break;
-    case Attributes::IntermediateSetpointsLift::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intermediateSetpointsLift));
-        break;
-    case Attributes::IntermediateSetpointsTilt::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, intermediateSetpointsTilt));
         break;
     case Attributes::SafetyStatus::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, safetyStatus));
@@ -18884,9 +19193,9 @@ namespace Events {
 } // namespace Events
 
 } // namespace WakeOnLan
-namespace TvChannel {
+namespace Channel {
 namespace Structs {
-namespace TvChannelInfo {
+namespace ChannelInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -18937,8 +19246,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TvChannelInfo
-namespace TvChannelLineupInfo {
+} // namespace ChannelInfo
+namespace LineupInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -18985,11 +19294,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace TvChannelLineupInfo
+} // namespace LineupInfo
 } // namespace Structs
 
 namespace Commands {
-namespace ChangeChannel {
+namespace ChangeChannelRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19022,7 +19331,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ChangeChannel.
+} // namespace ChangeChannelRequest.
 namespace ChangeChannelResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -19061,7 +19370,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace ChangeChannelResponse.
-namespace ChangeChannelByNumber {
+namespace ChangeChannelByNumberRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19098,8 +19407,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ChangeChannelByNumber.
-namespace SkipChannel {
+} // namespace ChangeChannelByNumberRequest.
+namespace SkipChannelRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19132,7 +19441,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SkipChannel.
+} // namespace SkipChannelRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -19169,10 +19478,10 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {
 } // namespace Events
 
-} // namespace TvChannel
+} // namespace Channel
 namespace TargetNavigator {
 namespace Structs {
-namespace NavigateTargetTargetInfo {
+namespace TargetInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19211,11 +19520,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace NavigateTargetTargetInfo
+} // namespace TargetInfo
 } // namespace Structs
 
 namespace Commands {
-namespace NavigateTarget {
+namespace NavigateTargetRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19252,7 +19561,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace NavigateTarget.
+} // namespace NavigateTargetRequest.
 namespace NavigateTargetResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -19327,7 +19636,7 @@ namespace Events {
 } // namespace TargetNavigator
 namespace MediaPlayback {
 namespace Structs {
-namespace MediaPlaybackPosition {
+namespace PlaybackPosition {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19366,11 +19675,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace MediaPlaybackPosition
+} // namespace PlaybackPosition
 } // namespace Structs
 
 namespace Commands {
-namespace MediaPlay {
+namespace PlayRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19399,43 +19708,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaPlay.
-namespace MediaPlayResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaPlayResponse.
-namespace MediaPause {
+} // namespace PlayRequest.
+namespace PauseRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19464,43 +19738,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaPause.
-namespace MediaPauseResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaPauseResponse.
-namespace MediaStop {
+} // namespace PauseRequest.
+namespace StopRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19529,43 +19768,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaStop.
-namespace MediaStopResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaStopResponse.
-namespace MediaStartOver {
+} // namespace StopRequest.
+namespace StartOverRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19594,43 +19798,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaStartOver.
-namespace MediaStartOverResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaStartOverResponse.
-namespace MediaPrevious {
+} // namespace StartOverRequest.
+namespace PreviousRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19659,43 +19828,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaPrevious.
-namespace MediaPreviousResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaPreviousResponse.
-namespace MediaNext {
+} // namespace PreviousRequest.
+namespace NextRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19724,43 +19858,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaNext.
-namespace MediaNextResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaNextResponse.
-namespace MediaRewind {
+} // namespace NextRequest.
+namespace RewindRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19789,43 +19888,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaRewind.
-namespace MediaRewindResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaRewindResponse.
-namespace MediaFastForward {
+} // namespace RewindRequest.
+namespace FastForwardRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19854,43 +19918,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaFastForward.
-namespace MediaFastForwardResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaFastForwardResponse.
-namespace MediaSkipForward {
+} // namespace FastForwardRequest.
+namespace SkipForwardRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19924,43 +19953,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaSkipForward.
-namespace MediaSkipForwardResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaSkipForwardResponse.
-namespace MediaSkipBackward {
+} // namespace SkipForwardRequest.
+namespace SkipBackwardRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -19994,14 +19988,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaSkipBackward.
-namespace MediaSkipBackwardResponse {
+} // namespace SkipBackwardRequest.
+namespace PlaybackResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -20017,8 +20010,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
+        case to_underlying(Fields::kStatus):
+            ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
         default:
             break;
@@ -20029,8 +20022,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaSkipBackwardResponse.
-namespace MediaSeek {
+} // namespace PlaybackResponse.
+namespace SeekRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20063,42 +20056,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace MediaSeek.
-namespace MediaSeekResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kMediaPlaybackStatus)), mediaPlaybackStatus));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kMediaPlaybackStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, mediaPlaybackStatus));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace MediaSeekResponse.
+} // namespace SeekRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -20150,7 +20108,7 @@ namespace Events {
 } // namespace MediaPlayback
 namespace MediaInput {
 namespace Structs {
-namespace MediaInputInfo {
+namespace InputInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20197,11 +20155,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace MediaInputInfo
+} // namespace InputInfo
 } // namespace Structs
 
 namespace Commands {
-namespace SelectInput {
+namespace SelectInputRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20234,8 +20192,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SelectInput.
-namespace ShowInputStatus {
+} // namespace SelectInputRequest.
+namespace ShowInputStatusRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20264,8 +20222,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace ShowInputStatus.
-namespace HideInputStatus {
+} // namespace ShowInputStatusRequest.
+namespace HideInputStatusRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20294,8 +20252,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace HideInputStatus.
-namespace RenameInput {
+} // namespace HideInputStatusRequest.
+namespace RenameInputRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20332,7 +20290,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RenameInput.
+} // namespace RenameInputRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -20431,7 +20389,7 @@ namespace Events {
 namespace KeypadInput {
 
 namespace Commands {
-namespace SendKey {
+namespace SendKeyRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20464,7 +20422,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SendKey.
+} // namespace SendKeyRequest.
 namespace SendKeyResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -20529,7 +20487,7 @@ namespace Events {
 } // namespace KeypadInput
 namespace ContentLauncher {
 namespace Structs {
-namespace ContentLaunchDimension {
+namespace Dimension {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20572,8 +20530,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentLaunchDimension
-namespace ContentLaunchAdditionalInfo {
+} // namespace Dimension
+namespace AdditionalInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20612,8 +20570,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentLaunchAdditionalInfo
-namespace ContentLaunchParamater {
+} // namespace AdditionalInfo
+namespace Parameter {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20656,8 +20614,44 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentLaunchParamater
-namespace ContentLaunchStyleInformation {
+} // namespace Parameter
+namespace ContentSearch {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
+{
+    TLV::TLVType outer;
+    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kParameterList)), parameterList));
+    ReturnErrorOnFailure(writer.EndContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TLV::TLVType outer;
+    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+    err = reader.EnterContainer(outer);
+    ReturnErrorOnFailure(err);
+    while ((err = reader.Next()) == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        switch (TLV::TagNumFromTag(reader.GetTag()))
+        {
+        case to_underlying(Fields::kParameterList):
+            ReturnErrorOnFailure(DataModel::Decode(reader, parameterList));
+            break;
+        default:
+            break;
+        }
+    }
+
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+    ReturnErrorOnFailure(reader.ExitContainer(outer));
+    return CHIP_NO_ERROR;
+}
+
+} // namespace ContentSearch
+namespace StyleInformation {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20700,8 +20694,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentLaunchStyleInformation
-namespace ContentLaunchBrandingInformation {
+} // namespace StyleInformation
+namespace BrandingInformation {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20756,11 +20750,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ContentLaunchBrandingInformation
+} // namespace BrandingInformation
 } // namespace Structs
 
 namespace Commands {
-namespace LaunchContent {
+namespace LaunchContentRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20801,47 +20795,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchContent.
-namespace LaunchContentResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kContentLaunchStatus)), contentLaunchStatus));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kContentLaunchStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, contentLaunchStatus));
-            break;
-        case to_underlying(Fields::kData):
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace LaunchContentResponse.
-namespace LaunchURL {
+} // namespace LaunchContentRequest.
+namespace LaunchURLRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -20883,14 +20838,13 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchURL.
-namespace LaunchURLResponse {
+} // namespace LaunchURLRequest.
+namespace LaunchResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(
-        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kContentLaunchStatus)), contentLaunchStatus));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
@@ -20907,8 +20861,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kContentLaunchStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, contentLaunchStatus));
+        case to_underlying(Fields::kStatus):
+            ReturnErrorOnFailure(DataModel::Decode(reader, status));
             break;
         case to_underlying(Fields::kData):
             ReturnErrorOnFailure(DataModel::Decode(reader, data));
@@ -20922,7 +20876,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchURLResponse.
+} // namespace LaunchResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -20930,8 +20884,8 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
-    case Attributes::AcceptsHeaderList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, acceptsHeaderList));
+    case Attributes::AcceptHeaderList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, acceptHeaderList));
         break;
     case Attributes::SupportedStreamingProtocols::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, supportedStreamingProtocols));
@@ -20959,7 +20913,7 @@ namespace Events {
 } // namespace ContentLauncher
 namespace AudioOutput {
 namespace Structs {
-namespace AudioOutputInfo {
+namespace OutputInfo {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21002,11 +20956,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace AudioOutputInfo
+} // namespace OutputInfo
 } // namespace Structs
 
 namespace Commands {
-namespace SelectOutput {
+namespace SelectOutputRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21039,8 +20993,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace SelectOutput.
-namespace RenameOutput {
+} // namespace SelectOutputRequest.
+namespace RenameOutputRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21077,7 +21031,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace RenameOutput.
+} // namespace RenameOutputRequest.
 } // namespace Commands
 
 namespace Attributes {
@@ -21114,7 +21068,7 @@ namespace Events {
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace ApplicationLauncherApp {
+namespace Application {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21153,8 +21107,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ApplicationLauncherApp
-namespace ApplicationLauncherEndpoint {
+} // namespace Application
+namespace ApplicationEP {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21193,11 +21147,11 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ApplicationLauncherEndpoint
+} // namespace ApplicationEP
 } // namespace Structs
 
 namespace Commands {
-namespace LaunchApp {
+namespace LaunchAppRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21234,46 +21188,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace LaunchApp.
-namespace LaunchAppResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
-            break;
-        case to_underlying(Fields::kData):
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace LaunchAppResponse.
-namespace StopApp {
+} // namespace LaunchAppRequest.
+namespace StopAppRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21306,46 +21222,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace StopApp.
-namespace StopAppResponse {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kData)), data));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
-            break;
-        case to_underlying(Fields::kData):
-            ReturnErrorOnFailure(DataModel::Decode(reader, data));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace StopAppResponse.
-namespace HideApp {
+} // namespace StopAppRequest.
+namespace HideAppRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21378,8 +21256,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace HideApp.
-namespace HideAppResponse {
+} // namespace HideAppRequest.
+namespace LauncherResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21416,7 +21294,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace HideAppResponse.
+} // namespace LauncherResponse.
 } // namespace Commands
 
 namespace Attributes {
@@ -21453,7 +21331,7 @@ namespace Events {
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace ApplicationBasicApp {
+namespace Application {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21492,44 +21370,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace ApplicationBasicApp
+} // namespace Application
 } // namespace Structs
 
 namespace Commands {
-namespace ChangeStatus {
-CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-{
-    TLV::TLVType outer;
-    ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kStatus)), status));
-    ReturnErrorOnFailure(writer.EndContainer(outer));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLV::TLVType outer;
-    VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(reader.EnterContainer(outer));
-    while ((err = reader.Next()) == CHIP_NO_ERROR)
-    {
-        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (TLV::TagNumFromTag(reader.GetTag()))
-        {
-        case to_underlying(Fields::kStatus):
-            ReturnErrorOnFailure(DataModel::Decode(reader, status));
-            break;
-        default:
-            break;
-        }
-    }
-
-    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-    ReturnErrorOnFailure(reader.ExitContainer(outer));
-    return CHIP_NO_ERROR;
-}
-} // namespace ChangeStatus.
 } // namespace Commands
 
 namespace Attributes {
@@ -21558,6 +21402,9 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     case Attributes::ApplicationVersion::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, applicationVersion));
         break;
+    case Attributes::AllowedVendorList::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, allowedVendorList));
+        break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
@@ -21582,7 +21429,7 @@ namespace Events {
 namespace AccountLogin {
 
 namespace Commands {
-namespace GetSetupPIN {
+namespace GetSetupPINRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21616,7 +21463,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace GetSetupPIN.
+} // namespace GetSetupPINRequest.
 namespace GetSetupPINResponse {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -21651,7 +21498,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 } // namespace GetSetupPINResponse.
-namespace Login {
+namespace LoginRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21689,8 +21536,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace Login.
-namespace Logout {
+} // namespace LoginRequest.
+namespace LogoutRequest {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21719,7 +21566,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     ReturnErrorOnFailure(reader.ExitContainer(outer));
     return CHIP_NO_ERROR;
 }
-} // namespace Logout.
+} // namespace LogoutRequest.
 } // namespace Commands
 
 namespace Attributes {

@@ -39,19 +39,6 @@ public:
     // Cluster Commands
     CHIP_ERROR Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t identifyTime);
     CHIP_ERROR IdentifyQuery(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-    // Cluster Attributes
-    CHIP_ERROR SubscribeAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeIdentifyTime(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeIdentifyType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeIdentifyType(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
-
-private:
 };
 
 } // namespace Controller

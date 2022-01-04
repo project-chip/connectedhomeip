@@ -150,6 +150,7 @@ CFLAGS
 cgit
 cgroup
 changeset
+Channel
 characterised
 CharString
 checkmark
@@ -726,6 +727,7 @@ OTARequesterImpl
 OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
+otasoftwareupdaterequestor
 OTBR
 otcli
 PAA
@@ -994,12 +996,12 @@ TransportMgrBase
 TrustedRootCertificates
 TSG
 tsv
+TTL
 tty
 ttyACM
 ttyACMx
 ttymxc
 ttyUSB
-TvChannel
 TXD
 txt
 UART

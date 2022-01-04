@@ -112,7 +112,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 
     while (CHIP_NO_ERROR == (err = attributeStatusesReader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::AnonymousTag() == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
         AttributeStatusIB::Parser element;
 
@@ -211,7 +211,7 @@ void WriteClient::ClearState()
     MoveToState(State::Uninitialized);
 }
 
-CHIP_ERROR WriteClient::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -248,14 +248,20 @@ exit:
         ChipLogError(DataManagement, "Write client failed to SendWriteRequest");
         ClearExistingExchangeContext();
     }
-
-    if (session.IsGroupSession())
+    else
     {
-        // Always shutdown on Group communication
-        ChipLogDetail(DataManagement, "Closing on group Communication ");
+        // TODO: Ideally this would happen async, but to make sure that we
+        // handle this object dying (e.g. due to IM enging shutdown) while the
+        // async bits are pending we'd need to malloc some state bit that we can
+        // twiddle if we die.  For now just do the OnDone callback sync.
+        if (session.IsGroupSession())
+        {
+            // Always shutdown on Group communication
+            ChipLogDetail(DataManagement, "Closing on group Communication ");
 
-        // onDone is called
-        ShutdownInternal();
+            // onDone is called
+            ShutdownInternal();
+        }
     }
 
     return err;
@@ -385,7 +391,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClientHandle::SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR WriteClientHandle::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = mpWriteClient->SendWriteRequest(session, timeout);
 

@@ -979,7 +979,7 @@
             },
             {
               "name": "ApplyUpdateRequest",
-              "code": 1,
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -987,7 +987,7 @@
             },
             {
               "name": "NotifyUpdateApplied",
-              "code": 2,
+              "code": 4,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -1022,7 +1022,7 @@
           "commands": [
             {
               "name": "QueryImageResponse",
-              "code": 3,
+              "code": 1,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -1030,7 +1030,7 @@
             },
             {
               "name": "ApplyUpdateResponse",
-              "code": 4,
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -1100,7 +1100,22 @@
           "commands": [],
           "attributes": [
             {
-              "name": "default ota provider",
+              "name": "DefaultOtaProviders",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "UpdatePossible",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -1108,14 +1123,14 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "1",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
             },
             {
-              "name": "update possible",
+              "name": "UpdateState",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -1123,8 +1138,53 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "",
+              "defaultValue": "0",
               "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "UpdateStateProgress",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AttributeList",
+              "code": 65531,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1477,7 +1537,7 @@
               "reportableChange": 0
             },
             {
-              "name": "NetworkDisabled",
+              "name": "InterfaceEnabled",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -3852,6 +3912,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 22
     }
-  ],
-  "log": []
+  ]
 }

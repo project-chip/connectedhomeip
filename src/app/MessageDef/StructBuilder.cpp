@@ -32,7 +32,7 @@ CHIP_ERROR StructBuilder::Init(TLV::TLVWriter * const apWriter, const uint8_t aC
 CHIP_ERROR StructBuilder::Init(TLV::TLVWriter * const apWriter)
 {
     mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, mOuterContainerType);
+    mError   = mpWriter->StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, mOuterContainerType);
     return mError;
 }
 } // namespace app

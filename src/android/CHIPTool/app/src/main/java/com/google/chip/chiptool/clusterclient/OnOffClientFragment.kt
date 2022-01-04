@@ -31,7 +31,6 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.showSubscribeDialogBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
@@ -108,7 +107,9 @@ class OnOffClientFragment : Fragment() {
           minIntervalEd.text.toString().toInt(),
           maxIntervalEd.text.toString().toInt()
         )
-        dialog.dismiss()
+        requireActivity().runOnUiThread {
+          dialog.dismiss()
+        }
       }
     }
     dialog.show()
@@ -117,26 +118,20 @@ class OnOffClientFragment : Fragment() {
   private suspend fun sendSubscribeOnOffClick(minInterval: Int, maxInterval: Int) {
     val onOffCluster = getOnOffClusterForDevice()
 
-    val subscribeCallback = object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        val message = "Subscribe on/off success"
+    val subscribeCallback = object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(value: Boolean) {
+        val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
+        val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
+
+        Log.v(TAG, message)
+        showReportMessage(message)
+      }
+
+      override fun onSubscriptionEstablished() {
+        val message = "Subscription for on/off established"
         Log.v(TAG, message)
         showMessage(message)
-
-        onOffCluster.reportOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
-          override fun onSuccess(on: Boolean) {
-            Log.v(TAG, "Report on/off attribute value: $on")
-
-            val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-            val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
-            showReportMessage("Report on/off at $time: ${if (on) "ON" else "OFF"}")
-          }
-
-          override fun onError(ex: Exception) {
-            Log.e(TAG, "Error reporting on/off attribute", ex)
-            showReportMessage("Error reporting on/off attribute: $ex")
-          }
-        })
       }
 
       override fun onError(ex: Exception) {

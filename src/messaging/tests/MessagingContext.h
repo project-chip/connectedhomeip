@@ -50,6 +50,14 @@ public:
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
 
+    // Initialize from an existing messaging context.  Useful if we want to
+    // share some state (like the transport).
+    CHIP_ERROR InitFromExisting(const MessagingContext & existing);
+
+    // The shutdown method to use if using InitFromExisting.  Must pass in the
+    // same existing context as was passed to InitFromExisting.
+    CHIP_ERROR ShutdownAndRestoreExisting(MessagingContext & existing);
+
     static Inet::IPAddress GetAddress()
     {
         Inet::IPAddress addr;
@@ -98,6 +106,7 @@ private:
     Messaging::ExchangeManager mExchangeManager;
     secure_channel::MessageCounterManager mMessageCounterManager;
     IOContext * mIOContext;
+    TransportMgrBase * mTransport; // Only needed for InitFromExisting.
 
     NodeId mBobNodeId       = 123654;
     NodeId mAliceNodeId     = 111222333;
@@ -115,7 +124,7 @@ private:
     FabricIndex mDestFabricIndex = 0;
 };
 
-template <typename Transport>
+template <typename Transport = LoopbackTransport>
 class LoopbackMessagingContext : public MessagingContext
 {
 public:
@@ -165,6 +174,8 @@ public:
     }
 
     Transport & GetLoopback() { return mTransportManager.GetTransport().template GetImplAtIndex<0>(); }
+
+    TransportMgrBase & GetTransportMgr() { return mTransportManager; }
 
     /*
      * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,

@@ -149,7 +149,7 @@ private:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -248,8 +248,11 @@ public:
     /**
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
+     *
+     * Note: In failure cases this will _synchronously_ invoke OnDone on the
+     * WriteClient::Callback before returning.
      */
-    CHIP_ERROR SendWriteRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put

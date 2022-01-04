@@ -275,9 +275,9 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
     netif->name[0]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[0];
     netif->name[1]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[1];
     netif->output_ip6 = SendPacket;
-#if LWIP_IPV4 || LWIP_VERSION_MAJOR < 2
+#if LWIP_IPV4
     netif->output = NULL;
-#endif /* LWIP_IPV4 || LWIP_VERSION_MAJOR < 2 */
+#endif // LWIP_IPV4
     netif->linkoutput = NULL;
     netif->flags      = NETIF_FLAG_UP | NETIF_FLAG_LINK_UP | NETIF_FLAG_BROADCAST;
     netif->mtu        = CHIP_DEVICE_CONFIG_THREAD_IF_MTU;
@@ -293,13 +293,8 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
  * NB: This method is called in the LwIP TCPIP thread with the LwIP core lock held.
  */
 template <class ImplClass>
-#if LWIP_VERSION_MAJOR < 2
-err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
-                                                                           struct ip6_addr * ipaddr)
-#else
 err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
                                                                            const struct ip6_addr * ipaddr)
-#endif
 {
     err_t lwipErr = ERR_OK;
     otError otErr;

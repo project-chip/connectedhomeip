@@ -1238,32 +1238,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _newVersion = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _softwareVersion = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
@@ -1289,6 +1263,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _newVersion = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
@@ -1302,18 +1289,33 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _softwareVersion = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _providerLocation = @(0);
+        _providerNodeId = @(0);
 
         _vendorId = @(0);
 
         _announcementReason = @(0);
 
         _metadataForNode = nil;
+
+        _endpoint = @(0);
     }
     return self;
 }
@@ -1412,9 +1414,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _debugText = @"";
 
-        _wiFiScanResults = [NSArray array];
+        _wiFiScanResults = nil;
 
-        _threadScanResults = [NSArray array];
+        _threadScanResults = nil;
     }
     return self;
 }
@@ -1737,6 +1739,72 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _trustedRootIdentifier = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetRemoveParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
     }
     return self;
 }
@@ -3189,7 +3257,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelParams
+@implementation CHIPChannelClusterChangeChannelRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3200,12 +3268,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponseParams
+@implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _channelMatch = [CHIPTvChannelClusterTvChannelInfo new];
+        _channelMatch = [CHIPChannelClusterChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3213,7 +3281,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberParams
+@implementation CHIPChannelClusterChangeChannelByNumberRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3226,7 +3294,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterSkipChannelParams
+@implementation CHIPChannelClusterSkipChannelRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3237,7 +3305,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetParams
+@implementation CHIPTargetNavigatorClusterNavigateTargetRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3263,95 +3331,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPlayResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPauseResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStopResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStartOverResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPreviousResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaNextResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaRewindResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaFastForwardResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardParams
+@implementation CHIPMediaPlaybackClusterSkipForwardRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3362,18 +3342,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardParams
+@implementation CHIPMediaPlaybackClusterSkipBackwardRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3384,18 +3353,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams
+@implementation CHIPMediaPlaybackClusterPlaybackResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mediaPlaybackStatus = @(0);
+        _status = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekParams
+@implementation CHIPMediaPlaybackClusterSeekRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3406,18 +3375,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaInputClusterSelectInputParams
+@implementation CHIPMediaInputClusterSelectInputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3428,7 +3386,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterRenameInputParams
+@implementation CHIPMediaInputClusterRenameInputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3441,7 +3399,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPKeypadInputClusterSendKeyParams
+@implementation CHIPKeypadInputClusterSendKeyRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3463,7 +3421,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentParams
+@implementation CHIPContentLauncherClusterLaunchContentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3478,20 +3436,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _contentLaunchStatus = @(0);
-
-        _data = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPContentLauncherClusterLaunchURLParams
+@implementation CHIPContentLauncherClusterLaunchURLRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3500,18 +3445,18 @@ NS_ASSUME_NONNULL_BEGIN
 
         _displayString = @"";
 
-        _brandingInformation = [NSArray array];
+        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
     }
     return self;
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLResponseParams
+@implementation CHIPContentLauncherClusterLaunchResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _contentLaunchStatus = @(0);
+        _status = @(0);
 
         _data = @"";
     }
@@ -3519,7 +3464,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterSelectOutputParams
+@implementation CHIPAudioOutputClusterSelectOutputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3530,7 +3475,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterRenameOutputParams
+@implementation CHIPAudioOutputClusterRenameOutputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3543,20 +3488,42 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppParams
+@implementation CHIPApplicationLauncherClusterLaunchAppRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _data = @"";
 
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+        _application = [CHIPApplicationLauncherClusterApplication new];
     }
     return self;
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
+@implementation CHIPApplicationLauncherClusterStopAppRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplication new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplication new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterLauncherResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3569,66 +3536,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterStopAppParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplicationLauncherClusterStopAppResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _data = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplicationLauncherClusterHideAppParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplicationLauncherClusterHideAppResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-
-        _data = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPApplicationBasicClusterChangeStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAccountLoginClusterGetSetupPINParams
+@implementation CHIPAccountLoginClusterGetSetupPINRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3650,7 +3558,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterLoginParams
+@implementation CHIPAccountLoginClusterLoginRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {

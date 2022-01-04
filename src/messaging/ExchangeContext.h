@@ -63,7 +63,8 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -74,7 +75,7 @@ public:
      */
     bool IsInitiator() const;
 
-    bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
+    bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
     bool IsGroupExchangeContext() const { return (mSession && mSession.Get().IsGroupSession()); }
 
@@ -149,7 +150,7 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
+    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
     SessionHandle GetSessionHandle() const { return mSession.Get(); }
     bool HasSessionHandle() const { return mSession; }
@@ -183,7 +184,7 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
-    ExchangeMessageDispatch * mDispatch = nullptr;
+    ExchangeMessageDispatch & mDispatch;
 
     SessionHolder mSession; // The connection state
     uint16_t mExchangeId;   // Assigned exchange ID.
@@ -226,7 +227,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify the exchange that its connection has expired.

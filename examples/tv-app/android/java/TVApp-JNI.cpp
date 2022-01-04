@@ -16,12 +16,12 @@
  *
  */
 
+#include "ChannelManager.h"
 #include "ContentLauncherManager.h"
 #include "KeypadInputManager.h"
 #include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
-#include "TvChannelManager.h"
 #include "WakeOnLanManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
@@ -70,7 +70,7 @@ JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jobject manager)
     MediaPlaybackMgr().InitializeWithObjects(manager);
 }
 
-JNI_METHOD(void, setTvChannelManager)(JNIEnv *, jobject, jobject manager)
+JNI_METHOD(void, setChannelManager)(JNIEnv *, jobject, jobject manager)
 {
-    TvChannelMgr().InitializeWithObjects(manager);
+    ChannelMgr().InitializeWithObjects(manager);
 }

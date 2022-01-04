@@ -40,14 +40,12 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 class ConnectivityManagerImpl;
 class ConfigurationManagerImpl;
+class DeviceControlServer;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 
 namespace Internal {
-class DeviceControlServer;
-class FabricProvisioningServer;
-class ServiceProvisioningServer;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -182,6 +180,8 @@ public:
 
     CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
                                  LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
+                                LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR GetUserLabelList(EndpointId endpoint,
                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
@@ -194,13 +194,11 @@ private:
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
-    friend class Internal::DeviceControlServer;
-    friend class Internal::FabricProvisioningServer;
-    friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -432,6 +430,13 @@ PlatformManager::GetFixedLabelList(EndpointId endpoint,
                                    LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR
+PlatformManager::SetUserLabelList(EndpointId endpoint,
+                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
 inline CHIP_ERROR

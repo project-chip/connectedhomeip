@@ -690,7 +690,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-s', help='discover commissionable nodes with given short discriminator', type=int)
             group.add_argument(
-                '-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+                '-v', help='discover commissionable nodes with given vendor ID', type=int)
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
@@ -896,19 +896,34 @@ class DeviceMgrCmd(Cmd):
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-wifi-credential ssid credentials
         """
-        print("Pairing WiFi Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 2:
+                print("Usage:")
+                self.do_help("set-pairing-wifi-credential")
+                return
+            self.devCtrl.SetWifiCredentials(
+                args[0].encode("utf-8"), args[1].encode("utf-8"))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_setpairingthreadcredential(self, line):
         """
-        set-pairing-thread-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-thread-credential threadOperationalDataset
         """
-        print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 1:
+                print("Usage:")
+                self.do_help("set-pairing-thread-credential")
+                return
+            self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_opencommissioningwindow(self, line):
         """

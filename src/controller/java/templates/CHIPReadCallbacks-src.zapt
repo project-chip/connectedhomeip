@@ -4,9 +4,9 @@
 
 #include <zap-generated/CHIPClientCallbacks.h>
 
+#include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <jni.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
 

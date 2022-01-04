@@ -70,7 +70,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::LevelControl;
 
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint);
+static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint);
 #endif
 
 #if (EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE == 0)
@@ -970,8 +970,8 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
 void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-    // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
-    if (areStartUpLevelControlServerAttributesTokenized(endpoint))
+    // StartUp behavior relies StartUpCurrentLevel attributes being non-volatile.
+    if (areStartUpLevelControlServerAttributesNonVolatile(endpoint))
     {
         // Read the StartUpOnOff attribute and set the OnOff attribute as per
         // following from zcl 7 14-0127-20i-zcl-ch-3-general.doc.
@@ -1030,20 +1030,20 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 }
 
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint)
+static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 
     metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
                                               EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
     metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID,
                                               CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!metadata->IsNonVolatile())
     {
         return false;
     }

@@ -16,6 +16,7 @@
  */
 #include "DefaultDeviceAttestationVerifier.h"
 
+#include <controller/OperationalCredentialsDelegate.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
 #include <credentials/DeviceAttestationConstructor.h>
@@ -159,6 +160,11 @@ public:
     AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
                                                                         const ByteSpan & firmwareInfo,
                                                                         const DeviceInfoForAttestation & deviceInfo) override;
+
+    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                   const ByteSpan & attestationChallengeBuffer,
+                                                   const ByteSpan & attestationSignatureBuffer, const P256PublicKey & dacPublicKey,
+                                                   const ByteSpan & csrNonce) override;
 
 protected:
     DefaultDACVerifier() {}
@@ -365,6 +371,39 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
     }
 
     return AttestationVerificationResult::kSuccess;
+}
+
+CHIP_ERROR DefaultDACVerifier::VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                                   const ByteSpan & attestationChallengeBuffer,
+                                                                   const ByteSpan & attestationSignatureBuffer,
+                                                                   const P256PublicKey & dacPublicKey, const ByteSpan & csrNonce)
+{
+    VerifyOrReturnError(!nocsrElementsBuffer.empty() && !attestationChallengeBuffer.empty() &&
+                            !attestationSignatureBuffer.empty() && !csrNonce.empty(),
+                        CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrReturnError(csrNonce.size() == Controller::kOpCSRNonceLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+    ByteSpan csrSpan;
+    ByteSpan csrNonceSpan;
+    ByteSpan vendorReserved1Span;
+    ByteSpan vendorReserved2Span;
+    ByteSpan vendorReserved3Span;
+    ReturnErrorOnFailure(DeconstructNOCSRElements(nocsrElementsBuffer, csrSpan, csrNonceSpan, vendorReserved1Span,
+                                                  vendorReserved2Span, vendorReserved3Span));
+
+    // Verify that Nonce matches with what we sent
+    VerifyOrReturnError(csrNonceSpan.data_equal(csrNonce), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Validate overall attestation signature on attestation information
+    P256ECDSASignature signature;
+    // SetLength will fail if signature doesn't fit
+    ReturnErrorOnFailure(signature.SetLength(attestationSignatureBuffer.size()));
+    memcpy(signature.Bytes(), attestationSignatureBuffer.data(), attestationSignatureBuffer.size());
+
+    ReturnErrorOnFailure(ValidateAttestationSignature(dacPublicKey, nocsrElementsBuffer, attestationChallengeBuffer, signature));
+
+    return CHIP_NO_ERROR;
 }
 
 } // namespace

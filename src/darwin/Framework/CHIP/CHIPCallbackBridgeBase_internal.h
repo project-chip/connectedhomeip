@@ -41,12 +41,12 @@ public:
         });
 
         if (CHIP_NO_ERROR != err) {
-            dispatch_async(queue, ^{
-                handler(nil, [CHIPError errorForCHIPErrorCode:err]);
-            });
+            NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
+                chip::ErrorStr(err));
 
-            NSString * errorStr = [NSString stringWithFormat:@"%s: %s", typeid(T).name(), chip::ErrorStr(err)];
-            @throw [NSException exceptionWithName:errorStr reason:nil userInfo:nil];
+            // Take the normal async error-reporting codepath.  This will also
+            // handle cleaning us up properly.
+            DispatchFailure(this, [CHIPError errorForCHIPErrorCode:err]);
         }
     };
 

@@ -281,7 +281,7 @@ public:
 private:
     friend class TCPTest;
     TCPBase::ActiveConnectionState mConnectionsBuffer[kActiveConnectionsSize];
-    PoolImpl<PendingPacket, kPendingPacketSize, PendingPacketPoolType::Interface> mPendingPackets;
+    PoolImpl<PendingPacket, kPendingPacketSize, ObjectPoolMem::kInline, PendingPacketPoolType::Interface> mPendingPackets;
 };
 
 } // namespace Transport

@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
@@ -54,7 +55,6 @@
 
 namespace chip {
 
-constexpr size_t kOpCSRNonceLength       = 32;
 constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
@@ -164,7 +164,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased(const SessionHandle & session) override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -204,7 +204,7 @@ public:
 
     NodeId GetDeviceId() const override { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.Contains(session); }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
     SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
     chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
@@ -328,7 +328,7 @@ private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     // TODO: Offload Nonces and DAC/PAI into a new struct
-    uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mCSRNonce[Controller::kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
 
     uint8_t * mDAC   = nullptr;

@@ -445,14 +445,16 @@ void OnResolve(dnssd_error_e result, dnssd_service_h service, void * data)
     // If both IPv4 and IPv6 are set, IPv6 address has higher priority.
     if (ipv6 != nullptr)
     {
-        validIP = chip::Inet::IPAddress::FromString(ipv6, ipStr);
+        validIP = (chip::Inet::IPAddress::FromString(ipv6, ipStr) && ipStr.Type() == chip::Inet::IPAddressType::kIPv6);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (ipv4 != nullptr)
     {
-        validIP = chip::Inet::IPAddress::FromString(ipv4, ipStr);
+        validIP = (chip::Inet::IPAddress::FromString(ipv4, ipStr) && ipStr.Type() == chip::Inet::IPAddressType::kIPv4);
     }
 #endif
+
+    ChipLogDetail(DeviceLayer, "Dnssd: %s ipv4: %s, ipv6: %s, valid: %d", __func__, ipv4, ipv6, validIP);
 
     if (validIP)
     {

@@ -74,29 +74,6 @@ exit:
 }
 
 {{/chip_cluster_commands}}
-// {{asUpperCamelCase name}} Cluster Attributes
-{{#chip_server_cluster_attributes}}
-{{#unless (isStrEqual chipCallback.name "Unsupported")}}
-{{#if isReportableAttribute}}
-{{#unless isList}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mAttributeId    = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id, onReportCallback, BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
-}
-
-{{/unless}}
-{{/if}}
-{{/unless}}
-{{/chip_server_cluster_attributes}}
 
 {{/chip_client_clusters}}
 

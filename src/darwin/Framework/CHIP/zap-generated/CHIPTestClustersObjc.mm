@@ -391,7 +391,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = ApplicationBasic::Attributes::ApplicationStatus::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -410,6 +410,46 @@ using namespace chip::app::Clusters;
             using TypeInfo = ApplicationBasic::Attributes::ApplicationVersion::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = [self asCharSpan:value];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAllowedVendorListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = ApplicationBasic::Attributes::AllowedVendorList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                            element_0.unsignedShortValue);
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -617,11 +657,11 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPAudioOutputClusterAudioOutputInfo class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPAudioOutputClusterOutputInfo class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPAudioOutputClusterAudioOutputInfo *) value[i_0];
+                        auto element_0 = (CHIPAudioOutputClusterOutputInfo *) value[i_0];
                         listHolder_0->mList[i_0].index = element_0.index.unsignedCharValue;
                         listHolder_0->mList[i_0].outputType
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].outputType)>>(
@@ -1736,6 +1776,119 @@ using namespace chip::app::Clusters;
 
 @end
 
+@interface CHIPTestChannel ()
+@property (readonly) chip::Controller::ChannelClusterTest cppCluster;
+@end
+
+@implementation CHIPTestChannel
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::ChannelList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[CHIPChannelClusterChannelInfo class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (CHIPChannelClusterChannelInfo *) value[i_0];
+                        listHolder_0->mList[i_0].majorNumber = element_0.majorNumber.unsignedShortValue;
+                        listHolder_0->mList[i_0].minorNumber = element_0.minorNumber.unsignedShortValue;
+                        listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
+                        listHolder_0->mList[i_0].callSign = [self asCharSpan:element_0.callSign];
+                        listHolder_0->mList[i_0].affiliateCallSign = [self asCharSpan:element_0.affiliateCallSign];
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::AttributeList::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = Channel::Attributes::ClusterRevision::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+@end
+
 @interface CHIPTestColorControl ()
 @property (readonly) chip::Controller::ColorControlClusterTest cppCluster;
 @end
@@ -2522,7 +2675,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeAcceptsHeaderListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAcceptHeaderListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -2531,7 +2684,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo;
+            using TypeInfo = ContentLauncher::Attributes::AcceptHeaderList::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -2543,12 +2696,12 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSData class]]) {
+                        if (![value[i_0] isKindOfClass:[NSString class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSData *) value[i_0];
-                        listHolder_0->mList[i_0] = [self asByteSpan:element_0];
+                        auto element_0 = (NSString *) value[i_0];
+                        listHolder_0->mList[i_0] = [self asCharSpan:element_0];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
@@ -4381,7 +4534,7 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeGroupsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeGroupKeyMapWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -4390,48 +4543,7 @@ using namespace chip::app::Clusters;
         },
         ^(Cancelable * success, Cancelable * failure) {
             ListFreer listFreer;
-            using TypeInfo = GroupKeyManagement::Attributes::Groups::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupState class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (CHIPGroupKeyManagementClusterGroupState *) value[i_0];
-                        listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
-                        listHolder_0->mList[i_0].vendorGroupId = element_0.vendorGroupId.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeySetIndex = element_0.groupKeySetIndex.unsignedShortValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGroupKeysWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = GroupKeyManagement::Attributes::GroupKeys::TypeInfo;
+            using TypeInfo = GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo;
             TypeInfo::Type cppValue;
             {
                 using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
@@ -4448,19 +4560,115 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPGroupKeyManagementClusterGroupKey *) value[i_0];
-                        listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeyIndex = element_0.groupKeyIndex.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeyRoot = [self asByteSpan:element_0.groupKeyRoot];
-                        listHolder_0->mList[i_0].groupKeyEpochStartTime = element_0.groupKeyEpochStartTime.unsignedLongLongValue;
-                        listHolder_0->mList[i_0].groupKeySecurityPolicy
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].groupKeySecurityPolicy)>>(
-                                element_0.groupKeySecurityPolicy.unsignedCharValue);
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedShortValue;
+                        listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
+                        listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
                     cppValue = ListType_0();
                 }
             }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeGroupTableWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GroupKeyManagement::Attributes::GroupTable::TypeInfo;
+            TypeInfo::Type cppValue;
+            {
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupInfo class]]) {
+                            // Wrong kind of value.
+                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        }
+                        auto element_0 = (CHIPGroupKeyManagementClusterGroupInfo *) value[i_0];
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedShortValue;
+                        listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].endpoints)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.endpoints.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.endpoints.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.endpoints.count; ++i_2) {
+                                    if (![element_0.endpoints[i_2] isKindOfClass:[NSNumber class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSNumber *) element_0.endpoints[i_2];
+                                    listHolder_2->mList[i_2] = element_2.unsignedShortValue;
+                                }
+                                listHolder_0->mList[i_0].endpoints = ListType_2(listHolder_2->mList, element_0.endpoints.count);
+                            } else {
+                                listHolder_0->mList[i_0].endpoints = ListType_2();
+                            }
+                        }
+                        listHolder_0->mList[i_0].groupName = [self asCharSpan:element_0.groupName];
+                    }
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType_0();
+                }
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMaxGroupsPerFabricWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeMaxGroupKeysPerFabricWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -5250,11 +5458,11 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPMediaInputClusterMediaInputInfo class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPMediaInputClusterInputInfo class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPMediaInputClusterMediaInputInfo *) value[i_0];
+                        auto element_0 = (CHIPMediaInputClusterInputInfo *) value[i_0];
                         listHolder_0->mList[i_0].index = element_0.index.unsignedCharValue;
                         listHolder_0->mList[i_0].inputType
                             = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].inputType)>>(
@@ -5372,7 +5580,7 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = MediaPlayback::Attributes::PlaybackState::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -5985,6 +6193,47 @@ using namespace chip::app::Clusters;
             using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo;
             TypeInfo::Type cppValue;
             cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeUpdateStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeUpdateStateProgressWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -8179,119 +8428,6 @@ using namespace chip::app::Clusters;
 
 @end
 
-@interface CHIPTestTvChannel ()
-@property (readonly) chip::Controller::TvChannelClusterTest cppCluster;
-@end
-
-@implementation CHIPTestTvChannel
-
-- (chip::Controller::ClusterBase *)getCluster
-{
-    return &_cppCluster;
-}
-
-- (void)writeAttributeChannelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = TvChannel::Attributes::ChannelList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPTvChannelClusterTvChannelInfo class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (CHIPTvChannelClusterTvChannelInfo *) value[i_0];
-                        listHolder_0->mList[i_0].majorNumber = element_0.majorNumber.unsignedShortValue;
-                        listHolder_0->mList[i_0].minorNumber = element_0.minorNumber.unsignedShortValue;
-                        listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
-                        listHolder_0->mList[i_0].callSign = [self asCharSpan:element_0.callSign];
-                        listHolder_0->mList[i_0].affiliateCallSign = [self asCharSpan:element_0.affiliateCallSign];
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeAttributeListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = TvChannel::Attributes::AttributeList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (NSNumber *) value[i_0];
-                        listHolder_0->mList[i_0] = element_0.unsignedIntValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = TvChannel::Attributes::ClusterRevision::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-@end
-
 @interface CHIPTestTargetNavigator ()
 @property (readonly) chip::Controller::TargetNavigatorClusterTest cppCluster;
 @end
@@ -8324,11 +8460,11 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPTargetNavigatorClusterNavigateTargetTargetInfo class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPTargetNavigatorClusterTargetInfo class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPTargetNavigatorClusterNavigateTargetTargetInfo *) value[i_0];
+                        auto element_0 = (CHIPTargetNavigatorClusterTargetInfo *) value[i_0];
                         listHolder_0->mList[i_0].identifier = element_0.identifier.unsignedCharValue;
                         listHolder_0->mList[i_0].name = [self asCharSpan:element_0.name];
                     }
@@ -10577,48 +10713,6 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)writeAttributeLabelListWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(id _Nullable ignored, NSError * _Nullable error) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = UserLabel::Attributes::LabelList::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPUserLabelClusterLabelStruct class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
-                        }
-                        auto element_0 = (CHIPUserLabelClusterLabelStruct *) value[i_0];
-                        listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
-                        listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11080,7 +11174,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCurrentPositionLiftWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11091,14 +11185,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLift::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeCurrentPositionTiltWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -11109,7 +11208,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTilt::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11134,7 +11238,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11146,14 +11250,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercentageWithValue:(NSNumber * _Nullable)value
                                            completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11165,7 +11274,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11190,7 +11304,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11202,14 +11316,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeTargetPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                              completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11221,7 +11340,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -11246,7 +11370,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionLiftPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11258,14 +11382,19 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeCurrentPositionTiltPercent100thsWithValue:(NSNumber * _Nullable)value
                                               completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
@@ -11277,7 +11406,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
