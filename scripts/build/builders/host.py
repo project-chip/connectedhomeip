@@ -73,8 +73,8 @@ class HostApp(Enum):
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
         elif self == HostApp.LOCK:
-            yield 'chip-lock-app'
-            yield 'chip-lock-app.map'
+            yield 'chip-door-lock-app'
+            yield 'chip-door-lock-app.map'
         elif self == HostApp.TESTS:
             pass
         else:
