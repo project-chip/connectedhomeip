@@ -17,10 +17,20 @@
  */
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
-
 #include "OTAImageProcessorImpl.h"
 
+extern "C" {
+#include "platform/bootloader/api/btl_interface.h"
+}
+
+/// No error, operation OK
+#define SL_BOOTLOADER_OK                               0L
+
 namespace chip {
+
+// Define static memebers
+uint8_t OTAImageProcessorImpl::mSlotId;
+uint16_t OTAImageProcessorImpl::mWriteOffset;
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -42,6 +52,25 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    uint32_t err = SL_BOOTLOADER_OK;
+
+    // Assuming that bootloader_verifyImage() call is not too expensive and
+    // doesn't need to be offladed to a different task
+    err = bootloader_verifyImage(mSlotId, NULL);
+    if (err != SL_BOOTLOADER_OK)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+    err = bootloader_setImageToBootload(mSlotId);
+    if (err != SL_BOOTLOADER_OK)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
+    // This reboots the device
+    bootloader_rebootAndInstall();
+
     return CHIP_NO_ERROR;
 }
 
@@ -59,11 +88,6 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    if (!mOfs.is_open() || !mOfs.good())
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
     if ((block.data() == nullptr) || block.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -82,7 +106,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    int32_t err = BOOTLOADER_OK;
+    int32_t err = SL_BOOTLOADER_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -97,10 +121,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     bootloader_init();
+    mSlotId = 0; // Single slot unless we support multiple images
     mWriteOffset = 0;
     err = bootloader_eraseStorageSlot(mSlotId);
 
-    imageProcessor->mDownloader->OnPreparedForDownload(err == BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
+    imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
 }
 
 void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
@@ -111,7 +136,6 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
@@ -125,13 +149,13 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.close();
-    remove(imageProcessor->mParams.imageFile.data());
+    // Not clearing the imag storage area as it will be done during preparation for the next download
     imageProcessor->ReleaseBlock();
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
+    uint32_t err = SL_BOOTLOADER_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -146,7 +170,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     // TODO: Process block header if any
 
-    err = bootloader_writeStorage(mSlotId, imageProcessor->mBlock.size(), 
+    err = bootloader_writeStorage(mSlotId, imageProcessor->mBlock.size(),
         reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()), mWriteOffset);
 
     if (err)
