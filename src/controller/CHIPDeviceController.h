@@ -328,6 +328,11 @@ public:
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
+    OperationalDeviceProxy * GetOperationalDeviceProxy(PeerId peerId) const
+    {
+        return mCASESessionManager->FindExistingSession(peerId);
+    }
+
 protected:
     enum class State
     {

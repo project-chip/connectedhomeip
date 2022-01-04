@@ -25,6 +25,7 @@
 #include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
+#include <controller-clusters/zap-generated/CHIPClusters.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
 
@@ -213,11 +214,10 @@ DeviceCommissioner gCommissioner;
 MyServerStorageDelegate gServerStorage;
 chip::SimpleFabricStorage gFabricStorage;
 ExampleOperationalCredentialsIssuer gOpCredsIssuer;
+NodeId gLocalId = chip::kPlaceholderNodeId;
 
 CHIP_ERROR InitCommissioner()
 {
-    NodeId localId = chip::kPlaceholderNodeId;
-
     chip::Controller::FactoryInitParams factoryParams;
     chip::Controller::SetupParams params;
 
@@ -256,7 +256,7 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(ephemeralKey.Initialize());
 
     ReturnErrorOnFailure(
-        gOpCredsIssuer.GenerateNOCChainAfterValidation(localId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+        gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, 0, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     params.ephemeralKeypair = &ephemeralKey;
     params.controllerRCAC   = rcacSpan;
@@ -278,6 +278,9 @@ CHIP_ERROR ShutdownCommissioner()
 
 class PairingCommand : public chip::Controller::DevicePairingDelegate, public chip::Controller::DeviceAddressUpdateDelegate
 {
+public:
+    PairingCommand() : mSuccessCallback(OnSuccessResponse, this), mFailureCallback(OnFailureResponse, this){};
+
     /////////// DevicePairingDelegate Interface /////////
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
@@ -288,6 +291,14 @@ class PairingCommand : public chip::Controller::DevicePairingDelegate, public ch
     void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
 
     CHIP_ERROR UpdateNetworkAddress();
+
+    /* Callback when command results in success */
+    static void OnSuccessResponse(void * context);
+    /* Callback when command results in failure */
+    static void OnFailureResponse(void * context, uint8_t status);
+
+    Callback::Callback<DefaultSuccessCallback> mSuccessCallback;
+    Callback::Callback<DefaultFailureCallback> mFailureCallback;
 };
 
 PairingCommand gPairingCommand;
@@ -346,11 +357,45 @@ void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
     }
 }
 
+void PairingCommand::OnSuccessResponse(void * context)
+{
+    ChipLogProgress(Controller, "OnSuccessResponse");
+}
+
+void PairingCommand::OnFailureResponse(void * context, uint8_t status)
+{
+    ChipLogProgress(Controller, "OnFailureResponse");
+}
+
 void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
 {
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(AppServer, "Device commissioning completed with success");
+
+        PeerId peerId;
+        peerId.SetNodeId(nodeId);
+        peerId.SetCompressedFabricId(gCommissioner.GetCompressedFabricId());
+
+        OperationalDeviceProxy * device = gCommissioner.GetOperationalDeviceProxy(peerId);
+        if (device == nullptr)
+        {
+            ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from device commissioner");
+            return;
+        }
+
+        constexpr EndpointId kBindingClusterEndpoint = 0;
+        chip::Controller::BindingCluster cluster;
+        cluster.Associate(device, kBindingClusterEndpoint);
+
+        Callback::Cancelable * successCallback = mSuccessCallback.Cancel();
+        Callback::Cancelable * failureCallback = mFailureCallback.Cancel();
+
+        chip::GroupId groupId       = kUndefinedGroupId;
+        chip::EndpointId endpointId = 1; // TODO: populate with ContentApp endpoint id
+        chip::ClusterId clusterId   = kInvalidClusterId;
+
+        cluster.Bind(successCallback, failureCallback, gLocalId, groupId, endpointId, clusterId);
     }
     else
     {
