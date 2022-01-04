@@ -33,6 +33,7 @@
 #include <string.h>
 #include <type_traits>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 
@@ -484,6 +485,15 @@ public:
      * @return  An LwIP ip_addr_t structure corresponding to the IP address.
      */
     ip_addr_t ToLwIPAddr(void) const;
+
+    /**
+     * Extract the IP address as a LwIP ip_addr_t structure.
+     *
+     * If the IP address is Any, the result is IP6_ADDR_ANY unless the requested addressType is kIPv4.
+     * If the requested addressType is IPAddressType::kAny, extracts the IP address as an LwIP ip_addr_t structure.
+     * Otherwise, returns INET_ERROR_WRONG_ADDRESS_TYPE if the requested addressType does not match the IP address.
+     */
+    CHIP_ERROR ToLwIPAddr(IPAddressType addressType, ip_addr_t & outAddress) const;
 
     /**
      * @brief   Convert the INET layer address type to its underlying LwIP type.
