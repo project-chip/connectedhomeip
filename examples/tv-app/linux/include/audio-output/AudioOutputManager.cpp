@@ -18,54 +18,38 @@
 
 #include "AudioOutputManager.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-
-#include <map>
-#include <string>
-
 using namespace std;
+using namespace chip::app::Clusters::AudioOutput;
 
-CHIP_ERROR AudioOutputManager::Init()
+uint8_t AudioOutputManager::HandleGetCurrentOutput()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["NU"] = true;
-
-    return err;
+    return 0;
 }
 
-CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::EndpointId mEndpointId,
-                                                             chip::app::AttributeValueEncoder & aEncoder)
+std::list<Structs::OutputInfo::Type> AudioOutputManager::HandleGetOutputList()
 {
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        int maximumVectorSize = 3;
-        char name[]           = "exampleName";
+    std::list<Structs::OutputInfo::Type> list;
+    // TODO: Insert code here
+    int maximumVectorSize = 3;
 
-        for (int i = 0; i < maximumVectorSize; ++i)
-        {
-            chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
-            outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
-            outputInfo.name       = chip::CharSpan(name, sizeof(name) - 1);
-            outputInfo.index      = static_cast<uint8_t>(1 + i);
-            ReturnErrorOnFailure(encoder.Encode(outputInfo));
-        }
-        return CHIP_NO_ERROR;
-    });
+    for (int i = 0; i < maximumVectorSize; ++i)
+    {
+        chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type outputInfo;
+        outputInfo.outputType = chip::app::Clusters::AudioOutput::OutputTypeEnum::kHdmi;
+        outputInfo.name       = chip::CharSpan("exampleName", strlen("exampleName"));
+        outputInfo.index      = static_cast<uint8_t>(1 + i);
+        list.push_back(outputInfo);
+    }
+    return list;
 }
 
-bool audioOutputClusterSelectOutput(uint8_t index)
+bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
     return true;
 }
-bool audioOutputClusterRenameOutput(uint8_t index, const chip::CharSpan & name)
+
+bool AudioOutputManager::HandleSelectOutput(const uint8_t & index)
 {
     // TODO: Insert code here
     return true;

@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,25 +17,16 @@
 
 #pragma once
 
+#include "application-basic-delegate.h"
 #include <app-common/zap-generated/cluster-objects.h>
 
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
-struct Application
-{
-    using ApplicationBasicStatus   = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
-    char vendorName[32]            = "";
-    char name[32]                  = "";
-    char id[32]                    = "";
-    char version[32]               = "";
-    uint16_t vendorId              = 0;
-    uint16_t productId             = 0;
-    uint16_t catalogVendorId       = 0;
-    uint16_t allowedVendorList[32] = { 123, 456 };
-    ApplicationBasicStatus status  = ApplicationBasicStatus::kStopped;
-};
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
 } // namespace ApplicationBasic
 } // namespace Clusters
 } // namespace app

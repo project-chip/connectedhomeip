@@ -32825,7 +32825,12 @@ private:
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_1(chip::CharSpan setupPIN) { NextTest(); }
+    void OnSuccessResponse_1(chip::CharSpan setupPIN)
+    {
+        VerifyOrReturn(CheckValueAsString("setupPIN", setupPIN, chip::CharSpan("tempPin123", 10)));
+
+        NextTest();
+    }
 
     CHIP_ERROR TestLoginCommand_2()
     {
@@ -33452,7 +33457,7 @@ private:
 
     void OnSuccessResponse_2(uint64_t startTime)
     {
-        VerifyOrReturn(CheckValue("startTime", startTime, 255ULL));
+        VerifyOrReturn(CheckValue("startTime", startTime, 0ULL));
 
         NextTest();
     }

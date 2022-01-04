@@ -16,68 +16,68 @@
  */
 
 #include "ChannelManager.h"
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <map>
-#include <string>
-#include <vector>
 
 using namespace chip;
+using namespace chip::app::Clusters::Channel;
 
-CHIP_ERROR ChannelManager::Init()
+std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    // TODO: Store feature map once it is supported
-    std::map<std::string, bool> featureMap;
-    featureMap["CL"] = true;
-    featureMap["LI"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-CHIP_ERROR ChannelManager::proxyGetChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        int maximumVectorSize    = 2;
-        char affiliateCallSign[] = "exampleASign";
-        char callSign[]          = "exampleCSign";
-        char name[]              = "exampleName";
-
-        for (int i = 0; i < maximumVectorSize; ++i)
-        {
-            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
-            channelInfo.affiliateCallSign = CharSpan(affiliateCallSign, sizeof(affiliateCallSign) - 1);
-            channelInfo.callSign          = CharSpan(callSign, sizeof(callSign) - 1);
-            channelInfo.name              = CharSpan(name, sizeof(name) - 1);
-            channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
-            channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
-            ReturnErrorOnFailure(encoder.Encode(channelInfo));
-        }
-        return CHIP_NO_ERROR;
-    });
-}
-
-ChannelInfo ChannelClusterChangeChannel(std::string match)
-{
+    std::list<Structs::ChannelInfo::Type> list;
     // TODO: Insert code here
-    ChannelInfo channel = {};
-    return channel;
+    int maximumVectorSize = 2;
+
+    for (int i = 0; i < maximumVectorSize; ++i)
+    {
+        chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+        channelInfo.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
+        channelInfo.callSign          = chip::CharSpan("exampleCSign", strlen("exampleCSign"));
+        channelInfo.name              = chip::CharSpan("exampleName", strlen("exampleName"));
+        channelInfo.majorNumber       = static_cast<uint8_t>(1 + i);
+        channelInfo.minorNumber       = static_cast<uint16_t>(2 + i);
+        list.push_back(channelInfo);
+    }
+    return list;
 }
-bool ChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
+
+chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup()
+{
+    chip::app::Clusters::Channel::Structs::LineupInfo::Type lineup;
+    lineup.operatorName   = chip::CharSpan("operatorName", strlen("operatorName"));
+    lineup.lineupName     = chip::CharSpan("lineupName", strlen("lineupName"));
+    lineup.postalCode     = chip::CharSpan("postalCode", strlen("postalCode"));
+    lineup.lineupInfoType = chip::app::Clusters::Channel::LineupInfoTypeEnum::kMso;
+    return lineup;
+}
+
+chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel()
+{
+    chip::app::Clusters::Channel::Structs::ChannelInfo::Type currentChannel;
+    currentChannel.affiliateCallSign = chip::CharSpan("exampleASign", strlen("exampleASign"));
+    currentChannel.callSign          = chip::CharSpan("exampleCSign", strlen("exampleCSign"));
+    currentChannel.name              = chip::CharSpan("exampleName", strlen("exampleName"));
+    currentChannel.majorNumber       = 1;
+    currentChannel.minorNumber       = 0;
+    return currentChannel;
+}
+
+Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match)
+{
+    Commands::ChangeChannelResponse::Type response;
+    response.channelMatch.majorNumber       = 1;
+    response.channelMatch.minorNumber       = 0;
+    response.channelMatch.name              = chip::CharSpan("name", strlen("name"));
+    response.channelMatch.callSign          = chip::CharSpan("callSign", strlen("callSign"));
+    response.channelMatch.affiliateCallSign = chip::CharSpan("affiliateCallSign", strlen("affiliateCallSign"));
+    response.errorType                      = chip::app::Clusters::Channel::ErrorTypeEnum::kMultipleMatches;
+    return response;
+}
+
+bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
 {
     // TODO: Insert code here
     return true;
 }
-bool ChannelClusterSkipChannel(uint16_t count)
+bool ChannelManager::HandleSkipChannel(const uint16_t & count)
 {
     // TODO: Insert code here
     return true;

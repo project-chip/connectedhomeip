@@ -27,7 +27,7 @@ limitations under the License.
     <description>This cluster provides an interface for controlling Media Playback (PLAY, PAUSE, etc) on a media device such as a TV or Speaker.</description>
 
     <attribute side="server" code="0x0000" define="MEDIA_PLAYBACK_STATE" type="PlaybackStateEnum" min="0x00" max="0x02" writable="false" default="0x00" optional="true">playback state</attribute>
-    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="INT64U" min="0x00"  writable="false" default="0xFF" optional="true">start time</attribute>
+    <attribute side="server" code="0x0001" define="MEDIA_PLAYBACK_START_TIME" type="EPOCH_US" min="0x00"  writable="false" default="0xFF" optional="true">start time</attribute>
     <attribute side="server" code="0x0002" define="MEDIA_PLAYBACK_DURATION" type="INT64U" min="0x00"  writable="false" optional="true">duration</attribute>
     <attribute side="server" code="0x0003" define="MEDIA_PLAYBACK_PLAYBACK_POSITION" type="PlaybackPosition" writable="true" optional="false">position</attribute>
     <attribute side="server" code="0x0004" define="MEDIA_PLAYBACK_PLAYBACK_SPEED" type="single" min="0x00"  writable="false" optional="true">playback speed</attribute>

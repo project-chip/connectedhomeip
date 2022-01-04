@@ -38,22 +38,19 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "content-launch-server.h"
-
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
+#include <app/clusters/content-launch-server/content-launch-delegate.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <list>
 
 using namespace chip;
 using namespace chip::app;
+using namespace chip::app::Clusters::ContentLauncher;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -119,7 +116,7 @@ public:
 
 private:
     CHIP_ERROR ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
-    CHIP_ERROR ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
 };
 
 ContentLauncherAttrAccess gContentLauncherAttrAccess;
@@ -140,7 +137,7 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadAcceptHeaderAttribute(aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::Id: {
-        return ReadSupportedStreamingProtocols(aEncoder, delegate);
+        return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
     default: {
         break;
@@ -163,7 +160,8 @@ CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptHeaderAttribute(app::AttributeVa
     });
 }
 
-CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocols(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder,
+                                                                               Delegate * delegate)
 {
     uint32_t streamingProtocols = delegate->HandleGetSupportedStreamingProtocols();
     return aEncoder.Encode(streamingProtocols);
@@ -178,8 +176,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & autoplay = commandData.autoPlay;
@@ -192,20 +189,15 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        LaunchResponse resp = delegate->HandleLaunchContent(emberAfCurrentEndpoint(), parameterList, autoplay, data);
-        VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
-
-        response.status = resp.status;
-        response.data   = resp.data;
-
-        err = commandObj->AddResponseData(commandPath, response);
+        Commands::LaunchResponse::Type response = delegate->HandleLaunchContent(endpoint, parameterList, autoplay, data);
+        err                                     = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentCallback error: %s", err.AsString());
+        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentRequestCallback error: %s", err.AsString());
 
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
@@ -217,8 +209,7 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type response;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
     auto & contentUrl    = commandData.contentURL;
@@ -231,13 +222,8 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        LaunchResponse resp = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
-        VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
-
-        response.status = resp.status;
-        response.data   = resp.data;
-
-        err = commandObj->AddResponseData(commandPath, response);
+        Commands::LaunchResponse::Type response = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
+        err                                     = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }
 
