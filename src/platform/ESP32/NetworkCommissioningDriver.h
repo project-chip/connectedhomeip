@@ -17,47 +17,42 @@
 
 #pragma once
 #include <platform/NetworkCommissioning.h>
+#include <esp_wifi.h>
 
 namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
-namespace {
-constexpr uint16_t kMaxScanResultsNum = 15;
-}
-template <typename T>
-class ESPScanResponseIterator : public Iterator<T>
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    ESPScanResponseIterator() {}
-    size_t Count() override { return size; }
-    bool Next(T & item) override
+    ESPScanResponseIterator(size_t size, wifi_ap_record_t * scanResults) : mSize(size), mpscanResults(scanResults) {}
+    size_t Count() override { return mSize; }
+    bool Next(WiFiScanResponse & item) override
     {
-        if (size == 0 || iternum >= size)
+        if (mSize == 0 || iternum >= mSize)
         {
             return false;
         }
-        item = scanResponse[iternum];
+
+        item.security = mpscanResults[iternum].authmode;
+        item.ssidLen  = strnlen((const char *)mpscanResults[iternum].ssid, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        item.channel  = mpscanResults[iternum].primary;
+        item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
+        item.rssi     = mpscanResults[iternum].rssi;
+        memcpy(item.ssid, mpscanResults[iternum].ssid, item.ssidLen);
+        memcpy(item.bssid, mpscanResults[iternum].bssid, 6);
+
         iternum++;
         return true;
     }
     void Release() override {}
-    bool Add(T scanResult)
-    {
-        if (size >= kMaxScanResultsNum)
-        {
-            return false;
-        }
-        scanResponse[size++] = scanResult;
-        return true;
-    }
-
 private:
-    size_t size = 0;
-    T scanResponse[kMaxScanResultsNum];
+    size_t mSize;
+    wifi_ap_record_t * mpscanResults;
     uint8_t iternum = 0;
 };
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 class ESPWiFiDriver final : public WiFiDriver
 {
 public:
