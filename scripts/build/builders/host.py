@@ -27,6 +27,7 @@ class HostApp(Enum):
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     TV_APP = auto()
+    LOCK = auto()
     TESTS = auto()
 
     def ExamplePath(self):
@@ -42,6 +43,8 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.LOCK:
+            return 'door-lock-app/linux'
         elif self == HostApp.TESTS:
             return '../'
         else:
@@ -69,6 +72,9 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.LOCK:
+            yield 'chip-lock-app'
+            yield 'chip-lock-app.map'
         elif self == HostApp.TESTS:
             pass
         else:
