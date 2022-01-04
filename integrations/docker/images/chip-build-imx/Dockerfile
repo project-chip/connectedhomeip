@@ -7,13 +7,6 @@ RUN set -x \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
-RUN set -x \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget=1.20.3-1ubuntu2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/ \
-    && : # last line
 WORKDIR /opt
 RUN set -x \
     && wget --quiet -O fsl-l5.10.52-2.1.0-sdk.tar.gz https://www.nxp.com/lgfiles/IMM/fsl-l5.10.52-2.1.0-sdk.tar.gz \
