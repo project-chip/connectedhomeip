@@ -53,6 +53,7 @@
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+#define PW_TRACE_BUFFER_SIZE_BYTES 1024
 #include "pw_trace/trace.h"
 #include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
 
