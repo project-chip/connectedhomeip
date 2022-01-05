@@ -1201,6 +1201,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LocalizationUnit {
 namespace Attributes {
 
+namespace TemperatureUnit {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace TemperatureUnit
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
