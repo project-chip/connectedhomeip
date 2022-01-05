@@ -379,10 +379,10 @@ public:
     {
         std::string resetWiFi                   = "Reset WiFi";
         std::string resetToFactory              = "Reset to factory";
-        std::string forceWifiCommissioningBasic = "Force WiFi commissioning (basic)";
+        std::string forceWiFiCommissioningBasic = "Force WiFi commissioning (basic)";
         options.emplace_back(resetWiFi);
         options.emplace_back(resetToFactory);
-        options.emplace_back(forceWifiCommissioningBasic);
+        options.emplace_back(forceWiFiCommissioningBasic);
     }
     virtual std::string GetTitle() { return "Setup"; }
     virtual int GetItemCount() { return options.size(); }

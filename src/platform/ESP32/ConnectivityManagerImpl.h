@@ -108,7 +108,7 @@ private:
     void _MaintainOnDemandWiFiAP(void);
     System::Clock::Timeout _GetWiFiAPIdleTimeout(void);
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-    CHIP_ERROR _GetAndLogWifiStatsCounters(void);
+    CHIP_ERROR _GetAndLogWiFiStatsCounters(void);
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();

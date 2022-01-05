@@ -35,21 +35,21 @@ enum CommissioningStage : uint8_t
     kDeviceAttestation,
     kCheckCertificates,
     kConfigACL,
-    kWifiNetworkSetup,
+    kWiFiNetworkSetup,
     kThreadNetworkSetup,
-    kWifiNetworkEnable,
+    kWiFiNetworkEnable,
     kThreadNetworkEnable,
     kFindOperational,
     kSendComplete,
     kCleanup,
 };
 
-struct WifiCredentials
+struct WiFiCredentials
 {
     ByteSpan ssid;
     // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
-    WifiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+    WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
 class CommissioningParameters
 {
@@ -59,11 +59,11 @@ public:
     static constexpr size_t kMaxCredentialsLen   = 64;
     bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
+    bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
-    const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
+    const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
@@ -79,9 +79,9 @@ public:
         mAttestationNonce.SetValue(attestationNonce);
         return *this;
     }
-    CommissioningParameters & SetWifiCredentials(WifiCredentials wifiCreds)
+    CommissioningParameters & SetWiFiCredentials(WiFiCredentials wifiCreds)
     {
-        mWifiCreds.SetValue(wifiCreds);
+        mWiFiCreds.SetValue(wifiCreds);
         return *this;
     }
 
@@ -95,7 +95,7 @@ public:
 private:
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
-    Optional<WifiCredentials> mWifiCreds;
+    Optional<WiFiCredentials> mWiFiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
 };
 
