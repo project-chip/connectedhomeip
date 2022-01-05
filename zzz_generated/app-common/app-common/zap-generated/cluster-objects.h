@@ -8837,6 +8837,30 @@ namespace LocalizationConfiguration {
 
 namespace Attributes {
 
+namespace ActiveLocale {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveLocale::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveLocale
+namespace SupportedLocales {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocales::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedLocales
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8882,6 +8906,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ActiveLocale::TypeInfo::DecodableType activeLocale;
+        Attributes::SupportedLocales::TypeInfo::DecodableType supportedLocales;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;

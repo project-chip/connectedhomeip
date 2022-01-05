@@ -1169,6 +1169,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocale {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace ActiveLocale
+
 namespace FeatureMap {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
