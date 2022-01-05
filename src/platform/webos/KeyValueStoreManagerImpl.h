@@ -34,7 +34,7 @@ class KeyValueStoreManagerImpl : public KeyValueStoreManager
 public:
     /**
      * @brief
-     * Initalize the KVS, must be called before using.
+     * Initialize the KVS, must be called before using.
      */
     void Init(const char * file) { mStorage.Init(file); }
 
