@@ -105,7 +105,6 @@ CHIP_ERROR MakeU8FromAsciiHex(const char * src, uint8_t * val)
         {
             ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('0'));
         }
-        // Only uppercase is supported according to spec.
         else if (c >= 'A' && c <= 'F')
         {
             ret = static_cast<uint8_t>(ret + cval - static_cast<uint8_t>('A') + 0xA);

@@ -44,6 +44,8 @@ static_library("chip-tool-utils") {
     "commands/common/CommandInvoker.h",
     "commands/common/Commands.cpp",
     "commands/common/CredentialIssuerCommands.h",
+    "commands/common/ValueParser.cpp",
+    "commands/common/ValueParser.h",
     "commands/discover/DiscoverCommand.cpp",
     "commands/discover/DiscoverCommissionablesCommand.cpp",
     "commands/discover/DiscoverCommissionersCommand.cpp",
