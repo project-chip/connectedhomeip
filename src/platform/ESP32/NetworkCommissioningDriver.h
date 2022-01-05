@@ -27,7 +27,7 @@ namespace {
 constexpr uint8_t kMaxWiFiNetworks                  = 1;
 constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
 constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
-}
+} // namespace
 
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
@@ -42,8 +42,8 @@ public:
         }
 
         item.security = mpScanResults[mIternum].authmode;
-        item.ssidLen  = strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
-                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        item.ssidLen =
+            strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid), chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
         item.channel  = mpScanResults[mIternum].primary;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
         item.rssi     = mpScanResults[mIternum].rssi;

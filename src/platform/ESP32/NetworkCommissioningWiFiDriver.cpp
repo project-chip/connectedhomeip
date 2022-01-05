@@ -298,7 +298,7 @@ bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     memcpy(item.networkID, mDriver->mStagingNetwork.ssid, mDriver->mStagingNetwork.ssidLen);
     item.networkIDLen = mDriver->mStagingNetwork.ssidLen;
     item.connected    = false;
-    mExhausted         = true;
+    mExhausted        = true;
 
     Network connectedNetwork;
     CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
