@@ -131,14 +131,14 @@ public:
 protected:
     // The list is formed as a ring with mNode being the end.
     //
-    // begin                   end
-    //   v                      v
-    // item -> item -> ... -> mNode
-    //   ^                      |
-    //    \--------------------/
+    // begin                                        end
+    //   v                                           v
+    // item(first) -> item -> ... -> item(last) -> mNode
+    //   ^                                           |
+    //    \------------------------------------------/
     //
     IntrusiveListBase() : mNode(&mNode, &mNode) {}
-    ~IntrusiveListBase() { mNode.Remove(); }
+    ~IntrusiveListBase() { mNode.Remove(); /* clear mNode such that the destructor checking mNode.IsInList doesn't fail */ }
 
     IteratorBase begin() { return IteratorBase(mNode.mNext); }
     IteratorBase end() { return IteratorBase(&mNode); }
@@ -146,23 +146,9 @@ protected:
     void PushFront(IntrusiveListNodeBase * node) { mNode.Append(node); }
     void PushBack(IntrusiveListNodeBase * node) { mNode.Prepend(node); }
 
-    void InsertBefore(IteratorBase pos, IntrusiveListNodeBase * node)
-    {
-        VerifyOrDie(pos.mCurrent->IsInList());
-        pos.mCurrent->Prepend(node);
-    }
-
-    void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node)
-    {
-        VerifyOrDie(pos.mCurrent->IsInList());
-        pos.mCurrent->Append(node);
-    }
-
-    void Remove(IntrusiveListNodeBase * node)
-    {
-        VerifyOrDie(Contains(node));
-        node->Remove();
-    }
+    void InsertBefore(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Prepend(node); }
+    void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Append(node); }
+    void Remove(IntrusiveListNodeBase * node) { node->Remove(); }
 
     bool Contains(IntrusiveListNodeBase * node)
     {
@@ -187,6 +173,12 @@ public:
     static IntrusiveListNodeBase * ToNode(T * object) { return static_cast<IntrusiveListNodeBase *>(object); }
 };
 
+/**
+ * @brief An intrusive double linked list.
+ *
+ * @tparam T    Type of element in the list.
+ * @tparam Hook A hook to convert between object T and the IntrusiveListNodeBase
+ */
 template <typename T, typename Hook = IntrusiveListBaseHook<T>>
 class IntrusiveList : public IntrusiveListBase
 {
@@ -215,8 +207,6 @@ public:
     void InsertAfter(Iterator pos, T * value) { IntrusiveListBase::InsertAfter(pos, Hook::ToNode(value)); }
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
     bool Contains(T * value) { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
-
-private:
 };
 
 } // namespace chip
