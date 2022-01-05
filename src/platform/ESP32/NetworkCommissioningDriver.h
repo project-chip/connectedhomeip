@@ -23,35 +23,42 @@ namespace chip {
 namespace DeviceLayer {
 namespace NetworkCommissioning {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+namespace {
+constexpr uint8_t kMaxWiFiNetworks                  = 1;
+constexpr uint8_t kWiFiScanNetworksTimeOutSeconds   = 10;
+constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 20;
+}
+
 class ESPScanResponseIterator : public Iterator<WiFiScanResponse>
 {
 public:
-    ESPScanResponseIterator(size_t size, wifi_ap_record_t * scanResults) : mSize(size), mpscanResults(scanResults) {}
+    ESPScanResponseIterator(const size_t size, const wifi_ap_record_t * scanResults) : mSize(size), mpScanResults(scanResults) {}
     size_t Count() override { return mSize; }
     bool Next(WiFiScanResponse & item) override
     {
-        if (mSize == 0 || iternum >= mSize)
+        if (mIternum >= mSize)
         {
             return false;
         }
 
-        item.security = mpscanResults[iternum].authmode;
-        item.ssidLen  = strnlen((const char *) mpscanResults[iternum].ssid, chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
-        item.channel  = mpscanResults[iternum].primary;
+        item.security = mpScanResults[mIternum].authmode;
+        item.ssidLen  = strnlen(reinterpret_cast<const char *>(mpScanResults[mIternum].ssid),
+                                chip::DeviceLayer::Internal::kMaxWiFiSSIDLength);
+        item.channel  = mpScanResults[mIternum].primary;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        item.rssi     = mpscanResults[iternum].rssi;
-        memcpy(item.ssid, mpscanResults[iternum].ssid, item.ssidLen);
-        memcpy(item.bssid, mpscanResults[iternum].bssid, 6);
+        item.rssi     = mpScanResults[mIternum].rssi;
+        memcpy(item.ssid, mpScanResults[mIternum].ssid, item.ssidLen);
+        memcpy(item.bssid, mpScanResults[mIternum].bssid, 6);
 
-        iternum++;
+        mIternum++;
         return true;
     }
     void Release() override {}
 
 private:
-    size_t mSize;
-    wifi_ap_record_t * mpscanResults;
-    uint8_t iternum = 0;
+    const size_t mSize;
+    const wifi_ap_record_t * mpScanResults;
+    size_t mIternum = 0;
 };
 
 class ESPWiFiDriver final : public WiFiDriver
@@ -60,15 +67,15 @@ public:
     class WiFiNetworkIterator final : public NetworkIterator
     {
     public:
-        WiFiNetworkIterator(ESPWiFiDriver * aDriver) : driver(aDriver) {}
+        WiFiNetworkIterator(ESPWiFiDriver * aDriver) : mDriver(aDriver) {}
         size_t Count() override;
         bool Next(Network & item) override;
         void Release() override { delete this; }
         ~WiFiNetworkIterator() = default;
 
     private:
-        ESPWiFiDriver * driver;
-        bool exhausted = false;
+        ESPWiFiDriver * mDriver;
+        bool mExhausted = false;
     };
 
     struct WiFiNetwork
@@ -85,9 +92,9 @@ public:
     CHIP_ERROR Shutdown() override;
 
     // WirelessDriver
-    uint8_t GetMaxNetworks() override { return 1; }
-    uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetMaxNetworks() override { return kMaxWiFiNetworks; }
+    uint8_t GetScanNetworkTimeoutSeconds() override { return kWiFiScanNetworksTimeOutSeconds; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return kWiFiConnectNetworkTimeoutSeconds; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -122,7 +129,7 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-// TODO: Add Thread Driver for ESP32 platform
+// TODO: Add Thread Driver for ESP32H2 platform
 #endif
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer

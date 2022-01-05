@@ -201,18 +201,6 @@ CHIP_ERROR ESPWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
     return CHIP_NO_ERROR;
 }
 
-bool GetWiFiScanRespFromAPRecord(wifi_ap_record_t * ap_record, WiFiScanResponse & scanResponse)
-{
-    scanResponse.security = ap_record->authmode;
-    scanResponse.ssidLen  = strnlen((const char *) ap_record->ssid, DeviceLayer::Internal::kMaxWiFiSSIDLength);
-    memcpy((char *) scanResponse.ssid, ap_record->ssid, scanResponse.ssidLen);
-    memcpy(scanResponse.bssid, ap_record->bssid, 6);
-    scanResponse.channel  = ap_record->primary;
-    scanResponse.wiFiBand = DeviceLayer::NetworkCommissioning::WiFiBand::k2g4; // ESP32 platform only support 2.4G Hz WiFi Band
-    scanResponse.rssi     = ap_record->rssi;
-    return true;
-}
-
 void ESPWiFiDriver::OnScanWiFiNetworkDone()
 {
     uint16_t ap_number;
@@ -247,8 +235,9 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
             {
                 GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
                 GetInstance().mpScanCallback = nullptr;
-                free(ap_list_buffer);
             }
+            free(ap_list_buffer);
+            return CHIP_NO_ERROR;
         });
     }
     else
@@ -259,17 +248,20 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
             mpScanCallback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
             mpScanCallback = nullptr;
         }
+        free(ap_list_buffer);
     }
 }
 
 void ESPWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
 {
-    CHIP_ERROR err = StartScanWiFiNetworks(ssid);
-    mpScanCallback = callback;
-    if (err != CHIP_NO_ERROR)
+    if (callback != nullptr)
     {
-        mpScanCallback = nullptr;
-        callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        mpScanCallback = callback;
+        if (StartScanWiFiNetworks(ssid) != CHIP_NO_ERROR)
+        {
+            mpScanCallback = nullptr;
+            callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
+        }
     }
 }
 
@@ -282,7 +274,7 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
     {
         return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
     }
-    uint8_t length = strlen((const char *) (ap_info.ssid));
+    uint8_t length = strnlen(reinterpret_cast<const char *>(ap_info.ssid), DeviceLayer::Internal::kMaxWiFiSSIDLength);
     if (length > sizeof(network.networkID))
     {
         return CHIP_ERROR_INTERNAL;
@@ -294,19 +286,19 @@ CHIP_ERROR GetConnectedNetwork(Network & network)
 
 size_t ESPWiFiDriver::WiFiNetworkIterator::Count()
 {
-    return driver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
+    return mDriver->mStagingNetwork.ssidLen == 0 ? 0 : 1;
 }
 
 bool ESPWiFiDriver::WiFiNetworkIterator::Next(Network & item)
 {
-    if (exhausted || driver->mStagingNetwork.ssidLen == 0)
+    if (mExhausted || mDriver->mStagingNetwork.ssidLen == 0)
     {
         return false;
     }
-    memcpy(item.networkID, driver->mStagingNetwork.ssid, driver->mStagingNetwork.ssidLen);
-    item.networkIDLen = driver->mStagingNetwork.ssidLen;
+    memcpy(item.networkID, mDriver->mStagingNetwork.ssid, mDriver->mStagingNetwork.ssidLen);
+    item.networkIDLen = mDriver->mStagingNetwork.ssidLen;
     item.connected    = false;
-    exhausted         = true;
+    mExhausted         = true;
 
     Network connectedNetwork;
     CHIP_ERROR err = GetConnectedNetwork(connectedNetwork);
