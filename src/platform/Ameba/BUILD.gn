@@ -54,4 +54,11 @@ static_library("Ameba") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "AmebaOTAImageProcessor.cpp",
+      "AmebaOTAImageProcessor.h",
+    ]
+  } 
 }
