@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
 #include <list>
 
 class ApplicationLauncherManager : public chip::app::Clusters::ApplicationLauncher::Delegate

@@ -27,12 +27,14 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <app/data-model/Encode.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <list>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationBasic;
+using namespace chip::AppPlatform;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -41,12 +43,21 @@ using chip::app::Clusters::ApplicationBasic::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegate = NULL;
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
+    if (app != NULL && app->GetApplicationBasicDelegate() != NULL)
+    {
+        ChipLogError(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetApplicationBasicDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    return gDelegate;
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -65,16 +76,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationBasic {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    if (ep != 0xFFFF)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-    else
-    {
-    }
+    gDelegate = delegate;
 }
 
 } // namespace ApplicationBasic

@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+void SetDefaultDelegate(Delegate * delegate);
 
 } // namespace ApplicationLauncher
 } // namespace Clusters

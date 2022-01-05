@@ -29,11 +29,13 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
+using namespace chip::AppPlatform;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -42,12 +44,21 @@ using chip::app::Clusters::ApplicationLauncher::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegate = NULL;
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationLauncher::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
+    if (app != NULL && app->GetApplicationLauncherDelegate() != NULL)
+    {
+        ChipLogError(Zcl, "ApplicationLauncher returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetApplicationLauncherDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "ApplicationLauncher NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    return gDelegate;
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -66,16 +77,9 @@ namespace app {
 namespace Clusters {
 namespace ApplicationLauncher {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationLauncher::Id);
-    if (ep != 0xFFFF)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-    else
-    {
-    }
+    gDelegate = delegate;
 }
 
 } // namespace ApplicationLauncher

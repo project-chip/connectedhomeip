@@ -23,6 +23,11 @@
 class ApplicationBasicManager : public chip::app::Clusters::ApplicationBasic::Delegate
 {
 public:
+    ApplicationBasicManager() : ApplicationBasicManager("exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
+    ApplicationBasicManager(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
+                            const char * szApplicationVersion);
+    virtual ~ApplicationBasicManager(){};
+
     chip::CharSpan HandleGetVendorName() override;
     uint16_t HandleGetVendorId() override;
     chip::CharSpan HandleGetApplicationName() override;
@@ -31,4 +36,24 @@ public:
     chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
     chip::CharSpan HandleGetApplicationVersion() override;
     std::list<uint16_t> HandleGetAllowedVendorList() override;
+
+    inline void SetApplicationStatus(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    {
+        mApplicationStatus = applicationStatus;
+    };
+
+    inline const char * GetApplicationName() override { return mApplicationName; }
+
+protected:
+    static const int kVendorNameSize         = 32;
+    static const int kApplicationNameSize    = 32;
+    static const int kApplicationVersionSize = 32;
+
+    char mVendorName[kVendorNameSize];
+    uint16_t mVendorId;
+    char mApplicationName[kApplicationNameSize];
+    uint16_t mProductId;
+    chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum mApplicationStatus =
+        chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped;
+    char mApplicationVersion[kApplicationVersionSize];
 };

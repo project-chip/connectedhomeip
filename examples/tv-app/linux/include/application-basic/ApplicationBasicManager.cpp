@@ -21,24 +21,36 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationBasic;
 
+ApplicationBasicManager::ApplicationBasicManager(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
+                                                 uint16_t productId, const char * szApplicationVersion)
+{
+    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationName, szApplicationName);
+
+    strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
+    strncpy(mVendorName, szVendorName, sizeof(mVendorName));
+    mVendorId = vendorId;
+    strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
+    mProductId = productId;
+}
+
 chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
 {
-    return chip::CharSpan("exampleVendorName1", strlen("exampleVendorName1"));
+    return chip::CharSpan(mVendorName, strlen(mVendorName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetVendorId()
 {
-    return 1;
+    return mVendorId;
 }
 
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
 {
-    return chip::CharSpan("exampleName1", strlen("exampleName1"));
+    return chip::CharSpan(mApplicationName, strlen(mApplicationName));
 }
 
 uint16_t ApplicationBasicManager::HandleGetProductId()
 {
-    return 1;
+    return mProductId;
 }
 
 chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication()
@@ -51,15 +63,15 @@ chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBas
 
 ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
 {
-    return ApplicationStatusEnum::kStopped;
+    return mApplicationStatus;
 }
 
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
 {
-    return chip::CharSpan("exampleVersion", strlen("exampleVersion"));
+    return chip::CharSpan(mApplicationVersion, strlen(mApplicationVersion));
 }
 
 std::list<uint16_t> ApplicationBasicManager::HandleGetAllowedVendorList()
 {
-    return { 123, 456 };
+    return { mVendorId, 456 };
 }

@@ -26,10 +26,13 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/clusters/account-login-server/account-login-delegate.h>
-#include <app/clusters/application-launcher-server/application-launcher-server.h>
+#include <app/clusters/application-basic-server/application-basic-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/channel-server/channel-delegate.h>
 #include <app/clusters/content-launch-server/content-launch-delegate.h>
-#include <app/clusters/content-launch-server/content-launch-server.h>
-#include <app/clusters/target-navigator-server/target-navigator-server.h>
+#include <app/clusters/keypad-input-server/keypad-input-delegate.h>
+#include <app/clusters/media-playback-server/media-playback-delegate.h>
+#include <app/clusters/target-navigator-server/target-navigator-delegate.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
 #include <list>
@@ -40,88 +43,6 @@
 namespace chip {
 namespace AppPlatform {
 
-class DLL_EXPORT ContentAppCluster
-{
-public:
-    virtual ~ContentAppCluster() = default;
-
-    virtual EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) = 0;
-    virtual EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)                        = 0;
-};
-
-class DLL_EXPORT ApplicationBasic : public ContentAppCluster
-{
-public:
-    virtual ~ApplicationBasic() = default;
-
-    virtual const char * GetVendorName()                                                                        = 0;
-    virtual uint16_t GetVendorId()                                                                              = 0;
-    virtual const char * GetApplicationName()                                                                   = 0;
-    virtual uint16_t GetProductId()                                                                             = 0;
-    virtual app::Clusters::ApplicationBasic::ApplicationStatusEnum GetApplicationStatus()                       = 0;
-    virtual const char * GetApplicationVersion()                                                                = 0;
-    virtual void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus) = 0;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
-class DLL_EXPORT KeypadInput : public ContentAppCluster
-{
-public:
-    virtual ~KeypadInput() = default;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
-class DLL_EXPORT ApplicationLauncher : public ContentAppCluster
-{
-public:
-    virtual ~ApplicationLauncher() = default;
-
-    virtual app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(Application application,
-                                                                                           std::string data) = 0;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
-class DLL_EXPORT MediaPlayback : public ContentAppCluster
-{
-public:
-    virtual ~MediaPlayback() = default;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
-class DLL_EXPORT TargetNavigator : public ContentAppCluster
-{
-public:
-    TargetNavigator(std::list<std::string> targets, uint8_t currentTarget);
-    virtual ~TargetNavigator() = default;
-
-    app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type NavigateTarget(uint8_t target, std::string data);
-    CHIP_ERROR GetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-
-protected:
-    std::list<std::string> mTargets;
-    uint8_t mCurrentTarget;
-};
-
-class DLL_EXPORT Channel : public ContentAppCluster
-{
-public:
-    virtual ~Channel() = default;
-
-    EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;
-    EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer) override;
-};
-
 class DLL_EXPORT ContentApp
 {
 public:
@@ -130,15 +51,14 @@ public:
     inline void SetEndpointId(chip::EndpointId id) { mEndpointId = id; };
     inline chip::EndpointId GetEndpointId() { return mEndpointId; };
 
-    virtual ApplicationBasic * GetApplicationBasic()       = 0;
-    virtual KeypadInput * GetKeypadInput()                 = 0;
-    virtual ApplicationLauncher * GetApplicationLauncher() = 0;
-    virtual MediaPlayback * GetMediaPlayback()             = 0;
-    virtual TargetNavigator * GetTargetNavigator()         = 0;
-    virtual Channel * GetChannel()                         = 0;
-
-    virtual chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate()       = 0;
-    virtual chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate() = 0;
+    virtual chip::app::Clusters::AccountLogin::Delegate * GetAccountLoginDelegate()               = 0;
+    virtual chip::app::Clusters::ApplicationBasic::Delegate * GetApplicationBasicDelegate()       = 0;
+    virtual chip::app::Clusters::ApplicationLauncher::Delegate * GetApplicationLauncherDelegate() = 0;
+    virtual chip::app::Clusters::Channel::Delegate * GetChannelDelegate()                         = 0;
+    virtual chip::app::Clusters::ContentLauncher::Delegate * GetContentLauncherDelegate()         = 0;
+    virtual chip::app::Clusters::KeypadInput::Delegate * GetKeypadInputDelegate()                 = 0;
+    virtual chip::app::Clusters::MediaPlayback::Delegate * GetMediaPlaybackDelegate()             = 0;
+    virtual chip::app::Clusters::TargetNavigator::Delegate * GetTargetNavigatorDelegate()         = 0;
 
     EmberAfStatus HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
     EmberAfStatus HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer);

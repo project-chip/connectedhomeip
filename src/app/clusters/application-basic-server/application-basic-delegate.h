@@ -42,6 +42,7 @@ public:
     virtual ApplicationStatusEnum HandleGetStatus()                                                  = 0;
     virtual chip::CharSpan HandleGetApplicationVersion()                                             = 0;
     virtual std::list<uint16_t> HandleGetAllowedVendorList()                                         = 0;
+    virtual const char * GetApplicationName()                                                        = 0;
 
     virtual ~Delegate() = default;
 };

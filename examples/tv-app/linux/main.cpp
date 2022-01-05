@@ -113,13 +113,13 @@ void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)
 void emberAfApplicationBasicClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
+    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(&applicationBasicManager);
 }
 
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
+    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(&applicationLauncherManager);
 }
 
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
@@ -131,13 +131,13 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: Channel::SetDefaultDelegate");
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
+    chip::app::Clusters::Channel::SetDefaultDelegate(&channelManager);
 }
 
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: KeypadInput::SetDefaultDelegate");
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    chip::app::Clusters::KeypadInput::SetDefaultDelegate(&keypadInputManager);
 }
 
 void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
@@ -155,13 +155,13 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: MediaPlayback::SetDefaultDelegate");
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(&mediaPlaybackManager);
 }
 
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
+    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(&targetNavigatorManager);
 }
 
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)

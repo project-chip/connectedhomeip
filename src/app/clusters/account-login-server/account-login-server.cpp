@@ -50,11 +50,11 @@ Delegate * GetDelegate(EndpointId endpoint)
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
     if (app != NULL && app->GetAccountLoginDelegate() != NULL)
     {
-        ChipLogError(Zcl, "Account Login returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        ChipLogError(Zcl, "AccountLogin returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetAccountLoginDelegate();
     }
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-    ChipLogError(Zcl, "Account Login NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+    ChipLogError(Zcl, "AccountLogin NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     return gDelegate;
 }

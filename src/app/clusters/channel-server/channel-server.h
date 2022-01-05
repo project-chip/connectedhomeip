@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace Channel {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+void SetDefaultDelegate(Delegate * delegate);
 
 } // namespace Channel
 } // namespace Clusters

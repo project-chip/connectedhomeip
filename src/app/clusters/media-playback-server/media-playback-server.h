@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace MediaPlayback {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+void SetDefaultDelegate(Delegate * delegate);
 
 } // namespace MediaPlayback
 } // namespace Clusters

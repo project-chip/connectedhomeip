@@ -147,43 +147,6 @@ DECLARE_DYNAMIC_CLUSTER(ZCL_DESCRIPTOR_CLUSTER_ID, descriptorAttrs),
 // Declare Content App endpoint
 DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
-void ApplicationBasicImpl::SetApplicationName(const char * szApplicationName)
-{
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationName, szApplicationName);
-
-    strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
-}
-
-void ApplicationBasicImpl::SetVendorName(const char * szVendorName)
-{
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Vendor Name=\"%s\"", mApplicationName, szVendorName);
-
-    strncpy(mVendorName, szVendorName, sizeof(mVendorName));
-}
-
-void ApplicationBasicImpl::SetApplicationVersion(const char * szApplicationVersion)
-{
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Version=\"%s\"", mApplicationName, szApplicationVersion);
-
-    strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
-}
-
-chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
-{
-    std::string appId(application.applicationId.data(), application.applicationId.size());
-    ChipLogProgress(DeviceLayer,
-                    "ApplicationLauncherResponse: LaunchApp application.catalogVendorId=%d "
-                    "application.applicationId=%s data=%s",
-                    application.catalogVendorId, appId.c_str(), data.c_str());
-
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
-    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
-
-    return response;
-}
-
 ContentAppFactoryImpl::ContentAppFactoryImpl() {}
 
 ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
@@ -191,7 +154,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
     for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
     {
         ContentAppImpl app = mContentApps[i];
-        if (app.GetApplicationBasic()->GetVendorId() == vendorId)
+        if (app.GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
         {
             AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
             return &mContentApps[i];
@@ -213,8 +176,8 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application applicatio
     for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
     {
         ContentAppImpl app = mContentApps[i];
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasic()->GetApplicationName());
-        if (strcmp(app.GetApplicationBasic()->GetApplicationName(), appId.c_str()) == 0)
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetApplicationName());
+        if (strcmp(app.GetApplicationBasicDelegate()->GetApplicationName(), appId.c_str()) == 0)
         {
             AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
             return &mContentApps[i];

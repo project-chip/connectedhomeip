@@ -31,7 +31,7 @@ namespace app {
 namespace Clusters {
 namespace TargetNavigator {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+void SetDefaultDelegate(Delegate * delegate);
 
 } // namespace TargetNavigator
 } // namespace Clusters

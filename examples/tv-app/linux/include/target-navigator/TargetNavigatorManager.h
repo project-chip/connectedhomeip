@@ -22,8 +22,15 @@
 class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Delegate
 {
 public:
+    TargetNavigatorManager() : TargetNavigatorManager({ "exampleName", "exampleName" }, 0){};
+    TargetNavigatorManager(std::list<std::string> targets, uint8_t currentTarget);
+
     std::list<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type> HandleGetTargetList() override;
     uint8_t HandleGetCurrentTarget() override;
     chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type
     HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) override;
+
+protected:
+    std::list<std::string> mTargets;
+    uint8_t mCurrentTarget;
 };

@@ -29,11 +29,13 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/data-model/Encode.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::TargetNavigator;
+using namespace chip::AppPlatform;
 
 // -----------------------------------------------------------------------------
 // Delegate Implementation
@@ -42,12 +44,21 @@ using chip::app::Clusters::TargetNavigator::Delegate;
 
 namespace {
 
-Delegate * gDelegateTable[EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+Delegate * gDelegate = NULL;
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::TargetNavigator::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
+    if (app != NULL && app->GetTargetNavigatorDelegate() != NULL)
+    {
+        ChipLogError(Zcl, "TargetNavigator returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+        return app->GetTargetNavigatorDelegate();
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ChipLogError(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
+
+    return gDelegate;
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -66,16 +77,9 @@ namespace app {
 namespace Clusters {
 namespace TargetNavigator {
 
-void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+void SetDefaultDelegate(Delegate * delegate)
 {
-    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::TargetNavigator::Id);
-    if (ep != 0xFFFF)
-    {
-        gDelegateTable[ep] = delegate;
-    }
-    else
-    {
-    }
+    gDelegate = delegate;
 }
 
 } // namespace TargetNavigator

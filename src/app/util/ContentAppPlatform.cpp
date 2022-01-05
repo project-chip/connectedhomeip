@@ -85,7 +85,7 @@ namespace AppPlatform {
 
 int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
 {
-    ChipLogProgress(DeviceLayer, "Adding device %s ", app->GetApplicationBasic()->GetApplicationName());
+    ChipLogProgress(DeviceLayer, "Adding device %s ", app->GetApplicationBasicDelegate()->GetApplicationName());
     uint8_t index = 0;
     // check if already loaded
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -111,7 +111,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
                     ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)",
-                                    app->GetApplicationBasic()->GetApplicationName(), mCurrentEndpointId, index);
+                                    app->GetApplicationBasicDelegate()->GetApplicationName(), mCurrentEndpointId, index);
                     app->SetEndpointId(mCurrentEndpointId);
                     return index;
                 }
@@ -142,8 +142,8 @@ int AppPlatform::RemoveContentApp(ContentApp * app)
         {
             EndpointId ep       = emberAfClearDynamicEndpoint(index);
             mContentApps[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasic()->GetApplicationName(), ep, index);
+            ChipLogProgress(DeviceLayer, "Removed device %d from dynamic endpoint %d (index=%d)",
+                            app->GetApplicationBasicDelegate()->HandleGetVendorId(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
             UNUSED_VAR(ep);
@@ -191,12 +191,12 @@ void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
+        if (app != NULL && app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
         {
             EndpointId ep       = emberAfClearDynamicEndpoint(index);
             mContentApps[index] = NULL;
             ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasic()->GetApplicationName(), ep, index);
+                            app->GetApplicationBasicDelegate()->GetApplicationName(), ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
             UNUSED_VAR(ep);
@@ -214,7 +214,7 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
-        if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
+        if (app != NULL && app->GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
         {
             return app;
         }
