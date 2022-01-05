@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <system/SystemClock.h>
 
@@ -46,20 +47,6 @@ enum class UpdateNotFoundReason
     UpToDate
 };
 
-// Possible values for the UpdateState attribute
-enum class UpdateStateEnum
-{
-    Unknown              = 0,
-    Idle                 = 1,
-    Querying             = 2,
-    DelayedOnQuery       = 3,
-    Downloading          = 4,
-    Applying             = 5,
-    DelayedOnApply       = 6,
-    RollingBack          = 7,
-    DelayedOnUserConsent = 8,
-};
-
 // Interface class to abstract the OTA-related business logic. Each application
 // must implement this interface. All calls must be non-blocking unless stated otherwise
 class OTARequestorDriver
@@ -74,7 +61,7 @@ public:
     virtual uint16_t GetMaxDownloadBlockSize() { return 1024; }
 
     /// Called when an error occurs at any OTA requestor operation
-    virtual void HandleError(UpdateStateEnum state, CHIP_ERROR error) = 0;
+    virtual void HandleError(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state, CHIP_ERROR error) = 0;
 
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;

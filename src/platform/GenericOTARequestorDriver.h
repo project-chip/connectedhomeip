@@ -40,7 +40,7 @@ public:
     bool CanConsent() override;
     uint16_t GetMaxDownloadBlockSize() override;
 
-    void HandleError(UpdateStateEnum state, CHIP_ERROR error) override;
+    void HandleError(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state, CHIP_ERROR error) override;
     void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) override;
     void UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) override;
     void UpdateDownloaded() override;
@@ -49,7 +49,8 @@ public:
     void UpdateDiscontinued() override;
 
 private:
-    void ScheduleDelayedAction(UpdateStateEnum state, System::Clock::Seconds32 delay, System::TimerCompleteCallback action);
+    void ScheduleDelayedAction(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum state, System::Clock::Seconds32 delay,
+                               System::TimerCompleteCallback action);
 
     OTARequestorInterface * mRequestor           = nullptr;
     OTAImageProcessorInterface * mImageProcessor = nullptr;
