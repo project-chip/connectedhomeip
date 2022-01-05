@@ -204,7 +204,6 @@ config("strict_warnings") {
     "-Wvla",
   ]
 
-
   if (current_os == "webos") {
     cflags -= [
       "-Wshadow",
@@ -276,8 +275,7 @@ config("runtime_default") {
       "$dir_pw_toolchain/host_clang:xcode_sysroot",
     ]
   }
-  if (current_os == "linux" || current_os == "tizen" ||
-      current_os == "webos") {
+  if (current_os == "linux" || current_os == "tizen" || current_os == "webos") {
     libs = [
       "dl",
       "pthread",

@@ -131,17 +131,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
 
     if (current_os == "webos") {
-      deps += [
-        "${chip_root}/examples/chip-tool-webos",
-      ]
+      deps += [ "${chip_root}/examples/chip-tool-webos" ]
     }
   }
 
   if (chip_build_tools) {
     group("certification") {
-      data_deps = [
-        "${chip_root}/examples/chip-tool",
-      ]
+      data_deps = [ "${chip_root}/examples/chip-tool" ]
 
       if (chip_enable_python_modules) {
         if (enable_pylib) {
@@ -331,9 +327,7 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
 
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
-      deps = [
-        "${chip_root}/examples/chip-tool(${standalone_toolchain})",
-      ]
+      deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
     }
   }
 

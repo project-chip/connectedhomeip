@@ -224,7 +224,7 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
       defines -=
-        [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
+          [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     }
   }
 } else {

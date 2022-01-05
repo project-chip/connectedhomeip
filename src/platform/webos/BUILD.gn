@@ -45,7 +45,7 @@ pkg_config("glib") {
 }
 
 static_library("webos") {
-  if(enable_syslog) {
+  if (enable_syslog) {
     print("### enable syslog logging ###")
     defines = [ "USE_SYSLOG=1" ]
   }
@@ -127,13 +127,13 @@ static_library("webos") {
     public_deps += [ "dbus/openthread" ]
   }
 
-  print ("### enable_wifi = ${chip_enable_wifi}")
+  print("### enable_wifi = ${chip_enable_wifi}")
   if (chip_enable_wifi) {
     # TBD: Use webOS specific Wi-Fi resource
     #public_deps += [ "dbus/wpa" ]
   }
 
-  print ("### enable_ble = ${chip_enable_ble}")
+  print("### enable_ble = ${chip_enable_ble}")
 
   if (chip_enable_ble) {
     # TBD: Use webOS specific Bluetooth resource
