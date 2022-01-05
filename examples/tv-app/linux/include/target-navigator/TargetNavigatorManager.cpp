@@ -31,12 +31,13 @@ std::list<Structs::TargetInfo::Type> TargetNavigatorManager::HandleGetTargetList
     std::list<Structs::TargetInfo::Type> list;
 
     int i = 0;
-    for (std::string entry : mTargets)
+    for (std::string & entry : mTargets)
     {
         Structs::TargetInfo::Type outputInfo;
         outputInfo.identifier = static_cast<uint8_t>(i + 1);
         outputInfo.name       = chip::CharSpan(entry.c_str(), entry.length());
         list.push_back(outputInfo);
+        i++;
     }
     return list;
 }

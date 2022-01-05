@@ -37,7 +37,7 @@ static ContentLauncherManager contentLauncherManager;
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDelegate");
-    chip::app::Clusters::ContentLauncher::SetDelegate(&contentLauncherManager);
+    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(&contentLauncherManager);
 }
 
 Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
