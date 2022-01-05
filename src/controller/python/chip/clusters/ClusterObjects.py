@@ -213,6 +213,10 @@ class ClusterCommand(ClusterObject):
     def command_id(self) -> int:
         raise NotImplementedError()
 
+    @ChipUtility.classproperty
+    def must_use_timed_invoke(cls) -> bool:
+        return False
+
 
 class Cluster(ClusterObject):
     ''' This class does nothing, but a convenient class that generated clusters can inherit from.
@@ -258,6 +262,10 @@ class ClusterAttributeDescriptor:
     @ChipUtility.classproperty
     def attribute_type(cls) -> ClusterObjectFieldDescriptor:
         raise NotImplementedError()
+
+    @ChipUtility.classproperty
+    def must_use_timed_write(cls) -> bool:
+        return False
 
     @ChipUtility.classproperty
     def _cluster_object(cls) -> ClusterObject:

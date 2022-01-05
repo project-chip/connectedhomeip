@@ -176,7 +176,8 @@ private:
 
 extern "C" {
 // Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...);
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
+                                                                uint16_t timedWriteTimeoutMs, size_t n, ...);
 chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
                                                               ReadClientCallback ** pCallback, DeviceProxy * device,
                                                               bool isSubscription, uint32_t minInterval, uint32_t maxInterval,
@@ -249,7 +250,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReportEndCallback               = onReportEndCallback;
 }
 
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...)
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
+                                                                uint16_t timedWriteTimeoutMs, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -259,7 +261,9 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     va_list args;
     va_start(args, n);
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewWriteClient(client, callback.get()));
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewWriteClient(
+                      client, callback.get(),
+                      timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing()));
 
     {
         for (size_t i = 0; i < n; i++)
