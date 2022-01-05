@@ -1085,18 +1085,9 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
 static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoint)
 {
-    EmberAfAttributeMetadata * metadata;
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, CLUSTER_MASK_SERVER);
-    if (!metadata->IsNonVolatile())
+    if (emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, true))
     {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, Attributes::CurrentLevel::Id, CLUSTER_MASK_SERVER);
-    if (!metadata->IsNonVolatile())
-    {
-        return false;
+        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpCurrentLevel::Id, true);
     }
 
     return false;

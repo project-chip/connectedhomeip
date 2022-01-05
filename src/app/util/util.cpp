@@ -987,7 +987,7 @@ bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId cluster
     return (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, 0) != nullptr);
 }
 
-bool emberAfHasTokenizedAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                   bool asServer)
 {
     uint8_t mask                        = asServer ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT;
@@ -998,7 +998,7 @@ bool emberAfHasTokenizedAttribute(chip::EndpointId endpoint, chip::ClusterId clu
         return false;
     }
 
-    return emberAfAttributeIsTokenized(metadata);
+    return metadata->IsNonVolatile();
 }
 
 chip::Messaging::ExchangeManager * chip::ExchangeManager()

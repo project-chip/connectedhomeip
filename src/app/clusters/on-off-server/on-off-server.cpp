@@ -503,21 +503,9 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint)
 {
-    EmberAfAttributeMetadata * metadata;
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::OnOff::Id, CLUSTER_MASK_SERVER);
-    if (!metadata->IsNonVolatile())
+    if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id, true))
     {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, CLUSTER_MASK_SERVER);
-    if (!metadata->IsNonVolatile())
-    {
-        if (emberAfHasTokenizedAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true))
-        {
-            return true;
-        }
+        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true);
     }
 
     return false;
