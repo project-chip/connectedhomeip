@@ -3278,6 +3278,14 @@ enum class StepMode : uint8_t
 using StepMode                        = EmberAfStepMode;
 #endif
 
+// Bitmap for LevelControlFeature
+enum class LevelControlFeature : uint32_t
+{
+    kOnOff     = 0x1,
+    kLighting  = 0x2,
+    kFrequency = 0x4,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 

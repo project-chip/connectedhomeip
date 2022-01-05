@@ -8281,7 +8281,7 @@
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "NVM",
+              "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",

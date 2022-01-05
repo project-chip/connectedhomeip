@@ -63,7 +63,7 @@ private:
      *********************************************************/
 
 #ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
-    bool areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint);
+    bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
 #endif
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);

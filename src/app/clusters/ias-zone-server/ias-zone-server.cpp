@@ -62,8 +62,8 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
-#include <app/util/util.h>
 #include <app/util/binding-table.h>
+#include <app/util/util.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
@@ -597,8 +597,7 @@ static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
     if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, true) ||
         !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, true) ||
         !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, true) ||
-        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, true)
-       )
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, true))
     {
         return false;
     }

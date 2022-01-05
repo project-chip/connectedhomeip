@@ -281,7 +281,7 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
 bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                                  bool asServer);
+                                   bool asServer);
 
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();
