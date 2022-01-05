@@ -544,6 +544,33 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowInternal()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceController::CreateBindingWithCallback(chip::NodeId deviceId, chip::EndpointId deviceEndpointId,
+                                                       chip::NodeId bindingNodeId, chip::GroupId bindingGroupId,
+                                                       chip::EndpointId bindingEndpointId, chip::ClusterId bindingClusterId,
+                                                       Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback)
+{
+    PeerId peerId;
+    peerId.SetNodeId(deviceId);
+    peerId.SetCompressedFabricId(GetCompressedFabricId());
+
+    OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(peerId);
+    if (device == nullptr)
+    {
+        ChipLogProgress(AppServer, "No OperationalDeviceProxy returned from device commissioner");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    chip::Controller::BindingCluster cluster;
+    cluster.Associate(device, deviceEndpointId);
+
+    ReturnErrorOnFailure(
+        cluster.Bind(onSuccessCallback, onFailureCallback, bindingNodeId, bindingGroupId, bindingEndpointId, bindingClusterId));
+
+    ChipLogDetail(Controller, "Sent Bind command request, waiting for response");
+    return CHIP_NO_ERROR;
+}
+
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 Transport::PeerAddress DeviceController::ToPeerAddress(const chip::Dnssd::ResolvedNodeData & nodeData) const
 {

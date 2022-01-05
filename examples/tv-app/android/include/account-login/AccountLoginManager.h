@@ -25,6 +25,8 @@
 class AccountLoginManager : public chip::app::Clusters::AccountLogin::Delegate
 {
 public:
+    inline void SetSetupPIN(uint32_t setupPIN) override { return; };
+
     bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) override;
     bool HandleLogout() override;
     chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type
