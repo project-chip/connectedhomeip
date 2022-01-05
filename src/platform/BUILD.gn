@@ -69,7 +69,7 @@ if (chip_device_platform != "none") {
 
   if (chip_stack_lock_tracking == "auto") {
     if (chip_device_platform == "linux" || chip_device_platform == "tizen" ||
-        chip_device_platform == "android") {
+        chip_device_platform == "android" || chip_device_platform == "webos") {
       # TODO: should be fatal for development. Change once bugs are fixed
       chip_stack_lock_tracking = "log"
     } else {
@@ -217,6 +217,14 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET=Ameba",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+    } else if (chip_device_platform == "webos") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_LINUX=1",
+        "CHIP_DEVICE_LAYER_TARGET=webos",
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
+      ]
+      defines -=
+        [ "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}" ]
     }
   }
 } else {
@@ -336,6 +344,8 @@ if (chip_device_platform != "none") {
       _platform_target = "P6"
     } else if (chip_device_platform == "ameba") {
       _platform_target = "Ameba"
+    } else if (chip_device_platform == "webos") {
+      _platform_target = "webos"
     } else if (chip_device_platform == "fake") {
       _platform_target = "fake"
     } else {

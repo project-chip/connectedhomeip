@@ -32,11 +32,6 @@ if (current_os == "") {
   current_os = target_os
 }
 
-#[webos] if target_os is webos, set current_os as linux.
-if (target_os == "webos") {
-  current_os = "linux"
-}
-
 _build_overrides = {
   import("//build_overrides/build.gni")
 }

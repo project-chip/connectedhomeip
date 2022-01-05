@@ -129,13 +129,18 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "${chip_root}/src/setup_payload/java",
       ]
     }
+
+    if (current_os == "webos") {
+      deps += [
+        "${chip_root}/examples/chip-tool-webos",
+      ]
+    }
   }
 
   if (chip_build_tools) {
     group("certification") {
       data_deps = [
         "${chip_root}/examples/chip-tool",
-        "${chip_root}/examples/chip-tool-webos",
       ]
 
       if (chip_enable_python_modules) {
@@ -211,6 +216,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     # Build the chip-tool-darwin example.
     enable_standalone_chip_tool_darwin_build =
         enable_default_builds && host_os == "mac"
+
+    # Build the chip-tool-webos example.
+    enable_standalone_chip_tool_webos_build =
+        enable_default_builds && host_os != "win"
 
     # Build the shell example.
     enable_standalone_shell_build = enable_default_builds && host_os != "win"
@@ -324,7 +333,6 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     group("standalone_chip_tool") {
       deps = [
         "${chip_root}/examples/chip-tool(${standalone_toolchain})",
-        "${chip_root}/examples/chip-tool-webos(${standalone_toolchain})",
       ]
     }
   }
@@ -333,6 +341,13 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     group("standalone_chip_tool_darwin") {
       deps =
           [ "${chip_root}/examples/chip-tool-darwin(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_standalone_chip_tool_webos_build) {
+    group("standalone_chip_tool_webos") {
+      deps =
+          [ "${chip_root}/examples/chip-tool-webos(${standalone_toolchain})" ]
     }
   }
 
@@ -468,6 +483,9 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
     }
     if (enable_standalone_chip_tool_darwin_build) {
       deps += [ ":standalone_chip_tool_darwin" ]
+    }
+    if (enable_standalone_chip_tool_webos_build) {
+      deps += [ ":standalone_chip_tool_webos" ]
     }
     if (enable_standalone_shell_build) {
       deps += [ ":standalone_shell" ]

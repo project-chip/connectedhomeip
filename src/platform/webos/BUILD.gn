@@ -1,0 +1,142 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/linux/pkg_config.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "webos")
+
+declare_args() {
+  # Support syslog along instead of stdout(printf)
+  enable_syslog = true
+}
+
+if (chip_enable_openthread) {
+  import("//build_overrides/openthread.gni")
+  import("//build_overrides/ot_br_posix.gni")
+}
+
+if (chip_mdns != "none") {
+  pkg_config("avahi_client_config") {
+    packages = [ "avahi-client" ]
+  }
+}
+
+pkg_config("glib") {
+  packages = [
+    "glib-2.0",
+    "gio-unix-2.0",
+  ]
+}
+
+static_library("webos") {
+  if(enable_syslog) {
+    print("### enable syslog logging ###")
+    defines = [ "USE_SYSLOG=1" ]
+  }
+  sources = [
+    "../DeviceSafeQueue.cpp",
+    "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
+    "BLEManagerImpl.cpp",
+    "BLEManagerImpl.h",
+    "BlePlatformConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPLinuxStorage.cpp",
+    "CHIPLinuxStorage.h",
+    "CHIPLinuxStorageIni.cpp",
+    "CHIPLinuxStorageIni.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "ConnectivityUtils.cpp",
+    "ConnectivityUtils.h",
+    "DeviceNetworkProvisioningDelegateImpl.cpp",
+    "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "Logging.cpp",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "PosixConfig.cpp",
+    "PosixConfig.h",
+    "SystemPlatformConfig.h",
+    "SystemTimeSupport.cpp",
+  ]
+
+  deps = [ "${chip_root}/src/setup_payload" ]
+
+  public_deps = [
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  public_configs = []
+
+  if (chip_mdns != "none") {
+    sources += [
+      "DnssdImpl.cpp",
+      "DnssdImpl.h",
+    ]
+
+    deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+
+    public_configs += [
+      ":avahi_client_config",
+      ":glib",
+    ]
+  }
+
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+      "OTARequestorDriverImpl.cpp",
+      "OTARequestorDriverImpl.h",
+    ]
+  }
+
+  if (chip_enable_openthread) {
+    sources += [
+      "GlibTypeDeleter.h",
+      "ThreadStackManagerImpl.cpp",
+      "ThreadStackManagerImpl.h",
+    ]
+
+    public_deps += [ "dbus/openthread" ]
+  }
+
+  print ("### enable_wifi = ${chip_enable_wifi}")
+  if (chip_enable_wifi) {
+    # TBD: Use webOS specific Wi-Fi resource
+    #public_deps += [ "dbus/wpa" ]
+  }
+
+  print ("### enable_ble = ${chip_enable_ble}")
+
+  if (chip_enable_ble) {
+    # TBD: Use webOS specific Bluetooth resource
+    #public_deps += [ "dbus/bluez" ]
+  }
+}
