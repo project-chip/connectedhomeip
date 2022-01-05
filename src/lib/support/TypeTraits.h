@@ -41,6 +41,7 @@ constexpr std::underlying_type_t<T> to_underlying(T e)
 /**
  * @brief This template is not designed to be used directly. A common pattern to check the presence of a member of a class is:
  *
+ * \cond
  * template <typename T>
  * class IsMagic
  * {
@@ -54,6 +55,7 @@ constexpr std::underlying_type_t<T> to_underlying(T e)
  * public:
  *     static constexpr bool value = decltype(TestHasMagic<std::decay_t<T>>(0))::value;
  * };
+ * \endcond
  *
  *   The compiler will try to match TestHasMagicFunction(int) first, if MagicFunction is a member function of T, the match succeed
  * and HasMagicFunction is an alias of std::true_type. If MagicFunction is not a member function of T, the match of

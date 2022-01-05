@@ -194,12 +194,13 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
         SuccessOrExit(err = AddTestCommissioning());
     }
-    else if ((DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) &&
-             (GetFabricTable().FabricCount() != 0))
+    else if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
+#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+#endif
     }
     else
     {

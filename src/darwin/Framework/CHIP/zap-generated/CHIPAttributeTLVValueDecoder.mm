@@ -3369,7 +3369,7 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 auto & entry_0 = iter_0.GetValue();
                 CHIPGroupKeyManagementClusterGroupKey * newElement_0;
                 newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                 newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
                 [array_0 addObject:newElement_0];

@@ -21,6 +21,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-chip-tool-ipv6only'
 
+# Generating linux-arm64-door-lock
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-door-lock'
+
+# Generating linux-arm64-door-lock-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-door-lock-ipv6only'
+
 # Generating linux-arm64-minmdns
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -55,6 +65,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating linux-x64-chip-tool-ipv6only
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/chip-tool --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-chip-tool-ipv6only
+
+# Generating linux-x64-door-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux {out}/linux-x64-door-lock
+
+# Generating linux-x64-door-lock-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/door-lock-app/linux --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-door-lock-ipv6only
 
 # Generating linux-x64-minmdns
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns {out}/linux-x64-minmdns
@@ -92,6 +108,12 @@ ninja -C {out}/linux-arm64-chip-tool
 # Building linux-arm64-chip-tool-ipv6only
 ninja -C {out}/linux-arm64-chip-tool-ipv6only
 
+# Building linux-arm64-door-lock
+ninja -C {out}/linux-arm64-door-lock
+
+# Building linux-arm64-door-lock-ipv6only
+ninja -C {out}/linux-arm64-door-lock-ipv6only
+
 # Building linux-arm64-minmdns
 ninja -C {out}/linux-arm64-minmdns
 
@@ -118,6 +140,12 @@ ninja -C {out}/linux-x64-chip-tool
 
 # Building linux-x64-chip-tool-ipv6only
 ninja -C {out}/linux-x64-chip-tool-ipv6only
+
+# Building linux-x64-door-lock
+ninja -C {out}/linux-x64-door-lock
+
+# Building linux-x64-door-lock-ipv6only
+ninja -C {out}/linux-x64-door-lock-ipv6only
 
 # Building linux-x64-minmdns
 ninja -C {out}/linux-x64-minmdns

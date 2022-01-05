@@ -102,6 +102,10 @@ class TestDefinition:
             if os.path.exists('/tmp/chip_tool_config.ini'):
                 os.unlink('/tmp/chip_tool_config.ini')
 
+            # Remove server all_clusters_app or tv_app storage, so it will be commissionable again
+            if os.path.exists('/tmp/chip_kvs'):
+                os.unlink('/tmp/chip_kvs')
+
             discriminator = str(randrange(1, 4096))
             logging.debug(
                 'Executing application under test with discriminator %s.' % discriminator)

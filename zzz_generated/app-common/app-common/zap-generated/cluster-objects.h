@@ -14999,12 +14999,13 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex;
+    chip::FabricIndex fabricIndex;
     uint16_t groupId;
     uint16_t groupKeySetID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;

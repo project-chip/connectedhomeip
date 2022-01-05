@@ -5358,7 +5358,7 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
         bool fabricIndexNull     = false;
         bool fabricIndexHasValue = true;
 
-        uint16_t fabricIndexValue = entry.fabricIndex;
+        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
 
         jobject fabricIndex = nullptr;
         if (!fabricIndexNull && fabricIndexHasValue)
