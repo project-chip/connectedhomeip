@@ -7283,6 +7283,58 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallba
     }
 }
 
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationUnit::TempUnit value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationUnit::TempUnit> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPGeneralCommissioningClusterGeneralCommissioningErrorAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError value)
 {

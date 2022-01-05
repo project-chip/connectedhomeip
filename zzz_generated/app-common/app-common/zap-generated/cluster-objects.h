@@ -8946,9 +8946,28 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationTimeFormat
 namespace LocalizationUnit {
+// Enum for TempUnit
+enum class TempUnit : uint8_t
+{
+    kFahrenheit = 0x00,
+    kCelsius    = 0x01,
+    kKelvin     = 0x02,
+};
 
 namespace Attributes {
 
+namespace TemperatureUnit {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureUnit
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8994,6 +9013,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;

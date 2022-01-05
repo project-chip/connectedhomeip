@@ -339,6 +339,7 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_TEMPERATURE_UNIT_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Power Source Configuration
 
