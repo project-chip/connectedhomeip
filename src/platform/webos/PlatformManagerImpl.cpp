@@ -28,9 +28,9 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
-#include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 
 #include <thread>
 

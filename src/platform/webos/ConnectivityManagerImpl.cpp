@@ -127,13 +127,11 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 bool ConnectivityManagerImpl::mAssociattionStarted = false;
-BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManage     rImpl>::ConnectivityFlags>
+BitFlags<Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManage rImpl>::ConnectivityFlags>
     ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 std::mutex ConnectivityManagerImpl::mWpaSupplicantMutex;
@@ -162,7 +160,6 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
 exit:
     return err;
 }
-
 
 CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
 {

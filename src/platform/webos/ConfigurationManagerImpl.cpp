@@ -33,8 +33,8 @@
 #include <netpacket/packet.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/webos/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
+#include <platform/webos/PosixConfig.h>
 
 namespace chip {
 namespace DeviceLayer {

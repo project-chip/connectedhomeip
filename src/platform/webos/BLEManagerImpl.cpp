@@ -115,9 +115,7 @@ CHIP_ERROR BLEManagerImpl::StopBLEAdvertising()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
-{
-}
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event) {}
 
 uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {

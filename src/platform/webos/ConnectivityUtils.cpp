@@ -22,8 +22,8 @@
  */
 
 #include <app-common/zap-generated/enums.h>
-#include <platform/webos/ConnectivityUtils.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/webos/ConnectivityUtils.h>
 
 #include <arpa/inet.h>
 #include <ifaddrs.h>

@@ -31,8 +31,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <platform/webos/CHIPLinuxStorageIni.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+#include <platform/webos/CHIPLinuxStorageIni.h>
 
 namespace chip {
 namespace DeviceLayer {
