@@ -81,5 +81,5 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
 void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App: KeypadInput::SetDefaultDelegate");
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
+    chip::app::Clusters::KeypadInput::SetDefaultDelegate(&keypadInputManager);
 }

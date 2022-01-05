@@ -387,5 +387,5 @@ ChannelManager ChannelManager::sInstance;
 void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App: Channel::SetDefaultDelegate");
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
+    chip::app::Clusters::Channel::SetDefaultDelegate(&channelManager);
 }

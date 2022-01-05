@@ -49,12 +49,18 @@ Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const
 {
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
-    // tempPin123 is needed for unit tests to succeed
-    std::string pin = mSetupPIN == 0 ? "tempPin123" : std::to_string(mSetupPIN);
+    Commands::GetSetupPINResponse::Type response;
+    if (mSetupPIN == 0)
+    {
+        // tempPin123 is needed for unit tests to succeed
+        ChipLogProgress(Zcl, "temporary account id: %s returning dummy pin", tempAccountIdentifierString.c_str());
+        response.setupPIN = chip::CharSpan("tempPin123", strlen("tempPin123"));
+        return response;
+    }
 
+    std::string pin = std::to_string(mSetupPIN);
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), pin.c_str());
 
-    Commands::GetSetupPINResponse::Type response;
     response.setupPIN = chip::CharSpan(pin.c_str(), pin.length());
     return response;
 }

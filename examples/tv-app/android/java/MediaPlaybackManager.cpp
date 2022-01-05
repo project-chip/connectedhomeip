@@ -43,7 +43,7 @@ static MediaPlaybackManager mediaPlaybackManager;
 void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Android App: MediaPlayback::SetDefaultDelegate");
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(&mediaPlaybackManager);
 }
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
