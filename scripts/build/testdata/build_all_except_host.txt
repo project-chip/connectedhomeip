@@ -332,6 +332,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
 
+# Generating esp32-devkitc-light
+mkdir -p {out}/esp32-devkitc-light
+
+cp examples/lighting-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-light/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
+
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
 
@@ -969,6 +980,13 @@ rm -f examples/bridge-app/esp32/sdkconfig
 bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
 
 rm -f examples/lock-app/esp32/sdkconfig
 
