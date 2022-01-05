@@ -133,7 +133,7 @@ exit:
 
 JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
 {
-    chip::ThreadWork::ChipMainThreadScheduleAndWait([&] { ChipAndroidAppShutdown(); });
+    chip::ThreadWork::ChipMainThreadScheduleAndWait([] { ChipAndroidAppShutdown(); });
     return JNI_TRUE;
 }
 

@@ -22,7 +22,7 @@
 
 CHIP_ERROR ChipAndroidAppInit(void);
 
-CHIP_ERROR ChipAndroidAppShutdown(void);
+void ChipAndroidAppShutdown(void);
 
 jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved);
 
