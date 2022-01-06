@@ -43,6 +43,7 @@ void ApplicationLauncherManager::HandleLaunchApp(CommandResponseHelper<LauncherR
     // TODO: Insert code here
     LauncherResponseType response;
     response.data   = CharSpan::fromCharString("data");
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
 }
@@ -57,6 +58,7 @@ void ApplicationLauncherManager::HandleStopApp(CommandResponseHelper<LauncherRes
     response.data   = CharSpan::fromCharString("data");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
 }
 
 void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherResponseType> & helper,
@@ -69,4 +71,5 @@ void ApplicationLauncherManager::HandleHideApp(CommandResponseHelper<LauncherRes
     response.data   = CharSpan::fromCharString("data");
     response.status = StatusEnum::kSuccess;
     helper.Success(response);
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
 }
