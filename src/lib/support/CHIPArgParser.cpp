@@ -48,6 +48,7 @@
 
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 /*

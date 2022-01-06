@@ -39,6 +39,7 @@
 
 #include <platform/logging/LogV.h>
 
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>

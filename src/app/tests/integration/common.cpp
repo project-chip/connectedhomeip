@@ -27,6 +27,7 @@
 #include <app/tests/integration/common.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/ErrorStr.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceLayer.h>

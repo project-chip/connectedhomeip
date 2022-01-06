@@ -33,6 +33,7 @@
 
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
