@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
 #include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
@@ -46,6 +47,13 @@ public:
         return Format("f/%x/g/%x/e/%x", fabric, group, endpoint);
     }
     const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset) { return Format("f/%x/k/%x", fabric, keyset); }
+
+    const char * AttributeValue(const app::ConcreteAttributePath & aPath)
+    {
+        // Needs at most 24 chars: 4 for "a///", 4 for the endpoint id, 8 each
+        // for the cluster and attribute ids.
+        return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    }
 
 private:
     static const size_t kKeyLengthMax = 32;

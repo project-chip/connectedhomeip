@@ -16216,8 +16216,8 @@ public:
             err = TestReadsCurrentLevelAttributeFromDut_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Reset level to 0\n");
-            err = TestResetLevelTo0_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Reset level to 254\n");
+            err = TestResetLevelTo254_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Wait 100ms\n");
@@ -16311,7 +16311,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
 
         NextTest();
     }
@@ -16495,13 +16495,13 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestResetLevelTo0_12()
+    CHIP_ERROR TestResetLevelTo254_12()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
-        request.level          = 0;
+        request.level          = 254;
         request.transitionTime = 0U;
         request.optionMask     = 1;
         request.optionOverride = 1;
@@ -16619,6 +16619,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 14 : reads current level attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_14();
             break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Reset level to 254\n");
+            err = TestResetLevelTo254_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Wait 100ms\n");
+            err = TestWait100ms_16();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -16630,7 +16638,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 15;
+    const uint16_t mTestCount = 17;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -16734,7 +16742,7 @@ private:
 
     void OnSuccessResponse_1(uint8_t currentLevel)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
 
         NextTest();
     }
@@ -16930,7 +16938,7 @@ private:
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
         RequestType request;
-        request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(1);
+        request.moveMode       = static_cast<chip::app::Clusters::LevelControl::MoveMode>(0);
         request.rate           = 255;
         request.optionMask     = 1;
         request.optionOverride = 1;
@@ -16975,6 +16983,39 @@ private:
         VerifyOrReturn(CheckConstraintNotValue("currentLevel", currentLevel, 255));
 
         NextTest();
+    }
+
+    CHIP_ERROR TestResetLevelTo254_15()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 254;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_15();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_15(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_16()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
     }
 };
 
@@ -17138,8 +17179,8 @@ private:
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
         RequestType request;
-        request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
-        request.stepSize       = 128;
+        request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(1);
+        request.stepSize       = 126;
         request.transitionTime = 20U;
         request.optionMask     = 0;
         request.optionOverride = 0;

@@ -428,14 +428,6 @@ public:
 
 #endif // CONFIG_DEVICE_TYPE_M5STACK
 
-void SetupInitialLevelControlValues(chip::EndpointId endpointId)
-{
-    uint8_t level = UINT8_MAX;
-
-    emberAfWriteAttribute(endpointId, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
-                          ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
 void SetupPretendDevices()
 {
     AddDevice("Watch");
@@ -523,8 +515,6 @@ static void InitServer(intptr_t context)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     SetupPretendDevices();
-    SetupInitialLevelControlValues(/* endpointId = */ 1);
-    SetupInitialLevelControlValues(/* endpointId = */ 2);
 }
 
 extern "C" void app_main()

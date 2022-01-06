@@ -552,16 +552,6 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
  * destination buffer not including the length bytes.
  */
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);
 
 /*
  * @brief Function that determines the size of a zigbee Cluster Library
@@ -633,12 +623,6 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index);
  * @return true if data type is a string.
  */
 bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
-
-/** @brief Returns true if the given attribute type is a string. */
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
-
-/** @brief Returns true if the given attribute type is a long string. */
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
 
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
