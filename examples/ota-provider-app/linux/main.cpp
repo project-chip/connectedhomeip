@@ -53,11 +53,6 @@ constexpr uint16_t kOptionFilepath             = 'f';
 constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
-// Arbitrary BDX Transfer Params
-constexpr uint32_t kMaxBdxBlockSize                 = 1024;
-constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
-constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
 OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec                                 = 0;
@@ -139,7 +134,6 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     OTAProviderExample otaProvider;
-    BdxOtaSender bdxServer;
 
     if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
     {
@@ -164,8 +158,10 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
+    BdxOtaSender * bdxOtaSender = otaProvider.GetBdxOtaSender();
+    VerifyOrReturnError(bdxOtaSender != nullptr, 1);
     err = chip::Server::GetInstance().GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::BDX::Id,
-                                                                                                        &bdxServer);
+                                                                                                        bdxOtaSender);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogDetail(SoftwareUpdate, "RegisterUnsolicitedMessageHandler failed: %s", chip::ErrorStr(err));
@@ -177,23 +173,12 @@ int main(int argc, char * argv[])
     if (gOtaFilepath != nullptr)
     {
         otaProvider.SetOTAFilePath(gOtaFilepath);
-        bdxServer.SetFilepath(gOtaFilepath);
     }
 
     otaProvider.SetQueryImageBehavior(gQueryImageBehavior);
     otaProvider.SetDelayedActionTimeSec(gDelayedActionTimeSec);
 
     chip::app::Clusters::OTAProvider::SetDelegate(kOtaProviderEndpoint, &otaProvider);
-
-    BitFlags<TransferControlFlags> bdxFlags;
-    bdxFlags.Set(TransferControlFlags::kReceiverDrive);
-    err = bdxServer.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender, bdxFlags,
-                                       kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(BDX, "failed to init BDX server: %s", chip::ErrorStr(err));
-        return 1;
-    }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
