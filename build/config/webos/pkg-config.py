@@ -143,6 +143,8 @@ def main():
                       dest='version_as_components')
     (options, args) = parser.parse_args()
 
+    options.sysroot = os.environ['PKG_CONFIG_SYSROOT_DIR']
+
     # Make a list of regular expressions to strip out.
     strip_out = []
     if options.strip_out != None:
