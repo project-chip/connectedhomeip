@@ -33,6 +33,7 @@ chip_test_suite("tests") {
     "TestErrorStr.cpp",
     "TestFixedBufferAllocator.cpp",
     "TestFold.cpp",
+    "TestIntrusiveList.cpp",
     "TestOwnerOf.cpp",
     "TestPool.cpp",
     "TestPrivateHeap.cpp",
