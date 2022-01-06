@@ -266,8 +266,9 @@ def NrfTargets():
     yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
 
     targets = [
-        target.Extend('nrf5340', board=NrfBoard.NRF5340),
-        target.Extend('nrf52840', board=NrfBoard.NRF52840),
+        target.Extend('nrf5340dk', board=NrfBoard.NRF5340DK),
+        target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
+        target.Extend('nrf52840dongle', board=NrfBoard.NRF52840DONGLE),
     ]
 
     for target in targets:

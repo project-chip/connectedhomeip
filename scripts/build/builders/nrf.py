@@ -84,14 +84,17 @@ class NrfApp(Enum):
 
 
 class NrfBoard(Enum):
-    NRF52840 = auto()
-    NRF5340 = auto()
+    NRF52840DK = auto()
+    NRF52840DONGLE = auto()
+    NRF5340DK = auto()
     NATIVE_POSIX_64 = auto()
 
     def GnArgName(self):
-        if self == NrfBoard.NRF52840:
+        if self == NrfBoard.NRF52840DK:
             return 'nrf52840dk_nrf52840'
-        elif self == NrfBoard.NRF5340:
+        elif self == NrfBoard.NRF52840DONGLE:
+            return 'nrf52840dongle_nrf52840'
+        elif self == NrfBoard.NRF5340DK:
             return 'nrf5340dk_nrf5340_cpuapp'
         elif self == NrfBoard.NATIVE_POSIX_64:
             return 'native_posix_64'
@@ -105,7 +108,7 @@ class NrfConnectBuilder(Builder):
                  root,
                  runner,
                  app: NrfApp = NrfApp.LIGHT,
-                 board: NrfBoard = NrfBoard.NRF52840,
+                 board: NrfBoard = NrfBoard.NRF52840DK,
                  enable_rpcs: bool = False):
         super(NrfConnectBuilder, self).__init__(root, runner)
         self.app = app
@@ -138,17 +141,22 @@ class NrfConnectBuilder(Builder):
                         'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
                     raise Exception('ZEPHYR_BASE validation failed')
-
+            if os.path.exists(os.path.join(
+                    self.root, self.app.AppPath(), "nrfconnect/boards/"+self.board.GnArgName()+".conf")):
+                boardconfig="-DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
+            else:
+                boardconfig=""
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir}{rpcs}
+west build --cmake-only -d {outdir} -b {board} {sourcedir} -- {boardoverlay} {rpcs}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
                     self.root, self.app.AppPath(), 'nrfconnect')),
-                rpcs=" -- -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
+                boardoverlay=boardconfig,
+                rpcs="-DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
             ).strip()
 
             self._Execute(['bash', '-c', cmd],
