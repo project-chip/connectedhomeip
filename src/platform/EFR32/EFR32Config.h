@@ -95,12 +95,11 @@ public:
     static constexpr Key kConfigKey_CountryCode        = EFR32ConfigKey(kChipConfig_KeyBase, 0x0A);
     static constexpr Key kConfigKey_Breadcrumb         = EFR32ConfigKey(kChipConfig_KeyBase, 0x0B);
     static constexpr Key kConfigKey_GroupKeyBase       = EFR32ConfigKey(kChipConfig_KeyBase, 0x0C);
-    static constexpr Key kConfigKey_GroupKeyMax        = EFR32ConfigKey(kChipConfig_KeyBase, 0x1B); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyMax = EFR32ConfigKey(kChipConfig_KeyBase, 0x1B); // Allows 16 Group Keys to be created.
 
     // CHIP Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kChipCounter_KeyBase, 0x00);
     static constexpr Key kConfigKey_TotalOperationalHours = EFR32ConfigKey(kChipCounter_KeyBase, 0x01);
-
 
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = EFR32ConfigKey(kChipFactory_KeyBase, 0x00);
