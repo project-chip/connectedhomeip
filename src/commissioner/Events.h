@@ -73,48 +73,6 @@ private:
     size_t mLen      = 0;
 };
 
-struct SharedString
-{
-    const char * Get() const { return mData.get(); }
-    CHIP_ERROR Set(const char * cStr)
-    {
-        if (cStr == nullptr)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        const size_t len = sizeof(*cStr) * (strlen(cStr) + 1);
-        if (mCapacity < len)
-        {
-            ReturnErrorOnFailure(Allocate(len));
-        }
-        memmove(mData.get(), cStr, len);
-        mLen = len;
-        return CHIP_NO_ERROR;
-    }
-    void Clear()
-    {
-        mData     = std::shared_ptr<char>(nullptr);
-        mCapacity = 0;
-        mLen      = 0;
-    }
-    CHIP_ERROR Allocate(size_t len)
-    {
-        mData = std::shared_ptr<char>(static_cast<char *>(chip::Platform::MemoryAlloc(len)), chip::Platform::MemoryFree);
-        if (mData.get() == nullptr)
-        {
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        mLen      = 0;
-        mCapacity = len;
-        return CHIP_NO_ERROR;
-    }
-
-private:
-    Platform::SharedPtr<char> mData;
-    size_t mCapacity = 0;
-    size_t mLen      = 0;
-};
-
 template <size_t MaxSize>
 struct CapacityBoundSharedBuffer : public SharedBuffer
 {
