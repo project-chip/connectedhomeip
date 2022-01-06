@@ -287,6 +287,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+#if CHIP_KVS_AVAILABLE
+    PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
+#endif // CHIP_KVS_AVAILABLE
+
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     NVIC_SystemReset();
