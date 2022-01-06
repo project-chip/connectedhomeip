@@ -16,13 +16,17 @@
  */
 
 const { ensureClusters } = require('../ClustersHelper.js');
-const { DelayCommands }  = require('./TestDelayCommands.js');
-const { LogCommands }    = require('./TestLogCommands.js');
 
-const SimulatedClusters = [
-  DelayCommands,
-  LogCommands,
-];
+const fs   = require('fs');
+const path = require('path');
+
+let SimulatedClusters = [];
+(async () => {
+  const simulatedClustersPath  = path.join(__dirname, 'clusters');
+  const simulatedClustersFiles = await fs.promises.readdir(simulatedClustersPath);
+  SimulatedClusters = simulatedClustersFiles.map(filename => (require(path.join(simulatedClustersPath, filename))).cluster);
+  return SimulatedClusters;
+})();
 
 function getSimulatedCluster(clusterName)
 {

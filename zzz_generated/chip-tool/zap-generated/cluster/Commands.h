@@ -25266,7 +25266,7 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+    static void OnAttributeResponse(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
     {
         OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdateState response", value);
     }
@@ -25303,7 +25303,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+    static void OnValueReport(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
     {
         LogValue("OtaSoftwareUpdateRequestor.UpdateState report", 0, value);
     }

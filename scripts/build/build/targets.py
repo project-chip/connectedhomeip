@@ -151,6 +151,7 @@ def HostTargets():
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
+        app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
 
     # Possible build variants. Note that number of potential
     # builds is exponential here

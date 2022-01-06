@@ -39,11 +39,10 @@ public:
         mPeerNodeId(kPlaceholderNodeId), mFabric(kUndefinedFabricIndex), mUnauthenticatedSessionHandle(session)
     {}
 
-    SessionHandle(NodeId peerNodeId, uint16_t localSessionId, uint16_t peerSessionId, FabricIndex fabric) :
-        mPeerNodeId(peerNodeId), mFabric(fabric)
+    SessionHandle(Transport::SecureSession & session) : mPeerNodeId(session.GetPeerNodeId()), mFabric(session.GetFabricIndex())
     {
-        mLocalSessionId.SetValue(localSessionId);
-        mPeerSessionId.SetValue(peerSessionId);
+        mLocalSessionId.SetValue(session.GetLocalSessionId());
+        mPeerSessionId.SetValue(session.GetPeerSessionId());
     }
 
     SessionHandle(NodeId peerNodeId, GroupId groupId, FabricIndex fabric) : mPeerNodeId(peerNodeId), mFabric(fabric)

@@ -617,6 +617,7 @@ DeviceCommissioner::DeviceCommissioner() :
     mOnAttestationFailureCallback(OnAttestationFailureResponse, this), mOnCSRFailureCallback(OnCSRFailureResponse, this),
     mOnCertFailureCallback(OnAddNOCFailureResponse, this), mOnRootCertFailureCallback(OnRootCertFailureResponse, this),
     mOnDeviceConnectedCallback(OnDeviceConnectedFn, this), mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
+    mDeviceAttestationInformationVerificationCallback(OnDeviceAttestationInformationVerification, this),
     mDeviceNOCChainCallback(OnDeviceNOCChainGeneration, this), mSetUpCodePairer(this), mAutoCommissioner(this)
 {
     mPairingDelegate         = nullptr;
@@ -1161,26 +1162,14 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
     commissioner->mAttestationResponseCallback.Cancel();
     commissioner->mOnAttestationFailureCallback.Cancel();
 
-    commissioner->HandleAttestationResult(commissioner->ValidateAttestationInfo(attestationElements, signature));
+    commissioner->ValidateAttestationInfo(attestationElements, signature);
 }
 
-CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature)
+void DeviceCommissioner::OnDeviceAttestationInformationVerification(void * context, AttestationVerificationResult result)
 {
-    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    CHIP_ERROR error                  = CHIP_NO_ERROR;
 
-    CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-
-    DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
-
-    // Retrieve attestation challenge
-    ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession(mDeviceBeingCommissioned->GetSecureSession().Value())
-                                        ->GetCryptoContext()
-                                        .GetAttestationChallenge();
-
-    AttestationVerificationResult result = dac_verifier->VerifyAttestationInformation(
-        attestationElements, attestationChallenge, signature, device->GetPAI(), device->GetDAC(), device->GetAttestationNonce());
     if (result != AttestationVerificationResult::kSuccess)
     {
         if (result == AttestationVerificationResult::kNotImplemented)
@@ -1188,7 +1177,7 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
             ChipLogError(Controller,
                          "Failed in verifying 'Attestation Information' command received from the device due to default "
                          "DeviceAttestationVerifier Class not being overridden by a real implementation.");
-            return CHIP_ERROR_NOT_IMPLEMENTED;
+            SuccessOrExit(error = CHIP_ERROR_NOT_IMPLEMENTED);
         }
         else
         {
@@ -1198,11 +1187,33 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
                          static_cast<uint16_t>(result));
             // Go look at AttestationVerificationResult enum in src/credentials/DeviceAttestationVerifier.h to understand the
             // errors.
-            return CHIP_ERROR_INTERNAL;
+            SuccessOrExit(error = CHIP_ERROR_INTERNAL);
         }
     }
 
     ChipLogProgress(Controller, "Successfully validated 'Attestation Information' command received from the device.");
+
+exit:
+    commissioner->HandleAttestationResult(error);
+}
+
+CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature)
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mDeviceBeingCommissioned != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
+
+    // Retrieve attestation challenge
+    ByteSpan attestationChallenge = mSystemState->SessionMgr()
+                                        ->GetSecureSession(mDeviceBeingCommissioned->GetSecureSession().Value())
+                                        ->GetCryptoContext()
+                                        .GetAttestationChallenge();
+
+    dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature,
+                                               mDeviceBeingCommissioned->GetPAI(), mDeviceBeingCommissioned->GetDAC(),
+                                               mDeviceBeingCommissioned->GetAttestationNonce(),
+                                               &mDeviceAttestationInformationVerificationCallback);
 
     // TODO: Validate Firmware Information
 

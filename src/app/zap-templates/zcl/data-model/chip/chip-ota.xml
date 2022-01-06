@@ -88,7 +88,7 @@ limitations under the License.
         <item name="UpdateAvailable" value="0x1"/>
         <item name="UrgentUpdateAvailable" value="0x2"/>
     </enum>
-    <enum name="UpdateStateEnum" type="ENUM8">
+    <enum name="OTAUpdateStateEnum" type="ENUM8">
         <cluster code="0x002a"/>
         <item name="Unknown" value="0x0"/>
         <item name="Idle" value="0x1"/>
@@ -100,7 +100,7 @@ limitations under the License.
         <item name="RollingBack" value="0x7"/>
         <item name="DelayedOnUserConsent" value="0x8"/>            
     </enum>
-    <enum name="ChangeReasonEnum" type="ENUM8">
+    <enum name="OTAChangeReasonEnum" type="ENUM8">
         <cluster code="0x002a"/>
         <item name="Unknown" value="0x0"/>
         <item name="Success" value="0x1"/>
@@ -124,7 +124,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
         <attribute side="server" code="0x0000" define="DEFAULT_OTA_PROVIDERS" type="ARRAY" entryType="ProviderLocation" writable="true" optional="false">DefaultOtaProviders</attribute>
         <attribute side="server" code="0x0001" define="UPDATE_POSSIBLE" type="BOOLEAN" default="true" writable="false" optional="false">UpdatePossible</attribute>
-        <attribute side="server" code="0x0002" define="UPDATE_STATE" type="UpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
+        <attribute side="server" code="0x0002" define="UPDATE_STATE" type="OTAUpdateStateEnum" default="Unknown" writable="false" optional="false">UpdateState</attribute>
         <attribute side="server" code="0x0003" define="UPDATE_STATE_PROGRESS" type="INT8U" min="0" max="100" writable="false" isNullable="true" optional="false">UpdateStateProgress</attribute>
         <command source="client" code="0x00" name="AnnounceOtaProvider" optional="true" cli="chip ota announceotaprovider">
             <description>Announce the presence of an OTA Provider</description>
@@ -136,9 +136,9 @@ limitations under the License.
         </command>
         <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
           <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
-          <field id="0" name="PreviousState" type="UpdateStateEnum" isNullable="true"/>
-          <field id="1" name="NewState" type="UpdateStateEnum"/>
-          <field id="2" name="Reason" type="ChangeReasonEnum"/>
+          <field id="0" name="PreviousState" type="OTAUpdateStateEnum" isNullable="true"/>
+          <field id="1" name="NewState" type="OTAUpdateStateEnum"/>
+          <field id="2" name="Reason" type="OTAChangeReasonEnum"/>
           <field id="3" name="TargetSoftwareVersion" type="INT32U" isNullable="true"/>
         </event> 
         <event side="server" code="0x01" name="VersionApplied" priority="critical" optional="false">

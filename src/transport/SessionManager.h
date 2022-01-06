@@ -294,7 +294,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    void HandleConnectionExpired(const Transport::SecureSession & state);
+    void HandleConnectionExpired(Transport::SecureSession & state);
 
     /**
      * Callback for timer expiry check

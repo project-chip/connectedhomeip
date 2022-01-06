@@ -34,7 +34,9 @@
 
 class DoorLockServer
 {
+public:
     static DoorLockServer & Instance();
+    static DoorLockServer instance;
 
     void InitServer(chip::EndpointId endpointId);
 
@@ -48,14 +50,10 @@ class DoorLockServer
 
     bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
     bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
-
-private:
-    static DoorLockServer instance;
 };
 
-bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCOde);
-bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
-
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 // =============================================================================
 // Pre-change callbacks for cluster attributes
 // =============================================================================

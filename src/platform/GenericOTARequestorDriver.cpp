@@ -25,6 +25,8 @@ namespace chip {
 namespace DeviceLayer {
 namespace {
 
+using namespace app::Clusters::OtaSoftwareUpdateRequestor;
+
 GenericOTARequestorDriver * ToDriver(void * context)
 {
     return static_cast<GenericOTARequestorDriver *>(context);
@@ -42,7 +44,7 @@ uint16_t GenericOTARequestorDriver::GetMaxDownloadBlockSize()
     return 1024;
 }
 
-void GenericOTARequestorDriver::HandleError(UpdateStateEnum state, CHIP_ERROR error)
+void GenericOTARequestorDriver::HandleError(OTAUpdateStateEnum state, CHIP_ERROR error)
 {
     // TODO: Schedule the next QueryImage
 }
@@ -50,7 +52,7 @@ void GenericOTARequestorDriver::HandleError(UpdateStateEnum state, CHIP_ERROR er
 void GenericOTARequestorDriver::UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(UpdateStateEnum::DelayedOnQuery, delay,
+    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnQuery, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->DownloadUpdate(); });
 }
 
@@ -68,14 +70,14 @@ void GenericOTARequestorDriver::UpdateDownloaded()
 void GenericOTARequestorDriver::UpdateConfirmed(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mImageProcessor != nullptr);
-    ScheduleDelayedAction(UpdateStateEnum::DelayedOnApply, delay,
+    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnApply, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mImageProcessor->Apply(); });
 }
 
 void GenericOTARequestorDriver::UpdateSuspended(System::Clock::Seconds32 delay)
 {
     VerifyOrDie(mRequestor != nullptr);
-    ScheduleDelayedAction(UpdateStateEnum::DelayedOnApply, delay,
+    ScheduleDelayedAction(OTAUpdateStateEnum::kDelayedOnApply, delay,
                           [](System::Layer *, void * context) { ToDriver(context)->mRequestor->ApplyUpdate(); });
 }
 
@@ -85,7 +87,7 @@ void GenericOTARequestorDriver::UpdateDiscontinued()
     mImageProcessor->Abort();
 }
 
-void GenericOTARequestorDriver::ScheduleDelayedAction(UpdateStateEnum state, System::Clock::Seconds32 delay,
+void GenericOTARequestorDriver::ScheduleDelayedAction(OTAUpdateStateEnum state, System::Clock::Seconds32 delay,
                                                       System::TimerCompleteCallback action)
 {
     CHIP_ERROR error = SystemLayer().StartTimer(std::chrono::duration_cast<System::Clock::Timeout>(delay), action, this);
