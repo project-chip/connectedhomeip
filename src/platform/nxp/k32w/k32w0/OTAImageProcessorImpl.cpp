@@ -28,11 +28,11 @@ namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-	if (mParams.imageFile.empty())
-	{
+    if (mParams.imageFile.empty())
+    {
         ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
         return CHIP_ERROR_INTERNAL;
-	}
+    }
 
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
@@ -63,20 +63,20 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-	if ((block.data() == nullptr) || block.empty())
-	{
-	    return CHIP_ERROR_INVALID_ARGUMENT;
-	}
+    if ((block.data() == nullptr) || block.empty())
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
-	// Store block data for HandleProcessBlock to access
-	CHIP_ERROR err = SetBlock(block);
-	if (err != CHIP_NO_ERROR)
-	{
-	    ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
-	}
+    // Store block data for HandleProcessBlock to access
+    CHIP_ERROR err = SetBlock(block);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Cannot set block data: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 
-	DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
-	return CHIP_NO_ERROR;
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleProcessBlock, reinterpret_cast<intptr_t>(this));
+    return CHIP_NO_ERROR;
 }
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
@@ -129,9 +129,10 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     }
 
     /* Will start an erase of 4K if necessary */
-    if  (gOtaSuccess_c == OTA_MakeHeadRoomForNextBlock(imageProcessor->mBlock.size(), NULL, 0))
+    if (gOtaSuccess_c == OTA_MakeHeadRoomForNextBlock(imageProcessor->mBlock.size(), NULL, 0))
     {
-        if (gOtaSuccess_c == OTA_PushImageChunk (imageProcessor->mBlock.data(), (uint16_t)imageProcessor->mBlock.size(), NULL, NULL))
+        if (gOtaSuccess_c ==
+            OTA_PushImageChunk(imageProcessor->mBlock.data(), (uint16_t) imageProcessor->mBlock.size(), NULL, NULL))
         {
             imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
             return;
@@ -176,11 +177,11 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
     }
 
     OTA_CommitImage(NULL);
-    if(OTA_ImageAuthenticate() == gOtaImageAuthPass_c)
+    if (OTA_ImageAuthenticate() == gOtaImageAuthPass_c)
     {
         /* Set the necessary information to inform the SSBL that a new image is available */
-        OTA_SetNewImageFlag ();
-        ResetMCU ();
+        OTA_SetNewImageFlag();
+        ResetMCU();
     }
 
     imageProcessor->ReleaseBlock();

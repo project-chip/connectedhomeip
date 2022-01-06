@@ -35,10 +35,10 @@
 
 /* OTA related includes */
 #include "OTAImageProcessorImpl.h"
+#include "OtaSupport.h"
 #include "platform/GenericOTARequestorDriver.h"
 #include "src/app/clusters/ota-requestor/BDXDownloader.h"
 #include "src/app/clusters/ota-requestor/OTARequestor.h"
-#include "OtaSupport.h"
 
 #include "Keyboard.h"
 #include "LED.h"
@@ -78,7 +78,8 @@ extern "C" void K32WUartProcess(void);
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
-using namespace chip;;
+using namespace chip;
+;
 
 AppTask AppTask::sAppTask;
 

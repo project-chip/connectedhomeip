@@ -19,8 +19,8 @@
 #pragma once
 
 #include <src/app/clusters/ota-requestor/OTADownloader.h>
-#include <src/include/platform/OTAImageProcessor.h>
 #include <src/include/platform/CHIPDeviceLayer.h>
+#include <src/include/platform/OTAImageProcessor.h>
 
 namespace chip {
 
