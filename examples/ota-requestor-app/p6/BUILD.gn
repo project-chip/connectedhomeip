@@ -64,7 +64,6 @@ p6_executable("ota_requestor_app") {
     "${examples_plat_dir}/init_p6Platform.cpp",
     "src/AppTask.cpp",
     "src/ButtonHandler.cpp",
-    "src/ClusterManager.cpp",
     "src/ZclCallbacks.cpp",
     "src/main.cpp",
   ]
@@ -74,6 +73,7 @@ p6_executable("ota_requestor_app") {
     "${chip_root}/examples/ota-requestor-app/ota-requestor-common",
     "${chip_root}/examples/common/QRCode",
     "${chip_root}/src/lib",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/setup_payload",
   ]
 

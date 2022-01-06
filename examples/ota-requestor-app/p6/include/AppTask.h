@@ -54,7 +54,6 @@ private:
 
     static AppTask sAppTask;
     void DispatchEvent(AppEvent * event);
-    static void OnOffUpdateClusterState(void);
 };
 
 inline AppTask & GetAppTask(void)

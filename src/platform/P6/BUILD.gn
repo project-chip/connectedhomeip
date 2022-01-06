@@ -50,6 +50,8 @@ static_library("P6") {
     "MTBKeyValueStore.h",
     "NetworkCommissioningDriver.h",
     "NetworkCommissioningWiFiDriver.cpp",
+    "OTAImageProcessorImpl.cpp",
+    "OTAImageProcessorImpl.h",
     "P6Config.cpp",
     "P6Config.h",
     "P6Utils.cpp",
