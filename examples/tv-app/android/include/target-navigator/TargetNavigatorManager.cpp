@@ -41,7 +41,7 @@ uint8_t TargetNavigatorManager::HandleGetCurrentTarget()
     return 0;
 }
 
-Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint64_t & target,
+Commands::NavigateTargetResponse::Type TargetNavigatorManager::HandleNavigateTarget(const uint8_t & target,
                                                                                     const chip::CharSpan & data)
 {
     // TODO: Insert code here
