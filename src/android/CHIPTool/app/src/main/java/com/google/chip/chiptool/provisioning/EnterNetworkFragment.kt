@@ -64,13 +64,13 @@ class EnterNetworkFragment : Fragment() {
 
   private fun onSaveNetworkClicked() {
     if (networkType == ProvisionNetworkType.WIFI) {
-      saveWifiNetwork()
+      saveWiFiNetwork()
     } else {
       saveThreadNetwork()
     }
   }
 
-  private fun saveWifiNetwork() {
+  private fun saveWiFiNetwork() {
     val ssid = ssidEd?.text
     val pwd = pwdEd?.text
 
@@ -79,8 +79,8 @@ class EnterNetworkFragment : Fragment() {
       return
     }
 
-    val networkCredentials = NetworkCredentials.forWifi(
-      NetworkCredentials.WifiCredentials(ssid.toString(), pwd.toString())
+    val networkCredentials = NetworkCredentials.forWiFi(
+      NetworkCredentials.WiFiCredentials(ssid.toString(), pwd.toString())
     )
     FragmentUtil.getHost(this, Callback::class.java)
       ?.onNetworkCredentialsEntered(networkCredentials)

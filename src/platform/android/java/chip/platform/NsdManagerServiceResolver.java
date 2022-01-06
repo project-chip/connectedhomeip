@@ -20,8 +20,8 @@ package chip.platform;
 import android.content.Context;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
-import android.net.wifi.WifiManager;
-import android.net.wifi.WifiManager.MulticastLock;
+import android.net.wifi.WiFiManager;
+import android.net.wifi.WiFiManager.MulticastLock;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -41,7 +41,7 @@ public class NsdManagerServiceResolver implements ServiceResolver {
     this.mainThreadHandler = new Handler(Looper.getMainLooper());
 
     this.multicastLock =
-        ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+        ((WiFiManager) context.getSystemService(Context.WIFI_SERVICE))
             .createMulticastLock("chipMulticastLock");
     this.multicastLock.setReferenceCounted(true);
   }

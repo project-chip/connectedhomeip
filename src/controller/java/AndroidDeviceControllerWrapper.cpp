@@ -104,7 +104,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                  "onOpCSRGenerationComplete", "([B)V", &method);
+                                                             "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());
@@ -290,12 +290,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
 
     // Retrieve WiFi or Thread credentials from the NetworkCredentials Java object, and set them in the commissioning params.
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
-    jmethodID getWifiCredentials;
-    err = chip::JniReferences::GetInstance().FindMethod(env, networkCredentials, "getWifiCredentials",
-                                                        "()Lchip/devicecontroller/NetworkCredentials$WifiCredentials;",
-                                                        &getWifiCredentials);
+    jmethodID getWiFiCredentials;
+    err = chip::JniReferences::GetInstance().FindMethod(env, networkCredentials, "getWiFiCredentials",
+                                                        "()Lchip/devicecontroller/NetworkCredentials$WiFiCredentials;",
+                                                        &getWiFiCredentials);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err);
-    jobject wifiCredentialsJava = env->CallObjectMethod(networkCredentials, getWifiCredentials);
+    jobject wifiCredentialsJava = env->CallObjectMethod(networkCredentials, getWiFiCredentials);
 
     jmethodID getThreadCredentials;
     err = chip::JniReferences::GetInstance().FindMethod(env, networkCredentials, "getThreadCredentials",
@@ -323,8 +323,8 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
         jsize ssidLength     = env->GetStringUTFLength(ssidStr);
         jsize passwordLength = env->GetStringUTFLength(passwordStr);
 
-        params.SetWifiCredentials(
-            WifiCredentials(chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), static_cast<size_t>(ssidLength)),
+        params.SetWiFiCredentials(
+            WiFiCredentials(chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), static_cast<size_t>(ssidLength)),
                             chip::ByteSpan(reinterpret_cast<const uint8_t *>(password), static_cast<size_t>(passwordLength))));
     }
     else if (threadCredentialsJava != nullptr)

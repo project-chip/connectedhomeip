@@ -118,7 +118,7 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance())
   }
 
-  override fun onProvisionWifiCredentialsClicked() {
+  override fun onProvisionWiFiCredentialsClicked() {
     networkType = ProvisionNetworkType.WIFI
     showFragment(BarcodeFragment.newInstance(), false)
   }
