@@ -36,9 +36,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         memcpy(mThreadOperationalDataset, dataset.data(), dataset.size());
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
-    if (params.HasWifiCredentials())
+    if (params.HasWiFiCredentials())
     {
-        WifiCredentials creds = params.GetWifiCredentials().Value();
+        WiFiCredentials creds = params.GetWiFiCredentials().Value();
         if (creds.ssid.size() > CommissioningParameters::kMaxSsidLen ||
             creds.credentials.size() > CommissioningParameters::kMaxCredentialsLen)
         {
@@ -46,8 +46,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         }
         memcpy(mSsid, creds.ssid.data(), creds.ssid.size());
         memcpy(mCredentials, creds.credentials.data(), creds.credentials.size());
-        mParams.SetWifiCredentials(
-            WifiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
+        mParams.SetWiFiCredentials(
+            WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
     return CHIP_NO_ERROR;
 }
@@ -66,9 +66,9 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkSetup;
+            return CommissioningStage::kWiFiNetworkSetup;
         }
         else if (mParams.HasThreadOperationalDataset())
         {
@@ -82,26 +82,26 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kSendComplete;
 #endif
         }
-    case CommissioningStage::kWifiNetworkSetup:
+    case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
         else
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
         else
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
 
-    case CommissioningStage::kWifiNetworkEnable:
+    case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkEnable;

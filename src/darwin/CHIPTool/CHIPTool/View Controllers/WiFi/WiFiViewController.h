@@ -19,7 +19,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WifiViewController : UIViewController
+@interface WiFiViewController : UIViewController
 
 @end
 

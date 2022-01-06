@@ -72,7 +72,7 @@ public:
     void _MaintainOnDemandWiFiAP();
     System::Clock::Timeout _GetWiFiAPIdleTimeout();
     void _SetWiFiAPIdleTimeout(System::Clock::Timeout val);
-    CHIP_ERROR _GetAndLogWifiStatsCounters();
+    CHIP_ERROR _GetAndLogWiFiStatsCounters();
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
@@ -162,7 +162,7 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiAPIdleTimeou
 {}
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetAndLogWifiStatsCounters()
+inline CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_GetAndLogWiFiStatsCounters()
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

@@ -892,7 +892,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    if (!params.HasWifiCredentials() && !params.HasThreadOperationalDataset() && !mIsIPRendezvous)
+    if (!params.HasWiFiCredentials() && !params.HasThreadOperationalDataset() && !mIsIPRendezvous)
     {
         ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -1834,8 +1834,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kConfigACL:
         // TODO: Implement
         break;
-    case CommissioningStage::kWifiNetworkSetup: {
-        if (!params.HasWifiCredentials())
+    case CommissioningStage::kWiFiNetworkSetup: {
+        if (!params.HasWiFiCredentials())
         {
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
@@ -1845,8 +1845,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.AddOrUpdateWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid,
-                                      params.GetWifiCredentials().Value().credentials, breadcrumb);
+        netCom.AddOrUpdateWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid,
+                                      params.GetWiFiCredentials().Value().credentials, breadcrumb);
     }
     break;
     case CommissioningStage::kThreadNetworkSetup: {
@@ -1864,8 +1864,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                         breadcrumb);
     }
     break;
-    case CommissioningStage::kWifiNetworkEnable: {
-        if (!params.HasWifiCredentials())
+    case CommissioningStage::kWiFiNetworkEnable: {
+        if (!params.HasWiFiCredentials())
         {
             CommissioningDelegate::CommissioningReport report;
             report.stageCompleted = step;
@@ -1875,7 +1875,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioningCluster netCom;
         netCom.Associate(proxy, 0);
-        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid, breadcrumb);
+        netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid, breadcrumb);
     }
     break;
     case CommissioningStage::kThreadNetworkEnable: {

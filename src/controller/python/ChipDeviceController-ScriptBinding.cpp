@@ -117,7 +117,7 @@ ChipError::StorageType pychip_DeviceController_ConnectBLE(chip::Controller::Devi
 ChipError::StorageType pychip_DeviceController_ConnectIP(chip::Controller::DeviceCommissioner * devCtrl, const char * peerAddrStr,
                                                          uint32_t setupPINCode, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const char * threadOperationalDataset, uint32_t size);
-ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * ssid, const char * credentials);
+ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials);
 ChipError::StorageType pychip_DeviceController_CloseSession(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeid);
 ChipError::StorageType pychip_DeviceController_EstablishPASESessionIP(chip::Controller::DeviceCommissioner * devCtrl,
                                                                       const char * peerAddrStr, uint32_t setupPINCode,
@@ -349,7 +349,7 @@ ChipError::StorageType pychip_DeviceController_SetThreadOperationalDataset(const
     sCommissioningParameters.SetThreadOperationalDataset(ByteSpan(sThreadBuf.Get(), size));
     return CHIP_NO_ERROR.AsInteger();
 }
-ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * ssid, const char * credentials)
+ChipError::StorageType pychip_DeviceController_SetWiFiCredentials(const char * ssid, const char * credentials)
 {
     size_t ssidSize = strlen(ssid);
     ReturnErrorCodeIf(!sSsidBuf.Alloc(ssidSize), CHIP_ERROR_NO_MEMORY.AsInteger());
@@ -359,10 +359,10 @@ ChipError::StorageType pychip_DeviceController_SetWifiCredentials(const char * s
     ReturnErrorCodeIf(!sCredsBuf.Alloc(credsSize), CHIP_ERROR_NO_MEMORY.AsInteger());
     memcpy(sCredsBuf.Get(), credentials, credsSize);
 
-    sCommissioningParameters.SetWifiCredentials(
-        chip::Controller::WifiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
+    sCommissioningParameters.SetWiFiCredentials(
+        chip::Controller::WiFiCredentials(ByteSpan(sSsidBuf.Get(), ssidSize), ByteSpan(sCredsBuf.Get(), credsSize)));
     char tmp[128];
-    chip::Platform::CopyString(tmp, sCommissioningParameters.GetWifiCredentials().Value().ssid);
+    chip::Platform::CopyString(tmp, sCommissioningParameters.GetWiFiCredentials().Value().ssid);
     return CHIP_NO_ERROR.AsInteger();
 }
 

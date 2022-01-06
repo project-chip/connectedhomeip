@@ -338,7 +338,7 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
     return frequency;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     esp_err_t err;
     wifi_config_t wifiConfig;
@@ -366,7 +366,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
                   "Our bits are going to start overlapping");
     bssid = static_cast<uint16_t>((wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5]);
     ChipLogProgress(DeviceLayer,
-                    "Wifi-Telemetry\n"
+                    "WiFi-Telemetry\n"
                     "BSSID: %x\n"
                     "freq: %d\n",
                     bssid, freq);
