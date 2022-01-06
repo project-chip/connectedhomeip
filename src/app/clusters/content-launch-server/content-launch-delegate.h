@@ -35,8 +35,7 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual Commands::LaunchResponse::Type HandleLaunchContent(chip::EndpointId endpointId,
-                                                               const std::list<Parameter> & parameterList, bool autoplay,
+    virtual Commands::LaunchResponse::Type HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay,
                                                                const chip::CharSpan & data) = 0;
 
     virtual Commands::LaunchResponse::Type HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,

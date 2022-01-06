@@ -27,8 +27,7 @@ ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHead
     mSupportedStreamingProtocols = supportedStreamingProtocols;
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                           const std::list<Parameter> & parameterList,
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(const std::list<Parameter> & parameterList,
                                                                            bool autoplay, const chip::CharSpan & data)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");

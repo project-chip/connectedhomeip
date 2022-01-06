@@ -151,13 +151,12 @@ ContentAppFactoryImpl::ContentAppFactoryImpl() {}
 
 ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
 {
-    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
+    for (auto & app : mContentApps)
     {
-        ContentAppImpl app = mContentApps[i];
         if (app.GetApplicationBasicDelegate()->HandleGetVendorId() == vendorId)
         {
-            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
-            return &mContentApps[i];
+            AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            return &app;
         }
     }
     ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendor %d not found ", vendorId);
@@ -173,14 +172,13 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application applicatio
                     "application.applicationIdSize=%ld application.applicationId=%s ",
                     application.catalogVendorId, application.applicationId.size(), appId.c_str());
 
-    for (unsigned int i = 0; i < APP_LIBRARY_SIZE; i++)
+    for (auto & app : mContentApps)
     {
-        ContentAppImpl app = mContentApps[i];
         ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetApplicationName());
         if (strcmp(app.GetApplicationBasicDelegate()->GetApplicationName(), appId.c_str()) == 0)
         {
-            AppPlatform::GetInstance().AddContentApp(&mContentApps[i], &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
-            return &mContentApps[i];
+            AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
+            return &app;
         }
     }
     ChipLogProgress(DeviceLayer, "LoadContentAppByAppId() - app id %s not found ", appId.c_str());

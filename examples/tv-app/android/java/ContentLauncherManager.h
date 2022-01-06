@@ -32,8 +32,7 @@ public:
     void InitializeWithObjects(jobject managerObject);
 
     chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
-    HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
-                        const chip::CharSpan & data) override;
+    HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data) override;
     chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
     HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
                     const std::list<BrandingInformation> & brandingInformation) override;

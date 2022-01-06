@@ -194,7 +194,7 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
 
     {
-        Commands::LaunchResponse::Type response = delegate->HandleLaunchContent(endpoint, parameterList, autoplay, data);
+        Commands::LaunchResponse::Type response = delegate->HandleLaunchContent(parameterList, autoplay, data);
         err                                     = commandObj->AddResponseData(commandPath, response);
         SuccessOrExit(err);
     }

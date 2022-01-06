@@ -40,8 +40,7 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
     chip::app::Clusters::ContentLauncher::SetDefaultDelegate(&contentLauncherManager);
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                           const std::list<Parameter> & parameterList,
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(const std::list<Parameter> & parameterList,
                                                                            bool autoplay, const chip::CharSpan & data)
 {
     Commands::LaunchResponse::Type response;
