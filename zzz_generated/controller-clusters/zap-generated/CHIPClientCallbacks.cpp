@@ -2283,11 +2283,11 @@ bool emberAfAccountLoginClusterGetSetupPINResponseCallback(EndpointId endpoint, 
 }
 
 bool emberAfApplicationLauncherClusterLauncherResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status,
-                                                               chip::CharSpan data)
+                                                               chip::ByteSpan data)
 {
     ChipLogProgress(Zcl, "LauncherResponse:");
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-    ChipLogProgress(Zcl, "  data: %.*s", static_cast<int>(data.size()), data.data());
+    ChipLogProgress(Zcl, "  data: %zu", data.size());
 
     GET_CLUSTER_RESPONSE_CALLBACKS("ApplicationLauncherClusterLauncherResponseCallback");
 

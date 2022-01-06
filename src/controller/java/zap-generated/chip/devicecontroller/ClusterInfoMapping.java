@@ -435,11 +435,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, String data) {
+    public void onSuccess(Integer status, byte[] data) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "int");
       responseValues.put(statusResponseValue, status);
-      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "String");
+      CommandResponseInfo dataResponseValue = new CommandResponseInfo("data", "byte[]");
       responseValues.put(dataResponseValue, data);
       callback.onSuccess(responseValues);
     }
@@ -4745,7 +4745,7 @@ public class ClusterInfoMapping {
     Map<String, CommandParameterInfo> applicationLauncherlaunchAppRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo applicationLauncherlaunchAppRequestdataCommandParameterInfo =
-        new CommandParameterInfo("data", String.class);
+        new CommandParameterInfo("data", byte[].class);
     applicationLauncherlaunchAppRequestCommandParams.put(
         "data", applicationLauncherlaunchAppRequestdataCommandParameterInfo);
 
@@ -4766,7 +4766,7 @@ public class ClusterInfoMapping {
               ((ChipClusters.ApplicationLauncherCluster) cluster)
                   .launchAppRequest(
                       (ChipClusters.ApplicationLauncherCluster.LauncherResponseCallback) callback,
-                      (String) commandArguments.get("data"),
+                      (byte[]) commandArguments.get("data"),
                       (Integer) commandArguments.get("catalogVendorId"),
                       (String) commandArguments.get("applicationId"));
             },

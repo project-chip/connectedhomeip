@@ -36,7 +36,7 @@ class Delegate
 public:
     virtual std::list<Structs::TargetInfo::Type> HandleGetTargetList()                                                        = 0;
     virtual uint8_t HandleGetCurrentTarget()                                                                                  = 0;
-    virtual Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) = 0;
+    virtual Commands::NavigateTargetResponse::Type HandleNavigateTarget(const uint8_t & target, const chip::CharSpan & data) = 0;
 
     virtual ~Delegate() = default;
 };

@@ -708,7 +708,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject catalogVendorId, jstring applicationId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray data, jobject catalogVendorId, jstring applicationId)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -716,7 +716,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
 
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type request;
 
-    request.data        = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
+    request.data        = chip::JniByteArray(env, static_cast<jbyteArray>(data)).byteSpan();
     request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,

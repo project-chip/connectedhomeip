@@ -2108,12 +2108,36 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Basic (server) */                                                                 \
-            { 0x0000, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },     /* vendor name */                                   \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* vendor id */                                     \
-            { 0x0002, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },     /* application name */                              \
-            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* product id */                                    \
-            { 0x0005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },            /* application status */                            \
-            { 0x0006, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },     /* application version */                           \
+            {                                                                                                                      \
+                0x0000,                                                                                                            \
+                ZAP_TYPE(CHAR_STRING),                                                                                             \
+                ERROR : vendor name,                                                                                               \
+                invalid size,                                                                                                      \
+                char_string1,                                                                                                      \
+                0,                                                                                                                 \
+                ZAP_EMPTY_DEFAULT()                                                                                                \
+            },                                                       /* vendor name */                                             \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* vendor id */                                               \
+            {                                                                                                                      \
+                0x0002,                                                                                                            \
+                ZAP_TYPE(CHAR_STRING),                                                                                             \
+                ERROR : application name,                                                                                          \
+                invalid size,                                                                                                      \
+                char_string1,                                                                                                      \
+                0,                                                                                                                 \
+                ZAP_EMPTY_DEFAULT()                                                                                                \
+            },                                                       /* application name */                                        \
+            { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* product id */                                              \
+            { 0x0005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* application status */                                      \
+            {                                                                                                                      \
+                0x0006,                                                                                                            \
+                ZAP_TYPE(CHAR_STRING),                                                                                             \
+                ERROR : application version,                                                                                       \
+                invalid size,                                                                                                      \
+                char_string1,                                                                                                      \
+                0,                                                                                                                 \
+                ZAP_EMPTY_DEFAULT()                                                                                                \
+            },                                                                 /* application version */                           \
             { 0x0007, ZAP_TYPE(ARRAY), 32, 0, ZAP_LONG_DEFAULTS_INDEX(2542) }, /* allowed vendor list */                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                               \
                                                                                                                                    \
@@ -2592,7 +2616,18 @@
                 0x050C, ZAP_ATTRIBUTE_INDEX(482), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 1, Cluster: Application Launcher (server) */                                                           \
             {                                                                                                                      \
-                0x050D, ZAP_ATTRIBUTE_INDEX(484), 8, 138, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x050D,                                                                                                            \
+                ZAP_ATTRIBUTE_INDEX(484),                                                                                          \
+                8,                                                                                                                 \
+                0ERROR : vendor name,                                                                                              \
+                invalid size,                                                                                                      \
+                char_string12ERROR : application name,                                                                             \
+                invalid size,                                                                                                      \
+                char_string121ERROR : application version,                                                                         \
+                invalid size,                                                                                                      \
+                char_string1322,                                                                                                   \
+                ZAP_CLUSTER_MASK(SERVER),                                                                                          \
+                NULL                                                                                                               \
             }, /* Endpoint: 1, Cluster: Application Basic (server) */                                                              \
             {                                                                                                                      \
                 0x050E, ZAP_ATTRIBUTE_INDEX(492), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
@@ -2631,7 +2666,18 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 23, 1465 }, { ZAP_CLUSTER_INDEX(23), 46, 6170 }, { ZAP_CLUSTER_INDEX(69), 4, 21 },                 \
+        { ZAP_CLUSTER_INDEX(0), 23, 1465 }, {                                                                                      \
+            ZAP_CLUSTER_INDEX(23),                                                                                                 \
+            46,                                                                                                                    \
+            27170ERROR : vendor name,                                                                                              \
+            invalid size,                                                                                                          \
+            char_string12ERROR : application name,                                                                                 \
+            invalid size,                                                                                                          \
+            char_string121ERROR : application version,                                                                             \
+            invalid size,                                                                                                          \
+            char_string13222328528                                                                                                 \
+        },                                                                                                                         \
+            { ZAP_CLUSTER_INDEX(69), 4, 21 },                                                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -2641,7 +2687,12 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (689)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (7656)
+#define ATTRIBUTE_MAX_SIZE                                                                                                         \
+    (4182ERROR                                                                                                                     \
+     : vendor name, invalid size, char_string12ERROR                                                                               \
+     : application name, invalid size, char_string121ERROR                                                                         \
+     : application version, invalid size,                                                                                          \
+       char_string132221124812345678123456781248110001002111002842010112210001112481234567812345678124811111011222442222222222121122142000001112)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

@@ -595,7 +595,7 @@ public class ChipClusters {
 
     public void launchAppRequest(
         LauncherResponseCallback callback,
-        String data,
+        byte[] data,
         Integer catalogVendorId,
         String applicationId) {
       launchAppRequest(chipClusterPtr, callback, data, catalogVendorId, applicationId);
@@ -615,7 +615,7 @@ public class ChipClusters {
     private native void launchAppRequest(
         long chipClusterPtr,
         LauncherResponseCallback Callback,
-        String data,
+        byte[] data,
         Integer catalogVendorId,
         String applicationId);
 
@@ -626,7 +626,7 @@ public class ChipClusters {
         String applicationId);
 
     public interface LauncherResponseCallback {
-      void onSuccess(Integer status, String data);
+      void onSuccess(Integer status, byte[] data);
 
       void onError(Exception error);
     }

@@ -158,7 +158,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         case Commands::LauncherResponse::Id: {
             expectArgumentCount = 2;
             uint8_t status;
-            chip::CharSpan data;
+            chip::ByteSpan data;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
