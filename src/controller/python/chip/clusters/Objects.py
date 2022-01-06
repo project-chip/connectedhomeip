@@ -6989,11 +6989,15 @@ class LocalizationConfiguration(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
+                ClusterObjectFieldDescriptor(Label="activeLocale", Tag=0x00000001, Type=str),
+                ClusterObjectFieldDescriptor(Label="supportedLocales", Tag=0x00000002, Type=typing.List[str]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
+    activeLocale: 'str' = None
+    supportedLocales: 'typing.List[str]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -7002,6 +7006,38 @@ class LocalizationConfiguration(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class ActiveLocale(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=str)
+
+            value: 'str' = ""
+
+        @dataclass
+        class SupportedLocales(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002B
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[str])
+
+            value: 'typing.List[str]' = field(default_factory=lambda: [])
+
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
             @ChipUtility.classproperty

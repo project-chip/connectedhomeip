@@ -6431,6 +6431,38 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocale {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+{
+    uint8_t zclString[35 + 1];
+    EmberAfStatus status =
+        emberAfReadServerAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+
+    VerifyOrReturnError(value.size() == 35, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 35);
+    value.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    static_assert(35 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 35, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[35 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::LocalizationConfiguration::Id, Id, zclString,
+                                       ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace ActiveLocale
+
 namespace FeatureMap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)

@@ -6322,6 +6322,12 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 {
     switch (path.mAttributeId)
     {
+    case Attributes::ActiveLocale::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, activeLocale));
+        break;
+    case Attributes::SupportedLocales::TypeInfo::GetAttributeId():
+        ReturnErrorOnFailure(DataModel::Decode(reader, supportedLocales));
+        break;
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
         ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
         break;
