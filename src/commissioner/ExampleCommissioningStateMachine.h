@@ -347,9 +347,12 @@ struct NetworkFeatureMapRead : chip::Commissioner::States::Base<Context>
     {}
     void Enter()
     {
-        // TODO: currently, devices don't correctly report the neworking
-        // commissioning cluster feature map attribute.  But when they do, we
-        // should key network configuration on this.  For now, just log it.
+        // TODO(#13170): Until platform driver support is added for the network
+        // commissioning cluster, many devices may incorrectly report the
+        // feature map attribute.  When this is resolved, we can branch our
+        // state machine on cluster cability (WiFi, Thread or Ethernet). But
+        // until then, we will infer commissoinee network type from the
+        // credentials given to us and only log the feature map.
         ChipLogDetail(Controller, "Network Feature Map = 0x%08" PRIX32, mFeatureMap);
         if (mSsid.size())
         {
@@ -361,8 +364,9 @@ struct NetworkFeatureMapRead : chip::Commissioner::States::Base<Context>
         }
         else
         {
-            // We should only arrive here if the commissionee was not located on
-            // an IP network.
+            // We should only arrive in this state if the commissionee was not
+            // located on an IP network.  In such cases, we need to configure a
+            // WiFi or Thread network.  If we can't, that's a failure.
             this->mCtx.Dispatch(Event::Create<Failure>());
         }
     };
