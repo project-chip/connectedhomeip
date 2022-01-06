@@ -172,13 +172,23 @@ struct AttestationVerification : chip::Commissioner::States::Base<Context>
     {
         auto testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
         auto verifier         = chip::Credentials::GetDefaultDACVerifier(testingRootStore);
-        auto result           = verifier->VerifyAttestationInformation(
+        Callback::Callback<Credentials::OnAttestationInformationVerification> callback(OnVerification, this);
+        verifier->VerifyAttestationInformation(
             mAttestationInformation.AttestationElements()->Get(), mAttestationInformation.Challenge()->Get(),
             mAttestationInformation.Signature()->Get(), mAttestationInformation.Pai()->Get(), mAttestationInformation.Dac()->Get(),
-            mAttestationInformation.Nonce()->Get());
+            mAttestationInformation.Nonce()->Get(), &callback);
+    }
+
+    void DispatchSuccess() { this->mCtx.Dispatch(Event::Create<AttestationInformation>(mAttestationInformation)); }
+    void DispatchFailure() { this->mCtx.Dispatch(Event::Create<Failure>()); }
+
+private:
+    static void OnVerification(void * context, Credentials::AttestationVerificationResult result)
+    {
+        auto state = static_cast<AttestationVerification *>(context);
         if (result == chip::Credentials::AttestationVerificationResult::kSuccess)
         {
-            this->mCtx.Dispatch(Event::Create<AttestationInformation>(mAttestationInformation));
+            state->DispatchSuccess();
         }
         else
         {
@@ -188,11 +198,10 @@ struct AttestationVerification : chip::Commissioner::States::Base<Context>
                          static_cast<uint16_t>(result));
             // Go look at AttestationVerificationResult enum in src/credentials/DeviceAttestationVerifier.h to understand the
             // errors.
-            this->mCtx.Dispatch(Event::Create<Failure>());
+            state->DispatchFailure();
         }
     }
 
-private:
     AttestationInformation mAttestationInformation;
 };
 
