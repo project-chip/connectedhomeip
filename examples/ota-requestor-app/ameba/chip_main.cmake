@@ -28,8 +28,6 @@ list(
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
     ${chip_dir}/src/app/util/im-client-callbacks.cpp
-
-    ${sdk_root}/component/soc/realtek/amebad/misc/rtl8721d_ota.c
 )
 
 add_library(
