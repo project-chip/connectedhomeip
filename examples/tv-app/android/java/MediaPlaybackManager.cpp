@@ -155,7 +155,7 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jlong>(mediaPlaybackRequest),
+    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jint>(mediaPlaybackRequest),
                              static_cast<jlong>(deltaPositionMilliseconds));
     if (env->ExceptionCheck())
     {
