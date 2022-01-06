@@ -3493,7 +3493,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _data = @"";
+        _data = [NSData data];
 
         _application = [CHIPApplicationLauncherClusterApplication new];
     }
@@ -3530,7 +3530,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _status = @(0);
 
-        _data = @"";
+        _data = [NSData data];
     }
     return self;
 }

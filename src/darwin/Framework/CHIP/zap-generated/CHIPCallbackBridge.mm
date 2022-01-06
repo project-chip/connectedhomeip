@@ -5086,7 +5086,7 @@ void CHIPApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = [NSData dataWithBytes:data.data.data() length:data.data.size()];
     }
     DispatchSuccess(context, response);
 };

@@ -83,7 +83,7 @@ public:
     CHIP_ERROR HideAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                               uint16_t catalogVendorId, chip::CharSpan applicationId);
     CHIP_ERROR LaunchAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
+                                chip::ByteSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId);
     CHIP_ERROR StopAppRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                               uint16_t catalogVendorId, chip::CharSpan applicationId);
 };

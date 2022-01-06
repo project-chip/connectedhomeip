@@ -1641,7 +1641,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPApplicationLauncherClusterLaunchAppRequestParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSData * _Nonnull data;
 @property (strong, nonatomic) CHIPApplicationLauncherClusterApplication * _Nonnull application;
 - (instancetype)init;
 @end
@@ -1658,7 +1658,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPApplicationLauncherClusterLauncherResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSData * _Nonnull data;
 - (instancetype)init;
 @end
 

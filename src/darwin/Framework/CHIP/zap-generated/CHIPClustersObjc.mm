@@ -793,7 +793,7 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
-    request.data = [self asCharSpan:params.data];
+    request.data = [self asByteSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
     request.application.applicationId = [self asCharSpan:params.application.applicationId];

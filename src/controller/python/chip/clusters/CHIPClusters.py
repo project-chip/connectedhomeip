@@ -242,7 +242,7 @@ class ChipClusters:
                     "commandId": 0x00000000,
                     "commandName": "LaunchAppRequest",
                     "args": {
-                        "data": "str",
+                        "data": "bytes",
                         "catalogVendorId": "int",
                         "applicationId": "str",
                     },

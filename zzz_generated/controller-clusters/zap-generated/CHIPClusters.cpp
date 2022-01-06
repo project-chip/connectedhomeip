@@ -346,7 +346,7 @@ exit:
 }
 
 CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data,
+                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan data,
                                                         uint16_t catalogVendorId, chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -371,8 +371,8 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * o
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // data: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
+    // data: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), data));
     // catalogVendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
     // applicationId: charString
