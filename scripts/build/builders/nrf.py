@@ -143,20 +143,20 @@ class NrfConnectBuilder(Builder):
                     raise Exception('ZEPHYR_BASE validation failed')
             if os.path.exists(os.path.join(
                     self.root, self.app.AppPath(), "nrfconnect/boards/"+self.board.GnArgName()+".conf")):
-                boardconfig = "-DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
+                boardconfig = " -DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
             else:
                 boardconfig = ""
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir} -- {boardoverlay} {rpcs}
+west build --cmake-only -d {outdir} -b {board} {sourcedir} --{boardoverlay}{rpcs}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
                     self.root, self.app.AppPath(), 'nrfconnect')),
                 boardoverlay=boardconfig,
-                rpcs="-DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
+                rpcs=" -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
             ).strip()
 
             self._Execute(['bash', '-c', cmd],
