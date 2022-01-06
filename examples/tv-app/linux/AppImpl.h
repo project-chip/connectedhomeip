@@ -23,8 +23,8 @@
 #pragma once
 
 #include <app-common/zap-generated/enums.h>
-#include <app/util/ContentApp.h>
-#include <app/util/ContentAppPlatform.h>
+#include <app/app-platform/ContentApp.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
 #include <stdbool.h>

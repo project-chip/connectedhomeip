@@ -145,8 +145,8 @@ template("chip_data_model") {
       } else if (cluster == "application-launcher-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          "${_app_root}/util/ContentApp.cpp",
-          "${_app_root}/util/ContentAppPlatform.cpp",
+          "${_app_root}/app-platform/ContentApp.cpp",
+          "${_app_root}/app-platform/ContentAppPlatform.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]

@@ -17,11 +17,9 @@
  */
 
 #include "ContentLauncherManager.h"
-#include <app/util/ContentAppPlatform.h>
 
 using namespace std;
 using namespace chip::app::Clusters::ContentLauncher;
-using namespace chip::AppPlatform;
 
 ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {

@@ -26,8 +26,8 @@
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/data-model/Encode.h>
-#include <app/util/ContentAppPlatform.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;

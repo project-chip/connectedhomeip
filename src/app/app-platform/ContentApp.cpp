@@ -23,7 +23,7 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>

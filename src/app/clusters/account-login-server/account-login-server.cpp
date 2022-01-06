@@ -27,7 +27,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/ContentAppPlatform.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/util/af.h>
 
 using namespace chip;

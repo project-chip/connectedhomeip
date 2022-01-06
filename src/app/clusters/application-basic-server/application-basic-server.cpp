@@ -26,8 +26,8 @@
 #include <app/clusters/application-basic-server/application-basic-server.h>
 
 #include <app/AttributeAccessInterface.h>
+#include <app/app-platform/ContentAppPlatform.h>
 #include <app/data-model/Encode.h>
-#include <app/util/ContentAppPlatform.h>
 #include <app/util/attribute-storage.h>
 #include <list>
 
