@@ -335,6 +335,9 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_HOUR_FORMAT_ATTRIBUTE_ID (0x0000)
+#define ZCL_CALENDAR_TYPE_ATTRIBUTE_ID (0x0001)
+#define ZCL_SUPPORTED_CALENDAR_TYPES_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Localization Unit
 

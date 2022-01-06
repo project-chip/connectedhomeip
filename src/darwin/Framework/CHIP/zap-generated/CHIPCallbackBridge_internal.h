@@ -203,6 +203,14 @@ typedef void (*OtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallb
     void *, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum);
 typedef void (*NullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> &);
+typedef void (*LocalizationTimeFormatClusterCalendarTypeAttributeCallback)(
+    void *, chip::app::Clusters::LocalizationTimeFormat::CalendarType);
+typedef void (*NullableLocalizationTimeFormatClusterCalendarTypeAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::CalendarType> &);
+typedef void (*LocalizationTimeFormatClusterHourFormatAttributeCallback)(void *,
+                                                                         chip::app::Clusters::LocalizationTimeFormat::HourFormat);
+typedef void (*NullableLocalizationTimeFormatClusterHourFormatAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::HourFormat> &);
 typedef void (*LocalizationUnitClusterTempUnitAttributeCallback)(void *, chip::app::Clusters::LocalizationUnit::TempUnit);
 typedef void (*NullableLocalizationUnitClusterTempUnitAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationUnit::TempUnit> &);
@@ -6013,6 +6021,125 @@ public:
         dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
         SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationTimeFormatClusterCalendarTypeAttributeCallback>
+{
+public:
+    CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationTimeFormatClusterCalendarTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LocalizationTimeFormat::CalendarType value);
+};
+
+class CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge
+{
+public:
+    CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableLocalizationTimeFormatClusterCalendarTypeAttributeCallback>
+{
+public:
+    CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                                 CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableLocalizationTimeFormatClusterCalendarTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & value);
+};
+
+class CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge
+    : public CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge
+{
+public:
+    CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationTimeFormatClusterHourFormatAttributeCallback>
+{
+public:
+    CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationTimeFormatClusterHourFormatAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::LocalizationTimeFormat::HourFormat value);
+};
+
+class CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge
+{
+public:
+    CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableLocalizationTimeFormatClusterHourFormatAttributeCallback>
+{
+public:
+    CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                               CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableLocalizationTimeFormatClusterHourFormatAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::HourFormat> & value);
+};
+
+class CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge
+    : public CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge
+{
+public:
+    CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 
