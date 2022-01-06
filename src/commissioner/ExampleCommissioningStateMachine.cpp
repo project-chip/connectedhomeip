@@ -91,7 +91,7 @@ chip::StateMachine::Optional<State> Transitions::operator()(const State & state,
     {
         return mFactory.CreateInvokingArmFailSafe(event.Get<ArmFailSafe>());
     }
-    else if (state.Is<InvokingArmFailSafe>() && (event.Is<Success>() || event.Is<Failure>())) // TODO: current devices fail this
+    else if (state.Is<InvokingArmFailSafe>() && (event.Is<Success>() || event.Is<Failure>())) // TODO(#13327): accept failure; until #13327 is resolved, commissionees will return ArmFailSafe instead of ArmFailSafeResponse
     {
         return mFactory.CreateFailSafeArmed();
     }
@@ -196,7 +196,7 @@ chip::StateMachine::Optional<State> Transitions::operator()(const State & state,
         return mFactory.CreateInvokingCommissioningComplete();
     }
     else if (state.Is<InvokingCommissioningComplete>() &&
-             (event.Is<Success>() || event.Is<Failure>())) // TODO: current devices fail this
+             (event.Is<Success>() || event.Is<Failure>())) // TODO(#13327): accept failure; until #13327 is resolved, commissionees will return CommissioningComplete instead of CommissioningCompleteResponse
     {
         return mFactory.CreateCommissioningComplete();
     }
