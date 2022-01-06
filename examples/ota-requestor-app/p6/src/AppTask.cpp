@@ -46,7 +46,6 @@
 
 LEDWidget sStatusLED;
 LEDWidget sLightLED;
-LEDWidget sClusterLED;
 
 namespace {
 
@@ -112,7 +111,6 @@ CHIP_ERROR AppTask::Init()
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
     sLightLED.Init(LIGHT_LED);
-    sClusterLED.RGB_init();
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -149,9 +147,6 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
 {
     /* ON/OFF Light Led based on Button interrupt */
     sLightLED.Invert();
-
-    /* Update OnOff Cluster state */
-    sAppTask.OnOffUpdateClusterState();
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
@@ -215,21 +210,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         P6_LOG("Event received with no handler. Dropping event.");
     }
-}
-
-void AppTask::OnOffUpdateClusterState(void)
-{
-    uint8_t newValue = sLightLED.Get();
-
-    // write the new on/off value
-    EmberAfStatus status = OnOff::Attributes::OnOff::Set(2, newValue);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        P6_LOG("ERR: updating on/off %x", status);
-    }
-}
-
-bool lowPowerClusterSleep()
-{
-    return true;
 }
