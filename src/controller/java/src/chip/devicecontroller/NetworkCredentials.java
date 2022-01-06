@@ -23,30 +23,30 @@ import androidx.annotation.Nullable;
 
 /** Class for holding WiFi or Thread credentials, but not both. */
 public class NetworkCredentials implements Parcelable {
-  @Nullable private WifiCredentials wifiCredentials;
+  @Nullable private WiFiCredentials wifiCredentials;
   @Nullable private ThreadCredentials threadCredentials;
 
   private NetworkCredentials(
-      @Nullable WifiCredentials wifiCredentials, @Nullable ThreadCredentials threadCredentials) {
+      @Nullable WiFiCredentials wifiCredentials, @Nullable ThreadCredentials threadCredentials) {
     this.wifiCredentials = wifiCredentials;
     this.threadCredentials = threadCredentials;
   }
 
   /**
-   * Return a NetworkCredentials object with the given WifiCredentials and null ThreadCredentials.
+   * Return a NetworkCredentials object with the given WiFiCredentials and null ThreadCredentials.
    */
-  public static NetworkCredentials forWifi(WifiCredentials wifiCredentials) {
+  public static NetworkCredentials forWiFi(WiFiCredentials wifiCredentials) {
     return new NetworkCredentials(wifiCredentials, null);
   }
 
   /**
-   * Return a NetworkCredentials object with the given ThreadCredentials and null WifiCredentials.
+   * Return a NetworkCredentials object with the given ThreadCredentials and null WiFiCredentials.
    */
   public static NetworkCredentials forThread(ThreadCredentials threadCredentials) {
     return new NetworkCredentials(null, threadCredentials);
   }
 
-  public WifiCredentials getWifiCredentials() {
+  public WiFiCredentials getWiFiCredentials() {
     return wifiCredentials;
   }
 
@@ -57,7 +57,7 @@ public class NetworkCredentials implements Parcelable {
   // Begin Parcelable implementation
 
   private NetworkCredentials(Parcel in) {
-    wifiCredentials = in.readParcelable(WifiCredentials.class.getClassLoader());
+    wifiCredentials = in.readParcelable(WiFiCredentials.class.getClassLoader());
     threadCredentials = in.readParcelable(ThreadCredentials.class.getClassLoader());
   }
 
@@ -81,11 +81,11 @@ public class NetworkCredentials implements Parcelable {
         }
       };
 
-  public static class WifiCredentials implements Parcelable {
+  public static class WiFiCredentials implements Parcelable {
     private final String ssid;
     private final String password;
 
-    public WifiCredentials(String ssid, String password) {
+    public WiFiCredentials(String ssid, String password) {
       this.ssid = ssid;
       this.password = password;
     }
@@ -100,7 +100,7 @@ public class NetworkCredentials implements Parcelable {
 
     // Begin Parcelable implementation
 
-    private WifiCredentials(Parcel in) {
+    private WiFiCredentials(Parcel in) {
       ssid = in.readString();
       password = in.readString();
     }
@@ -114,14 +114,14 @@ public class NetworkCredentials implements Parcelable {
       out.writeString(password);
     }
 
-    public static final Parcelable.Creator<WifiCredentials> CREATOR =
-        new Parcelable.Creator<WifiCredentials>() {
-          public WifiCredentials createFromParcel(Parcel in) {
-            return new WifiCredentials(in);
+    public static final Parcelable.Creator<WiFiCredentials> CREATOR =
+        new Parcelable.Creator<WiFiCredentials>() {
+          public WiFiCredentials createFromParcel(Parcel in) {
+            return new WiFiCredentials(in);
           }
 
-          public WifiCredentials[] newArray(int size) {
-            return new WifiCredentials[size];
+          public WiFiCredentials[] newArray(int size) {
+            return new WiFiCredentials[size];
           }
         };
   }

@@ -12,7 +12,7 @@
         android:text="@string/scan_qr_code_btn_text" />
 
     <Button
-        android:id="@+id/provisionWifiCredentialsBtn"
+        android:id="@+id/provisionWiFiCredentialsBtn"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:layout_marginStart="8dp"
