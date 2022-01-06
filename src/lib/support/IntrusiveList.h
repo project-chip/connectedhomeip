@@ -74,6 +74,56 @@ private:
 class IntrusiveListBase
 {
 public:
+    class ConstIteratorBase
+    {
+    private:
+        friend class IntrusiveListBase;
+        ConstIteratorBase(const IntrusiveListNodeBase * cur) : mCurrent(cur) {}
+
+        const IntrusiveListNodeBase & operator*() { return *mCurrent; }
+
+    public:
+        using difference_type   = std::ptrdiff_t;
+        using iterator_category = std::bidirectional_iterator_tag;
+
+        ConstIteratorBase(const ConstIteratorBase &) = default;
+        ConstIteratorBase(ConstIteratorBase &&)      = default;
+        ConstIteratorBase & operator=(const ConstIteratorBase &) = default;
+        ConstIteratorBase & operator=(ConstIteratorBase &&) = default;
+
+        bool operator==(const ConstIteratorBase & that) const { return mCurrent == that.mCurrent; }
+        bool operator!=(const ConstIteratorBase & that) const { return !(*this == that); }
+
+        ConstIteratorBase & operator++()
+        {
+            mCurrent = mCurrent->mNext;
+            return *this;
+        }
+
+        ConstIteratorBase operator++(int)
+        {
+            ConstIteratorBase res(mCurrent);
+            mCurrent = mCurrent->mNext;
+            return res;
+        }
+
+        ConstIteratorBase & operator--()
+        {
+            mCurrent = mCurrent->mPrev;
+            return *this;
+        }
+
+        ConstIteratorBase operator--(int)
+        {
+            ConstIteratorBase res(mCurrent);
+            mCurrent = mCurrent->mPrev;
+            return res;
+        }
+
+    protected:
+        const IntrusiveListNodeBase * mCurrent;
+    };
+
     class IteratorBase
     {
     private:
@@ -140,6 +190,8 @@ protected:
     IntrusiveListBase() : mNode(&mNode, &mNode) {}
     ~IntrusiveListBase() { mNode.Remove(); /* clear mNode such that the destructor checking mNode.IsInList doesn't fail */ }
 
+    ConstIteratorBase begin() const { return ConstIteratorBase(mNode.mNext); }
+    ConstIteratorBase end() const { return ConstIteratorBase(&mNode); }
     IteratorBase begin() { return IteratorBase(mNode.mNext); }
     IteratorBase end() { return IteratorBase(&mNode); }
 
@@ -150,7 +202,7 @@ protected:
     void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Append(node); }
     void Remove(IntrusiveListNodeBase * node) { node->Remove(); }
 
-    bool Contains(IntrusiveListNodeBase * node)
+    bool Contains(IntrusiveListNodeBase * node) const
     {
         for (auto & iter : *this)
         {
@@ -164,6 +216,10 @@ private:
     IntrusiveListNodeBase mNode;
 };
 
+/// The hook convert between node object T and IntrusiveListNodeBase
+///
+/// When using this hook, the node type (T) MUST inherit from IntrusiveListNodeBase.
+///
 template <typename T>
 class IntrusiveListBaseHook
 {
@@ -173,12 +229,25 @@ public:
     static IntrusiveListNodeBase * ToNode(T * object) { return static_cast<IntrusiveListNodeBase *>(object); }
 };
 
-/**
- * @brief An intrusive double linked list.
- *
- * @tparam T    Type of element in the list.
- * @tparam Hook A hook to convert between object T and the IntrusiveListNodeBase
- */
+/// A double-linked list where the data is stored together with the previous/next pointers for cache efficiency / and compactness.
+///
+/// The default hook (IntrusiveListBaseHook<T>) requires T inherit from IntrusiveListNodeBase.
+///
+/// IntrusiveListNodeBase object associated with a node is assumed to be longer than the list they belong to. A list is effcively a
+/// single node into / a chain of other nodes referenced by pointers.
+///
+/// A node may only belong to a single list. The code will assert (via VerifyOrDie) on this invariant.
+///
+/// Example usage:
+///
+///     class ListNode : public IntrusiveListNodeBase  {};
+///     // ...
+///     ListNode a,b,c;
+///     IntrusiveList<ListNode> list;    // NOTE: node lifetime >= list lifetime
+///
+///     list.PushBack(&a);
+///     list.PushFront(&b);
+///     assert(list.Contains(&a)  && list.Contains(&b) && !list.Contains(&c));
 template <typename T, typename Hook = IntrusiveListBaseHook<T>>
 class IntrusiveList : public IntrusiveListBase
 {
@@ -186,6 +255,18 @@ public:
     static_assert(std::is_base_of<IntrusiveListNodeBase, T>::value, "T must derive from IntrusiveListNodeBase");
 
     IntrusiveList() : IntrusiveListBase() {}
+
+    class ConstIterator : public IntrusiveListBase::ConstIteratorBase
+    {
+    public:
+        using value_type = const T;
+        using pointer    = const T *;
+        using reference  = const T &;
+
+        ConstIterator(IntrusiveListBase::ConstIteratorBase && base) : IntrusiveListBase::ConstIteratorBase(std::move(base)) {}
+        const T * operator->() { return Hook::ToObject(mCurrent); }
+        const T & operator*() { return *Hook::ToObject(mCurrent); }
+    };
 
     class Iterator : public IntrusiveListBase::IteratorBase
     {
@@ -199,6 +280,8 @@ public:
         T & operator*() { return *Hook::ToObject(mCurrent); }
     };
 
+    ConstIterator begin() const { return IntrusiveListBase::begin(); }
+    ConstIterator end() const { return IntrusiveListBase::end(); }
     Iterator begin() { return IntrusiveListBase::begin(); }
     Iterator end() { return IntrusiveListBase::end(); }
     void PushFront(T * value) { IntrusiveListBase::PushFront(Hook::ToNode(value)); }
@@ -206,7 +289,7 @@ public:
     void InsertBefore(Iterator pos, T * value) { IntrusiveListBase::InsertBefore(pos, Hook::ToNode(value)); }
     void InsertAfter(Iterator pos, T * value) { IntrusiveListBase::InsertAfter(pos, Hook::ToNode(value)); }
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
-    bool Contains(T * value) { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
+    bool Contains(T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
 };
 
 } // namespace chip
