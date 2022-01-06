@@ -666,8 +666,7 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
 [[maybe_unused]] CHIP_ERROR SessionManager::ForEachSessionHandle(void * context, SessionHandleCallback lambda)
 {
     mSecureSessions.ForEachSession([&](auto session) {
-        SessionHandle handle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-                             session->GetFabricIndex());
+        SessionHandle handle(*session);
         lambda(context, handle);
         return Loop::Continue;
     });
