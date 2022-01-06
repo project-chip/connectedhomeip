@@ -246,6 +246,28 @@ JNI_METHOD(void, pairDeviceWithAddress)
     }
 }
 
+JNI_METHOD(void, establishPaseConnection)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jint connObj, jlong pinCode)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetSetupPINCode(pinCode)
+#if CONFIG_NETWORK_LAYER_BLE
+                                                .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+#endif
+                                                .SetPeerAddress(Transport::PeerAddress::BLE());
+
+    err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to establish PASE connection.");
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+    }
+}
+
 JNI_METHOD(void, unpairDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
 {
     chip::DeviceLayer::StackLock lock;

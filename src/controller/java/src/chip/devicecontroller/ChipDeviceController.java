@@ -101,6 +101,25 @@ public class ChipDeviceController {
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
   }
 
+  public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
+    if (connectionId == 0) {
+      connectionId = connId;
+
+      if (connectionId == 0) {
+        Log.e(TAG, "Failed to add Bluetooth connection.");
+        completionListener.onError(new Exception("Failed to add Bluetooth connection."));
+        return;
+      }
+
+      Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
+      Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+      establishPaseConnection(deviceControllerPtr, deviceId, connId, setupPincode);
+    } else {
+      Log.e(TAG, "Bluetooth connection already in use.");
+      completionListener.onError(new Exception("Bluetooth connection already in use."));
+    }
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -262,6 +281,9 @@ public class ChipDeviceController {
       int discriminator,
       long pinCode,
       @Nullable byte[] csrNonce);
+
+  private native void establishPaseConnection(
+      long deviceControllerPtr, long deviceId, int connId, long setupPincode);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
