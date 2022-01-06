@@ -173,7 +173,7 @@ CHIP_ERROR DnssdDiscoverer::GetAddress(chip::Optional<Transport::PeerAddress> & 
     Dnssd::DiscoveredNodeData & node = GetDiscoveredNodes().data()[mNodeIdx];
     Inet::InterfaceId interfaceId = node.ipAddress[mIpIdx].IsIPv6LinkLocal() ? node.interfaceId[mIpIdx] : Inet::InterfaceId::Null();
 #if 0
-        // TODO: TCP support
+        // TODO(#13326): connecting via TCP does not work
         if (node.supportsTcp)
         {
             address.SetValue(Transport::PeerAddress::TCP(node.ipAddress[mIpIdx], node.port, interfaceId));

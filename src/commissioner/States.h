@@ -746,7 +746,7 @@ protected:
         Inet::InterfaceId interfaceId =
             mRecord.get()->mAddress[mIdx].IsIPv6LinkLocal() ? mRecord.get()->mInterfaceId : Inet::InterfaceId::Null();
 #if 0
-        // TODO: TCP support
+        // TODO(#13326): connecting via TCP does not work
         if (mRecord.get()->supportsTcp)
         {
             this->mCommissionee.mOperationalAddress.SetValue(Transport::PeerAddress::TCP(mRecord.get()->mAddress[mIdx], mRecord.get()->mPort, interfaceId));
