@@ -397,7 +397,7 @@ private:
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
     static void OnPIDReadResponse(void * context, uint16_t value);
-    static void OnVIDReadResponse(void * context, uint16_t value);
+    static void OnVIDReadResponse(void * context, VendorId value);
     static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
 
     CHIP_ERROR OpenCommissioningWindowInternal();

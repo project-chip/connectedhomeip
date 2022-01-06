@@ -374,10 +374,8 @@ CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & devicePr
     constexpr OTADownloadProtocol kProtocolsSupported[] = { OTADownloadProtocol::kBDXSynchronous };
     QueryImage::Type args;
 
-    uint16_t vendorId;
-    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &vendorId) == EMBER_ZCL_STATUS_SUCCESS,
+    VerifyOrReturnError(Basic::Attributes::VendorID::Get(kRootEndpointId, &args.vendorId) == EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_READ_FAILED);
-    args.vendorId = static_cast<VendorId>(vendorId);
 
     VerifyOrReturnError(Basic::Attributes::ProductID::Get(kRootEndpointId, &args.productId) == EMBER_ZCL_STATUS_SUCCESS,
                         CHIP_ERROR_READ_FAILED);

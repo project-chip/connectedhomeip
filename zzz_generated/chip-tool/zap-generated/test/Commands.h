@@ -14206,7 +14206,7 @@ private:
         (static_cast<Test_TC_DM_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t vendorID)
+    static void OnSuccessCallback_3(void * context, chip::VendorId vendorID)
     {
         (static_cast<Test_TC_DM_1_1 *>(context))->OnSuccessResponse_3(vendorID);
     }
@@ -14433,7 +14433,7 @@ private:
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t vendorID)
+    void OnSuccessResponse_3(chip::VendorId vendorID)
     {
         VerifyOrReturn(CheckConstraintType("vendorID", "", "uint16"));
         NextTest();

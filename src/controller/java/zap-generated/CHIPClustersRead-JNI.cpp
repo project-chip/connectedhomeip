@@ -1289,8 +1289,9 @@ JNI_METHOD(void, BasicCluster, readVendorIDAttribute)(JNIEnv * env, jobject self
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt16uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPBasicVendorIDAttributeCallback, void (*)(CHIPBasicVendorIDAttributeCallback *)> onSuccess(
+        chip::Platform::New<CHIPBasicVendorIDAttributeCallback>(callback, false),
+        chip::Platform::Delete<CHIPBasicVendorIDAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
