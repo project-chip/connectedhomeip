@@ -45,8 +45,13 @@ public class ChipDeviceController {
     completionListener = listener;
   }
 
-  public void pairDevice(BluetoothGatt bleServer, int connId, long deviceId, long setupPincode) {
-    pairDevice(bleServer, connId, deviceId, setupPincode, null);
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      NetworkCredentials networkCredentials) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials);
   }
 
   /**
@@ -64,7 +69,8 @@ public class ChipDeviceController {
       int connId,
       long deviceId,
       long setupPincode,
-      @Nullable byte[] csrNonce) {
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials) {
     if (connectionId == 0) {
       connectionId = connId;
 
@@ -76,7 +82,8 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce);
+      pairDevice(
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -244,7 +251,8 @@ public class ChipDeviceController {
       long deviceId,
       int connectionId,
       long pinCode,
-      @Nullable byte[] csrNonce);
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
