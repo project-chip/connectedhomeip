@@ -143,9 +143,9 @@ class NrfConnectBuilder(Builder):
                     raise Exception('ZEPHYR_BASE validation failed')
             if os.path.exists(os.path.join(
                     self.root, self.app.AppPath(), "nrfconnect/boards/"+self.board.GnArgName()+".conf")):
-                boardconfig="-DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
+                boardconfig = "-DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
             else:
-                boardconfig=""
+                boardconfig = ""
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
