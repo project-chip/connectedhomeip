@@ -104,7 +104,7 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
     jmethodID method;
     CHIP_ERROR err = CHIP_NO_ERROR;
     err            = JniReferences::GetInstance().FindMethod(JniReferences::GetInstance().GetEnvForCurrentThread(), mJavaObjectRef,
-                                                             "onOpCSRGenerationComplete", "([B)V", &method);
+                                                  "onOpCSRGenerationComplete", "([B)V", &method);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Error invoking onOpCSRGenerationComplete: %" CHIP_ERROR_FORMAT, err.Format());
