@@ -84,7 +84,7 @@ int main()
     }
 
     // Initialize the default streamer that was linked.
-    ret = streamer_init(streamer_get());
+    ret = Engine::Root().Init();
     if (ret)
     {
         ChipLogError(Shell, "Streamer initialization failed [%d]", ret);
