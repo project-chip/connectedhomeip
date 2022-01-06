@@ -32605,7 +32605,7 @@ private:
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
 
         RequestType request;
-        request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
+        request.data = chip::ByteSpan(chip::Uint8::from_const_char("datagarbage: not in length on purpose"), 4);
 
         request.application.catalogVendorId = 123U;
         request.application.catalogVendorId = 123U;
@@ -32626,11 +32626,11 @@ private:
 
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -32661,11 +32661,11 @@ private:
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_3(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }
@@ -32696,11 +32696,11 @@ private:
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::CharSpan data)
+    void OnSuccessResponse_4(chip::app::Clusters::ApplicationLauncher::StatusEnum status, chip::ByteSpan data)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValueAsString("data", data, chip::CharSpan("data", 4)));
+        VerifyOrReturn(CheckValueAsString("data", data, chip::ByteSpan(chip::Uint8::from_const_char("data"), 4)));
 
         NextTest();
     }

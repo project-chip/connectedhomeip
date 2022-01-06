@@ -30670,9 +30670,9 @@ namespace TargetNavigator {
 // Enum for StatusEnum
 enum class StatusEnum : uint8_t
 {
-    kSuccess         = 0x00,
-    kAppNotAvailable = 0x01,
-    kSystemBusy      = 0x02,
+    kSuccess        = 0x00,
+    kTargetNotFound = 0x01,
+    kNotAllowed     = 0x02,
 };
 
 namespace Structs {
@@ -32818,7 +32818,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
+    chip::ByteSpan data;
     Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32834,7 +32834,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    chip::CharSpan data;
+    chip::ByteSpan data;
     Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -32918,7 +32918,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status;
-    chip::CharSpan data;
+    chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32934,7 +32934,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     StatusEnum status;
-    chip::CharSpan data;
+    chip::ByteSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LauncherResponse

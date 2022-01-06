@@ -36,7 +36,7 @@
 
 // Cluster Specific Response Callbacks
 typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, chip::CharSpan setupPIN);
-typedef void (*ApplicationLauncherClusterLauncherResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*ApplicationLauncherClusterLauncherResponseCallback)(void * context, uint8_t status, chip::ByteSpan data);
 typedef void (*ChannelClusterChangeChannelResponseCallback)(void * context, ChannelInfo channelMatch, uint8_t errorType);
 typedef void (*ContentLauncherClusterLaunchResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallback)(void * context, uint8_t status, chip::ByteSpan content,

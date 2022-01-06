@@ -27738,8 +27738,8 @@ class TargetNavigator(Cluster):
     class Enums:
         class StatusEnum(IntEnum):
             kSuccess = 0x00
-            kAppNotAvailable = 0x01
-            kSystemBusy = 0x02
+            kTargetNotFound = 0x01
+            kNotAllowed = 0x02
 
 
     class Structs:
@@ -29264,11 +29264,11 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=bytes),
                             ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.Application),
                     ])
 
-            data: 'str' = ""
+            data: 'bytes' = b""
             application: 'ApplicationLauncher.Structs.Application' = field(default_factory=lambda: ApplicationLauncher.Structs.Application())
 
         @dataclass
@@ -29312,11 +29312,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=ApplicationLauncher.Enums.StatusEnum),
-                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=str),
+                            ClusterObjectFieldDescriptor(Label="data", Tag=1, Type=bytes),
                     ])
 
             status: 'ApplicationLauncher.Enums.StatusEnum' = 0
-            data: 'str' = ""
+            data: 'bytes' = b""
 
 
     class Attributes:
