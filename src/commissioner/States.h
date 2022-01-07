@@ -801,7 +801,7 @@ protected:
 
     Platform::SharedPtr<Dnssd::ResolvedNodeData> mRecord;
     Platform::SharedPtr<CASESession> mPairing;
-    size_t mIdx   = 0;
+    size_t mIdx = 0;
 };
 
 template <typename TContext>
