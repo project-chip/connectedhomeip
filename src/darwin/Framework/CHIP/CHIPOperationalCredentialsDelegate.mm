@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #import "CHIPOperationalCredentialsDelegate.h"
 
 #import <Security/Security.h>

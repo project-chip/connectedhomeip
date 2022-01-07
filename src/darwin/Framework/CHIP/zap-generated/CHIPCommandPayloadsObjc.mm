@@ -1414,9 +1414,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _debugText = @"";
 
-        _wiFiScanResults = [NSArray array];
+        _wiFiScanResults = nil;
 
-        _threadScanResults = [NSArray array];
+        _threadScanResults = nil;
     }
     return self;
 }

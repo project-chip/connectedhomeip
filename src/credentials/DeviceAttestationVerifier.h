@@ -17,6 +17,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
@@ -103,6 +104,8 @@ struct DeviceInfoForAttestation
     // Vendor ID from  PAA cert
     uint16_t paaVendorId = VendorId::NotSpecified;
 };
+
+typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);
 
 /**
  * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
@@ -205,15 +208,13 @@ public:
      *                                If length zero, there was no PAI certificate.
      * @param[in] dacDerBuffer Buffer containing the DAC certificate from device in DER format.
      * @param[in] attestationNonce Buffer containing attestation nonce.
-     *
-     * @returns AttestationVerificationResult::kSuccess on success or another specific
-     *          value from AttestationVerificationResult enum on failure.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         VerifyAttestationInformation()
      */
-    virtual AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
-                                                                       const ByteSpan & attestationChallengeBuffer,
-                                                                       const ByteSpan & attestationSignatureBuffer,
-                                                                       const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
-                                                                       const ByteSpan & attestationNonce) = 0;
+    virtual void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
+                                              const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
+                                              const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                              Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
 
     /**
      * @brief Verify a CMS Signed Data signature against the CSA certificate of Subject Key Identifier that matches
@@ -244,10 +245,24 @@ public:
 
     // TODO: Validate Firmware Information
 
+    /**
+     * @brief Verify an operational certificate signing request payload against the DAC's public key.
+     *
+     * @param[in]  nocsrElementsBuffer Buffer containing CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in]  attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
+     * @param[in]  attestationSignatureBuffer Buffer containing the signature portion of CSR Response
+     * @param[in]  dacPublicKey Public Key from the DAC's certificate received from device.
+     * @param[in]  csrNonce Buffer containing CSR nonce.
+     */
+    virtual CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                           const ByteSpan & attestationChallengeBuffer,
+                                                           const ByteSpan & attestationSignatureBuffer,
+                                                           const Crypto::P256PublicKey & dacPublicKey,
+                                                           const ByteSpan & csrNonce) = 0;
+
 protected:
-    CHIP_ERROR ValidateAttestationSignature(const chip::Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
-                                            const ByteSpan & attestationChallenge,
-                                            const chip::Crypto::P256ECDSASignature & signature);
+    CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
+                                            const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 };
 
 /**

@@ -40,67 +40,6 @@ using namespace chip::app::Clusters;
 
 namespace {
 
-struct GroupKeyCodec
-{
-    static constexpr TLV::Tag TagFabric()
-    {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kFabricIndex));
-    }
-    static constexpr TLV::Tag TagGroup()
-    {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupId));
-    }
-    static constexpr TLV::Tag TagKeyset()
-    {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupKey::Fields::kGroupKeySetID));
-    }
-
-    chip::FabricIndex mFabric = 0;
-    GroupDataProvider::GroupKey mMapping;
-
-    GroupKeyCodec() = default;
-    GroupKeyCodec(chip::FabricIndex fabric_index, const GroupDataProvider::GroupKey & mapping) :
-        mFabric(fabric_index), mMapping(mapping)
-    {}
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
-    {
-        TLV::TLVType outer;
-        ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-
-        // FabricIndex
-        ReturnErrorOnFailure(DataModel::Encode(writer, TagFabric(), mFabric));
-        // GroupId
-        ReturnErrorOnFailure(DataModel::Encode(writer, TagGroup(), mMapping.group_id));
-        // GroupKeySetID
-        ReturnErrorOnFailure(DataModel::Encode(writer, TagKeyset(), mMapping.keyset_id));
-
-        ReturnErrorOnFailure(writer.EndContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader)
-    {
-        TLV::TLVType outer;
-
-        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(reader.EnterContainer(outer));
-
-        // FabricIndex
-        ReturnErrorOnFailure(reader.Next(TagFabric()));
-        ReturnErrorOnFailure(reader.Get(mFabric));
-        // GroupId
-        ReturnErrorOnFailure(reader.Next(TagGroup()));
-        ReturnErrorOnFailure(reader.Get(mMapping.group_id));
-        // GroupKeySetID
-        ReturnErrorOnFailure(reader.Next(TagKeyset()));
-        ReturnErrorOnFailure(reader.Get(mMapping.keyset_id));
-
-        ReturnErrorOnFailure(reader.ExitContainer(outer));
-        return CHIP_NO_ERROR;
-    }
-};
-
 struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
@@ -221,7 +160,10 @@ private:
             GroupDataProvider::GroupKey mapping;
             while (iter->Next(mapping))
             {
-                encoder.Encode(GroupKeyCodec(fabric_index, mapping));
+                GroupKeyManagement::Structs::GroupKey::Type key = { .fabricIndex   = fabric_index,
+                                                                    .groupId       = mapping.group_id,
+                                                                    .groupKeySetID = mapping.keyset_id };
+                encoder.Encode(key);
             }
             iter->Release();
             return CHIP_NO_ERROR;
@@ -233,7 +175,7 @@ private:
     {
         auto fabric_index = aDecoder.AccessingFabricIndex();
         auto provider     = GetGroupDataProvider();
-        DataModel::DecodableList<GroupKeyCodec> list;
+        GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType list;
         size_t new_count;
 
         VerifyOrReturnError(nullptr != provider, CHIP_ERROR_INTERNAL);
@@ -248,9 +190,10 @@ private:
         size_t i  = 0;
         while (iter.Next())
         {
-            const GroupKeyCodec & value = iter.GetValue();
-            VerifyOrReturnError(fabric_index == value.mFabric, CHIP_ERROR_INVALID_FABRIC_ID);
-            ReturnErrorOnFailure(provider->SetGroupKeyAt(value.mFabric, i++, value.mMapping));
+            const auto & value = iter.GetValue();
+            VerifyOrReturnError(fabric_index == value.fabricIndex, CHIP_ERROR_INVALID_FABRIC_ID);
+            ReturnErrorOnFailure(
+                provider->SetGroupKeyAt(value.fabricIndex, i++, GroupDataProvider::GroupKey(value.groupId, value.groupKeySetID)));
         }
         ReturnErrorOnFailure(iter.GetStatus());
         return CHIP_NO_ERROR;

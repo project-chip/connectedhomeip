@@ -340,7 +340,7 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
     ReturnErrorOnFailure(pairing->DeriveSecureSession(session->GetCryptoContext(), direction));
 
     session->GetSessionMessageCounter().GetPeerMessageCounter().SetCounter(pairing->GetPeerCounter());
-    sessionHolder.Grab(SessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric));
+    sessionHolder.Grab(SessionHandle(*session));
 
     return CHIP_NO_ERROR;
 }
@@ -530,8 +530,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (mCB != nullptr)
     {
-        SessionHandle sessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(),
-                                    session->GetFabricIndex());
+        SessionHandle sessionHandle(*session);
         mCB->OnMessageReceived(packetHeader, payloadHeader, sessionHandle, peerAddress, isDuplicate, std::move(msg));
     }
 }
@@ -606,13 +605,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     }
 }
 
-void SessionManager::HandleConnectionExpired(const Transport::SecureSession & session)
+void SessionManager::HandleConnectionExpired(Transport::SecureSession & session)
 {
     ChipLogDetail(Inet, "Marking old secure session for device 0x" ChipLogFormatX64 " as expired",
                   ChipLogValueX64(session.GetPeerNodeId()));
 
-    SessionHandle sessionHandle(session.GetPeerNodeId(), session.GetLocalSessionId(), session.GetPeerSessionId(),
-                                session.GetFabricIndex());
+    SessionHandle sessionHandle(session);
     mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * cb) {
         cb->get().OnSessionReleased(sessionHandle);
         return Loop::Continue;
@@ -659,7 +657,20 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
     });
 
     VerifyOrDie(found != nullptr);
-    return SessionHandle(found->GetPeerNodeId(), found->GetLocalSessionId(), found->GetPeerSessionId(), found->GetFabricIndex());
+    return SessionHandle(*found);
+}
+
+/**
+ * Provides a means to get diagnostic information such as number of sessions.
+ */
+[[maybe_unused]] CHIP_ERROR SessionManager::ForEachSessionHandle(void * context, SessionHandleCallback lambda)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        SessionHandle handle(*session);
+        lambda(context, handle);
+        return Loop::Continue;
+    });
+    return CHIP_NO_ERROR;
 }
 
 } // namespace chip

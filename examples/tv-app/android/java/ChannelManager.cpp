@@ -16,83 +16,307 @@
  */
 
 #include "ChannelManager.h"
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-#include <map>
-#include <string>
-#include <vector>
 
 using namespace chip;
+using namespace chip::app::Clusters::Channel;
 
-ChannelManager ChannelManager::sInstance;
+namespace {
+static ChannelManager channelManager;
+} // namespace
 
-class ChannelInfoAttrAccess : public app::AttributeAccessInterface
+std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
-public:
-    ChannelInfoAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::Channel::Id) {}
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    std::list<Structs::ChannelInfo::Type> list;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleGetChannelList");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
     {
-        if (aPath.mAttributeId == app::Clusters::Channel::Attributes::ChannelList::Id)
-        {
-            return ChannelMgr().getChannelList(aEncoder);
-        }
-        else if (aPath.mAttributeId == app::Clusters::Channel::Attributes::ChannelLineup::Id)
-        {
-            return ChannelMgr().getChannelLineup(aEncoder);
-        }
-        else if (aPath.mAttributeId == app::Clusters::Channel::Attributes::CurrentChannel::Id)
-        {
-            return ChannelMgr().getCurrentChannel(aEncoder);
-        }
+        jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mChannelManagerObject, mGetChannelListMethod);
+        jint length                  = env->GetArrayLength(channelInfoList);
 
-        return CHIP_NO_ERROR;
+        for (jint i = 0; i < length; i++)
+        {
+            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+            jobject channelObject = env->GetObjectArrayElement(channelInfoList, i);
+            jclass channelClass   = env->GetObjectClass(channelObject);
+
+            jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
+            jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelObject, getCallSignField));
+            if (jcallSign != NULL)
+            {
+                JniUtfString callsign(env, jcallSign);
+                channelInfo.callSign = callsign.charSpan();
+            }
+
+            jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
+            jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
+            if (jname != NULL)
+            {
+                JniUtfString name(env, jname);
+                channelInfo.callSign = name.charSpan();
+            }
+
+            jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
+            jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
+            if (jaffiliateCallSign != NULL)
+            {
+                JniUtfString affiliateCallSign(env, jaffiliateCallSign);
+                channelInfo.callSign = affiliateCallSign.charSpan();
+            }
+
+            jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
+            jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
+            channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
+
+            jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
+            jint jminorNum          = env->GetIntField(channelObject, minorNumField);
+            channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
+            list.push_back(channelInfo);
+        }
     }
-};
 
-ChannelInfoAttrAccess gChannelAttrAccess;
-
-/** @brief Channel  Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfChannelClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
+exit:
+    if (err != CHIP_NO_ERROR)
     {
-        registerAttributeAccessOverride(&gChannelAttrAccess);
-        attrAccessRegistered = true;
+        ChipLogError(Zcl, "ChannelManager::getChannelList status error: %s", err.AsString());
     }
+
+    return list;
 }
 
-ChannelInfo ChannelClusterChangeChannel(std::string match)
+chip::app::Clusters::Channel::Structs::LineupInfo::Type ChannelManager::HandleGetLineup()
 {
-    return ChannelMgr().ChangeChannelByMatch(match);
+    chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleGetLineup");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
+        jclass channelLineupClazz   = env->GetObjectClass(channelLineupObject);
+
+        jfieldID operatorNameFild = env->GetFieldID(channelLineupClazz, "operatorName", "Ljava/lang/String;");
+        jstring joperatorName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, operatorNameFild));
+        if (joperatorName != NULL)
+        {
+            JniUtfString operatorName(env, joperatorName);
+            lineupInfo.operatorName = operatorName.charSpan();
+        }
+
+        jfieldID lineupNameFild = env->GetFieldID(channelLineupClazz, "lineupName", "Ljava/lang/String;");
+        jstring jlineupName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, lineupNameFild));
+        if (jlineupName != NULL)
+        {
+            JniUtfString lineupName(env, jlineupName);
+            lineupInfo.lineupName = lineupName.charSpan();
+        }
+
+        jfieldID postalCodeFild = env->GetFieldID(channelLineupClazz, "postalCode", "Ljava/lang/String;");
+        jstring jpostalCode     = static_cast<jstring>(env->GetObjectField(channelLineupObject, postalCodeFild));
+        if (jpostalCode != NULL)
+        {
+            JniUtfString postalCode(env, jpostalCode);
+            lineupInfo.postalCode = postalCode.charSpan();
+        }
+
+        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
+        jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
+        lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ChannelManager::getChannelLineup status error: %s", err.AsString());
+    }
+
+    return lineupInfo;
 }
 
-bool ChannelClusterChangeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
+chip::app::Clusters::Channel::Structs::ChannelInfo::Type ChannelManager::HandleGetCurrentChannel()
 {
-    return ChannelMgr().changeChannelByNumber(majorNumber, minorNumber);
+    chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleGetCurrentChannel");
+    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
+
+    {
+        jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
+        jclass channelClass       = env->GetObjectClass(channelInfoObject);
+
+        jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
+        jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
+        if (jcallSign != NULL)
+        {
+            JniUtfString callsign(env, jcallSign);
+            channelInfo.callSign = callsign.charSpan();
+        }
+
+        jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
+        jstring jname         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getNameField));
+        if (jname != NULL)
+        {
+            JniUtfString name(env, jname);
+            channelInfo.callSign = name.charSpan();
+        }
+
+        jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
+        jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelInfoObject, getJaffiliateCallSignField));
+        if (jaffiliateCallSign != NULL)
+        {
+            JniUtfString affiliateCallSign(env, jaffiliateCallSign);
+            channelInfo.callSign = affiliateCallSign.charSpan();
+        }
+
+        jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
+        jint jmajorNum          = env->GetIntField(channelInfoObject, majorNumField);
+        channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
+
+        jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
+        jint jminorNum          = env->GetIntField(channelInfoObject, minorNumField);
+        channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "ChannelManager::HandleGetCurrentChannel status error: %s", err.AsString());
+    }
+
+    return channelInfo;
 }
 
-bool ChannelClusterSkipChannel(uint16_t count)
+Commands::ChangeChannelResponse::Type ChannelManager::HandleChangeChannel(const chip::CharSpan & match)
 {
-    return ChannelMgr().skipChannnel(count);
+    std::string name(match.data(), match.size());
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    Commands::ChangeChannelResponse::Type response;
+    response.channelMatch.majorNumber = 0;
+    response.channelMatch.minorNumber = 0;
+
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannel name %s", name.c_str());
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
+    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
+
+    {
+        UtfString jniname(env, name.c_str());
+        env->ExceptionClear();
+        jobject channelObject = env->CallObjectMethod(mChannelManagerObject, mChangeChannelMethod, jniname.jniValue());
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleChangeChannel");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            return response;
+        }
+
+        jclass channelClass = env->GetObjectClass(channelObject);
+
+        jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
+        jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelObject, getCallSignField));
+        if (jcallSign != NULL)
+        {
+            JniUtfString callsign(env, jcallSign);
+            response.channelMatch.callSign = callsign.charSpan();
+        }
+
+        jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
+        jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
+        if (jname != NULL)
+        {
+            JniUtfString junitname(env, jname);
+            response.channelMatch.callSign = junitname.charSpan();
+        }
+        jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
+        jstring jaffiliateCallSign          = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
+        if (jaffiliateCallSign != NULL)
+        {
+            JniUtfString affiliateCallSign(env, jaffiliateCallSign);
+            response.channelMatch.callSign = affiliateCallSign.charSpan();
+        }
+
+        jfieldID majorNumField            = env->GetFieldID(channelClass, "majorNumber", "I");
+        jint jmajorNum                    = env->GetIntField(channelObject, majorNumField);
+        response.channelMatch.majorNumber = static_cast<uint16_t>(jmajorNum);
+
+        jfieldID minorNumField            = env->GetFieldID(channelClass, "minorNumber", "I");
+        jint jminorNum                    = env->GetIntField(channelObject, minorNumField);
+        response.channelMatch.majorNumber = static_cast<uint16_t>(jminorNum);
+    }
+
+exit:
+
+    return response;
+}
+
+bool ChannelManager::HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)
+{
+    jboolean ret = JNI_FALSE;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
+                    minorNumber);
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mChangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mChangeChannelByNumberMethod null"));
+    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
+
+    env->ExceptionClear();
+
+    ret = env->CallBooleanMethod(mChannelManagerObject, mChangeChannelByNumberMethod, static_cast<jint>(majorNumber),
+                                 static_cast<jint>(minorNumber));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(DeviceLayer, "Java exception in ChannelManager::changeChannelByNumber");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return false;
+    }
+
+exit:
+    return static_cast<bool>(ret);
+}
+
+bool ChannelManager::HandleSkipChannel(const uint16_t & count)
+{
+    jboolean ret = JNI_FALSE;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    ChipLogProgress(Zcl, "Received ChannelManager::HandleSkipChannel count %d", count);
+    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
+    VerifyOrExit(mSkipChannelMethod != nullptr, ChipLogError(Zcl, "mSkipChannelMethod null"));
+    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
+
+    env->ExceptionClear();
+
+    ret = env->CallBooleanMethod(mChannelManagerObject, mSkipChannelMethod, static_cast<jint>(count));
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(DeviceLayer, "Java exception in ChannelManager::HandleSkipChannel");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return false;
+    }
+
+exit:
+    return static_cast<bool>(ret);
 }
 
 void ChannelManager::InitializeWithObjects(jobject managerObject)
@@ -134,310 +358,34 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mchangeChannelByNumberMethod = env->GetMethodID(managerClass, "changeChannelByNumber", "(II)Z");
-    if (mchangeChannelByNumberMethod == nullptr)
+    mChangeChannelByNumberMethod = env->GetMethodID(managerClass, "changeChannelByNumber", "(II)Z");
+    if (mChangeChannelByNumberMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'changeChannelByNumber' method");
         env->ExceptionClear();
     }
 
-    mskipChannelMethod = env->GetMethodID(managerClass, "skipChannel", "(I)Z");
-    if (mskipChannelMethod == nullptr)
+    mSkipChannelMethod = env->GetMethodID(managerClass, "skipChannel", "(I)Z");
+    if (mSkipChannelMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ChannelManager 'skipChannel' method");
         env->ExceptionClear();
     }
 }
 
-CHIP_ERROR ChannelManager::getChannelList(chip::app::AttributeValueEncoder & aEncoder)
+ChannelManager ChannelManager::sInstance;
+
+/** @brief Channel  Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::getChannelList");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetChannelListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    return aEncoder.EncodeList([env, this](const auto & encoder) -> CHIP_ERROR {
-        jobjectArray channelInfoList = (jobjectArray) env->CallObjectMethod(mChannelManagerObject, mGetChannelListMethod);
-        jint length                  = env->GetArrayLength(channelInfoList);
-        for (jint i = 0; i < length; i++)
-        {
-            chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
-            jobject channelObject = env->GetObjectArrayElement(channelInfoList, i);
-            jclass channelClass   = env->GetObjectClass(channelObject);
-
-            jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
-            jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelObject, getCallSignField));
-            if (jcallSign != NULL)
-            {
-                JniUtfString callsign(env, jcallSign);
-                channelInfo.callSign = callsign.charSpan();
-            }
-
-            jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
-            jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
-            if (jname != NULL)
-            {
-                JniUtfString name(env, jname);
-                channelInfo.callSign = name.charSpan();
-            }
-
-            jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
-            jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
-            if (jaffiliateCallSign != NULL)
-            {
-                JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-                channelInfo.callSign = affiliateCallSign.charSpan();
-            }
-
-            jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
-            jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
-            channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
-
-            jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
-            jint jminorNum          = env->GetIntField(channelObject, minorNumField);
-            channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
-            ReturnErrorOnFailure(encoder.Encode(channelInfo));
-        }
-        return CHIP_NO_ERROR;
-    });
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ChannelManager::getChannelList status error: %s", err.AsString());
-    }
-
-    return err;
-}
-
-CHIP_ERROR ChannelManager::getChannelLineup(chip::app::AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::getChannelLineup");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetLineupMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    {
-        chip::app::Clusters::Channel::Structs::LineupInfo::Type lineupInfo;
-
-        jobject channelLineupObject = env->CallObjectMethod(mChannelManagerObject, mGetLineupMethod);
-        jclass channelLineupClazz   = env->GetObjectClass(channelLineupObject);
-
-        jfieldID operatorNameFild = env->GetFieldID(channelLineupClazz, "operatorName", "Ljava/lang/String;");
-        jstring joperatorName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, operatorNameFild));
-        if (joperatorName != NULL)
-        {
-            JniUtfString operatorName(env, joperatorName);
-            lineupInfo.operatorName = operatorName.charSpan();
-        }
-
-        jfieldID lineupNameFild = env->GetFieldID(channelLineupClazz, "lineupName", "Ljava/lang/String;");
-        jstring jlineupName     = static_cast<jstring>(env->GetObjectField(channelLineupObject, lineupNameFild));
-        if (jlineupName != NULL)
-        {
-            JniUtfString lineupName(env, jlineupName);
-            lineupInfo.lineupName = lineupName.charSpan();
-        }
-
-        jfieldID postalCodeFild = env->GetFieldID(channelLineupClazz, "postalCode", "Ljava/lang/String;");
-        jstring jpostalCode     = static_cast<jstring>(env->GetObjectField(channelLineupObject, postalCodeFild));
-        if (jpostalCode != NULL)
-        {
-            JniUtfString postalCode(env, jpostalCode);
-            lineupInfo.postalCode = postalCode.charSpan();
-        }
-
-        jfieldID lineupInfoTypeFild = env->GetFieldID(channelLineupClazz, "lineupInfoTypeEnum", "I");
-        jint jlineupInfoType        = (env->GetIntField(channelLineupObject, lineupInfoTypeFild));
-        lineupInfo.lineupInfoType   = static_cast<app::Clusters::Channel::LineupInfoTypeEnum>(jlineupInfoType);
-
-        ReturnErrorOnFailure(aEncoder.Encode(lineupInfo));
-
-        return CHIP_NO_ERROR;
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ChannelManager::getChannelLineup status error: %s", err.AsString());
-    }
-
-    return err;
-}
-
-CHIP_ERROR ChannelManager::getCurrentChannel(chip::app::AttributeValueEncoder & aEncoder)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ChipLogProgress(Zcl, "Received ChannelManager::getCurrentChannel");
-    VerifyOrExit(mChannelManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mGetCurrentChannelMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
-
-    {
-        chip::app::Clusters::Channel::Structs::ChannelInfo::Type channelInfo;
-
-        jobject channelInfoObject = env->CallObjectMethod(mChannelManagerObject, mGetCurrentChannelMethod);
-        jclass channelClass       = env->GetObjectClass(channelInfoObject);
-
-        jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
-        jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getCallSignField));
-        if (jcallSign != NULL)
-        {
-            JniUtfString callsign(env, jcallSign);
-            channelInfo.callSign = callsign.charSpan();
-        }
-
-        jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
-        jstring jname         = static_cast<jstring>(env->GetObjectField(channelInfoObject, getNameField));
-        if (jname != NULL)
-        {
-            JniUtfString name(env, jname);
-            channelInfo.callSign = name.charSpan();
-        }
-
-        jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
-        jstring jaffiliateCallSign = static_cast<jstring>(env->GetObjectField(channelInfoObject, getJaffiliateCallSignField));
-        if (jaffiliateCallSign != NULL)
-        {
-            JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-            channelInfo.callSign = affiliateCallSign.charSpan();
-        }
-
-        jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
-        jint jmajorNum          = env->GetIntField(channelInfoObject, majorNumField);
-        channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
-
-        jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
-        jint jminorNum          = env->GetIntField(channelInfoObject, minorNumField);
-        channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
-
-        ReturnErrorOnFailure(aEncoder.Encode(channelInfo));
-        return CHIP_NO_ERROR;
-    }
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "ChannelManager::getChannel status error: %s", err.AsString());
-    }
-
-    return err;
-}
-
-ChannelInfo ChannelManager::ChangeChannelByMatch(std::string name)
-{
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-    ChannelInfo channelInfo{ 0, 0 };
-
-    ChipLogProgress(Zcl, "Received ChannelManager::ChangeChannelByMatch name %s", name.c_str());
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
-    VerifyOrExit(mChangeChannelMethod != nullptr, ChipLogError(Zcl, "mChangeChannelMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-
-    {
-        UtfString jniname(env, name.c_str());
-        env->ExceptionClear();
-        jobject channelObject = env->CallObjectMethod(mChannelManagerObject, mChangeChannelMethod, jniname.jniValue());
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(DeviceLayer, "Java exception in ChannelManager::ChangeChannelByMatch");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return channelInfo;
-        }
-
-        jclass channelClass = env->GetObjectClass(channelObject);
-
-        jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
-        jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelObject, getCallSignField));
-        if (jcallSign != NULL)
-        {
-            JniUtfString callsign(env, jcallSign);
-            channelInfo.callSign = callsign.charSpan();
-        }
-
-        jfieldID getNameField = env->GetFieldID(channelClass, "name", "Ljava/lang/String;");
-        jstring jname         = static_cast<jstring>(env->GetObjectField(channelObject, getNameField));
-        if (jname != NULL)
-        {
-            JniUtfString junitname(env, jname);
-            channelInfo.callSign = junitname.charSpan();
-        }
-        jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
-        jstring jaffiliateCallSign          = static_cast<jstring>(env->GetObjectField(channelObject, getJaffiliateCallSignField));
-        if (jaffiliateCallSign != NULL)
-        {
-            JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-            channelInfo.callSign = affiliateCallSign.charSpan();
-        }
-
-        jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
-        jint jmajorNum          = env->GetIntField(channelObject, majorNumField);
-        channelInfo.majorNumber = static_cast<uint16_t>(jmajorNum);
-
-        jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
-        jint jminorNum          = env->GetIntField(channelObject, minorNumField);
-        channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
-    }
-
-exit:
-    return channelInfo;
-}
-
-bool ChannelManager::changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber)
-{
-    jboolean ret = JNI_FALSE;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::ChannelClusterChangeChannelByNumber majorNumber %d, minorNumber %d", majorNumber,
-                    minorNumber);
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
-    VerifyOrExit(mchangeChannelByNumberMethod != nullptr, ChipLogError(Zcl, "mchangeChannelByNumberMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-
-    env->ExceptionClear();
-
-    ret = env->CallBooleanMethod(mChannelManagerObject, mchangeChannelByNumberMethod, static_cast<jint>(majorNumber),
-                                 static_cast<jint>(minorNumber));
-    if (env->ExceptionCheck())
-    {
-        ChipLogError(DeviceLayer, "Java exception in ChannelManager::changeChannelByNumber");
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        return false;
-    }
-
-exit:
-    return static_cast<bool>(ret);
-}
-
-bool ChannelManager::skipChannnel(uint16_t count)
-{
-    jboolean ret = JNI_FALSE;
-    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
-
-    ChipLogProgress(Zcl, "Received ChannelManager::skipChannnel count %d", count);
-    VerifyOrExit(mChannelManagerObject != nullptr, ChipLogError(Zcl, "mChannelManagerObject null"));
-    VerifyOrExit(mskipChannelMethod != nullptr, ChipLogError(Zcl, "mskipChannelMethod null"));
-    VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
-
-    env->ExceptionClear();
-
-    ret = env->CallBooleanMethod(mChannelManagerObject, mskipChannelMethod, static_cast<jint>(count));
-    if (env->ExceptionCheck())
-    {
-        ChipLogError(DeviceLayer, "Java exception in ChannelManager::SkipChannel");
-        env->ExceptionDescribe();
-        env->ExceptionClear();
-        return false;
-    }
-
-exit:
-    return static_cast<bool>(ret);
+    ChipLogProgress(Zcl, "TV Android App: Channel::SetDefaultDelegate");
+    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
 }

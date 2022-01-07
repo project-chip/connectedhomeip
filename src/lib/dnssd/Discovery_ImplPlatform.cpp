@@ -129,7 +129,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
-    proxy->Release();
 
     for (size_t i = 0; i < servicesSize; ++i)
     {
@@ -144,6 +143,7 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
             HandleNodeResolve(context, &services[i], error);
         }
     }
+    proxy->Release();
 }
 
 CHIP_ERROR AddPtrRecord(DiscoveryFilter filter, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen)
@@ -174,7 +174,8 @@ CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t 
     return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, value.Value());
 }
 
-CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, int minCharactersWritten, const char * format, ...)
+CHIP_ERROR ENFORCE_FORMAT(4, 5)
+    CopyTextRecordValue(char * buffer, size_t bufferLen, int minCharactersWritten, const char * format, ...)
 {
     va_list args;
     va_start(args, format);

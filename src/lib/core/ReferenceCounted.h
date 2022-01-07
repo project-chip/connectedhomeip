@@ -51,6 +51,10 @@ public:
     /** Adds one to the usage count of this class */
     Subclass * Retain()
     {
+        if (kInitRefCount && mRefCount == 0)
+        {
+            abort();
+        }
         if (mRefCount == std::numeric_limits<count_type>::max())
         {
             abort();

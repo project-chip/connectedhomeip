@@ -50,6 +50,11 @@ public:
     void CallJavaMethod(const char * methodName, jint argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
 
+    /**
+     * Convert network credentials from Java, and apply them to the commissioning parameters object.
+     */
+    CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
+
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
     void OnPairingComplete(CHIP_ERROR error) override;
@@ -113,6 +118,14 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId      = 0;
     bool mNodeIdRequested             = false;
+
+    // These fields allow us to release the string/byte array memory later.
+    jstring ssidStr;
+    jstring passwordStr;
+    const char * ssid;
+    const char * password;
+    jbyteArray operationalDatasetBytes;
+    jbyte * operationalDataset;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {

@@ -609,6 +609,21 @@ function octetStringEscapedForCLiteral(value)
   });
 }
 
+// Structs may not always provide values for optional members.
+function if_include_struct_item_value(structValue, name, options)
+{
+  let hasValue = (name in structValue);
+  if (hasValue) {
+    return options.fn(this);
+  }
+
+  if (!this.isOptional) {
+    throw new Error(`Value not provided for ${name} where one is expected`);
+  }
+
+  return options.inverse(this);
+}
+
 //
 // Module exports
 //
@@ -621,3 +636,4 @@ exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.expectedValueHasProp                = expectedValueHasProp;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
+exports.if_include_struct_item_value        = if_include_struct_item_value;

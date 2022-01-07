@@ -33,7 +33,9 @@
 
 #include <inet/IPAddress.h>
 
+#include <inet/InetError.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 
 #include "arpa-inet-compatibility.h"
 
@@ -127,26 +129,56 @@ ip_addr_t IPAddress::ToLwIPAddr(void) const
     {
 #if INET_CONFIG_ENABLE_IPV4
     case IPAddressType::kIPv4:
-        IP_SET_TYPE_VAL(ret, IPADDR_TYPE_V4);
-        *ip_2_ip4(&ret) = IPAddress::ToIPv4();
+        ip_addr_copy_from_ip4(ret, IPAddress::ToIPv4());
         break;
 #endif // INET_CONFIG_ENABLE_IPV4
 
     case IPAddressType::kIPv6:
-        IP_SET_TYPE_VAL(ret, IPADDR_TYPE_V6);
-        *ip_2_ip6(&ret) = IPAddress::ToIPv6();
+        ip_addr_copy_from_ip6(ret, IPAddress::ToIPv6());
         break;
 
     default:
-#if INET_CONFIG_ENABLE_IPV4
-        ret = *IP_ADDR_ANY;
-#else
         ret = *IP6_ADDR_ANY;
-#endif
         break;
     }
 
     return ret;
+}
+
+CHIP_ERROR IPAddress::ToLwIPAddr(IPAddressType addressType, ip_addr_t & outAddress) const
+{
+    VerifyOrReturnError(addressType != IPAddressType::kUnknown, CHIP_ERROR_INVALID_ARGUMENT);
+
+    switch (Type())
+    {
+#if INET_CONFIG_ENABLE_IPV4
+    case IPAddressType::kIPv4:
+        ip_addr_copy_from_ip4(outAddress, IPAddress::ToIPv4());
+        return (addressType == IPAddressType::kIPv6) ? INET_ERROR_WRONG_ADDRESS_TYPE : CHIP_NO_ERROR;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    case IPAddressType::kIPv6:
+        ip_addr_copy_from_ip6(outAddress, IPAddress::ToIPv6());
+#if INET_CONFIG_ENABLE_IPV4
+        return (addressType == IPAddressType::kIPv4) ? INET_ERROR_WRONG_ADDRESS_TYPE : CHIP_NO_ERROR;
+#else
+        return CHIP_NO_ERROR;
+#endif // INET_CONFIG_ENABLE_IPV4
+
+    case IPAddressType::kAny:
+#if INET_CONFIG_ENABLE_IPV4
+        if (addressType == IPAddressType::kIPv4)
+        {
+            outAddress = *IP4_ADDR_ANY;
+            return CHIP_NO_ERROR;
+        }
+#endif // INET_CONFIG_ENABLE_IPV4
+        outAddress = *IP6_ADDR_ANY;
+        return CHIP_NO_ERROR;
+
+    default:
+        return INET_ERROR_WRONG_ADDRESS_TYPE;
+    }
 }
 
 lwip_ip_addr_type IPAddress::ToLwIPAddrType(IPAddressType typ)

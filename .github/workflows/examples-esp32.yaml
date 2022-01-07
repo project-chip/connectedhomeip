@@ -26,7 +26,7 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 85
+        timeout-minutes: 95
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -60,7 +60,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build some M5Stack variations
-              timeout-minutes: 20
+              timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \

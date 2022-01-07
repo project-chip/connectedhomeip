@@ -18,20 +18,52 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
 
-class MediaPlaybackManager
+enum MediaPlaybackRequest : uint8_t
+{
+    MEDIA_PLAYBACK_REQUEST_PLAY          = 0,
+    MEDIA_PLAYBACK_REQUEST_PAUSE         = 1,
+    MEDIA_PLAYBACK_REQUEST_STOP          = 2,
+    MEDIA_PLAYBACK_REQUEST_START_OVER    = 3,
+    MEDIA_PLAYBACK_REQUEST_PREVIOUS      = 4,
+    MEDIA_PLAYBACK_REQUEST_NEXT          = 5,
+    MEDIA_PLAYBACK_REQUEST_REWIND        = 6,
+    MEDIA_PLAYBACK_REQUEST_FAST_FORWARD  = 7,
+    MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD  = 8,
+    MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD = 9,
+    MEDIA_PLAYBACK_REQUEST_SEEK          = 10,
+};
+
+class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR GetAttribute(chip::app::AttributeValueEncoder & aEncoder, int attributeId);
-    chip::app::Clusters::MediaPlayback::StatusEnum Request(MediaPlaybackRequest mediaPlaybackRequest,
-                                                           uint64_t deltaPositionMilliseconds);
+    chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
+    uint64_t HandleGetStartTime() override;
+    uint64_t HandleGetDuration() override;
+    chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type HandleGetSampledPosition() override;
+    float HandleGetPlaybackSpeed() override;
+    uint64_t HandleGetSeekRangeStart() override;
+    uint64_t HandleGetSeekRangeEnd() override;
+
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePlay() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePause() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStop() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleFastForward() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandlePrevious() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleRewind() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSkipBackward(const uint64_t & deltaPositionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSkipForward(const uint64_t & deltaPositionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleSeekRequest(const uint64_t & positionMilliseconds) override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleNext() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStartOverRequest() override;
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
 private:
     friend MediaPlaybackManager & MediaPlaybackMgr();

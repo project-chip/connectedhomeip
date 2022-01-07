@@ -92,7 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
+    mAttributePersister(mServerStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -106,6 +107,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
+
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SetAttributePersistenceProvider(&mAttributePersister);
+
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -194,12 +200,13 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
         SuccessOrExit(err = AddTestCommissioning());
     }
-    else if ((DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) &&
-             (GetFabricTable().FabricCount() != 0))
+    else if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
+#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+#endif
     }
     else
     {
@@ -226,7 +233,8 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init();
+    err    = mCASESessionManager.Init();
+    mState = ServerState::Enabled;
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -242,6 +250,9 @@ exit:
 
 void Server::Shutdown()
 {
+    if (mState == ServerState::Disabled)
+        return;
+
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mExchangeMgr.Shutdown();
@@ -249,6 +260,8 @@ void Server::Shutdown()
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();
     chip::Platform::MemoryShutdown();
+
+    mState = ServerState::Disabled;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

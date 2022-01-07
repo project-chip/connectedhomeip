@@ -1,6 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,12 +15,19 @@
  *    limitations under the License.
  */
 
-#import <UIKit/UIKit.h>
+#pragma once
 
-NS_ASSUME_NONNULL_BEGIN
+#include "application-basic-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
-@interface WifiViewController : UIViewController
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ApplicationBasic {
 
-@end
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
 
-NS_ASSUME_NONNULL_END
+} // namespace ApplicationBasic
+} // namespace Clusters
+} // namespace app
+} // namespace chip

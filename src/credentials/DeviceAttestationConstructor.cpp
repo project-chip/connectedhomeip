@@ -27,12 +27,21 @@ namespace chip {
 namespace Credentials {
 
 // context tag positions
-enum : uint32_t
+enum AttestationInfoId : uint32_t
 {
     kCertificationDeclarationTagId = 1,
     kAttestationNonceTagId         = 2,
     kTimestampTagId                = 3,
     kFirmwareInfoTagId             = 4,
+};
+
+enum OperationalCSRInfoId : uint32_t
+{
+    kCsr             = 1,
+    kCsrNonce        = 2,
+    kVendorReserved1 = 3,
+    kVendorReserved2 = 4,
+    kVendorReserved3 = 5,
 };
 
 // utility to determine number of Vendor Reserved elements in a bytespan
@@ -141,8 +150,6 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     return CHIP_NO_ERROR;
 }
 
-// Have a class for vendor reserved data, discussed in:
-// https://github.com/project-chip/connectedhomeip/issues/9825
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
                                         uint32_t timestamp, const ByteSpan & firmwareInfo,
                                         DeviceAttestationVendorReservedConstructor & vendorReserved,
@@ -210,6 +217,83 @@ CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonc
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
     nocsrElements = nocsrElements.SubSpan(0, tlvWriter.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DeconstructNOCSRElements(const ByteSpan & nocsrElements, ByteSpan & csr, ByteSpan & csrNonce,
+                                    ByteSpan & vendor_reserved1, ByteSpan & vendor_reserved2, ByteSpan & vendor_reserved3)
+{
+    bool csrExists            = false;
+    bool csrNonceExists       = false;
+    bool gotFirstContextTag   = false;
+    uint32_t lastContextTagId = 0;
+
+    TLV::ContiguousBufferTLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+
+    // empty out the optional items initially
+    vendor_reserved1 = vendor_reserved2 = vendor_reserved3 = ByteSpan();
+
+    tlvReader.Init(nocsrElements);
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag()));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    CHIP_ERROR error;
+
+    // process context tags first (should be in sorted order)
+    while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
+    {
+        TLV::Tag tag = tlvReader.GetTag();
+        if (!TLV::IsContextTag(tag))
+        {
+            break;
+        }
+
+        // Ensure tag-order and correct first expected tag
+        uint32_t contextTagId = TLV::TagNumFromTag(tag);
+        if (!gotFirstContextTag)
+        {
+            // First tag must always be CSR
+            VerifyOrReturnError(contextTagId == kCsr, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+            gotFirstContextTag = true;
+        }
+        else
+        {
+            // Subsequent tags must always be in order
+            VerifyOrReturnError(contextTagId > lastContextTagId, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        }
+        lastContextTagId = contextTagId;
+
+        switch (contextTagId)
+        {
+        case kCsr:
+            ReturnErrorOnFailure(tlvReader.GetByteView(csr));
+            csrExists = true;
+            break;
+        case kCsrNonce:
+            ReturnErrorOnFailure(tlvReader.GetByteView(csrNonce));
+            csrNonceExists = true;
+            break;
+        case kVendorReserved1:
+            ReturnErrorOnFailure(tlvReader.Get(vendor_reserved1));
+            break;
+        case kVendorReserved2:
+            ReturnErrorOnFailure(tlvReader.Get(vendor_reserved2));
+            break;
+        case kVendorReserved3:
+            ReturnErrorOnFailure(tlvReader.Get(vendor_reserved3));
+            break;
+        default:
+            // unrecognized TLV element
+            return CHIP_ERROR_INVALID_TLV_ELEMENT;
+        }
+    }
+
+    VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
+
+    const bool allTagsNeededPresent = csrExists && csrNonceExists;
+    VerifyOrReturnError(allTagsNeededPresent, CHIP_ERROR_MISSING_TLV_ELEMENT);
 
     return CHIP_NO_ERROR;
 }

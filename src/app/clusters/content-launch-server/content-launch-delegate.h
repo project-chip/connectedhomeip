@@ -20,18 +20,9 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/enums.h>
 
 #include <app/util/af.h>
-#include <lib/core/Optional.h>
 #include <list>
-
-struct LaunchResponse
-{
-    CHIP_ERROR err;
-    chip::CharSpan data;
-    chip::app::Clusters::ContentLauncher::StatusEnum status;
-};
 
 namespace chip {
 namespace app {
@@ -44,11 +35,12 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual LaunchResponse HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
-                                               bool autoplay, const chip::CharSpan & data) = 0;
+    virtual Commands::LaunchResponse::Type HandleLaunchContent(chip::EndpointId endpointId,
+                                                               const std::list<Parameter> & parameterList, bool autoplay,
+                                                               const chip::CharSpan & data) = 0;
 
-    virtual LaunchResponse HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                           const std::list<BrandingInformation> & brandingInformation) = 0;
+    virtual Commands::LaunchResponse::Type HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                           const std::list<BrandingInformation> & brandingInformation) = 0;
 
     virtual std::list<std::string> HandleGetAcceptHeaderList() = 0;
 

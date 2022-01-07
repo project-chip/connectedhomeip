@@ -2593,7 +2593,7 @@ void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(v
         auto & entry_0 = iter_0.GetValue();
         CHIPGroupKeyManagementClusterGroupKey * newElement_0;
         newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
-        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
         newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
         newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
         [array_0 addObject:newElement_0];
@@ -5523,56 +5523,64 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
                                                     encoding:NSUTF8StringEncoding];
     }
     {
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.wiFiScanResults.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_0;
-            newElement_0 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
-            newElement_0.security = [NSNumber numberWithUnsignedChar:entry_0.security];
-            newElement_0.ssid = [NSData dataWithBytes:entry_0.ssid.data() length:entry_0.ssid.size()];
-            newElement_0.bssid = [NSData dataWithBytes:entry_0.bssid.data() length:entry_0.bssid.size()];
-            newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
-            newElement_0.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.wiFiBand)];
-            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
-            [array_0 addObject:newElement_0];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return;
+        if (data.wiFiScanResults.HasValue()) {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.wiFiScanResults.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
+                newElement_1 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
+                newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security];
+                newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
+                newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
+                newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
+                newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                [array_1 addObject:newElement_1];
             }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.wiFiScanResults = array_1;
+        } else {
+            response.wiFiScanResults = nil;
         }
-        response.wiFiScanResults = array_0;
     }
     {
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.threadScanResults.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_0;
-            newElement_0 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
-            newElement_0.panId = [NSNumber numberWithUnsignedLongLong:entry_0.panId];
-            newElement_0.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanId];
-            newElement_0.networkName = [[NSString alloc] initWithBytes:entry_0.networkName.data()
-                                                                length:entry_0.networkName.size()
-                                                              encoding:NSUTF8StringEncoding];
-            newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
-            newElement_0.version = [NSNumber numberWithUnsignedChar:entry_0.version];
-            newElement_0.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extendedAddress];
-            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
-            newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-            [array_0 addObject:newElement_0];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return;
+        if (data.threadScanResults.HasValue()) {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.threadScanResults.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
+                newElement_1 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
+                newElement_1.panId = [NSNumber numberWithUnsignedLongLong:entry_1.panId];
+                newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
+                newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
+                                                                    length:entry_1.networkName.size()
+                                                                  encoding:NSUTF8StringEncoding];
+                newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
+                newElement_1.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_1.extendedAddress];
+                newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
+                [array_1 addObject:newElement_1];
             }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.threadScanResults = array_1;
+        } else {
+            response.threadScanResults = nil;
         }
-        response.threadScanResults = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -7108,61 +7116,6 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
@@ -7220,18 +7173,19 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttribute
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7245,8 +7199,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscr
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7257,11 +7211,226 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(
+        context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationTimeFormat::CalendarType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationTimeFormat::HourFormat value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::HourFormat> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationUnit::TempUnit value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationUnit::TempUnit> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

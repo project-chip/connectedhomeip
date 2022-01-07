@@ -16,6 +16,7 @@ if (current_os == "android") {
     deps = [
       ":headers",
       "${chip_root}/src/lib/core:chip_config_header",
+      "${chip_root}/src/lib/support:enforce_format",
       "${chip_root}/src/lib/support:logging_constants",
       "${chip_root}/src/platform:platform_buildconfig",
     ]
@@ -30,6 +31,7 @@ static_library("stdio") {
   deps = [
     ":headers",
     "${chip_root}/src/lib/core:chip_config_header",
+    "${chip_root}/src/lib/support:enforce_format",
     "${chip_root}/src/lib/support:logging_constants",
     "${chip_root}/src/platform:platform_buildconfig",
   ]

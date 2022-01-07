@@ -12,20 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Categories
-on:
-    schedule:
-        - cron: "*/5 * * * *"
+import("//build_overrides/chip.gni")
 
-concurrency:
-    group: ${{ github.workflow }}
-    cancel-in-progress: true
-  
-jobs:
-    triage:
-        name: Label Categories
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/labeler@v3-preview
-              with:
-                  repo-token: "${{ secrets.GITHUB_TOKEN }}"
+import("${chip_root}/config/standalone/args.gni")

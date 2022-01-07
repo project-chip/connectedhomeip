@@ -1094,6 +1094,14 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocale {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveLocale
+
+namespace SupportedLocales {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedLocales
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1112,6 +1120,18 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationTimeFormat {
 namespace Attributes {
 
+namespace HourFormat {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace HourFormat
+
+namespace CalendarType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CalendarType
+
+namespace SupportedCalendarTypes {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedCalendarTypes
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1129,6 +1149,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace LocalizationUnit {
 namespace Attributes {
+
+namespace TemperatureUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

@@ -615,7 +615,6 @@ function isWeaklyTypedEnum(label)
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
     "BootReasonType",
-    "ChangeReasonEnum",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
@@ -648,9 +647,6 @@ function isWeaklyTypedEnum(label)
     "MoveMode",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
-    "OTAAnnouncementReason",
-    "OTAApplyUpdateAction",
-    "OTADownloadProtocol",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
@@ -669,11 +665,15 @@ function isWeaklyTypedEnum(label)
     "ThermostatControlSequence",
     "ThermostatRunningMode",
     "ThermostatSystemMode",
-    "UpdateStateEnum",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",
   ].includes(label);
+}
+
+function incrementDepth(depth)
+{
+  return depth + 1;
 }
 
 //
@@ -694,3 +694,4 @@ exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
 exports.getPythonFieldDefault               = getPythonFieldDefault;
+exports.incrementDepth                      = incrementDepth;

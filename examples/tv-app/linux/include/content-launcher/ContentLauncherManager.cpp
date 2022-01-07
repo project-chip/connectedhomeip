@@ -17,31 +17,17 @@
  */
 
 #include "ContentLauncherManager.h"
-
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
 #include <app/util/ContentAppPlatform.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-
-#include <map>
-#include <string>
 
 using namespace std;
+using namespace chip::app::Clusters::ContentLauncher;
 using namespace chip::AppPlatform;
 
-LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList,
-                                                           bool autoplay, const chip::CharSpan & data)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                           const std::list<Parameter> & parameterList,
+                                                                           bool autoplay, const chip::CharSpan & data)
 {
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent ");
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
     string dataString(data.data(), data.size());
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -53,15 +39,15 @@ LaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endp
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     // TODO: Insert code here
-    LaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
+    Commands::LaunchResponse::Type response;
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;
 }
 
-LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                       const std::list<BrandingInformation> & brandingInformation)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
+                                                                       const chip::CharSpan & displayString,
+                                                                       const std::list<BrandingInformation> & brandingInformation)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -69,8 +55,7 @@ LaunchResponse ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & co
     string displayStringString(displayString.data(), displayString.size());
 
     // TODO: Insert code here
-    LaunchResponse response;
-    response.err    = CHIP_NO_ERROR;
+    Commands::LaunchResponse::Type response;
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
     return response;

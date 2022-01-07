@@ -202,7 +202,7 @@ class {{filename}}: public TestCommand
 
         RequestType request;
         {{#chip_tests_item_parameters}}
-        {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue}}
+        {{>commandValue ns=parent.cluster container=(concat "request." (asLowerCamelCase label)) definedValue=definedValue depth=0}}
         {{/chip_tests_item_parameters}}
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -229,7 +229,7 @@ class {{filename}}: public TestCommand
 
         {{#chip_tests_item_parameters}}
         {{zapTypeToEncodableClusterObjectType type ns=parent.cluster}} {{asLowerCamelCase name}}Argument;
-        {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue}}
+        {{>commandValue ns=parent.cluster container=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue depth=0}}
         {{/chip_tests_item_parameters}}
 
         {{#if isWriteAttribute}}
@@ -305,7 +305,7 @@ class {{filename}}: public TestCommand
           {{#chip_tests_item_response_parameters}}
             {{~#*inline "item"}}{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{/inline}}
             {{#if hasExpectedValue}}
-              {{>valueEquals actual=(asLowerCamelCase name) label=(asLowerCamelCase name) expected=expectedValue}}
+              {{>valueEquals actual=(asLowerCamelCase name) label=(asLowerCamelCase name) expected=expectedValue depth=0}}
             {{/if}}
             {{#if hasExpectedConstraints}}
               {{#if isOptional}}

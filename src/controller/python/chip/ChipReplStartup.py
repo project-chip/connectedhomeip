@@ -41,7 +41,7 @@ def ReplInit():
 
 
 def matterhelp(classOrObj=None):
-    if (classOrObj == None):
+    if (classOrObj is None):
         inspect(builtins.devCtrl, methods=True, help=True, private=False)
         inspect(mattersetlog)
         inspect(mattersetdebug)
