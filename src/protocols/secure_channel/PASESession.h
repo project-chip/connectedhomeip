@@ -263,6 +263,12 @@ private:
 
     void CloseExchange();
 
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
+
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
     Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_PakeError;
