@@ -135,8 +135,8 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
      * Once bindings are implemented, this may no longer be needed.
      */
     SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
-    server->SetFabricIndex(handle->AsSecureSession().GetFabricIndex());
-    server->SetPeerNodeId(handle->AsSecureSession().GetPeerNodeId());
+    server->SetFabricIndex(handle->AsSecureSession()->GetFabricIndex());
+    server->SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
     CheckSuccess(server->CommissioningComplete(), Failure);
 
