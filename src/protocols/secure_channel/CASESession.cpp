@@ -122,6 +122,19 @@ void CASESession::CloseExchange()
     }
 }
 
+void CASESession::DiscardExchange()
+{
+    if (mExchangeCtxt != nullptr)
+    {
+        // Make sure the exchange doesn't try to notify us when it closes,
+        // since we might be dead by then.
+        mExchangeCtxt->SetDelegate(nullptr);
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
+    }
+}
+
 CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
 {
     const NodeId peerNodeId = GetPeerNodeId();
@@ -252,11 +265,12 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %" PRIu8,
                  mState);
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
-    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
-    mExchangeCtxt = nullptr;
+    DiscardExchange();
     Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
@@ -683,10 +697,12 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1117,10 +1133,12 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1301,16 +1319,18 @@ void CASESession::OnSuccessStatusReport()
     ChipLogProgress(SecureChannel, "Success status report received. Session was established");
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
-
-    // Call delegate to indicate pairing completion
-    mDelegate->OnSessionEstablished();
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     mState = kInitialized;
 
     // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
     // on running out of session contexts.
+
+    // Call delegate to indicate pairing completion.
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablished();
 }
 
 CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -1522,10 +1542,11 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // Discard the exchange so that Clear() doesn't try closing it.  The
         // exchange will handle that.
-        mExchangeCtxt = nullptr;
+        DiscardExchange();
         Clear();
+        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;

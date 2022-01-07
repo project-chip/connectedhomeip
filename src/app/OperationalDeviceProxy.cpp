@@ -217,7 +217,7 @@ void OperationalDeviceProxy::HandleCASEConnectionFailure(void * context, CASECli
 
     device->DequeueConnectionSuccessCallbacks(/* executeCallback */ false);
     device->DequeueConnectionFailureCallbacks(error, /* executeCallback */ true);
-    device->DeferCloseCASESession();
+    device->CloseCASESession();
 }
 
 void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * client)
@@ -238,7 +238,7 @@ void OperationalDeviceProxy::HandleCASEConnected(void * context, CASEClient * cl
 
         device->DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
         device->DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
-        device->DeferCloseCASESession();
+        device->CloseCASESession();
     }
 }
 
@@ -276,20 +276,13 @@ void OperationalDeviceProxy::Clear()
     mInitParams = DeviceProxyInitParams();
 }
 
-void OperationalDeviceProxy::CloseCASESessionTask(System::Layer * layer, void * context)
+void OperationalDeviceProxy::CloseCASESession()
 {
-    OperationalDeviceProxy * device = static_cast<OperationalDeviceProxy *>(context);
-    if (device->mCASEClient)
+    if (mCASEClient)
     {
-        device->mInitParams.clientPool->Release(device->mCASEClient);
-        device->mCASEClient = nullptr;
+        mInitParams.clientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
     }
-}
-
-void OperationalDeviceProxy::DeferCloseCASESession()
-{
-    // Defer the release for the pending Ack to be sent
-    mSystemLayer->ScheduleWork(CloseCASESessionTask, this);
 }
 
 void OperationalDeviceProxy::OnSessionReleased()
