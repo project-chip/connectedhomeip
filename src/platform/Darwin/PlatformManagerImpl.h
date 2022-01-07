@@ -63,7 +63,7 @@ private:
     CHIP_ERROR _StopEventLoopTask();
 
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
-                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
     void _RunEventLoop();
     void _LockChipStack(){};

@@ -134,8 +134,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
      * This allows device to send messages back to commissioner.
      * Once bindings are implemented, this may no longer be needed.
      */
-    server->SetFabricIndex(commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex());
-    server->SetPeerNodeId(commandObj->GetExchangeContext()->GetSessionHandle().GetPeerNodeId());
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+    server->SetFabricIndex(handle->AsSecureSession()->GetFabricIndex());
+    server->SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
     CheckSuccess(server->CommissioningComplete(), Failure);
 
@@ -152,7 +153,9 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    CheckSuccess(server->SetRegulatoryConfig(commandData.location, commandData.countryCode, commandData.breadcrumb), Failure);
+
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
+                 Failure);
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = GeneralCommissioningError::kOk;

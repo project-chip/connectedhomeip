@@ -90,8 +90,8 @@ public:
 
     virtual ~PASESession();
 
-    // TODO: The SetPeerNodeId method should not be exposed; we should not need
-    // to associate a node ID with a PASE session.
+    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
+    // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
 
     /**

@@ -74,11 +74,11 @@ public:
         {
         case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
             ChipLogProgress(chipTool, "Commissioning complete");
-            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
 
             TestCommand * command = reinterpret_cast<TestCommand *>(arg);
             command->isRunning    = true;
             command->NextTest();
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
             break;
         }
     }

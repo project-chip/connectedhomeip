@@ -276,7 +276,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionBobToAlice());
+    ctx.ExpireSessionBobToAlice();
 
     ctx.DrainAndServiceIO();
 
@@ -291,7 +291,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionAliceToBob());
+    ctx.ExpireSessionAliceToBob();
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
 

@@ -173,12 +173,8 @@ CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
 
     // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge = commandObj->GetExchangeContext()
-                                        ->GetExchangeMgr()
-                                        ->GetSessionManager()
-                                        ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
-                                        ->GetCryptoContext()
-                                        .GetAttestationChallenge();
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     Hash_SHA256_stream hashStream;
     ReturnErrorOnFailure(hashStream.Begin());
@@ -291,7 +287,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };

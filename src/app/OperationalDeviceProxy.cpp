@@ -127,11 +127,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
             return CHIP_NO_ERROR;
         }
 
-        Transport::SecureSession * secureSession = mInitParams.sessionManager->GetSecureSession(mSecureSession.Get());
-        if (secureSession != nullptr)
-        {
-            secureSession->SetPeerAddress(addr);
-        }
+        mSecureSession.Get()->AsSecureSession()->SetPeerAddress(addr);
     }
 
     return err;
@@ -262,7 +258,7 @@ CHIP_ERROR OperationalDeviceProxy::Disconnect()
     return CHIP_NO_ERROR;
 }
 
-void OperationalDeviceProxy::SetConnectedSession(SessionHandle handle)
+void OperationalDeviceProxy::SetConnectedSession(const SessionHandle & handle)
 {
     mSecureSession.Grab(handle);
     mState = State::SecureConnected;
@@ -289,12 +285,9 @@ void OperationalDeviceProxy::CloseCASESession()
     }
 }
 
-void OperationalDeviceProxy::OnSessionReleased(const SessionHandle & session)
+void OperationalDeviceProxy::OnSessionReleased()
 {
-    VerifyOrReturn(mSecureSession.Contains(session),
-                   ChipLogDetail(Controller, "Connection expired, but it doesn't match the current session"));
     mState = State::Initialized;
-    mSecureSession.Release();
 }
 
 CHIP_ERROR OperationalDeviceProxy::ShutdownSubscriptions()

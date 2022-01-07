@@ -139,9 +139,17 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(
-            (mSessionHandle.HasValue() ? mSessionHandle.Value() : mDevice->GetSecureSession().Value()), mEndpoint, clusterId,
-            attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        if (mGroupSession)
+        {
+            return chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
+                                                              onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        }
+        else
+        {
+            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
+                                                              attributeId, requestData, onSuccessCb, onFailureCb,
+                                                              aTimedWriteTimeoutMs, onDoneCb);
+        }
     }
 
     template <typename AttributeInfo>
@@ -262,7 +270,7 @@ protected:
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
-    chip::Optional<SessionHandle> mSessionHandle;
+    SessionHolder mGroupSession;
 };
 
 } // namespace Controller

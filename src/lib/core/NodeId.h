@@ -78,4 +78,9 @@ constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
     return kMinGroupNodeId | aGroupId;
 }
 
+constexpr NodeId NodeIdFromPAKEKeyId(GroupId aPAKEKeyId)
+{
+    return kMinPAKEKeyId | aPAKEKeyId;
+}
+
 } // namespace chip

@@ -60,11 +60,13 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    SecureSession * CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
-                                           CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
-                                           const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId,
+                                                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                                                   FabricIndex fabric, const ReliableMessageProtocolConfig & config)
     {
-        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config);
+        SecureSession * result =
+            mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config);
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
@@ -83,7 +85,7 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    SecureSession * FindSecureSessionByLocalKey(uint16_t localSessionId)
+    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId)
     {
         SecureSession * result = nullptr;
         mEntries.ForEachActiveObject([&](auto session) {
@@ -94,7 +96,7 @@ public:
             }
             return Loop::Continue;
         });
-        return result;
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
     /**

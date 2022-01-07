@@ -103,7 +103,7 @@ private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
     Messaging::ExchangeContext * mExchangeCtx = nullptr;
     EchoFunct OnEchoResponseReceived          = nullptr;
-    Optional<SessionHandle> mSecureSession    = Optional<SessionHandle>();
+    SessionHolder mSecureSession;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;

@@ -26,7 +26,7 @@
 
 #include <cstdint>
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
@@ -191,7 +191,7 @@ extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
 {
-    location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+    location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
     return CHIP_NO_ERROR;
 }
 

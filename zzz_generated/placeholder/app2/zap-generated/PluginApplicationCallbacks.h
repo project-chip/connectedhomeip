@@ -23,11 +23,15 @@
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterColorControlPluginServerInitCallback();                                                                                  \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
-    MatterScenesPluginServerInitCallback();
+    MatterScenesPluginServerInitCallback();                                                                                        \
+    MatterTemperatureMeasurementPluginClientInitCallback();                                                                        \
+    MatterTemperatureMeasurementPluginServerInitCallback();

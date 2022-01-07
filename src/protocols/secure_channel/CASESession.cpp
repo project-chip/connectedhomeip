@@ -244,7 +244,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     mFabricInfo     = fabric;
     mLocalMRPConfig = mrpConfig;
 
-    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     SetPeerAddress(peerAddress);
     SetPeerNodeId(peerNodeId);
 
@@ -1458,7 +1458,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     else
     {
         mExchangeCtxt = ec;
-        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);

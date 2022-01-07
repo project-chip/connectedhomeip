@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <platform/AttributeList.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
-#include <platform/LabelList.h>
 #include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
 
@@ -36,6 +36,9 @@ class DiscoveryImplPlatform;
 }
 
 namespace DeviceLayer {
+
+static constexpr size_t kMaxFixedLabels = 10;
+static constexpr size_t kMaxUserLabels  = 10;
 
 class PlatformManagerImpl;
 class ConnectivityManagerImpl;
@@ -179,11 +182,11 @@ public:
 #endif
 
     CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
-                                 LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
     CHIP_ERROR SetUserLabelList(EndpointId endpoint,
-                                LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR GetUserLabelList(EndpointId endpoint,
-                                LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
 private:
     bool mInitialized                   = false;
@@ -425,23 +428,22 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duratio
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
 }
 
-inline CHIP_ERROR
-PlatformManager::GetFixedLabelList(EndpointId endpoint,
-                                   LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+inline CHIP_ERROR PlatformManager::GetFixedLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
 }
 
 inline CHIP_ERROR
 PlatformManager::SetUserLabelList(EndpointId endpoint,
-                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
 inline CHIP_ERROR
 PlatformManager::GetUserLabelList(EndpointId endpoint,
-                                  LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
 }
