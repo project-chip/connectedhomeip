@@ -143,11 +143,6 @@ class NrfConnectBuilder(Builder):
                     raise Exception('ZEPHYR_BASE validation failed')
 
             overlays = []
-            project_root = os.path.join(os.path.dirname(__file__), "../../..")
-            if os.path.exists(os.path.join(
-                    project_root, self.app.AppPath(), "nrfconnect/boards", self.board.GnArgName()+".conf")):
-                overlays.append("-DOVERLAY_CONFIG=boards/" +
-                                self.board.GnArgName()+".conf")
             if self.enable_rpcs:
                 overlays.append("-DOVERLAY_CONFIG=rpc.overlay")
 
