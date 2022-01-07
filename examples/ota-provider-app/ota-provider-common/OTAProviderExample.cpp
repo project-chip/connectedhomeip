@@ -30,6 +30,7 @@
 
 #include <string.h>
 
+using chip::BitFlags;
 using chip::ByteSpan;
 using chip::CharSpan;
 using chip::FabricIndex;
@@ -40,12 +41,18 @@ using chip::Optional;
 using chip::Server;
 using chip::Span;
 using chip::app::Clusters::OTAProviderDelegate;
+using chip::bdx::TransferControlFlags;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kUriMaxLen          = 256;
+
+// Arbitrary BDX Transfer Params
+constexpr uint32_t kMaxBdxBlockSize                 = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
+constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
@@ -124,6 +131,18 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
         if (strlen(mOTAFilePath) != 0)
         {
             queryStatus = OTAQueryStatus::kUpdateAvailable;
+
+            // Initialize the transfer session in prepartion for a BDX transfer
+            mBdxOtaSender.SetFilepath(mOTAFilePath);
+            BitFlags<TransferControlFlags> bdxFlags;
+            bdxFlags.Set(TransferControlFlags::kReceiverDrive);
+            CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                              bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
+                return EMBER_ZCL_STATUS_FAILURE;
+            }
         }
         else
         {

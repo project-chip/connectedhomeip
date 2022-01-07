@@ -1567,6 +1567,50 @@ tests:
               - name: "wasPresent"
                 value: false
 
+    - label: "Read list of structs containing nullables and optionals"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          # By default, just one item, with everything default-initialized
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: null,
+                  },
+              ]
+
+    - label: "Write list of structs containing nullables and optionals"
+      command: "writeAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      arguments:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
+    - label:
+          "Read list of structs containing nullables and optionals after writing"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
     # Nullable attributes
 
     # Tests for nullable Boolean attribute

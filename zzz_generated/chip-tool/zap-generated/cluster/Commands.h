@@ -5990,7 +5990,7 @@ public:
                                                                                                  OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint16_t value)
+    static void OnAttributeResponse(void * context, chip::VendorId value)
     {
         OnGeneralAttributeResponse(context, "Basic.VendorID response", value);
     }
@@ -6027,7 +6027,7 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, uint16_t value) { LogValue("Basic.VendorID report", 0, value); }
+    static void OnValueReport(void * context, chip::VendorId value) { LogValue("Basic.VendorID report", 0, value); }
 
 private:
     uint16_t mMinInterval;

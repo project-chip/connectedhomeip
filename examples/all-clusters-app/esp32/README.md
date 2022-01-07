@@ -290,8 +290,8 @@ Start the console
 
 From within the console you can then invoke rpcs:
 
-    rpcs.chip.rpc.Wifi.Connect(ssid=b"MySSID", secret=b"MyPASSWORD")
-    rpcs.chip.rpc.Wifi.GetIP6Address()
+    rpcs.chip.rpc.WiFi.Connect(ssid=b"MySSID", secret=b"MyPASSWORD")
+    rpcs.chip.rpc.WiFi.GetIP6Address()
 
     rpcs.chip.rpc.Lighting.Get()
     rpcs.chip.rpc.Lighting.Set(on=True, level=128, color=protos.chip.rpc.LightingColor(hue=5, saturation=5))

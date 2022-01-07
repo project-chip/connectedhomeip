@@ -31,18 +31,18 @@
 namespace chip {
 namespace rpc {
 
-class Wifi final : public pw_rpc::nanopb::Wifi::Service<Wifi>
+class WiFi final : public pw_rpc::nanopb::WiFi::Service<WiFi>
 {
 public:
     // Singleton
-    static Wifi & Instance() { return instance_; }
+    static WiFi & Instance() { return instance_; }
 
     // Initalize the wifi station
     pw::Status Init();
 
     // Blocks the calling thread until wifi connection is completed successfully.
     // NOTE: Currently only supports blocking a single thread.
-    void BlockUntilWifiConnected() { xSemaphoreTake(wifi_connected_semaphore_, portMAX_DELAY); }
+    void BlockUntilWiFiConnected() { xSemaphoreTake(wifi_connected_semaphore_, portMAX_DELAY); }
 
     // The following functions are the RPC handlers
 
@@ -125,7 +125,7 @@ public:
     }
 
 private:
-    static Wifi instance_;
+    static WiFi instance_;
     esp_netif_t * esp_netif_ = nullptr;
     SemaphoreHandle_t wifi_connected_semaphore_;
 
@@ -156,7 +156,7 @@ private:
         }
     }
 
-    static void WifiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data);
+    static void WiFiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data);
 };
 
 } // namespace rpc

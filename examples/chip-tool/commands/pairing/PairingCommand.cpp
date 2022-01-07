@@ -74,7 +74,7 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
     switch (mNetworkType)
     {
     case PairingNetworkType::WiFi:
-        return CommissioningParameters().SetWifiCredentials(Controller::WifiCredentials(mSSID, mPassword));
+        return CommissioningParameters().SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
     case PairingNetworkType::Thread:
         return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
     case PairingNetworkType::Ethernet:

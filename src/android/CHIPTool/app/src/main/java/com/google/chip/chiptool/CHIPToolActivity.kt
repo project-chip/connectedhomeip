@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import chip.devicecontroller.NetworkCredentials
 import chip.setuppayload.SetupPayload
 import chip.setuppayload.SetupPayloadParser
 import chip.setuppayload.SetupPayloadParser.UnrecognizedQrCodeException
@@ -40,6 +41,7 @@ import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.clusterclient.SensorClientFragment
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
+import com.google.chip.chiptool.provisioning.EnterNetworkFragment
 import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
@@ -48,14 +50,16 @@ import com.google.chip.chiptool.setuppayloadscanner.CHIPLedgerDetailsFragment
 import org.json.JSONObject
 
 class CHIPToolActivity :
-    AppCompatActivity(),
-    BarcodeFragment.Callback,
-    SelectActionFragment.Callback,
-    DeviceProvisioningFragment.Callback,
-    CHIPDeviceDetailsFragment.Callback,
-    CHIPLedgerDetailsFragment.Callback {
+  AppCompatActivity(),
+  BarcodeFragment.Callback,
+  SelectActionFragment.Callback,
+  DeviceProvisioningFragment.Callback,
+  EnterNetworkFragment.Callback,
+  CHIPDeviceDetailsFragment.Callback,
+  CHIPLedgerDetailsFragment.Callback {
 
   private var networkType: ProvisionNetworkType? = null
+  private var deviceInfo: CHIPDeviceInfo? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -87,10 +91,15 @@ class CHIPToolActivity :
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
+    this.deviceInfo = deviceInfo
     if (networkType == null) {
       showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
     } else {
-      showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, networkType!!), false)
+      if (deviceInfo.ipAddress != null) {
+        showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, null))
+      } else {
+        showFragment(EnterNetworkFragment.newInstance(networkType!!), false)
+      }
     }
   }
 
@@ -109,7 +118,7 @@ class CHIPToolActivity :
     showFragment(BarcodeFragment.newInstance())
   }
 
-  override fun onProvisionWifiCredentialsClicked() {
+  override fun onProvisionWiFiCredentialsClicked() {
     networkType = ProvisionNetworkType.WIFI
     showFragment(BarcodeFragment.newInstance(), false)
   }
@@ -121,6 +130,10 @@ class CHIPToolActivity :
 
   override fun onShowDeviceAddressInput() {
     showFragment(AddressCommissioningFragment.newInstance(), false)
+  }
+
+  override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentials) {
+    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
   }
 
   override fun handleClusterInteractionClicked() {
