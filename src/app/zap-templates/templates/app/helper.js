@@ -353,7 +353,8 @@ function asMEI(prefix, suffix)
 }
 
 // Not to be exported.
-function nsValueToNamespace(ns) {
+function nsValueToNamespace(ns)
+{
   if (ns == "detail") {
     return ns;
   }
