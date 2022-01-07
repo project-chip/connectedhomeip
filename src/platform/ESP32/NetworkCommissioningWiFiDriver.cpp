@@ -241,7 +241,7 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
             {
                 ChipLogError(DeviceLayer, "can't find the ScanCallback function");
             }
-            
+
         }))
         {
             ap_buffer_ptr.release();
