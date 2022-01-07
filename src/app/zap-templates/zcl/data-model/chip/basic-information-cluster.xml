@@ -26,7 +26,7 @@ limitations under the License.
 
     <attribute side="server" code="0"  define="INTERACTION_MODEL_VERSION" type="int16u"                                 default="1"                                >InteractionModelVersion</attribute>
     <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                                             >VendorName</attribute>
-    <attribute side="server" code="2"  define="VENDOR_ID"                 type="int16u"                                                                            >VendorID</attribute>
+    <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                                            >VendorID</attribute>
     <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                                             >ProductName</attribute>
     <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"                                                                            >ProductID</attribute>
     <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true"                >NodeLabel</attribute>

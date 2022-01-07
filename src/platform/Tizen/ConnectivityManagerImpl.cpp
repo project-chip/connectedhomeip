@@ -125,41 +125,41 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectInterval(System::Clo
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 {
-    bool isWifiStationEnabled = false;
+    bool isWiFiStationEnabled = false;
 
-    WiFiMgr().IsActivated(&isWifiStationEnabled);
+    WiFiMgr().IsActivated(&isWiFiStationEnabled);
 
-    return isWifiStationEnabled;
+    return isWiFiStationEnabled;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
-    bool isWifiStationConnected                     = false;
+    bool isWiFiStationConnected                     = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationConnected);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWiFiStationConnected);
 
     if (connectionState == WIFI_MANAGER_CONNECTION_STATE_CONNECTED)
-        isWifiStationConnected = true;
+        isWiFiStationConnected = true;
 
-    return isWifiStationConnected;
+    return isWiFiStationConnected;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
-    bool isWifiStationProvisioned                   = false;
+    bool isWiFiStationProvisioned                   = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationProvisioned);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWiFiStationProvisioned);
 
     if (connectionState >= WIFI_MANAGER_CONNECTION_STATE_ASSOCIATION)
-        isWifiStationProvisioned = true;
+        isWiFiStationProvisioned = true;
 
-    return isWifiStationProvisioned;
+    return isWiFiStationProvisioned;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)

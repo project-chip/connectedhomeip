@@ -88,6 +88,14 @@ public:
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
     secure_channel::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
 
+    CHIP_ERROR CreateSessionBobToAlice();
+    CHIP_ERROR CreateSessionAliceToBob();
+    CHIP_ERROR CreateSessionBobToFriends();
+
+    void ExpireSessionBobToAlice();
+    void ExpireSessionAliceToBob();
+    void ExpireSessionBobToFriends();
+
     SessionHandle GetSessionBobToAlice();
     SessionHandle GetSessionAliceToBob();
     SessionHandle GetSessionBobToFriends();

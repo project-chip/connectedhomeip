@@ -25,6 +25,7 @@
 #include <credentials/CHIPCert.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
+#include <transport/Session.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -47,10 +48,8 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  *   - LastActivityTime is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
-class SecureSession
+class SecureSession : public Session
 {
 public:
     /**
@@ -70,14 +69,37 @@ public:
         mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
         mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
+    ~SecureSession() { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
 
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "secure"; };
+#endif
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override;
+
+    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp:
+            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
     Type GetSecureSessionType() const { return mSecureSessionType; }
@@ -86,7 +108,7 @@ public:
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }

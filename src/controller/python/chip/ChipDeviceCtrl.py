@@ -242,9 +242,9 @@ class ChipDeviceController(object):
             return False
         return self._ChipStack.commissioningEventRes == 0
 
-    def SetWifiCredentials(self, ssid, credentials):
+    def SetWiFiCredentials(self, ssid, credentials):
         return self._ChipStack.Call(
-            lambda: self._dmLib.pychip_DeviceController_SetWifiCredentials(
+            lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid, credentials)
         )
 
@@ -392,11 +392,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice.value == None:
+        if returnDevice.value is None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
@@ -696,9 +696,9 @@ class ChipDeviceController(object):
                 c_char_p, c_uint32]
             self._dmLib.pychip_DeviceController_SetThreadOperationalDataset.restype = c_uint32
 
-            self._dmLib.pychip_DeviceController_SetWifiCredentials.argtypes = [
+            self._dmLib.pychip_DeviceController_SetWiFiCredentials.argtypes = [
                 c_char_p, c_char_p]
-            self._dmLib.pychip_DeviceController_SetWifiCredentials.restype = c_uint32
+            self._dmLib.pychip_DeviceController_SetWiFiCredentials.restype = c_uint32
 
             self._dmLib.pychip_DeviceController_Commission.argtypes = [
                 c_void_p, c_uint64]

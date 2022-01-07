@@ -209,7 +209,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     uint16_t vendorId;
     if (ConfigurationMgr().GetVendorId(vendorId) == CHIP_NO_ERROR)
     {
-        status = Attributes::VendorID::Set(endpoint, vendorId);
+        status = Attributes::VendorID::Set(endpoint, static_cast<VendorId>(vendorId));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status, ChipLogError(Zcl, "Error setting Vendor Id: 0x%02x", status));
     }
 
@@ -268,7 +268,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     uint8_t manufacturingDayOfMonth;
     if (ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth) == CHIP_NO_ERROR)
     {
-        snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu16 "-%02" PRIu16,
+        snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8,
                  manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
         status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,

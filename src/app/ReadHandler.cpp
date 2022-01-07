@@ -58,8 +58,8 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mActiveSubscription     = false;
     mIsChunkedReport        = false;
     mInteractionType        = aInteractionType;
-    mInitiatorNodeId        = apExchangeContext->GetSessionHandle().GetPeerNodeId();
-    mSubjectDescriptor      = apExchangeContext->GetSessionHandle().GetSubjectDescriptor();
+    mInitiatorNodeId        = apExchangeContext->GetSessionHandle()->AsSecureSession()->GetPeerNodeId();
+    mSubjectDescriptor      = apExchangeContext->GetSessionHandle()->GetSubjectDescriptor();
     mHoldSync               = false;
     mLastWrittenEventsBytes = 0;
     if (apExchangeContext != nullptr)
@@ -201,12 +201,13 @@ CHIP_ERROR ReadHandler::SendReportData(System::PacketBufferHandle && aPayload, b
     VerifyOrReturnLogError(IsReportable(), CHIP_ERROR_INCORRECT_STATE);
     if (IsPriming() || IsChunkedReport())
     {
-        mSessionHandle.SetValue(mpExchangeCtx->GetSessionHandle());
+        mSessionHandle.Grab(mpExchangeCtx->GetSessionHandle());
     }
     else
     {
         VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
-        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Value(), this);
+        VerifyOrReturnLogError(mSessionHandle, CHIP_ERROR_INCORRECT_STATE);
+        mpExchangeCtx = mpExchangeMgr->NewContext(mSessionHandle.Get(), this);
         mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
     }
     VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);

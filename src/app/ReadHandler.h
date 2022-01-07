@@ -216,7 +216,7 @@ private:
     uint64_t mSubscriptionId            = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    Optional<SessionHandle> mSessionHandle;
+    SessionHolder mSessionHandle;
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;

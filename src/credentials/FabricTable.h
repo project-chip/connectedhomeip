@@ -21,6 +21,8 @@
 
 #pragma once
 
+#include <algorithm>
+
 #include <app/util/basic-types.h>
 #include <credentials/CHIPCert.h>
 #include <crypto/CHIPCryptoPAL.h>

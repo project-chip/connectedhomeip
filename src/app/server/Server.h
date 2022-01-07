@@ -19,6 +19,7 @@
 
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
+#include <app/DefaultAttributePersistenceProvider.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -26,6 +27,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/SafeInt.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
@@ -98,8 +100,15 @@ private:
     {
         CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override
         {
-            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size));
+            size_t bytesRead;
+            ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
+            if (!CanCastTo<uint16_t>(bytesRead))
+            {
+                ChipLogDetail(AppServer, "%zu is too big to fit in uint16_t", bytesRead);
+                return CHIP_ERROR_BUFFER_TOO_SMALL;
+            }
             ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);
+            size = static_cast<uint16_t>(bytesRead);
             return CHIP_NO_ERROR;
         }
 
@@ -159,6 +168,7 @@ private:
     // (https://github.com/project-chip/connectedhomeip/issues/12174)
     TestPersistentStorageDelegate mGroupsStorage;
     Credentials::GroupDataProviderImpl mGroupsProvider;
+    app::DefaultAttributePersistenceProvider mAttributePersister;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

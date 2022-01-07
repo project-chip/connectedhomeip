@@ -27,7 +27,7 @@ tests:
       command: "readAttribute"
       attribute: "current Level"
       response:
-          value: 0
+          value: 254
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"
@@ -116,12 +116,12 @@ tests:
       response:
           value: 254
 
-    - label: "Reset level to 0"
+    - label: "Reset level to 254"
       command: "MoveToLevel"
       arguments:
           values:
               - name: "level"
-                value: 0
+                value: 254
               - name: "transitionTime"
                 value: 0
               - name: "optionMask"

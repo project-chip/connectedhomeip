@@ -27,7 +27,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 0
+          value: 254
 
     - label: "reads max level attribute from DUT"
       command: "readAttribute"
@@ -112,7 +112,7 @@ tests:
       arguments:
           values:
               - name: "moveMode"
-                value: 1
+                value: 0
               - name: "rate"
                 value: 255
               - name: "optionMask"
@@ -134,3 +134,24 @@ tests:
       response:
           constraints:
               notValue: 255
+
+    - label: "Reset level to 254"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100

@@ -15,18 +15,18 @@
  *    limitations under the License.
  */
 
-#import "WifiViewController.h"
+#import "WiFiViewController.h"
 #import "CHIPUIViewUtils.h"
 #import "DefaultsUtils.h"
 
-@interface WifiViewController ()
+@interface WiFiViewController ()
 @property (strong, nonatomic) UITextField * networkSSID;
 @property (strong, nonatomic) UITextField * networkPassword;
 @property (strong, nonatomic) UIButton * saveButton;
 @property (strong, nonatomic) UIButton * clearButton;
 @end
 
-@implementation WifiViewController
+@implementation WiFiViewController
 
 // MARK: UIViewController methods
 

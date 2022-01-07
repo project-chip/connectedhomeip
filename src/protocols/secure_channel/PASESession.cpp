@@ -284,6 +284,8 @@ CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2I
     mPasscodeID      = 0;
     mLocalMRPConfig  = mrpConfig;
 
+    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
+
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
 exit:
@@ -298,11 +300,14 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t p
                                        uint16_t passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
                                        SessionEstablishmentDelegate * delegate)
 {
+    ReturnErrorCodeIf(passcodeID == 0, CHIP_ERROR_INVALID_ARGUMENT);
     ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, mrpConfig, delegate));
 
     memmove(&mPASEVerifier, &verifier, sizeof(verifier));
     mComputeVerifier = false;
     mPasscodeID      = passcodeID;
+
+    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
 
     return CHIP_NO_ERROR;
 }
@@ -316,9 +321,10 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     SuccessOrExit(err);
 
     mExchangeCtxt = exchangeCtxt;
-    mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+    mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
 
     SetPeerAddress(peerAddress);
+    SetPeerNodeId(NodeIdFromPAKEKeyId(mPasscodeID));
 
     mLocalMRPConfig = mrpConfig;
 
@@ -884,7 +890,7 @@ CHIP_ERROR PASESession::ValidateReceivedMessage(ExchangeContext * exchange, cons
     else
     {
         mExchangeCtxt = exchange;
-        mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+        mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
