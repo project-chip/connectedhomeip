@@ -2889,12 +2889,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
-                                                            encoding:NSUTF8StringEncoding];
                 newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                               length:entry_0.value.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -8806,12 +8800,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 newElement_0 = [CHIPUserLabelClusterLabelStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
                                                             encoding:NSUTF8StringEncoding];
                 newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                               length:entry_0.value.size()
