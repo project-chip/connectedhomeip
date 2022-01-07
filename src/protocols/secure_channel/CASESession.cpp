@@ -252,9 +252,11 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %" PRIu8,
                  mState);
+    // Make sure the exchange doesn't try to notify us when it closes,
+    // since we might be dead by then.
+    mExchangeCtxt->SetDelegate(nullptr);
     // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
     // exchange will handle that.
-    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
     Clear();
     // Do this last in case the delegate frees us.
