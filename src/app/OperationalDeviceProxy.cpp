@@ -284,8 +284,8 @@ void OperationalDeviceProxy::CloseCASESession()
 {
     if (mCASEClient)
     {
-        this->mInitParams.clientPool->Release(this->mCASEClient);
-        this->mCASEClient = nullptr;
+        mInitParams.clientPool->Release(mCASEClient);
+        mCASEClient = nullptr;
     }
 }
 
