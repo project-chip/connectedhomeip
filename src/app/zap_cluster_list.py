@@ -44,7 +44,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'ILLUMINANCE_MEASUREMENT_CLUSTER': [],
     'KEYPAD_INPUT_CLUSTER': ['keypad-input-server'],
     'LEVEL_CONTROL_CLUSTER': ['level-control'],
-    'LOCALIZATION_CONFIGURATION_CLUSTER': [],
+    'LOCALIZATION_CONFIGURATION_CLUSTER': ['localization-configuration-server'],
     'LOCALIZATION_TIME_FORMAT_CLUSTER': [],
     'LOCALIZATION_UNIT_CLUSTER': [],
     'LOW_POWER_CLUSTER': ['low-power-server'],
