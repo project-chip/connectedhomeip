@@ -17,14 +17,14 @@
 
 #include <cctype>
 
-#include <commands/common/ValueParser.h>
 #include <lib/support/BytesToHex.h>
+#include <lib/support/value_parser/ValueParserIntegral.h>
 
 namespace chip {
 
 bool IsTokenEnd(char ch)
 {
-    return ch == '\0' || ch == ',' || ch == ')' || ch == ']';
+    return isspace(ch) || ch == '\0' || ch == ',' || ch == ')' || ch == ']';
 }
 
 const char * SkipSpaces(const char * iter)
@@ -42,13 +42,13 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::v
     {
         value = true;
         iter += 4;
-        return CHIP_NO_ERROR;
+        return IsTokenEnd(*iter) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (strncmp("false", iter, 4) == 0)
+    if (strncmp("false", iter, 5) == 0)
     {
         value = false;
         iter += 5;
-        return CHIP_NO_ERROR;
+        return IsTokenEnd(*iter) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
@@ -67,7 +67,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & val
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
     std::vector<uint8_t> data;
-    for (; iter + 1 < end && *iter != ','; iter += 2)
+    for (; iter + 1 < end && !IsTokenEnd(*iter); iter += 2)
     {
         uint8_t converted;
         CHIP_ERROR error = chip::Encoding::MakeU8FromAsciiHex(iter, &converted);

@@ -20,12 +20,37 @@
 #include <type_traits>
 #include <vector>
 
+#include <app/data-model/List.h>
+#include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 
 #pragma once
 
 namespace chip {
+
+const char * SkipSpaces(const char * iter);
+
+bool IsTokenEnd(char ch);
+
+template <typename X,
+          typename std::enable_if_t<
+              std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions);
+
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
 
 CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::vector<std::function<void(void)>> & freeFunctions);
 
@@ -35,7 +60,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::CharSpan & val
 CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 
-template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int>>
 CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     char * nextIter;
@@ -51,7 +76,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
 
 template <typename X,
           typename std::enable_if_t<
-              std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+              std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int>>
 CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     while (isspace(*iter))
@@ -70,7 +95,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
     }
 }
 
-template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
+template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int>>
 CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     using StorageType    = std::remove_cv_t<std::remove_reference_t<X>>;
@@ -84,8 +109,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
     return error;
 }
 
-const char * SkipSpaces(const char * iter);
-
-bool IsTokenEnd(char ch);
+template <typename T>
+CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
+                      std::vector<std::function<void(void)>> & freeFunctions)
+{
+    return ParseValue(iter, end, *value.RawStorage(), freeFunctions);
+}
 
 } // namespace chip

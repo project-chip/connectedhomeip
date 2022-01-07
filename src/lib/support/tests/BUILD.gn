@@ -46,6 +46,7 @@ chip_test_suite("tests") {
     "TestStringBuilder.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
+    "TestValueParser.cpp",
     "TestVariant.cpp",
     "TestZclString.cpp",
   ]

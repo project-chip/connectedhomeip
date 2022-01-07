@@ -31,11 +31,11 @@
 #include <app/data-model/Nullable.h>
 #include <commands/clusters/ModelCommand.h>
 #include <commands/common/CommandInvoker.h>
-#include <commands/common/ValueParser.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
+#include <lib/support/value_parser/ValueParserIntegral.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
@@ -189,128 +189,13 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
                       chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+} // namespace chip
 
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
-template <typename ListEntryType>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<ListEntryType> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+// The value parser header needs to be included after parser of generated type
+// so that the template instantiantion can compile.
+#include <lib/support/value_parser/ValueParserComplex.h>
 
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
-{
-    return ParseValue(iter, end, *value.RawStorage(), freeFunctions);
-}
-
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
-{
-    iter = SkipSpaces(iter);
-    if (IsTokenEnd(*iter))
-    {
-        value = chip::Optional<T>();
-        return CHIP_NO_ERROR;
-    }
-    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
-    StorageType entry;
-    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
-    if (error != CHIP_NO_ERROR)
-    {
-        return error;
-    }
-    value.SetValue(entry);
-    return CHIP_NO_ERROR;
-}
-
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
-{
-    iter = SkipSpaces(iter);
-    if (strncmp("null", iter, 4) == 0)
-    {
-        iter += 4;
-        value = chip::app::DataModel::Nullable<T>();
-        return CHIP_NO_ERROR;
-    }
-    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
-    StorageType entry;
-    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
-    if (error != CHIP_NO_ERROR)
-    {
-        return error;
-    }
-    value.SetNonNull(entry);
-    return CHIP_NO_ERROR;
-}
-
-template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
-{
-    using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
-    if (end - iter < 2)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    if (*iter != '[')
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-    iter++;
-    std::vector<StorageType> entries;
-    entries.clear();
-    while (iter < end)
-    {
-        if (*iter == ']')
-        {
-            iter++;
-            break;
-        }
-        StorageType entryValue;
-        iter             = SkipSpaces(iter);
-        CHIP_ERROR error = ParseValue(iter, end, entryValue, freeFunctions);
-        if (error != CHIP_NO_ERROR)
-        {
-            return error;
-        }
-        if (iter >= end || (*iter != ']' && *iter != ','))
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
-        entries.push_back(entryValue);
-        if (*iter == ']')
-        {
-            iter++;
-            break;
-        }
-        iter++;
-    }
-    if (!entries.empty())
-    {
-        StorageType * storage = new StorageType[entries.size()];
-        std::copy(entries.begin(), entries.end(), storage);
-        value = chip::app::DataModel::List<T>(storage, entries.size());
-        freeFunctions.push_back([storage]() { delete[] storage; });
-    }
-    else
-    {
-        value = chip::app::DataModel::List<T>();
-    }
-    return CHIP_NO_ERROR;
-}
+namespace chip {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
@@ -44997,6 +44882,54 @@ public:
     }
 };
 
+class WriteTestClusterListNullablesAndOptionalsStruct : public ModelCommand
+{
+public:
+    WriteTestClusterListNullablesAndOptionalsStruct() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "list-nullables-and-optionals-struct");
+        AddArgument("attr-value", &mValueString);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterListNullablesAndOptionalsStruct() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+        std::vector<std::function<void(void)>> freeFunctions;
+        CHIP_ERROR error;
+
+        const char * iter = mValueString;
+        const char * end  = iter + strlen(mValueString);
+        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
+        if (iter != end)
+        {
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(chipTool,
+                         "Failed to parse argument to type chip::app::DataModel::List<const "
+                         "chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>");
+            return error;
+        }
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        error = cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+        for (auto && freeFunction : freeFunctions)
+        {
+            freeFunction();
+        }
+        return error;
+    }
+
+private:
+    char * mValueString;
+    chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type> mValue;
+};
+
 class ReportTestClusterListNullablesAndOptionalsStruct : public ModelCommand
 {
 public:
@@ -60753,6 +60686,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterVendorId>(),                           //
         make_unique<ReportTestClusterVendorId>(),                          //
         make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<WriteTestClusterListNullablesAndOptionalsStruct>(),    //
         make_unique<ReadTestClusterEnumAttr>(),                            //
         make_unique<WriteTestClusterEnumAttr>(),                           //
         make_unique<ReportTestClusterEnumAttr>(),                          //
