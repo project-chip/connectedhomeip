@@ -268,7 +268,7 @@ void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint)
     uint8_t manufacturingDayOfMonth;
     if (ConfigurationMgr().GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth) == CHIP_NO_ERROR)
     {
-        snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu8 "-%02" PRIu8,
+        snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04" PRIu16 "-%02" PRIu16 "-%02" PRIu16,
                  manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
         status = Attributes::ManufacturingDate::Set(endpoint, CharSpan(manufacturingDateString, strlen(manufacturingDateString)));
         VerifyOrdo(EMBER_ZCL_STATUS_SUCCESS == status,

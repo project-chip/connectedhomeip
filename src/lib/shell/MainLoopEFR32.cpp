@@ -185,6 +185,7 @@ namespace Shell {
 
 void Engine::RunMainLoop()
 {
+    Engine::Root().RegisterDefaultCommands();
     streamer_printf(streamer_get(), kShellPrompt);
 
     while (true)
