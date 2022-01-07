@@ -390,10 +390,8 @@ struct CapturingAttestationChallenge : Base<TContext>
     {}
     void Enter()
     {
-        const ByteSpan challenge = this->mCommissionee.mSystemState->SessionMgr()
-                                       ->GetSecureSession(this->mCommissionee.mPaseSession.Get())
-                                       ->GetCryptoContext()
-                                       .GetAttestationChallenge();
+        ByteSpan challenge =
+            this->mCommissionee.mPaseSession.Get()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
         if (mAttestationInformation.Challenge()->Set(challenge) == CHIP_NO_ERROR)
         {
             this->mCtx.Dispatch(TContext::Event::template Create<Events::AttestationInformation>(mAttestationInformation));

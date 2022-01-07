@@ -96,7 +96,7 @@ CHIP_ERROR OperationalDeviceProxy::Emplace(const Transport::PeerAddress & addr,
 {
     mPeerId = peerId;
     mState  = State::Initialized;
-    if (session && mInitParams.sessionManager->GetSecureSession(session.Get()))
+    if (session && session.Get()->AsSecureSession())
     {
         mSecureSession.Grab(session.Get());
         mState = State::SecureConnected;
