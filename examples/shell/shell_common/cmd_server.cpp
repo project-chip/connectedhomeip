@@ -34,11 +34,6 @@ using namespace chip::Shell;
 using namespace chip::Credentials;
 using namespace chip::ArgParser;
 
-bool lowPowerClusterSleep()
-{
-    return true;
-}
-
 // Anonymous namespace for file-scoped, static variables.
 namespace {
 
