@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,13 +16,22 @@
  */
 
 #pragma once
-#include <jni.h>
+
+#include <functional>
+
 #include <lib/core/CHIPError.h>
 
-CHIP_ERROR ChipAndroidAppInit(void);
+namespace chip {
+namespace ThreadWork {
 
-void ChipAndroidAppShutdown(void);
+using WorkCallback = std::function<void()>;
 
-jint AndroidAppServerJNI_OnLoad(JavaVM * jvm, void * reserved);
+/// Schedules a task to be run on the CHIP main thread and waits for that
+/// task to be complete.
+///
+/// Returns only once callback has been completely executed (callback
+/// will not be running anymore when this returns).
+void ChipMainThreadScheduleAndWait(WorkCallback callback);
 
-void AndroidAppServerJNI_OnUnload(JavaVM * jvm, void * reserved);
+} // namespace ThreadWork
+} // namespace chip

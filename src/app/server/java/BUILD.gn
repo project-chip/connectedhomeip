@@ -27,6 +27,8 @@ static_library("jni") {
     "AndroidAppServerWrapper.cpp",
     "AndroidAppServerWrapper.h",
     "CHIPAppServer-JNI.cpp",
+    "ChipThreadWork.cpp",
+    "ChipThreadWork.h",
   ]
 
   deps = [
