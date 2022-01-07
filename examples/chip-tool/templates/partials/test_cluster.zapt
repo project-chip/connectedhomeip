@@ -2,7 +2,16 @@
 class {{filename}}: public TestCommand
 {
   public:
-    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
+    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0)
+    {
+        {{#chip_tests_config}}
+          {{#if (isString type)}}
+          AddArgument("{{name}}", &m{{asUpperCamelCase name}});
+          {{else}}
+          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          {{/if}}
+        {{/chip_tests_config}}
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -45,12 +54,16 @@ class {{filename}}: public TestCommand
     }
 
   {{#if timeout}}
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() : mTimeout.Value() : {{timeout}}); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() ? mTimeout.Value() : {{timeout}}); }
   {{/if}}
 
   private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = {{totalTests}};
+
+    {{#chip_tests_config}}
+    chip::Optional<{{chipType}}> m{{asUpperCamelCase name}};
+    {{/chip_tests_config}}
 
     {{#chip_tests_items}}
     {{#chip_tests_item_response_parameters}}
@@ -156,7 +169,7 @@ class {{filename}}: public TestCommand
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
     {
-      const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
+      const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
       ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: {{cluster}} {{#if isAttribute}}Attribute: {{attribute}}{{else}}Command: {{wait}}{{/if}}] {{label}}", endpoint);
       {{#*inline "waitForTypeName"}}{{#if isAttribute}}Attribute{{else}}Command{{/if}}{{/inline}}
       {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{attribute}}{{else}}Commands::{{wait}}{{/if}}::Id{{/inline}}
@@ -172,7 +185,7 @@ class {{filename}}: public TestCommand
         {{#if isGroupCommand}}
         const chip::GroupId groupId = {{groupId}};
         {{else}}
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
+        const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
         {{/if}}
 
         {{~#*inline "maybeTimedInteractionTimeout"}}

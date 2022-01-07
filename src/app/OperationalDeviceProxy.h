@@ -250,7 +250,7 @@ private:
 
     static void CloseCASESessionTask(System::Layer * layer, void * context);
 
-    void DeferCloseCASESession();
+    void CloseCASESession();
 
     void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
                                     Callback::Callback<OnDeviceConnectionFailure> * onFailure);

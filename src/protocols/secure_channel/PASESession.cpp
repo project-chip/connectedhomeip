@@ -116,6 +116,19 @@ void PASESession::CloseExchange()
     }
 }
 
+void PASESession::DiscardExchange()
+{
+    if (mExchangeCtxt != nullptr)
+    {
+        // Make sure the exchange doesn't try to notify us when it closes,
+        // since we might be dead by then.
+        mExchangeCtxt->SetDelegate(nullptr);
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
+    }
+}
+
 CHIP_ERROR PASESession::Serialize(PASESessionSerialized & output)
 {
     PASESessionSerializable serializable;
@@ -353,11 +366,12 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     ChipLogError(SecureChannel,
                  "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
                  to_underlying(mNextExpectedMsg));
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
-    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
-    mExchangeCtxt = nullptr;
+    DiscardExchange();
     Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
@@ -833,10 +847,12 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
 
     mPairingComplete = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate pairing completion
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -852,10 +868,12 @@ void PASESession::OnSuccessStatusReport()
 {
     mPairingComplete = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate pairing completion
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 }
 
@@ -946,11 +964,12 @@ exit:
     // Call delegate to indicate pairing failure
     if (err != CHIP_NO_ERROR)
     {
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // Discard the exchange so that Clear() doesn't try closing it.  The
         // exchange will handle that.
-        mExchangeCtxt = nullptr;
+        DiscardExchange();
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
+        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;

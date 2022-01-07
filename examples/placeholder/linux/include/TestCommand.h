@@ -48,6 +48,18 @@ public:
         exit(CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 
+    template <typename T>
+    size_t AddArgument(const char * name, chip::Optional<T> * value)
+    {
+        return 0;
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<T> * value)
+    {
+        return 0;
+    }
+
     CHIP_ERROR Log(const char * message)
     {
         ChipLogProgress(chipTool, "%s", message);
