@@ -112,7 +112,8 @@ inline typename AttributeList<T, N>::Iterator AttributeList<T, N>::end() const
  * Iterator methods
  **/
 template <typename T, size_t N>
-inline AttributeList<T, N>::Iterator::Iterator(const AttributeList<T, N> * pAttributeList, int index) : mAttributeListPtr(pAttributeList), mIndex(index)
+inline AttributeList<T, N>::Iterator::Iterator(const AttributeList<T, N> * pAttributeList, int index) :
+    mAttributeListPtr(pAttributeList), mIndex(index)
 {}
 
 template <typename T, size_t N>
