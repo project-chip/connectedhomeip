@@ -127,8 +127,8 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_SetUserLabelList(EndpointId endpoint,
-                                       LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_NO_ERROR;
 }
