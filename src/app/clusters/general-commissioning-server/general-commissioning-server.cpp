@@ -152,7 +152,9 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
                                                                    const Commands::SetRegulatoryConfig::DecodableType & commandData)
 {
     DeviceControlServer * server = &DeviceLayer::DeviceControlServer::DeviceControlSvr();
-    CheckSuccess(server->SetRegulatoryConfig(commandData.location, commandData.countryCode, commandData.breadcrumb), Failure);
+
+    CheckSuccess(server->SetRegulatoryConfig(to_underlying(commandData.location), commandData.countryCode, commandData.breadcrumb),
+                 Failure);
 
     Commands::SetRegulatoryConfigResponse::Type response;
     response.errorCode = GeneralCommissioningError::kOk;

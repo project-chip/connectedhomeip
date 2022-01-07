@@ -653,7 +653,6 @@ function isWeaklyTypedEnum(label)
     "PHYRateType",
     "RadioFaultType",
     "RoutingRole",
-    "RegulatoryLocationType",
     "SaturationMoveMode",
     "SaturationStepMode",
     "SecurityType",
