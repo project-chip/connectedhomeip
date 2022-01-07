@@ -71,7 +71,7 @@ void WaitForShellActivity()
 
 void startShellTask()
 {
-    int status = chip::Shell::Engine::Root().Init();
+    int status = chip::Shell::streamer_init(chip::Shell::streamer_get());
     assert(status == 0);
 
     // For now also register commands from shell_common (shell app).
