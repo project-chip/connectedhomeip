@@ -336,6 +336,8 @@ public class ClusterInfoMapping {
            commandArguments.get("{{asLowerCamelCase label}}")
            {{/if_is_struct}}
            {{/chip_cluster_command_arguments_with_structs_expanded}}
+           {{! TODO: Allow timeout to be passed from client for this and timed write. }}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
          () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
@@ -350,6 +352,7 @@ public class ClusterInfoMapping {
            ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
            {{/chip_cluster_command_arguments_with_structs_expanded}}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
          () -> new DelegatedDefaultClusterCallback(),
