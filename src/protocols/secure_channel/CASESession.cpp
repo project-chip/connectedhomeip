@@ -252,11 +252,13 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %" PRIu8,
                  mState);
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
     // exchange will handle that.
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
     Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
@@ -684,9 +686,11 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
     mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1118,9 +1122,11 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1302,15 +1308,17 @@ void CASESession::OnSuccessStatusReport()
     mCASESessionEstablished = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
-
-    // Call delegate to indicate pairing completion
-    mDelegate->OnSessionEstablished();
 
     mState = kInitialized;
 
     // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
     // on running out of session contexts.
+
+    // Call delegate to indicate pairing completion.
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablished();
 }
 
 CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -1524,8 +1532,10 @@ exit:
     {
         // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
         // exchange will handle that.
+        mExchangeCtxt->SetDelegate(nullptr);
         mExchangeCtxt = nullptr;
         Clear();
+        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;

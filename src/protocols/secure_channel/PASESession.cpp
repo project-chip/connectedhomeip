@@ -343,11 +343,13 @@ void PASESession::OnResponseTimeout(ExchangeContext * ec)
     ChipLogError(SecureChannel,
                  "PASESession timed out while waiting for a response from the peer. Expected message type was %" PRIu8,
                  to_underlying(mNextExpectedMsg));
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
     // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
     // exchange will handle that.
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
     Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR PASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
@@ -824,9 +826,11 @@ CHIP_ERROR PASESession::HandleMsg3(System::PacketBufferHandle && msg)
     mPairingComplete = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -843,9 +847,11 @@ void PASESession::OnSuccessStatusReport()
     mPairingComplete = true;
 
     // Forget our exchange, as no additional messages are expected from the peer
+    mExchangeCtxt->SetDelegate(nullptr);
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate pairing completion
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 }
 
@@ -938,9 +944,11 @@ exit:
     {
         // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
         // exchange will handle that.
+        mExchangeCtxt->SetDelegate(nullptr);
         mExchangeCtxt = nullptr;
         Clear();
         ChipLogError(SecureChannel, "Failed during PASE session setup. %s", ErrorStr(err));
+        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;
