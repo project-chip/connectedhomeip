@@ -202,18 +202,9 @@ protected:
         {
             ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
         }
-        // We can't dustruct the PASESession object until the stack unwinds
-        // because the exchange isn't yet closed, the exchange has a pointer
-        // to the PASESession object, and ACK for the secure_channel Status
-        // Report hasn't been sent yet.  Therefore, schedule dispatch, and
-        // implicit destruction, for the next iteration of the event loop.
-        this->mCommissionee.mSystemState->SystemLayer()->ScheduleWork(Dispose, this);
-    }
-
-    static void Dispose(System::Layer * layer, void * context)
-    {
-        auto state = static_cast<PasscodeAuthenticatedSessionEstablishment *>(context);
-        state->ShutdownDiscoverer();
+        // We need to wait for the discoverer to shutdown.  Some platforms
+        // have no facility to interrupt BLE discovery.
+        this->ShutdownDiscoverer();
     }
 
     void OnDiscovery() override {}
@@ -727,13 +718,6 @@ struct CertificateAuthenticatedSessionEstablishment : Base<TContext>, SessionEst
         this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
     }
 
-    void DispatchStatus()
-    {
-        auto status =
-            mSuccess ? TContext::Event::template Create<Events::Success>() : TContext::Event::template Create<Events::Failure>();
-        this->mCtx.Dispatch(status);
-    }
-
 protected:
     CHIP_ERROR GetNextCandidate()
     {
@@ -806,30 +790,18 @@ protected:
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));
+            this->mCtx.Dispatch(TContext::Event::template Create<Events::Failure>());
         }
         else
         {
             ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake");
-            mSuccess = true;
+            this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>());
         }
-        // We can't dustruct the CASESession object until the stack unwinds
-        // because the exchange isn't yet closed, the exchange has a pointer
-        // to the CASESession object, and ACK for the secure_channel Status
-        // Report hasn't been sent yet.  Therefore, schedule dispatch, and
-        // implicit destruction, for the next iteration of the event loop.
-        this->mCommissionee.mSystemState->SystemLayer()->ScheduleWork(Dispose, this);
-    }
-
-    static void Dispose(System::Layer * layer, void * context)
-    {
-        auto state = static_cast<CertificateAuthenticatedSessionEstablishment *>(context);
-        state->DispatchStatus();
     }
 
     Platform::SharedPtr<Dnssd::ResolvedNodeData> mRecord;
     Platform::SharedPtr<CASESession> mPairing;
-    size_t mIdx   = 0;
-    bool mSuccess = false;
+    size_t mIdx = 0;
 };
 
 template <typename TContext>
