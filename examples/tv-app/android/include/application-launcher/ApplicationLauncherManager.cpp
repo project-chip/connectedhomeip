@@ -41,8 +41,8 @@ Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     const char * buf = "data";
-    response.data   = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
-    response.status = StatusEnum::kSuccess;
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
     return response;
 }
 
@@ -52,8 +52,8 @@ ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::Application
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     const char * buf = "data";
-    response.data   = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
-    response.status = StatusEnum::kSuccess;
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
     return response;
 }
 
@@ -63,7 +63,7 @@ ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::Application
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
     const char * buf = "data";
-    response.data   = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
-    response.status = StatusEnum::kSuccess;
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
+    response.status  = StatusEnum::kSuccess;
     return response;
 }
