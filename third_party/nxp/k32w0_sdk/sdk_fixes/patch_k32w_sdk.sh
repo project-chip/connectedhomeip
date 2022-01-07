@@ -20,7 +20,7 @@ cp -r ./third_party/nxp/k32w0_sdk/sdk_fixes/app_dual_mode_switch.h "$NXP_K32W061
 
 cp -r ./third_party/nxp/k32w0_sdk/sdk_fixes/OtaUtils.c "$NXP_K32W061_SDK_ROOT"/middleware/wireless/framework/OtaSupport/Source/
 
-patch -d "$NXP_K32W061_SDK_ROOT"/middleware/wireless/bluetooth/host/interface -p1 <"${SOURCE_DIR}/patch_ble_utils_h.patch"
+patch -d "$NXP_K32W061_SDK_ROOT"/middleware/wireless/bluetooth/host/interface -p1 <"$SOURCE_DIR/patch_ble_utils_h.patch"
 
 echo "K32W SDK MR3 QP1 was patched!"
 exit 0
