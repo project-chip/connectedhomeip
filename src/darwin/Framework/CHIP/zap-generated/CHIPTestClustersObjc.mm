@@ -3853,8 +3853,6 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPFixedLabelClusterLabelStruct *) value[i_0];
                         listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
                         listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
