@@ -141,24 +141,28 @@ class NrfConnectBuilder(Builder):
                         'To update $ZEPHYR_BASE run: python3 scripts/setup/nrfconnect/update_ncs.py --update --shallow')
 
                     raise Exception('ZEPHYR_BASE validation failed')
+
+            overlays = []
+            project_root = os.path.join(os.path.dirname(__file__), "../../..")
             if os.path.exists(os.path.join(
-                    self.root, self.app.AppPath(), "nrfconnect/boards/"+self.board.GnArgName()+".conf")):
-                boardconfig = " -DOVERLAY_CONFIG=boards/"+self.board.GnArgName()+".conf"
-            else:
-                boardconfig = ""
+                    project_root, self.app.AppPath(), "nrfconnect/boards", self.board.GnArgName()+".conf")):
+                overlays.append("-DOVERLAY_CONFIG=boards/" +
+                                self.board.GnArgName()+".conf")
+            if self.enable_rpcs:
+                overlays.append("-DOVERLAY_CONFIG=rpc.overlay")
+
             cmd = '''
 source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {outdir} -b {board} {sourcedir} --{boardoverlay}{rpcs}
+west build --cmake-only -d {outdir} -b {board} {sourcedir}{overlayflags}
         '''.format(
                 outdir=shlex.quote(self.output_dir),
                 board=self.board.GnArgName(),
                 sourcedir=shlex.quote(os.path.join(
                     self.root, self.app.AppPath(), 'nrfconnect')),
-                boardoverlay=boardconfig,
-                rpcs=" -DOVERLAY_CONFIG=rpc.overlay" if self.enable_rpcs else ""
+                overlayflags=" -- " +
+                " ".join(overlays) if len(overlays) > 0 else ""
             ).strip()
-
             self._Execute(['bash', '-c', cmd],
                           title='Generating ' + self.identifier)
 
