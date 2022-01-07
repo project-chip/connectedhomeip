@@ -38,7 +38,7 @@ public:
     virtual std::list<uint16_t> HandleGetCatalogList()                                                   = 0;
 
     virtual Commands::LauncherResponse::Type
-    HandleLaunchApp(const chip::CharSpan & data,
+    HandleLaunchApp(const chip::ByteSpan & data,
                     const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;
     virtual Commands::LauncherResponse::Type
     HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;

@@ -247,7 +247,7 @@ app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNav
 
     if (target >= mTargets.size())
     {
-        response.status = app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
+        response.status = app::Clusters::TargetNavigator::StatusEnum::kTargetNotFound;
     }
     else
     {
