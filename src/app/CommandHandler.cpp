@@ -259,7 +259,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
             // No exchange context or session handle means no subject descriptor so cannot check access control
             return AddStatus(concretePath, Protocols::InteractionModel::Status::Failure);
         }
-        Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle().GetSubjectDescriptor();
+        Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
         Access::RequestPath requestPath{ .cluster = concretePath.mClusterId, .endpoint = concretePath.mEndpointId };
         Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
         err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
