@@ -687,8 +687,10 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
+    // Make sure the exchange doesn't try to notify us when it closes,
+    // since we might be dead by then.
     mExchangeCtxt->SetDelegate(nullptr);
+    // Forget our exchange, as no additional messages are expected from the peer
     mExchangeCtxt = nullptr;
 
     // Call delegate to indicate session establishment is successful
