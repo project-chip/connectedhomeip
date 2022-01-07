@@ -52,6 +52,7 @@ tests:
 
     - label: "read the optional attribute: Tolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:

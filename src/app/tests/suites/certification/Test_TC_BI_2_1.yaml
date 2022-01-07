@@ -105,6 +105,7 @@ tests:
     #Issue #11142 Disabled all optional attribute checks
     - label: "Read optional non-global attribute: ActiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "active text"
       response:
@@ -112,6 +113,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: ActiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "active text"
       response:
@@ -121,6 +123,7 @@ tests:
     - label:
           "Write the default values to optional non-global attribute: ActiveText"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "active text"
       arguments:
@@ -128,6 +131,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: ActiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "active text"
       response:
@@ -135,6 +139,7 @@ tests:
 
     - label: "Read optional non-global attribute: Description"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "description"
       response:
@@ -142,6 +147,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: Description"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "description"
       response:
@@ -152,6 +158,7 @@ tests:
           "Write the default values to optional non-global attribute:
           Description"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "description"
       arguments:
@@ -159,6 +166,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: Description"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "description"
       response:
@@ -166,6 +174,7 @@ tests:
 
     - label: "Read optional non-global attribute: InactiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "inactive text"
       response:
@@ -173,6 +182,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: InactiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "inactive text"
       response:
@@ -183,6 +193,7 @@ tests:
           "Write the default values to optional non-global attribute:
           InactiveText"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "inactive text"
       arguments:
@@ -190,6 +201,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: InactiveText"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "inactive text"
       response:
@@ -197,6 +209,7 @@ tests:
 
     - label: "Read optional non-global attribute: Polarity"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "polarity"
       response:
@@ -204,6 +217,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: Polarity"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "polarity"
       response:
@@ -213,6 +227,7 @@ tests:
     - label:
           "Write the default values to optional non-global attribute: Polarity"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "polarity"
       arguments:
@@ -222,6 +237,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: Polarity"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "polarity"
       response:
@@ -229,6 +245,7 @@ tests:
 
     - label: "Read optional non-global attribute: Reliability"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "reliability"
       response:
@@ -236,6 +253,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: Reliability"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "reliability"
       response:
@@ -246,6 +264,7 @@ tests:
           "Write the default values to optional non-global attribute:
           Reliability"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "reliability"
       arguments:
@@ -253,6 +272,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: Reliability"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "reliability"
       response:
@@ -260,6 +280,7 @@ tests:
 
     - label: "Read optional non-global attribute constraints: ApplicationType"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "application type"
       response:
@@ -272,6 +293,7 @@ tests:
           "Write the default values to optional non-global attribute:
           ApplicationType"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "application type"
       arguments:
@@ -281,6 +303,7 @@ tests:
 
     - label: "Reads back the optional non-global attribute: ApplicationType"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "application type"
       response:

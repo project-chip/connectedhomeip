@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 48.1.1. [TC-DIAGSW-1.1] Attributes with server as DUT
+name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
 
 config:
     cluster: "Software Diagnostics"
@@ -23,41 +23,36 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    #Issue #11185 Disabled as ThreadMetrics attribute missing
-    - label:
-          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
+    #issue #11578 ResetWatermarks command is Failing
+    - label: "Sends ResetWatermarks to DUT"
+      disabled: true
+      optional: true
+      command: "ResetWatermarks"
+      PICS: CR_RESETWATERMARKS
+
+    - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       disabled: true
       optional: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
       response:
-          constraints:
-              value: 0
+          value: 0
 
-    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
-      command: "readAttribute"
-      attribute: "CurrentHeapFree"
+    - label: "Reads CurrentHeapUsed attribute value from DUT"
+      disabled: true
       optional: true
-      response:
-          constraints:
-              type: uint64
-
-    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
-      optional: true
       response:
-          constraints:
-              type: uint64
+          value: 0
 
-    - label:
-          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+    - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
+      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
-      optional: true
       response:
-          constraints:
-              type: uint64
+          value: 0
