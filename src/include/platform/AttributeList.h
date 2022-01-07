@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *          This is a list of string tuples. Each entry is a LabelStruct.
+ *          This is a list of attribute. Each entry is an attribute of type T.
  */
 
 #pragma once
@@ -32,26 +32,26 @@ static constexpr size_t kMaxFixedLabels = 10;
 static constexpr size_t kMaxUserLabels  = 10;
 
 template <typename T, size_t N>
-class LabelList
+class AttributeList
 {
 public:
     /* The iterator */
     class Iterator
     {
     public:
-        Iterator(const LabelList<T, N> * LabelList, int index);
+        Iterator(const AttributeList<T, N> * AttributeList, int index);
         T operator*() const;
         Iterator & operator++();
         bool operator!=(const Iterator & other) const;
 
     private:
-        const LabelList<T, N> * mLabelListPtr;
+        const AttributeList<T, N> * mAttributeListPtr;
         int mIndex = -1;
     };
 
 public:
-    LabelList() = default;
-    ~LabelList() { mSize = 0; }
+    AttributeList() = default;
+    ~AttributeList() { mSize = 0; }
 
     CHIP_ERROR add(const T & label);
 
@@ -67,10 +67,10 @@ private:
 };
 
 /*
- * LabelList methods
+ * AttributeList methods
  **/
 template <typename T, size_t N>
-inline CHIP_ERROR LabelList<T, N>::add(const T & label)
+inline CHIP_ERROR AttributeList<T, N>::add(const T & label)
 {
     if (mSize == N)
     {
@@ -84,52 +84,52 @@ inline CHIP_ERROR LabelList<T, N>::add(const T & label)
 }
 
 template <typename T, size_t N>
-inline size_t LabelList<T, N>::size() const
+inline size_t AttributeList<T, N>::size() const
 {
     return static_cast<size_t>(mSize);
 }
 
 template <typename T, size_t N>
-inline const T & LabelList<T, N>::operator[](int index) const
+inline const T & AttributeList<T, N>::operator[](int index) const
 {
     VerifyOrDie(index < mSize);
     return mList[index];
 }
 
 template <typename T, size_t N>
-inline typename LabelList<T, N>::Iterator LabelList<T, N>::begin() const
+inline typename AttributeList<T, N>::Iterator AttributeList<T, N>::begin() const
 {
-    return LabelList<T, N>::Iterator{ this, 0 };
+    return AttributeList<T, N>::Iterator{ this, 0 };
 }
 
 template <typename T, size_t N>
-inline typename LabelList<T, N>::Iterator LabelList<T, N>::end() const
+inline typename AttributeList<T, N>::Iterator AttributeList<T, N>::end() const
 {
-    return LabelList<T, N>::Iterator{ this, mSize };
+    return AttributeList<T, N>::Iterator{ this, mSize };
 }
 
 /*
  * Iterator methods
  **/
 template <typename T, size_t N>
-inline LabelList<T, N>::Iterator::Iterator(const LabelList<T, N> * pLabelList, int index) : mLabelListPtr(pLabelList), mIndex(index)
+inline AttributeList<T, N>::Iterator::Iterator(const AttributeList<T, N> * pAttributeList, int index) : mAttributeListPtr(pAttributeList), mIndex(index)
 {}
 
 template <typename T, size_t N>
-inline T LabelList<T, N>::Iterator::operator*() const
+inline T AttributeList<T, N>::Iterator::operator*() const
 {
-    return mLabelListPtr->operator[](mIndex);
+    return mAttributeListPtr->operator[](mIndex);
 }
 
 template <typename T, size_t N>
-inline typename LabelList<T, N>::Iterator & LabelList<T, N>::Iterator::operator++()
+inline typename AttributeList<T, N>::Iterator & AttributeList<T, N>::Iterator::operator++()
 {
     ++mIndex;
     return *this;
 }
 
 template <typename T, size_t N>
-inline bool LabelList<T, N>::Iterator::operator!=(const LabelList<T, N>::Iterator & other) const
+inline bool AttributeList<T, N>::Iterator::operator!=(const AttributeList<T, N>::Iterator & other) const
 {
     return mIndex != other.mIndex;
 }
