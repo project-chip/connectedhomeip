@@ -1,13 +1,14 @@
-
 14
 15
 16
 17
+ContentApp's
 18
 19
 20
 21
 22
+
 AAAA
 aabbccddeeff
 aarch
@@ -24,9 +25,9 @@ ACL
 AdapterAddress
 AdapterName
 adb
+addr
 AddOrUpdateThreadNetwork
 AddOrUpdateWiFiNetwork
-addr
 adk
 adoc
 AdvAutonomous
@@ -216,13 +217,11 @@ ConnectionData
 ConnectIP
 ConnectivityManager
 ConnectivityManagerImpl
-ConnectNetwork
 connstring
 conntype
 const
 ContentApp
 ContentAppPlatform
-ContentApp's
 ContentLaunch
 ContentLauncher
 contrib
@@ -355,6 +354,7 @@ elftools
 elock
 emberAfExternalAttributeReadCallback
 emberAfExternalAttributeWriteCallback
+ConnectNetwork
 EnableWiFiNetwork
 EndpointId
 endpointName
@@ -383,7 +383,6 @@ ExtendedPAN
 extern
 extpanid
 FabricId
-fabricIdx
 factoryreset
 fb
 fbb
@@ -751,8 +750,6 @@ pcaps
 PDFs
 PDK
 peerAddrStr
-peerNodeId
-peerSessionId
 pem
 percentageLiftValue
 pexpect
@@ -1009,9 +1006,8 @@ ttyUSB
 TXD
 txt
 UART
-udc
 UDC
-udcport
+udc
 udhcpc
 UDP
 UDPEndPoint
