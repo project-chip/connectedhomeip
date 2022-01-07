@@ -84,7 +84,7 @@ class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegat
 {
 public:
     ~CommissioneeDeviceProxy();
-    CommissioneeDeviceProxy() {}
+    CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(const SessionHandle & session) override;
+    void OnSessionReleased() override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -298,7 +298,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SessionHolder mSecureSession;
+    SessionHolderWithDelegate mSecureSession;
 
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 

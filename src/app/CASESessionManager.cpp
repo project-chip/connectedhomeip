@@ -109,14 +109,6 @@ CHIP_ERROR CASESessionManager::GetPeerAddress(PeerId peerId, Transport::PeerAddr
     return CHIP_NO_ERROR;
 }
 
-void CASESessionManager::OnSessionReleased(const SessionHandle & sessionHandle)
-{
-    OperationalDeviceProxy * session = FindSession(sessionHandle);
-    VerifyOrReturn(session != nullptr, ChipLogDetail(Controller, "OnSessionReleased was called for unknown device, ignoring it."));
-
-    session->OnSessionReleased(sessionHandle);
-}
-
 OperationalDeviceProxy * CASESessionManager::FindSession(const SessionHandle & session)
 {
     return mConfig.devicePool->FindDevice(session);

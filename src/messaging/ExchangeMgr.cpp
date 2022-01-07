@@ -83,7 +83,6 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
-    sessionManager->RegisterReleaseDelegate(*this);
     sessionManager->SetMessageDelegate(this);
 
     mReliableMessageMgr.Init(sessionManager->SystemLayer());
@@ -106,7 +105,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
     if (mSessionManager != nullptr)
     {
         mSessionManager->SetMessageDelegate(nullptr);
-        mSessionManager->UnregisterReleaseDelegate(*this);
         mSessionManager = nullptr;
     }
 
@@ -311,24 +309,6 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             ChipLogError(ExchangeManager, "OnMessageReceived failed, err = %s", ErrorStr(err));
         }
     }
-}
-
-void ExchangeManager::OnSessionReleased(const SessionHandle & session)
-{
-    ExpireExchangesForSession(session);
-}
-
-void ExchangeManager::ExpireExchangesForSession(const SessionHandle & session)
-{
-    mContextPool.ForEachActiveObject([&](auto * ec) {
-        if (ec->mSession.Contains(session))
-        {
-            ec->OnConnectionExpired();
-            // Continue to iterate because there can be multiple exchanges
-            // associated with the connection.
-        }
-        return Loop::Continue;
-    });
 }
 
 void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * delegate)

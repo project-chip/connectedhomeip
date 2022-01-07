@@ -1,5 +1,4 @@
 /*
- *
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +14,31 @@
  *    limitations under the License.
  */
 
+#include <transport/GroupSession.h>
 #include <transport/SecureSession.h>
-#include <transport/SessionHandle.h>
-#include <transport/SessionManager.h>
+#include <transport/Session.h>
+#include <transport/UnauthenticatedSessionTable.h>
 
 namespace chip {
+namespace Transport {
 
-using namespace Transport;
+SecureSession * Session::AsSecureSession()
+{
+    VerifyOrDie(GetSessionType() == SessionType::kSecure);
+    return static_cast<SecureSession *>(this);
+}
 
+UnauthenticatedSession * Session::AsUnauthenticatedSession()
+{
+    VerifyOrDie(GetSessionType() == SessionType::kUnauthenticated);
+    return static_cast<UnauthenticatedSession *>(this);
+}
+
+GroupSession * Session::AsGroupSession()
+{
+    VerifyOrDie(GetSessionType() == SessionType::kGroup);
+    return static_cast<GroupSession *>(this);
+}
+
+} // namespace Transport
 } // namespace chip

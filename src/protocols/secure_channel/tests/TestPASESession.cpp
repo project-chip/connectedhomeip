@@ -181,11 +181,10 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-        contextCommissioner->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
-                                                             {
-                                                                 64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                                 64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-                                                             });
+        contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
+            64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+            64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+        });
     }
 
     NL_TEST_ASSERT(inSuite,
@@ -309,11 +308,10 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    contextCommissioner->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
-                                                         {
-                                                             64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-                                                             64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-                                                         });
+    contextCommissioner->GetSessionHandle()->AsUnauthenticatedSession()->SetMRPConfig({
+        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+        64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+    });
 
     NL_TEST_ASSERT(inSuite,
                    ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(

@@ -134,8 +134,9 @@ bool emberAfGeneralCommissioningClusterCommissioningCompleteCallback(
      * This allows device to send messages back to commissioner.
      * Once bindings are implemented, this may no longer be needed.
      */
-    server->SetFabricIndex(commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex());
-    server->SetPeerNodeId(commandObj->GetExchangeContext()->GetSessionHandle().GetPeerNodeId());
+    SessionHandle handle = commandObj->GetExchangeContext()->GetSessionHandle();
+    server->SetFabricIndex(handle->AsSecureSession()->GetFabricIndex());
+    server->SetPeerNodeId(handle->AsSecureSession()->GetPeerNodeId());
 
     CheckSuccess(server->CommissioningComplete(), Failure);
 
