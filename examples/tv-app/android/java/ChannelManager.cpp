@@ -16,6 +16,8 @@
  */
 
 #include "ChannelManager.h"
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -24,9 +26,28 @@
 using namespace chip;
 using namespace chip::app::Clusters::Channel;
 
-namespace {
-static ChannelManager channelManager;
-} // namespace
+/** @brief Channel  Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ *
+ */
+void emberAfChannelClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Android App: Channel::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::Channel::Id, endpoint);
+}
+
+void ChannelManager::NewManager(jint endpoint, jobject manager)
+{
+    ChipLogProgress(Zcl, "TV Android App: Channel::SetDefaultDelegate");
+    ChannelManager* mgr = new ChannelManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::Channel::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
+}
 
 std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManager::HandleGetChannelList()
 {
@@ -62,7 +83,7 @@ std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManag
             if (jname != NULL)
             {
                 JniUtfString name(env, jname);
-                channelInfo.callSign = name.charSpan();
+                channelInfo.name = name.charSpan();
             }
 
             jfieldID getJaffiliateCallSignField = env->GetFieldID(channelClass, "affiliateCallSign", "Ljava/lang/String;");
@@ -70,7 +91,7 @@ std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManag
             if (jaffiliateCallSign != NULL)
             {
                 JniUtfString affiliateCallSign(env, jaffiliateCallSign);
-                channelInfo.callSign = affiliateCallSign.charSpan();
+                channelInfo.affiliateCallSign = affiliateCallSign.charSpan();
             }
 
             jfieldID majorNumField  = env->GetFieldID(channelClass, "majorNumber", "I");
@@ -79,7 +100,7 @@ std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> ChannelManag
 
             jfieldID minorNumField  = env->GetFieldID(channelClass, "minorNumber", "I");
             jint jminorNum          = env->GetIntField(channelObject, minorNumField);
-            channelInfo.majorNumber = static_cast<uint16_t>(jminorNum);
+            channelInfo.minorNumber = static_cast<uint16_t>(jminorNum);
             list.push_back(channelInfo);
         }
     }
@@ -371,21 +392,4 @@ void ChannelManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access ChannelManager 'skipChannel' method");
         env->ExceptionClear();
     }
-}
-
-ChannelManager ChannelManager::sInstance;
-
-/** @brief Channel  Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfChannelClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Android App: Channel::SetDefaultDelegate");
-    chip::app::Clusters::Channel::SetDefaultDelegate(endpoint, &channelManager);
 }

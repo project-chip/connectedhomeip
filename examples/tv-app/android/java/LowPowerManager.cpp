@@ -17,6 +17,8 @@
  */
 
 #include "LowPowerManager.h"
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
@@ -26,11 +28,19 @@
 using namespace chip;
 using namespace chip::app::Clusters::LowPower;
 
-LowPowerManager LowPowerManager::sInstance;
+void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Android App: LowPower::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::LowPower::Id, endpoint);
+}
 
-namespace {
-static LowPowerManager lowPowerManager;
-} // namespace
+void LowPowerManager::NewManager(jint endpoint, jobject manager)
+{
+    ChipLogProgress(Zcl, "TV Android App: LowPower::SetDefaultDelegate");
+    LowPowerManager* mgr = new LowPowerManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::LowPower::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
+}
 
 void LowPowerManager::InitializeWithObjects(jobject managerObject)
 {
@@ -73,10 +83,4 @@ bool LowPowerManager::HandleSleep()
 
 exit:
     return static_cast<bool>(ret);
-}
-
-void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Android App: LowPower::SetDefaultDelegate");
-    chip::app::Clusters::LowPower::SetDefaultDelegate(endpoint, &lowPowerManager);
 }

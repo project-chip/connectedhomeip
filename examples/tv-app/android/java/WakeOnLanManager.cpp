@@ -17,19 +17,14 @@
  */
 
 #include "WakeOnLanManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::WakeOnLan;
-
-WakeOnLanManager WakeOnLanManager::sInstance;
-
-namespace {
-static WakeOnLanManager wakeOnLanManager;
-} // namespace
 
 /** @brief Wake On LAN Cluster Init
  *
@@ -42,8 +37,16 @@ static WakeOnLanManager wakeOnLanManager;
  */
 void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "TV Android App: WakeOnLan::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::WakeOnLan::Id, endpoint);
+}
+
+void WakeOnLanManager::NewManager(jint endpoint, jobject manager)
+{
     ChipLogProgress(Zcl, "TV Android App: WakeOnLan::SetDefaultDelegate");
-    chip::app::Clusters::WakeOnLan::SetDefaultDelegate(endpoint, &wakeOnLanManager);
+    WakeOnLanManager* mgr = new WakeOnLanManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::WakeOnLan::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
@@ -60,7 +63,7 @@ chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
 
     {
         env->ExceptionClear();
-        jobject javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod, static_cast<jint>(1));
+        jobject javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(DeviceLayer, "Java exception in WakeOnLanManager::getMac");
@@ -92,7 +95,7 @@ void WakeOnLanManager::InitializeWithObjects(jobject managerObject)
     jclass WakeOnLanManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(WakeOnLanManagerClass != nullptr, ChipLogError(Zcl, "Failed to get WakeOnLanManager Java class"));
 
-    mGetMacMethod = env->GetMethodID(WakeOnLanManagerClass, "getMac", "(I)Ljava/lang/String;");
+    mGetMacMethod = env->GetMethodID(WakeOnLanManagerClass, "getMac", "()Ljava/lang/String;");
     if (mGetMacMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access WakeOnLanManager 'getMac' method");

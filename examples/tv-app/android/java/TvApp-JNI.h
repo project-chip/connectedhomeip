@@ -18,19 +18,23 @@
 
 #pragma once
 
-#include <app/clusters/keypad-input-server/keypad-input-server.h>
 #include <jni.h>
 
-class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
+class TvAppJNI
 {
 public:
-    static void NewManager(jint endpoint, jobject manager);
-    void InitializeWithObjects(jobject managerObject);
-
-    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
-    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
+    void InitializeWithObjects(jobject app);
+    void PostClusterInit(int clusterId, int endpoint);
 
 private:
-    jobject mKeypadInputManagerObject = nullptr;
-    jmethodID mSendKeyMethod          = nullptr;
+    friend TvAppJNI & TvAppJNIMgr();
+
+    static TvAppJNI sInstance;
+    jobject mTvAppObject      = nullptr;
+    jmethodID mPostClusterInitMethod    = nullptr;
 };
+
+inline class TvAppJNI & TvAppJNIMgr()
+{
+    return TvAppJNI::sInstance;
+}

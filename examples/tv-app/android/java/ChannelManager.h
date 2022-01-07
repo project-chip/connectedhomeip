@@ -23,6 +23,7 @@
 class ChannelManager : public chip::app::Clusters::Channel::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
     std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> HandleGetChannelList() override;
@@ -34,9 +35,6 @@ public:
     bool HandleSkipChannel(const uint16_t & count) override;
 
 private:
-    friend ChannelManager & ChannelMgr();
-
-    static ChannelManager sInstance;
     jobject mChannelManagerObject      = nullptr;
     jmethodID mGetChannelListMethod    = nullptr;
     jmethodID mGetLineupMethod         = nullptr;
@@ -46,8 +44,3 @@ private:
     jmethodID mChangeChannelByNumberMethod = nullptr;
     jmethodID mSkipChannelMethod           = nullptr;
 };
-
-inline class ChannelManager & ChannelMgr()
-{
-    return ChannelManager::sInstance;
-}

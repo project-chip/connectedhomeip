@@ -104,6 +104,8 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
+    "java/src/com/tcl/chip/tvapp/Clusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

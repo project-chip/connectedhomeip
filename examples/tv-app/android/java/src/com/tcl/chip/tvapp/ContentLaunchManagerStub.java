@@ -6,6 +6,12 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
 
   private final String TAG = ContentLaunchManagerStub.class.getSimpleName();
 
+  private int endpoint;
+
+  public ContentLaunchManagerStub(int endpoint) {
+    this.endpoint = endpoint;
+  }
+
   @Override
   public String[] getAcceptHeader() {
     String[] headers =
@@ -25,7 +31,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchResponse launchContent(
       ContentLaunchSearchParameter[] search, boolean autoplay, String data) {
-    Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay);
+    Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay + " at " + endpoint);
     ContentLaunchResponse resp =
         new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
     return resp;
@@ -34,7 +40,7 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
   @Override
   public ContentLaunchResponse launchUrl(
       String url, String display, ContentLaunchBrandingInformation branding) {
-    Log.d(TAG, "launchUrl:" + url + " display=" + display);
+    Log.d(TAG, "launchUrl:" + url + " display=" + display + " at " + endpoint);
     ContentLaunchResponse resp =
         new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
     return resp;

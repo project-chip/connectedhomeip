@@ -39,7 +39,9 @@ enum MediaPlaybackRequest : uint8_t
 class MediaPlaybackManager : public chip::app::Clusters::MediaPlayback::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
+
     chip::app::Clusters::MediaPlayback::PlaybackStateEnum HandleGetCurrentState() override;
     uint64_t HandleGetStartTime() override;
     uint64_t HandleGetDuration() override;
@@ -66,15 +68,7 @@ public:
     HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
 private:
-    friend MediaPlaybackManager & MediaPlaybackMgr();
-
-    static MediaPlaybackManager sInstance;
     jobject mMediaPlaybackManagerObject = nullptr;
     jmethodID mRequestMethod            = nullptr;
     jmethodID mGetAttributeMethod       = nullptr;
 };
-
-inline MediaPlaybackManager & MediaPlaybackMgr()
-{
-    return MediaPlaybackManager::sInstance;
-}

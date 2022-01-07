@@ -16,6 +16,8 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
@@ -24,12 +26,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::MediaPlayback;
-
-MediaPlaybackManager MediaPlaybackManager::sInstance;
-
-namespace {
-static MediaPlaybackManager mediaPlaybackManager;
-} // namespace
 
 /** @brief Media PlayBack Cluster Init
  *
@@ -42,8 +38,16 @@ static MediaPlaybackManager mediaPlaybackManager;
  */
 void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "TV Android App: MediaPlayback::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::MediaPlayback::Id, endpoint);
+}
+
+void MediaPlaybackManager::NewManager(jint endpoint, jobject manager)
+{
     ChipLogProgress(Zcl, "TV Android App: MediaPlayback::SetDefaultDelegate");
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(endpoint, &mediaPlaybackManager);
+    MediaPlaybackManager* mgr = new MediaPlaybackManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
@@ -86,57 +90,57 @@ uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePause()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStop()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleFastForward()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePrevious()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleRewind()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipBackward(const uint64_t & deltaPositionMilliseconds)
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipForward(const uint64_t & deltaPositionMilliseconds)
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSeekRequest(const uint64_t & positionMilliseconds)
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleNext()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
 {
-    return MediaPlaybackMgr().HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
+    return HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0);
 }
 
 Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest,
@@ -164,6 +168,7 @@ Commands::PlaybackResponse::Type MediaPlaybackManager::HandleMediaRequest(MediaP
         env->ExceptionClear();
         response.status = StatusEnum::kInvalidStateForCommand;
     }
+    response.status = static_cast<StatusEnum>(ret);
 
 exit:
     if (err != CHIP_NO_ERROR)

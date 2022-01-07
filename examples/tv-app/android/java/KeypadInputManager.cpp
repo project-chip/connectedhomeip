@@ -17,18 +17,27 @@
  */
 
 #include "KeypadInputManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
 
 using namespace chip;
 using namespace chip::app::Clusters::KeypadInput;
 
-KeypadInputManager KeypadInputManager::sInstance;
+void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
+{
+    ChipLogProgress(Zcl, "TV Android App: KeypadInput::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::KeypadInput::Id, endpoint);
+}
 
-namespace {
-static KeypadInputManager keypadInputManager;
-} // namespace
+void KeypadInputManager::NewManager(jint endpoint, jobject manager)
+{
+    ChipLogProgress(Zcl, "TV Android App: KeypadInput::SetDefaultDelegate");
+    KeypadInputManager* mgr = new KeypadInputManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::KeypadInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
+}
 
 Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCode & keyCode)
 {
@@ -76,10 +85,4 @@ void KeypadInputManager::InitializeWithObjects(jobject managerObject)
         ChipLogError(Zcl, "Failed to access KeypadInputManager 'sendKey' method");
         env->ExceptionClear();
     }
-}
-
-void emberAfKeypadInputClusterInitCallback(EndpointId endpoint)
-{
-    ChipLogProgress(Zcl, "TV Android App: KeypadInput::SetDefaultDelegate");
-    chip::app::Clusters::KeypadInput::SetDefaultDelegate(endpoint, &keypadInputManager);
 }

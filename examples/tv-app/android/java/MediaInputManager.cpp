@@ -16,7 +16,8 @@
  */
 
 #include "MediaInputManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -24,12 +25,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
-
-MediaInputManager MediaInputManager::sInstance;
-
-namespace {
-static MediaInputManager mediaInputManager;
-} // namespace
 
 /** @brief Media Input Cluster Init
  *
@@ -42,8 +37,16 @@ static MediaInputManager mediaInputManager;
  */
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
+    ChipLogProgress(Zcl, "TV Android App: MediaInput::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::MediaInput::Id, endpoint);
+}
+
+void MediaInputManager::NewManager(jint endpoint, jobject manager)
+{
     ChipLogProgress(Zcl, "TV Android App: MediaInput::SetDefaultDelegate");
-    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+    MediaInputManager* mgr = new MediaInputManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::MediaInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()

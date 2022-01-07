@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,22 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.tcl.chip.tvapp;
 
-#pragma once
-
-#include <app/clusters/keypad-input-server/keypad-input-server.h>
-#include <jni.h>
-
-class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
-{
-public:
-    static void NewManager(jint endpoint, jobject manager);
-    void InitializeWithObjects(jobject managerObject);
-
-    chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
-    HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
-
-private:
-    jobject mKeypadInputManagerObject = nullptr;
-    jmethodID mSendKeyMethod          = nullptr;
-};
+public interface TvAppCallback {
+    void onClusterInit(TvApp app, int clusterId, int endpoint);
+}

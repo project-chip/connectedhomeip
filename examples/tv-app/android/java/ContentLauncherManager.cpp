@@ -17,7 +17,8 @@
  */
 
 #include "ContentLauncherManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
@@ -28,16 +29,18 @@ using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::ContentLauncher;
 
-ContentLauncherManager ContentLauncherManager::sInstance;
-
-namespace {
-static ContentLauncherManager contentLauncherManager;
-} // namespace
-
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDelegate");
-    chip::app::Clusters::ContentLauncher::SetDelegate(endpoint, &contentLauncherManager);
+    ChipLogProgress(Zcl, "TV Android App: ContentLauncher::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::ContentLauncher::Id, endpoint);
+}
+
+void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
+{
+    ChipLogProgress(Zcl, "TV Android App: ContentLauncher::SetDefaultDelegate");
+    ContentLauncherManager* mgr = new ContentLauncherManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::ContentLauncher::SetDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,

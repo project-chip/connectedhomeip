@@ -29,6 +29,7 @@
 class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
     chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
@@ -41,17 +42,9 @@ public:
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
-    friend ContentLauncherManager & ContentLauncherMgr();
-
-    static ContentLauncherManager sInstance;
     jobject mContentLauncherManagerObject           = nullptr;
     jmethodID mGetAcceptHeaderMethod                = nullptr;
     jmethodID mGetSupportedStreamingProtocolsMethod = nullptr;
     jmethodID mLaunchContentMethod                  = nullptr;
     jmethodID mLaunchUrlMethod                      = nullptr;
 };
-
-inline ContentLauncherManager & ContentLauncherMgr()
-{
-    return ContentLauncherManager::sInstance;
-}
