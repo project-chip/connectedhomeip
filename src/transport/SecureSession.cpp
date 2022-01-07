@@ -27,8 +27,8 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     {
         subjectDescriptor.authMode    = Access::AuthMode::kCase;
         subjectDescriptor.subject     = mPeerNodeId;
+        subjectDescriptor.cats        = mPeerCATs;
         subjectDescriptor.fabricIndex = mFabric;
-        // TODO(#10243): add CATs
     }
     else if (IsPAKEKeyId(mPeerNodeId))
     {
