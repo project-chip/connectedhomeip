@@ -200,7 +200,8 @@ ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
                     application.catalogVendorId, appId.c_str(), data.c_str());
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
-    response.data   = chip::CharSpan("data", strlen("data"));
+    const char * buf = "data";
+    response.data   = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
     response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
