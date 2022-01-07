@@ -53,7 +53,7 @@ private:
 CHIP_ERROR FixedLabelAttrAccess::ReadLabelList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    DeviceLayer::LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxFixedLabels> labelList;
+    DeviceLayer::AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, DeviceLayer::kMaxFixedLabels> labelList;
 
     if (DeviceLayer::PlatformMgr().GetFixedLabelList(endpoint, labelList) == CHIP_NO_ERROR)
     {

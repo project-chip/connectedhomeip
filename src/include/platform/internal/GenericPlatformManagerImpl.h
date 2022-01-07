@@ -58,12 +58,13 @@ protected:
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetFixedLabelList(EndpointId endpoint,
-                                  LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR
+    _GetFixedLabelList(EndpointId endpoint,
+                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
-                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
-                                 LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
@@ -82,21 +83,21 @@ extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetFixedLabelList(
-    EndpointId endpoint, LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
-    EndpointId endpoint, LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUserLabelList(
-    EndpointId endpoint, LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

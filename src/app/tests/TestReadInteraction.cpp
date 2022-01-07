@@ -1319,7 +1319,7 @@ void TestReadInteraction::TestSubscribeInvalidAttributePathRoundtrip(nlTestSuite
 
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mSessionHandle             = ctx.GetSessionBobToAlice();
+    readPrepareParams.mSessionHolder.Grab(ctx.GetSessionBobToAlice());
     readPrepareParams.mMinIntervalFloorSeconds   = 2;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
     printf("\nSend subscribe request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
@@ -1406,7 +1406,7 @@ void TestReadInteraction::TestSubscribeInvalidIterval(nlTestSuite * apSuite, voi
 
     readPrepareParams.mAttributePathParamsListSize = 1;
 
-    readPrepareParams.mSessionHandle             = ctx.GetSessionBobToAlice();
+    readPrepareParams.mSessionHolder.Grab(ctx.GetSessionBobToAlice());
     readPrepareParams.mMinIntervalFloorSeconds   = 6;
     readPrepareParams.mMaxIntervalCeilingSeconds = 5;
 

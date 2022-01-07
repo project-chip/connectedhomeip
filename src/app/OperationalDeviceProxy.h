@@ -80,7 +80,7 @@ class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDele
 {
 public:
     virtual ~OperationalDeviceProxy();
-    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId)
+    OperationalDeviceProxy(DeviceProxyInitParams & params, PeerId peerId) : mSecureSession(*this)
     {
         VerifyOrReturn(params.Validate() == CHIP_NO_ERROR);
 
@@ -131,7 +131,7 @@ public:
      *   Called when a connection is closing.
      *   The object releases all resources associated with the connection.
      */
-    void OnSessionReleased(const SessionHandle & session) override;
+    void OnSessionReleased() override;
 
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeResolutionData)
     {
@@ -157,7 +157,7 @@ public:
      *
      * Note: Avoid using this function generally as it is Deprecated
      */
-    void SetConnectedSession(SessionHandle handle);
+    void SetConnectedSession(const SessionHandle & handle);
 
     NodeId GetDeviceId() const override { return mPeerId.GetNodeId(); }
 
@@ -234,7 +234,7 @@ private:
 
     State mState = State::Uninitialized;
 
-    SessionHolder mSecureSession;
+    SessionHolderWithDelegate mSecureSession;
 
     uint8_t mSequenceNumber = 0;
 

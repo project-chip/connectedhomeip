@@ -275,17 +275,11 @@ void DeviceController::EmplaceOperationalDevice(const Transport::PeerAddress & a
     mCASESessionManager->EmplaceSession(addr, config, peerId, session);
 }
 
-void DeviceController::OnSessionReleased(const SessionHandle & session)
-{
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
-    mCASESessionManager->OnSessionReleased(session);
-}
-
 void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
 {
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
-    UpdateDevice(session.GetPeerNodeId());
+    UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
 }
 
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
@@ -629,7 +623,6 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 {
     ReturnErrorOnFailure(DeviceController::Init(params));
 
-    params.systemState->SessionMgr()->RegisterReleaseDelegate(*this);
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     uint16_t nextKeyID = 0;
@@ -691,16 +684,6 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 
     DeviceController::Shutdown();
     return CHIP_NO_ERROR;
-}
-
-void DeviceCommissioner::OnSessionReleased(const SessionHandle & session)
-{
-    VerifyOrReturn(mState == State::Initialized, ChipLogError(Controller, "OnConnectionExpired was called in incorrect state"));
-
-    CommissioneeDeviceProxy * device = FindCommissioneeDevice(session);
-    VerifyOrReturn(device != nullptr, ChipLogDetail(Controller, "OnConnectionExpired was called for unknown device, ignoring it."));
-
-    device->OnSessionReleased(session);
 }
 
 CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const SessionHandle & session)
@@ -1205,10 +1188,8 @@ CHIP_ERROR DeviceCommissioner::ValidateAttestationInfo(const ByteSpan & attestat
     DeviceAttestationVerifier * dac_verifier = GetDeviceAttestationVerifier();
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession(mDeviceBeingCommissioned->GetSecureSession().Value())
-                                        ->GetCryptoContext()
-                                        .GetAttestationChallenge();
+    ByteSpan attestationChallenge =
+        mDeviceBeingCommissioned->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     dac_verifier->VerifyAttestationInformation(attestationElements, attestationChallenge, signature,
                                                mDeviceBeingCommissioned->GetPAI(), mDeviceBeingCommissioned->GetDAC(),
@@ -1368,10 +1349,8 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
     ReturnErrorOnFailure(ExtractPubkeyFromX509Cert(device->GetDAC(), dacPubkey));
 
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge = mSystemState->SessionMgr()
-                                        ->GetSecureSession(device->GetSecureSession().Value())
-                                        ->GetCryptoContext()
-                                        .GetAttestationChallenge();
+    ByteSpan attestationChallenge =
+        device->GetSecureSession().Value()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     // The operational CA should also verify this on its end during NOC generation, if end-to-end attestation is desired.
     ReturnErrorOnFailure(dacVerifier->VerifyNodeOperationalCSRInformation(NOCSRElements, attestationChallenge, AttestationSignature,
@@ -1773,7 +1752,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         // TODO(cecille): Worthwhile to keep this around as part of the class?
         // TODO(cecille): Where is the country config actually set?
         ChipLogProgress(Controller, "Setting Regulatory Config");
-        uint8_t regulatoryLocation = EMBER_ZCL_REGULATORY_LOCATION_TYPE_OUTDOOR;
+        uint8_t regulatoryLocation = to_underlying(app::Clusters::GeneralCommissioning::RegulatoryLocationType::kOutdoor);
 #if CONFIG_DEVICE_LAYER
         CHIP_ERROR status = DeviceLayer::ConfigurationMgr().GetRegulatoryLocation(regulatoryLocation);
 #else

@@ -48,7 +48,7 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public SessionReleaseDelegate, public Dnssd::ResolverDelegate
+class CASESessionManager : public Dnssd::ResolverDelegate
 {
 public:
     CASESessionManager() = delete;
@@ -110,9 +110,6 @@ public:
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
     CHIP_ERROR GetPeerAddress(PeerId peerId, Transport::PeerAddress & addr);
-
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// ResolverDelegate Implementation ///////////////
     void OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData) override;

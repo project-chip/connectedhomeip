@@ -173,8 +173,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
-                                    public SessionRecoveryDelegate,
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -380,9 +379,6 @@ protected:
     uint16_t mVendorId;
 
     ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
-
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(const SessionHandle & session) override;
 
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
@@ -690,9 +686,6 @@ private:
     CHIP_ERROR LoadKeyId(PersistentStorageDelegate * delegate, uint16_t & out);
 
     void OnSessionEstablishmentTimeout();
-
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(const SessionHandle & session) override;
 
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
