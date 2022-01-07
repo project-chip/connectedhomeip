@@ -201,8 +201,8 @@ ApplicationLauncherImpl::LaunchApp(Application application, std::string data)
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type response;
     const char * buf = "data";
-    response.data   = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
-    response.status = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
+    response.data    = chip::ByteSpan(chip::Uint8::from_const_char(buf), strlen(buf));
+    response.status  = chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess;
 
     return response;
 }
