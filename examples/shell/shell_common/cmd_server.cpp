@@ -42,6 +42,7 @@ bool lowPowerClusterSleep()
 static chip::Shell::Engine sShellServerSubcommands;
 static uint16_t sServerPortOperational   = CHIP_PORT;
 static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
+static bool sServerEnabled = false;
 
 static CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 {
@@ -57,12 +58,16 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    sServerEnabled = true;
+
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR CmdAppServerStop(int argc, char ** argv)
 {
+    if (sServerEnabled == false) return CHIP_NO_ERROR;
     chip::Server::GetInstance().Shutdown();
+    sServerEnabled = false;
     return CHIP_NO_ERROR;
 }
 
