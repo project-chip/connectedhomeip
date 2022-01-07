@@ -70,10 +70,6 @@ namespace Shell {
 
 void Engine::RunMainLoop()
 {
-    int ret = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    assert(ret == 0);
-
-    Engine::Root().RegisterDefaultCommands();
     while (true)
     {
         const char * prompt = LOG_COLOR_I "> " LOG_RESET_COLOR;

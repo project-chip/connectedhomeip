@@ -635,4 +635,17 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
     return SessionHandle(*found);
 }
 
+/**
+ * Provides a means to get diagnostic information such as number of sessions.
+ */
+[[maybe_unused]] CHIP_ERROR SessionManager::ForEachSessionHandle(void * context, SessionHandleCallback lambda)
+{
+    mSecureSessions.ForEachSession([&](auto session) {
+        SessionHandle handle(*session);
+        lambda(context, handle);
+        return Loop::Continue;
+    });
+    return CHIP_NO_ERROR;
+}
+
 } // namespace chip
