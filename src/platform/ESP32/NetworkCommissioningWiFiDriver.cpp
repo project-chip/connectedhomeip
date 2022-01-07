@@ -230,19 +230,18 @@ void ESPWiFiDriver::OnScanWiFiNetworkDone()
     if (esp_wifi_scan_get_ap_records(&ap_number, ap_list_buffer) == ESP_OK)
     {
         if (CHIP_NO_ERROR == DeviceLayer::SystemLayer().ScheduleLambda([ap_number, ap_list_buffer]() {
-            std::unique_ptr<wifi_ap_record_t[]> auto_free(ap_list_buffer);
-            ESPScanResponseIterator iter(ap_number, ap_list_buffer);
-            if (GetInstance().mpScanCallback)
-            {
-                GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
-                GetInstance().mpScanCallback = nullptr;
-            }
-            else
-            {
-                ChipLogError(DeviceLayer, "can't find the ScanCallback function");
-            }
-
-        }))
+                std::unique_ptr<wifi_ap_record_t[]> auto_free(ap_list_buffer);
+                ESPScanResponseIterator iter(ap_number, ap_list_buffer);
+                if (GetInstance().mpScanCallback)
+                {
+                    GetInstance().mpScanCallback->OnFinished(Status::kSuccess, CharSpan(), &iter);
+                    GetInstance().mpScanCallback = nullptr;
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "can't find the ScanCallback function");
+                }
+            }))
         {
             ap_buffer_ptr.release();
         }
