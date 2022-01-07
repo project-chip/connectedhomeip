@@ -20,6 +20,7 @@ chip_device_platform = "ameba"
 chip_project_config_include = ""
 chip_system_project_config_include = ""
 chip_ble_project_config_include = ""
+chip_project_config_include = "<CHIPProjectConfig.h>"
 
 mbedtls_target = "//mbedtls:mbedtls"
 lwip_platform = "external"

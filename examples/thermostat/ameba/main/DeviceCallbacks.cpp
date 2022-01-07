@@ -40,7 +40,7 @@
 #include "Globals.h"
 #include "LEDWidget.h"
 
-static const char * TAG = "app-devicecallbacks";
+static const char * TAG = "app-devicecallbacks-tstst";
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -82,13 +82,14 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
 {
     switch (clusterId)
     {
-    case ZCL_ON_OFF_CLUSTER_ID:
-        OnOnOffPostAttributeChangeCallback(endpointId, attributeId, value);
-        break;
-
     case ZCL_IDENTIFY_CLUSTER_ID:
         OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
+
+    case ZCL_THERMOSTAT_CLUSTER_ID:
+        OnThermostatPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
+
 
     default:
         break;
@@ -125,19 +126,6 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     }
 }
 
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
-{
-    VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID,
-                 ChipLogError(DeviceLayer, TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
-    VerifyOrExit(endpointId == 1 || endpointId == 2,
-                 ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    // At this point we can assume that value points to a bool value.
-    statusLED1.Set(*value);
-
-exit:
-    return;
-}
 
 void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
@@ -157,6 +145,7 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
     // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
+    statusLED1.Toggle();
 exit:
     return;
 }
@@ -166,3 +155,21 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+extern "C" { 
+    void __attribute__((weak)) SendtoThermostat(AttributeId attributeId, uint8_t *value)
+    {
+
+    }
+}
+
+void DeviceCallbacks::OnThermostatPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    // TODO add some code here to get to the stat
+
+    VerifyOrExit(endpointId == 1, ChipLogError(DeviceLayer, TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
+    SendtoThermostat(attributeId, value);
+exit:
+    return;
+}
+

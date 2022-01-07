@@ -62,14 +62,15 @@ Identify gIdentify1 = {
 #define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-#ifdef CONFIG_PLATFORM_8721D
-#define STATUS_LED_GPIO_NUM PB_5
-#elif defined(CONFIG_PLATFORM_8710C)
-#define STATUS_LED_GPIO_NUM PA_20
-#else
-#define STATUS_LED_GPIO_NUM NC
-#endif
-
+// #ifdef CONFIG_PLATFORM_8721D
+// #define STATUS_LED_GPIO_NUM PB_5
+// #elif defined(CONFIG_PLATFORM_8710C)
+// #define STATUS_LED_GPIO_NUM PA_20
+// #else
+// #define STATUS_LED_GPIO_NUM NC
+// #endif
+ #define STATUS_LED_GPIO_NUM PA_2
+ 
 static DeviceCallbacks EchoCallbacks;
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)

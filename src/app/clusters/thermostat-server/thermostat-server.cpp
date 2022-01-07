@@ -67,7 +67,7 @@ constexpr int8_t kDefaultDeadBand                    = 25; // 2.5C is the defaul
 #define FEATURE_MAP_SB 0x10
 #define FEATURE_MAP_AUTO 0x20
 
-#define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL | FEATURE_MAP_AUTO
+#define FEATURE_MAP_DEFAULT FEATURE_MAP_HEAT | FEATURE_MAP_COOL
 
 void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint)
 {

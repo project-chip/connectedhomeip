@@ -273,6 +273,7 @@ class LEDWidget
 public:
     void Init(PinName gpioNum);
     void Set(bool state);
+    void Toggle();
 
 private:
     PinName mGPIONum;
