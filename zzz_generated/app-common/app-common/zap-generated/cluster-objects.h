@@ -9224,6 +9224,72 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerSourceConfiguration
 namespace PowerSource {
+// Enum for BatChargeFaultType
+enum class BatChargeFaultType : uint8_t
+{
+    kUnspecfied          = 0x00,
+    kAmbientTooHot       = 0x01,
+    kAmbientTooCold      = 0x02,
+    kBatteryTooHot       = 0x03,
+    kBatteryTooCold      = 0x04,
+    kBatteryAbsent       = 0x05,
+    kBatteryOverVoltage  = 0x06,
+    kBatteryUnderVoltage = 0x07,
+    kChargerOverVoltage  = 0x08,
+    kChargerUnderVoltage = 0x09,
+    kSafetyTimeout       = 0x0A,
+};
+// Enum for BatChargeLevel
+enum class BatChargeLevel : uint8_t
+{
+    kOk       = 0x00,
+    kWarning  = 0x01,
+    kCritical = 0x02,
+};
+// Enum for BatChargeState
+enum class BatChargeState : uint8_t
+{
+    kUnknown        = 0x00,
+    kIsCharging     = 0x01,
+    kIsAtFullCharge = 0x02,
+    kIsNotCharging  = 0x03,
+};
+// Enum for BatFaultType
+enum class BatFaultType : uint8_t
+{
+    kUnspecfied = 0x00,
+    kOverTemp   = 0x01,
+    kUnderTemp  = 0x02,
+};
+// Enum for BatReplaceability
+enum class BatReplaceability : uint8_t
+{
+    kUnspecified        = 0x00,
+    kNotReplaceable     = 0x01,
+    kUserReplaceable    = 0x02,
+    kFactoryReplaceable = 0x03,
+};
+// Enum for PowerSourceStatus
+enum class PowerSourceStatus : uint8_t
+{
+    kUnspecfied  = 0x00,
+    kActive      = 0x01,
+    kStandby     = 0x02,
+    kUnavailable = 0x03,
+};
+// Enum for WiredCurrentType
+enum class WiredCurrentType : uint8_t
+{
+    kAc = 0x00,
+    kDc = 0x01,
+};
+// Enum for WiredFaultType
+enum class WiredFaultType : uint8_t
+{
+    kUnspecfied   = 0x00,
+    kOverVoltage  = 0x01,
+    kUnderVoltage = 0x02,
+};
 
 // Bitmap for PowerSourceFeature
 enum class PowerSourceFeature : uint32_t
@@ -9233,6 +9299,84 @@ enum class PowerSourceFeature : uint32_t
     kRechargeable = 0x4,
     kReplaceable  = 0x8,
 };
+
+namespace Structs {
+namespace BatChargeFaultChangeType {
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const BatChargeFaultType> current;
+    DataModel::List<const BatChargeFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<BatChargeFaultType> current;
+    DataModel::DecodableList<BatChargeFaultType> previous;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace BatChargeFaultChangeType
+namespace BatFaultChangeType {
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const BatFaultType> current;
+    DataModel::List<const BatFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<BatFaultType> current;
+    DataModel::DecodableList<BatFaultType> previous;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace BatFaultChangeType
+namespace WiredFaultChangeType {
+enum class Fields
+{
+    kCurrent  = 0,
+    kPrevious = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const WiredFaultType> current;
+    DataModel::List<const WiredFaultType> previous;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<WiredFaultType> current;
+    DataModel::DecodableList<WiredFaultType> previous;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace WiredFaultChangeType
+} // namespace Structs
 
 namespace Attributes {
 
