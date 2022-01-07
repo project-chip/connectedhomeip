@@ -226,8 +226,16 @@ private:
 
     struct DnsResult
     {
+        void * context;
         chip::Dnssd::DnssdService mMdnsService;
         DnsServiceTxtEntries mServiceTxtEntry;
+        CHIP_ERROR error;
+
+        DnsResult(void * cbContext, CHIP_ERROR aError)
+        {
+            context = cbContext;
+            error   = aError;
+        }
     };
 
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);
