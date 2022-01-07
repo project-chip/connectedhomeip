@@ -282,7 +282,7 @@ void OperationalDeviceProxy::Clear()
 
 void OperationalDeviceProxy::CloseCASESession()
 {
-    if (this->mCASEClient)
+    if (mCASEClient)
     {
         this->mInitParams.clientPool->Release(this->mCASEClient);
         this->mCASEClient = nullptr;
