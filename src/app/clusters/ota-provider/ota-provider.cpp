@@ -174,10 +174,6 @@ bool emberAfOtaSoftwareUpdateProviderClusterQueryImageCallback(app::CommandHandl
     auto & requestorCanConsent = commandData.requestorCanConsent;
     auto & metadataForProvider = commandData.metadataForProvider;
 
-    (void) vendorId;
-    (void) productId;
-    (void) softwareVersion;
-
     EndpointId endpoint = commandPath.mEndpointId;
 
     EmberAfStatus status           = EMBER_ZCL_STATUS_SUCCESS;

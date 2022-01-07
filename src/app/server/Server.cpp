@@ -233,8 +233,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err    = mCASESessionManager.Init();
-    mState = ServerState::Enabled;
+    err = mCASESessionManager.Init();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -250,9 +249,6 @@ exit:
 
 void Server::Shutdown()
 {
-    if (mState == ServerState::Disabled)
-        return;
-
     chip::Dnssd::ServiceAdvertiser::Instance().Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     mExchangeMgr.Shutdown();
@@ -260,8 +256,6 @@ void Server::Shutdown()
     mTransports.Close();
     mCommissioningWindowManager.Shutdown();
     chip::Platform::MemoryShutdown();
-
-    mState = ServerState::Disabled;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
