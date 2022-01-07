@@ -17,7 +17,7 @@
  */
 
 /**
- * @brief Manages Content Apps
+ * @brief classes relating to Content App of the Video Player.
  */
 
 #pragma once

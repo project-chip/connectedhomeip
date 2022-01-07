@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains Implementation of the ContentApp and the ContentAppPlatform.
  */
 
 #include "AppImpl.h"

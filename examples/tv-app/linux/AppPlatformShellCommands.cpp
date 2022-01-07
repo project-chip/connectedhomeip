@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
+ * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
  */
 
 #include "AppPlatformShellCommands.h"

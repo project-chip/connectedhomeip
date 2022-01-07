@@ -16,7 +16,7 @@
  */
 
 /**
- * @file Contains shell commands for a ContentApp relating to Content App platform of the Video Player.
+ * @file Contains functions relating to Content App platform of the Video Player.
  */
 
 #include <app-common/zap-generated/attribute-id.h>
