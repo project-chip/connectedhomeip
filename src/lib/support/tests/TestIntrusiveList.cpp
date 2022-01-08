@@ -97,6 +97,40 @@ void TestIntrusiveListRandom(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestContains(nlTestSuite * inSuite, void * inContext)
+{
+    ListNode a, b, c;
+    IntrusiveList<ListNode> list;
+
+    NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&c));
+
+    list.PushBack(&a);
+    list.PushFront(&c);
+
+    NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, list.Contains(&c));
+
+    list.PushBack(&b);
+
+    NL_TEST_ASSERT(inSuite, list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, list.Contains(&c));
+
+    list.Remove(&a);
+    list.Remove(&c);
+
+    NL_TEST_ASSERT(inSuite, !list.Contains(&a));
+    NL_TEST_ASSERT(inSuite, list.Contains(&b));
+    NL_TEST_ASSERT(inSuite, !list.Contains(&c));
+
+    // all nodes have to be removed from the list on destruction. Lists do NOT do
+    // this automatically
+    list.Remove(&b);
+}
+
 int Setup(void * inContext)
 {
     return SUCCESS;
@@ -113,7 +147,11 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestIntrusiveListRandom), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF_FN(TestIntrusiveListRandom), //
+    NL_TEST_DEF_FN(TestContains),            //
+    NL_TEST_SENTINEL(),                      //
+};
 
 int TestIntrusiveList()
 {
