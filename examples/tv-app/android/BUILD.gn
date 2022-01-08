@@ -87,6 +87,7 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/ChannelLineupInfo.java",
     "java/src/com/tcl/chip/tvapp/ChannelManager.java",
     "java/src/com/tcl/chip/tvapp/ChannelManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/Clusters.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchBrandingInformation.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManager.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",
@@ -102,10 +103,9 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
+    "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
-    "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
-    "java/src/com/tcl/chip/tvapp/Clusters.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
