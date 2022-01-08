@@ -44,7 +44,7 @@ void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 void MediaInputManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: MediaInput::SetDefaultDelegate");
-    MediaInputManager* mgr = new MediaInputManager();
+    MediaInputManager * mgr = new MediaInputManager();
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::MediaInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }

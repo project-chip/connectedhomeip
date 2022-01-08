@@ -30,8 +30,8 @@ private:
     friend TvAppJNI & TvAppJNIMgr();
 
     static TvAppJNI sInstance;
-    jobject mTvAppObject      = nullptr;
-    jmethodID mPostClusterInitMethod    = nullptr;
+    jobject mTvAppObject             = nullptr;
+    jmethodID mPostClusterInitMethod = nullptr;
 };
 
 inline class TvAppJNI & TvAppJNIMgr()

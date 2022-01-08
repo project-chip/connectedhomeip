@@ -44,7 +44,7 @@ void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
 void WakeOnLanManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: WakeOnLan::SetDefaultDelegate");
-    WakeOnLanManager* mgr = new WakeOnLanManager();
+    WakeOnLanManager * mgr = new WakeOnLanManager();
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::WakeOnLan::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }

@@ -37,7 +37,7 @@ void emberAfLowPowerClusterInitCallback(EndpointId endpoint)
 void LowPowerManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: LowPower::SetDefaultDelegate");
-    LowPowerManager* mgr = new LowPowerManager();
+    LowPowerManager * mgr = new LowPowerManager();
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::LowPower::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }

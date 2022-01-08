@@ -26,7 +26,7 @@ class WakeOnLanManager : public chip::app::Clusters::WakeOnLan::Delegate
 public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
-    
+
     chip::CharSpan HandleGetMacAddress() override;
 
 private:

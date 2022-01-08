@@ -45,7 +45,7 @@ void emberAfMediaPlaybackClusterInitCallback(chip::EndpointId endpoint)
 void MediaPlaybackManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: MediaPlayback::SetDefaultDelegate");
-    MediaPlaybackManager* mgr = new MediaPlaybackManager();
+    MediaPlaybackManager * mgr = new MediaPlaybackManager();
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::MediaPlayback::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
