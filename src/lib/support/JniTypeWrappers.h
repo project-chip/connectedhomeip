@@ -39,7 +39,7 @@ public:
     }
     ~JniUtfString() {
         if (mString != nullptr) {
-            mEnv->ReleaseStringUTFChars(mString, mChars); 
+            mEnv->ReleaseStringUTFChars(mString, mChars);
         }
     }
 

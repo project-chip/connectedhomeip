@@ -17,7 +17,7 @@
 package com.tcl.chip.tvapp;
 
 public class Clusters {
-    
+
     public static final int ClusterId_PowerConfiguration = 0x00000001;
     public static final int ClusterId_DeviceTemperatureConfiguration = 0x00000002;
     public static final int ClusterId_Identify = 0x00000003;
@@ -135,5 +135,5 @@ public class Clusters {
     public static final int ClusterId_ApplianceEventsAndAlert = 0x00000B02;
     public static final int ClusterId_ApplianceStatistics = 0x00000B03;
     public static final int ClusterId_ElectricalMeasurement = 0x00000B04;
-    
+
 }
