@@ -16,6 +16,7 @@
  *
  */
 
+#include "TvApp-JNI.h"
 #include "ChannelManager.h"
 #include "ContentLauncherManager.h"
 #include "KeypadInputManager.h"
@@ -23,7 +24,6 @@
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
 #include "WakeOnLanManager.h"
-#include "TvApp-JNI.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>

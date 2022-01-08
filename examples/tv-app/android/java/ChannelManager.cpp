@@ -44,7 +44,7 @@ void emberAfChannelClusterInitCallback(EndpointId endpoint)
 void ChannelManager::NewManager(jint endpoint, jobject manager)
 {
     ChipLogProgress(Zcl, "TV Android App: Channel::SetDefaultDelegate");
-    ChannelManager* mgr = new ChannelManager();
+    ChannelManager * mgr = new ChannelManager();
     mgr->InitializeWithObjects(manager);
     chip::app::Clusters::Channel::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }

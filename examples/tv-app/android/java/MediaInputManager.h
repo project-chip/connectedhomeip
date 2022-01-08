@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <app/clusters/media-input-server/media-input-server.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/media-input-server/media-input-server.h>
 #include <jni.h>
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate

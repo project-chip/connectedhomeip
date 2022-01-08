@@ -37,8 +37,10 @@ public:
         mChars      = env->GetStringUTFChars(string, 0);
         mDataLength = env->GetStringUTFLength(string);
     }
-    ~JniUtfString() {
-        if (mString != nullptr) {
+    ~JniUtfString()
+    {
+        if (mString != nullptr)
+        {
             mEnv->ReleaseStringUTFChars(mString, mChars);
         }
     }
