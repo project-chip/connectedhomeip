@@ -49,9 +49,8 @@ void MediaInputManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::MediaInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()
+CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    std::list<Structs::InputInfo::Type> list;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -60,14 +59,14 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputM
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    {
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject, mGetInputListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaInputManager::HandleGetInputList");
             env->ExceptionDescribe();
             env->ExceptionClear();
-            return list;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
 
         jint size = env->GetArrayLength(inputArray);
@@ -89,32 +88,34 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputM
             jfieldID nameId = env->GetFieldID(inputClass, "name", "Ljava/lang/String;");
             jstring jname   = static_cast<jstring>(env->GetObjectField(inputObj, nameId));
 
+            JniUtfString name(env, jname);
             if (jname != NULL)
             {
-                JniUtfString name(env, jname);
                 mediaInput.name = name.charSpan();
             }
 
             jfieldID descriptionId = env->GetFieldID(inputClass, "description", "Ljava/lang/String;");
             jstring jdescription   = static_cast<jstring>(env->GetObjectField(inputObj, descriptionId));
 
+            JniUtfString description(env, jdescription);
             if (jdescription != NULL)
             {
-                JniUtfString description(env, jdescription);
                 mediaInput.description = description.charSpan();
             }
 
-            list.push_back(mediaInput);
+            ReturnErrorOnFailure(encoder.Encode(mediaInput));
         }
-    }
+
+        return CHIP_NO_ERROR;
+    });
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaInputManager::HandleGetInputList status error: %s", err.AsString());
+        ChipLogError(Zcl, "MediaInputManager::GetInputList status error: %s", err.AsString());
     }
 
-    return list;
+    return err;
 }
 
 uint8_t MediaInputManager::HandleGetCurrentInput()

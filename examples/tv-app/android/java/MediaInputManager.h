@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/clusters/media-input-server/media-input-server.h>
+#include <app/AttributeAccessInterface.h>
 #include <jni.h>
 
 class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
@@ -27,7 +28,7 @@ public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> HandleGetInputList() override;
+    CHIP_ERROR HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint8_t HandleGetCurrentInput() override;
     bool HandleSelectInput(const uint8_t index) override;
     bool HandleShowInputStatus() override;
