@@ -259,7 +259,7 @@ void MediaInputManager::InitializeWithObjects(jobject managerObject)
     jclass MediaInputManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(MediaInputManagerClass != nullptr, ChipLogError(Zcl, "Failed to get MediaInputManager Java class"));
 
-    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/InputInfo;");
+    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/MediaInputInfo;");
     if (mGetInputListMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");
