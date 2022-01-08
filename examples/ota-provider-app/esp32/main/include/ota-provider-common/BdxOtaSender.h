@@ -89,6 +89,9 @@ public:
      */
     uint64_t GetTransferLength(void);
 
+    /* ota-provider-common/OTAProviderExample.cpp requires this */
+    void SetFilepath(const char * path) {}
+
 private:
     // Inherited from bdx::TransferFacilitator
     void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event) override;
