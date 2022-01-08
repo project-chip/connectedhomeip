@@ -59,7 +59,12 @@ public class ChannelManagerStub implements ChannelManager {
   public boolean changeChannelByNumber(int majorNumber, int minorNumber) {
     Log.d(
         TAG,
-        "changeChannelByNumber: majorNumber = " + majorNumber + " minorNumber = " + minorNumber + " at " + endpoint);
+        "changeChannelByNumber: majorNumber = "
+            + majorNumber
+            + " minorNumber = "
+            + minorNumber
+            + " at "
+            + endpoint);
     return true;
   }
 

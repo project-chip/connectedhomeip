@@ -30,7 +30,7 @@ public class TvApp {
 
   private void postClusterInit(int clusterId, int endpoint) {
     Log.d(TAG, "postClusterInit for " + clusterId + " at " + endpoint);
-    if(mCallback != null) {
+    if (mCallback != null) {
       mCallback.onClusterInit(this, clusterId, endpoint);
     }
   }

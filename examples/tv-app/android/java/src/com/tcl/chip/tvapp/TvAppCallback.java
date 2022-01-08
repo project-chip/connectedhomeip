@@ -17,5 +17,5 @@
 package com.tcl.chip.tvapp;
 
 public interface TvAppCallback {
-    void onClusterInit(TvApp app, int clusterId, int endpoint);
+  void onClusterInit(TvApp app, int clusterId, int endpoint);
 }
