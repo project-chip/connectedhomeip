@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 48.1.4. [TC-DIAGSW-3.2] Command received functionality with server as DUT
+name: 45.1.1. [TC-SWDIAG-1.1] Attributes with server as DUT
 
 config:
     cluster: "Software Diagnostics"
@@ -23,32 +23,41 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    #issue #11578 ResetWatermarks command is Failing
-    - label: "Sends ResetWatermarks to DUT"
+    #Issue #11185 Disabled as ThreadMetrics attribute missing
+    - label:
+          "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       disabled: true
-      command: "ResetWatermarks"
-      PICS: CR_RESETWATERMARKS
-
-    - label: "Reads a list of ThreadMetrics struct attribute from DUT."
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
       response:
-          value: 0
+          constraints:
+              value: 0
 
-    - label: "Reads CurrentHeapUsed attribute value from DUT"
-      disabled: true
+    - label: "Reads CurrentHeapFree non-global attribute value from DUT"
+      optional: true
+      command: "readAttribute"
+      attribute: "CurrentHeapFree"
+      response:
+          constraints:
+              type: uint64
+
+    - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
       response:
-          value: 0
+          constraints:
+              type: uint64
 
-    - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
-      disabled: true
+    - label:
+          "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
-          value: 0
+          constraints:
+              type: uint64

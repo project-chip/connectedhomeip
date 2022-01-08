@@ -152,9 +152,9 @@ public:
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestGroupMessaging\n");
-        printf("Test_TC_DIAGSW_1_1\n");
-        printf("Test_TC_DIAGSW_2_1\n");
-        printf("Test_TC_DIAGSW_3_2\n");
+        printf("Test_TC_SWDIAG_1_1\n");
+        printf("Test_TC_SWDIAG_2_1\n");
+        printf("Test_TC_SWDIAG_3_1\n");
         printf("TestSubscribe_OnOff\n");
 
         return CHIP_NO_ERROR;
@@ -4861,7 +4861,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_60(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_60(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_60(uint16_t coupleColorTempToLevelMinMireds)
     {
@@ -4904,7 +4907,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_62(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_62(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_62(uint16_t coupleColorTempToLevelMinMireds)
     {
@@ -4925,7 +4931,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_63(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_63(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds)
     {
@@ -4949,7 +4958,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_64(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_64(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_64() { NextTest(); }
 
@@ -4965,7 +4977,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_65(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_65(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_65(uint16_t startUpColorTemperatureMireds)
     {
@@ -4985,7 +5000,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_66(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_66(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_66(uint16_t remainingTime)
     {
@@ -5005,7 +5023,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_67(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_67(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_67(uint16_t remainingTime)
     {
@@ -5047,7 +5068,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_69(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_69(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_69(uint16_t remainingTime)
     {
@@ -5067,7 +5091,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_70(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_70(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_70(uint8_t driftCompensation)
     {
@@ -5109,7 +5136,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_72(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_72(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_72(uint8_t driftCompensation)
     {
@@ -5129,7 +5159,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_73(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_73(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_73(chip::CharSpan compensationText)
     {
@@ -6069,7 +6102,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_119(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_119(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_119(uint16_t whitePointX)
     {
@@ -6092,7 +6128,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_120(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_120(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_120() { NextTest(); }
 
@@ -6107,7 +6146,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_121(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_121(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_121(uint16_t whitePointX)
     {
@@ -6127,7 +6169,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_122(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_122(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_122(uint16_t whitePointY)
     {
@@ -6150,7 +6195,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_123(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_123(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_123() { NextTest(); }
 
@@ -6165,7 +6213,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_124(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_124(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_124(uint16_t whitePointY)
     {
@@ -6185,7 +6236,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_125(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_125(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_125(uint16_t colorPointRX)
     {
@@ -6208,7 +6262,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_126(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_126(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_126() { NextTest(); }
 
@@ -6223,7 +6280,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_127(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_127(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_127(uint16_t colorPointRX)
     {
@@ -6243,7 +6303,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_128(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_128(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_128(uint16_t colorPointRY)
     {
@@ -6266,7 +6329,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_129(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_129(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_129() { NextTest(); }
 
@@ -6281,7 +6347,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_130(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_130(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_130(uint16_t colorPointRY)
     {
@@ -6301,7 +6370,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_131(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_131(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_131(uint8_t colorPointRIntensity)
     {
@@ -6320,7 +6392,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_132(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_132(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_132(uint16_t colorPointGX)
     {
@@ -6343,7 +6418,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_133(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_133(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_133() { NextTest(); }
 
@@ -6358,7 +6436,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_134(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_134(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_134(uint16_t colorPointGX)
     {
@@ -6378,7 +6459,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_135(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_135(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_135(uint16_t colorPointGY)
     {
@@ -6401,7 +6485,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_136(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_136(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_136() { NextTest(); }
 
@@ -6416,7 +6503,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_137(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_137(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_137(uint16_t colorPointGY)
     {
@@ -6436,7 +6526,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_138(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_138(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_138(uint8_t colorPointGIntensity)
     {
@@ -6455,7 +6548,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_139(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_139(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_139(uint16_t colorPointBX)
     {
@@ -6478,7 +6574,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_140(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_140(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_140() { NextTest(); }
 
@@ -6493,7 +6592,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_141(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_141(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_141(uint16_t colorPointBX)
     {
@@ -6513,7 +6615,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_142(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_142(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_142(uint16_t colorPointBY)
     {
@@ -6536,7 +6641,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_143(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_143(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_143() { NextTest(); }
 
@@ -6551,7 +6659,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_144(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_144(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_144(uint16_t colorPointBY)
     {
@@ -6571,7 +6682,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_145(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_145(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_145(uint8_t colorPointBIntensity)
     {
@@ -15690,24 +15804,44 @@ public:
             err = TestReadTheMandatoryAttributeMaxMeasuredValue_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : write the default value to optional attribute: MinMeasuredValue\n");
-            err = TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : write the default value to optional attribute: MeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMeasuredValue_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : write the default value to optional attribute: MaxMeasuredValue\n");
-            err = TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : write the default value to optional attribute: MinMeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: MeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMeasuredValue_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : write the default value to optional attribute: MaxMeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MinMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMinMeasuredValue_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMeasuredValue_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MaxMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMaxMeasuredValue_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMinMeasuredValue_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : read the mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMaxMeasuredValue_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : write the default value to optional attribute: Tolerance\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeTolerance_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_13();
             break;
         }
 
@@ -15720,7 +15854,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -15774,19 +15908,16 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, int16_t measuredValue)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(measuredValue);
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_7(void * context, int16_t measuredValue)
     {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(minMeasuredValue);
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(measuredValue);
     }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
@@ -15794,9 +15925,56 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_8(void * context, int16_t minMeasuredValue)
     {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(maxMeasuredValue);
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(minMeasuredValue);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_10(tolerance);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_11(tolerance);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_12(); }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_13(tolerance);
     }
 
     //
@@ -15866,17 +16044,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_4()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMeasuredValue_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        int16_t measuredValueArgument;
+        measuredValueArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            minMeasuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            measuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
@@ -15888,17 +16066,17 @@ private:
 
     void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_5()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        int16_t minMeasuredValueArgument;
+        minMeasuredValueArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            maxMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
@@ -15910,60 +16088,173 @@ private:
 
     void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_6()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        int16_t maxMeasuredValueArgument;
+        maxMeasuredValueArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            maxMeasuredValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_6(int16_t measuredValue)
-    {
-        VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(int16_t minMeasuredValue)
+    void OnSuccessResponse_7(int16_t measuredValue)
     {
-        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_8()
+    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(int16_t maxMeasuredValue)
+    void OnSuccessResponse_8(int16_t minMeasuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(int16_t maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckValue("tolerance", tolerance, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeTolerance_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t toleranceArgument;
+        toleranceArgument = 0U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            toleranceArgument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckValue("tolerance", tolerance, 0U));
+
         NextTest();
     }
 };
@@ -19912,48 +20203,60 @@ public:
             err = TestReadTheMandatoryAttributeOnOff_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back mandatory attribute: OnOff\n");
-            err = TestReadsBackMandatoryAttributeOnOff_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : write the default value of mandatory attribute: OnOff\n");
+            err = TestWriteTheDefaultValueOfMandatoryAttributeOnOff_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : read LT attribute: GlobalSceneControl\n");
-            err = TestReadLtAttributeGlobalSceneControl_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back mandatory attribute: OnOff\n");
+            err = TestReadsBackMandatoryAttributeOnOff_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read LT attribute: OnTime\n");
-            err = TestReadLtAttributeOnTime_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read LT attribute: GlobalSceneControl\n");
+            err = TestReadLtAttributeGlobalSceneControl_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read LT attribute: OffWaitTime\n");
-            err = TestReadLtAttributeOffWaitTime_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read LT attribute: OnTime\n");
+            err = TestReadLtAttributeOnTime_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read LT attribute: StartUpOnOff\n");
-            err = TestReadLtAttributeStartUpOnOff_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read LT attribute: OffWaitTime\n");
+            err = TestReadLtAttributeOffWaitTime_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : write the default value to LT attribute: OnTime\n");
-            err = TestWriteTheDefaultValueToLtAttributeOnTime_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read LT attribute: StartUpOnOff\n");
+            err = TestReadLtAttributeStartUpOnOff_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default value to LT attribute: OffWaitTime\n");
-            err = TestWriteTheDefaultValueToLtAttributeOffWaitTime_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default value to LT attribute: GlobalSceneControl\n");
+            err = TestWriteTheDefaultValueToLtAttributeGlobalSceneControl_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : write the default value to LT attribute: StartUpOnOff\n");
-            err = TestWriteTheDefaultValueToLtAttributeStartUpOnOff_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : write the default value to LT attribute: OnTime\n");
+            err = TestWriteTheDefaultValueToLtAttributeOnTime_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : reads back LT attribute: OnTime\n");
-            err = TestReadsBackLtAttributeOnTime_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : write the default value to LT attribute: OffWaitTime\n");
+            err = TestWriteTheDefaultValueToLtAttributeOffWaitTime_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : reads back LT attribute: OffWaitTime\n");
-            err = TestReadsBackLtAttributeOffWaitTime_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : write the default value to LT attribute: StartUpOnOff\n");
+            err = TestWriteTheDefaultValueToLtAttributeStartUpOnOff_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : reads back LT attribute: StartUpOnOff\n");
-            err = TestReadsBackLtAttributeStartUpOnOff_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : reads back LT attribute: GlobalSceneControl\n");
+            err = TestReadsBackLtAttributeGlobalSceneControl_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : reads back LT attribute: OnTime\n");
+            err = TestReadsBackLtAttributeOnTime_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : reads back LT attribute: OffWaitTime\n");
+            err = TestReadsBackLtAttributeOffWaitTime_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : reads back LT attribute: StartUpOnOff\n");
+            err = TestReadsBackLtAttributeStartUpOnOff_15();
             break;
         }
 
@@ -19966,7 +20269,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 13;
+    const uint16_t mTestCount = 16;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -19986,19 +20289,16 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, bool onOff)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(onOff);
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, bool globalSceneControl)
+    static void OnSuccessCallback_3(void * context, bool onOff)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_3(globalSceneControl);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_3(onOff);
     }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
@@ -20006,9 +20306,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, uint16_t onTime)
+    static void OnSuccessCallback_4(void * context, bool globalSceneControl)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_4(onTime);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_4(globalSceneControl);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
@@ -20016,9 +20316,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_5(void * context, uint16_t onTime)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_5(offWaitTime);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_5(onTime);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -20026,9 +20326,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_6(void * context, uint16_t offWaitTime)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_6(startUpOnOff);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_6(offWaitTime);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -20036,7 +20336,10 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_7(); }
+    static void OnSuccessCallback_7(void * context, uint8_t startUpOnOff)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_7(startUpOnOff);
+    }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
     {
@@ -20057,29 +20360,53 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, uint16_t onTime)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(onTime);
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, uint16_t offWaitTime)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(offWaitTime);
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_12(void * context, bool globalSceneControl)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_12(startUpOnOff);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_12(globalSceneControl);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint16_t onTime)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_13(onTime);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, uint16_t offWaitTime)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_14(offWaitTime);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, uint8_t startUpOnOff)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_15(startUpOnOff);
     }
 
     //
@@ -20112,107 +20439,151 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_2()
+    CHIP_ERROR TestWriteTheDefaultValueOfMandatoryAttributeOnOff_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool onOffArgument;
+        onOffArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            onOffArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(bool onOff)
-    {
-        VerifyOrReturn(CheckValue("onOff", onOff, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadLtAttributeGlobalSceneControl_3()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(bool globalSceneControl)
+    void OnSuccessResponse_3(bool onOff)
     {
-        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
+        VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeOnTime_4()
+    CHIP_ERROR TestReadLtAttributeGlobalSceneControl_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint16_t onTime)
+    void OnSuccessResponse_4(bool globalSceneControl)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeOffWaitTime_5()
+    CHIP_ERROR TestReadLtAttributeOnTime_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint16_t offWaitTime)
+    void OnSuccessResponse_5(uint16_t onTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeStartUpOnOff_6()
+    CHIP_ERROR TestReadLtAttributeOffWaitTime_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t startUpOnOff)
+    void OnSuccessResponse_6(uint16_t offWaitTime)
+    {
+        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadLtAttributeStartUpOnOff_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_7()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeGlobalSceneControl_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool globalSceneControlArgument;
+        globalSceneControlArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
+            globalSceneControlArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -20222,15 +20593,15 @@ private:
         onTimeArgument = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            onTimeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+            onTimeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7() { NextTest(); }
+    void OnSuccessResponse_9() { NextTest(); }
 
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_8()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -20240,15 +20611,15 @@ private:
         offWaitTimeArgument = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            offWaitTimeArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+            offWaitTimeArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8() { NextTest(); }
+    void OnSuccessResponse_10() { NextTest(); }
 
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_9()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -20258,68 +20629,88 @@ private:
         startUpOnOffArgument = 0;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            startUpOnOffArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_9() { NextTest(); }
-
-    CHIP_ERROR TestReadsBackLtAttributeOnTime_10()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_10(uint16_t onTime)
-    {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsBackLtAttributeOffWaitTime_11()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+            startUpOnOffArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(uint16_t offWaitTime)
-    {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+    void OnSuccessResponse_11() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsBackLtAttributeStartUpOnOff_12()
+    CHIP_ERROR TestReadsBackLtAttributeGlobalSceneControl_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12(uint8_t startUpOnOff)
+    void OnSuccessResponse_12(bool globalSceneControl)
+    {
+        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeOnTime_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint16_t onTime)
+    {
+        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeOffWaitTime_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint16_t offWaitTime)
+    {
+        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeStartUpOnOff_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
 
@@ -23021,32 +23412,196 @@ public:
             err = TestReadTheMandatoryAttributeMaxPressure_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: EffectiveOperationMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveOperationMode_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: MaxSpeed\n");
+            err = TestReadTheMandatoryAttributeMaxSpeed_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: EffectiveControlMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveControlMode_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: MaxFlow\n");
+            err = TestReadTheMandatoryAttributeMaxFlow_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: Capacity\n");
-            err = TestReadTheMandatoryAttributeCapacity_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: EffectiveOperationMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveOperationMode_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read the mandatory attribute: MaxPressure\n");
-            err = TestReadTheMandatoryAttributeMaxPressure_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read the mandatory attribute: EffectiveControlMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveControlMode_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: EffectiveOperationMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveOperationMode_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: Capacity\n");
+            err = TestReadTheMandatoryAttributeCapacity_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: EffectiveControlMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveControlMode_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MaxPressure\n");
+            err = TestReadTheMandatoryAttributeMaxPressure_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: Capacity\n");
-            err = TestReadTheMandatoryAttributeCapacity_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MaxSpeed\n");
+            err = TestReadTheMandatoryAttributeMaxSpeed_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : read the mandatory attribute: MaxFlow\n");
+            err = TestReadTheMandatoryAttributeMaxFlow_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : read the mandatory attribute: EffectiveOperationMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveOperationMode_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : read the mandatory attribute: EffectiveControlMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveControlMode_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : read the mandatory attribute: Capacity\n");
+            err = TestReadTheMandatoryAttributeCapacity_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : read the optional attribute: MinConstPressure\n");
+            err = TestReadTheOptionalAttributeMinConstPressure_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : read the optional attribute: MaxConstPressure\n");
+            err = TestReadTheOptionalAttributeMaxConstPressure_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : read the optional attribute: MinCompPressure\n");
+            err = TestReadTheOptionalAttributeMinCompPressure_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : read the optional attribute: MaxCompPressure\n");
+            err = TestReadTheOptionalAttributeMaxCompPressure_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : read the optional attribute: MinConstSpeed\n");
+            err = TestReadTheOptionalAttributeMinConstSpeed_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : read the optional attribute: MaxConstSpeed\n");
+            err = TestReadTheOptionalAttributeMaxConstSpeed_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : read the optional attribute: MinConstFlow\n");
+            err = TestReadTheOptionalAttributeMinConstFlow_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : read the optional attribute: MaxConstFlow\n");
+            err = TestReadTheOptionalAttributeMaxConstFlow_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : read the optional attribute: MinConstTemp\n");
+            err = TestReadTheOptionalAttributeMinConstTemp_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : read the optional attribute: MaxConstTemp\n");
+            err = TestReadTheOptionalAttributeMaxConstTemp_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : read the optional attribute: Speed\n");
+            err = TestReadTheOptionalAttributeSpeed_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : read the optional attribute: Power\n");
+            err = TestReadTheOptionalAttributePower_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : write to the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestWriteToTheOptionalAttributeLifetimeEnergyConsumed_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : read the optional attribute: MinConstPressure\n");
+            err = TestReadTheOptionalAttributeMinConstPressure_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : read the optional attribute: MaxConstPressure\n");
+            err = TestReadTheOptionalAttributeMaxConstPressure_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : read the optional attribute: MinCompPressure\n");
+            err = TestReadTheOptionalAttributeMinCompPressure_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : read the optional attribute: MaxCompPressure\n");
+            err = TestReadTheOptionalAttributeMaxCompPressure_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : read the optional attribute: MinConstSpeed\n");
+            err = TestReadTheOptionalAttributeMinConstSpeed_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : read the optional attribute: MaxConstSpeed\n");
+            err = TestReadTheOptionalAttributeMaxConstSpeed_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : read the optional attribute: MinConstFlow\n");
+            err = TestReadTheOptionalAttributeMinConstFlow_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : read the optional attribute: MaxConstFlow\n");
+            err = TestReadTheOptionalAttributeMaxConstFlow_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : read the optional attribute: MinConstTemp\n");
+            err = TestReadTheOptionalAttributeMinConstTemp_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : read the optional attribute: MaxConstTemp\n");
+            err = TestReadTheOptionalAttributeMaxConstTemp_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : read the optional attribute: Speed\n");
+            err = TestReadTheOptionalAttributeSpeed_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : read the optional attribute: Power\n");
+            err = TestReadTheOptionalAttributePower_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_49();
             break;
         }
 
@@ -23059,7 +23614,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 50;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -23079,9 +23634,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t effectiveOperationMode)
+    static void OnSuccessCallback_2(void * context, uint16_t maxSpeed)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_2(effectiveOperationMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_2(maxSpeed);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
@@ -23089,9 +23644,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, uint8_t effectiveControlMode)
+    static void OnSuccessCallback_3(void * context, uint16_t maxFlow)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_3(effectiveControlMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_3(maxFlow);
     }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
@@ -23099,9 +23654,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, int16_t capacity)
+    static void OnSuccessCallback_4(void * context, uint8_t effectiveOperationMode)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_4(capacity);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_4(effectiveOperationMode);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
@@ -23109,9 +23664,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, int16_t maxPressure)
+    static void OnSuccessCallback_5(void * context, uint8_t effectiveControlMode)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_5(maxPressure);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_5(effectiveControlMode);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -23119,9 +23674,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t effectiveOperationMode)
+    static void OnSuccessCallback_6(void * context, int16_t capacity)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_6(effectiveOperationMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_6(capacity);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -23129,9 +23684,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, uint8_t effectiveControlMode)
+    static void OnSuccessCallback_7(void * context, int16_t maxPressure)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_7(effectiveControlMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_7(maxPressure);
     }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
@@ -23139,9 +23694,416 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t capacity)
+    static void OnSuccessCallback_8(void * context, uint16_t maxSpeed)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_8(capacity);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_8(maxSpeed);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint16_t maxFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_9(maxFlow);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint8_t effectiveOperationMode)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_10(effectiveOperationMode);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint8_t effectiveControlMode)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_11(effectiveControlMode);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, int16_t capacity)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_12(capacity);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, int16_t minConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_13(minConstPressure);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, int16_t maxConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_14(maxConstPressure);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, int16_t minCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_15(minCompPressure);
+    }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, int16_t maxCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_16(maxCompPressure);
+    }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_17(status);
+    }
+
+    static void OnSuccessCallback_17(void * context, uint16_t minConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_17(minConstSpeed);
+    }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_18(status);
+    }
+
+    static void OnSuccessCallback_18(void * context, uint16_t maxConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_18(maxConstSpeed);
+    }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_19(status);
+    }
+
+    static void OnSuccessCallback_19(void * context, uint16_t minConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_19(minConstFlow);
+    }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_20(status);
+    }
+
+    static void OnSuccessCallback_20(void * context, uint16_t maxConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_20(maxConstFlow);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context, int16_t minConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_21(minConstTemp);
+    }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_22(status);
+    }
+
+    static void OnSuccessCallback_22(void * context, int16_t maxConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_22(maxConstTemp);
+    }
+
+    static void OnFailureCallback_23(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_23(status);
+    }
+
+    static void OnSuccessCallback_23(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_23(pumpStatus);
+    }
+
+    static void OnFailureCallback_24(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_24(status);
+    }
+
+    static void OnSuccessCallback_24(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_24(pumpStatus);
+    }
+
+    static void OnFailureCallback_25(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_25(status);
+    }
+
+    static void OnSuccessCallback_25(void * context, uint16_t speed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_25(speed);
+    }
+
+    static void OnFailureCallback_26(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_26(status);
+    }
+
+    static void OnSuccessCallback_26(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_26(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_27(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_27(status);
+    }
+
+    static void OnSuccessCallback_27(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_27(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_28(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_28(status);
+    }
+
+    static void OnSuccessCallback_28(void * context, uint32_t power)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_28(power);
+    }
+
+    static void OnFailureCallback_29(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_29(status);
+    }
+
+    static void OnSuccessCallback_29(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_29(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_30(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_30(status);
+    }
+
+    static void OnSuccessCallback_30(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_30(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_31(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_31(status);
+    }
+
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_31(); }
+
+    static void OnFailureCallback_32(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_32(status);
+    }
+
+    static void OnSuccessCallback_32(void * context, int16_t minConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_32(minConstPressure);
+    }
+
+    static void OnFailureCallback_33(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_33(status);
+    }
+
+    static void OnSuccessCallback_33(void * context, int16_t maxConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_33(maxConstPressure);
+    }
+
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_34(status);
+    }
+
+    static void OnSuccessCallback_34(void * context, int16_t minCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_34(minCompPressure);
+    }
+
+    static void OnFailureCallback_35(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_35(status);
+    }
+
+    static void OnSuccessCallback_35(void * context, int16_t maxCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_35(maxCompPressure);
+    }
+
+    static void OnFailureCallback_36(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_36(status);
+    }
+
+    static void OnSuccessCallback_36(void * context, uint16_t minConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_36(minConstSpeed);
+    }
+
+    static void OnFailureCallback_37(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_37(status);
+    }
+
+    static void OnSuccessCallback_37(void * context, uint16_t maxConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_37(maxConstSpeed);
+    }
+
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_38(status);
+    }
+
+    static void OnSuccessCallback_38(void * context, uint16_t minConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_38(minConstFlow);
+    }
+
+    static void OnFailureCallback_39(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_39(status);
+    }
+
+    static void OnSuccessCallback_39(void * context, uint16_t maxConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_39(maxConstFlow);
+    }
+
+    static void OnFailureCallback_40(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_40(status);
+    }
+
+    static void OnSuccessCallback_40(void * context, int16_t minConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_40(minConstTemp);
+    }
+
+    static void OnFailureCallback_41(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_41(status);
+    }
+
+    static void OnSuccessCallback_41(void * context, int16_t maxConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_41(maxConstTemp);
+    }
+
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_42(status);
+    }
+
+    static void OnSuccessCallback_42(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_42(pumpStatus);
+    }
+
+    static void OnFailureCallback_43(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_43(status);
+    }
+
+    static void OnSuccessCallback_43(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_43(pumpStatus);
+    }
+
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_44(status);
+    }
+
+    static void OnSuccessCallback_44(void * context, uint16_t speed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_44(speed);
+    }
+
+    static void OnFailureCallback_45(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_45(status);
+    }
+
+    static void OnSuccessCallback_45(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_45(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_46(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_46(status);
+    }
+
+    static void OnSuccessCallback_46(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_46(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_47(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_47(status);
+    }
+
+    static void OnSuccessCallback_47(void * context, uint32_t power)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_47(power);
+    }
+
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_48(status);
+    }
+
+    static void OnSuccessCallback_48(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_48(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_49(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_49(status);
+    }
+
+    static void OnSuccessCallback_49(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_49(lifetimeEnergyConsumed);
     }
 
     //
@@ -23174,7 +24136,46 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxSpeed_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
+                this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t maxSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxFlow_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t maxFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_4()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23182,19 +24183,19 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-                this, OnSuccessCallback_2, OnFailureCallback_2));
+                this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint8_t effectiveOperationMode)
+    void OnSuccessResponse_4(uint8_t effectiveOperationMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_3()
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23202,19 +24203,19 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+                this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint8_t effectiveControlMode)
+    void OnSuccessResponse_5(uint8_t effectiveControlMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_4()
+    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23222,19 +24223,19 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
-                this, OnSuccessCallback_4, OnFailureCallback_4));
+                this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(int16_t capacity)
+    void OnSuccessResponse_6(int16_t capacity)
     {
         VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_5()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23242,19 +24243,58 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
-                this, OnSuccessCallback_5, OnFailureCallback_5));
+                this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(int16_t maxPressure)
+    void OnSuccessResponse_7(int16_t maxPressure)
     {
         VerifyOrReturn(CheckConstraintType("maxPressure", "", "int16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_6()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxSpeed_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
+                this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint16_t maxSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxFlow_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint16_t maxFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23262,19 +24302,19 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
-                this, OnSuccessCallback_6, OnFailureCallback_6));
+                this, OnSuccessCallback_10, OnFailureCallback_10));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t effectiveOperationMode)
+    void OnSuccessResponse_10(uint8_t effectiveOperationMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_7()
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23282,19 +24322,19 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_7, OnFailureCallback_7));
+                this, OnSuccessCallback_11, OnFailureCallback_11));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t effectiveControlMode)
+    void OnSuccessResponse_11(uint8_t effectiveControlMode)
     {
         VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_8()
+    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -23302,15 +24342,873 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
-                this, OnSuccessCallback_8, OnFailureCallback_8));
+                this, OnSuccessCallback_12, OnFailureCallback_12));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(int16_t capacity)
+    void OnSuccessResponse_12(int16_t capacity)
     {
         VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstPressure_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
+                this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(int16_t minConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstPressure_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
+                this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14(int16_t maxConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinCompPressure_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
+                this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(int16_t minCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxCompPressure_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
+                this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16(int16_t maxCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstSpeed_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17(uint16_t minConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstSpeed_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(uint16_t maxConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstFlow_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
+                this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(uint16_t minConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstFlow_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
+                this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(uint16_t maxConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstTemp_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
+                this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(int16_t minConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstTemp_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
+                this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22(int16_t maxConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_23, OnFailureCallback_23));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckValue("pumpStatus", pumpStatus, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("pumpStatus", "", "map16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeSpeed_25()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
+            this, OnSuccessCallback_25, OnFailureCallback_25));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_25(uint16_t speed)
+    {
+        VerifyOrReturn(CheckConstraintType("speed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_26()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_26, OnFailureCallback_26));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_26(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeRunningHours", lifetimeRunningHours));
+        VerifyOrReturn(CheckValue("lifetimeRunningHours.Value()", lifetimeRunningHours.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_27()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_27, OnFailureCallback_27));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_27(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_27(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeRunningHours", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePower_28()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
+            this, OnSuccessCallback_28, OnFailureCallback_28));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_28(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_28(uint32_t power)
+    {
+        VerifyOrReturn(CheckConstraintType("power", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_29()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_29, OnFailureCallback_29));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_29(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_29(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeEnergyConsumed", lifetimeEnergyConsumed));
+        VerifyOrReturn(CheckValue("lifetimeEnergyConsumed.Value()", lifetimeEnergyConsumed.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_30()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_30, OnFailureCallback_30));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_30(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_30(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeEnergyConsumed", "", "uint32"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteToTheOptionalAttributeLifetimeEnergyConsumed_31()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint32_t> lifetimeEnergyConsumedArgument;
+        lifetimeEnergyConsumedArgument.SetNonNull();
+        lifetimeEnergyConsumedArgument.Value() = 0UL;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                lifetimeEnergyConsumedArgument, this, OnSuccessCallback_31, OnFailureCallback_31));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_31(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_31() { NextTest(); }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstPressure_32()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
+                this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_32(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_32(int16_t minConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstPressure_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
+                this, OnSuccessCallback_33, OnFailureCallback_33));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_33(int16_t maxConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinCompPressure_34()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
+                this, OnSuccessCallback_34, OnFailureCallback_34));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_34(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_34(int16_t minCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxCompPressure_35()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
+                this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_35(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_35(int16_t maxCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstSpeed_36()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_36, OnFailureCallback_36));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_36(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_36(uint16_t minConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstSpeed_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_37(uint16_t maxConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstFlow_38()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
+                this, OnSuccessCallback_38, OnFailureCallback_38));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_38(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_38(uint16_t minConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstFlow_39()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
+                this, OnSuccessCallback_39, OnFailureCallback_39));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_39(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_39(uint16_t maxConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstTemp_40()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
+                this, OnSuccessCallback_40, OnFailureCallback_40));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_40(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_40(int16_t minConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstTemp_41()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
+                this, OnSuccessCallback_41, OnFailureCallback_41));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_41(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_41(int16_t maxConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_42()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_42(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_42(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckValue("pumpStatus", pumpStatus, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_43()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_43, OnFailureCallback_43));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_43(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_43(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("pumpStatus", "", "map16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeSpeed_44()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
+            this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_44(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_44(uint16_t speed)
+    {
+        VerifyOrReturn(CheckConstraintType("speed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_45()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_45, OnFailureCallback_45));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_45(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeRunningHours", lifetimeRunningHours));
+        VerifyOrReturn(CheckValue("lifetimeRunningHours.Value()", lifetimeRunningHours.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_46()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_46, OnFailureCallback_46));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_46(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_46(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeRunningHours", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePower_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
+            this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_47(uint32_t power)
+    {
+        VerifyOrReturn(CheckConstraintType("power", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_48()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_48, OnFailureCallback_48));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_48(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_48(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeEnergyConsumed", lifetimeEnergyConsumed));
+        VerifyOrReturn(CheckValue("lifetimeEnergyConsumed.Value()", lifetimeEnergyConsumed.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_49()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_49, OnFailureCallback_49));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_49(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_49(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeEnergyConsumed", "", "uint32"));
         NextTest();
     }
 };
@@ -23516,6 +25414,34 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: EffectiveOperationMode\n");
             err = ShouldSkip("A_EFFECTIVEOPERATIONMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveOperationMode_2();
             break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write 0 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite0ToTheControlModeAttributeToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the attribute: EffectiveControlMode\n");
+            err = ShouldSkip("A_EFFECTIVECONTROLMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveControlMode_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write 1 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite1ToTheControlModeAttributeToDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Write 2 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite2ToTheControlModeAttributeToDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 3 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite3ToTheControlModeAttributeToDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 5 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite5ToTheControlModeAttributeToDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 7 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite7ToTheControlModeAttributeToDut_9();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -23527,7 +25453,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 10;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -23548,6 +25474,58 @@ private:
     {
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_2(effectiveOperationMode);
     }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t effectiveControlMode)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_4(effectiveControlMode);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_6(); }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_7(); }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_9(); }
 
     //
     // Tests methods
@@ -23598,6 +25576,141 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestWrite0ToTheControlModeAttributeToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 0;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t effectiveControlMode)
+    {
+        VerifyOrReturn(CheckValue("effectiveControlMode", effectiveControlMode, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWrite1ToTheControlModeAttributeToDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 1;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 2;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 3;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 5;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 7;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
 };
 
 class Test_TC_RH_1_1 : public TestCommand
@@ -26500,7 +28613,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_50(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_50(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_50(int8_t minSetpointDeadBand)
     {
@@ -26520,7 +28636,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_51(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_51(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_51(int8_t minSetpointDeadBand)
     {
@@ -26543,7 +28662,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_52(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_52(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_52() { NextTest(); }
 
@@ -26558,7 +28680,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_53(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_53(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_53(int8_t minSetpointDeadBand)
     {
@@ -26578,7 +28703,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_54(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_54(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_54(uint8_t startOfWeek)
     {
@@ -26620,7 +28748,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_56(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_56(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_56(uint8_t startOfWeek)
     {
@@ -26641,7 +28772,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_57(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_57(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_57(uint8_t numberOfWeeklyTransitions)
     {
@@ -26683,7 +28817,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_59(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_59(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_59(uint8_t numberOfDailyTransitions)
     {
@@ -58282,10 +60419,10 @@ private:
     void OnDoneResponse_2() { NextTest(); }
 };
 
-class Test_TC_DIAGSW_1_1 : public TestCommand
+class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_1_1() : TestCommand("Test_TC_DIAGSW_1_1"), mTestIndex(0)
+    Test_TC_SWDIAG_1_1() : TestCommand("Test_TC_SWDIAG_1_1"), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -58298,12 +60435,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_1_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_1_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_1_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_1_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -58351,32 +60488,32 @@ private:
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_1(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
     static void OnSuccessCallback_1(void * context, uint64_t currentHeapFree)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
     }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_2(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_3(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
     static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
     }
 
     //
@@ -58457,10 +60594,10 @@ private:
     }
 };
 
-class Test_TC_DIAGSW_2_1 : public TestCommand
+class Test_TC_SWDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_2_1() : TestCommand("Test_TC_DIAGSW_2_1"), mTestIndex(0)
+    Test_TC_SWDIAG_2_1() : TestCommand("Test_TC_SWDIAG_2_1"), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -58473,12 +60610,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_2_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_2_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_2_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_2_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -58512,10 +60649,10 @@ private:
     //
 };
 
-class Test_TC_DIAGSW_3_2 : public TestCommand
+class Test_TC_SWDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_3_2() : TestCommand("Test_TC_DIAGSW_3_2"), mTestIndex(0)
+    Test_TC_SWDIAG_3_1() : TestCommand("Test_TC_SWDIAG_3_1"), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -58528,12 +60665,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_3_2\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_3_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_3_2\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_3_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -59014,9 +61151,9 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),
-        make_unique<Test_TC_DIAGSW_1_1>(),
-        make_unique<Test_TC_DIAGSW_2_1>(),
-        make_unique<Test_TC_DIAGSW_3_2>(),
+        make_unique<Test_TC_SWDIAG_1_1>(),
+        make_unique<Test_TC_SWDIAG_2_1>(),
+        make_unique<Test_TC_SWDIAG_3_1>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 

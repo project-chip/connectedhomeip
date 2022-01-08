@@ -72,6 +72,7 @@ tests:
 
     - label: "Reads the optional attribute: Tolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "tolerance"
       response:
@@ -79,6 +80,7 @@ tests:
 
     - label: "Reads constraints of attribute: Tolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "tolerance"
       response:

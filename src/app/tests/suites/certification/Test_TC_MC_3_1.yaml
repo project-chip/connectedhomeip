@@ -25,7 +25,7 @@ tests:
 
     - label: "Send Select"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -33,7 +33,7 @@ tests:
 
     - label: "Send Up"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -41,7 +41,7 @@ tests:
 
     - label: "Send Down"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -49,14 +49,14 @@ tests:
 
     - label: "Send Left"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
                 value: 0x03
     - label: "Send Right"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -64,7 +64,7 @@ tests:
 
     - label: "Send RightUp"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -72,7 +72,7 @@ tests:
 
     - label: "Send RightDown"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -80,7 +80,7 @@ tests:
 
     - label: "Send LeftUp"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -88,7 +88,7 @@ tests:
 
     - label: "Send LeftDown"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -96,7 +96,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -104,7 +104,7 @@ tests:
 
     - label: "Send SetupMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -112,7 +112,7 @@ tests:
 
     - label: "Send ContentsMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -120,7 +120,7 @@ tests:
 
     - label: "Send FavoriteMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -128,7 +128,7 @@ tests:
 
     - label: "Send Exit"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -136,7 +136,7 @@ tests:
 
     - label: "Send Invalid"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"

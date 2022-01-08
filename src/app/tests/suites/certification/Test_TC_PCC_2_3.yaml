@@ -38,7 +38,6 @@ tests:
           value: 0
 
     - label: "Write 0 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
@@ -46,7 +45,6 @@ tests:
           value: 0
 
     - label: "Reads the attribute: EffectiveControlMode"
-      disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
       PICS: A_EFFECTIVECONTROLMODE
@@ -54,7 +52,6 @@ tests:
           value: 0
 
     - label: "Write 1 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
@@ -70,7 +67,6 @@ tests:
           value: 1
 
     - label: "Write 2 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
@@ -86,7 +82,6 @@ tests:
           value: 2
 
     - label: "Write 3 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
@@ -102,7 +97,6 @@ tests:
           value: 3
 
     - label: "Write 5 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
@@ -118,7 +112,6 @@ tests:
           value: 5
 
     - label: "Write 7 to the ControlMode attribute to DUT"
-      disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
       PICS: A_CONTROLMODE
