@@ -120,6 +120,45 @@ public class ChipDeviceController {
     }
   }
 
+  /**
+   * Establish a secure PASE connection to the given device via IP address.
+   *
+   * @param deviceId the ID of the node to connect to
+   * @param address the IP address at which the node is located
+   * @param port the port at which the node is located
+   * @param setupPincode the pincode for this node
+   */
+  public void establishPaseConnection(long deviceId, String address, int port, long setupPincode) {
+    Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+    establishPaseConnectionByAddress(deviceControllerPtr, deviceId, address, port, setupPincode);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(long deviceId, NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param csrNonce a nonce to be used for the CSR request
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
@@ -284,6 +323,15 @@ public class ChipDeviceController {
 
   private native void establishPaseConnection(
       long deviceControllerPtr, long deviceId, int connId, long setupPincode);
+
+  private native void establishPaseConnectionByAddress(
+      long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
+
+  private native void commissionDevice(
+      long deviceControllerPtr,
+      long deviceId,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 
