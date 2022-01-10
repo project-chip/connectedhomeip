@@ -48,7 +48,7 @@ struct Joinable
 protected:
     bool InProgress() { return mShutdownToken.get() != nullptr ? true : false; }
     void RetainShutdownToken(Platform::SharedPtr<ShutdownToken> token) { mShutdownToken = token; }
-    void ReleaseShutdownToken() { mShutdownToken = std::shared_ptr<ShutdownToken>(nullptr); }
+    void ReleaseShutdownToken() { mShutdownToken = Platform::SharedPtr<ShutdownToken>(nullptr); }
     Platform::SharedPtr<ShutdownToken> GetShutdownToken() { return mShutdownToken; }
 
     Delegate ** mDelegate;
