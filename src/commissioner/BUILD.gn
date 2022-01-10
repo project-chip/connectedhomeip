@@ -21,9 +21,11 @@ static_library("commissioner") {
   output_name = "libCommissioner"
 
   sources = [
+    "BleDiscoverer.cpp",
     "Commissionee.h",
     "Discoverer.cpp",
     "Discoverer.h",
+    "DnssdDiscoverer.cpp",
     "Events.h",
     "ExampleCommissioningStateMachine.cpp",
     "ExampleCommissioningStateMachine.h",
