@@ -349,7 +349,7 @@ int main(int argc, char ** args)
         chip::System::Clock::Milliseconds32(gOptions.runtimeMs),
         [](System::Layer *, void *) {
             // Close all sockets BEFORE system layer is shut down, otherwise
-            // attempts to free UDP sockeds with system layer down will segfault
+            // attempts to free UDP sockets with system layer down will segfault
             gMdnsServer.Shutdown();
 
             DeviceLayer::PlatformMgr().StopEventLoopTask();
