@@ -51,13 +51,13 @@ struct SharedBuffer
     }
     void Clear()
     {
-        mData     = std::shared_ptr<uint8_t>(nullptr);
+        mData     = Platform::SharedPtr<uint8_t>(nullptr);
         mCapacity = 0;
         mLen      = 0;
     }
     CHIP_ERROR Allocate(size_t size)
     {
-        mData = std::shared_ptr<uint8_t>(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(size)), chip::Platform::MemoryFree);
+        mData = Platform::SharedPtr<uint8_t>(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(size)), chip::Platform::MemoryFree);
         if (mData.get() == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
