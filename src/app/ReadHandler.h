@@ -145,7 +145,10 @@ public:
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const
+    {
+        return mIsFabricFiltered ? mSubjectDescriptor.fabricIndex : kUndefinedFabricIndex;
+    }
 
     const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
 

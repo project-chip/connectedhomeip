@@ -360,8 +360,8 @@ CHIP_ERROR ReadViaAccessInterface(FabricIndex aAccessingFabricIndex, const Concr
 
 } // anonymous namespace
 
-CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIBs::Builder & aAttributeReports,
+CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, FabricIndex aFabricIndex,
+                                 const ConcreteReadAttributePath & aPath, AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     ChipLogDetail(DataManagement,
@@ -424,8 +424,8 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         bool triedEncode;
-        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
-                                                    attrOverride, &triedEncode));
+        ReturnErrorOnFailure(
+            ReadViaAccessInterface(aFabricIndex, aPath, aAttributeReports, apEncoderState, attrOverride, &triedEncode));
 
         if (triedEncode)
         {

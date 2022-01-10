@@ -104,7 +104,9 @@ public:
         CHIP_ERROR Encode(T && aArg) const
         {
             // If the fabric index does not match that present in the request, skip encoding this list item.
-            VerifyOrReturnError(aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex), CHIP_NO_ERROR);
+            VerifyOrReturnError(mAttributeValueEncoder.mAccessingFabricIndex == kUndefinedFabricIndex ||
+                                    aArg.MatchesFabricIndex(mAttributeValueEncoder.mAccessingFabricIndex),
+                                CHIP_NO_ERROR);
             return mAttributeValueEncoder.EncodeListItem(std::forward<T>(aArg));
         }
 

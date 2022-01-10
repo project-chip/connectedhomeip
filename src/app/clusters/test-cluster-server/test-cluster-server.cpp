@@ -47,6 +47,9 @@ constexpr uint8_t kAttributeListLength = 4;
 // The maximum length of the test attribute list element in bytes
 constexpr uint8_t kAttributeEntryLength = 6;
 
+// The number of elements in ListFabricScoped attribute, it will emit elements with fabric index equals to 1, 2, ...
+constexpr uint8_t kListFabricScopedAttributeElementCount = 4;
+
 namespace {
 
 class OctetStringData
@@ -84,6 +87,7 @@ private:
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -123,6 +127,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
+    }
+    case ListFabricScoped::Id: {
+        return ReadListFabricScopedAttribute(aEncoder);
     }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
@@ -404,6 +411,20 @@ CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
 CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
 {
     return aDecoder.Decode(gStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        // Just encode our one struct for now.
+        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+        for (uint8_t i = 1; i <= kListFabricScopedAttributeElementCount; i++)
+        {
+            val.fabricIndex = i;
+            ReturnErrorOnFailure(encoder.Encode(val));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace

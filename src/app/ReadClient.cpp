@@ -178,7 +178,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             }
         }
 
-        ReturnErrorOnFailure(request.IsFabricFiltered(false).EndOfReadRequestMessage().GetError());
+        ReturnErrorOnFailure(request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfReadRequestMessage().GetError());
         ReturnErrorOnFailure(writer.Finalize(&msgBuf));
     }
 
@@ -436,7 +436,7 @@ exit:
     {
         bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                                                            : Protocols::InteractionModel::Status::InvalidSubscription,
                                    mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))
@@ -696,7 +696,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         ReturnErrorOnFailure(err = eventFilters.GetError());
     }
 
-    request.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
+    request.IsFabricFiltered(aReadPrepareParams.mIsFabricFiltered).EndOfSubscribeRequestMessage();
     ReturnErrorOnFailure(err = request.GetError());
 
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
