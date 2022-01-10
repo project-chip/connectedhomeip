@@ -98,12 +98,11 @@ void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
         imageProcessor->ota_target_index = OTA_INDEX_2;
     else if (ota_get_cur_index() == OTA_INDEX_2)
         imageProcessor->ota_target_index = OTA_INDEX_1;
-    ChipLogProgress(SoftwareUpdate, "OTA%d address space will be upgraded", imageProcessor->ota_target_index+1);
+    ChipLogProgress(SoftwareUpdate, "OTA%d address space will be upgraded", imageProcessor->ota_target_index + 1);
 #elif defined(CONFIG_PLATFORM_8710C)
     imageProcessor->flash_addr = sys_update_ota_prepare_addr();
     ChipLogProgress(SoftwareUpdate, "New Flash Address: 0x%X", imageProcessor->flash_addr);
 #endif
-
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
@@ -116,7 +115,6 @@ void AmebaOTAImageProcessor::HandleFinalize(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-
 
     // Verify checksum
 #if defined(CONFIG_PLATFORM_8721D)
@@ -135,7 +133,7 @@ void AmebaOTAImageProcessor::HandleFinalize(intptr_t context)
         return;
     }
 #elif defined(CONFIG_PLATFORM_8710C)
-    if(update_ota_signature(imageProcessor->signature, imageProcessor->flash_addr) < 0)
+    if (update_ota_signature(imageProcessor->signature, imageProcessor->flash_addr) < 0)
     {
         ChipLogError(SoftwareUpdate, "OTA update signature failed");
         return;
@@ -176,24 +174,25 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
     }
 
 #if defined(CONFIG_PLATFORM_8721D)
-    if(!imageProcessor->readHeader) // First block received, process header
+    if (!imageProcessor->readHeader) // First block received, process header
     {
-        uint8_t *tempBuf = (uint8_t*) ota_update_malloc(32);
-        imageProcessor->pOtaTgtHdr = (update_ota_target_hdr*) ota_update_malloc(sizeof(update_ota_target_hdr));
+        uint8_t * tempBuf          = (uint8_t *) ota_update_malloc(32);
+        imageProcessor->pOtaTgtHdr = (update_ota_target_hdr *) ota_update_malloc(sizeof(update_ota_target_hdr));
 
         memcpy(tempBuf, imageProcessor->mBlock.data(), 32);
         memcpy(imageProcessor->pOtaTgtHdr, tempBuf, 8); // Store FwVer, HdrNum
-        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgHdrLen), tempBuf+12, 16); // Store ImgHdrLen, Checksum, ImgLen, Offset
-        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), tempBuf+8, 4); // Store OTA id
+        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgHdrLen), tempBuf + 12,
+               16);                                                                 // Store ImgHdrLen, Checksum, ImgLen, Offset
+        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), tempBuf + 8, 4); // Store OTA id
 
-        if(imageProcessor->ota_target_index == OTA_INDEX_1)
+        if (imageProcessor->ota_target_index == OTA_INDEX_1)
             imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr = LS_IMG2_OTA1_ADDR;
         else if (imageProcessor->ota_target_index == OTA_INDEX_2)
             imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr = LS_IMG2_OTA2_ADDR;
 
         imageProcessor->pOtaTgtHdr->ValidImgCnt = 1;
 
-        if(strncmp("OTA", (const char*) &(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), 3) != 0)
+        if (strncmp("OTA", (const char *) &(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), 3) != 0)
         {
             ChipLogError(SoftwareUpdate, "Wrong Image ID for OTA");
             return;
@@ -211,8 +210,9 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
         // Erase update partition
         ChipLogProgress(SoftwareUpdate, "Erasing target partition...");
-        erase_ota_target_flash(imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr, imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgLen);
-        ChipLogProgress(SoftwareUpdate, "Erased partition OTA%d", imageProcessor->ota_target_index+1);
+        erase_ota_target_flash(imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr,
+                               imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgLen);
+        ChipLogProgress(SoftwareUpdate, "Erased partition OTA%d", imageProcessor->ota_target_index + 1);
 
         // Set RemainBytes to image length, excluding 8bytes of signature
         imageProcessor->RemainBytes = imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgLen - 8;
@@ -224,14 +224,14 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         imageProcessor->signature = &(imageProcessor->pOtaTgtHdr->Sign[0][0]);
 
         // Store the signature temporarily
-        uint8_t *tempbufptr = imageProcessor->mBlock.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset;
+        uint8_t * tempbufptr = imageProcessor->mBlock.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset;
         memcpy(imageProcessor->signature, tempbufptr, 8);
         tempbufptr += 8;
 
         // Write remaining downloaded bytes to flash_addr
         uint32_t tempsize = imageProcessor->mBlock.size() - imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset - 8;
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        if(ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, tempsize, tempbufptr) < 0)
+        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, tempsize, tempbufptr) < 0)
         {
             ChipLogError(SoftwareUpdate, "Write to flash failed");
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
@@ -248,7 +248,8 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
     else // received subsequent blocks
     {
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        if(ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, imageProcessor->mBlock.size(), imageProcessor->mBlock.data()) < 0)
+        if (ota_writestream_user(imageProcessor->flash_addr + imageProcessor->size, imageProcessor->mBlock.size(),
+                                 imageProcessor->mBlock.data()) < 0)
         {
             ChipLogError(SoftwareUpdate, "Write to flash failed");
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
@@ -261,7 +262,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         imageProcessor->RemainBytes -= imageProcessor->mBlock.size();
     }
 #elif defined(CONFIG_PLATFORM_8710C)
-    if(!imageProcessor->readHeader) // First block received, process 32bytes signature
+    if (!imageProcessor->readHeader) // First block received, process 32bytes signature
     {
         // Store signature temporarily
         memcpy(imageProcessor->signature, imageProcessor->mBlock.data(), 32);
@@ -270,18 +271,19 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
         // Erase target partition
         ChipLogProgress(SoftwareUpdate, "Erasing partition");
-        imageProcessor->NewFWBlkSize = ((0x1F8000 - 1)/4096) + 1; // Use a fixed image length of 0xF8000, change in the future
+        imageProcessor->NewFWBlkSize = ((0x1F8000 - 1) / 4096) + 1; // Use a fixed image length of 0xF8000, change in the future
         ChipLogProgress(SoftwareUpdate, "Erasing %d sectors", imageProcessor->NewFWBlkSize);
         device_mutex_lock(RT_DEV_LOCK_FLASH);
-        for (int i=0; i<imageProcessor->NewFWBlkSize; i++)
+        for (int i = 0; i < imageProcessor->NewFWBlkSize; i++)
             flash_erase_sector(&flash_ota, imageProcessor->flash_addr + i * 4096);
         device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
         // Write first block to target flash
-        if(imageProcessor->block_len > 0)
+        if (imageProcessor->block_len > 0)
         {
             device_mutex_lock(RT_DEV_LOCK_FLASH);
-            if(flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32, imageProcessor->block_len, imageProcessor->mBlock.data() + 32) < 0)
+            if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32, imageProcessor->block_len,
+                                  imageProcessor->mBlock.data() + 32) < 0)
             {
                 device_mutex_unlock(RT_DEV_LOCK_FLASH);
                 ChipLogError(SoftwareUpdate, "Write to flash failed");
@@ -306,10 +308,11 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         imageProcessor->block_len = imageProcessor->mBlock.size();
 
         // Write first block to target flash
-        if(imageProcessor->block_len > 0)
+        if (imageProcessor->block_len > 0)
         {
             device_mutex_lock(RT_DEV_LOCK_FLASH);
-            if(flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32 + imageProcessor->size, imageProcessor->block_len, imageProcessor->mBlock.data()) < 0)
+            if (flash_burst_write(&flash_ota, imageProcessor->flash_addr + 32 + imageProcessor->size, imageProcessor->block_len,
+                                  imageProcessor->mBlock.data()) < 0)
             {
                 device_mutex_unlock(RT_DEV_LOCK_FLASH);
                 ChipLogError(SoftwareUpdate, "Write to flash failed");
@@ -392,4 +395,4 @@ CHIP_ERROR AmebaOTAImageProcessor::ReleaseBlock()
     mBlock = MutableByteSpan();
     return CHIP_NO_ERROR;
 }
-} // namespace chip*
+} // namespace chip

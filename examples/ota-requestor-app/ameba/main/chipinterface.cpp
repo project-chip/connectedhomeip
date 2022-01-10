@@ -29,19 +29,19 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Ameba/AmebaOTAImageProcessor.h"
+#include "platform/GenericOTARequestorDriver.h"
 
 void * __dso_handle = 0;
 
+using chip::AmebaOTAImageProcessor;
 using chip::BDXDownloader;
 using chip::ByteSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
-using chip::AmebaOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
@@ -107,7 +107,7 @@ extern "C" void ChipTest(void)
     initPref();
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    err                           = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
