@@ -23,17 +23,24 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    # TODO: Enable test and update response value when SDK supports.
-    - label: "Reads the ChannelList attribute from the DUT"
+    #issue 13412 TODO: Enable test and update response value when SDK supports.
+    - label: "Read attribute Channel list"
       disabled: true
       command: "readAttribute"
-      attribute: "channel list"
+      attribute: "Channel list"
       response:
           value:
               [
                   {
                       majorNumber: 1,
                       minorNumber: 2,
+                      name: "exampleName",
+                      callSign: "exampleCSign",
+                      affiliateCallSign: "exampleASign",
+                  },
+                  {
+                      majorNumber: 2,
+                      minorNumber: 3,
                       name: "exampleName",
                       callSign: "exampleCSign",
                       affiliateCallSign: "exampleASign",

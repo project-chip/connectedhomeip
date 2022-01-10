@@ -23,9 +23,9 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    - label: "reads current Level attribute from DUT"
+    - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current Level"
+      attribute: "current level"
       response:
           value: 254
 
@@ -62,9 +62,9 @@ tests:
               - name: "ms"
                 value: 100
 
-    - label: "reads current Level attribute from DUT"
+    - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current Level"
+      attribute: "current level"
       response:
           value: 64
 
@@ -89,9 +89,9 @@ tests:
               - name: "ms"
                 value: 200
 
-    - label: "reads current Level attribute from DUT"
+    - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current Level"
+      attribute: "current level"
       response:
           value: 128
 
@@ -122,9 +122,9 @@ tests:
               - name: "ms"
                 value: 10
 
-    - label: "reads current Level attribute from DUT"
+    - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
-      attribute: "current Level"
+      attribute: "current level"
       response:
           value: 254
 

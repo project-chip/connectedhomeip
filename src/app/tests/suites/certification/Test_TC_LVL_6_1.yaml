@@ -27,36 +27,32 @@ tests:
       cluster: "On/Off"
       command: "on"
 
-    - label: "Precondition: DUT level is set to 0x80"
-      command: "Step"
+    - label: "Precondition: set DUT to lowest point"
+      command: "MoveToLevel"
       arguments:
           values:
-              - name: "stepMode"
+              - name: "level"
                 value: 0
-              - name: "stepSize"
-                value: 128
               - name: "transitionTime"
-                value: 20
+                value: 0
               - name: "optionMask"
-                value: 0
+                value: 1
               - name: "optionOverride"
-                value: 0
+                value: 1
 
-    - label: "Wait 3000ms"
+    - label: "Wait 100ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 100
 
-    #Disabling as current level value read was returning null on darwin build.
-    - label: "Reads current level attribute from DUT"
-      disabled: true
+    - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 128
+          value: 0
 
     - label: "Sends a move up command to DUT"
       command: "Move"
@@ -71,13 +67,13 @@ tests:
               - name: "optionOverride"
                 value: 1
 
-    - label: "Wait 3000ms"
+    - label: "Wait 2000ms"
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
           values:
               - name: "ms"
-                value: 3000
+                value: 2000
 
     - label: "Sends stop command to DUT"
       command: "Stop"
@@ -88,13 +84,32 @@ tests:
               - name: "optionOverride"
                 value: 0
 
-    #Disabling as current level value read was inconsistent when running test case multiple times.
-    - label: "Reads current level attribute from DUT"
-      disabled: true
+    - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 133
+          value: 2
+
+    - label: "Reset level to 254"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
     - label: "Sending off command"
       cluster: "On/Off"

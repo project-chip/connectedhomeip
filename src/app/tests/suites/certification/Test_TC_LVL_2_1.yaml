@@ -23,13 +23,11 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    #Disabled due to issue - #11670
     - label: "Reads the CurrentLevel attribute"
-      disabled: true
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: null
+          value: 254
 
     - label: "Reads the CurrentLevel attribute"
       command: "readAttribute"
@@ -93,7 +91,7 @@ tests:
           constraints:
               type: uint16
 
-    #Disabled due to issue - #11670
+    #Disabled due to issue - #13414
     - label: "Reads the OnLevel attribute "
       disabled: true
       command: "readAttribute"
@@ -108,7 +106,7 @@ tests:
           constraints:
               type: uint8
 
-    #Disabled due to issue - #11670
+    #Disabled due to issue - #13414
     - label: "Reads the OnTransitionTime attribute "
       disabled: true
       command: "readAttribute"
@@ -123,7 +121,7 @@ tests:
           constraints:
               type: uint16
 
-    #Disabled due to issue - #11670
+    #Disabled due to issue - #13414
     - label: "Reads the OffTransitionTime attribute "
       disabled: true
       command: "readAttribute"
