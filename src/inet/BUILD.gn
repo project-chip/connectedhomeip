@@ -24,7 +24,7 @@ import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 import("inet.gni")
 
-if (chip_system_config_use_ot_udp) {
+if (chip_system_config_use_open_thread_udp) {
   import("//build_overrides/openthread.gni")
 }
 
@@ -55,9 +55,10 @@ buildconfig_header("inet_buildconfig") {
   }
 
   defines += [ "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>" ]
-  if (chip_system_config_use_ot_udp) {
-    defines +=
-        [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImplOT.h>" ]
+  if (chip_system_config_use_open_thread_udp) {
+    defines += [
+      "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl_OpenThread.h>",
+    ]
   } else {
     defines += [ "INET_UDP_END_POINT_IMPL_CONFIG_FILE=<inet/UDPEndPointImpl${chip_system_config_inet}.h>" ]
   }
@@ -112,7 +113,7 @@ static_library("inet") {
     public_deps += [ "${chip_root}/src/lwip" ]
   }
 
-  if (chip_system_config_use_ot_udp) {
+  if (chip_system_config_use_open_thread_udp) {
     if (chip_openthread_ftd) {
       public_deps +=
           [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
@@ -139,10 +140,10 @@ static_library("inet") {
       "UDPEndPointImpl.h",
     ]
 
-    if (chip_system_config_use_ot_udp) {
+    if (chip_system_config_use_open_thread_udp) {
       sources += [
-        "UDPEndPointImplOT.cpp",
-        "UDPEndPointImplOT.h",
+        "UDPEndPointImpl_OpenThread.cpp",
+        "UDPEndPointImpl_OpenThread.h",
       ]
     } else {
       sources += [

@@ -17,18 +17,13 @@
  *    limitations under the License.
  */
 
-/**
- * This file implements Inet::UDPEndPoint using OpenThread.
- */
-
-#include <inet/UDPEndPointImplOT.h>
+#include <inet/UDPEndPointImpl_OpenThread.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
-//#include <include/platform/ThreadStackManager.h>
 
 #include <system/SystemPacketBuffer.h>
 

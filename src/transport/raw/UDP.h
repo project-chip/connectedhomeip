@@ -34,9 +34,9 @@
 #include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 struct otInstance;
-#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 
 namespace chip {
 namespace Transport {
@@ -75,26 +75,20 @@ public:
         return *this;
     }
 
-private:
-    Inet::EndPointManager<Inet::UDPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
-    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
-    uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
-    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
-
-#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
-public:
-    otInstance * GetOtInstance() const { return mOtInstance; }
-    UdpListenParameters & SetOtInstance(otInstance * instance)
+    void * GetNativeParams() const { return mNativeParams; }
+    UdpListenParameters & SetNativeParams(void * params)
     {
-        mOtInstance = instance;
+        mNativeParams = params;
 
         return *this;
     }
 
 private:
-    otInstance * mOtInstance = nullptr;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
+    Inet::EndPointManager<Inet::UDPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
+    Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
+    uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
+    Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
+    void * mNativeParams             = nullptr;
 };
 
 /** Implements a transport using UDP. */

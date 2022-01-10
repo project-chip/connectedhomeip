@@ -17,10 +17,6 @@
  *    limitations under the License.
  */
 
-/**
- * This file declares an implementation of Inet::UDPEndPoint using sockets.
- */
-
 #pragma once
 
 #include <inet/UDPEndPoint.h>
@@ -47,7 +43,7 @@ public:
     uint16_t GetBoundPort() const override;
     void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    inline void SetOtInstance(otInstance * instance) { mOTInstance = instance; }
+    inline void SetNativeParams(otInstance * params) { mOTInstance = static_cast<otInstance *>(params); }
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 

@@ -233,7 +233,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
 
 // Multicast won't work with LWIP on top of OT
 // Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
-#if CHIP_SYSTEM_CONFIG_USE_OT_UDP
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
             // Refresh Multicast listening
             if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
             {
@@ -262,7 +262,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                     }
                 }
             }
-#endif // CHIP_SYSTEM_CONFIG_USE_OT_UDP
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");

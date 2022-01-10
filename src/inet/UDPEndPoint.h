@@ -247,7 +247,7 @@ public:
      */
     virtual void Free() = 0;
 
-    virtual inline void SetOtInstance(otInstance * instance) { (void) instance; }
+    virtual inline void SetNativeParams(void * params) { (void) params; }
 
 protected:
     UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
