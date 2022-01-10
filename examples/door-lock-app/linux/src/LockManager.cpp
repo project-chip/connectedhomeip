@@ -43,17 +43,21 @@ bool LockManager::Unlock(chip::Optional<chip::ByteSpan> pin)
 
 bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    userIndex = userIndex - 1;
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetUser [endpoint=%d,userIndex=%hu]", endpointId, userIndex);
 
-    if (userIndex > mLockUsers.size())
+    uint16_t adjustedUserIndex = userIndex - 1;
+    if (adjustedUserIndex > mLockUsers.size())
     {
+        ChipLogError(Zcl, "Cannot get user - index out of range [endpoint=%d,index=%hu,adjustedIndex=%d]", endpointId, userIndex,
+                     adjustedUserIndex);
         return false;
     }
 
-    const auto & userInDb = mLockUsers[userIndex];
+    const auto & userInDb = mLockUsers[adjustedUserIndex];
     user.userStatus       = userInDb.userStatus;
     if (DlUserStatus::kAvailable == user.userStatus)
     {
+        ChipLogDetail(Zcl, "Found unoccupied user [endpoint=%d,adjustedIndex=%hu]", endpointId, adjustedUserIndex);
         return true;
     }
 
@@ -65,6 +69,14 @@ bool LockManager::GetUser(chip::EndpointId endpointId, uint16_t userIndex, Ember
     user.createdBy      = userInDb.createdBy;
     user.lastModifiedBy = userInDb.lastModifiedBy;
 
+    ChipLogDetail(Zcl,
+                  "Found occupied user "
+                  "[endpoint=%d,adjustedIndex=%hu,name=\"%*.s\",credentialsCount=%zu,uniqueId=%x,type=%hhu,credentialRule=%hhu,"
+                  "createdBy=%d,lastModifiedBy=%d]",
+                  endpointId, adjustedUserIndex, static_cast<int>(user.userName.size()), user.userName.data(),
+                  user.credentials.size(), user.userUniqueId, user.userType, user.credentialRule, user.createdBy,
+                  user.lastModifiedBy);
+
     return true;
 }
 
@@ -72,14 +84,22 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
                           const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
                           DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
 {
-    userIndex = userIndex - 1;
+    ChipLogProgress(Zcl,
+                    "Door Lock App: LockManager::SetUser "
+                    "[endpoint=%d,userIndex=%hu,creator=%d,modifier=%d,userName=\"%*.s\",uniqueId=%x,userStatus=%hhu,userType=%hhu,"
+                    "credentialRule=%hhu,credentials=%p,totalCredentials=%zu]",
+                    endpointId, userIndex, creator, modifier, static_cast<int>(userName.size()), userName.data(), uniqueId,
+                    userStatus, usertype, credentialRule, credentials, totalCredentials);
 
-    if (userIndex > mLockUsers.size())
+    uint16_t adjustedUserIndex = userIndex - 1;
+    if (adjustedUserIndex > mLockUsers.size())
     {
+        ChipLogError(Zcl, "Cannot set user - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%hu]", endpointId,
+                     userIndex, adjustedUserIndex);
         return false;
     }
 
-    auto & userInStorage = mLockUsers[userIndex];
+    auto & userInStorage = mLockUsers[adjustedUserIndex];
 
     strncpy(userInStorage.userName, userName.data(), userName.size());
     userInStorage.userUniqueId   = uniqueId;
@@ -95,49 +115,76 @@ bool LockManager::SetUser(chip::EndpointId endpointId, uint16_t userIndex, chip:
         userInStorage.credentials[i] = credentials[i];
     }
 
+    ChipLogProgress(Zcl, "Successfully set the user [endpointId=%d,index=%d,adjustedIndex=%d]", endpointId, userIndex,
+                    adjustedUserIndex);
+
     return true;
 }
 
 bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                                 EmberAfPluginDoorLockCredentialInfo & credential)
 {
-    credentialIndex = credentialIndex - 1;
+    ChipLogProgress(Zcl, "Door Lock App: LockManager::GetCredential [endpoint=%d,credentialIndex=%hu,credentialType=%hhu]",
+                    endpointId, credentialIndex, credentialType);
 
-    if (credentialIndex > mLockCredentials.size())
+    uint16_t adjustedCredentialIndex = credentialIndex - 1;
+    if (adjustedCredentialIndex > mLockCredentials.size())
     {
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%hu]", endpointId,
+                     credentialIndex, adjustedCredentialIndex);
         return false;
     }
 
-    const auto & credentialInStorage = mLockCredentials[credentialIndex];
+    const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
 
     credential.status = credentialInStorage.status;
-    if (DlCredentialStatus::kAvailable != credential.status)
+    if (DlCredentialStatus::kAvailable == credential.status)
     {
-        credential.credentialType = credentialInStorage.credentialType;
-        credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,adjustedIndex=%hu]", endpointId, adjustedCredentialIndex);
+        return true;
     }
+    credential.credentialType = credentialInStorage.credentialType;
+    credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
+
+    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,adjustedIndex=%hu,type=%hhu,dataSize=%zu]", endpointId,
+                  adjustedCredentialIndex, credential.credentialType, credential.credentialData.size());
+
     return true;
 }
 
 bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
                                 DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    credentialIndex = credentialIndex - 1;
+    ChipLogProgress(Zcl,
+                    "Door Lock App: LockManager::GetCredential "
+                    "[endpoint=%d,credentialIndex=%hu,credentialStatus=%hhu,credentialType=%hhu,credentialDataSize=%zu]",
+                    endpointId, credentialIndex, credentialStatus, credentialType, credentialData.size());
 
-    if (credentialIndex > mLockCredentials.size())
+    uint16_t adjustedCredentialIndex = credentialIndex - 1;
+    if (adjustedCredentialIndex > mLockCredentials.size())
     {
+        ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%hu]", endpointId,
+                     credentialIndex, adjustedCredentialIndex);
         return false;
     }
 
-    auto & credentialInStorage = mLockCredentials[credentialIndex];
+    auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
+        ChipLogError(Zcl,
+                     "Cannot get the credential - data size exceeds limit "
+                     "[endpoint=%d,index=%d,adjustedUserIndex=%hu,dataSize=%zu,maxDataSize=%zu]",
+                     endpointId, credentialIndex, adjustedCredentialIndex, credentialData.size(),
+                     DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
         return false;
     }
     credentialInStorage.status         = credentialStatus;
     credentialInStorage.credentialType = credentialType;
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
+
+    ChipLogProgress(Zcl, "Successfully set the user [endpointId=%d,index=%d,adjustedIndex=%d,credentialType=%hhu]", endpointId, credentialIndex,
+                    adjustedCredentialIndex, credentialType);
 
     return true;
 }
