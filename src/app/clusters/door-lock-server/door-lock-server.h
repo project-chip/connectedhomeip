@@ -29,14 +29,6 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
-#ifndef DOOR_LOCK_SERVER_ENDPOINT
-#define DOOR_LOCK_SERVER_ENDPOINT 1
-#endif
-
-#ifndef DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION
-#define DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION 1
-#endif
-
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDoorState;

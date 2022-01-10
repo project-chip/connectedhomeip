@@ -1809,105 +1809,34 @@ emberAfPluginDoorLockOnUnhandledAttributeChange(chip::EndpointId EndpointId, Emb
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-#if DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION
+// =============================================================================
+// Users and credentials access callbacks
+// =============================================================================
 
-struct UserInfo
+bool __attribute__((weak))
+emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
 {
-    char userName[DOOR_LOCK_USER_NAME_BUFFER_SIZE];
-    DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
-    size_t totalCredentials;
-    uint32_t userUniqueId;
-    DlUserStatus userStatus;
-    DlUserType userType;
-    DlCredentialRule credentialRule;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex lastModifiedBy;
-};
-
-static UserInfo gs_users[10];
-
-bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
-{
-    const auto & userInDb = gs_users[userIndex];
-    user.userStatus       = userInDb.userStatus;
-    if (DlUserStatus::kAvailable == user.userStatus)
-    {
-        return true;
-    }
-
-    user.userName       = chip::CharSpan(userInDb.userName, strlen(userInDb.userName));
-    user.credentials    = chip::Span<const DlCredential>(userInDb.credentials, userInDb.totalCredentials);
-    user.userUniqueId   = userInDb.userUniqueId;
-    user.userType       = userInDb.userType;
-    user.credentialRule = userInDb.credentialRule;
-    user.createdBy      = userInDb.createdBy;
-    user.lastModifiedBy = userInDb.lastModifiedBy;
-
-    return true;
+    return false;
 }
 
-bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
-                                  chip::FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus,
-                                  DlUserType usertype, DlCredentialRule credentialRule, const DlCredential * credentials,
-                                  size_t totalCredentials)
+bool __attribute__((weak))
+emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
+                             const chip::CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus, DlUserType usertype,
+                             DlCredentialRule credentialRule, const DlCredential * credentials, size_t totalCredentials)
 {
-    strncpy(gs_users[userIndex].userName, userName.data(), userName.size());
-    gs_users[userIndex].userUniqueId   = uniqueId;
-    gs_users[userIndex].userStatus     = userStatus;
-    gs_users[userIndex].userType       = usertype;
-    gs_users[userIndex].credentialRule = credentialRule;
-    gs_users[userIndex].lastModifiedBy = modifier;
-    gs_users[userIndex].createdBy      = creator;
-
-    gs_users[userIndex].totalCredentials = totalCredentials;
-    for (size_t i = 0; i < totalCredentials; ++i)
-    {
-        gs_users[userIndex].credentials[i] = credentials[i];
-    }
-
-    return true;
+    return false;
 }
 
-static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
-
-struct CredentialInfo
+bool __attribute__((weak))
+emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                   EmberAfPluginDoorLockCredentialInfo & credential)
 {
-    DlCredentialStatus status;
-    DlCredentialType credentialType;
-    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
-    size_t credentialDataSize;
-};
-
-static CredentialInfo gs_credentials[10];
-
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
-                                        EmberAfPluginDoorLockCredentialInfo & credential)
-{
-    auto & credentialInStorage = gs_credentials[credentialIndex];
-
-    credential.status = credentialInStorage.status;
-    if (DlCredentialStatus::kAvailable != credential.status)
-    {
-        credential.credentialType = credentialInStorage.credentialType;
-        credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
-    }
-    return true;
+    return false;
 }
 
-bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+bool __attribute__((weak))
+emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+                                   DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
-    auto & credentialInStorage = gs_credentials[credentialIndex];
-
-    if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
-    {
-        return false;
-    }
-    credentialInStorage.status         = credentialStatus;
-    credentialInStorage.credentialType = credentialType;
-    std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
-    credentialInStorage.credentialDataSize = credentialData.size();
-
-    return true;
+    return false;
 }
-#endif /* DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION */
