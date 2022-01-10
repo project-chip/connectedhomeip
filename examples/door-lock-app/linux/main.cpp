@@ -41,6 +41,33 @@ bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip:
     return LockManager::Instance().Unlock(pinCode);
 }
 
+bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user)
+{
+    return LockManager::Instance().GetUser(endpointId, userIndex, user);
+}
+
+bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
+                                  chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
+                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
+                                  const DlCredential * credentials, size_t totalCredentials)
+{
+
+    return LockManager::Instance().SetUser(endpointId, userIndex, creator, modifier, userName, uniqueId, userStatus, usertype,
+                                           credentialRule, credentials, totalCredentials);
+}
+
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
+{
+    return LockManager::Instance().GetCredential(endpointId, credentialIndex, credentialType, credential);
+}
+
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
+                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+{
+    return LockManager::Instance().SetCredential(endpointId, credentialIndex, credentialStatus, credentialType, credentialData);
+}
+
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type,
                                        uint16_t size, uint8_t * value)
 {
