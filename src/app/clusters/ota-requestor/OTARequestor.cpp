@@ -200,7 +200,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     }
 
     mProviderNodeId      = providerNodeId;
-    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
     mProviderEndpointId  = providerEndpoint;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
