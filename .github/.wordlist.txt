@@ -729,6 +729,7 @@ OTARequesterImpl
 OTARequestor
 OTARequestorDriver
 OTARequestorSerialPort
+otar
 otasoftwareupdaterequestor
 OTBR
 otcli
